@@ -90,8 +90,8 @@ export default function HabitTracker() {
   const weekDays = useMemo(() => {
     const today = new Date();
     const days = [];
-    // Show 7 days total (-3 to +3) but container will show ~5 fully visible
-    for (let i = -3; i <= 3; i++) {
+    // Show 6 days total (-2 to +3) for better spacing
+    for (let i = -2; i <= 3; i++) {
       days.push(addDays(today, i));
     }
     return days;
@@ -144,7 +144,7 @@ export default function HabitTracker() {
           <Button
             variant="ghost"
             size="sm"
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 p-1 h-6 w-6 bg-background/80 hover:bg-background border border-border/50 rounded-full shadow-sm"
+            className="absolute -left-2 top-1/2 -translate-y-1/2 z-10 p-1 h-6 w-6 bg-background/80 hover:bg-background border border-border/50 rounded-full shadow-sm"
             onClick={scrollLeft}
           >
             <ChevronLeft size={12} />
@@ -152,7 +152,7 @@ export default function HabitTracker() {
           <Button
             variant="ghost"
             size="sm"
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 p-1 h-6 w-6 bg-background/80 hover:bg-background border border-border/50 rounded-full shadow-sm"
+            className="absolute -right-2 top-1/2 -translate-y-1/2 z-10 p-1 h-6 w-6 bg-background/80 hover:bg-background border border-border/50 rounded-full shadow-sm"
             onClick={scrollRight}
           >
             <ChevronRight size={12} />

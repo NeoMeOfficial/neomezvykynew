@@ -30,7 +30,7 @@ export const WeekDay = memo<WeekDayProps>(({
       <button
         ref={buttonRef}
         onClick={onClick}
-        className={`relative w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 shadow-sm ${
+        className={`relative w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 shadow-sm ${
           isToday 
             ? 'bg-amber-900 text-white ring-2 ring-amber-900/30' 
             : isSelected 
@@ -43,7 +43,7 @@ export const WeekDay = memo<WeekDayProps>(({
         </span>
       </button>
       <div
-        className="w-10 bg-muted rounded-full h-0.5 mt-0.5 overflow-hidden"
+        className="w-12 bg-muted rounded-full h-0.5 mt-0.5 overflow-hidden"
         aria-label={`Progress: ${Math.round(completionPercentage)}%`}
       >
         <div
