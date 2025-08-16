@@ -43,7 +43,7 @@ export const WeekDay = memo<WeekDayProps>(({
         </span>
       </button>
       <div
-        className="w-12 bg-muted rounded-full h-0.5 mt-0.5 overflow-hidden"
+        className="w-12 bg-muted rounded-full h-0.5 mt-2 overflow-hidden"
         aria-label={`Progress: ${Math.round(completionPercentage)}%`}
       >
         <div
