@@ -140,11 +140,25 @@ export default function HabitTracker() {
                 <p className="text-sm text-muted-foreground">
                   {completedHabits.length} z {upcomingHabits.length + completedHabits.length} dokončených
                 </p>
-                <DialogTrigger asChild>
-                  <Button variant="ghost" size="sm" className="p-2 bg-amber-100 hover:bg-amber-200 border border-amber-200 rounded-xl shadow-sm" onClick={() => setShowMonthlyCalendar(true)}>
-                    <Calendar size={20} className="text-foreground" />
-                  </Button>
-                </DialogTrigger>
+                <Dialog open={showMonthlyCalendar} onOpenChange={setShowMonthlyCalendar}>
+                  <DialogTrigger asChild>
+                    <Button variant="ghost" size="sm" className="p-2 bg-amber-100 hover:bg-amber-200 border border-amber-200 rounded-xl shadow-sm">
+                      <Calendar size={20} className="text-foreground" />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Mesačný pohľad</DialogTitle>
+                    </DialogHeader>
+                    <MonthlyCalendar
+                      habitData={habitData}
+                      selectedMonth={monthlyCalendarDate}
+                      onMonthChange={setMonthlyCalendarDate}
+                      habits={habits}
+                      formatDate={formatDate}
+                    />
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
             {upcomingHabits.map(habit => (
@@ -189,20 +203,6 @@ export default function HabitTracker() {
           )}
         </div>
 
-        <Dialog open={showMonthlyCalendar} onOpenChange={setShowMonthlyCalendar}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Mesačný pohľad</DialogTitle>
-            </DialogHeader>
-            <MonthlyCalendar
-              habitData={habitData}
-              selectedMonth={monthlyCalendarDate}
-              onMonthChange={setMonthlyCalendarDate}
-              habits={habits}
-              formatDate={formatDate}
-            />
-          </DialogContent>
-        </Dialog>
       </div>
     </div>
   );
