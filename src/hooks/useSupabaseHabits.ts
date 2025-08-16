@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
 
 export interface Habit {
   id: string;
@@ -11,12 +10,11 @@ export interface Habit {
   unit: string;
 }
 
-export const useSupabaseHabits = () => {
+export const useSupabaseHabits = (onSuccess?: () => void) => {
   const [habitData, setHabitData] = useState<Record<string, Record<string, number>>>({});
   const [loading, setLoading] = useState(true);
   const [connected, setConnected] = useState(false);
   const [userId, setUserId] = useState<string>('');
-  const { toast } = useToast();
 
   const habits: Habit[] = [
     { 
@@ -178,13 +176,11 @@ export const useSupabaseHabits = () => {
           console.error('Error saving to database:', error);
           setConnected(false);
         } else {
-          setTimeout(() => {
-            const habit = habits.find(h => h.id === habitId);
-            toast({
-              title: "✓",
-              duration: 1000,
-            });
-          }, 800);
+          if (onSuccess) {
+            setTimeout(() => {
+              onSuccess();
+            }, 100);
+          }
         }
       } catch (error) {
         console.error('Database save failed:', error);
@@ -192,15 +188,13 @@ export const useSupabaseHabits = () => {
       }
     } else {
       // Show localStorage save confirmation
-      setTimeout(() => {
-        const habit = habits.find(h => h.id === habitId);
-        toast({
-          title: "✓",
-          duration: 1000,
-        });
-      }, 800);
+      if (onSuccess) {
+        setTimeout(() => {
+          onSuccess();
+        }, 100);
+      }
     }
-  }, [habits, toast, connected, userId]);
+  }, [habits, onSuccess, connected, userId]);
 
   return {
     habits,

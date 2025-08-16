@@ -7,6 +7,7 @@ import { WeekDay } from './WeekDay';
 import { HabitCard } from './HabitCard';
 import { MonthlyCalendar } from './MonthlyCalendar';
 import { ConnectionStatus } from './ConnectionStatus';
+import { SuccessIndicator } from './SuccessIndicator';
 
 const addDays = (date: Date, days: number): Date => {
   const newDate = new Date(date);
@@ -21,7 +22,16 @@ const isSameDay = (date1: Date, date2: Date): boolean => {
 };
 
 export default function HabitTracker() {
-  const { habits, habitData, loading, connected, updateHabitProgress, formatDate, startOfDay } = useHabits();
+  const [showSuccessIndicator, setShowSuccessIndicator] = useState(false);
+  
+  const handleSuccess = useCallback(() => {
+    setShowSuccessIndicator(true);
+    setTimeout(() => {
+      setShowSuccessIndicator(false);
+    }, 1200);
+  }, []);
+  
+  const { habits, habitData, loading, connected, updateHabitProgress, formatDate, startOfDay } = useHabits(handleSuccess);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [anchorDate, setAnchorDate] = useState(new Date());
   const [monthlyCalendarDate, setMonthlyCalendarDate] = useState(new Date());
@@ -206,6 +216,8 @@ export default function HabitTracker() {
         </div>
 
         <ConnectionStatus connected={connected} />
+        
+        <SuccessIndicator show={showSuccessIndicator} />
 
       </div>
     </div>

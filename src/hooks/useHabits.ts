@@ -1,8 +1,11 @@
 // Legacy hook - use useSupabaseHabits for new implementations
-export { useSupabaseHabits as useHabits } from './useSupabaseHabits';
+import { useSupabaseHabits } from './useSupabaseHabits';
+
+export const useHabits = (onSuccess?: () => void) => {
+  return useSupabaseHabits(onSuccess);
+};
 
 import { useState, useEffect, useCallback } from 'react';
-import { useToast } from '@/hooks/use-toast';
 
 export interface Habit {
   id: string;
@@ -13,10 +16,9 @@ export interface Habit {
   unit: string;
 }
 
-export const useLocalHabits = () => {
+export const useLocalHabits = (onSuccess?: () => void) => {
   const [habitData, setHabitData] = useState<Record<string, Record<string, number>>>({});
   const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
 
   const habits: Habit[] = [
     { 
@@ -85,14 +87,12 @@ export const useLocalHabits = () => {
       return newData;
     });
 
-    setTimeout(() => {
-      const habit = habits.find(h => h.id === habitId);
-      toast({
-        title: "✓",
-        duration: 1000,
-      });
-    }, 800);
-  }, [habits, toast]);
+    if (onSuccess) {
+      setTimeout(() => {
+        onSuccess();
+      }, 100);
+    }
+  }, [onSuccess]);
 
   return {
     habits,
