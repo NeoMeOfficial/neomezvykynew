@@ -110,19 +110,8 @@ export default function HabitTracker() {
     }
   }, []);
 
-  const { upcomingHabits, completedHabits } = useMemo(() => {
-    const upcoming = [];
-    const completed = [];
-    
-    habits.forEach(habit => {
-      if (isHabitCompleted(habit.id, selectedDate)) {
-        completed.push(habit);
-      } else {
-        upcoming.push(habit);
-      }
-    });
-    
-    return { upcomingHabits: upcoming, completedHabits: completed };
+  const completedCount = useMemo(() => {
+    return habits.filter(habit => isHabitCompleted(habit.id, selectedDate)).length;
   }, [habits, selectedDate, isHabitCompleted]);
 
   if (loading) {
@@ -180,75 +169,43 @@ export default function HabitTracker() {
           </div>
         </div>
 
-        {upcomingHabits.length > 0 && (
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-foreground">Nadchádzajúce</h2>
-              <div className="flex items-center space-x-2">
-                <p className="text-sm text-muted-foreground">
-                  {completedHabits.length} z {upcomingHabits.length + completedHabits.length} dokončených
-                </p>
-                <Dialog open={showMonthlyCalendar} onOpenChange={setShowMonthlyCalendar}>
-                  <DialogTrigger asChild>
-                    <Button variant="ghost" size="sm" className="p-1.5 bg-amber-100 hover:bg-amber-200 border border-amber-200 rounded-xl shadow-sm">
-                      <Calendar size={20} className="text-foreground" />
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Mesačný pohľad</DialogTitle>
-                    </DialogHeader>
-                    <MonthlyCalendar
-                      habitData={habitData}
-                      selectedMonth={monthlyCalendarDate}
-                      onMonthChange={setMonthlyCalendarDate}
-                      habits={habits}
-                      formatDate={formatDate}
-                    />
-                  </DialogContent>
-                </Dialog>
-              </div>
-            </div>
-            {upcomingHabits.map(habit => (
-              <HabitCard
-                key={habit.id}
-                habit={habit}
-                progress={getHabitProgress(habit.id, selectedDate)}
-                streak={getStreak(habit.id)}
-                onProgressChange={(value) => updateHabitProgress(habit.id, selectedDate, value)}
-              />
-            ))}
-          </div>
-        )}
-
         <div className="space-y-1.5">
-          <h2 className="text-sm font-semibold text-foreground">Dnes dokončené</h2>
-          {completedHabits.length > 0 ? (
-            completedHabits.map(habit => (
-              <HabitCard
-                key={habit.id}
-                habit={habit}
-                progress={getHabitProgress(habit.id, selectedDate)}
-                streak={getStreak(habit.id)}
-                onProgressChange={(value) => updateHabitProgress(habit.id, selectedDate, value)}
-              />
-            ))
-          ) : (
-            <div className="w-full p-2 rounded-lg border-2 bg-muted border-border text-muted-foreground">
-              <div className="space-y-1">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2 flex-1">
-                    <span className="text-xl opacity-50">✨</span>
-                    <div className="text-left flex-1">
-                      <div className="font-medium text-sm">
-                        Aj dnes môžeš pre seba niečo spraviť
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-foreground">Moje návyky</h2>
+            <div className="flex items-center space-x-2">
+              <p className="text-sm text-muted-foreground">
+                {completedCount} z {habits.length} dokončených
+              </p>
+              <Dialog open={showMonthlyCalendar} onOpenChange={setShowMonthlyCalendar}>
+                <DialogTrigger asChild>
+                  <Button variant="ghost" size="sm" className="p-1.5 bg-amber-100 hover:bg-amber-200 border border-amber-200 rounded-xl shadow-sm">
+                    <Calendar size={20} className="text-foreground" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Mesačný pohľad</DialogTitle>
+                  </DialogHeader>
+                  <MonthlyCalendar
+                    habitData={habitData}
+                    selectedMonth={monthlyCalendarDate}
+                    onMonthChange={setMonthlyCalendarDate}
+                    habits={habits}
+                    formatDate={formatDate}
+                  />
+                </DialogContent>
+              </Dialog>
             </div>
-          )}
+          </div>
+          {habits.map(habit => (
+            <HabitCard
+              key={habit.id}
+              habit={habit}
+              progress={getHabitProgress(habit.id, selectedDate)}
+              streak={getStreak(habit.id)}
+              onProgressChange={(value) => updateHabitProgress(habit.id, selectedDate, value)}
+            />
+          ))}
         </div>
 
       </div>
