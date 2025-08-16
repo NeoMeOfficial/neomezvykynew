@@ -128,8 +128,8 @@ export default function HabitTracker() {
   return (
     <div className="bg-background p-1">
       <div className="max-w-md mx-auto space-y-2">
-        <div className="relative overflow-hidden">
-          <div ref={scrollRef} className="flex space-x-2 overflow-x-auto pb-1 px-1" style={{scrollbarWidth: 'none', msOverflowStyle: 'none', width: 'calc(5 * 3.5rem + 4 * 0.5rem)', margin: '0 auto'}}>
+        <div className="relative">
+          <div ref={scrollRef} className="flex justify-between w-full pb-1 px-1">
             {weekDays.map((date, index) => {
               const isToday = isSameDay(date, new Date());
               const isSelected = isSameDay(date, selectedDate);

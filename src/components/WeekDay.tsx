@@ -23,7 +23,7 @@ export const WeekDay = memo<WeekDayProps>(({
   buttonRef
 }) => {
   return (
-    <div className="flex flex-col items-center w-14">
+    <div className="flex flex-col items-center flex-1">
       <div className="text-xs font-medium mb-0.5 text-amber-900">
         {getDayName(date)}
       </div>
