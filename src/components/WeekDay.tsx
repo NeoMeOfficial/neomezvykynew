@@ -4,6 +4,7 @@ interface WeekDayProps {
   date: Date;
   isSelected: boolean;
   isToday: boolean;
+  isCentral: boolean;
   completionPercentage: number;
   onClick: () => void;
   buttonRef?: React.RefObject<HTMLButtonElement>;
@@ -18,6 +19,7 @@ export const WeekDay = memo<WeekDayProps>(({
   date, 
   isSelected, 
   isToday, 
+  isCentral,
   completionPercentage,
   onClick,
   buttonRef
@@ -30,12 +32,14 @@ export const WeekDay = memo<WeekDayProps>(({
       <button
         ref={buttonRef}
         onClick={onClick}
-        className={`relative w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 shadow-sm ${
-          isToday 
-            ? 'bg-amber-900 text-white ring-2 ring-amber-900/30' 
+        className={`relative rounded-full flex items-center justify-center transition-all duration-300 shadow-sm ${
+          isCentral
+            ? 'w-14 h-14 bg-amber-900 text-white ring-2 ring-amber-900/30 scale-105'
+            : isToday 
+            ? 'w-12 h-12 bg-amber-900 text-white ring-2 ring-amber-900/30' 
             : isSelected 
-            ? 'bg-amber-700 text-white shadow-md' 
-            : 'bg-muted text-amber-900'
+            ? 'w-12 h-12 bg-amber-700 text-white shadow-md' 
+            : 'w-12 h-12 bg-muted text-amber-900'
         }`}
       >
         <span className="relative z-10 text-sm font-bold">
@@ -43,7 +47,9 @@ export const WeekDay = memo<WeekDayProps>(({
         </span>
       </button>
       <div
-        className="w-12 bg-muted rounded-full h-0.5 mt-2 overflow-hidden"
+        className={`bg-muted rounded-full h-0.5 mt-2 overflow-hidden transition-all duration-300 ${
+          isCentral ? 'w-14' : 'w-12'
+        }`}
         aria-label={`Progress: ${Math.round(completionPercentage)}%`}
       >
         <div

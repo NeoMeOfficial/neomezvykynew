@@ -159,6 +159,7 @@ export default function HabitTracker() {
             {weekDays.map((date, index) => {
               const isToday = isSameDay(date, new Date());
               const isSelected = isSameDay(date, selectedDate);
+              const isCentral = index === 2; // Center position in the 6-day layout (-2 to +3)
               const completionPercentage = getDayCompletionPercentage(date);
               
               return (
@@ -167,6 +168,7 @@ export default function HabitTracker() {
                   date={date}
                   isSelected={isSelected}
                   isToday={isToday}
+                  isCentral={isCentral}
                   completionPercentage={completionPercentage}
                   onClick={() => setSelectedDate(date)}
                   buttonRef={isToday ? todayButtonRef : undefined}
