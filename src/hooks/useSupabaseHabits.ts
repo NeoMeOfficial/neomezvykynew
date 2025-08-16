@@ -181,9 +181,8 @@ export const useSupabaseHabits = () => {
           setTimeout(() => {
             const habit = habits.find(h => h.id === habitId);
             toast({
-              title: "✓ Anonymne uložené",
-              description: `${habit?.name}: ${value} ${habit?.unit}`,
-              duration: 1500,
+              title: "✓",
+              duration: 1000,
             });
           }, 800);
         }
@@ -196,9 +195,8 @@ export const useSupabaseHabits = () => {
       setTimeout(() => {
         const habit = habits.find(h => h.id === habitId);
         toast({
-          title: "✓ Lokálne uložené",
-          description: `${habit?.name}: ${value} ${habit?.unit}`,
-          duration: 1500,
+          title: "✓",
+          duration: 1000,
         });
       }, 800);
     }

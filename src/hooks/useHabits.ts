@@ -88,9 +88,8 @@ export const useLocalHabits = () => {
     setTimeout(() => {
       const habit = habits.find(h => h.id === habitId);
       toast({
-        title: "✓ Uložené",
-        description: `${habit?.name}: ${value} ${habit?.unit}`,
-        duration: 1500,
+        title: "✓",
+        duration: 1000,
       });
     }, 800);
   }, [habits, toast]);
