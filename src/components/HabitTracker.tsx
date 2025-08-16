@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
-import { Calendar, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Calendar, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useHabits } from '@/hooks/useHabits';
@@ -23,6 +23,7 @@ const isSameDay = (date1: Date, date2: Date): boolean => {
 export default function HabitTracker() {
   const { habits, habitData, loading, connected, updateHabitProgress, formatDate, startOfDay } = useHabits();
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [anchorDate, setAnchorDate] = useState(new Date());
   const [monthlyCalendarDate, setMonthlyCalendarDate] = useState(new Date());
   const [showMonthlyCalendar, setShowMonthlyCalendar] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -91,26 +92,14 @@ export default function HabitTracker() {
   }, [habits, getHabitProgress]);
 
   const weekDays = useMemo(() => {
-    const today = new Date();
     const days = [];
-    // Show 6 days total (-2 to +3) for better spacing
+    // Show 6 days total (-2 to +3) around the anchor date
     for (let i = -2; i <= 3; i++) {
-      days.push(addDays(today, i));
+      days.push(addDays(anchorDate, i));
     }
     return days;
-  }, []);
+  }, [anchorDate]);
 
-  const scrollLeft = useCallback(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollBy({ left: -100, behavior: 'smooth' });
-    }
-  }, []);
-
-  const scrollRight = useCallback(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollBy({ left: 100, behavior: 'smooth' });
-    }
-  }, []);
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
@@ -125,15 +114,9 @@ export default function HabitTracker() {
     const minSwipeDistance = 50;
 
     if (Math.abs(swipeDistance) > minSwipeDistance) {
-      if (swipeDistance > 0) {
-        // Swiped left, scroll right
-        scrollRight();
-      } else {
-        // Swiped right, scroll left
-        scrollLeft();
-      }
+      setAnchorDate((prev) => addDays(prev, swipeDistance > 0 ? 1 : -1));
     }
-  }, [scrollLeft, scrollRight]);
+  }, []);
 
   const completedCount = useMemo(() => {
     return habits.filter(habit => isHabitCompleted(habit.id, selectedDate)).length;
@@ -156,22 +139,6 @@ export default function HabitTracker() {
     <div className="bg-background p-1">
       <div className="max-w-md mx-auto space-y-2">
         <div className="relative">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="absolute -left-2 top-1/2 -translate-y-1/2 z-10 p-1 h-6 w-6 bg-background/80 hover:bg-background border border-border/50 rounded-full shadow-sm"
-            onClick={scrollLeft}
-          >
-            <ChevronLeft size={12} />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="absolute -right-2 top-1/2 -translate-y-1/2 z-10 p-1 h-6 w-6 bg-background/80 hover:bg-background border border-border/50 rounded-full shadow-sm"
-            onClick={scrollRight}
-          >
-            <ChevronRight size={12} />
-          </Button>
           <div 
             ref={scrollRef} 
             className="flex justify-between w-full pb-1 px-1"
