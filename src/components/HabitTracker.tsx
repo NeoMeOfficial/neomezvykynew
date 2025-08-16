@@ -90,7 +90,8 @@ export default function HabitTracker() {
   const weekDays = useMemo(() => {
     const today = new Date();
     const days = [];
-    for (let i = -6; i <= 6; i++) {
+    // Show 7 days total (-3 to +3) but container will show ~5 fully visible
+    for (let i = -3; i <= 3; i++) {
       days.push(addDays(today, i));
     }
     return days;
@@ -127,8 +128,8 @@ export default function HabitTracker() {
   return (
     <div className="bg-background p-1">
       <div className="max-w-md mx-auto space-y-2">
-        <div className="relative">
-          <div ref={scrollRef} className="flex space-x-2 overflow-x-auto pb-1 px-1" style={{scrollbarWidth: 'none', msOverflowStyle: 'none'}}>
+        <div className="relative overflow-hidden">
+          <div ref={scrollRef} className="flex space-x-2 overflow-x-auto pb-1 px-1" style={{scrollbarWidth: 'none', msOverflowStyle: 'none', width: 'calc(5 * 3.5rem + 4 * 0.5rem)', margin: '0 auto'}}>
             {weekDays.map((date, index) => {
               const isToday = isSameDay(date, new Date());
               const isSelected = isSameDay(date, selectedDate);
