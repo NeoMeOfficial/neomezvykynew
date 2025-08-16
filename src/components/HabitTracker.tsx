@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useRef } from 'react';
+import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { Calendar, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -20,14 +20,29 @@ const isSameDay = (date1: Date, date2: Date): boolean => {
 };
 
 export default function HabitTracker() {
-  console.log('HabitTracker component is rendering');
   const { habits, habitData, loading, updateHabitProgress, formatDate, startOfDay } = useHabits();
-  console.log('Habits data:', habits, 'Loading:', loading);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [monthlyCalendarDate, setMonthlyCalendarDate] = useState(new Date());
   const [showMonthlyCalendar, setShowMonthlyCalendar] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const todayButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Auto-center today's date when component loads
+  useEffect(() => {
+    if (todayButtonRef.current && scrollRef.current) {
+      const button = todayButtonRef.current;
+      const container = scrollRef.current;
+      const buttonLeft = button.offsetLeft;
+      const buttonWidth = button.offsetWidth;
+      const containerWidth = container.offsetWidth;
+      const scrollLeft = buttonLeft - (containerWidth / 2) + (buttonWidth / 2);
+      
+      container.scrollTo({
+        left: scrollLeft,
+        behavior: 'smooth'
+      });
+    }
+  }, [loading, habits]);
 
   const getHabitProgress = useCallback((habitId: string, date: Date) => {
     const dateStr = formatDate(startOfDay(date));
