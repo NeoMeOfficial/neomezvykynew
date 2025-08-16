@@ -179,7 +179,7 @@ export const useSupabaseHabits = (onSuccess?: () => void) => {
           if (onSuccess) {
             setTimeout(() => {
               onSuccess();
-            }, 100);
+            }, 200);
           }
         }
       } catch (error) {
@@ -191,7 +191,7 @@ export const useSupabaseHabits = (onSuccess?: () => void) => {
       if (onSuccess) {
         setTimeout(() => {
           onSuccess();
-        }, 100);
+        }, 200);
       }
     }
   }, [habits, onSuccess, connected, userId]);

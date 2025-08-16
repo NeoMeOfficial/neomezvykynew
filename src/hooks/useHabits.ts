@@ -90,7 +90,7 @@ export const useLocalHabits = (onSuccess?: () => void) => {
     if (onSuccess) {
       setTimeout(() => {
         onSuccess();
-      }, 100);
+      }, 200);
     }
   }, [onSuccess]);
 
