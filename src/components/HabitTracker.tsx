@@ -197,7 +197,7 @@ export default function HabitTracker() {
               return (
                 <div
                   key={index}
-                  className={`transition-all duration-200 ${
+                  className={`transition-all duration-100 ease-out ${
                     isRightmostWhenButtonShown ? 'invisible' : 
                     isEdge ? 'opacity-50 scale-75' : 'opacity-100 scale-100'
                   }`}
