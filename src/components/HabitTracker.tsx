@@ -103,8 +103,8 @@ export default function HabitTracker() {
 
   const weekDays = useMemo(() => {
     const days = [];
-    // Show 6 days total (-2 to +3) around the anchor date
-    for (let i = -2; i <= 3; i++) {
+    // Show 7 days total (-3 to +3) for 5 full days + half days on sides
+    for (let i = -3; i <= 3; i++) {
       days.push(addDays(anchorDate, i));
     }
     return days;
@@ -121,10 +121,13 @@ export default function HabitTracker() {
 
   const handleTouchEnd = useCallback(() => {
     const swipeDistance = touchStartX.current - touchEndX.current;
-    const minSwipeDistance = 50;
+    const minSwipeDistance = 30; // Reduced for faster response
+    const swipeVelocity = Math.abs(swipeDistance);
 
     if (Math.abs(swipeDistance) > minSwipeDistance) {
-      setAnchorDate((prev) => addDays(prev, swipeDistance > 0 ? 1 : -1));
+      // More responsive: larger swipes move multiple days
+      const daysToMove = swipeVelocity > 100 ? 2 : 1;
+      setAnchorDate((prev) => addDays(prev, swipeDistance > 0 ? daysToMove : -daysToMove));
     }
   }, []);
 
@@ -148,10 +151,15 @@ export default function HabitTracker() {
   return (
     <div className="bg-background p-1">
       <div className="max-w-md mx-auto space-y-2">
-        <div className="relative">
+        <div className="relative overflow-hidden">
           <div 
             ref={scrollRef} 
-            className="flex justify-between w-full pb-1 px-1"
+            className="flex justify-center w-full pb-1 px-4"
+            style={{ 
+              transform: 'translateX(0)',
+              gap: '8px',
+              maskImage: 'linear-gradient(to right, transparent 0%, black 20%, black 80%, transparent 100%)'
+            }}
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
@@ -159,20 +167,27 @@ export default function HabitTracker() {
             {weekDays.map((date, index) => {
               const isToday = isSameDay(date, new Date());
               const isSelected = isSameDay(date, selectedDate);
-              const isCentral = index === 2; // Center position in the 6-day layout (-2 to +3)
+              const isCentral = index === 3; // Center position in the 7-day layout (-3 to +3)
+              const isEdge = index === 0 || index === 6; // First and last items (half visible)
               const completionPercentage = getDayCompletionPercentage(date);
               
               return (
-                <WeekDay
+                <div
                   key={index}
-                  date={date}
-                  isSelected={isSelected}
-                  isToday={isToday}
-                  isCentral={isCentral}
-                  completionPercentage={completionPercentage}
-                  onClick={() => setSelectedDate(date)}
-                  buttonRef={isToday ? todayButtonRef : undefined}
-                />
+                  className={`transition-all duration-200 ${
+                    isEdge ? 'opacity-50 scale-75' : 'opacity-100 scale-100'
+                  }`}
+                >
+                  <WeekDay
+                    date={date}
+                    isSelected={isSelected}
+                    isToday={isToday}
+                    isCentral={isCentral}
+                    completionPercentage={completionPercentage}
+                    onClick={() => setSelectedDate(date)}
+                    buttonRef={isToday ? todayButtonRef : undefined}
+                  />
+                </div>
               );
             })}
           </div>
