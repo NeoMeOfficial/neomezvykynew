@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
-import { Calendar, Loader2 } from 'lucide-react';
+import { Calendar, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useHabits } from '@/hooks/useHabits';
@@ -97,6 +97,18 @@ export default function HabitTracker() {
     return days;
   }, []);
 
+  const scrollLeft = useCallback(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: -100, behavior: 'smooth' });
+    }
+  }, []);
+
+  const scrollRight = useCallback(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: 100, behavior: 'smooth' });
+    }
+  }, []);
+
   const { upcomingHabits, completedHabits } = useMemo(() => {
     const upcoming = [];
     const completed = [];
@@ -129,6 +141,22 @@ export default function HabitTracker() {
     <div className="bg-background p-1">
       <div className="max-w-md mx-auto space-y-2">
         <div className="relative">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 p-1 h-6 w-6 bg-background/80 hover:bg-background border border-border/50 rounded-full shadow-sm"
+            onClick={scrollLeft}
+          >
+            <ChevronLeft size={12} />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 p-1 h-6 w-6 bg-background/80 hover:bg-background border border-border/50 rounded-full shadow-sm"
+            onClick={scrollRight}
+          >
+            <ChevronRight size={12} />
+          </Button>
           <div ref={scrollRef} className="flex justify-between w-full pb-1 px-1">
             {weekDays.map((date, index) => {
               const isToday = isSameDay(date, new Date());
