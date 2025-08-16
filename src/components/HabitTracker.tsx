@@ -27,6 +27,8 @@ export default function HabitTracker() {
   const [showMonthlyCalendar, setShowMonthlyCalendar] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const todayButtonRef = useRef<HTMLButtonElement>(null);
+  const touchStartX = useRef<number>(0);
+  const touchEndX = useRef<number>(0);
 
   // Auto-center today's date when component loads
   useEffect(() => {
@@ -110,6 +112,29 @@ export default function HabitTracker() {
     }
   }, []);
 
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    touchEndX.current = e.touches[0].clientX;
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
+    const swipeDistance = touchStartX.current - touchEndX.current;
+    const minSwipeDistance = 50;
+
+    if (Math.abs(swipeDistance) > minSwipeDistance) {
+      if (swipeDistance > 0) {
+        // Swiped left, scroll right
+        scrollRight();
+      } else {
+        // Swiped right, scroll left
+        scrollLeft();
+      }
+    }
+  }, [scrollLeft, scrollRight]);
+
   const completedCount = useMemo(() => {
     return habits.filter(habit => isHabitCompleted(habit.id, selectedDate)).length;
   }, [habits, selectedDate, isHabitCompleted]);
@@ -147,7 +172,13 @@ export default function HabitTracker() {
           >
             <ChevronRight size={12} />
           </Button>
-          <div ref={scrollRef} className="flex justify-between w-full pb-1 px-1">
+          <div 
+            ref={scrollRef} 
+            className="flex justify-between w-full pb-1 px-1"
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+          >
             {weekDays.map((date, index) => {
               const isToday = isSameDay(date, new Date());
               const isSelected = isSameDay(date, selectedDate);
