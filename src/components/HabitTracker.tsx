@@ -110,6 +110,18 @@ export default function HabitTracker() {
     return days;
   }, [anchorDate]);
 
+  // Check if today is visible in current week view
+  const isTodayVisible = useMemo(() => {
+    const today = new Date();
+    return weekDays.some(date => isSameDay(date, today));
+  }, [weekDays]);
+
+  const goToToday = useCallback(() => {
+    const today = new Date();
+    setAnchorDate(today);
+    setSelectedDate(today);
+  }, []);
+
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
@@ -152,6 +164,15 @@ export default function HabitTracker() {
     <div className="bg-background p-1">
       <div className="max-w-md mx-auto space-y-2">
         <div className="relative overflow-hidden">
+          {!isTodayVisible && (
+            <Button
+              onClick={goToToday}
+              size="sm"
+              className="absolute top-2 right-2 z-10 bg-primary/90 hover:bg-primary text-primary-foreground px-3 py-1 text-xs rounded-full shadow-lg"
+            >
+              Dnes
+            </Button>
+          )}
           <div 
             ref={scrollRef} 
             className="flex justify-center w-full pb-1 px-4"
