@@ -6,7 +6,7 @@ interface ConnectionStatusProps {
 
 export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({ connected }) => {
   return (
-    <div className="flex items-center justify-center mb-2">
+    <div className="flex items-center justify-center mb-1">
       <div className="flex items-center space-x-2 text-xs text-muted-foreground">
         <div 
           className={`w-2 h-2 rounded-full ${
@@ -14,7 +14,7 @@ export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({ connected })
           }`}
         />
         <span>
-          {connected ? 'Pripojené k databáze' : 'Lokálne úložisko'}
+          {connected ? 'Uložené anonymne' : 'Lokálne úložisko'}
         </span>
       </div>
     </div>
