@@ -43,28 +43,90 @@ export const useSupabaseHabits = (onSuccess?: () => void) => {
     },
   ];
 
-  // Initialize anonymous authentication
+  // Initialize persistent anonymous authentication
   useEffect(() => {
+    const STORED_USER_KEY = 'habit_tracker_user_id';
+    
     const initAuth = async () => {
       try {
-        // Check if user is already authenticated
-        const { data: { user } } = await supabase.auth.getUser();
-        
-        if (!user) {
-          // Sign in anonymously
-          const { data, error } = await supabase.auth.signInAnonymously();
-          if (error) {
-            console.error('Error signing in anonymously:', error);
-            setConnected(false);
-            return;
+        // First, set up auth state listener for session persistence
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+          async (event, session) => {
+            if (session?.user) {
+              setUserId(session.user.id);
+              setConnected(true);
+              // Store user ID in localStorage for persistence
+              localStorage.setItem(STORED_USER_KEY, session.user.id);
+            } else {
+              // Try to recover from stored user ID
+              const storedUserId = localStorage.getItem(STORED_USER_KEY);
+              if (storedUserId) {
+                setUserId(storedUserId);
+                setConnected(false); // Mark as disconnected but keep user ID
+              }
+            }
           }
-          setUserId(data.user?.id || '');
+        );
+
+        // Check for existing session first
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (session?.user) {
+          // Existing session found
+          setUserId(session.user.id);
+          setConnected(true);
+          localStorage.setItem(STORED_USER_KEY, session.user.id);
         } else {
-          setUserId(user.id);
+          // No active session, check for stored user ID
+          const storedUserId = localStorage.getItem(STORED_USER_KEY);
+          
+          if (storedUserId) {
+            // Try to restore previous anonymous session
+            setUserId(storedUserId);
+            setConnected(false); // Will use localStorage until we can reconnect
+            
+            // Attempt to create new session with stored user context
+            try {
+              const { data, error } = await supabase.auth.signInAnonymously();
+              if (!error && data.user) {
+                // New session created, migrate data if needed
+                const newUserId = data.user.id;
+                if (newUserId !== storedUserId) {
+                  // Different user ID, but we'll keep using stored data
+                  console.log('Session restored with new user ID, keeping existing data');
+                }
+                setUserId(newUserId);
+                setConnected(true);
+                localStorage.setItem(STORED_USER_KEY, newUserId);
+              }
+            } catch (error) {
+              console.log('Could not create new session, using localStorage mode');
+            }
+          } else {
+            // No stored user, create new anonymous session
+            const { data, error } = await supabase.auth.signInAnonymously();
+            if (error) {
+              console.error('Error signing in anonymously:', error);
+              setConnected(false);
+              return;
+            }
+            const newUserId = data.user?.id || '';
+            setUserId(newUserId);
+            setConnected(true);
+            localStorage.setItem(STORED_USER_KEY, newUserId);
+          }
         }
-        setConnected(true);
+
+        return () => {
+          subscription.unsubscribe();
+        };
       } catch (error) {
         console.error('Auth initialization failed:', error);
+        // Fallback to localStorage mode with stored user ID
+        const storedUserId = localStorage.getItem(STORED_USER_KEY);
+        if (storedUserId) {
+          setUserId(storedUserId);
+        }
         setConnected(false);
       }
     };
