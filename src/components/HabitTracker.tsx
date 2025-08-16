@@ -168,7 +168,8 @@ export default function HabitTracker() {
             <Button
               onClick={goToToday}
               size="sm"
-              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 bg-primary/90 hover:bg-primary text-primary-foreground px-3 py-1 text-xs rounded-full shadow-lg"
+              className="absolute top-1/2 right-4 transform -translate-y-1/2 z-10 bg-primary/90 hover:bg-primary text-primary-foreground px-3 py-1 text-xs rounded-full shadow-lg"
+              style={{ right: 'calc(4px + 24px)' }}
             >
               Dnes
             </Button>
