@@ -168,7 +168,7 @@ export default function HabitTracker() {
             <Button
               onClick={goToToday}
               size="sm"
-              className="absolute top-2 right-2 z-10 bg-primary/90 hover:bg-primary text-primary-foreground px-3 py-1 text-xs rounded-full shadow-lg"
+              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 bg-primary/90 hover:bg-primary text-primary-foreground px-3 py-1 text-xs rounded-full shadow-lg"
             >
               Dnes
             </Button>
@@ -190,12 +190,14 @@ export default function HabitTracker() {
               const isSelected = isSameDay(date, selectedDate);
               const isCentral = index === 3; // Center position in the 7-day layout (-3 to +3)
               const isEdge = index === 0 || index === 6; // First and last items (half visible)
+              const isRightmostWhenButtonShown = !isTodayVisible && index === 6; // Hide rightmost day when button is shown
               const completionPercentage = getDayCompletionPercentage(date);
               
               return (
                 <div
                   key={index}
                   className={`transition-all duration-200 ${
+                    isRightmostWhenButtonShown ? 'invisible' : 
                     isEdge ? 'opacity-50 scale-75' : 'opacity-100 scale-100'
                   }`}
                 >
