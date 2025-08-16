@@ -15,7 +15,7 @@ export const useSupabaseHabits = () => {
   const [habitData, setHabitData] = useState<Record<string, Record<string, number>>>({});
   const [loading, setLoading] = useState(true);
   const [connected, setConnected] = useState(false);
-  const [anonymousUserId, setAnonymousUserId] = useState<string>('');
+  const [userId, setUserId] = useState<string>('');
   const { toast } = useToast();
 
   const habits: Habit[] = [
@@ -45,26 +45,45 @@ export const useSupabaseHabits = () => {
     },
   ];
 
-  // Generate anonymous user ID
+  // Initialize anonymous authentication
   useEffect(() => {
-    let userId = localStorage.getItem('anonymous_user_id');
-    if (!userId) {
-      userId = 'anon_' + Math.random().toString(36).substr(2, 16);
-      localStorage.setItem('anonymous_user_id', userId);
-    }
-    setAnonymousUserId(userId);
+    const initAuth = async () => {
+      try {
+        // Check if user is already authenticated
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (!user) {
+          // Sign in anonymously
+          const { data, error } = await supabase.auth.signInAnonymously();
+          if (error) {
+            console.error('Error signing in anonymously:', error);
+            setConnected(false);
+            return;
+          }
+          setUserId(data.user?.id || '');
+        } else {
+          setUserId(user.id);
+        }
+        setConnected(true);
+      } catch (error) {
+        console.error('Auth initialization failed:', error);
+        setConnected(false);
+      }
+    };
+
+    initAuth();
   }, []);
 
   // Load data from Supabase
   useEffect(() => {
     const loadData = async () => {
-      if (!anonymousUserId) return;
+      if (!userId) return;
       
       try {
         const { data: entries, error } = await supabase
           .from('habit_entries')
           .select('*')
-          .eq('user_id', anonymousUserId);
+          .eq('user_id', userId);
 
         if (error) {
           console.error('Error loading habit entries:', error);
@@ -109,7 +128,7 @@ export const useSupabaseHabits = () => {
     };
 
     loadData();
-  }, [anonymousUserId]);
+  }, [userId]);
 
   const formatDate = (date: Date): string => {
     const year = date.getFullYear();
@@ -142,12 +161,12 @@ export const useSupabaseHabits = () => {
     });
 
     // Try to save to Supabase
-    if (connected && anonymousUserId) {
+    if (connected && userId) {
       try {
         const { error } = await supabase
           .from('habit_entries')
           .upsert({
-            user_id: anonymousUserId,
+            user_id: userId,
             habit_id: habitId,
             date: dateStr,
             value: numValue
@@ -183,7 +202,7 @@ export const useSupabaseHabits = () => {
         });
       }, 800);
     }
-  }, [habits, toast, connected, anonymousUserId]);
+  }, [habits, toast, connected, userId]);
 
   return {
     habits,
