@@ -168,7 +168,7 @@ export default function HabitTracker() {
             <Button
               onClick={goToToday}
               size="sm"
-              className="absolute top-2 right-2 z-10 bg-primary/90 hover:bg-primary text-primary-foreground px-3 py-1 text-xs rounded-full shadow-lg"
+              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 bg-primary/90 hover:bg-primary text-primary-foreground px-3 py-1 text-xs rounded-full shadow-lg"
             >
               Dnes
             </Button>
@@ -197,7 +197,7 @@ export default function HabitTracker() {
                   key={index}
                   className={`transition-all duration-200 ${
                     isEdge ? 'opacity-50 scale-75' : 'opacity-100 scale-100'
-                  }`}
+                  } ${isCentral && !isTodayVisible ? 'invisible' : ''}`}
                 >
                   <WeekDay
                     date={date}
