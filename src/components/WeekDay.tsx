@@ -43,7 +43,7 @@ export const WeekDay = memo<WeekDayProps>(({
         }`}
       >
         <span className="relative z-10 text-sm font-bold">
-          {date.getDate()}
+          {date.getDate().toString().padStart(2, '0')}.{(date.getMonth() + 1).toString().padStart(2, '0')}
         </span>
       </button>
       <div
