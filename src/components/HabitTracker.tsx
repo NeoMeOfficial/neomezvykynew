@@ -6,6 +6,7 @@ import { useHabits } from '@/hooks/useHabits';
 import { WeekDay } from './WeekDay';
 import { HabitCard } from './HabitCard';
 import { MonthlyCalendar } from './MonthlyCalendar';
+import { ConnectionStatus } from './ConnectionStatus';
 
 const addDays = (date: Date, days: number): Date => {
   const newDate = new Date(date);
@@ -20,7 +21,7 @@ const isSameDay = (date1: Date, date2: Date): boolean => {
 };
 
 export default function HabitTracker() {
-  const { habits, habitData, loading, updateHabitProgress, formatDate, startOfDay } = useHabits();
+  const { habits, habitData, loading, connected, updateHabitProgress, formatDate, startOfDay } = useHabits();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [monthlyCalendarDate, setMonthlyCalendarDate] = useState(new Date());
   const [showMonthlyCalendar, setShowMonthlyCalendar] = useState(false);
@@ -140,6 +141,7 @@ export default function HabitTracker() {
   return (
     <div className="bg-background p-1">
       <div className="max-w-md mx-auto space-y-2">
+        <ConnectionStatus connected={connected} />
         <div className="relative">
           <Button
             variant="ghost"

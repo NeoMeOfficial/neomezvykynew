@@ -1,3 +1,6 @@
+// Legacy hook - use useSupabaseHabits for new implementations
+export { useSupabaseHabits as useHabits } from './useSupabaseHabits';
+
 import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -10,7 +13,7 @@ export interface Habit {
   unit: string;
 }
 
-export const useHabits = () => {
+export const useLocalHabits = () => {
   const [habitData, setHabitData] = useState<Record<string, Record<string, number>>>({});
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
