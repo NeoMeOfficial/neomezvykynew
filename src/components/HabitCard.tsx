@@ -27,7 +27,7 @@ export const HabitCard = memo<HabitCardProps>(({
       } ${isCompleted ? 'opacity-80' : ''}`}
     >
       <div
-        className={`w-full p-3 rounded-2xl border-2 ${
+        className={`w-full p-2 rounded-xl border-2 ${
           isCompleted 
             ? 'bg-background text-muted-foreground border-border'
             : 'text-foreground shadow-sm border-border'
@@ -37,7 +37,7 @@ export const HabitCard = memo<HabitCardProps>(({
           borderColor: !isCompleted ? `${habit.color}30` : undefined
         }}
       >
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2 flex-1">
               <span className="text-xl">{habit.emoji}</span>
@@ -68,7 +68,7 @@ export const HabitCard = memo<HabitCardProps>(({
             </div>
           </div>
           
-          <div className="w-full space-y-1.5">
+          <div className="w-full space-y-1">
             <CustomSlider
               value={[progress]}
               onValueChange={(value) => onProgressChange(value[0])}
@@ -79,7 +79,7 @@ export const HabitCard = memo<HabitCardProps>(({
             />
             
             {streak > 0 && (
-              <div className="flex items-center justify-center gap-1.5 text-amber-700">
+              <div className="flex items-center justify-center gap-1 text-amber-700">
                 <span aria-hidden className="text-sm">🏆</span>
                 <span className="font-medium text-xs">
                   {streak} {streak > 1 ? 'dní' : 'deň'} série!
