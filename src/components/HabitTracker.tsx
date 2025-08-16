@@ -130,7 +130,6 @@ export default function HabitTracker() {
   return (
     <div className="bg-background p-1">
       <div className="max-w-md mx-auto space-y-2">
-        <ConnectionStatus connected={connected} />
         <div className="relative">
           <Button
             variant="ghost"
@@ -207,6 +206,8 @@ export default function HabitTracker() {
             />
           ))}
         </div>
+
+        <ConnectionStatus connected={connected} />
 
       </div>
     </div>
