@@ -20,7 +20,9 @@ const isSameDay = (date1: Date, date2: Date): boolean => {
 };
 
 export default function HabitTracker() {
+  console.log('HabitTracker component is rendering');
   const { habits, habitData, loading, updateHabitProgress, formatDate, startOfDay } = useHabits();
+  console.log('Habits data:', habits, 'Loading:', loading);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [monthlyCalendarDate, setMonthlyCalendarDate] = useState(new Date());
   const [showMonthlyCalendar, setShowMonthlyCalendar] = useState(false);
