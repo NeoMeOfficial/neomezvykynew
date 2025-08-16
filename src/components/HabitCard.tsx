@@ -30,10 +30,10 @@ export const HabitCard = memo<HabitCardProps>(({
         className={`w-full p-3 rounded-2xl border-2 ${
           isCompleted 
             ? 'bg-background text-muted-foreground border-border'
-            : 'bg-gradient-to-r from-muted to-muted/50 text-foreground shadow-sm border-border'
+            : 'text-foreground shadow-sm border-border'
         }`}
         style={{
-          backgroundImage: !isCompleted ? `linear-gradient(to right, hsl(var(--muted)), ${habit.color}20)` : undefined,
+          backgroundImage: !isCompleted ? `linear-gradient(to right, white, ${habit.color}20)` : undefined,
           borderColor: !isCompleted ? `${habit.color}30` : undefined
         }}
       >
