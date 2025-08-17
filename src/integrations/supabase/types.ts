@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       habit_entries: {
         Row: {
+          access_code: string | null
           created_at: string
           date: string
           habit_id: string
@@ -25,6 +26,7 @@ export type Database = {
           value: number
         }
         Insert: {
+          access_code?: string | null
           created_at?: string
           date: string
           habit_id: string
@@ -34,6 +36,7 @@ export type Database = {
           value?: number
         }
         Update: {
+          access_code?: string | null
           created_at?: string
           date?: string
           habit_id?: string
@@ -54,6 +57,7 @@ export type Database = {
       }
       habits: {
         Row: {
+          access_code: string | null
           color: string
           created_at: string
           emoji: string
@@ -65,6 +69,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          access_code?: string | null
           color?: string
           created_at?: string
           emoji?: string
@@ -76,6 +81,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          access_code?: string | null
           color?: string
           created_at?: string
           emoji?: string
@@ -93,7 +99,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_access_code: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
