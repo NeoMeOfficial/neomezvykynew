@@ -86,7 +86,9 @@ export const AccessCodeWelcome = ({ open, onOpenChange }: AccessCodeWelcomeProps
             </DialogHeader>
             <div className="mt-4 space-y-4">
               <div>
-                <Label htmlFor="custom-code">Váš vlastný kód</Label>
+                <Label htmlFor="custom-code" className="font-medium">
+                  Váš vlastný kód <span className="text-primary font-bold">(minimálne 4 znaky)</span>
+                </Label>
                 <Input
                   id="custom-code"
                   value={customCode}
@@ -94,7 +96,7 @@ export const AccessCodeWelcome = ({ open, onOpenChange }: AccessCodeWelcomeProps
                     setCustomCode(e.target.value.toUpperCase());
                     setCustomCodeError('');
                   }}
-                  placeholder="MOJKOD"
+                  placeholder="MOJKOD (min. 4 znaky)"
                   className="font-mono"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
@@ -115,9 +117,9 @@ export const AccessCodeWelcome = ({ open, onOpenChange }: AccessCodeWelcomeProps
                 </Button>
               </div>
             </div>
-            <div className="bg-blue-50 p-3 rounded-lg mt-4 border border-blue-200">
-              <p className="text-xs text-blue-800 font-medium text-center">
-                💡 Zadajte ľubovoľný kód (min. 4 znaky). Automaticky sa pridá jedinečný identifikátor na zabránenie zmiešania údajov.
+            <div className="bg-white p-4 rounded-lg mt-4 border border-primary/20">
+              <p className="text-sm text-foreground font-medium text-center">
+                💡 <span className="font-bold text-primary">Minimálne 4 znaky</span> - Zadajte ľubovoľný kód. Automaticky sa pridá jedinečný identifikátor na zabránenie zmiešania údajov.
               </p>
             </div>
           </>
