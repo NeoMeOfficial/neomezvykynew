@@ -3,7 +3,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Copy, Check } from 'lucide-react';
 import { useAccessCode } from '@/hooks/useAccessCode';
 
 interface AccessCodeWelcomeProps {
@@ -17,7 +16,6 @@ export const AccessCodeWelcome = ({ open, onOpenChange }: AccessCodeWelcomeProps
   const [generatedCode, setGeneratedCode] = useState<string>('');
   const [customCode, setCustomCode] = useState<string>('');
   const [customCodeError, setCustomCodeError] = useState<string>('');
-  const [copied, setCopied] = useState(false);
 
   const handleWantCode = () => {
     setStep('custom');
@@ -37,12 +35,6 @@ export const AccessCodeWelcome = ({ open, onOpenChange }: AccessCodeWelcomeProps
     const finalCode = setCustomAccessCode(customCode);
     setGeneratedCode(finalCode);
     setStep('code');
-  };
-
-  const handleCopyCode = async () => {
-    await navigator.clipboard.writeText(generatedCode);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
   };
 
   const handleContinue = () => {
@@ -139,30 +131,15 @@ export const AccessCodeWelcome = ({ open, onOpenChange }: AccessCodeWelcomeProps
                   {generatedCode}
                 </div>
               </div>
-              <Button 
-                variant="outline" 
-                onClick={handleCopyCode}
-                className="w-full mt-3"
-              >
-                {copied ? (
-                  <>
-                    <Check className="w-4 h-4 mr-2" />
-                    Skopírované!
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-4 h-4 mr-2" />
-                    Kopírovať kód
-                  </>
-                )}
-              </Button>
-              <Button onClick={handleContinue} className="w-full mt-2">
+              <Button onClick={handleContinue} className="w-full mt-3">
                 Pokračovať
               </Button>
             </div>
-            <p className="text-xs text-muted-foreground mt-2">
-              Kód si môžete kedykoľvek zobraziť v nastaveniach aplikácie.
-            </p>
+            <div className="bg-blue-50 p-4 rounded-lg mt-4 border border-blue-200">
+              <p className="text-sm text-blue-800 font-medium text-center">
+                 💡 Váš kód si môžete kedykoľvek zobraziť v nastaveniach aplikácie
+               </p>
+             </div>
           </>
         )}
       </DialogContent>
