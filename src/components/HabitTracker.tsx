@@ -96,6 +96,7 @@ export default function HabitTracker({ onFirstInteraction }: HabitTrackerProps) 
   }, [habits, getHabitProgress]);
 
   const getDayCompletionPercentage = useCallback((date: Date) => {
+    if (habits.length === 0) return 0; // Prevent division by zero
     let totalProgress = 0;
     habits.forEach(habit => {
       const value = getHabitProgress(habit.id, date);

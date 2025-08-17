@@ -21,6 +21,7 @@ export const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
 
   const getDayCompletionPercentage = (date: Date) => {
+    if (habits.length === 0) return 0; // Prevent division by zero
     let totalProgress = 0;
     habits.forEach(habit => {
       const dateStr = formatDate(date);

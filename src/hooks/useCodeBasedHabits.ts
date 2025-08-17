@@ -47,6 +47,8 @@ export const useCodeBasedHabits = (onSuccess?: () => void) => {
   // Load habits from database when access code is available
   useEffect(() => {
     if (!accessCode) {
+      // Return default habits when no access code for local use
+      setHabits(defaultHabits);
       setLoading(false);
       return;
     }
