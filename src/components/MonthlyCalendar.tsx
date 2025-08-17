@@ -65,7 +65,7 @@ export const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
         month={selectedMonth}
         modifiers={modifiers}
         modifiersStyles={modifiersStyles}
-        className={cn("p-2 pointer-events-auto text-sm scale-90")}
+        className={cn("p-2 pointer-events-auto text-sm scale-90 [&_table]:border-spacing-x-1 [&_td]:px-1 [&_th]:px-1")}
         showOutsideDays={false}
       />
       
