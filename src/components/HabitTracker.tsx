@@ -2,7 +2,7 @@ import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { Calendar, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { useHabits } from '@/hooks/useHabits';
+import { useCodeBasedHabits } from '../hooks/useCodeBasedHabits';
 import { WeekDay } from './WeekDay';
 import { HabitCard } from './HabitCard';
 import { MonthlyCalendar } from './MonthlyCalendar';
@@ -31,7 +31,7 @@ export default function HabitTracker() {
     }, 1200);
   }, []);
   
-  const { habits, habitData, loading, connected, updateHabitProgress, formatDate, startOfDay } = useHabits(handleSuccess);
+  const { habits, habitData, loading, updateHabitProgress, formatDate, startOfDay, hasAccessCode } = useCodeBasedHabits(handleSuccess);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [anchorDate, setAnchorDate] = useState(new Date());
   const [monthlyCalendarDate, setMonthlyCalendarDate] = useState(new Date());
@@ -256,7 +256,11 @@ export default function HabitTracker() {
           ))}
         </div>
 
-        <ConnectionStatus connected={connected} />
+        {hasAccessCode && (
+          <div className="text-center mt-4">
+            <p className="text-green-300 text-sm">✓ Údaje sa synchronizujú s databázou</p>
+          </div>
+        )}
         
         <SuccessIndicator show={showSuccessIndicator} />
 

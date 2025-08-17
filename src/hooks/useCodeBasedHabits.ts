@@ -131,7 +131,8 @@ export const useCodeBasedHabits = (onSuccess?: () => void) => {
         color: habit.color,
         target: habit.target,
         unit: habit.unit,
-        access_code: accessCode
+        access_code: accessCode,
+        user_id: 'anonymous' // Required by schema but not used in access code system
       }));
 
       const { error } = await supabase
@@ -185,7 +186,8 @@ export const useCodeBasedHabits = (onSuccess?: () => void) => {
             habit_id: habitId,
             date: dateStr,
             value: numericValue,
-            access_code: accessCode
+            access_code: accessCode,
+            user_id: 'anonymous' // Required by schema but not used in access code system
           }, {
             onConflict: 'habit_id,date,access_code'
           });

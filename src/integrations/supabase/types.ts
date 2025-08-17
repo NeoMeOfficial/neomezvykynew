@@ -22,7 +22,7 @@ export type Database = {
           habit_id: string
           id: string
           updated_at: string
-          user_id: string
+          user_id: string | null
           value: number
         }
         Insert: {
@@ -32,7 +32,7 @@ export type Database = {
           habit_id: string
           id?: string
           updated_at?: string
-          user_id: string
+          user_id?: string | null
           value?: number
         }
         Update: {
@@ -42,7 +42,7 @@ export type Database = {
           habit_id?: string
           id?: string
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
           value?: number
         }
         Relationships: [
@@ -66,7 +66,7 @@ export type Database = {
           target: number
           unit: string
           updated_at: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           access_code?: string | null
@@ -78,7 +78,7 @@ export type Database = {
           target?: number
           unit?: string
           updated_at?: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           access_code?: string | null
@@ -90,7 +90,7 @@ export type Database = {
           target?: number
           unit?: string
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: []
       }
