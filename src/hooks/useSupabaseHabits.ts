@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -11,12 +12,13 @@ export interface Habit {
 }
 
 export const useSupabaseHabits = (onSuccess?: () => void) => {
+  const [habits, setHabits] = useState<Habit[]>([]);
   const [habitData, setHabitData] = useState<Record<string, Record<string, number>>>({});
   const [loading, setLoading] = useState(true);
   const [connected, setConnected] = useState(false);
   const [userId, setUserId] = useState<string>('');
 
-  const habits: Habit[] = [
+  const defaultHabits = [
     { 
       id: 'water', 
       name: 'Hydratácia', 
@@ -134,10 +136,82 @@ export const useSupabaseHabits = (onSuccess?: () => void) => {
     initAuth();
   }, []);
 
+  // Load and seed habits from Supabase
+  useEffect(() => {
+    const loadHabits = async () => {
+      if (!userId) return;
+      
+      try {
+        const { data: existingHabits, error } = await supabase
+          .from('habits')
+          .select('*')
+          .eq('user_id', userId);
+
+        if (error) {
+          console.error('Error loading habits:', error);
+          setConnected(false);
+          // Use default habits as fallback
+          setHabits(defaultHabits);
+        } else if (existingHabits && existingHabits.length > 0) {
+          // Convert database habits to our format
+          const dbHabits = existingHabits.map(habit => ({
+            id: habit.id,
+            name: habit.name,
+            emoji: habit.emoji,
+            color: habit.color,
+            target: habit.target,
+            unit: habit.unit
+          }));
+          setHabits(dbHabits);
+          setConnected(true);
+        } else {
+          // No habits exist, seed the default ones
+          console.log('Seeding default habits for user:', userId);
+          const { data: seededHabits, error: seedError } = await supabase
+            .from('habits')
+            .insert(
+              defaultHabits.map(habit => ({
+                user_id: userId,
+                name: habit.name,
+                emoji: habit.emoji,
+                color: habit.color,
+                target: habit.target,
+                unit: habit.unit
+              }))
+            )
+            .select();
+
+          if (seedError) {
+            console.error('Error seeding habits:', seedError);
+            setHabits(defaultHabits);
+            setConnected(false);
+          } else if (seededHabits) {
+            const newHabits = seededHabits.map(habit => ({
+              id: habit.id,
+              name: habit.name,
+              emoji: habit.emoji,
+              color: habit.color,
+              target: habit.target,
+              unit: habit.unit
+            }));
+            setHabits(newHabits);
+            setConnected(true);
+          }
+        }
+      } catch (error) {
+        console.error('Database connection failed:', error);
+        setConnected(false);
+        setHabits(defaultHabits);
+      }
+    };
+
+    loadHabits();
+  }, [userId]);
+
   // Load data from Supabase
   useEffect(() => {
     const loadData = async () => {
-      if (!userId) return;
+      if (!userId || habits.length === 0) return;
       
       try {
         const { data: entries, error } = await supabase
@@ -169,6 +243,7 @@ export const useSupabaseHabits = (onSuccess?: () => void) => {
           });
           
           setHabitData(dataMap);
+          console.log('Loaded habit data:', dataMap);
         }
       } catch (error) {
         console.error('Database connection failed:', error);
@@ -188,7 +263,7 @@ export const useSupabaseHabits = (onSuccess?: () => void) => {
     };
 
     loadData();
-  }, [userId]);
+  }, [userId, habits]);
 
   const formatDate = (date: Date): string => {
     const year = date.getFullYear();
@@ -206,6 +281,8 @@ export const useSupabaseHabits = (onSuccess?: () => void) => {
   const updateHabitProgress = useCallback(async (habitId: string, date: Date, value: number) => {
     const dateStr = formatDate(startOfDay(date));
     const numValue = Math.max(0, Number(value) || 0);
+    
+    console.log('Updating habit progress:', { habitId, dateStr, numValue });
     
     // Update local state immediately
     setHabitData(prev => {
@@ -238,6 +315,7 @@ export const useSupabaseHabits = (onSuccess?: () => void) => {
           console.error('Error saving to database:', error);
           setConnected(false);
         } else {
+          console.log('Successfully saved to database');
           if (onSuccess) {
             setTimeout(() => {
               onSuccess();
@@ -256,7 +334,7 @@ export const useSupabaseHabits = (onSuccess?: () => void) => {
         }, 200);
       }
     }
-  }, [habits, onSuccess, connected, userId]);
+  }, [onSuccess, connected, userId]);
 
   return {
     habits,
