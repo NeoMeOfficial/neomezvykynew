@@ -53,7 +53,7 @@ export const AccessCodeWelcome = ({ open, onOpenChange }: AccessCodeWelcomeProps
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto md:top-[50%] top-[45%]">
         {step === 'welcome' ? (
           <>
             <DialogHeader>
@@ -70,9 +70,11 @@ export const AccessCodeWelcome = ({ open, onOpenChange }: AccessCodeWelcomeProps
                 Nie, zatial nie
               </Button>
             </div>
-            <p className="text-xs text-muted-foreground mt-2">
-              Neuchovávame žiadne osobné údaje. Iba váš kód a údaje o návykoch.
-            </p>
+            <div className="bg-blue-50 p-3 rounded-lg mt-4 border border-blue-200">
+              <p className="text-xs text-blue-800 font-medium text-center">
+                💡 Neuchovávame žiadne osobné údaje. Iba váš kód a údaje o návykoch.
+              </p>
+            </div>
           </>
         ) : step === 'custom' ? (
           <>
@@ -113,9 +115,11 @@ export const AccessCodeWelcome = ({ open, onOpenChange }: AccessCodeWelcomeProps
                 </Button>
               </div>
             </div>
-            <p className="text-xs text-muted-foreground mt-2">
-              Zadajte ľubovoľný kód (min. 4 znaky). Automaticky sa pridá jedinečný identifikátor na zabránenie zmiešania údajov.
-            </p>
+            <div className="bg-blue-50 p-3 rounded-lg mt-4 border border-blue-200">
+              <p className="text-xs text-blue-800 font-medium text-center">
+                💡 Zadajte ľubovoľný kód (min. 4 znaky). Automaticky sa pridá jedinečný identifikátor na zabránenie zmiešania údajov.
+              </p>
+            </div>
           </>
         ) : (
           <>
