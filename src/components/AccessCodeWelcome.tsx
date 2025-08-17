@@ -70,7 +70,7 @@ export const AccessCodeWelcome = ({ open, onOpenChange }: AccessCodeWelcomeProps
                 Nie, zatial nie
               </Button>
             </div>
-            <div className="bg-blue-50 p-3 rounded-lg mt-4 border border-blue-200">
+            <div className="bg-white p-3 rounded-lg mt-4 border border-blue-200">
               <p className="text-xs text-blue-800 font-medium text-center">
                 💡 Neuchovávame žiadne osobné údaje. Iba váš kód a údaje o návykoch.
               </p>
@@ -115,7 +115,7 @@ export const AccessCodeWelcome = ({ open, onOpenChange }: AccessCodeWelcomeProps
                 </Button>
               </div>
             </div>
-            <div className="bg-blue-50 p-3 rounded-lg mt-4 border border-blue-200">
+            <div className="bg-white p-3 rounded-lg mt-4 border border-blue-200">
               <p className="text-xs text-blue-800 font-medium text-center">
                 💡 Zadajte ľubovoľný kód (min. 4 znaky). Automaticky sa pridá jedinečný identifikátor na zabránenie zmiešania údajov.
               </p>
@@ -139,8 +139,8 @@ export const AccessCodeWelcome = ({ open, onOpenChange }: AccessCodeWelcomeProps
                 Pokračovať
               </Button>
             </div>
-            <div className="bg-blue-50 p-4 rounded-lg mt-4 border border-blue-200">
-              <p className="text-sm text-blue-800 font-medium text-center">
+             <div className="bg-white p-4 rounded-lg mt-4 border border-blue-200">
+               <p className="text-sm text-blue-800 font-medium text-center">
                  💡 Váš kód si môžete kedykoľvek zobraziť v nastaveniach aplikácie
                </p>
              </div>
