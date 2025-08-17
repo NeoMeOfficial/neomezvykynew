@@ -135,11 +135,13 @@ export const AccessCodeWelcome = ({ open, onOpenChange }: AccessCodeWelcomeProps
                 Pokračovať
               </Button>
             </div>
-            <div className="bg-blue-50 p-4 rounded-lg mt-4 border border-blue-200">
-              <p className="text-sm text-blue-800 font-medium text-center">
-                 💡 Váš kód si môžete kedykoľvek zobraziť v nastaveniach aplikácie
-               </p>
-             </div>
+            <div className="fixed left-0 right-0 bottom-8 z-50">
+              <div className="bg-white p-4 mx-auto max-w-md rounded-lg shadow-lg border border-gray-200">
+                <p className="text-sm text-gray-800 font-medium text-center">
+                  💡 Váš kód si môžete kedykoľvek zobraziť v nastaveniach aplikácie
+                </p>
+              </div>
+            </div>
           </>
         )}
       </DialogContent>
