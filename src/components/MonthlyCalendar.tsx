@@ -1,7 +1,7 @@
-import React, { memo, useMemo, useCallback } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import React, { useState } from 'react';
+import { Calendar } from '@/components/ui/calendar';
 import { Habit } from '@/hooks/useCodeBasedHabits';
+import { cn } from '@/lib/utils';
 
 interface MonthlyCalendarProps {
   habitData: Record<string, Record<string, number>>;
@@ -11,122 +11,108 @@ interface MonthlyCalendarProps {
   formatDate: (date: Date) => string;
 }
 
-const addDays = (date: Date, days: number): Date => {
-  const newDate = new Date(date);
-  newDate.setDate(newDate.getDate() + days);
-  return newDate;
-};
-
-const isSameDay = (date1: Date, date2: Date): boolean => {
-  return date1.getDate() === date2.getDate() &&
-         date1.getMonth() === date2.getMonth() &&
-         date1.getFullYear() === date2.getFullYear();
-};
-
-const getMonthDays = (date: Date): Date[] => {
-  const year = date.getFullYear();
-  const month = date.getMonth();
-  const firstDay = new Date(year, month, 1);
-  const lastDay = new Date(year, month + 1, 0);
-  const days = [];
-  
-  const startDay = firstDay.getDay();
-  for (let i = startDay - 1; i >= 0; i--) {
-    days.push(addDays(firstDay, -i - 1));
-  }
-  
-  for (let i = 1; i <= lastDay.getDate(); i++) {
-    days.push(new Date(year, month, i));
-  }
-  
-  const remainingDays = 42 - days.length;
-  for (let i = 1; i <= remainingDays; i++) {
-    days.push(addDays(lastDay, i));
-  }
-  
-  return days;
-};
-
-export const MonthlyCalendar = memo<MonthlyCalendarProps>(({ 
-  habitData, 
-  selectedMonth, 
+export const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
+  habitData,
+  selectedMonth,
   onMonthChange,
   habits,
   formatDate
 }) => {
-  const monthDays = useMemo(() => getMonthDays(selectedMonth), [selectedMonth]);
-  
-  const getDayCompletionPercentage = useCallback((date: Date) => {
-    const dateStr = formatDate(date);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+
+  const getDayCompletionPercentage = (date: Date) => {
     let totalProgress = 0;
     habits.forEach(habit => {
+      const dateStr = formatDate(date);
       const value = habitData[habit.id]?.[dateStr] || 0;
       const progress = Math.min(value / habit.target, 1);
       totalProgress += progress;
     });
     return (totalProgress / habits.length) * 100;
-  }, [habitData, habits, formatDate]);
+  };
+
+  const modifiers = {
+    completed: (date: Date) => {
+      const completionPercentage = getDayCompletionPercentage(date);
+      return completionPercentage >= 100;
+    },
+    partial: (date: Date) => {
+      const completionPercentage = getDayCompletionPercentage(date);
+      return completionPercentage > 0 && completionPercentage < 100;
+    }
+  };
+
+  const modifiersStyles = {
+    completed: { 
+      backgroundColor: '#22c55e',
+      color: 'white',
+      fontWeight: 'bold'
+    },
+    partial: { 
+      backgroundColor: '#fbbf24',
+      color: 'white'
+    }
+  };
 
   return (
-    <div className="p-6">
-      <div className="flex items-center justify-between mb-6">
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={() => onMonthChange(addDays(selectedMonth, -30))}
-        >
-          <ChevronLeft size={16} />
-        </Button>
-        <h3 className="text-lg font-semibold">
-          {selectedMonth.toLocaleDateString('sk-SK', { month: 'long', year: 'numeric' })}
-        </h3>
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={() => onMonthChange(addDays(selectedMonth, 30))}
-        >
-          <ChevronRight size={16} />
-        </Button>
+    <div className="space-y-4">
+      <Calendar
+        mode="single"
+        selected={selectedDate}
+        onSelect={setSelectedDate}
+        onMonthChange={onMonthChange}
+        month={selectedMonth}
+        modifiers={modifiers}
+        modifiersStyles={modifiersStyles}
+        className={cn("p-3 pointer-events-auto")}
+        showOutsideDays={false}
+      />
+      
+      <div className="space-y-2 text-sm">
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 rounded bg-green-500"></div>
+          <span>Všetky návyky dokončené</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 rounded bg-yellow-500"></div>
+          <span>Čiastočne dokončené</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 rounded bg-gray-200"></div>
+          <span>Bez aktivity</span>
+        </div>
       </div>
 
-      <div className="grid grid-cols-7 gap-1 mb-2">
-        {['Ned', 'Pon', 'Uto', 'Str', 'Štv', 'Pia', 'Sob'].map(day => (
-          <div key={day} className="text-center text-sm font-medium text-muted-foreground py-2">
-            {day}
+      {selectedDate && (
+        <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+          <h4 className="font-medium mb-2">
+            {selectedDate.toLocaleDateString('sk-SK', { 
+              weekday: 'long',
+              day: 'numeric',
+              month: 'long'
+            })}
+          </h4>
+          <div className="space-y-1">
+            {habits.map(habit => {
+              const dateStr = formatDate(selectedDate);
+              const value = habitData[habit.id]?.[dateStr] || 0;
+              const isCompleted = value >= habit.target;
+              
+              return (
+                <div key={habit.id} className="flex items-center justify-between text-sm">
+                  <div className="flex items-center gap-2">
+                    <span>{habit.emoji}</span>
+                    <span>{habit.name}</span>
+                  </div>
+                  <div className={`font-medium ${isCompleted ? 'text-green-600' : 'text-gray-500'}`}>
+                    {habit.name === 'Hydratácia' ? Number(value).toFixed(1) : Math.round(Number(value))} / {habit.target} {habit.unit}
+                  </div>
+                </div>
+              );
+            })}
           </div>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-7 gap-1">
-        {monthDays.map((date, index) => {
-          const completionPercentage = getDayCompletionPercentage(date);
-          const isCurrentMonth = date.getMonth() === selectedMonth.getMonth();
-          const isToday = isSameDay(date, new Date());
-          
-          return (
-            <div
-              key={index}
-              className={`h-10 w-10 rounded-full flex items-center justify-center text-sm relative ${
-                !isCurrentMonth 
-                  ? 'text-muted-foreground' 
-                  : isToday
-                  ? 'bg-orange-100 text-orange-600 font-bold'
-                  : 'text-foreground'
-              }`}
-            >
-              <span className={`relative z-10 ${completionPercentage === 100 ? 'text-white' : ''}`}>
-                {date.getDate()}
-              </span>
-              {isCurrentMonth && completionPercentage > 0 && (
-                <div 
-                  className="absolute inset-0 rounded-full bg-gradient-to-r from-amber-600 to-amber-800"
-                  style={{ opacity: completionPercentage === 100 ? 1 : 0.65 }}
-                />
-              )}
-            </div>
-          );
-        })}
-      </div>
+        </div>
+      )}
     </div>
   );
-});
+};

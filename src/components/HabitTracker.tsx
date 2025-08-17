@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
-import { Calendar, Loader2 } from 'lucide-react';
+import { Calendar, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useCodeBasedHabits } from '../hooks/useCodeBasedHabits';
@@ -107,44 +107,24 @@ export default function HabitTracker({ onFirstInteraction }: HabitTrackerProps) 
 
   const weekDays = useMemo(() => {
     const days = [];
-    // Show 7 days total (-3 to +3) for 5 full days + half days on sides
-    for (let i = -3; i <= 3; i++) {
-      days.push(addDays(anchorDate, i));
+    // Show 3 days total (-1, 0, +1) with the middle day being selected
+    for (let i = -1; i <= 1; i++) {
+      days.push(addDays(selectedDate, i));
     }
     return days;
-  }, [anchorDate]);
+  }, [selectedDate]);
 
-  // Check if today is visible in current week view
-  const isTodayVisible = useMemo(() => {
-    const today = new Date();
-    return weekDays.some(date => isSameDay(date, today));
-  }, [weekDays]);
+  const goToPreviousDay = useCallback(() => {
+    setSelectedDate(prev => addDays(prev, -1));
+  }, []);
+
+  const goToNextDay = useCallback(() => {
+    setSelectedDate(prev => addDays(prev, 1));
+  }, []);
 
   const goToToday = useCallback(() => {
     const today = new Date();
-    setAnchorDate(today);
     setSelectedDate(today);
-  }, []);
-
-
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
-  }, []);
-
-  const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    touchEndX.current = e.touches[0].clientX;
-  }, []);
-
-  const handleTouchEnd = useCallback(() => {
-    const swipeDistance = touchStartX.current - touchEndX.current;
-    const minSwipeDistance = 30; // Reduced for faster response
-    const swipeVelocity = Math.abs(swipeDistance);
-
-    if (Math.abs(swipeDistance) > minSwipeDistance) {
-      // More responsive: larger swipes move multiple days
-      const daysToMove = swipeVelocity > 100 ? 2 : 1;
-      setAnchorDate((prev) => addDays(prev, swipeDistance > 0 ? daysToMove : -daysToMove));
-    }
   }, []);
 
   const completedCount = useMemo(() => {
@@ -167,58 +147,45 @@ export default function HabitTracker({ onFirstInteraction }: HabitTrackerProps) 
   return (
     <div className="bg-background p-1">
       <div className="max-w-md mx-auto space-y-2">
-        <div className="relative overflow-hidden">
-          {!isTodayVisible && (
-            <Button
-              onClick={goToToday}
-              size="sm"
-              className="absolute top-1/2 right-4 transform -translate-y-1/2 z-10 bg-primary/90 hover:bg-primary text-primary-foreground px-3 py-1 text-xs rounded-full shadow-lg"
-              style={{ right: 'calc(4px + 24px)' }}
-            >
-              Dnes
-            </Button>
-          )}
-          <div 
-            ref={scrollRef} 
-            className="flex justify-center w-full pb-1 px-4"
-            style={{ 
-              transform: 'translateX(0)',
-              gap: '8px',
-              maskImage: 'linear-gradient(to right, transparent 0%, black 20%, black 80%, transparent 100%)'
-            }}
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
+        {/* Navigation with arrows */}
+        <div className="flex items-center justify-center gap-4 mb-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={goToPreviousDay}
+            className="h-8 w-8 p-0"
           >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          
+          <div className="flex gap-2">
             {weekDays.map((date, index) => {
               const isToday = isSameDay(date, new Date());
-              const isSelected = isSameDay(date, selectedDate);
-              const isCentral = index === 3; // Center position in the 7-day layout (-3 to +3)
-              const isEdge = index === 0 || index === 6; // First and last items (half visible)
-              const isRightmostWhenButtonShown = !isTodayVisible && index === 6; // Hide rightmost day when button is shown
+              const isSelected = index === 1; // Middle day is always selected
               const completionPercentage = getDayCompletionPercentage(date);
               
               return (
-                <div
+                <WeekDay
                   key={index}
-                  className={`transition-all duration-100 ease-out ${
-                    isRightmostWhenButtonShown ? 'invisible' : 
-                    isEdge ? 'opacity-50 scale-75' : 'opacity-100 scale-100'
-                  }`}
-                >
-                  <WeekDay
-                    date={date}
-                    isSelected={isSelected}
-                    isToday={isToday}
-                    isCentral={isCentral}
-                    completionPercentage={completionPercentage}
-                    onClick={() => setSelectedDate(date)}
-                    buttonRef={isToday ? todayButtonRef : undefined}
-                  />
-                </div>
+                  date={date}
+                  isSelected={isSelected}
+                  isToday={isToday}
+                  isCentral={isSelected}
+                  completionPercentage={completionPercentage}
+                  onClick={() => setSelectedDate(date)}
+                />
               );
             })}
           </div>
+          
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={goToNextDay}
+            className="h-8 w-8 p-0"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
         </div>
 
         <div className="space-y-1.5">
@@ -234,7 +201,7 @@ export default function HabitTracker({ onFirstInteraction }: HabitTrackerProps) 
                     <Calendar size={20} className="text-foreground" />
                   </Button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className="max-w-fit">
                   <DialogHeader>
                     <DialogTitle>Mesačný pohľad</DialogTitle>
                   </DialogHeader>
