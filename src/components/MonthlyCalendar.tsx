@@ -56,7 +56,7 @@ export const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <Calendar
         mode="single"
         selected={selectedDate}
@@ -65,44 +65,44 @@ export const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
         month={selectedMonth}
         modifiers={modifiers}
         modifiersStyles={modifiersStyles}
-        className={cn("p-3 pointer-events-auto")}
+        className={cn("p-2 pointer-events-auto text-sm scale-90")}
         showOutsideDays={false}
       />
       
-      <div className="space-y-2 text-sm">
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded bg-green-500"></div>
+      <div className="space-y-1.5 text-xs">
+        <div className="flex items-center gap-1.5">
+          <div className="w-3 h-3 rounded bg-green-500"></div>
           <span>Všetky návyky dokončené</span>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded bg-yellow-500"></div>
+        <div className="flex items-center gap-1.5">
+          <div className="w-3 h-3 rounded bg-yellow-500"></div>
           <span>Čiastočne dokončené</span>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded bg-gray-200"></div>
+        <div className="flex items-center gap-1.5">
+          <div className="w-3 h-3 rounded bg-gray-200"></div>
           <span>Bez aktivity</span>
         </div>
       </div>
 
       {selectedDate && (
-        <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-          <h4 className="font-medium mb-2">
+        <div className="mt-3 p-2.5 bg-gray-50 rounded-lg">
+          <h4 className="font-medium mb-1.5 text-sm">
             {selectedDate.toLocaleDateString('sk-SK', { 
               weekday: 'long',
               day: 'numeric',
               month: 'long'
             })}
           </h4>
-          <div className="space-y-1">
+          <div className="space-y-0.5">
             {habits.map(habit => {
               const dateStr = formatDate(selectedDate);
               const value = habitData[habit.id]?.[dateStr] || 0;
               const isCompleted = value >= habit.target;
               
               return (
-                <div key={habit.id} className="flex items-center justify-between text-sm">
-                  <div className="flex items-center gap-2">
-                    <span>{habit.emoji}</span>
+                <div key={habit.id} className="flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-sm">{habit.emoji}</span>
                     <span>{habit.name}</span>
                   </div>
                   <div className={`font-medium ${isCompleted ? 'text-green-600' : 'text-gray-500'}`}>
