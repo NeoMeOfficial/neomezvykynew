@@ -127,25 +127,35 @@ export const useCodeBasedHabits = (onSuccess?: () => void) => {
 
     try {
       const habitsToInsert = defaultHabits.map(habit => ({
-        id: habit.id,
         name: habit.name,
         emoji: habit.emoji,
         color: habit.color,
         target: habit.target,
         unit: habit.unit,
         access_code: accessCode,
-        user_id: 'anonymous' // Required by schema but not used in access code system
       }));
 
-      const { error } = await supabase
+      const { data: inserted, error } = await supabase
         .from('habits')
-        .insert(habitsToInsert);
+        .insert(habitsToInsert)
+        .select('*');
 
       if (error) throw error;
 
-      setHabits(defaultHabits);
+      // Map inserted DB rows to our Habit interface (use DB-generated UUIDs)
+      const mappedHabits: Habit[] = (inserted ?? []).map(habit => ({
+        id: habit.id,
+        name: habit.name,
+        emoji: habit.emoji,
+        color: habit.color,
+        target: habit.target,
+        unit: habit.unit
+      }));
+
+      setHabits(mappedHabits);
     } catch (error) {
       console.error('Error seeding habits:', error);
+      // Fallback to default habits (local-only, won't sync)
       setHabits(defaultHabits);
     }
   };
@@ -189,7 +199,6 @@ export const useCodeBasedHabits = (onSuccess?: () => void) => {
             date: dateStr,
             value: numericValue,
             access_code: accessCode,
-            user_id: 'anonymous' // Required by schema but not used in access code system
           }, {
             onConflict: 'habit_id,date,access_code'
           });
