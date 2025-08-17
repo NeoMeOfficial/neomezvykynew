@@ -56,7 +56,7 @@ export const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
   };
 
   return (
-    <div className="space-y-1">
+    <div>
       <Calendar
         mode="single"
         selected={selectedDate}
@@ -65,7 +65,7 @@ export const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
         month={selectedMonth}
         modifiers={modifiers}
         modifiersStyles={modifiersStyles}
-        className={cn("p-2 pointer-events-auto text-sm scale-90 [&_table]:border-spacing-x-1 [&_td]:px-1 [&_th]:px-1")}
+        className={cn("pointer-events-auto text-sm scale-90 [&_table]:border-spacing-x-1 [&_td]:px-1 [&_th]:px-1")}
         showOutsideDays={false}
       />
       
