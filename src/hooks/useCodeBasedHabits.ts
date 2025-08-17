@@ -177,6 +177,14 @@ export const useCodeBasedHabits = (onSuccess?: () => void) => {
     const dateStr = formatDate(startOfDay(date));
     const numericValue = Math.max(0, Number(value) || 0);
     
+    console.log('updateHabitProgress called:', {
+      habitId,
+      dateStr, 
+      numericValue,
+      accessCode,
+      hasAccessCode: !!accessCode
+    });
+    
     // Update local state immediately
     setHabitData(prev => {
       const newData = {
@@ -192,7 +200,14 @@ export const useCodeBasedHabits = (onSuccess?: () => void) => {
     // Update database if we have an access code
     if (accessCode) {
       try {
-        const { error } = await supabase
+        console.log('Attempting to upsert to database:', {
+          habit_id: habitId,
+          date: dateStr,
+          value: numericValue,
+          access_code: accessCode,
+        });
+
+        const { data, error } = await supabase
           .from('habit_entries')
           .upsert({
             habit_id: habitId,
@@ -201,12 +216,20 @@ export const useCodeBasedHabits = (onSuccess?: () => void) => {
             access_code: accessCode,
           }, {
             onConflict: 'habit_id,date,access_code'
-          });
+          })
+          .select();
 
-        if (error) throw error;
+        if (error) {
+          console.error('Database upsert error:', error);
+          throw error;
+        }
+        
+        console.log('Database upsert successful:', data);
       } catch (error) {
         console.error('Error updating habit progress:', error);
       }
+    } else {
+      console.log('No access code available, skipping database save');
     }
 
     if (onSuccess) {

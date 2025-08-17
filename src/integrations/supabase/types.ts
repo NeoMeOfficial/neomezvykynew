@@ -94,6 +94,39 @@ export type Database = {
         }
         Relationships: []
       }
+      reflections: {
+        Row: {
+          access_code: string | null
+          created_at: string
+          date: string
+          id: string
+          improve: string | null
+          updated_at: string
+          user_id: string | null
+          well_done: string | null
+        }
+        Insert: {
+          access_code?: string | null
+          created_at?: string
+          date: string
+          id?: string
+          improve?: string | null
+          updated_at?: string
+          user_id?: string | null
+          well_done?: string | null
+        }
+        Update: {
+          access_code?: string | null
+          created_at?: string
+          date?: string
+          id?: string
+          improve?: string | null
+          updated_at?: string
+          user_id?: string | null
+          well_done?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
