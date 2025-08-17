@@ -43,6 +43,13 @@ export const useAccessCode = () => {
     return newCode;
   };
 
+  const setCustomAccessCode = (customCode: string): string => {
+    const formattedCode = customCode.toUpperCase().trim();
+    setAccessCode(formattedCode);
+    localStorage.setItem(ACCESS_CODE_KEY, formattedCode);
+    return formattedCode;
+  };
+
   const enterAccessCode = (code: string) => {
     const formattedCode = code.toUpperCase().trim();
     setAccessCode(formattedCode);
@@ -58,6 +65,7 @@ export const useAccessCode = () => {
     accessCode,
     loading,
     setNewAccessCode,
+    setCustomAccessCode,
     enterAccessCode,
     clearAccessCode
   };
