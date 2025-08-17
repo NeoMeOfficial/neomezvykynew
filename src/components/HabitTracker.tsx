@@ -107,8 +107,8 @@ export default function HabitTracker({ onFirstInteraction }: HabitTrackerProps) 
 
   const weekDays = useMemo(() => {
     const days = [];
-    // Show 3 days total (-1, 0, +1) with the middle day being selected
-    for (let i = -1; i <= 1; i++) {
+    // Show 5 days total (-2, -1, 0, +1, +2) with the middle day being selected
+    for (let i = -2; i <= 2; i++) {
       days.push(addDays(selectedDate, i));
     }
     return days;
@@ -161,7 +161,7 @@ export default function HabitTracker({ onFirstInteraction }: HabitTrackerProps) 
           <div className="flex gap-2">
             {weekDays.map((date, index) => {
               const isToday = isSameDay(date, new Date());
-              const isSelected = index === 1; // Middle day is always selected
+              const isSelected = index === 2; // Middle day is always selected (index 2 of 5 days)
               const completionPercentage = getDayCompletionPercentage(date);
               
               return (
