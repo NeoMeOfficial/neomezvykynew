@@ -6,7 +6,7 @@ import { useCodeBasedHabits } from '../hooks/useCodeBasedHabits';
 import { WeekDay } from './WeekDay';
 import { HabitCard } from './HabitCard';
 import { MonthlyCalendar } from './MonthlyCalendar';
-import { ConnectionStatus } from './ConnectionStatus';
+
 import { SuccessIndicator } from './SuccessIndicator';
 
 const addDays = (date: Date, days: number): Date => {

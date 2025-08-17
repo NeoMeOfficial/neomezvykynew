@@ -1,7 +1,7 @@
 import React, { memo, useMemo, useCallback } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Habit } from '@/hooks/useHabits';
+import { Habit } from '@/hooks/useCodeBasedHabits';
 
 interface MonthlyCalendarProps {
   habitData: Record<string, Record<string, number>>;

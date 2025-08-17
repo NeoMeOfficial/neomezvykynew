@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 import { Check } from 'lucide-react';
 import { CustomSlider } from './CustomSlider';
-import { Habit } from '@/hooks/useHabits';
+import { Habit } from '@/hooks/useCodeBasedHabits';
 
 interface HabitCardProps {
   habit: Habit;
