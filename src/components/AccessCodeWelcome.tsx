@@ -12,24 +12,14 @@ interface AccessCodeWelcomeProps {
 }
 
 export const AccessCodeWelcome = ({ open, onOpenChange }: AccessCodeWelcomeProps) => {
-  const { setNewAccessCode, setCustomAccessCode } = useAccessCode();
-  const [step, setStep] = useState<'welcome' | 'options' | 'custom' | 'code'>('welcome');
+  const { setCustomAccessCode } = useAccessCode();
+  const [step, setStep] = useState<'welcome' | 'custom' | 'code'>('welcome');
   const [generatedCode, setGeneratedCode] = useState<string>('');
   const [customCode, setCustomCode] = useState<string>('');
   const [customCodeError, setCustomCodeError] = useState<string>('');
   const [copied, setCopied] = useState(false);
 
   const handleWantCode = () => {
-    setStep('options');
-  };
-
-  const handleGenerateCode = async () => {
-    const code = await setNewAccessCode();
-    setGeneratedCode(code);
-    setStep('code');
-  };
-
-  const handleCustomCodeOption = () => {
     setStep('custom');
   };
 
@@ -39,10 +29,8 @@ export const AccessCodeWelcome = ({ open, onOpenChange }: AccessCodeWelcomeProps
       return;
     }
 
-    // Basic format validation
-    const codePattern = /^[A-Z]+-[A-Z]+-\d{4}$/;
-    if (!codePattern.test(customCode.toUpperCase().trim())) {
-      setCustomCodeError('Kód musí byť vo formáte SLOVO-SLOVO-ČÍSLA (napr. APPLE-BEACH-1234)');
+    if (customCode.trim().length < 4) {
+      setCustomCodeError('Kód musí mať aspoň 4 znaky');
       return;
     }
 
@@ -66,8 +54,8 @@ export const AccessCodeWelcome = ({ open, onOpenChange }: AccessCodeWelcomeProps
   };
 
   const handleBack = () => {
-    if (step === 'custom' || step === 'options') {
-      setStep(step === 'custom' ? 'options' : 'welcome');
+    if (step === 'custom') {
+      setStep('welcome');
     }
   };
 
@@ -94,37 +82,12 @@ export const AccessCodeWelcome = ({ open, onOpenChange }: AccessCodeWelcomeProps
               Neuchovávame žiadne osobné údaje. Iba váš kód a údaje o návykoch.
             </p>
           </>
-        ) : step === 'options' ? (
+        ) : step === 'custom' ? (
           <>
             <DialogHeader>
               <DialogTitle>Vytvorenie prístupového kódu</DialogTitle>
               <DialogDescription>
-                Vyberte si, ako chcete vytvoriť váš prístupový kód.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="flex flex-col gap-3 mt-4">
-              <Button onClick={handleGenerateCode} className="w-full">
-                Vygenerovať automaticky
-              </Button>
-              <Button variant="outline" onClick={handleCustomCodeOption} className="w-full">
-                Vytvoriť vlastný kód
-              </Button>
-            </div>
-            <div className="flex gap-2 mt-4">
-              <Button variant="ghost" onClick={handleBack} className="flex-1">
-                Späť
-              </Button>
-            </div>
-            <p className="text-xs text-muted-foreground mt-2">
-              Automaticky generovaný kód je bezpečnejší, ale vlastný kód si môžete ľahšie zapamätať.
-            </p>
-          </>
-        ) : step === 'custom' ? (
-          <>
-            <DialogHeader>
-              <DialogTitle>Vytvorenie vlastného kódu</DialogTitle>
-              <DialogDescription>
-                Vytvorte si vlastný prístupový kód vo formáte SLOVO-SLOVO-ČÍSLA.
+                Vytvorte si vlastný prístupový kód (minimálne 4 znaky). Automaticky sa pridá jedinečný identifikátor.
               </DialogDescription>
             </DialogHeader>
             <div className="mt-4 space-y-4">
@@ -137,7 +100,7 @@ export const AccessCodeWelcome = ({ open, onOpenChange }: AccessCodeWelcomeProps
                     setCustomCode(e.target.value.toUpperCase());
                     setCustomCodeError('');
                   }}
-                  placeholder="EXAMPLE-WORD-1234"
+                  placeholder="MOJKOD"
                   className="font-mono"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
@@ -159,7 +122,7 @@ export const AccessCodeWelcome = ({ open, onOpenChange }: AccessCodeWelcomeProps
               </div>
             </div>
             <p className="text-xs text-muted-foreground mt-2">
-              Kód musí byť vo formáte SLOVO-SLOVO-ČÍSLA, napríklad EXAMPLE-WORD-1234
+              Zadajte ľubovoľný kód (min. 4 znaky). Automaticky sa pridá jedinečný identifikátor na zabránenie zmiešania údajov.
             </p>
           </>
         ) : (

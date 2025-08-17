@@ -16,38 +16,17 @@ export const useAccessCode = () => {
     setLoading(false);
   }, []);
 
-  const generateNewCode = async (): Promise<string> => {
-    try {
-      const { data, error } = await supabase.rpc('generate_access_code');
-      if (error) throw error;
-      return data;
-    } catch (error) {
-      console.error('Error generating access code:', error);
-      // Fallback to client-side generation if DB function fails
-      return generateClientSideCode();
-    }
-  };
-
-  const generateClientSideCode = (): string => {
-    const words = ['apple', 'beach', 'chair', 'dance', 'eagle', 'flame', 'grape', 'house', 'island', 'jungle'];
-    const word1 = words[Math.floor(Math.random() * words.length)];
-    const word2 = words[Math.floor(Math.random() * words.length)];
-    const number = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-    return `${word1.toUpperCase()}-${word2.toUpperCase()}-${number}`;
-  };
-
-  const setNewAccessCode = async (): Promise<string> => {
-    const newCode = await generateNewCode();
-    setAccessCode(newCode);
-    localStorage.setItem(ACCESS_CODE_KEY, newCode);
-    return newCode;
+  const generateUniqueIdentifier = (): string => {
+    return Math.random().toString(36).substring(2, 8).toUpperCase();
   };
 
   const setCustomAccessCode = (customCode: string): string => {
-    const formattedCode = customCode.toUpperCase().trim();
-    setAccessCode(formattedCode);
-    localStorage.setItem(ACCESS_CODE_KEY, formattedCode);
-    return formattedCode;
+    const baseCode = customCode.toUpperCase().trim();
+    const uniqueId = generateUniqueIdentifier();
+    const finalCode = `${baseCode}-${uniqueId}`;
+    setAccessCode(finalCode);
+    localStorage.setItem(ACCESS_CODE_KEY, finalCode);
+    return finalCode;
   };
 
   const enterAccessCode = (code: string) => {
@@ -64,7 +43,6 @@ export const useAccessCode = () => {
   return {
     accessCode,
     loading,
-    setNewAccessCode,
     setCustomAccessCode,
     enterAccessCode,
     clearAccessCode
