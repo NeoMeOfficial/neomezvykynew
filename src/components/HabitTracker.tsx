@@ -203,7 +203,7 @@ export default function HabitTracker({ onFirstInteraction }: HabitTrackerProps) 
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-fit">
-                  <DialogHeader className="pb-2">
+                  <DialogHeader className="pb-0">
                     <DialogTitle className="text-lg">Mesačný pohľad</DialogTitle>
                   </DialogHeader>
                   <MonthlyCalendar

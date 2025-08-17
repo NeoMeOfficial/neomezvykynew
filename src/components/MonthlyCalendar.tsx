@@ -56,7 +56,7 @@ export const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-1">
       <Calendar
         mode="single"
         selected={selectedDate}
