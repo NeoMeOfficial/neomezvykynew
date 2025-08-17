@@ -21,7 +21,11 @@ const isSameDay = (date1: Date, date2: Date): boolean => {
          date1.getFullYear() === date2.getFullYear();
 };
 
-export default function HabitTracker() {
+interface HabitTrackerProps {
+  onFirstInteraction?: () => void;
+}
+
+export default function HabitTracker({ onFirstInteraction }: HabitTrackerProps) {
   const [showSuccessIndicator, setShowSuccessIndicator] = useState(false);
   
   const handleSuccess = useCallback(() => {
@@ -252,6 +256,7 @@ export default function HabitTracker() {
               progress={getHabitProgress(habit.id, selectedDate)}
               streak={getStreak(habit.id)}
               onProgressChange={(value) => updateHabitProgress(habit.id, selectedDate, value)}
+              onFirstInteraction={onFirstInteraction}
             />
           ))}
         </div>

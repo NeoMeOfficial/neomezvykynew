@@ -43,8 +43,7 @@ export const AccessCodeWelcome = ({ open, onOpenChange }: AccessCodeWelcomeProps
             <DialogHeader>
               <DialogTitle>Uloženie vašich údajov</DialogTitle>
               <DialogDescription>
-                Chcete si uložiť svoje návyky a sledovať ich naprieč zariadeniami? 
-                Vygenerujeme vám jedinečný kód, ktorý budete môcť použiť na akomkoľvek zariadení.
+                Vaše údaje sa ukladajú iba lokálne. Vytvorte si kód pre synchronizáciu naprieč zariadeniami.
               </DialogDescription>
             </DialogHeader>
             <div className="flex flex-col gap-3 mt-4">

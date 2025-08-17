@@ -8,6 +8,7 @@ interface HabitCardProps {
   progress: number;
   streak: number;
   onProgressChange: (value: number) => void;
+  onFirstInteraction?: () => void;
   isAnimating?: boolean;
 }
 
@@ -16,6 +17,7 @@ export const HabitCard = memo<HabitCardProps>(({
   progress,
   streak,
   onProgressChange,
+  onFirstInteraction,
   isAnimating = false
 }) => {
   const isCompleted = progress >= habit.target;
@@ -71,7 +73,10 @@ export const HabitCard = memo<HabitCardProps>(({
           <div className="w-full space-y-1">
             <CustomSlider
               value={[progress]}
-              onValueChange={(value) => onProgressChange(value[0])}
+              onValueChange={(value) => {
+                onFirstInteraction?.();
+                onProgressChange(value[0]);
+              }}
               max={habit.target}
               step={habit.name === 'Pohyb' ? 500 : habit.name === 'Hydratácia' ? 0.1 : 0.5}
               accentColor={habit.color}
