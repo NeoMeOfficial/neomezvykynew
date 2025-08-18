@@ -64,7 +64,7 @@ export const DateNavigationHeader: React.FC<DateNavigationHeaderProps> = ({
             {formatDisplayDate(currentDate)}
           </h1>
           {isCompleted && (
-            <div className="flex items-center justify-center gap-1 text-xs text-green-600">
+            <div className="flex items-center justify-center gap-1 text-xs text-reflection-text-soft">
               <span>✓</span>
               <span>Dokončené</span>
             </div>
