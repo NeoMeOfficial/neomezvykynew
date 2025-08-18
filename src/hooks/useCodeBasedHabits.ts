@@ -101,13 +101,15 @@ export const useCodeBasedHabits = (onSuccess?: () => void) => {
       if (newAccessCode) {
         // New code created - immediately seed habits
         console.log('New access code detected, seeding habits immediately');
-        seedHabitsForNewCode(newAccessCode);
-      } else {
-        // Code cleared - reset state
-        console.log('Access code cleared, resetting state');
-        setLoading(true);
         setHabits([]);
         setHabitData({});
+        seedHabitsForNewCode(newAccessCode);
+      } else {
+        // Code cleared - reset to defaults immediately
+        console.log('Access code cleared, resetting to default habits');
+        setHabits(defaultHabits);
+        setHabitData({});
+        setLoading(false);
       }
     };
 
