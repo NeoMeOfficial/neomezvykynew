@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { ChevronLeft, ChevronRight, Calendar, Save, Share } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar, Save, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 // Utility functions
@@ -104,12 +104,12 @@ export const DateNavigationHeader: React.FC<DateNavigationHeaderProps> = ({
           size="sm" 
           onClick={onSettingsClick}
           className={hasAccessCode 
-            ? "text-reflection-text hover:bg-reflection-muted/50"
+            ? "text-green-700 hover:bg-green-100/80 bg-green-100/50"
             : "text-orange-700 bg-orange-100/50 hover:bg-orange-100/80"
           }
         >
           {hasAccessCode ? (
-            <Share className="h-4 w-4" />
+            <Settings className="h-4 w-4" />
           ) : (
             <Save className="h-4 w-4" />
           )}
