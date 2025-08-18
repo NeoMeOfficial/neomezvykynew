@@ -53,29 +53,52 @@ export const AccessCodeWelcome = ({ open, onOpenChange }: AccessCodeWelcomeProps
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto md:top-[50%] top-[45%]">
+      <DialogContent className="sm:max-w-md">
         {step === 'welcome' ? (
-          <>
-            <DialogHeader>
-              <DialogTitle>Uloženie vašich údajov</DialogTitle>
-              <DialogDescription>
-                Vaše údaje sa ukladajú iba lokálne. Vytvorte si kód pre synchronizáciu naprieč zariadeniami.
+          <div className="space-y-6">
+            <DialogHeader className="space-y-2">
+              <DialogTitle className="text-xl font-semibold text-gray-900">
+                Zadaj kód a nestratíš svoje návyky
+              </DialogTitle>
+              <DialogDescription className="text-gray-600">
+                Stačí, ak klikneš na 'Vytvoriť kód' a my ti tvoje návyky uložíme anonymne
               </DialogDescription>
             </DialogHeader>
-            <div className="flex flex-col gap-3 mt-4">
-              <Button onClick={handleWantCode} className="w-full">
-                Áno, chcem si uložiť údaje
+            
+            <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+              <div className="flex items-start gap-3">
+                <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span className="text-white text-xs font-bold">i</span>
+                </div>
+                <div className="space-y-2">
+                  <h4 className="font-medium text-blue-900">Prečo potrebuješ kód:</h4>
+                  <ul className="text-sm text-blue-800 space-y-1">
+                    <li>• Zachováš si súkromie a anonymitu</li>
+                    <li>• Budeš si môcť prechádzať svoje návyky</li>
+                  </ul>
+                  <p className="text-sm text-blue-800 font-medium">
+                    💡 Neuchovávame žiadne osobné údaje. Iba tvoj kód a údaje o tvojich návykoch!
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <Button 
+                onClick={handleWantCode} 
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                Vytvoriť kód
               </Button>
-              <Button variant="outline" onClick={handleSkip} className="w-full">
-                Nie, zatial nie
+              <Button 
+                variant="outline" 
+                onClick={handleSkip} 
+                className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50"
+              >
+                Zrušiť
               </Button>
             </div>
-            <div className="bg-blue-50 p-3 rounded-lg mt-4 border border-blue-200">
-              <p className="text-xs text-blue-800 font-medium text-center">
-                💡 Neuchovávame žiadne osobné údaje. Iba váš kód a údaje o návykoch.
-              </p>
-            </div>
-          </>
+          </div>
         ) : step === 'custom' ? (
           <>
             <DialogHeader>
