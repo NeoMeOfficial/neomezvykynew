@@ -21,10 +21,13 @@ export const AccessCodeInput = ({ open, onOpenChange }: AccessCodeInputProps) =>
       return;
     }
 
-    // Basic format validation
-    const codePattern = /^[A-Z]+-[A-Z]+-\d{4}$/;
-    if (!codePattern.test(code.toUpperCase().trim())) {
-      setError('Kód musí byť vo formáte SLOVO-SLOVO-ČÍSLA (napr. APPLE-BEACH-1234)');
+    // Basic format validation - accept both generated and custom formats
+    const generatedCodePattern = /^[A-Z]+-[A-Z]+-\d{4}$/;
+    const customCodePattern = /^[A-Z0-9]+-[A-Z0-9]+$/;
+    
+    const trimmedCode = code.toUpperCase().trim();
+    if (!generatedCodePattern.test(trimmedCode) && !customCodePattern.test(trimmedCode)) {
+      setError('Kód musí byť vo formáte SLOVO-SLOVO-ČÍSLA (napr. APPLE-BEACH-1234) alebo vlastný kód (napr. TEST1234-5NQMTU)');
       return;
     }
 
@@ -59,7 +62,7 @@ export const AccessCodeInput = ({ open, onOpenChange }: AccessCodeInputProps) =>
                 setCode(e.target.value.toUpperCase());
                 setError('');
               }}
-              placeholder="SLOVO-SLOVO-1234"
+              placeholder="SLOVO-SLOVO-1234 alebo TEST1234-XXXXX"
               className="font-mono"
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
@@ -81,7 +84,7 @@ export const AccessCodeInput = ({ open, onOpenChange }: AccessCodeInputProps) =>
           </div>
         </div>
         <p className="text-xs text-muted-foreground mt-2">
-          Kód je vo formáte SLOVO-SLOVO-ČÍSLA, napríklad APPLE-BEACH-1234
+          Kód je vo formáte SLOVO-SLOVO-ČÍSLA (napr. APPLE-BEACH-1234) alebo vlastný kód (napr. TEST1234-XXXXX)
         </p>
       </DialogContent>
     </Dialog>

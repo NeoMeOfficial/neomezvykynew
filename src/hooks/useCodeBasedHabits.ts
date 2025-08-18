@@ -17,6 +17,18 @@ export const useCodeBasedHabits = (onSuccess?: () => void) => {
   const [habitData, setHabitData] = useState<Record<string, Record<string, number>>>({});
   const [loading, setLoading] = useState(true);
 
+  // Listen for access code changes to reload data
+  useEffect(() => {
+    const handleAccessCodeChange = () => {
+      setLoading(true);
+      setHabits([]);
+      setHabitData({});
+    };
+
+    window.addEventListener('accessCodeChanged', handleAccessCodeChange);
+    return () => window.removeEventListener('accessCodeChanged', handleAccessCodeChange);
+  }, []);
+
   const defaultHabits: Habit[] = [
     { 
       id: 'water', 

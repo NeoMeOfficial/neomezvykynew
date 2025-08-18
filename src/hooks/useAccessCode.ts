@@ -26,6 +26,12 @@ export const useAccessCode = () => {
     const finalCode = `${baseCode}-${uniqueId}`;
     setAccessCode(finalCode);
     localStorage.setItem(ACCESS_CODE_KEY, finalCode);
+    
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new CustomEvent('accessCodeChanged', { 
+      detail: { accessCode: finalCode } 
+    }));
+    
     return finalCode;
   };
 
@@ -33,11 +39,21 @@ export const useAccessCode = () => {
     const formattedCode = code.toUpperCase().trim();
     setAccessCode(formattedCode);
     localStorage.setItem(ACCESS_CODE_KEY, formattedCode);
+    
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new CustomEvent('accessCodeChanged', { 
+      detail: { accessCode: formattedCode } 
+    }));
   };
 
   const clearAccessCode = () => {
     setAccessCode(null);
     localStorage.removeItem(ACCESS_CODE_KEY);
+    
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new CustomEvent('accessCodeChanged', { 
+      detail: { accessCode: null } 
+    }));
   };
 
   return {

@@ -3,6 +3,7 @@ import { Calendar, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useCodeBasedHabits } from '../hooks/useCodeBasedHabits';
+import { useAccessCode } from '../hooks/useAccessCode';
 import { WeekDay } from './WeekDay';
 import { HabitCard } from './HabitCard';
 import { MonthlyCalendar } from './MonthlyCalendar';
@@ -36,6 +37,7 @@ export default function HabitTracker({ onFirstInteraction }: HabitTrackerProps) 
   }, []);
   
   const { habits, habitData, loading, updateHabitProgress, formatDate, startOfDay, hasAccessCode } = useCodeBasedHabits(handleSuccess);
+  const { accessCode } = useAccessCode();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [anchorDate, setAnchorDate] = useState(new Date());
   const [monthlyCalendarDate, setMonthlyCalendarDate] = useState(new Date());
@@ -232,6 +234,7 @@ export default function HabitTracker({ onFirstInteraction }: HabitTrackerProps) 
         {hasAccessCode && (
           <div className="text-center mt-4">
             <p className="text-green-300 text-sm">✓ Údaje sa synchronizujú s databázou</p>
+            <p className="text-muted-foreground text-xs mt-1">Aktívny kód: {accessCode}</p>
           </div>
         )}
         
