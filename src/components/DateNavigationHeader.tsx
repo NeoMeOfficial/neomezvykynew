@@ -49,18 +49,18 @@ export const DateNavigationHeader: React.FC<DateNavigationHeaderProps> = ({
   };
 
   return (
-    <div className="flex items-center justify-between bg-white/60 backdrop-blur border border-gray-200/50 px-[26px] py-[3px] rounded-lg">
+    <div className="flex items-center justify-between p-4 bg-white/60 backdrop-blur-sm rounded-lg border border-reflection-border/30 shadow-sm my-0 mx-0 px-[26px] py-[3px]">
       {/* Left Navigation Button */}
-      <Button variant="ghost" size="sm" onClick={onPreviousDay}>
+      <Button variant="ghost" size="sm" onClick={onPreviousDay} className="flex items-center gap-2 text-reflection-text hover:bg-reflection-muted/50">
         <ChevronLeft className="h-4 w-4" />
         <span className="hidden sm:inline">Predchádzajúci</span>
       </Button>
 
       {/* Center Date Display */}
       <div className="flex items-center gap-3">
-        <Calendar className="h-5 w-5 text-muted-foreground" />
+        <Calendar className="h-5 w-5 text-reflection-text-soft" />
         <div className="text-center">
-          <h1 className="text-lg font-semibold text-foreground">
+          <h1 className="text-lg font-semibold text-reflection-text">
             {formatDisplayDate(currentDate)}
           </h1>
           {isCompleted && (
@@ -75,7 +75,7 @@ export const DateNavigationHeader: React.FC<DateNavigationHeaderProps> = ({
       {/* Right Action Buttons */}
       <div className="flex items-center gap-2">
         {/* Access Code Button */}
-        <Button variant="ghost" size="sm" onClick={onSettingsClick}>
+        <Button variant="ghost" size="sm" onClick={onSettingsClick} className="text-reflection-text hover:bg-reflection-muted/50">
           {hasAccessCode ? (
             <Share className="h-4 w-4" />
           ) : (
@@ -85,7 +85,7 @@ export const DateNavigationHeader: React.FC<DateNavigationHeaderProps> = ({
 
         {/* "Dnes" Button - Only show when not viewing today */}
         {!isToday() && (
-          <Button variant="ghost" size="sm" onClick={onToday}>
+          <Button variant="ghost" size="sm" onClick={onToday} className="text-reflection-text hover:bg-reflection-muted/50">
             Dnes
           </Button>
         )}
@@ -96,6 +96,7 @@ export const DateNavigationHeader: React.FC<DateNavigationHeaderProps> = ({
           size="sm" 
           onClick={onNextDay}
           disabled={!hasNextDay}
+          className="text-reflection-text hover:bg-reflection-muted/50"
         >
           <span className="hidden sm:inline">Nasledujúci</span>
           <ChevronRight className="h-4 w-4" />
