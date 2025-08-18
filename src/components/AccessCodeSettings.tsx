@@ -6,10 +6,27 @@ import { Label } from '@/components/ui/label';
 import { Copy, Check, Settings, Trash2, Edit } from 'lucide-react';
 import { useAccessCode } from '@/hooks/useAccessCode';
 
-export const AccessCodeSettings = () => {
+interface AccessCodeSettingsProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+export const AccessCodeSettings = ({ open: externalOpen, onOpenChange }: AccessCodeSettingsProps = {}) => {
   const { accessCode, clearAccessCode, setCustomAccessCode, enterAccessCode } = useAccessCode();
   const [copied, setCopied] = useState(false);
   const [open, setOpen] = useState(false);
+  
+  // Handle external control if provided
+  const isControlledExternally = externalOpen !== undefined && onOpenChange !== undefined;
+  const isOpen = isControlledExternally ? externalOpen : open;
+  
+  const handleOpenChange = (newOpen: boolean) => {
+    if (isControlledExternally) {
+      onOpenChange?.(newOpen);
+    } else {
+      setOpen(newOpen);
+    }
+  };
   const [showChangeCode, setShowChangeCode] = useState(false);
   const [changeCodeType, setChangeCodeType] = useState<'custom' | 'existing'>('custom');
   const [newCode, setNewCode] = useState('');
@@ -26,7 +43,7 @@ export const AccessCodeSettings = () => {
 
   const handleClearCode = () => {
     clearAccessCode();
-    setOpen(false);
+    handleOpenChange(false);
   };
 
   const handleChangeCode = () => {
@@ -68,12 +85,7 @@ export const AccessCodeSettings = () => {
   if (!accessCode) return null;
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="ghost" size="sm" className="fixed top-4 right-4 z-10">
-          <Settings className="w-4 h-4" />
-        </Button>
-      </DialogTrigger>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>Nastavenia kódu</DialogTitle>

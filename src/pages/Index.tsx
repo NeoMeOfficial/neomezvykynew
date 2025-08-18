@@ -10,12 +10,21 @@ const Index = () => {
   const { accessCode, loading } = useAccessCode();
   const [showWelcome, setShowWelcome] = useState(false);
   const [showCodeInput, setShowCodeInput] = useState(false);
+  const [showAccessCodeSettings, setShowAccessCodeSettings] = useState(false);
 
   const [hasInteracted, setHasInteracted] = useState(false);
 
   const handleFirstInteraction = () => {
     if (!hasInteracted && !accessCode) {
       setHasInteracted(true);
+      setShowWelcome(true);
+    }
+  };
+
+  const handleSettingsClick = () => {
+    if (accessCode) {
+      setShowAccessCodeSettings(true);
+    } else {
       setShowWelcome(true);
     }
   };
@@ -31,9 +40,15 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-white">
       <div className="container mx-auto px-4 py-8">
-        <HabitTracker onFirstInteraction={handleFirstInteraction} />
+        <HabitTracker 
+          onFirstInteraction={handleFirstInteraction} 
+          onSettingsClick={handleSettingsClick}
+        />
         
-        <AccessCodeSettings />
+        <AccessCodeSettings 
+          open={showAccessCodeSettings}
+          onOpenChange={setShowAccessCodeSettings}
+        />
         
         <AccessCodeWelcome 
           open={showWelcome} 

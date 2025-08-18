@@ -24,9 +24,10 @@ const isSameDay = (date1: Date, date2: Date): boolean => {
 
 interface HabitTrackerProps {
   onFirstInteraction?: () => void;
+  onSettingsClick?: () => void;
 }
 
-export default function HabitTracker({ onFirstInteraction }: HabitTrackerProps) {
+export default function HabitTracker({ onFirstInteraction, onSettingsClick }: HabitTrackerProps) {
   const [showSuccessIndicator, setShowSuccessIndicator] = useState(false);
   
   const handleSuccess = useCallback(() => {
@@ -103,10 +104,13 @@ export default function HabitTracker({ onFirstInteraction }: HabitTrackerProps) 
   }, [selectedDate, formatDate]);
 
   const handleSettingsClick = useCallback(() => {
-    // This will be handled by the parent component (Index)
-    // For now, we'll just open the monthly calendar
-    setShowMonthlyCalendar(true);
-  }, []);
+    if (onSettingsClick) {
+      onSettingsClick();
+    } else {
+      // Fallback to opening monthly calendar if no settings handler provided
+      setShowMonthlyCalendar(true);
+    }
+  }, [onSettingsClick]);
 
   const completedCount = useMemo(() => {
     return habits.filter(habit => isHabitCompleted(habit.id, selectedDate)).length;
