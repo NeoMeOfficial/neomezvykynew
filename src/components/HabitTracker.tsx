@@ -1,12 +1,12 @@
 import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
-import { Calendar, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Calendar, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useCodeBasedHabits } from '../hooks/useCodeBasedHabits';
 import { useAccessCode } from '../hooks/useAccessCode';
-import { WeekDay } from './WeekDay';
 import { HabitCard } from './HabitCard';
 import { MonthlyCalendar } from './MonthlyCalendar';
+import { DateNavigationHeader } from './DateNavigationHeader';
 
 import { SuccessIndicator } from './SuccessIndicator';
 
@@ -39,30 +39,9 @@ export default function HabitTracker({ onFirstInteraction }: HabitTrackerProps) 
   const { habits, habitData, loading, updateHabitProgress, formatDate, startOfDay, hasAccessCode } = useCodeBasedHabits(handleSuccess);
   const { accessCode } = useAccessCode();
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [anchorDate, setAnchorDate] = useState(new Date());
   const [monthlyCalendarDate, setMonthlyCalendarDate] = useState(new Date());
   const [showMonthlyCalendar, setShowMonthlyCalendar] = useState(false);
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const todayButtonRef = useRef<HTMLButtonElement>(null);
-  const touchStartX = useRef<number>(0);
-  const touchEndX = useRef<number>(0);
 
-  // Auto-center today's date when component loads
-  useEffect(() => {
-    if (todayButtonRef.current && scrollRef.current) {
-      const button = todayButtonRef.current;
-      const container = scrollRef.current;
-      const buttonLeft = button.offsetLeft;
-      const buttonWidth = button.offsetWidth;
-      const containerWidth = container.offsetWidth;
-      const scrollLeft = buttonLeft - (containerWidth / 2) + (buttonWidth / 2);
-      
-      container.scrollTo({
-        left: scrollLeft,
-        behavior: 'smooth'
-      });
-    }
-  }, [loading, habits]);
 
   const getHabitProgress = useCallback((habitId: string, date: Date) => {
     const dateStr = formatDate(startOfDay(date));
@@ -108,14 +87,6 @@ export default function HabitTracker({ onFirstInteraction }: HabitTrackerProps) 
     return (totalProgress / habits.length) * 100;
   }, [habits, getHabitProgress]);
 
-  const weekDays = useMemo(() => {
-    const days = [];
-    // Show 5 days total (-2, -1, 0, +1, +2) with the middle day being selected
-    for (let i = -2; i <= 2; i++) {
-      days.push(addDays(selectedDate, i));
-    }
-    return days;
-  }, [selectedDate]);
 
   const goToPreviousDay = useCallback(() => {
     setSelectedDate(prev => addDays(prev, -1));
@@ -128,6 +99,21 @@ export default function HabitTracker({ onFirstInteraction }: HabitTrackerProps) 
   const goToToday = useCallback(() => {
     const today = new Date();
     setSelectedDate(today);
+  }, []);
+
+  const hasNextDay = useMemo(() => {
+    const today = new Date();
+    return selectedDate < today;
+  }, [selectedDate]);
+
+  const currentDateString = useMemo(() => {
+    return formatDate(selectedDate);
+  }, [selectedDate, formatDate]);
+
+  const handleSettingsClick = useCallback(() => {
+    // This will be handled by the parent component (Index)
+    // For now, we'll just open the monthly calendar
+    setShowMonthlyCalendar(true);
   }, []);
 
   const completedCount = useMemo(() => {
@@ -150,46 +136,16 @@ export default function HabitTracker({ onFirstInteraction }: HabitTrackerProps) 
   return (
     <div className="bg-background p-1">
       <div className="max-w-md mx-auto space-y-2">
-        {/* Navigation with arrows */}
-        <div className="flex items-center justify-center gap-4 mb-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={goToPreviousDay}
-            className="h-8 w-8 p-0"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          
-          <div className="flex gap-2">
-            {weekDays.map((date, index) => {
-              const isToday = isSameDay(date, new Date());
-              const isSelected = index === 2; // Middle day is always selected (index 2 of 5 days)
-              const completionPercentage = getDayCompletionPercentage(date);
-              
-              return (
-                <WeekDay
-                  key={index}
-                  date={date}
-                  isSelected={isSelected}
-                  isToday={isToday}
-                  isCentral={isSelected}
-                  completionPercentage={completionPercentage}
-                  onClick={() => setSelectedDate(date)}
-                />
-              );
-            })}
-          </div>
-          
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={goToNextDay}
-            className="h-8 w-8 p-0"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
+        {/* Date Navigation Header */}
+        <DateNavigationHeader
+          currentDate={currentDateString}
+          onPreviousDay={goToPreviousDay}
+          onNextDay={goToNextDay}
+          onToday={goToToday}
+          onSettingsClick={handleSettingsClick}
+          hasAccessCode={hasAccessCode}
+          hasNextDay={hasNextDay}
+        />
 
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
