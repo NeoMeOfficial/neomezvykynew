@@ -17,24 +17,6 @@ export const useCodeBasedHabits = (onSuccess?: () => void) => {
   const [habitData, setHabitData] = useState<Record<string, Record<string, number>>>({});
   const [loading, setLoading] = useState(true);
 
-  // Listen for access code changes to reload data
-  useEffect(() => {
-    const handleAccessCodeChange = (event: CustomEvent) => {
-      console.log('Access code changed event received:', event.detail);
-      setLoading(true);
-      setHabits([]);
-      setHabitData({});
-      
-      // Add a small delay to ensure the access code state is updated
-      setTimeout(() => {
-        console.log('Access code change cleanup completed');
-      }, 100);
-    };
-
-    window.addEventListener('accessCodeChanged', handleAccessCodeChange as EventListener);
-    return () => window.removeEventListener('accessCodeChanged', handleAccessCodeChange as EventListener);
-  }, []);
-
   const defaultHabits: Habit[] = [
     { 
       id: 'water', 
@@ -61,6 +43,78 @@ export const useCodeBasedHabits = (onSuccess?: () => void) => {
       unit: 'jedál'
     },
   ];
+
+  // Function to immediately seed habits when code is created
+  const seedHabitsForNewCode = useCallback(async (newAccessCode: string) => {
+    console.log('Seeding habits for new access code:', newAccessCode);
+    setLoading(true);
+    
+    try {
+      const habitsToInsert = defaultHabits.map(habit => ({
+        name: habit.name,
+        emoji: habit.emoji,
+        color: habit.color,
+        target: habit.target,
+        unit: habit.unit,
+        access_code: newAccessCode,
+      }));
+
+      console.log('Inserting habits for new code:', habitsToInsert);
+
+      const { data: inserted, error } = await supabase
+        .from('habits')
+        .insert(habitsToInsert)
+        .select('*');
+
+      if (error) {
+        console.error('Database insert error for new code:', error);
+        throw error;
+      }
+
+      console.log('Successfully inserted habits for new code:', inserted);
+
+      const mappedHabits: Habit[] = (inserted ?? []).map(habit => ({
+        id: habit.id,
+        name: habit.name,
+        emoji: habit.emoji,
+        color: habit.color,
+        target: habit.target,
+        unit: habit.unit
+      }));
+
+      setHabits(mappedHabits);
+      console.log('Habits ready for new access code');
+    } catch (error) {
+      console.error('Error seeding habits for new code:', error);
+      setHabits(defaultHabits);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Listen for access code changes to reload data
+  useEffect(() => {
+    const handleAccessCodeChange = (event: CustomEvent) => {
+      console.log('Access code changed event received:', event.detail);
+      const newAccessCode = event.detail?.accessCode;
+      
+      if (newAccessCode) {
+        // New code created - immediately seed habits
+        console.log('New access code detected, seeding habits immediately');
+        seedHabitsForNewCode(newAccessCode);
+      } else {
+        // Code cleared - reset state
+        console.log('Access code cleared, resetting state');
+        setLoading(true);
+        setHabits([]);
+        setHabitData({});
+      }
+    };
+
+    window.addEventListener('accessCodeChanged', handleAccessCodeChange as EventListener);
+    return () => window.removeEventListener('accessCodeChanged', handleAccessCodeChange as EventListener);
+  }, [seedHabitsForNewCode]);
+
 
   // Load habits from database when access code is available
   useEffect(() => {
@@ -300,6 +354,7 @@ export const useCodeBasedHabits = (onSuccess?: () => void) => {
     habitData,
     formatDate,
     startOfDay,
-    hasAccessCode: !!accessCode
+    hasAccessCode: !!accessCode,
+    seedHabitsForNewCode
   };
 };
