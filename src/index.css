@@ -8,6 +8,8 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
+    --gradient-improve: linear-gradient(to right, hsl(45 20% 94%), hsl(50 25% 92%));
+    --gradient-glass: linear-gradient(to right, hsl(0 0% 100% / 0.3), hsl(0 0% 100% / 0.1));
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
 
