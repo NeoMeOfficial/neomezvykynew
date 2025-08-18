@@ -285,6 +285,7 @@ export const useCodeBasedHabits = (onSuccess?: () => void) => {
     const dateStr = formatDate(startOfDay(date));
     const numericValue = Math.max(0, Number(value) || 0);
     
+    console.log('=== UPDATE HABIT PROGRESS START ===');
     console.log('updateHabitProgress called:', {
       habitId,
       dateStr, 
@@ -302,6 +303,7 @@ export const useCodeBasedHabits = (onSuccess?: () => void) => {
           [dateStr]: numericValue
         }
       };
+      console.log('Local state updated:', newData);
       return newData;
     });
 
@@ -328,13 +330,23 @@ export const useCodeBasedHabits = (onSuccess?: () => void) => {
           .select();
 
         if (error) {
+          console.error('=== DATABASE UPSERT ERROR ===');
           console.error('Database upsert error:', error);
+          console.error('Error details:', {
+            code: error.code,
+            message: error.message,
+            details: error.details,
+            hint: error.hint
+          });
           throw error;
         }
         
+        console.log('=== DATABASE UPSERT SUCCESS ===');
         console.log('Database upsert successful:', data);
       } catch (error) {
+        console.error('=== CAUGHT ERROR IN UPDATE ===');
         console.error('Error updating habit progress:', error);
+        // Don't revert local state - let the user see their changes even if DB fails
       }
     } else {
       console.log('No access code available, skipping database save');
@@ -345,6 +357,8 @@ export const useCodeBasedHabits = (onSuccess?: () => void) => {
         onSuccess();
       }, 200);
     }
+    
+    console.log('=== UPDATE HABIT PROGRESS END ===');
   }, [accessCode, onSuccess]);
 
   return {
