@@ -126,8 +126,8 @@ export default function HabitTracker({ onFirstInteraction }: HabitTrackerProps) 
   }
 
   return (
-    <div className="bg-background p-1">
-      <div className="max-w-md mx-auto space-y-2">
+    <div className="bg-background p-3">
+      <div className="max-w-[600px] mx-auto space-y-4">
         {/* Date Navigation Header */}
         <DateNavigationHeader
           currentDate={currentDateString}

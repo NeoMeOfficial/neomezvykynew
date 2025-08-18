@@ -67,7 +67,7 @@ export const DateNavigationHeader: React.FC<DateNavigationHeaderProps> = ({
   }, [today, onDateChange]);
 
   return (
-    <div className="flex items-center justify-between p-4 bg-white/60 backdrop-blur-sm rounded-lg border border-reflection-border/30 shadow-sm my-0 mx-0 px-[26px] py-[3px]">
+    <div className="flex items-center justify-between p-4 bg-white/60 backdrop-blur-sm rounded-lg border border-reflection-border/30 shadow-sm my-0 mx-0 px-[26px] py-[3px] max-w-[600px] mx-auto">
       
       {/* Left Navigation */}
       <Button 
