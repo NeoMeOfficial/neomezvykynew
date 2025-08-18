@@ -92,18 +92,18 @@ export const useCodeBasedHabits = (onSuccess?: () => void) => {
     }
   }, []);
 
-  // Listen for access code changes to reload data
+  // Listen for access code changes to handle immediate state updates
   useEffect(() => {
     const handleAccessCodeChange = (event: CustomEvent) => {
       console.log('Access code changed event received:', event.detail);
       const newAccessCode = event.detail?.accessCode;
       
       if (newAccessCode) {
-        // New code created - immediately seed habits
-        console.log('New access code detected, seeding habits immediately');
+        // New code created - reset state and let the main effect handle loading
+        console.log('New access code detected, resetting state');
         setHabits([]);
         setHabitData({});
-        seedHabitsForNewCode(newAccessCode);
+        setLoading(true);
       } else {
         // Code cleared - reset to defaults immediately
         console.log('Access code cleared, resetting to default habits');
@@ -115,7 +115,7 @@ export const useCodeBasedHabits = (onSuccess?: () => void) => {
 
     window.addEventListener('accessCodeChanged', handleAccessCodeChange as EventListener);
     return () => window.removeEventListener('accessCodeChanged', handleAccessCodeChange as EventListener);
-  }, [seedHabitsForNewCode]);
+  }, []);
 
 
   // Load habits from database when access code is available

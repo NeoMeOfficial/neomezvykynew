@@ -16,6 +16,28 @@ export const useAccessCode = () => {
     setLoading(false);
   }, []);
 
+  // Listen for access code changes from other components
+  useEffect(() => {
+    const handleAccessCodeChange = (event: CustomEvent) => {
+      const newCode = event.detail?.accessCode;
+      setAccessCode(newCode);
+    };
+
+    const handleStorageChange = (event: StorageEvent) => {
+      if (event.key === ACCESS_CODE_KEY) {
+        setAccessCode(event.newValue);
+      }
+    };
+
+    window.addEventListener('accessCodeChanged', handleAccessCodeChange as EventListener);
+    window.addEventListener('storage', handleStorageChange);
+    
+    return () => {
+      window.removeEventListener('accessCodeChanged', handleAccessCodeChange as EventListener);
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
+
   const generateUniqueIdentifier = (): string => {
     return Math.random().toString(36).substring(2, 8).toUpperCase();
   };
