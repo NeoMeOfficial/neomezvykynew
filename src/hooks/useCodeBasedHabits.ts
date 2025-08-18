@@ -19,14 +19,20 @@ export const useCodeBasedHabits = (onSuccess?: () => void) => {
 
   // Listen for access code changes to reload data
   useEffect(() => {
-    const handleAccessCodeChange = () => {
+    const handleAccessCodeChange = (event: CustomEvent) => {
+      console.log('Access code changed event received:', event.detail);
       setLoading(true);
       setHabits([]);
       setHabitData({});
+      
+      // Add a small delay to ensure the access code state is updated
+      setTimeout(() => {
+        console.log('Access code change cleanup completed');
+      }, 100);
     };
 
-    window.addEventListener('accessCodeChanged', handleAccessCodeChange);
-    return () => window.removeEventListener('accessCodeChanged', handleAccessCodeChange);
+    window.addEventListener('accessCodeChanged', handleAccessCodeChange as EventListener);
+    return () => window.removeEventListener('accessCodeChanged', handleAccessCodeChange as EventListener);
   }, []);
 
   const defaultHabits: Habit[] = [
@@ -60,19 +66,37 @@ export const useCodeBasedHabits = (onSuccess?: () => void) => {
   useEffect(() => {
     if (!accessCode) {
       // Return default habits when no access code for local use
+      console.log('No access code, using default habits');
       setHabits(defaultHabits);
       setLoading(false);
       return;
     }
 
+    console.log('Loading habits for access code:', accessCode);
+    
     const loadHabits = async () => {
+      // Set a timeout to prevent infinite loading
+      const timeoutId = setTimeout(() => {
+        console.warn('Habits loading timeout, falling back to defaults');
+        setHabits(defaultHabits);
+        setLoading(false);
+      }, 10000); // 10 second timeout
+
       try {
+        console.log('Fetching existing habits from database...');
         const { data: existingHabits, error } = await supabase
           .from('habits')
           .select('*')
           .eq('access_code', accessCode);
 
-        if (error) throw error;
+        clearTimeout(timeoutId);
+
+        if (error) {
+          console.error('Database error fetching habits:', error);
+          throw error;
+        }
+
+        console.log('Existing habits found:', existingHabits?.length || 0);
 
         if (existingHabits && existingHabits.length > 0) {
           // Convert from database format to our interface
@@ -84,14 +108,18 @@ export const useCodeBasedHabits = (onSuccess?: () => void) => {
             target: habit.target,
             unit: habit.unit
           }));
+          console.log('Using existing habits from database');
           setHabits(mappedHabits);
         } else {
           // No habits found, seed with defaults
+          console.log('No existing habits found, seeding defaults...');
           await seedDefaultHabits();
         }
       } catch (error) {
+        clearTimeout(timeoutId);
         console.error('Error loading habits:', error);
         // Fallback to default habits
+        console.log('Falling back to default habits due to error');
         setHabits(defaultHabits);
       } finally {
         setLoading(false);
@@ -135,9 +163,14 @@ export const useCodeBasedHabits = (onSuccess?: () => void) => {
   }, [accessCode]);
 
   const seedDefaultHabits = async () => {
-    if (!accessCode) return;
+    if (!accessCode) {
+      console.log('Cannot seed habits: no access code');
+      return;
+    }
 
     try {
+      console.log('Seeding default habits with access code:', accessCode);
+      
       const habitsToInsert = defaultHabits.map(habit => ({
         name: habit.name,
         emoji: habit.emoji,
@@ -147,12 +180,19 @@ export const useCodeBasedHabits = (onSuccess?: () => void) => {
         access_code: accessCode,
       }));
 
+      console.log('Inserting habits:', habitsToInsert);
+
       const { data: inserted, error } = await supabase
         .from('habits')
         .insert(habitsToInsert)
         .select('*');
 
-      if (error) throw error;
+      if (error) {
+        console.error('Database insert error:', error);
+        throw error;
+      }
+
+      console.log('Successfully inserted habits:', inserted);
 
       // Map inserted DB rows to our Habit interface (use DB-generated UUIDs)
       const mappedHabits: Habit[] = (inserted ?? []).map(habit => ({
@@ -164,10 +204,12 @@ export const useCodeBasedHabits = (onSuccess?: () => void) => {
         unit: habit.unit
       }));
 
+      console.log('Setting mapped habits:', mappedHabits);
       setHabits(mappedHabits);
     } catch (error) {
       console.error('Error seeding habits:', error);
       // Fallback to default habits (local-only, won't sync)
+      console.log('Using default habits as fallback');
       setHabits(defaultHabits);
     }
   };
