@@ -88,17 +88,9 @@ export default function HabitTracker({ onFirstInteraction }: HabitTrackerProps) 
   }, [habits, getHabitProgress]);
 
 
-  const goToPreviousDay = useCallback(() => {
-    setSelectedDate(prev => addDays(prev, -1));
-  }, []);
-
-  const goToNextDay = useCallback(() => {
-    setSelectedDate(prev => addDays(prev, 1));
-  }, []);
-
-  const goToToday = useCallback(() => {
-    const today = new Date();
-    setSelectedDate(today);
+  const handleDateChange = useCallback((dateString: string) => {
+    const newDate = new Date(dateString + 'T00:00:00');
+    setSelectedDate(newDate);
   }, []);
 
   const hasNextDay = useMemo(() => {
@@ -139,12 +131,10 @@ export default function HabitTracker({ onFirstInteraction }: HabitTrackerProps) 
         {/* Date Navigation Header */}
         <DateNavigationHeader
           currentDate={currentDateString}
-          onPreviousDay={goToPreviousDay}
-          onNextDay={goToNextDay}
-          onToday={goToToday}
-          onSettingsClick={handleSettingsClick}
+          onDateChange={handleDateChange}
+          isCompleted={completedCount === habits.length && habits.length > 0}
           hasAccessCode={hasAccessCode}
-          hasNextDay={hasNextDay}
+          onSettingsClick={handleSettingsClick}
         />
 
         <div className="space-y-1.5">
