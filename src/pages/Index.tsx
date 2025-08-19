@@ -85,7 +85,6 @@ const Index = () => {
         <AccessCodeWelcome 
           open={showWelcome} 
           onOpenChange={setShowWelcome} 
-          onEnterExistingCode={handleEnterCodeClick}
         />
         
         <AccessCodeInput 

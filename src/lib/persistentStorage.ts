@@ -160,7 +160,7 @@ class PersistentStorage {
     try {
       const expiryDate = new Date();
       expiryDate.setFullYear(expiryDate.getFullYear() + 2); // 2 years
-      document.cookie = `${ACCESS_CODE_KEY}=${encodeURIComponent(code)}; expires=${expiryDate.toUTCString()}; path=/; SameSite=Lax`;
+      document.cookie = `${ACCESS_CODE_KEY}=${encodeURIComponent(code)}; expires=${expiryDate.toUTCString()}; path=/; SameSite=Strict`;
       return { success: true, value: code };
     } catch (error) {
       return { success: false, error: String(error) };
@@ -251,33 +251,6 @@ class PersistentStorage {
   }
 
   /**
-   * Pin access code to URL query parameter for maximum persistence
-   */
-  private pinToUrl(code: string): StorageResult {
-    try {
-      const url = new URL(window.location.href);
-      url.searchParams.set('access_code', code);
-      window.history.replaceState({}, '', url.toString());
-      return { success: true, value: code };
-    } catch (error) {
-      return { success: false, error: String(error) };
-    }
-  }
-
-  /**
-   * Retrieve access code from URL parameters
-   */
-  private getFromUrlParam(): StorageResult {
-    try {
-      const params = new URLSearchParams(window.location.search);
-      const value = params.get('access_code') || params.get('code');
-      return { success: true, value };
-    } catch (error) {
-      return { success: false, error: String(error) };
-    }
-  }
-
-  /**
    * Store access code using all available methods
    */
   async store(code: string): Promise<boolean> {
@@ -285,8 +258,7 @@ class PersistentStorage {
       this.storeInIndexedDB(code),
       Promise.resolve(this.storeInLocalStorage(code)),
       Promise.resolve(this.storeInCookie(code)),
-      Promise.resolve(this.storeInUrlHash(code)),
-      Promise.resolve(this.pinToUrl(code))
+      Promise.resolve(this.storeInUrlHash(code))
     ]);
 
     // Update recent codes
@@ -294,7 +266,7 @@ class PersistentStorage {
 
     // Consider successful if at least one method worked
     const successCount = results.filter(r => r.status === 'fulfilled' && r.value.success).length;
-    console.log(`Access code stored using ${successCount}/5 methods`);
+    console.log(`Access code stored using ${successCount}/4 methods`);
     
     return successCount > 0;
   }
@@ -303,13 +275,11 @@ class PersistentStorage {
    * Retrieve access code with automatic fallback
    */
   async retrieve(): Promise<string | null> {
-    // Prefer URL param first, then the most reliable methods for embedded browsers
     const methods = [
-      () => Promise.resolve(this.getFromUrlParam()),
+      () => this.getFromIndexedDB(),
       () => Promise.resolve(this.getFromLocalStorage()),
       () => Promise.resolve(this.getFromCookie()),
-      () => Promise.resolve(this.getFromUrlHash()),
-      () => this.getFromIndexedDB(),
+      () => Promise.resolve(this.getFromUrlHash())
     ];
 
     for (const method of methods) {
@@ -317,8 +287,6 @@ class PersistentStorage {
         const result = await method();
         if (result.success && result.value) {
           console.log('Access code retrieved successfully');
-          // Promote the code to all storage methods to ensure persistence
-          await this.store(result.value);
           // Update recent codes when successfully retrieved
           this.updateRecentCodes(result.value);
           return result.value;
@@ -340,29 +308,13 @@ class PersistentStorage {
       this.clearFromIndexedDB(),
       Promise.resolve(this.clearFromLocalStorage()),
       Promise.resolve(this.clearFromCookie()),
-      Promise.resolve(this.clearFromUrlHash()),
-      Promise.resolve(this.clearUrlParam())
+      Promise.resolve(this.clearFromUrlHash())
     ]);
 
     const successCount = results.filter(r => r.status === 'fulfilled' && r.value).length;
-    console.log(`Access code cleared from ${successCount}/5 storage methods`);
+    console.log(`Access code cleared from ${successCount}/4 storage methods`);
     
     return successCount > 0;
-  }
-
-  /**
-   * Clear access code from URL parameters
-   */
-  private clearUrlParam(): boolean {
-    try {
-      const url = new URL(window.location.href);
-      url.searchParams.delete('access_code');
-      url.searchParams.delete('code');
-      window.history.replaceState({}, '', url.toString());
-      return true;
-    } catch (error) {
-      return false;
-    }
   }
 
   private async clearFromIndexedDB(): Promise<boolean> {
@@ -468,133 +420,6 @@ class PersistentStorage {
     }
 
     return results;
-  }
-
-  /**
-   * Generate a personal link with the access code
-   */
-  generatePersonalLink(code: string): string {
-    const url = new URL(window.location.origin + window.location.pathname);
-    url.searchParams.set('access_code', code);
-    return url.toString();
-  }
-
-  /**
-   * Request/Check Storage Access API (third-party iframe support)
-   */
-  async hasStorageAccess(): Promise<boolean> {
-    try {
-      // @ts-ignore
-      if (typeof document.hasStorageAccess === 'function') {
-        // @ts-ignore
-        return await (document as any).hasStorageAccess();
-      }
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
-  async requestStorageAccess(): Promise<boolean> {
-    try {
-      // @ts-ignore
-      if (typeof document.requestStorageAccess === 'function') {
-        // @ts-ignore
-        await (document as any).requestStorageAccess();
-        return true;
-      }
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
-  /**
-   * Open personal link in new tab for top-level storage access
-   */
-  openPersonalLink(code: string): void {
-    try {
-      const personalLink = this.generatePersonalLink(code);
-      console.log('Opening personal link in new tab:', personalLink);
-      
-      // Open in new tab/window for top-level interaction
-      const newWindow = window.open(personalLink, '_blank', 'noopener,noreferrer');
-      
-      if (!newWindow) {
-        console.warn('Pop-up blocked. Please allow pop-ups and try again.');
-        // Fallback: copy to clipboard
-        navigator.clipboard.writeText(personalLink).catch(() => {
-          console.warn('Could not copy link to clipboard');
-        });
-      }
-    } catch (error) {
-      console.error('Failed to open personal link:', error);
-    }
-  }
-
-  /**
-   * PostMessage protocol for host integration
-   */
-  setupPostMessageProtocol(): () => void {
-    const handleMessage = (event: MessageEvent) => {
-      // Only handle messages from parent window
-      if (event.source !== window.parent) return;
-
-      switch (event.data?.type) {
-        case 'ACCESS_CODE_SYNC':
-          const { accessCode } = event.data;
-          if (accessCode) {
-            console.log('Received access code from parent:', accessCode);
-            this.store(accessCode);
-            window.dispatchEvent(new CustomEvent('accessCodeChanged', { 
-              detail: { accessCode } 
-            }));
-          }
-          break;
-      }
-    };
-
-    window.addEventListener('message', handleMessage);
-
-    // Request access code from parent on setup
-    try {
-      window.parent.postMessage({ type: 'ACCESS_CODE_REQUEST' }, '*');
-    } catch (error) {
-      console.debug('Could not request access code from parent:', error);
-    }
-
-    return () => window.removeEventListener('message', handleMessage);
-  }
-
-  /**
-   * Notify parent of access code changes
-   */
-  notifyParentOfCodeChange(accessCode: string | null): void {
-    try {
-      window.parent.postMessage({ 
-        type: 'ACCESS_CODE_UPDATE', 
-        accessCode 
-      }, '*');
-    } catch (error) {
-      console.debug('Could not notify parent of code change:', error);
-    }
-  }
-
-  /**
-   * Check if we're in an ephemeral browser context
-   */
-  isEphemeralContext(): boolean {
-    try {
-      // Check if storage is heavily restricted
-      const testKey = '_test_storage_' + Date.now();
-      localStorage.setItem(testKey, 'test');
-      localStorage.removeItem(testKey);
-      
-      // If we can't access basic storage features, we're likely in an ephemeral context
-      return !window.navigator.storage || !window.indexedDB;
-    } catch {
-      return true;
-    }
   }
 }
 

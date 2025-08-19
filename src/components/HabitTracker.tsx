@@ -49,7 +49,6 @@ export default function HabitTracker({ onFirstInteraction, onSettingsClick, onEn
   const getHabitProgress = useCallback((habitId: string, date: Date) => {
     const dateStr = formatDate(startOfDay(date));
     const value = habitData[habitId]?.[dateStr] || 0;
-    console.log('Getting progress for habit:', habitId, 'date:', dateStr, 'value:', value, 'habitData:', habitData[habitId]);
     return typeof value === 'number' ? value : Number(value) || 0;
   }, [habitData, formatDate, startOfDay]);
 

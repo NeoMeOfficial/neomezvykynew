@@ -9,34 +9,17 @@ export const useRobustAccessCode = () => {
   const [retryCount, setRetryCount] = useState(0);
   const [lastHealthCheck, setLastHealthCheck] = useState<Date | null>(null);
 
-  // Initialize access code on mount with retry logic and postMessage support
+  // Initialize access code on mount with retry logic
   useEffect(() => {
     let isMounted = true;
     let retryTimeout: NodeJS.Timeout;
-    let cleanupPostMessage: (() => void) | undefined;
 
     const initializeWithRetry = async (attempt: number = 1) => {
       if (!isMounted) return;
 
       try {
         console.log(`Initializing access code (attempt ${attempt})`);
-        
-        // Setup postMessage protocol for host integration
-        if (attempt === 1) {
-          cleanupPostMessage = persistentStorage.setupPostMessageProtocol();
-        }
-
-        let retrievedCode = await persistentStorage.retrieve();
-
-        // Auto-restore from recent codes if not found and this is not the first time
-        if (!retrievedCode) {
-          const recent = persistentStorage.getRecentCodes();
-          if (recent && recent.length > 0) {
-            retrievedCode = recent[0].code;
-            await persistentStorage.store(retrievedCode);
-            console.log('Access code restored from recent codes');
-          }
-        }
+        const retrievedCode = await persistentStorage.retrieve();
         
         if (isMounted) {
           setAccessCode(retrievedCode);
@@ -46,13 +29,7 @@ export const useRobustAccessCode = () => {
           if (retrievedCode) {
             console.log('Access code retrieved successfully:', retrievedCode);
           } else {
-            console.log('No access code found, waiting for potential postMessage...');
-            // Give postMessage a chance to provide the code
-            setTimeout(() => {
-              if (isMounted && !accessCode) {
-                console.log('No code received via postMessage, showing welcome flow');
-              }
-            }, 1000);
+            console.log('No access code found');
           }
         }
       } catch (error) {
@@ -89,9 +66,6 @@ export const useRobustAccessCode = () => {
       isMounted = false;
       if (retryTimeout) {
         clearTimeout(retryTimeout);
-      }
-      if (cleanupPostMessage) {
-        cleanupPostMessage();
       }
     };
   }, []);
@@ -171,9 +145,6 @@ export const useRobustAccessCode = () => {
       if (stored) {
         setAccessCode(finalCode);
         
-        // Notify parent of code change
-        persistentStorage.notifyParentOfCodeChange(finalCode);
-        
         // Dispatch custom event to notify other components
         window.dispatchEvent(new CustomEvent('accessCodeChanged', { 
           detail: { accessCode: finalCode } 
@@ -198,9 +169,6 @@ export const useRobustAccessCode = () => {
       if (stored) {
         setAccessCode(formattedCode);
         
-        // Notify parent of code change
-        persistentStorage.notifyParentOfCodeChange(formattedCode);
-        
         // Dispatch custom event to notify other components
         window.dispatchEvent(new CustomEvent('accessCodeChanged', { 
           detail: { accessCode: formattedCode } 
@@ -220,9 +188,6 @@ export const useRobustAccessCode = () => {
     try {
       await persistentStorage.clear();
       setAccessCode(null);
-      
-      // Notify parent of code change
-      persistentStorage.notifyParentOfCodeChange(null);
       
       // Dispatch custom event to notify other components
       window.dispatchEvent(new CustomEvent('accessCodeChanged', { 
