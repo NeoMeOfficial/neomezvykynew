@@ -251,6 +251,33 @@ class PersistentStorage {
   }
 
   /**
+   * Pin access code to URL query parameter for maximum persistence
+   */
+  private pinToUrl(code: string): StorageResult {
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.set('access_code', code);
+      window.history.replaceState({}, '', url.toString());
+      return { success: true, value: code };
+    } catch (error) {
+      return { success: false, error: String(error) };
+    }
+  }
+
+  /**
+   * Retrieve access code from URL parameters
+   */
+  private getFromUrlParam(): StorageResult {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const value = params.get('access_code') || params.get('code');
+      return { success: true, value };
+    } catch (error) {
+      return { success: false, error: String(error) };
+    }
+  }
+
+  /**
    * Store access code using all available methods
    */
   async store(code: string): Promise<boolean> {
@@ -258,7 +285,8 @@ class PersistentStorage {
       this.storeInIndexedDB(code),
       Promise.resolve(this.storeInLocalStorage(code)),
       Promise.resolve(this.storeInCookie(code)),
-      Promise.resolve(this.storeInUrlHash(code))
+      Promise.resolve(this.storeInUrlHash(code)),
+      Promise.resolve(this.pinToUrl(code))
     ]);
 
     // Update recent codes
@@ -266,7 +294,7 @@ class PersistentStorage {
 
     // Consider successful if at least one method worked
     const successCount = results.filter(r => r.status === 'fulfilled' && r.value.success).length;
-    console.log(`Access code stored using ${successCount}/4 methods`);
+    console.log(`Access code stored using ${successCount}/5 methods`);
     
     return successCount > 0;
   }
@@ -275,8 +303,9 @@ class PersistentStorage {
    * Retrieve access code with automatic fallback
    */
   async retrieve(): Promise<string | null> {
-    // Prefer the most reliable/simple methods first to maximize persistence in embedded browsers
+    // Prefer URL param first, then the most reliable methods for embedded browsers
     const methods = [
+      () => Promise.resolve(this.getFromUrlParam()),
       () => Promise.resolve(this.getFromLocalStorage()),
       () => Promise.resolve(this.getFromCookie()),
       () => Promise.resolve(this.getFromUrlHash()),
@@ -311,13 +340,29 @@ class PersistentStorage {
       this.clearFromIndexedDB(),
       Promise.resolve(this.clearFromLocalStorage()),
       Promise.resolve(this.clearFromCookie()),
-      Promise.resolve(this.clearFromUrlHash())
+      Promise.resolve(this.clearFromUrlHash()),
+      Promise.resolve(this.clearUrlParam())
     ]);
 
     const successCount = results.filter(r => r.status === 'fulfilled' && r.value).length;
-    console.log(`Access code cleared from ${successCount}/4 storage methods`);
+    console.log(`Access code cleared from ${successCount}/5 storage methods`);
     
     return successCount > 0;
+  }
+
+  /**
+   * Clear access code from URL parameters
+   */
+  private clearUrlParam(): boolean {
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('access_code');
+      url.searchParams.delete('code');
+      window.history.replaceState({}, '', url.toString());
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 
   private async clearFromIndexedDB(): Promise<boolean> {
@@ -423,6 +468,32 @@ class PersistentStorage {
     }
 
     return results;
+  }
+
+  /**
+   * Generate a personal link with the access code
+   */
+  generatePersonalLink(code: string): string {
+    const url = new URL(window.location.origin + window.location.pathname);
+    url.searchParams.set('access_code', code);
+    return url.toString();
+  }
+
+  /**
+   * Check if we're in an ephemeral browser context
+   */
+  isEphemeralContext(): boolean {
+    try {
+      // Check if storage is heavily restricted
+      const testKey = '_test_storage_' + Date.now();
+      localStorage.setItem(testKey, 'test');
+      localStorage.removeItem(testKey);
+      
+      // If we can't access basic storage features, we're likely in an ephemeral context
+      return !window.navigator.storage || !window.indexedDB;
+    } catch {
+      return true;
+    }
   }
 }
 

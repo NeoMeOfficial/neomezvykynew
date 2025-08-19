@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAccessCode } from '@/hooks/useAccessCode';
+import { CopyLinkButton } from '@/components/CopyLinkButton';
 
 interface AccessCodeWelcomeProps {
   open: boolean;
@@ -176,9 +177,16 @@ export const AccessCodeWelcome = ({ open, onOpenChange, onEnterExistingCode }: A
                   {generatedCode}
                 </div>
               </div>
-              <Button onClick={handleContinue} className="w-full mt-3">
-                Pokračovať
-              </Button>
+              <div className="flex gap-2 mt-3">
+                <Button onClick={handleContinue} className="flex-1">
+                  Pokračovať
+                </Button>
+                <CopyLinkButton 
+                  accessCode={generatedCode} 
+                  showText={true}
+                  className="flex-1"
+                />
+              </div>
             </div>
             <div className="bg-blue-50 p-4 rounded-lg mt-4 border border-blue-200">
               <p className="text-sm text-blue-800 font-medium text-center">
