@@ -26,9 +26,10 @@ const isSameDay = (date1: Date, date2: Date): boolean => {
 interface HabitTrackerProps {
   onFirstInteraction?: () => void;
   onSettingsClick?: () => void;
+  onEnterCodeClick?: () => void;
 }
 
-export default function HabitTracker({ onFirstInteraction, onSettingsClick }: HabitTrackerProps) {
+export default function HabitTracker({ onFirstInteraction, onSettingsClick, onEnterCodeClick }: HabitTrackerProps) {
   const [showSuccessIndicator, setShowSuccessIndicator] = useState(false);
   
   const handleSuccess = useCallback(() => {

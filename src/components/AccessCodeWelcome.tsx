@@ -8,9 +8,10 @@ import { useAccessCode } from '@/hooks/useAccessCode';
 interface AccessCodeWelcomeProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onEnterExistingCode?: () => void;
 }
 
-export const AccessCodeWelcome = ({ open, onOpenChange }: AccessCodeWelcomeProps) => {
+export const AccessCodeWelcome = ({ open, onOpenChange, onEnterExistingCode }: AccessCodeWelcomeProps) => {
   const { setCustomAccessCode } = useAccessCode();
   const [step, setStep] = useState<'welcome' | 'custom' | 'code'>('welcome');
   const [generatedCode, setGeneratedCode] = useState<string>('');
@@ -87,17 +88,28 @@ export const AccessCodeWelcome = ({ open, onOpenChange }: AccessCodeWelcomeProps
               </div>
             </div>
 
-            <div className="flex gap-3">
+            <div className="space-y-3">
+              <div className="flex gap-3">
+                <Button 
+                  onClick={handleWantCode} 
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  Vytvoriť nový kód
+                </Button>
+                {onEnterExistingCode && (
+                  <Button 
+                    onClick={onEnterExistingCode}
+                    variant="outline"
+                    className="flex-1 border-blue-300 text-blue-700 hover:bg-blue-50"
+                  >
+                    Mám už kód
+                  </Button>
+                )}
+              </div>
               <Button 
-                onClick={handleWantCode} 
-                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                Vytvoriť kód
-              </Button>
-              <Button 
-                variant="outline" 
+                variant="ghost" 
                 onClick={handleSkip} 
-                className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50"
+                className="w-full text-gray-600 hover:bg-gray-50"
               >
                 Zrušiť
               </Button>

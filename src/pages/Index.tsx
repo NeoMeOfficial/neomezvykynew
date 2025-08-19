@@ -30,6 +30,10 @@ const Index = () => {
     }
   };
 
+  const handleEnterCodeClick = () => {
+    setShowCodeInput(true);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -44,7 +48,25 @@ const Index = () => {
         <HabitTracker 
           onFirstInteraction={handleFirstInteraction} 
           onSettingsClick={handleSettingsClick}
+          onEnterCodeClick={handleEnterCodeClick}
         />
+        
+        {!accessCode && (
+          <div className="max-w-[600px] mx-auto mt-4">
+            <div className="text-center p-4 bg-muted/50 rounded-lg border border-border/50">
+              <p className="text-sm text-muted-foreground mb-3">
+                Máte už prístupový kód? Zadajte ho pre prístup k vašim uloženým údajom.
+              </p>
+              <Button 
+                variant="outline" 
+                onClick={handleEnterCodeClick}
+                className="text-sm"
+              >
+                Zadať existujúci kód
+              </Button>
+            </div>
+          </div>
+        )}
         
         {accessCode && (
           <div className="fixed bottom-4 right-4">
