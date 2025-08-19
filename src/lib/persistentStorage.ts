@@ -215,6 +215,25 @@ class PersistentStorage {
   }
 
   /**
+   * Retrieve access code from URL parameters
+   */
+  private getFromUrlParams(): StorageResult {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const accessCode = urlParams.get('access_code');
+      
+      if (accessCode) {
+        console.log('Access code found in URL parameters');
+        return { success: true, value: accessCode };
+      }
+      
+      return { success: true, value: null };
+    } catch (error) {
+      return { success: false, error: String(error) };
+    }
+  }
+
+  /**
    * Add code to recent codes list
    */
   private updateRecentCodes(code: string): void {
@@ -276,6 +295,7 @@ class PersistentStorage {
    */
   async retrieve(): Promise<string | null> {
     const methods = [
+      () => Promise.resolve(this.getFromUrlParams()), // Check URL parameters first
       () => this.getFromIndexedDB(),
       () => Promise.resolve(this.getFromLocalStorage()),
       () => Promise.resolve(this.getFromCookie()),
@@ -289,6 +309,13 @@ class PersistentStorage {
           console.log('Access code retrieved successfully');
           // Update recent codes when successfully retrieved
           this.updateRecentCodes(result.value);
+          
+          // Store to all methods if retrieved from URL params (first time setup)
+          if (method === methods[0]) {
+            console.log('Storing URL parameter code to all storage methods');
+            await this.store(result.value);
+          }
+          
           return result.value;
         }
       } catch (error) {
@@ -420,6 +447,25 @@ class PersistentStorage {
     }
 
     return results;
+  }
+
+  /**
+   * Generate a personal link with the access code
+   */
+  generatePersonalLink(accessCode: string): string {
+    const baseUrl = window.location.origin + window.location.pathname;
+    return `${baseUrl}?access_code=${encodeURIComponent(accessCode)}`;
+  }
+
+  /**
+   * Check if running in an embedded context (iframe)
+   */
+  isEmbedded(): boolean {
+    try {
+      return window.self !== window.top;
+    } catch (e) {
+      return true; // If we can't access window.top, we're likely embedded
+    }
   }
 }
 

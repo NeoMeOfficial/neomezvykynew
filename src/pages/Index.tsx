@@ -73,6 +73,7 @@ const Index = () => {
             <StorageHealthIndicator 
               accessCode={accessCode} 
               onReconnect={reconnect}
+              showPersonalLink={true}
             />
           </div>
         )}

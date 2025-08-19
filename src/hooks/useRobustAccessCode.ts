@@ -224,6 +224,15 @@ export const useRobustAccessCode = () => {
     }
   }, []);
 
+  const generatePersonalLink = useCallback(() => {
+    if (!accessCode) return '';
+    return persistentStorage.generatePersonalLink(accessCode);
+  }, [accessCode]);
+
+  const isEmbedded = useCallback(() => {
+    return persistentStorage.isEmbedded();
+  }, []);
+
   return {
     accessCode,
     loading,
@@ -233,6 +242,8 @@ export const useRobustAccessCode = () => {
     enterAccessCode,
     clearAccessCode,
     getRecentCodes,
-    reconnect
+    reconnect,
+    generatePersonalLink,
+    isEmbedded
   };
 };
