@@ -169,14 +169,26 @@ export const StorageHealthIndicator: React.FC<StorageHealthIndicatorProps> = ({
             <div className="space-y-2">
               <p className="font-medium text-foreground">Storage is blocked in this widget</p>
               <p className="text-muted-foreground">
-                Enable storage access so your code persists when closing the app.
+                To enable storage access:
               </p>
-              <div className="flex gap-2">
+              <ol className="text-muted-foreground space-y-1 ml-4 list-decimal">
+                <li>Click "Open personal link" below</li>
+                <li>Return here and click "Enable storage"</li>
+              </ol>
+              <div className="flex gap-2 flex-wrap">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => accessCode && persistentStorage.openPersonalLink(accessCode)}
+                  disabled={!accessCode}
+                >
+                  Open personal link
+                </Button>
                 <Button variant="outline" size="sm" onClick={handleRequestAccess} disabled={checking}>
                   {checking ? 'Checking...' : 'Enable storage'}
                 </Button>
                 <Button variant="ghost" size="sm" onClick={copyPersonalLink}>
-                  Copy personal link
+                  Copy link
                 </Button>
               </div>
             </div>

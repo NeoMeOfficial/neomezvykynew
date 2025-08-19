@@ -510,6 +510,77 @@ class PersistentStorage {
   }
 
   /**
+   * Open personal link in new tab for top-level storage access
+   */
+  openPersonalLink(code: string): void {
+    try {
+      const personalLink = this.generatePersonalLink(code);
+      console.log('Opening personal link in new tab:', personalLink);
+      
+      // Open in new tab/window for top-level interaction
+      const newWindow = window.open(personalLink, '_blank', 'noopener,noreferrer');
+      
+      if (!newWindow) {
+        console.warn('Pop-up blocked. Please allow pop-ups and try again.');
+        // Fallback: copy to clipboard
+        navigator.clipboard.writeText(personalLink).catch(() => {
+          console.warn('Could not copy link to clipboard');
+        });
+      }
+    } catch (error) {
+      console.error('Failed to open personal link:', error);
+    }
+  }
+
+  /**
+   * PostMessage protocol for host integration
+   */
+  setupPostMessageProtocol(): () => void {
+    const handleMessage = (event: MessageEvent) => {
+      // Only handle messages from parent window
+      if (event.source !== window.parent) return;
+
+      switch (event.data?.type) {
+        case 'ACCESS_CODE_SYNC':
+          const { accessCode } = event.data;
+          if (accessCode) {
+            console.log('Received access code from parent:', accessCode);
+            this.store(accessCode);
+            window.dispatchEvent(new CustomEvent('accessCodeChanged', { 
+              detail: { accessCode } 
+            }));
+          }
+          break;
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+
+    // Request access code from parent on setup
+    try {
+      window.parent.postMessage({ type: 'ACCESS_CODE_REQUEST' }, '*');
+    } catch (error) {
+      console.debug('Could not request access code from parent:', error);
+    }
+
+    return () => window.removeEventListener('message', handleMessage);
+  }
+
+  /**
+   * Notify parent of access code changes
+   */
+  notifyParentOfCodeChange(accessCode: string | null): void {
+    try {
+      window.parent.postMessage({ 
+        type: 'ACCESS_CODE_UPDATE', 
+        accessCode 
+      }, '*');
+    } catch (error) {
+      console.debug('Could not notify parent of code change:', error);
+    }
+  }
+
+  /**
    * Check if we're in an ephemeral browser context
    */
   isEphemeralContext(): boolean {
