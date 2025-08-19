@@ -3,7 +3,7 @@ import HabitTracker from "@/components/HabitTracker";
 import { AccessCodeWelcome } from "@/components/AccessCodeWelcome";
 import { AccessCodeInput } from "@/components/AccessCodeInput";
 import { AccessCodeSettings } from "@/components/AccessCodeSettings";
-import { StorageHealthIndicator } from "@/components/StorageHealthIndicator";
+
 import { Button } from "@/components/ui/button";
 import { useAccessCode } from "@/hooks/useAccessCode";
 import { persistentStorage } from "@/lib/persistentStorage";
@@ -74,15 +74,6 @@ const Index = () => {
           </div>
         )}
         
-        {accessCode && (
-          <div className="fixed bottom-4 right-4">
-            <StorageHealthIndicator 
-              accessCode={accessCode} 
-              onReconnect={reconnect}
-              showPersonalLink={true}
-            />
-          </div>
-        )}
         
         <AccessCodeSettings 
           open={showAccessCodeSettings}
