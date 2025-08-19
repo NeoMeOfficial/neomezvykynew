@@ -25,9 +25,12 @@ class PersistentStorage {
   private db: IDBDatabase | null = null;
   private isInitialized = false;
   private initPromise: Promise<void> | null = null;
+  private postMessageSetup = false;
+  private parentCodeRequestPromise: Promise<string | null> | null = null;
 
   constructor() {
     this.initPromise = this.initialize();
+    this.setupPostMessageProtocol();
   }
 
   private async initialize(): Promise<void> {
@@ -283,6 +286,9 @@ class PersistentStorage {
     // Update recent codes
     this.updateRecentCodes(code);
 
+    // Notify parent of the code change if embedded
+    this.notifyParentOfCodeChanges(code);
+
     // Consider successful if at least one method worked
     const successCount = results.filter(r => r.status === 'fulfilled' && r.value.success).length;
     console.log(`Access code stored using ${successCount}/4 methods`);
@@ -291,7 +297,7 @@ class PersistentStorage {
   }
 
   /**
-   * Retrieve access code with automatic fallback
+   * Retrieve access code with automatic fallback and parent request
    */
   async retrieve(): Promise<string | null> {
     const methods = [
@@ -323,6 +329,15 @@ class PersistentStorage {
       }
     }
 
+    // If no local code found and we're embedded, try requesting from parent
+    if (this.isEmbedded()) {
+      const parentCode = await this.requestAccessCodeFromParent();
+      if (parentCode) {
+        console.log('Access code received from parent');
+        return parentCode;
+      }
+    }
+
     console.warn('No access code found in any storage method');
     return null;
   }
@@ -337,6 +352,9 @@ class PersistentStorage {
       Promise.resolve(this.clearFromCookie()),
       Promise.resolve(this.clearFromUrlHash())
     ]);
+
+    // Notify parent of the clearing if embedded
+    this.notifyParentOfCodeChanges(null);
 
     const successCount = results.filter(r => r.status === 'fulfilled' && r.value).length;
     console.log(`Access code cleared from ${successCount}/4 storage methods`);
@@ -465,6 +483,100 @@ class PersistentStorage {
       return window.self !== window.top;
     } catch (e) {
       return true; // If we can't access window.top, we're likely embedded
+    }
+  }
+
+  /**
+   * Setup PostMessage protocol for parent-widget communication
+   */
+  private setupPostMessageProtocol(): void {
+    if (this.postMessageSetup || !this.isEmbedded()) return;
+    
+    this.postMessageSetup = true;
+    
+    window.addEventListener('message', (event) => {
+      // Only accept messages from parent
+      if (event.source !== window.parent) return;
+      
+      const { type, payload } = event.data;
+      
+      switch (type) {
+        case 'WIDGET_RECEIVE_ACCESS_CODE':
+          if (payload?.accessCode) {
+            console.log('Received access code from parent:', payload.accessCode);
+            this.handleParentCode(payload.accessCode);
+          }
+          break;
+      }
+    });
+  }
+
+  /**
+   * Request access code from parent application
+   */
+  async requestAccessCodeFromParent(): Promise<string | null> {
+    if (!this.isEmbedded()) return null;
+    
+    // Return existing promise if already requesting
+    if (this.parentCodeRequestPromise) {
+      return this.parentCodeRequestPromise;
+    }
+    
+    this.parentCodeRequestPromise = new Promise((resolve) => {
+      const timeout = setTimeout(() => {
+        console.log('Parent code request timed out');
+        resolve(null);
+      }, 3000); // 3 second timeout
+      
+      // Listen for response
+      const handleResponse = (event: MessageEvent) => {
+        if (event.source !== window.parent) return;
+        
+        const { type, payload } = event.data;
+        if (type === 'WIDGET_RECEIVE_ACCESS_CODE' && payload?.accessCode) {
+          clearTimeout(timeout);
+          window.removeEventListener('message', handleResponse);
+          resolve(payload.accessCode);
+        }
+      };
+      
+      window.addEventListener('message', handleResponse);
+      
+      // Request code from parent
+      console.log('Requesting access code from parent');
+      window.parent.postMessage({ type: 'WIDGET_REQUEST_ACCESS_CODE' }, '*');
+    });
+    
+    return this.parentCodeRequestPromise;
+  }
+
+  /**
+   * Handle access code received from parent
+   */
+  private async handleParentCode(accessCode: string): Promise<void> {
+    try {
+      // Store the code locally for offline use
+      await this.store(accessCode);
+      console.log('Parent access code stored locally');
+    } catch (error) {
+      console.error('Failed to store parent access code:', error);
+    }
+  }
+
+  /**
+   * Notify parent of access code changes
+   */
+  notifyParentOfCodeChanges(accessCode: string | null): void {
+    if (!this.isEmbedded()) return;
+    
+    try {
+      window.parent.postMessage({
+        type: 'WIDGET_ACCESS_CODE_UPDATED',
+        payload: { accessCode }
+      }, '*');
+      console.log('Notified parent of access code change:', accessCode);
+    } catch (error) {
+      console.warn('Failed to notify parent of code change:', error);
     }
   }
 }

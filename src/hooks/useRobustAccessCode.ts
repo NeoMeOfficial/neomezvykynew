@@ -9,7 +9,7 @@ export const useRobustAccessCode = () => {
   const [retryCount, setRetryCount] = useState(0);
   const [lastHealthCheck, setLastHealthCheck] = useState<Date | null>(null);
 
-  // Initialize access code on mount with retry logic
+  // Initialize access code on mount with retry logic and parent request
   useEffect(() => {
     let isMounted = true;
     let retryTimeout: NodeJS.Timeout;

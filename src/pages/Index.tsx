@@ -6,6 +6,7 @@ import { AccessCodeSettings } from "@/components/AccessCodeSettings";
 import { StorageHealthIndicator } from "@/components/StorageHealthIndicator";
 import { Button } from "@/components/ui/button";
 import { useAccessCode } from "@/hooks/useAccessCode";
+import { persistentStorage } from "@/lib/persistentStorage";
 
 const Index = () => {
   const { accessCode, loading, reconnect } = useAccessCode();
@@ -37,7 +38,12 @@ const Index = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-muted-foreground">Načítavam...</div>
+        <div className="text-center space-y-2">
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto" />
+          <div className="text-muted-foreground">
+            {persistentStorage.isEmbedded() ? 'Connecting to your data...' : 'Načítavam...'}
+          </div>
+        </div>
       </div>
     );
   }
