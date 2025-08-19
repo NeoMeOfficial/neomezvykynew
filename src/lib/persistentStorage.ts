@@ -160,7 +160,7 @@ class PersistentStorage {
     try {
       const expiryDate = new Date();
       expiryDate.setFullYear(expiryDate.getFullYear() + 2); // 2 years
-      document.cookie = `${ACCESS_CODE_KEY}=${encodeURIComponent(code)}; expires=${expiryDate.toUTCString()}; path=/; SameSite=Strict`;
+      document.cookie = `${ACCESS_CODE_KEY}=${encodeURIComponent(code)}; expires=${expiryDate.toUTCString()}; path=/; SameSite=Lax`;
       return { success: true, value: code };
     } catch (error) {
       return { success: false, error: String(error) };

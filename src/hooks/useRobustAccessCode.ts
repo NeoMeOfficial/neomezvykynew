@@ -19,7 +19,28 @@ export const useRobustAccessCode = () => {
 
       try {
         console.log(`Initializing access code (attempt ${attempt})`);
-        const retrievedCode = await persistentStorage.retrieve();
+        let retrievedCode = await persistentStorage.retrieve();
+
+        // 1) Query param rescue (e.g., ?code=XXXX or ?access_code=XXXX)
+        if (!retrievedCode) {
+          const params = new URLSearchParams(window.location.search);
+          const urlCode = params.get('code') || params.get('access_code');
+          if (urlCode) {
+            retrievedCode = urlCode.toUpperCase().trim();
+            await persistentStorage.store(retrievedCode);
+            console.log('Access code restored from URL param');
+          }
+        }
+
+        // 2) Recent-codes rescue: force-restore last used code for this browser
+        if (!retrievedCode) {
+          const recent = persistentStorage.getRecentCodes();
+          if (recent && recent.length > 0) {
+            retrievedCode = recent[0].code;
+            await persistentStorage.store(retrievedCode);
+            console.log('Access code restored from recent codes');
+          }
+        }
         
         if (isMounted) {
           setAccessCode(retrievedCode);
