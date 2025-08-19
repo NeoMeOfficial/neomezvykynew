@@ -165,7 +165,7 @@ export const useCodeBasedHabits = (onSuccess?: () => void) => {
         if (existingHabits && existingHabits.length > 0) {
           // Convert from database format to our interface
           const mappedHabits = existingHabits.map(habit => ({
-            id: habit.id,
+            id: habit.id, // Use the database UUID, not the local ID
             name: habit.name,
             emoji: habit.emoji,
             color: habit.color,
@@ -173,7 +173,7 @@ export const useCodeBasedHabits = (onSuccess?: () => void) => {
             unit: habit.unit
           }));
           console.log('=== USING EXISTING HABITS ===');
-          console.log('Mapped habits:', mappedHabits);
+          console.log('Mapped habits with DB IDs:', mappedHabits);
           setHabits(mappedHabits);
         } else {
           // No habits found, seed with defaults
@@ -228,6 +228,7 @@ export const useCodeBasedHabits = (onSuccess?: () => void) => {
           const formattedData: Record<string, Record<string, number>> = {};
           
           entries.forEach(entry => {
+            console.log('Processing entry:', entry);
             if (!formattedData[entry.habit_id]) {
               formattedData[entry.habit_id] = {};
             }
