@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAccessCode } from '@/hooks/useAccessCode';
+import { toast } from '@/hooks/use-toast';
 
 interface AccessCodeInputProps {
   open: boolean;
@@ -15,7 +16,7 @@ export const AccessCodeInput = ({ open, onOpenChange }: AccessCodeInputProps) =>
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!code.trim()) {
       setError('Prosím zadajte váš kód');
       return;
@@ -31,12 +32,17 @@ export const AccessCodeInput = ({ open, onOpenChange }: AccessCodeInputProps) =>
       return;
     }
 
-    enterAccessCode(code);
-    setCode('');
-    setError('');
-    onOpenChange(false);
+    try {
+      await enterAccessCode(trimmedCode);
+      toast({ title: 'Kód uložený', description: 'Načítavam vaše údaje...' });
+      setCode('');
+      setError('');
+      onOpenChange(false);
+    } catch (err) {
+      console.error('Failed to enter access code:', err);
+      setError('Nepodarilo sa uložiť kód. Skúste znova.');
+    }
   };
-
   const handleClose = () => {
     setCode('');
     setError('');
