@@ -18,13 +18,15 @@ export const StorageHealthIndicator: React.FC<StorageHealthIndicatorProps> = ({
   const [checking, setChecking] = useState(false);
   const [reconnecting, setReconnecting] = useState(false);
   const [isEphemeral, setIsEphemeral] = useState(false);
-
+  const [hasStorageAccess, setHasStorageAccess] = useState<boolean | null>(null);
   const checkHealth = async () => {
     setChecking(true);
     try {
       const healthResult = await persistentStorage.healthCheck();
       setHealth(healthResult);
       setIsEphemeral(persistentStorage.isEphemeralContext());
+      const access = await (persistentStorage as any).hasStorageAccess?.();
+      setHasStorageAccess(typeof access === 'boolean' ? access : true);
     } catch (error) {
       console.error('Health check failed:', error);
     } finally {
@@ -67,6 +69,20 @@ export const StorageHealthIndicator: React.FC<StorageHealthIndicatorProps> = ({
       setReconnecting(false);
     }
   };
+  
+  const handleRequestAccess = async () => {
+    try {
+      const granted = await (persistentStorage as any).requestStorageAccess?.();
+      if (granted) {
+        toast({ title: 'Storage enabled', description: 'We can now keep your code between sessions.' });
+        await checkHealth();
+      } else {
+        toast({ title: 'Permission denied', description: 'Storage access was not granted.', variant: 'destructive' });
+      }
+    } catch (e) {
+      toast({ title: 'Permission failed', description: 'Could not request storage access.', variant: 'destructive' });
+    }
+  };
 
   useEffect(() => {
     if (accessCode) {
@@ -82,7 +98,7 @@ export const StorageHealthIndicator: React.FC<StorageHealthIndicatorProps> = ({
   if (totalMethods === 0) return null;
 
   const isHealthy = healthyMethods >= 2;
-  const showWarning = healthyMethods === 1 || isEphemeral;
+  const showWarning = healthyMethods === 1 || isEphemeral || hasStorageAccess === false;
   const isCritical = healthyMethods === 0;
 
   return (
@@ -141,6 +157,28 @@ export const StorageHealthIndicator: React.FC<StorageHealthIndicatorProps> = ({
                 <li>• Bookmark your personal link (copied above)</li>
                 <li>• Or open this app in your main browser</li>
               </ul>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {hasStorageAccess === false && (
+        <div className="bg-muted/50 border border-border rounded-lg p-3 text-xs space-y-2">
+          <div className="flex items-start gap-2">
+            <ExternalLink className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+            <div className="space-y-2">
+              <p className="font-medium text-foreground">Storage is blocked in this widget</p>
+              <p className="text-muted-foreground">
+                Enable storage access so your code persists when closing the app.
+              </p>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" onClick={handleRequestAccess} disabled={checking}>
+                  {checking ? 'Checking...' : 'Enable storage'}
+                </Button>
+                <Button variant="ghost" size="sm" onClick={copyPersonalLink}>
+                  Copy personal link
+                </Button>
+              </div>
             </div>
           </div>
         </div>

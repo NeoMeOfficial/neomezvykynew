@@ -480,6 +480,36 @@ class PersistentStorage {
   }
 
   /**
+   * Request/Check Storage Access API (third-party iframe support)
+   */
+  async hasStorageAccess(): Promise<boolean> {
+    try {
+      // @ts-ignore
+      if (typeof document.hasStorageAccess === 'function') {
+        // @ts-ignore
+        return await (document as any).hasStorageAccess();
+      }
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async requestStorageAccess(): Promise<boolean> {
+    try {
+      // @ts-ignore
+      if (typeof document.requestStorageAccess === 'function') {
+        // @ts-ignore
+        await (document as any).requestStorageAccess();
+        return true;
+      }
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
    * Check if we're in an ephemeral browser context
    */
   isEphemeralContext(): boolean {
