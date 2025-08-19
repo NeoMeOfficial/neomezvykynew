@@ -275,11 +275,12 @@ class PersistentStorage {
    * Retrieve access code with automatic fallback
    */
   async retrieve(): Promise<string | null> {
+    // Prefer the most reliable/simple methods first to maximize persistence in embedded browsers
     const methods = [
-      () => this.getFromIndexedDB(),
       () => Promise.resolve(this.getFromLocalStorage()),
       () => Promise.resolve(this.getFromCookie()),
-      () => Promise.resolve(this.getFromUrlHash())
+      () => Promise.resolve(this.getFromUrlHash()),
+      () => this.getFromIndexedDB(),
     ];
 
     for (const method of methods) {
@@ -287,6 +288,8 @@ class PersistentStorage {
         const result = await method();
         if (result.success && result.value) {
           console.log('Access code retrieved successfully');
+          // Promote the code to all storage methods to ensure persistence
+          await this.store(result.value);
           // Update recent codes when successfully retrieved
           this.updateRecentCodes(result.value);
           return result.value;
