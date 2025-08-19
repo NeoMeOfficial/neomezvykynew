@@ -237,6 +237,20 @@ class PersistentStorage {
   }
 
   /**
+   * Store access code in URL parameters without reloading
+   */
+  private storeInUrlParams(code: string): StorageResult {
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.set('access_code', code);
+      window.history.replaceState({}, '', url.toString());
+      return { success: true, value: code };
+    } catch (error) {
+      return { success: false, error: String(error) };
+    }
+  }
+
+  /**
    * Add code to recent codes list
    */
   private updateRecentCodes(code: string): void {
@@ -280,7 +294,8 @@ class PersistentStorage {
       this.storeInIndexedDB(code),
       Promise.resolve(this.storeInLocalStorage(code)),
       Promise.resolve(this.storeInCookie(code)),
-      Promise.resolve(this.storeInUrlHash(code))
+      Promise.resolve(this.storeInUrlHash(code)),
+      Promise.resolve(this.storeInUrlParams(code))
     ]);
 
     // Update recent codes
@@ -291,7 +306,7 @@ class PersistentStorage {
 
     // Consider successful if at least one method worked
     const successCount = results.filter(r => r.status === 'fulfilled' && r.value.success).length;
-    console.log(`Access code stored using ${successCount}/4 methods`);
+    console.log(`Access code stored using ${successCount}/5 methods`);
     
     return successCount > 0;
   }
@@ -350,14 +365,15 @@ class PersistentStorage {
       this.clearFromIndexedDB(),
       Promise.resolve(this.clearFromLocalStorage()),
       Promise.resolve(this.clearFromCookie()),
-      Promise.resolve(this.clearFromUrlHash())
+      Promise.resolve(this.clearFromUrlHash()),
+      Promise.resolve(this.clearFromUrlParams())
     ]);
 
     // Notify parent of the clearing if embedded
     this.notifyParentOfCodeChanges(null);
 
     const successCount = results.filter(r => r.status === 'fulfilled' && r.value).length;
-    console.log(`Access code cleared from ${successCount}/4 storage methods`);
+    console.log(`Access code cleared from ${successCount}/5 storage methods`);
     
     return successCount > 0;
   }
@@ -406,6 +422,17 @@ class PersistentStorage {
       if (window.location.hash.startsWith('#data=')) {
         window.location.hash = '';
       }
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  private clearFromUrlParams(): boolean {
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('access_code');
+      window.history.replaceState({}, '', url.toString());
       return true;
     } catch (error) {
       return false;
