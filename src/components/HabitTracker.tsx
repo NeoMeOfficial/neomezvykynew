@@ -9,6 +9,7 @@ import { MonthlyCalendar } from './MonthlyCalendar';
 import { DateNavigationHeader } from './DateNavigationHeader';
 
 import { SuccessIndicator } from './SuccessIndicator';
+import { ConnectionStatus } from './ConnectionStatus';
 
 const addDays = (date: Date, days: number): Date => {
   const newDate = new Date(date);
@@ -181,12 +182,14 @@ export default function HabitTracker({ onFirstInteraction, onSettingsClick }: Ha
           ))}
         </div>
 
-        {hasAccessCode && (
-          <div className="text-center mt-4">
-            <p className="text-green-300 text-sm">✓ Údaje sa synchronizujú s databázou</p>
-            <p className="text-muted-foreground text-xs mt-1">Aktívny kód: {accessCode}</p>
-          </div>
-        )}
+        <div className="mt-4">
+          <ConnectionStatus connected={hasAccessCode} />
+          {hasAccessCode && accessCode && (
+            <div className="text-center mt-2">
+              <p className="text-muted-foreground text-xs">Aktívny kód: {accessCode}</p>
+            </div>
+          )}
+        </div>
         
         <SuccessIndicator show={showSuccessIndicator} />
 

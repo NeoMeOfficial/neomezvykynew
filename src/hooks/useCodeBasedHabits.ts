@@ -128,12 +128,17 @@ export const useCodeBasedHabits = (onSuccess?: () => void) => {
       return;
     }
 
-    console.log('Loading habits for access code:', accessCode);
+    console.log('=== LOADING HABITS FOR ACCESS CODE ===');
+    console.log('Access code:', accessCode);
+    console.log('Current habits state:', habits.length);
     
     const loadHabits = async () => {
+      setLoading(true);
+      
       // Set a timeout to prevent infinite loading
       const timeoutId = setTimeout(() => {
-        console.warn('Habits loading timeout, falling back to defaults');
+        console.warn('=== HABITS LOADING TIMEOUT ===');
+        console.warn('Falling back to defaults after 10 seconds');
         setHabits(defaultHabits);
         setLoading(false);
       }, 10000); // 10 second timeout
@@ -148,11 +153,14 @@ export const useCodeBasedHabits = (onSuccess?: () => void) => {
         clearTimeout(timeoutId);
 
         if (error) {
-          console.error('Database error fetching habits:', error);
+          console.error('=== DATABASE ERROR FETCHING HABITS ===');
+          console.error('Error details:', error);
           throw error;
         }
 
+        console.log('=== HABITS FETCH RESULT ===');
         console.log('Existing habits found:', existingHabits?.length || 0);
+        console.log('Habits data:', existingHabits);
 
         if (existingHabits && existingHabits.length > 0) {
           // Convert from database format to our interface
@@ -164,21 +172,24 @@ export const useCodeBasedHabits = (onSuccess?: () => void) => {
             target: habit.target,
             unit: habit.unit
           }));
-          console.log('Using existing habits from database');
+          console.log('=== USING EXISTING HABITS ===');
+          console.log('Mapped habits:', mappedHabits);
           setHabits(mappedHabits);
         } else {
           // No habits found, seed with defaults
-          console.log('No existing habits found, seeding defaults...');
+          console.log('=== NO HABITS FOUND, SEEDING DEFAULTS ===');
           await seedDefaultHabits();
         }
       } catch (error) {
         clearTimeout(timeoutId);
-        console.error('Error loading habits:', error);
+        console.error('=== ERROR LOADING HABITS ===');
+        console.error('Error details:', error);
         // Fallback to default habits
-        console.log('Falling back to default habits due to error');
+        console.log('=== FALLING BACK TO DEFAULT HABITS ===');
         setHabits(defaultHabits);
       } finally {
         setLoading(false);
+        console.log('=== HABITS LOADING COMPLETE ===');
       }
     };
 
@@ -187,7 +198,14 @@ export const useCodeBasedHabits = (onSuccess?: () => void) => {
 
   // Load habit entries when access code is available
   useEffect(() => {
-    if (!accessCode) return;
+    if (!accessCode) {
+      console.log('No access code for habit entries, clearing data');
+      setHabitData({});
+      return;
+    }
+
+    console.log('=== LOADING HABIT ENTRIES ===');
+    console.log('Access code for entries:', accessCode);
 
     const loadHabitData = async () => {
       try {
@@ -196,7 +214,15 @@ export const useCodeBasedHabits = (onSuccess?: () => void) => {
           .select('*')
           .eq('access_code', accessCode);
 
-        if (error) throw error;
+        if (error) {
+          console.error('=== ERROR LOADING HABIT ENTRIES ===');
+          console.error('Error details:', error);
+          throw error;
+        }
+
+        console.log('=== HABIT ENTRIES LOADED ===');
+        console.log('Entries count:', entries?.length || 0);
+        console.log('Entries data:', entries);
 
         if (entries) {
           const formattedData: Record<string, Record<string, number>> = {};
@@ -208,9 +234,12 @@ export const useCodeBasedHabits = (onSuccess?: () => void) => {
             formattedData[entry.habit_id][entry.date] = Number(entry.value);
           });
 
+          console.log('=== FORMATTED HABIT DATA ===');
+          console.log('Formatted data:', formattedData);
           setHabitData(formattedData);
         }
       } catch (error) {
+        console.error('=== ERROR IN HABIT DATA LOADING ===');
         console.error('Error loading habit data:', error);
       }
     };

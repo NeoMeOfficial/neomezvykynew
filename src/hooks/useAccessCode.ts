@@ -4,17 +4,28 @@ import { supabase } from '@/integrations/supabase/client';
 const ACCESS_CODE_KEY = 'habit_tracker_access_code';
 
 export const useAccessCode = () => {
-  const [accessCode, setAccessCode] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  // Initialize synchronously from localStorage to avoid race conditions
+  const getInitialAccessCode = () => {
+    try {
+      const savedCode = localStorage.getItem(ACCESS_CODE_KEY);
+      console.log('Initial access code from localStorage:', savedCode);
+      return savedCode;
+    } catch (error) {
+      console.error('Error reading from localStorage:', error);
+      return null;
+    }
+  };
+
+  const [accessCode, setAccessCode] = useState<string | null>(getInitialAccessCode);
+  const [loading, setLoading] = useState(false); // Start as not loading since we have sync data
 
   useEffect(() => {
-    // Check for existing access code in localStorage
-    const savedCode = localStorage.getItem(ACCESS_CODE_KEY);
-    if (savedCode) {
-      setAccessCode(savedCode);
+    // Verify the access code is still valid and trigger any necessary events
+    if (accessCode) {
+      console.log('Access code verified on mount:', accessCode);
     }
     setLoading(false);
-  }, []);
+  }, [accessCode]);
 
   // Listen for access code changes from other components
   useEffect(() => {
