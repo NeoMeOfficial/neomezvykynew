@@ -76,6 +76,15 @@ class PersistentStorage {
     }
   }
 
+  // Normalize and sanitize access codes coming from various sources (URL, user input)
+  private sanitizeCode(code: string | null | undefined): string | null {
+    if (!code) return null;
+    // Trim spaces and zero-width chars, strip trailing non-word/hyphen chars, uppercase
+    const cleaned = code.toString().replace(/[\u200B\uFEFF]/g, '').trim();
+    const strippedTrailing = cleaned.replace(/[^\w-]+$/g, '');
+    return strippedTrailing.toUpperCase();
+  }
+
   /**
    * Store access code in IndexedDB (primary storage)
    */
@@ -226,8 +235,11 @@ class PersistentStorage {
       const accessCode = urlParams.get('access_code');
       
       if (accessCode) {
-        console.log('Access code found in URL parameters');
-        return { success: true, value: accessCode };
+        const normalized = this.sanitizeCode(accessCode);
+        if (normalized) {
+          console.log('Access code found in URL parameters');
+          return { success: true, value: normalized };
+        }
       }
       
       return { success: true, value: null };
@@ -290,19 +302,22 @@ class PersistentStorage {
    * Store access code using all available methods
    */
   async store(code: string): Promise<boolean> {
+    const normalized = this.sanitizeCode(code);
+    if (!normalized) return false;
+
     const results = await Promise.allSettled([
-      this.storeInIndexedDB(code),
-      Promise.resolve(this.storeInLocalStorage(code)),
-      Promise.resolve(this.storeInCookie(code)),
-      Promise.resolve(this.storeInUrlHash(code)),
-      Promise.resolve(this.storeInUrlParams(code))
+      this.storeInIndexedDB(normalized),
+      Promise.resolve(this.storeInLocalStorage(normalized)),
+      Promise.resolve(this.storeInCookie(normalized)),
+      Promise.resolve(this.storeInUrlHash(normalized)),
+      Promise.resolve(this.storeInUrlParams(normalized))
     ]);
 
     // Update recent codes
-    this.updateRecentCodes(code);
+    this.updateRecentCodes(normalized);
 
     // Notify parent of the code change if embedded
-    this.notifyParentOfCodeChanges(code);
+    this.notifyParentOfCodeChanges(normalized);
 
     // Consider successful if at least one method worked
     const successCount = results.filter(r => r.status === 'fulfilled' && r.value.success).length;
@@ -327,17 +342,22 @@ class PersistentStorage {
       try {
         const result = await method();
         if (result.success && result.value) {
+          const normalized = this.sanitizeCode(result.value);
+          if (!normalized) continue;
           console.log('Access code retrieved successfully');
           // Update recent codes when successfully retrieved
-          this.updateRecentCodes(result.value);
+          this.updateRecentCodes(normalized);
           
           // Store to all methods if retrieved from URL params (first time setup)
           if (method === methods[0]) {
             console.log('Storing URL parameter code to all storage methods');
-            await this.store(result.value);
+            await this.store(normalized);
+          } else {
+            // Ensure URL param mirrors the current code for resilience across reloads
+            this.storeInUrlParams(normalized);
           }
           
-          return result.value;
+          return normalized;
         }
       } catch (error) {
         console.warn('Storage method failed:', error);
