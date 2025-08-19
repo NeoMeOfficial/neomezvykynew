@@ -21,7 +21,7 @@ export const AccessCodeWelcome = ({ open, onOpenChange }: AccessCodeWelcomeProps
     setStep('custom');
   };
 
-  const handleCreateCustomCode = () => {
+  const handleCreateCustomCode = async () => {
     if (!customCode.trim()) {
       setCustomCodeError('Prosím zadajte váš kód');
       return;
@@ -32,9 +32,13 @@ export const AccessCodeWelcome = ({ open, onOpenChange }: AccessCodeWelcomeProps
       return;
     }
 
-    const finalCode = setCustomAccessCode(customCode);
-    setGeneratedCode(finalCode);
-    setStep('code');
+    try {
+      const finalCode = await setCustomAccessCode(customCode);
+      setGeneratedCode(finalCode);
+      setStep('code');
+    } catch (error) {
+      setCustomCodeError('Nepodarilo sa vytvoriť kód');
+    }
   };
 
   const handleContinue = () => {

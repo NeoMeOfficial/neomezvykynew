@@ -53,19 +53,29 @@ export const AccessCodeSettings = ({ open: externalOpen, onOpenChange }: AccessC
     setCodeSuccess('');
   };
 
-  const handleSubmitNewCode = () => {
+  const handleSubmitNewCode = async () => {
     if (changeCodeType === 'custom') {
       if (newCode.trim().length < 4) {
         setCodeError('Kód musí obsahovať minimálne 4 znaky');
         return;
       }
-      setCustomAccessCode(newCode.trim());
+      try {
+        await setCustomAccessCode(newCode.trim());
+      } catch (error) {
+        setCodeError('Nepodarilo sa vytvoriť kód');
+        return;
+      }
     } else {
       if (newCode.trim().length < 4) {
         setCodeError('Kód musí obsahovať minimálne 4 znaky');
         return;
       }
-      enterAccessCode(newCode.trim());
+      try {
+        await enterAccessCode(newCode.trim());
+      } catch (error) {
+        setCodeError('Nepodarilo sa zmeniť kód');
+        return;
+      }
     }
     
     setCodeSuccess('Kód bol úspešne zmenený!');
