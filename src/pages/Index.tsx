@@ -9,7 +9,7 @@ import { AccessCodeSettings } from "@/components/AccessCodeSettings";
 import { StorageHealthIndicator } from "@/components/StorageHealthIndicator";
 import { DateNavigationHeader } from "@/components/DateNavigationHeader";
 import { Button } from "@/components/ui/button";
-import { Fingerprint } from "lucide-react";
+import { Fingerprint, ArrowLeft } from "lucide-react";
 import { useAccessCode } from "@/hooks/useAccessCode";
 import { persistentStorage } from "@/lib/persistentStorage";
 
@@ -111,6 +111,21 @@ const Index = () => {
             hasAccessCode={!!accessCode}
             onSettingsClick={handleSettingsClick}
           />
+        </div>
+
+        {/* Back Button */}
+        <div className="max-w-[600px] mx-auto mb-6">
+          <Button 
+            onClick={() => window.history.back()}
+            className="w-full flex items-center justify-center gap-2 rounded-lg py-3 px-4 text-sm font-medium border-0 shadow-sm transition-colors"
+            style={{ 
+              backgroundColor: '#5F3E31',
+              color: '#F6F6F1'
+            }}
+          >
+            <ArrowLeft className="h-4 w-4" style={{ color: '#F6F6F1' }} />
+            Naspäť
+          </Button>
         </div>
 
         {/* Habit Tracker Widget */}
