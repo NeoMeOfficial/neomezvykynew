@@ -243,6 +243,7 @@ export const useBiometricAuth = () => {
           allowCredentials: [{
             id: credentialId,
             type: 'public-key',
+            transports: ['internal'],
           }],
           userVerification: 'required',
           timeout: 60000,
