@@ -5,6 +5,7 @@
 
 const ACCESS_CODE_KEY = 'habit_tracker_access_code';
 const RECENT_CODES_KEY = 'habit_tracker_recent_codes';
+const ZAPIER_WEBHOOK_KEY = 'habit_tracker_zapier_webhook';
 const DB_NAME = 'HabitTrackerDB';
 const DB_VERSION = 1;
 const STORE_NAME = 'accessCodes';
@@ -307,6 +308,7 @@ class PersistentStorage {
 
     const results = await Promise.allSettled([
       this.storeInIndexedDB(normalized),
+      this.storeInZapier(normalized),
       Promise.resolve(this.storeInLocalStorage(normalized)),
       Promise.resolve(this.storeInCookie(normalized)),
       Promise.resolve(this.storeInUrlHash(normalized)),
@@ -321,7 +323,7 @@ class PersistentStorage {
 
     // Consider successful if at least one method worked
     const successCount = results.filter(r => r.status === 'fulfilled' && r.value.success).length;
-    console.log(`Access code stored using ${successCount}/5 methods`);
+    console.log(`Access code stored using ${successCount}/6 methods`);
     
     return successCount > 0;
   }
@@ -466,6 +468,7 @@ class PersistentStorage {
     const testValue = 'test_' + Date.now();
     const results = {
       indexedDB: false,
+      zapier: false,
       localStorage: false,
       cookie: false,
       urlHash: false
@@ -479,6 +482,13 @@ class PersistentStorage {
       }
     } catch (error) {
       console.warn('IndexedDB health check failed:', error);
+    }
+
+    try {
+      const zapierResult = await this.storeInZapier(testValue);
+      results.zapier = zapierResult.success;
+    } catch (error) {
+      console.warn('Zapier health check failed:', error);
     }
 
     try {
@@ -520,6 +530,71 @@ class PersistentStorage {
   generatePersonalLink(accessCode: string): string {
     const baseUrl = window.location.origin + window.location.pathname;
     return `${baseUrl}?access_code=${encodeURIComponent(accessCode)}`;
+  }
+
+  /**
+   * Zapier webhook configuration methods
+   */
+  setZapierWebhook(webhookUrl: string): void {
+    try {
+      if (webhookUrl) {
+        localStorage.setItem(ZAPIER_WEBHOOK_KEY, webhookUrl);
+      } else {
+        localStorage.removeItem(ZAPIER_WEBHOOK_KEY);
+      }
+    } catch (error) {
+      console.warn('Failed to save Zapier webhook:', error);
+    }
+  }
+
+  getZapierWebhook(): string | null {
+    try {
+      return localStorage.getItem(ZAPIER_WEBHOOK_KEY);
+    } catch (error) {
+      console.warn('Failed to get Zapier webhook:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Store access code via Zapier webhook
+   */
+  private async storeInZapier(code: string): Promise<StorageResult> {
+    const webhookUrl = this.getZapierWebhook();
+    if (!webhookUrl) {
+      return { success: false, error: 'No Zapier webhook configured' };
+    }
+
+    try {
+      const response = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        mode: 'no-cors', // Handle CORS restrictions
+        body: JSON.stringify({
+          action: 'store',
+          accessCode: code,
+          timestamp: new Date().toISOString(),
+          source: window.location.origin,
+        }),
+      });
+
+      // Since we're using no-cors, we can't read the response
+      // Assume success if no error is thrown
+      return { success: true, value: code };
+    } catch (error) {
+      return { success: false, error: String(error) };
+    }
+  }
+
+  /**
+   * Retrieve access code via Zapier webhook (limited due to CORS)
+   */
+  private async getFromZapier(): Promise<StorageResult> {
+    // Due to CORS and no-cors mode, we can't retrieve data from Zapier webhooks
+    // This would require a different Zapier setup with a return endpoint
+    return { success: false, error: 'Zapier retrieval not available via webhook' };
   }
 
   /**

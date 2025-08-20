@@ -80,6 +80,7 @@ export const StorageHealthIndicator: React.FC<StorageHealthIndicatorProps> = ({
             <ShieldAlert className="w-3 h-3 text-destructive" />
           )}
           {isHealthy ? 'Secure' : showWarning ? 'Limited' : 'At Risk'}
+          {health.zapier && <span className="text-xs">+Z</span>}
         </Badge>
         
         <span className="text-muted-foreground">
