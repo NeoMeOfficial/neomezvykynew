@@ -33,9 +33,12 @@ export const BiometricPrompt = ({
       } else {
         setError('Prihlásenie sa nepodarilo');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Biometric authentication failed:', error);
-      setError('Face ID/Touch ID sa nepodarilo. Skúste znovu alebo použite kód.');
+      
+      // Show user-friendly error message if available
+      const errorMessage = error.userMessage || error.message || 'Face ID/Touch ID sa nepodarilo. Skúste znovu alebo použite kód.';
+      setError(errorMessage);
     } finally {
       setIsAuthenticating(false);
     }

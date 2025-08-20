@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useIsMobile } from './use-mobile';
+import { base64urlEncode, base64urlDecode } from '@/lib/utils';
 
 interface BiometricCapability {
   available: boolean;
@@ -9,6 +10,7 @@ interface BiometricCapability {
 
 interface BiometricCredential {
   id: string;
+  rawId: string; // Store the raw credential ID properly
   publicKey: string;
   accessCode: string;
 }
@@ -190,6 +192,7 @@ export const useBiometricAuth = () => {
       if (credential) {
         const biometricCredential: BiometricCredential = {
           id: credential.id,
+          rawId: base64urlEncode(credential.rawId), // Store rawId properly encoded
           publicKey: btoa(String.fromCharCode(...new Uint8Array((credential.response as any).publicKey))),
           accessCode,
         };
@@ -198,7 +201,10 @@ export const useBiometricAuth = () => {
         setCredential(biometricCredential);
         setIsEnrolled(true);
 
-        console.log('Biometric credential registered successfully');
+        console.log('Biometric credential registered successfully:', {
+          id: credential.id,
+          rawIdLength: credential.rawId.byteLength
+        });
         return true;
       }
 
@@ -214,6 +220,7 @@ export const useBiometricAuth = () => {
   // Authenticate with biometrics
   const authenticateWithBiometric = useCallback(async (): Promise<string | null> => {
     if (!isEnrolled || !credential) {
+      console.error('No biometric credential enrolled:', { isEnrolled, hasCredential: !!credential });
       throw new Error('No biometric credential enrolled');
     }
 
@@ -221,17 +228,25 @@ export const useBiometricAuth = () => {
       const challenge = new Uint8Array(32);
       crypto.getRandomValues(challenge);
 
-      console.log('Starting biometric authentication');
+      console.log('Starting biometric authentication with credential:', {
+        id: credential.id,
+        rawId: credential.rawId,
+        hasRawId: !!credential.rawId
+      });
+
+      // Use the properly stored rawId
+      const credentialId = credential.rawId ? base64urlDecode(credential.rawId) : new TextEncoder().encode(credential.id);
 
       const assertion = await navigator.credentials.get({
         publicKey: {
           challenge,
           allowCredentials: [{
-            id: new TextEncoder().encode(credential.id),
+            id: credentialId,
             type: 'public-key',
           }],
           userVerification: 'required',
           timeout: 60000,
+          rpId: window.location.hostname,
         },
       });
 
