@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { persistentStorage } from '@/lib/persistentStorage';
+import { useBiometricAuth } from './useBiometricAuth';
 
 const ACCESS_CODE_KEY = 'habit_tracker_access_code';
 
@@ -8,8 +9,14 @@ export const useRobustAccessCode = () => {
   const [loading, setLoading] = useState(true);
   const [retryCount, setRetryCount] = useState(0);
   const [lastHealthCheck, setLastHealthCheck] = useState<Date | null>(null);
+  const { 
+    isEnrolled, 
+    authenticateWithBiometric, 
+    shouldOfferBiometric,
+    isMobile 
+  } = useBiometricAuth();
 
-  // Initialize access code on mount with retry logic and parent request
+  // Initialize access code on mount with retry logic and biometric auth
   useEffect(() => {
     let isMounted = true;
     let retryTimeout: NodeJS.Timeout;
@@ -19,6 +26,24 @@ export const useRobustAccessCode = () => {
 
       try {
         console.log(`Initializing access code (attempt ${attempt})`);
+        
+        // Try biometric authentication first on mobile if enrolled
+        if (isMobile && isEnrolled && attempt === 1) {
+          try {
+            const biometricCode = await authenticateWithBiometric();
+            if (biometricCode && isMounted) {
+              setAccessCode(biometricCode);
+              setLoading(false);
+              setRetryCount(0);
+              console.log('Biometric authentication successful');
+              return;
+            }
+          } catch (biometricError) {
+            console.log('Biometric authentication failed, falling back to persistent storage');
+          }
+        }
+        
+        // Fallback to persistent storage
         const retrievedCode = await persistentStorage.retrieve();
         
         if (isMounted) {
@@ -68,7 +93,7 @@ export const useRobustAccessCode = () => {
         clearTimeout(retryTimeout);
       }
     };
-  }, []);
+  }, [isMobile, isEnrolled, authenticateWithBiometric]);
 
   // Periodic health check every 5 minutes
   useEffect(() => {
@@ -233,6 +258,26 @@ export const useRobustAccessCode = () => {
     return persistentStorage.isEmbedded();
   }, []);
 
+  // Biometric authentication method
+  const authenticateWithBiometrics = useCallback(async (): Promise<string | null> => {
+    if (!shouldOfferBiometric() || !isEnrolled) {
+      throw new Error('Biometric authentication not available');
+    }
+
+    try {
+      const biometricCode = await authenticateWithBiometric();
+      if (biometricCode) {
+        setAccessCode(biometricCode);
+        console.log('Biometric authentication successful');
+        return biometricCode;
+      }
+      return null;
+    } catch (error) {
+      console.error('Biometric authentication failed:', error);
+      throw error;
+    }
+  }, [shouldOfferBiometric, isEnrolled, authenticateWithBiometric]);
+
   return {
     accessCode,
     loading,
@@ -244,6 +289,11 @@ export const useRobustAccessCode = () => {
     getRecentCodes,
     reconnect,
     generatePersonalLink,
-    isEmbedded
+    isEmbedded,
+    // Biometric features
+    shouldOfferBiometric,
+    isEnrolled,
+    isMobile,
+    authenticateWithBiometrics
   };
 };

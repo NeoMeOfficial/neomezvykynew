@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import HabitTracker from "@/components/HabitTracker";
 import { AccessCodeWelcome } from "@/components/AccessCodeWelcome";
+import { BiometricWelcome } from "@/components/BiometricWelcome";
+import { BiometricPrompt } from "@/components/BiometricPrompt";
 import { AccessCodeInput } from "@/components/AccessCodeInput";
 import { AccessCodeSettings } from "@/components/AccessCodeSettings";
 import { StorageHealthIndicator } from "@/components/StorageHealthIndicator";
@@ -9,10 +11,19 @@ import { useAccessCode } from "@/hooks/useAccessCode";
 import { persistentStorage } from "@/lib/persistentStorage";
 
 const Index = () => {
-  const { accessCode, loading, reconnect } = useAccessCode();
+  const { 
+    accessCode, 
+    loading, 
+    reconnect,
+    shouldOfferBiometric,
+    isEnrolled,
+    isMobile,
+    authenticateWithBiometrics
+  } = useAccessCode();
   const [showWelcome, setShowWelcome] = useState(false);
   const [showCodeInput, setShowCodeInput] = useState(false);
   const [showAccessCodeSettings, setShowAccessCodeSettings] = useState(false);
+  const [showBiometricPrompt, setShowBiometricPrompt] = useState(false);
 
   const [hasInteracted, setHasInteracted] = useState(false);
 
@@ -32,6 +43,20 @@ const Index = () => {
   };
 
   const handleEnterCodeClick = () => {
+    setShowCodeInput(true);
+  };
+
+  const handleBiometricSuccess = (code: string) => {
+    // Access code is already set by the authenticateWithBiometrics function
+    console.log('Biometric authentication successful for code:', code);
+  };
+
+  const handleShowBiometricPrompt = () => {
+    setShowBiometricPrompt(true);
+  };
+
+  const handleEnterExistingCode = () => {
+    setShowWelcome(false);
     setShowCodeInput(true);
   };
 
@@ -61,15 +86,28 @@ const Index = () => {
           <div className="max-w-[600px] mx-auto mt-4">
             <div className="text-center p-4 bg-muted/50 rounded-lg border border-border/50">
               <p className="text-sm text-muted-foreground mb-3">
-                Máte už prístupový kód? Zadajte ho pre prístup k vašim uloženým údajom.
+                {isMobile && isEnrolled 
+                  ? "Použite Face ID alebo zadajte váš prístupový kód."
+                  : "Máte už prístupový kód? Zadajte ho pre prístup k vašim uloženým údajom."
+                }
               </p>
-              <Button 
-                variant="outline" 
-                onClick={handleEnterCodeClick}
-                className="text-sm"
-              >
-                Zadať existujúci kód
-              </Button>
+              <div className="flex gap-2 justify-center">
+                {isMobile && isEnrolled && (
+                  <Button 
+                    onClick={handleShowBiometricPrompt}
+                    className="text-sm"
+                  >
+                    Prihlásiť sa Face ID
+                  </Button>
+                )}
+                <Button 
+                  variant="outline" 
+                  onClick={handleEnterCodeClick}
+                  className="text-sm"
+                >
+                  Zadať existujúci kód
+                </Button>
+              </div>
             </div>
           </div>
         )}
@@ -89,9 +127,25 @@ const Index = () => {
           onOpenChange={setShowAccessCodeSettings}
         />
         
-        <AccessCodeWelcome 
-          open={showWelcome} 
-          onOpenChange={setShowWelcome} 
+        {shouldOfferBiometric() ? (
+          <BiometricWelcome
+            open={showWelcome}
+            onOpenChange={setShowWelcome}
+            onEnterExistingCode={handleEnterExistingCode}
+          />
+        ) : (
+          <AccessCodeWelcome
+            open={showWelcome}
+            onOpenChange={setShowWelcome}
+            onEnterExistingCode={handleEnterExistingCode}
+          />
+        )}
+        
+        <BiometricPrompt
+          open={showBiometricPrompt}
+          onOpenChange={setShowBiometricPrompt}
+          onSuccess={handleBiometricSuccess}
+          onFallbackToCode={handleEnterCodeClick}
         />
         
         <AccessCodeInput 
