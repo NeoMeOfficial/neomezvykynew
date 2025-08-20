@@ -9,12 +9,15 @@ export const useRobustAccessCode = () => {
   const [loading, setLoading] = useState(true);
   const [retryCount, setRetryCount] = useState(0);
   const [lastHealthCheck, setLastHealthCheck] = useState<Date | null>(null);
+  
+  // Always call biometric hook to maintain hook order
+  const biometric = useBiometricAuth();
   const { 
     isEnrolled, 
     authenticateWithBiometric, 
     shouldOfferBiometric,
     isMobile 
-  } = useBiometricAuth();
+  } = biometric;
 
   // Initialize access code on mount with retry logic and biometric auth
   useEffect(() => {
