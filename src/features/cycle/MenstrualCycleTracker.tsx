@@ -56,9 +56,11 @@ export default function MenstrualCycleTracker({
 
   if (loading) {
     return (
-      <div className="widget-card animate-fade-in">
-        <div className="flex items-center justify-center h-32">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <div className="bg-widget-bg p-3 w-full overflow-hidden">
+        <div className="w-full max-w-[600px] mx-auto space-y-2">
+          <div className="flex items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
         </div>
       </div>
     );
@@ -67,8 +69,8 @@ export default function MenstrualCycleTracker({
   // Welcome screen for first-time setup
   if (!cycleData.lastPeriodStart) {
     return (
-      <div className="widget-card animate-fade-in">
-        <div className="text-center space-y-6">
+      <div className="bg-widget-bg p-3 w-full overflow-hidden">
+        <div className="w-full max-w-[600px] mx-auto space-y-6">
           <div>
             <h2 className="text-xl font-heading text-widget-text mb-2">
               Menštruačný cyklus
@@ -123,17 +125,17 @@ export default function MenstrualCycleTracker({
               {UI_TEXT.lastPeriod}
             </Button>
           </div>
-        </div>
 
-        <DatePickerModal
-          isOpen={showDatePicker}
-          onClose={() => setShowDatePicker(false)}
-          onDateSelect={handleSetupComplete}
-          derivedState={derivedState}
-          cycleLength={setupCycleLength}
-          periodLength={setupPeriodLength}
-          lastPeriodStart={null}
-        />
+          <DatePickerModal
+            isOpen={showDatePicker}
+            onClose={() => setShowDatePicker(false)}
+            onDateSelect={handleSetupComplete}
+            derivedState={derivedState}
+            cycleLength={setupCycleLength}
+            periodLength={setupPeriodLength}
+            lastPeriodStart={null}
+          />
+        </div>
       </div>
     );
   }
@@ -143,7 +145,8 @@ export default function MenstrualCycleTracker({
   const nextPeriodDate = getNextPeriodDate(cycleData.lastPeriodStart!, cycleData.cycleLength);
 
   return (
-    <div className="widget-card animate-fade-in">
+    <div className="bg-widget-bg p-3 w-full overflow-hidden">
+      <div className="w-full max-w-[600px] mx-auto space-y-4">
       <div className="mb-6">
         <div className="flex items-center justify-between mb-2">
           <h2 className="text-xl font-heading text-widget-text">
@@ -220,6 +223,7 @@ export default function MenstrualCycleTracker({
         onUpdateCycleLength={setCycleLength}
         onUpdatePeriodLength={setPeriodLength}
       />
+    </div>
     </div>
   );
 }
