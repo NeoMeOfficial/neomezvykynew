@@ -19,7 +19,7 @@ export const useRobustAccessCode = () => {
     isMobile 
   } = biometric;
 
-  // Initialize access code on mount with retry logic and biometric auth
+  // Initialize access code on mount with retry logic but without automatic biometric
   useEffect(() => {
     let isMounted = true;
     let retryTimeout: NodeJS.Timeout;
@@ -30,23 +30,7 @@ export const useRobustAccessCode = () => {
       try {
         console.log(`Initializing access code (attempt ${attempt})`);
         
-        // Try biometric authentication first on mobile if enrolled
-        if (isMobile && isEnrolled && attempt === 1) {
-          try {
-            const biometricCode = await authenticateWithBiometric();
-            if (biometricCode && isMounted) {
-              setAccessCode(biometricCode);
-              setLoading(false);
-              setRetryCount(0);
-              console.log('Biometric authentication successful');
-              return;
-            }
-          } catch (biometricError) {
-            console.log('Biometric authentication failed, falling back to persistent storage');
-          }
-        }
-        
-        // Fallback to persistent storage
+        // Get code from persistent storage only (no automatic biometric)
         const retrievedCode = await persistentStorage.retrieve();
         
         if (isMounted) {
@@ -96,7 +80,7 @@ export const useRobustAccessCode = () => {
         clearTimeout(retryTimeout);
       }
     };
-  }, [isMobile, isEnrolled, authenticateWithBiometric]);
+  }, []);
 
   // Periodic health check every 5 minutes
   useEffect(() => {
@@ -107,7 +91,7 @@ export const useRobustAccessCode = () => {
         const health = await persistentStorage.healthCheck();
         const healthyMethods = Object.values(health).filter(Boolean).length;
         
-        console.log(`Storage health check: ${healthyMethods}/4 methods working`);
+        console.log(`Storage health check: ${healthyMethods}/3 methods working`);
         setLastHealthCheck(new Date());
 
         // If storage is degraded, try to restore

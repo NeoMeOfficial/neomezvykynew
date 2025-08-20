@@ -97,7 +97,7 @@ const Index = () => {
                     onClick={handleShowBiometricPrompt}
                     className="text-sm"
                   >
-                    Prihlásiť sa Face ID
+                    Prihlásiť sa
                   </Button>
                 )}
                 <Button 
