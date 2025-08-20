@@ -223,7 +223,15 @@ All colors MUST be HSL.
     border: 2px solid var(--glass-border);
     border-radius: 2rem;
     box-shadow: var(--glass-shadow);
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  /* Desktop spacing */
+  @media (min-width: 640px) {
+    .glass-container {
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
   }
 }
