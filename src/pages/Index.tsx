@@ -119,29 +119,30 @@ const Index = () => {
       <div className="w-full max-w-none px-2 sm:px-4 py-4 sm:py-8 mx-auto">
         {/* Navigation Buttons */}
         <div className="w-full max-w-[600px] mx-auto mb-4 sm:mb-6">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid gap-3" style={{ gridTemplateColumns: shouldOfferBiometric() ? '1fr 2fr' : '1fr 1fr' }}>
             <Button 
               onClick={() => window.location.href = 'https://neome.mvt.so/mj-de'}
-              className="flex items-center justify-center gap-2 rounded-3xl py-3 px-4 text-sm font-medium border-0 shadow-sm transition-colors"
-              style={{ 
-                backgroundColor: '#5F3E31',
-                color: '#F6F6F1'
-              }}
+              className="glass-surface flex items-center justify-center gap-2 rounded-3xl py-3 px-3 text-sm font-medium border-0 backdrop-blur-md transition-all hover:bg-background/30"
             >
-              <ArrowLeft className="h-4 w-4" style={{ color: '#F6F6F1' }} />
+              <ArrowLeft className="h-4 w-4" />
               Naspäť
             </Button>
-            <Button 
-              onClick={handleEnterCodeClick}
-              className="flex items-center justify-center gap-2 rounded-3xl py-3 px-4 text-sm font-medium border-2 transition-colors"
-              style={{ 
-                backgroundColor: '#F6F6F1',
-                color: '#5F3E31',
-                borderColor: '#5F3E31'
-              }}
-            >
-              Prihlásenie
-            </Button>
+            {shouldOfferBiometric() ? (
+              <Button 
+                onClick={handleShowBiometricPrompt}
+                className="glass-surface flex items-center justify-center gap-2 rounded-3xl py-3 px-4 text-sm font-medium border-0 backdrop-blur-md transition-all hover:bg-background/30"
+              >
+                <Fingerprint className="h-4 w-4" />
+                Prihlásiť sa s Face ID/Touch ID
+              </Button>
+            ) : (
+              <Button 
+                onClick={handleEnterCodeClick}
+                className="glass-surface flex items-center justify-center gap-2 rounded-3xl py-3 px-4 text-sm font-medium border-0 backdrop-blur-md transition-all hover:bg-background/30"
+              >
+                Prihlásenie
+              </Button>
+            )}
           </div>
         </div>
 
@@ -234,43 +235,19 @@ const Index = () => {
           </div>
         </div>
         
-        {!accessCode && (
+        {!accessCode && !shouldOfferBiometric() && (
           <div className="w-full max-w-[600px] mx-auto mt-4">
             <div className="text-center p-4 bg-muted/50 rounded-lg border border-border/50">
               <div className="space-y-3">
-                {shouldOfferBiometric() ? (
-                  <>
-                    <p className="text-sm text-muted-foreground">
-                      Použite Face ID pre rýchle prihlásenie
-                    </p>
-                    <Button 
-                      onClick={handleShowBiometricPrompt}
-                      className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
-                    >
-                      <Fingerprint className="mr-2 h-4 w-4" />
-                      Prihlásiť sa s Face ID/Touch ID
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      onClick={handleEnterCodeClick}
-                      className="w-full"
-                    >
-                      Použiť prístupový kód
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    <Button 
-                      onClick={handleEnterCodeClick}
-                      className="w-full"
-                    >
-                      Zadať prístupový kód
-                    </Button>
-                    <p className="text-sm text-muted-foreground">
-                      Zadajte váš prístupový kód pre prístup k údajom
-                    </p>
-                  </>
-                )}
+                <Button 
+                  onClick={handleEnterCodeClick}
+                  className="w-full"
+                >
+                  Zadať prístupový kód
+                </Button>
+                <p className="text-sm text-muted-foreground">
+                  Zadajte váš prístupový kód pre prístup k údajom
+                </p>
               </div>
             </div>
           </div>
