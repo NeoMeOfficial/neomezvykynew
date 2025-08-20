@@ -128,7 +128,7 @@ export default function ReflectionWidget({ selectedDate, onFirstInteraction }: R
             <div className="bg-gradient-success p-4 rounded-xl border border-reflection-border/30 shadow-sm">
               <div className="flex items-center gap-2 mb-3">
                 <BookOpen className="h-4 w-4 text-reflection-text" />
-                <h3 className="text-sm font-medium text-reflection-text">Čo sa mi dnes darilo?</h3>
+                <h3 className="font-medium text-sm text-reflection-text">Čo sa mi dnes darilo?</h3>
               </div>
               <Textarea
                 value={wellDone}
@@ -142,7 +142,7 @@ export default function ReflectionWidget({ selectedDate, onFirstInteraction }: R
             <div className="bg-gradient-improve p-4 rounded-xl border border-reflection-border/30 shadow-sm">
               <div className="flex items-center gap-2 mb-3">
                 <Lightbulb className="h-4 w-4 text-reflection-text" />
-                <h3 className="text-sm font-medium text-reflection-text">Čo môžem zlepšiť?</h3>
+                <h3 className="font-medium text-sm text-reflection-text">Čo môžem zlepšiť?</h3>
               </div>
               <Textarea
                 value={improve}
