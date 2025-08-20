@@ -81,48 +81,53 @@ export default function MenstrualCycleTracker({
           </div>
 
           <div className="flex justify-end">
-            <div className="space-y-4 w-48">
+            <div className="grid grid-cols-3 gap-6 items-end">
               <div className="space-y-2">
-                <Label htmlFor="setupCycleLength">{UI_TEXT.cycleLength}</Label>
-                <div className="flex items-center space-x-2">
-                  <Input
-                    id="setupCycleLength"
-                    type="number"
-                    min="21"
-                    max="45"
-                    value={setupCycleLength}
-                    onChange={(e) => setSetupCycleLength(Number(e.target.value))}
-                    className="w-20 text-base"
-                  />
-                  <span className="text-sm text-muted-foreground">{UI_TEXT.days}</span>
-                </div>
+                <Label htmlFor="setupCycleLength" className="text-sm font-medium text-widget-text">
+                  {UI_TEXT.cycleLength}
+                </Label>
+                <Input
+                  id="setupCycleLength"
+                  type="number"
+                  min="21"
+                  max="45"
+                  value={setupCycleLength}
+                  onChange={(e) => setSetupCycleLength(Number(e.target.value))}
+                  placeholder="28 dni"
+                  className="w-20 text-base"
+                />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="setupPeriodLength">{UI_TEXT.periodLength}</Label>
-                <div className="flex items-center space-x-2">
-                  <Input
-                    id="setupPeriodLength"
-                    type="number"
-                    min="2"
-                    max="10"
-                    value={setupPeriodLength}
-                    onChange={(e) => setSetupPeriodLength(Number(e.target.value))}
-                    className="w-20 text-base"
-                  />
-                  <span className="text-sm text-muted-foreground">{UI_TEXT.days}</span>
-                </div>
+                <Label htmlFor="setupPeriodLength" className="text-sm font-medium text-widget-text">
+                  {UI_TEXT.periodLength}
+                </Label>
+                <Input
+                  id="setupPeriodLength"
+                  type="number"
+                  min="2"
+                  max="10"
+                  value={setupPeriodLength}
+                  onChange={(e) => setSetupPeriodLength(Number(e.target.value))}
+                  placeholder="5 dni"
+                  className="w-20 text-base"
+                />
               </div>
 
-              <Button
-                onClick={() => setShowDatePicker(true)}
-                variant="hero"
-                size="lg"
-                className="w-full"
-              >
-                <CalendarIcon className="w-5 h-5 mr-2" />
-                {UI_TEXT.lastPeriod}
-              </Button>
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-widget-text">
+                  {UI_TEXT.lastPeriod}
+                </Label>
+                <Button
+                  onClick={() => setShowDatePicker(true)}
+                  variant="outline"
+                  size="sm"
+                  className="w-auto px-3 py-2"
+                >
+                  <CalendarIcon className="w-4 h-4 mr-2" />
+                  {UI_TEXT.selectDate}
+                </Button>
+              </div>
             </div>
           </div>
 

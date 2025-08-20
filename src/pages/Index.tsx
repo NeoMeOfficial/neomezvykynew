@@ -106,11 +106,10 @@ const Index = () => {
       <div className="w-full max-w-none px-4 py-8 mx-auto">
         {/* Navigation Buttons */}
         <div className="w-full max-w-[600px] mx-auto mb-6">
-          <div className="flex gap-3">
+          <div className="grid grid-cols-2 gap-3">
             <Button 
               onClick={() => window.location.href = 'https://neome.mvt.so/mj-de'}
-              size="sm"
-              className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium border-0 shadow-sm transition-colors"
+              className="flex items-center justify-center gap-2 rounded-lg py-3 px-4 text-sm font-medium border-0 shadow-sm transition-colors"
               style={{ 
                 backgroundColor: '#5F3E31',
                 color: '#F6F6F1'
@@ -121,8 +120,12 @@ const Index = () => {
             </Button>
             <Button 
               onClick={handleEnterCodeClick}
-              size="sm"
-              className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium border border-border bg-background hover:bg-accent"
+              className="flex items-center justify-center gap-2 rounded-lg py-3 px-4 text-sm font-medium border-2 transition-colors"
+              style={{ 
+                backgroundColor: '#F6F6F1',
+                color: '#5F3E31',
+                borderColor: '#5F3E31'
+              }}
             >
               Login
             </Button>

@@ -82,5 +82,6 @@ export const UI_TEXT = {
   today: "DNES",
   setup: "Nastavenie",
   history: "História",
-  settings: "Nastavenia"
+  settings: "Nastavenia",
+  selectDate: "Vybrať dátum"
 };
