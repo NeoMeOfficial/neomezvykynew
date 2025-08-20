@@ -61,51 +61,58 @@ export function DatePickerModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <CalendarIcon className="w-5 h-5" />
+      <DialogContent className="glass-container border-0 backdrop-blur-xl shadow-2xl sm:max-w-md">
+        <DialogHeader className="pb-4">
+          <DialogTitle className="text-xl font-semibold text-foreground flex items-center gap-3">
+            <div className="p-2 rounded-xl bg-primary/10">
+              <CalendarIcon className="w-5 h-5 text-primary" />
+            </div>
             {title}
           </DialogTitle>
         </DialogHeader>
         
-        <div className="space-y-4">
-          <Calendar
-            mode="single"
-            selected={selectedDate}
-            onSelect={handleDateSelect}
-            disabled={(date) => 
-              !validateDate(date, derivedState.minDate, derivedState.maxDate)
-            }
-            modifiers={{
-              period: (date) => 
-                lastPeriodStart ? isPeriodDate(date, lastPeriodStart, cycleLength, periodLength) : false
-            }}
-            modifiersStyles={{
-              period: { 
-                backgroundColor: 'hsl(var(--blush))', 
-                color: 'white',
-                borderRadius: '4px'
+        <div className="space-y-6">
+          <div className="glass-surface rounded-2xl p-4">
+            <Calendar
+              mode="single"
+              selected={selectedDate}
+              onSelect={handleDateSelect}
+              disabled={(date) => 
+                !validateDate(date, derivedState.minDate, derivedState.maxDate)
               }
-            }}
-            className="rounded-md border glass-surface"
-          />
+              modifiers={{
+                period: (date) => 
+                  lastPeriodStart ? isPeriodDate(date, lastPeriodStart, cycleLength, periodLength) : false
+              }}
+              modifiersStyles={{
+                period: { 
+                  backgroundColor: 'hsl(var(--blush))', 
+                  color: 'white',
+                  borderRadius: '8px',
+                  fontWeight: 'bold'
+                }
+              }}
+              className="rounded-xl border-0"
+            />
+          </div>
           
           {selectedDate && (
-            <div className="text-center text-sm text-muted-foreground">
-              Vybraný dátum: {formatDateSk(selectedDate)}
+            <div className="glass-surface rounded-xl p-3 text-center">
+              <p className="text-sm font-medium text-foreground/80">
+                Vybraný dátum: <span className="text-foreground font-semibold">{formatDateSk(selectedDate)}</span>
+              </p>
             </div>
           )}
           
-          <div className="flex gap-2 justify-end">
-            <Button variant="outline" onClick={handleCancel}>
+          <div className="flex gap-3 justify-end pt-2">
+            <Button variant="ghost" onClick={handleCancel} className="glass-surface border-0 hover:bg-background/50">
               <X className="w-4 h-4 mr-2" />
               {UI_TEXT.cancel}
             </Button>
             <Button 
               onClick={handleConfirm} 
               disabled={!selectedDate}
-              variant="hero"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg"
             >
               <Check className="w-4 h-4 mr-2" />
               {UI_TEXT.save}

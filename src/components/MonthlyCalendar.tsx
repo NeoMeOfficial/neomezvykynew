@@ -65,47 +65,50 @@ export const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
         month={selectedMonth}
         modifiers={modifiers}
         modifiersStyles={modifiersStyles}
-        className={cn("rounded-md border glass-surface")}
+        className={cn("rounded-xl border-0")}
         showOutsideDays={false}
       />
       
-      <div className="space-y-1.5 text-xs">
-        <div className="flex items-center gap-1.5">
-          <div className="w-3 h-3 rounded bg-green-500"></div>
-          <span>Všetky návyky dokončené</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <div className="w-3 h-3 rounded bg-yellow-500"></div>
-          <span>Čiastočne dokončené</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <div className="w-3 h-3 rounded bg-gray-200"></div>
-          <span>Bez aktivity</span>
+      <div className="glass-surface rounded-xl p-4 mt-4 space-y-3">
+        <h4 className="text-sm font-semibold text-foreground/80 mb-3">Legenda</h4>
+        <div className="grid grid-cols-1 gap-2 text-xs">
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded bg-green-500 shadow-sm"></div>
+            <span className="text-foreground/70">Všetky návyky dokončené</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded bg-yellow-500 shadow-sm"></div>
+            <span className="text-foreground/70">Čiastočne dokončené</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded bg-muted shadow-sm"></div>
+            <span className="text-foreground/70">Bez aktivity</span>
+          </div>
         </div>
       </div>
 
       {selectedDate && (
-        <div className="mt-3 p-2.5 bg-gray-50 rounded-lg">
-          <h4 className="font-medium mb-1.5 text-sm">
+        <div className="glass-surface rounded-xl p-4 mt-4">
+          <h4 className="font-semibold mb-3 text-sm text-foreground">
             {selectedDate.toLocaleDateString('sk-SK', { 
               weekday: 'long',
               day: 'numeric',
               month: 'long'
             })}
           </h4>
-          <div className="space-y-0.5">
+          <div className="space-y-2">
             {habits.map(habit => {
               const dateStr = formatDate(selectedDate);
               const value = habitData[habit.id]?.[dateStr] || 0;
               const isCompleted = value >= habit.target;
               
               return (
-                <div key={habit.id} className="flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-sm">{habit.emoji}</span>
-                    <span>{habit.name}</span>
+                <div key={habit.id} className="flex items-center justify-between p-2 rounded-lg bg-background/30 backdrop-blur-sm">
+                  <div className="flex items-center gap-2">
+                    <span className="text-base">{habit.emoji}</span>
+                    <span className="text-sm font-medium text-foreground/80">{habit.name}</span>
                   </div>
-                  <div className={`font-medium ${isCompleted ? 'text-green-600' : 'text-gray-500'}`}>
+                  <div className={`text-sm font-semibold ${isCompleted ? 'text-green-600' : 'text-foreground/60'}`}>
                     {habit.name === 'Hydratácia' ? Number(value).toFixed(1) : Math.round(Number(value))} / {habit.target} {habit.unit}
                   </div>
                 </div>

@@ -171,17 +171,24 @@ const Index = () => {
                       <Calendar size={20} className="text-foreground" />
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="max-w-fit">
-                    <DialogHeader className="pb-0">
-                      <DialogTitle className="text-lg">Mesačný pohľad - Návyky</DialogTitle>
+                  <DialogContent className="glass-container border-0 backdrop-blur-xl shadow-2xl">
+                    <DialogHeader className="pb-4">
+                      <DialogTitle className="text-xl font-semibold text-foreground flex items-center gap-3">
+                        <div className="p-2 rounded-xl bg-primary/10">
+                          <Calendar size={20} className="text-primary" />
+                        </div>
+                        Mesačný pohľad - Návyky
+                      </DialogTitle>
                     </DialogHeader>
-                    <MonthlyCalendar
-                      habitData={habitData}
-                      selectedMonth={monthlyCalendarDate}
-                      onMonthChange={setMonthlyCalendarDate}
-                      habits={habits}
-                      formatDate={habitFormatDate}
-                    />
+                    <div className="glass-surface rounded-2xl p-4">
+                      <MonthlyCalendar
+                        habitData={habitData}
+                        selectedMonth={monthlyCalendarDate}
+                        onMonthChange={setMonthlyCalendarDate}
+                        habits={habits}
+                        formatDate={habitFormatDate}
+                      />
+                    </div>
                   </DialogContent>
                 </Dialog>
               </div>
