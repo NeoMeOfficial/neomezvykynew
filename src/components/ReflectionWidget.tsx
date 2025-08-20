@@ -116,7 +116,7 @@ export default function ReflectionWidget({ selectedDate, onFirstInteraction }: R
       <div className="max-w-[600px] mx-auto space-y-4">
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-widget-text">Denná reflexia</h2>
+            <h2 className="text-lg font-heading font-semibold text-widget-text">Denná reflexia</h2>
             <div className="flex items-center space-x-2">
               <p className="text-sm text-widget-text-soft">
                 {isCompleted ? 'Dokončené' : 'Nedokončené'}
@@ -184,9 +184,6 @@ export default function ReflectionWidget({ selectedDate, onFirstInteraction }: R
           </div>
         </div>
 
-        <div className="mt-4">
-          <ConnectionStatus connected={hasAccessCode} />
-        </div>
       </div>
     </div>
   );

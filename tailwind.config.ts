@@ -82,6 +82,10 @@ export default {
 					border: 'hsl(var(--reflection-border))'
 				}
 			},
+			fontFamily: {
+				'heading': ['Lexend Deca', 'sans-serif'],
+				'body': ['Open Sans', 'sans-serif'],
+			},
 			backgroundImage: {
 				'gradient-success': 'var(--gradient-success)',
 				'gradient-improve': 'var(--gradient-improve)',

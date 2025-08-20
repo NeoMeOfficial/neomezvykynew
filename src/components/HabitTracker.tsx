@@ -112,7 +112,7 @@ export default function HabitTracker({ selectedDate, onFirstInteraction }: Habit
       <div className="max-w-[600px] mx-auto space-y-4">
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-widget-text">Moje návyky</h2>
+            <h2 className="text-lg font-heading font-semibold text-widget-text">Moje návyky</h2>
             <div className="flex items-center space-x-2">
               <p className="text-sm text-widget-text-soft">
                 {completedCount} z {habits.length} dokončených
@@ -150,17 +150,7 @@ export default function HabitTracker({ selectedDate, onFirstInteraction }: Habit
           ))}
         </div>
 
-        <div className="mt-4">
-          <ConnectionStatus connected={hasAccessCode} />
-          {hasAccessCode && accessCode && (
-            <div className="text-center mt-2">
-              <p className="text-widget-text-soft text-xs">Aktívny kód: {accessCode}</p>
-            </div>
-          )}
-        </div>
-        
         <SuccessIndicator show={showSuccessIndicator} />
-
       </div>
     </div>
   );
