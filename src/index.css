@@ -145,4 +145,9 @@ All colors MUST be HSL.
     overflow-x: hidden;
     width: 100%;
   }
+  
+  /* Prevent iOS zoom on input focus */
+  input, textarea, select {
+    font-size: 16px !important;
+  }
 }
