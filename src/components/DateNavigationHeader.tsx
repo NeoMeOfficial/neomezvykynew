@@ -1,6 +1,8 @@
-import React, { useCallback } from 'react';
-import { ChevronLeft, ChevronRight, Calendar, Save, Settings } from 'lucide-react';
+import React, { useCallback, useState } from 'react';
+import { ChevronLeft, ChevronRight, Calendar, Key, Settings, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useBiometricAuth } from '@/hooks/useBiometricAuth';
+import { useRobustAccessCode } from '@/hooks/useRobustAccessCode';
 
 // Utility functions
 const formatDate = (date: Date): string => {
@@ -48,6 +50,10 @@ export const DateNavigationHeader: React.FC<DateNavigationHeaderProps> = ({
   hasAccessCode,
   onSettingsClick
 }) => {
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
+  const { authenticateWithBiometric, shouldOfferBiometric } = useBiometricAuth();
+  const { enterAccessCode } = useRobustAccessCode();
+  
   const today = formatDate(new Date());
   const isToday = currentDate === today;
   const hasNextDay = currentDate < today;
@@ -65,6 +71,28 @@ export const DateNavigationHeader: React.FC<DateNavigationHeaderProps> = ({
   const goToToday = useCallback(() => {
     onDateChange(today);
   }, [today, onDateChange]);
+
+  const handleBiometricAuth = useCallback(async () => {
+    if (!shouldOfferBiometric()) {
+      onSettingsClick();
+      return;
+    }
+
+    setIsAuthenticating(true);
+    try {
+      const accessCode = await authenticateWithBiometric();
+      if (accessCode) {
+        await enterAccessCode(accessCode);
+        // Access code is now set, the component will re-render
+      }
+    } catch (error) {
+      console.error('Biometric authentication failed:', error);
+      // Fallback to regular access code input
+      onSettingsClick();
+    } finally {
+      setIsAuthenticating(false);
+    }
+  }, [shouldOfferBiometric, authenticateWithBiometric, enterAccessCode, onSettingsClick]);
 
   return (
     <div className="flex items-center justify-between p-4 bg-white/60 backdrop-blur-sm rounded-lg border border-reflection-border/30 shadow-sm my-0 mx-0 px-[26px] py-[3px] max-w-[600px] mx-auto">
@@ -102,16 +130,19 @@ export const DateNavigationHeader: React.FC<DateNavigationHeaderProps> = ({
         <Button 
           variant="ghost" 
           size="sm" 
-          onClick={onSettingsClick}
+          onClick={hasAccessCode ? onSettingsClick : handleBiometricAuth}
+          disabled={isAuthenticating}
           className={hasAccessCode 
             ? "text-green-700 hover:bg-green-100/80 bg-green-100/50"
             : "text-orange-700 bg-orange-100/50 hover:bg-orange-100/80"
           }
         >
-          {hasAccessCode ? (
+          {isAuthenticating ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : hasAccessCode ? (
             <Settings className="h-4 w-4" />
           ) : (
-            <Save className="h-4 w-4" />
+            <Key className="h-4 w-4" />
           )}
         </Button>
         

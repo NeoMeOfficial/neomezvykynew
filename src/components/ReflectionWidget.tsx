@@ -1,5 +1,5 @@
-import React, { useState, useCallback, useMemo } from 'react';
-import { BookOpen, Lightbulb, Loader2, NotebookPen } from 'lucide-react';
+import React, { useState, useCallback, useMemo, useRef } from 'react';
+import { BookOpen, Lightbulb, Loader2, NotebookPen, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
@@ -32,6 +32,11 @@ export default function ReflectionWidget({ selectedDate, onFirstInteraction }: R
   } = useReflectionData();
   
   const [showDiaryView, setShowDiaryView] = useState(false);
+  const [wellDoneSaveStatus, setWellDoneSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+  const [improveSaveStatus, setImproveSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+  
+  const wellDoneTimeoutRef = useRef<NodeJS.Timeout>();
+  const improveTimeoutRef = useRef<NodeJS.Timeout>();
 
   const currentReflection = getReflection(selectedDate);
   const [wellDone, setWellDone] = useState(currentReflection?.well_done || '');
@@ -53,21 +58,64 @@ export default function ReflectionWidget({ selectedDate, onFirstInteraction }: R
     return motivationalQuotes[Math.abs(hash) % motivationalQuotes.length];
   }, [selectedDate, formatDate]);
 
+  // Debounced save functions
+  const debouncedSaveWellDone = useCallback((value: string) => {
+    if (wellDoneTimeoutRef.current) {
+      clearTimeout(wellDoneTimeoutRef.current);
+    }
+    
+    wellDoneTimeoutRef.current = setTimeout(async () => {
+      await updateReflection(selectedDate, value || null, improve || null);
+    }, 500);
+  }, [selectedDate, improve, updateReflection]);
+
+  const debouncedSaveImprove = useCallback((value: string) => {
+    if (improveTimeoutRef.current) {
+      clearTimeout(improveTimeoutRef.current);
+    }
+    
+    improveTimeoutRef.current = setTimeout(async () => {
+      await updateReflection(selectedDate, wellDone || null, value || null);
+    }, 500);
+  }, [selectedDate, wellDone, updateReflection]);
+
   const handleWellDoneChange = useCallback((value: string) => {
     setWellDone(value);
-    updateReflection(selectedDate, value || null, improve || null);
+    debouncedSaveWellDone(value);
     if (onFirstInteraction) {
       onFirstInteraction();
     }
-  }, [selectedDate, improve, updateReflection, onFirstInteraction]);
+  }, [debouncedSaveWellDone, onFirstInteraction]);
 
   const handleImproveChange = useCallback((value: string) => {
     setImprove(value);
-    updateReflection(selectedDate, wellDone || null, value || null);
+    debouncedSaveImprove(value);
     if (onFirstInteraction) {
       onFirstInteraction();
     }
-  }, [selectedDate, wellDone, updateReflection, onFirstInteraction]);
+  }, [debouncedSaveImprove, onFirstInteraction]);
+
+  const handleWellDoneSave = useCallback(async () => {
+    setWellDoneSaveStatus('saving');
+    try {
+      await updateReflection(selectedDate, wellDone || null, improve || null);
+      setWellDoneSaveStatus('saved');
+      setTimeout(() => setWellDoneSaveStatus('idle'), 2000);
+    } catch (error) {
+      setWellDoneSaveStatus('idle');
+    }
+  }, [selectedDate, wellDone, improve, updateReflection]);
+
+  const handleImproveSave = useCallback(async () => {
+    setImproveSaveStatus('saving');
+    try {
+      await updateReflection(selectedDate, wellDone || null, improve || null);
+      setImproveSaveStatus('saved');
+      setTimeout(() => setImproveSaveStatus('idle'), 2000);
+    } catch (error) {
+      setImproveSaveStatus('idle');
+    }
+  }, [selectedDate, wellDone, improve, updateReflection]);
 
   const isCompleted = isReflectionCompleted(selectedDate);
 
@@ -135,9 +183,16 @@ export default function ReflectionWidget({ selectedDate, onFirstInteraction }: R
                   size="sm"
                   variant="outline"
                   className="h-7 px-2 text-xs bg-white/50 border-reflection-border/50 text-reflection-text hover:bg-white/70"
-                  onClick={() => handleWellDoneChange(wellDone)}
+                  onClick={handleWellDoneSave}
+                  disabled={wellDoneSaveStatus === 'saving'}
                 >
-                  Uložiť
+                  {wellDoneSaveStatus === 'saved' ? (
+                    <Check className="h-3 w-3 text-green-600" />
+                  ) : wellDoneSaveStatus === 'saving' ? (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  ) : (
+                    'Uložiť'
+                  )}
                 </Button>
               </div>
               <Textarea
@@ -159,9 +214,16 @@ export default function ReflectionWidget({ selectedDate, onFirstInteraction }: R
                   size="sm"
                   variant="outline"
                   className="h-7 px-2 text-xs bg-white/50 border-reflection-border/50 text-reflection-text hover:bg-white/70"
-                  onClick={() => handleImproveChange(improve)}
+                  onClick={handleImproveSave}
+                  disabled={improveSaveStatus === 'saving'}
                 >
-                  Uložiť
+                  {improveSaveStatus === 'saved' ? (
+                    <Check className="h-3 w-3 text-green-600" />
+                  ) : improveSaveStatus === 'saving' ? (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  ) : (
+                    'Uložiť'
+                  )}
                 </Button>
               </div>
               <Textarea
