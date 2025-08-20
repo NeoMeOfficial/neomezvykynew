@@ -54,9 +54,23 @@ export const BiometricWelcome = ({ open, onOpenChange, onEnterExistingCode }: Bi
       
       setGeneratedCode(finalCode);
       setStep('code');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to register biometric:', error);
-      setBiometricError('Nepodarilo sa nastaviť Face ID. Skúste to znovu.');
+      
+      // Handle specific error types from enhanced error parsing
+      if (error.userMessage) {
+        setBiometricError(error.userMessage);
+      } else if (error.code === 'USER_CANCELLED') {
+        setBiometricError('Prihlásenie bolo zrušené. Skúste to znovu.');
+      } else if (error.code === 'NOT_SUPPORTED') {
+        setBiometricError('Face ID/Touch ID nie je na tomto zariadení podporované. Môžete pokračovať iba s kódom.');
+      } else if (error.code === 'SECURITY_ERROR') {
+        setBiometricError('Bezpečnostný problém. Skúste aplikáciu otvoriť v bezpečnom pripojení.');
+      } else if (error.code === 'ALREADY_REGISTERED') {
+        setBiometricError('Face ID je už nastavené pre tento kód. Skúste zadať iný kód.');
+      } else {
+        setBiometricError('Nepodarilo sa aktivovať Face ID. Môžete pokračovať iba s kódom.');
+      }
     } finally {
       setIsRegistering(false);
     }

@@ -13,6 +13,13 @@ interface BiometricCredential {
   accessCode: string;
 }
 
+interface BiometricError {
+  code: string;
+  message: string;
+  userMessage: string;
+  debugging?: string;
+}
+
 export const useBiometricAuth = () => {
   const [isSupported, setIsSupported] = useState(false);
   const [isAvailable, setIsAvailable] = useState(false);
@@ -76,15 +83,87 @@ export const useBiometricAuth = () => {
     initializeBiometric();
   }, [isMobile, checkBiometricCapability]);
 
+  // Parse WebAuthn error into user-friendly message
+  const parseWebAuthnError = useCallback((error: any): BiometricError => {
+    console.log('WebAuthn Error Details:', {
+      name: error.name,
+      message: error.message,
+      code: error.code,
+      stack: error.stack,
+      userAgent: navigator.userAgent,
+      isSecure: window.location.protocol === 'https:',
+      isLocalhost: window.location.hostname === 'localhost'
+    });
+
+    // User cancelled or timeout
+    if (error.name === 'NotAllowedError' || error.message?.includes('cancel')) {
+      return {
+        code: 'USER_CANCELLED',
+        message: error.message,
+        userMessage: 'Prihlásenie bolo zrušené. Skúste to znovu.',
+        debugging: 'User cancelled the biometric prompt or it timed out'
+      };
+    }
+
+    // Not supported
+    if (error.name === 'NotSupportedError') {
+      return {
+        code: 'NOT_SUPPORTED',
+        message: error.message,
+        userMessage: 'Face ID/Touch ID nie je na tomto zariadení podporované.',
+        debugging: 'WebAuthn or platform authenticator not supported'
+      };
+    }
+
+    // Security requirements not met
+    if (error.name === 'SecurityError') {
+      return {
+        code: 'SECURITY_ERROR',
+        message: error.message,
+        userMessage: 'Bezpečnostný problém. Skúste aplikáciu otvoriť v bezpečnom pripojení (HTTPS).',
+        debugging: 'Security requirements not met - likely HTTPS required'
+      };
+    }
+
+    // Invalid state (already registered)
+    if (error.name === 'InvalidStateError') {
+      return {
+        code: 'ALREADY_REGISTERED',
+        message: error.message,
+        userMessage: 'Face ID je už nastavené pre tento kód. Skúste zadať iný kód.',
+        debugging: 'Credential already exists for this user'
+      };
+    }
+
+    // Unknown error
+    return {
+      code: 'UNKNOWN_ERROR',
+      message: error.message || 'Unknown error',
+      userMessage: 'Neočakávaná chyba. Skúste to znovu alebo použite iba prístupový kód.',
+      debugging: `Unknown WebAuthn error: ${error.name || 'NoName'} - ${error.message || 'NoMessage'}`
+    };
+  }, []);
+
   // Register biometric credential
   const registerBiometric = useCallback(async (accessCode: string): Promise<boolean> => {
+    console.log('Starting biometric registration for accessCode:', accessCode);
+    console.log('Current capabilities:', { isSupported, isAvailable, isMobile });
+    
     if (!isSupported || !isAvailable) {
-      throw new Error('Biometric authentication not available');
+      const error = new Error('Biometric authentication not available');
+      console.error('Registration failed - not available:', { isSupported, isAvailable });
+      throw error;
     }
 
     try {
       const challenge = new Uint8Array(32);
       crypto.getRandomValues(challenge);
+
+      console.log('Creating WebAuthn credential with:', {
+        rpId: window.location.hostname,
+        userAgent: navigator.userAgent,
+        protocol: window.location.protocol
+      });
 
       const credential = await navigator.credentials.create({
         publicKey: {
@@ -123,12 +202,14 @@ export const useBiometricAuth = () => {
         return true;
       }
 
+      console.error('Credential creation returned null');
       return false;
     } catch (error) {
-      console.error('Failed to register biometric credential:', error);
-      throw error;
+      const parsedError = parseWebAuthnError(error);
+      console.error('Failed to register biometric credential:', parsedError);
+      throw parsedError;
     }
-  }, [isSupported, isAvailable]);
+  }, [isSupported, isAvailable, parseWebAuthnError]);
 
   // Authenticate with biometrics
   const authenticateWithBiometric = useCallback(async (): Promise<string | null> => {
@@ -139,6 +220,8 @@ export const useBiometricAuth = () => {
     try {
       const challenge = new Uint8Array(32);
       crypto.getRandomValues(challenge);
+
+      console.log('Starting biometric authentication');
 
       const assertion = await navigator.credentials.get({
         publicKey: {
@@ -157,12 +240,14 @@ export const useBiometricAuth = () => {
         return credential.accessCode;
       }
 
+      console.log('Biometric authentication returned null');
       return null;
     } catch (error) {
-      console.error('Biometric authentication failed:', error);
-      throw error;
+      const parsedError = parseWebAuthnError(error);
+      console.error('Biometric authentication failed:', parsedError);
+      throw parsedError;
     }
-  }, [credential, isEnrolled]);
+  }, [credential, isEnrolled, parseWebAuthnError]);
 
   // Clear biometric credential
   const clearBiometric = useCallback(async (): Promise<void> => {
