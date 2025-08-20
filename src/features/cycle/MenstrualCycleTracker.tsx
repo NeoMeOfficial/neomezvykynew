@@ -76,10 +76,10 @@ export default function MenstrualCycleTracker({
             </p>
           </div>
 
-          <div className="flex justify-end">
-            <div className="grid grid-cols-3 gap-6 items-end">
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 sm:items-end">
               <div className="space-y-2">
-                <Label htmlFor="setupCycleLength" className="text-sm font-medium text-widget-text">
+                <Label htmlFor="setupCycleLength" className="text-sm font-medium text-widget-text block">
                   {UI_TEXT.cycleLength}
                 </Label>
                 <Input
@@ -90,12 +90,12 @@ export default function MenstrualCycleTracker({
                   value={setupCycleLength}
                   onChange={(e) => setSetupCycleLength(Number(e.target.value))}
                   placeholder="28 dni"
-                  className="w-20 text-base"
+                  className="w-full sm:w-20 text-base"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="setupPeriodLength" className="text-sm font-medium text-widget-text">
+                <Label htmlFor="setupPeriodLength" className="text-sm font-medium text-widget-text block">
                   {UI_TEXT.periodLength}
                 </Label>
                 <Input
@@ -106,19 +106,19 @@ export default function MenstrualCycleTracker({
                   value={setupPeriodLength}
                   onChange={(e) => setSetupPeriodLength(Number(e.target.value))}
                   placeholder="5 dni"
-                  className="w-20 text-base"
+                  className="w-full sm:w-20 text-base"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-widget-text">
+                <Label className="text-sm font-medium text-widget-text block">
                   {UI_TEXT.lastPeriod}
                 </Label>
                 <Button
                   onClick={() => setShowDatePicker(true)}
                   variant="outline"
                   size="sm"
-                  className="w-auto px-3 py-2"
+                  className="w-full sm:w-auto px-3 py-2 text-sm"
                 >
                   <CalendarIcon className="w-4 h-4 mr-2" />
                   {UI_TEXT.selectDate}
