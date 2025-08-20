@@ -48,29 +48,28 @@ export const BiometricWelcome = ({ open, onOpenChange, onEnterExistingCode }: Bi
     try {
       // First create the access code
       const finalCode = await setCustomAccessCode(customCode);
-      
-      // Then register biometric credential with the final code
-      await registerBiometric(finalCode);
-      
       setGeneratedCode(finalCode);
-      setStep('code');
-    } catch (error: any) {
-      console.error('Failed to register biometric:', error);
       
-      // Handle specific error types from enhanced error parsing
-      if (error.userMessage) {
-        setBiometricError(error.userMessage);
-      } else if (error.code === 'USER_CANCELLED') {
-        setBiometricError('Prihlásenie bolo zrušené. Skúste to znovu.');
-      } else if (error.code === 'NOT_SUPPORTED') {
-        setBiometricError('Face ID/Touch ID nie je na tomto zariadení podporované. Môžete pokračovať iba s kódom.');
-      } else if (error.code === 'SECURITY_ERROR') {
-        setBiometricError('Bezpečnostný problém. Skúste aplikáciu otvoriť v bezpečnom pripojení.');
-      } else if (error.code === 'ALREADY_REGISTERED') {
-        setBiometricError('Face ID je už nastavené pre tento kód. Skúste zadať iný kód.');
-      } else {
-        setBiometricError('Nepodarilo sa aktivovať Face ID. Môžete pokračovať iba s kódom.');
+      // Try to register biometric credential with the final code
+      try {
+        await registerBiometric(finalCode);
+        setStep('code');
+      } catch (biometricError: any) {
+        // If biometric registration fails, we still have the code
+        console.warn('Biometric registration failed, but code was created:', biometricError);
+        
+        // Show specific error message but continue with code
+        if (biometricError.userMessage) {
+          setBiometricError(`${biometricError.userMessage} Váš kód je však vytvorený.`);
+        } else {
+          setBiometricError('Face ID sa nepodarilo aktivovať, ale váš kód je vytvorený.');
+        }
+        
+        setStep('code');
       }
+    } catch (error: any) {
+      console.error('Failed to create access code:', error);
+      setCustomCodeError('Nepodarilo sa vytvoriť kód. Skúste to znovu.');
     } finally {
       setIsRegistering(false);
     }
@@ -304,8 +303,12 @@ export const BiometricWelcome = ({ open, onOpenChange, onEnterExistingCode }: Bi
               
               <div className="bg-accent/50 p-4 rounded-lg border border-accent">
                 <p className="text-sm text-muted-foreground font-medium text-center">
-                  💡 Na tomto zariadení sa môžete prihlasovať pomocou Face ID/Touch ID. 
-                  Kód použite na iných zariadeniach.
+                  {biometricError ? (
+                    <>⚠️ {biometricError}</>
+                  ) : (
+                    <>💡 Na tomto zariadení sa môžete prihlasovať pomocou Face ID/Touch ID. 
+                    Kód použite na iných zariadeniach.</>
+                  )}
                 </p>
               </div>
               

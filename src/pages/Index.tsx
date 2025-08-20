@@ -7,6 +7,7 @@ import { AccessCodeInput } from "@/components/AccessCodeInput";
 import { AccessCodeSettings } from "@/components/AccessCodeSettings";
 import { StorageHealthIndicator } from "@/components/StorageHealthIndicator";
 import { Button } from "@/components/ui/button";
+import { Fingerprint } from "lucide-react";
 import { useAccessCode } from "@/hooks/useAccessCode";
 import { persistentStorage } from "@/lib/persistentStorage";
 
@@ -85,28 +86,40 @@ const Index = () => {
         {!accessCode && (
           <div className="max-w-[600px] mx-auto mt-4">
             <div className="text-center p-4 bg-muted/50 rounded-lg border border-border/50">
-              <p className="text-sm text-muted-foreground mb-3">
-                {isMobile && isEnrolled 
-                  ? "Použite Face ID alebo zadajte váš prístupový kód."
-                  : "Máte už prístupový kód? Zadajte ho pre prístup k vašim uloženým údajom."
-                }
-              </p>
-              <div className="flex gap-2 justify-center">
-                {isMobile && isEnrolled && (
-                  <Button 
-                    onClick={handleShowBiometricPrompt}
-                    className="text-sm"
-                  >
-                    Prihlásiť sa
-                  </Button>
+              <div className="space-y-3">
+                {isMobile && isEnrolled ? (
+                  <>
+                    <p className="text-sm text-muted-foreground">
+                      Použite Face ID pre rýchle prihlásenie
+                    </p>
+                    <Button 
+                      onClick={handleShowBiometricPrompt}
+                      className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                    >
+                      <Fingerprint className="mr-2 h-4 w-4" />
+                      Prihlásiť sa s Face ID/Touch ID
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={handleEnterCodeClick}
+                      className="w-full"
+                    >
+                      Použiť prístupový kód
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-sm text-muted-foreground">
+                      Zadajte váš prístupový kód pre prístup k údajom
+                    </p>
+                    <Button 
+                      onClick={handleEnterCodeClick}
+                      className="w-full"
+                    >
+                      Zadať prístupový kód
+                    </Button>
+                  </>
                 )}
-                <Button 
-                  variant="outline" 
-                  onClick={handleEnterCodeClick}
-                  className="text-sm"
-                >
-                  Zadať existujúci kód
-                </Button>
               </div>
             </div>
           </div>
