@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Fingerprint, ArrowLeft } from "lucide-react";
 import { useAccessCode } from "@/hooks/useAccessCode";
 import { persistentStorage } from "@/lib/persistentStorage";
+import MenstrualCycleTracker from "@/features/cycle/MenstrualCycleTracker";
 
 const Index = () => {
   const { 
@@ -129,10 +130,15 @@ const Index = () => {
         </div>
 
         {/* Habit Tracker Widget */}
-        <HabitTracker 
-          selectedDate={selectedDate}
-          onFirstInteraction={handleFirstInteraction} 
-        />
+          <MenstrualCycleTracker
+            accessCode={accessCode}
+            onFirstInteraction={handleFirstInteraction}
+          />
+          
+          <HabitTracker 
+            selectedDate={selectedDate} 
+            onFirstInteraction={handleFirstInteraction}
+          />
         
         {/* Reflection Widget */}
         <ReflectionWidget 

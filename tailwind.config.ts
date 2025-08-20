@@ -80,7 +80,23 @@ export default {
 					text: 'hsl(var(--reflection-text))',
 					'text-soft': 'hsl(var(--reflection-text-soft))',
 					border: 'hsl(var(--reflection-border))'
-				}
+				},
+				// Beach/green tokens
+				sand: 'hsl(var(--sand))',
+				shell: 'hsl(var(--shell))',
+				seafoam: 'hsl(var(--seafoam))',
+				deepGreen: 'hsl(var(--deep-green))',
+				'deepGreen-foreground': 'hsl(var(--deep-green-foreground))',
+				glass: 'hsl(var(--glass))',
+				chartCenter: 'hsl(var(--chart-center))',
+				ctaFrom: 'hsl(var(--cta-from))',
+				ctaTo: 'hsl(var(--cta-to))',
+				// Palette tokens
+				peach: 'hsl(var(--peach))',
+				blush: 'hsl(var(--blush))',
+				lavender: 'hsl(var(--lavender))',
+				mint: 'hsl(var(--mint))',
+				gold: 'hsl(var(--gold))'
 			},
 			fontFamily: {
 				'heading': ['Lexend Deca', 'sans-serif'],

@@ -70,6 +70,29 @@ All colors MUST be HSL.
     --gradient-success: linear-gradient(135deg, hsl(35 25% 92%) 0%, hsl(40 30% 90%) 100%);
     --gradient-improve: linear-gradient(135deg, hsl(45 20% 94%) 0%, hsl(50 25% 92%) 100%);
     --gradient-widget: linear-gradient(135deg, hsl(0 0% 98%) 0%, hsl(0 0% 96%) 100%);
+
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+
+    /* Beach palette tokens */
+    --sand: 38 40% 92%;
+    --shell: 36 24% 97%;
+    --seafoam: 160 35% 85%;
+    --deep-green: 165 25% 24%;
+    --deep-green-foreground: 160 30% 96%;
+    --glass: 40 30% 97%;
+    --chart-center: 41 78% 93%;
+    --cta-from: 41 78% 93%;
+    --cta-to: 18 69% 91%;
+    --peach: 17 80% 86%;
+    --blush: 345 75% 80%;
+    --lavender: 265 30% 92%;
+    --mint: 150 31% 82%;
+    --gold: 42 85% 72%;
+    --shadow-elegant: 0 20px 50px -22px hsl(38 24% 30% / 0.25);
   }
 
   .dark {
@@ -132,6 +155,14 @@ All colors MUST be HSL.
     --gradient-success: linear-gradient(135deg, hsl(35 25% 15%) 0%, hsl(40 30% 12%) 100%);
     --gradient-improve: linear-gradient(135deg, hsl(45 20% 15%) 0%, hsl(50 25% 12%) 100%);
     --gradient-widget: linear-gradient(135deg, hsl(217.2 32.6% 7%) 0%, hsl(217.2 32.6% 5%) 100%);
+
+    /* Beach palette dark mode */
+    --sand: 38 22% 22%;
+    --shell: 210 12% 12%;
+    --seafoam: 160 20% 25%;
+    --deep-green: 160 15% 75%;
+    --deep-green-foreground: 210 25% 10%;
+    --glass: 210 12% 12%;
   }
 }
 
@@ -149,5 +180,13 @@ All colors MUST be HSL.
   /* Prevent iOS zoom on input focus */
   input, textarea, select {
     font-size: 16px !important;
+  }
+
+  /* Utility classes */
+  .glass-surface {
+    background-color: hsl(var(--glass) / 0.50);
+    backdrop-filter: saturate(150%) blur(14px);
+    border: 1px solid hsl(var(--sand) / 0.35);
+    box-shadow: var(--shadow-elegant);
   }
 }
