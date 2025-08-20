@@ -150,13 +150,9 @@ export default function MenstrualCycleTracker({
   const nextPeriodDate = getNextPeriodDate(cycleData.lastPeriodStart!, cycleData.cycleLength);
 
   return (
-    <div className="bg-widget-bg p-3 w-full overflow-hidden">
-      <div className="w-full max-w-[600px] mx-auto space-y-4">
+    <div className="w-full space-y-4">
       <div className="mb-6">
         <div className="flex items-center justify-between mb-2">
-          <h2 className="text-xl font-heading text-widget-text">
-            Menštruačný cyklus
-          </h2>
           <div className="text-right">
             <p className="text-xs text-widget-text-soft">
               {UI_TEXT.expectedPeriod}
@@ -228,7 +224,6 @@ export default function MenstrualCycleTracker({
         onUpdateCycleLength={setCycleLength}
         onUpdatePeriodLength={setPeriodLength}
       />
-    </div>
     </div>
   );
 }

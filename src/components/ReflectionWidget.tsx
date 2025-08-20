@@ -135,11 +135,9 @@ export default function ReflectionWidget({ selectedDate, onFirstInteraction }: R
   }
 
   return (
-    <div className="bg-widget-bg p-3 w-full overflow-hidden">
-      <div className="w-full max-w-[600px] mx-auto space-y-4">
-        <div className="space-y-1.5">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-heading font-semibold text-widget-text">Denná reflexia</h2>
+    <div className="w-full space-y-4">
+      <div className="space-y-1.5">
+        <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <p className="text-sm text-widget-text-soft">
                 Tvoj diár
@@ -239,6 +237,5 @@ export default function ReflectionWidget({ selectedDate, onFirstInteraction }: R
         </div>
 
       </div>
-    </div>
   );
 }
