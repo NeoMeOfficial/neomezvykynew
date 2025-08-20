@@ -95,7 +95,7 @@ All colors MUST be HSL.
     --shadow-elegant: 0 20px 50px -22px hsl(38 24% 30% / 0.25);
     
     /* Glassmorphism effects */
-    --glass-bg: hsla(0 0% 100% / 0.75);
+    --glass-bg: hsla(0 0% 100% / 0.6);
     --glass-border: white;
     --glass-shadow: 0 8px 32px hsla(0 0% 0% / 0.1);
     

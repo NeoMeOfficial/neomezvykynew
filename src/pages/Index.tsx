@@ -13,6 +13,7 @@ import { Fingerprint, ArrowLeft } from "lucide-react";
 import { useAccessCode } from "@/hooks/useAccessCode";
 import { persistentStorage } from "@/lib/persistentStorage";
 import MenstrualCycleTracker from "@/features/cycle/MenstrualCycleTracker";
+import HabitCompletionCount from "@/components/HabitCompletionCount";
 
 const Index = () => {
   const { 
@@ -109,7 +110,7 @@ const Index = () => {
           <div className="grid grid-cols-2 gap-3">
             <Button 
               onClick={() => window.location.href = 'https://neome.mvt.so/mj-de'}
-              className="flex items-center justify-center gap-2 rounded-lg py-3 px-4 text-sm font-medium border-0 shadow-sm transition-colors"
+              className="flex items-center justify-center gap-2 rounded-3xl py-3 px-4 text-sm font-medium border-0 shadow-sm transition-colors"
               style={{ 
                 backgroundColor: '#5F3E31',
                 color: '#F6F6F1'
@@ -120,14 +121,14 @@ const Index = () => {
             </Button>
             <Button 
               onClick={handleEnterCodeClick}
-              className="flex items-center justify-center gap-2 rounded-lg py-3 px-4 text-sm font-medium border-2 transition-colors"
+              className="flex items-center justify-center gap-2 rounded-3xl py-3 px-4 text-sm font-medium border-2 transition-colors"
               style={{ 
                 backgroundColor: '#F6F6F1',
                 color: '#5F3E31',
                 borderColor: '#5F3E31'
               }}
             >
-              Login
+              Prihlásenie
             </Button>
           </div>
         </div>
@@ -146,7 +147,12 @@ const Index = () => {
         {/* Habit Tracker Widget */}
         <div className="w-full max-w-[600px] mx-auto">
           <div className="glass-container">
-            <h2 className="text-lg font-semibold text-foreground mb-4">Moje návyky</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-foreground">Moje návyky</h2>
+              <p className="text-sm text-muted-foreground">
+                <HabitCompletionCount selectedDate={selectedDate} />
+              </p>
+            </div>
             <HabitTracker 
               selectedDate={selectedDate} 
               onFirstInteraction={handleFirstInteraction}
@@ -157,7 +163,12 @@ const Index = () => {
         {/* Reflection Widget */}
         <div className="w-full max-w-[600px] mx-auto">
           <div className="glass-container">
-            <h2 className="text-lg font-semibold text-foreground mb-4">Denná reflexia</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-foreground">Denná reflexia</h2>
+              <p className="text-sm text-muted-foreground">
+                Tvoj diár
+              </p>
+            </div>
             <ReflectionWidget 
               selectedDate={selectedDate}
               onFirstInteraction={handleFirstInteraction}

@@ -69,12 +69,8 @@ export default function MenstrualCycleTracker({
   // Welcome screen for first-time setup
   if (!cycleData.lastPeriodStart) {
     return (
-      <div className="bg-widget-bg p-3 w-full overflow-hidden">
-        <div className="w-full max-w-[600px] mx-auto space-y-6">
+      <div className="w-full space-y-6">
           <div>
-            <h2 className="text-xl font-heading text-widget-text mb-2">
-              Menštruačný cyklus
-            </h2>
             <p className="text-widget-text-soft text-sm">
               {UI_TEXT.welcome}
             </p>
@@ -141,7 +137,6 @@ export default function MenstrualCycleTracker({
             lastPeriodStart={null}
           />
         </div>
-      </div>
     );
   }
 

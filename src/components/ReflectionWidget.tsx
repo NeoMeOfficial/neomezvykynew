@@ -139,9 +139,6 @@ export default function ReflectionWidget({ selectedDate, onFirstInteraction }: R
       <div className="space-y-1.5">
         <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <p className="text-sm text-widget-text-soft">
-                Tvoj diár
-              </p>
               <Dialog open={showDiaryView} onOpenChange={setShowDiaryView}>
                 <DialogTrigger asChild>
                   <Button variant="ghost" size="sm" className="p-1.5 bg-amber-100 hover:bg-amber-200 border border-amber-200 rounded-xl shadow-sm">

@@ -110,9 +110,6 @@ export default function HabitTracker({ selectedDate, onFirstInteraction }: Habit
       <div className="space-y-1.5">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <p className="text-sm text-widget-text-soft">
-                {completedCount} z {habits.length} dokončených
-              </p>
               <Dialog open={showMonthlyCalendar} onOpenChange={setShowMonthlyCalendar}>
                 <DialogTrigger asChild>
                   <Button variant="ghost" size="sm" className="p-1.5 bg-amber-100 hover:bg-amber-200 border border-amber-200 rounded-xl shadow-sm">
