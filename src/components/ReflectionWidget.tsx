@@ -148,7 +148,7 @@ export default function ReflectionWidget({ selectedDate, onFirstInteraction }: R
                 value={improve}
                 onChange={(e) => handleImproveChange(e.target.value)}
                 placeholder="Čo by si chcel/a zajtra urobiť lepšie alebo inak..."
-                className="min-h-[80px] bg-white/50 border-reflection-border/50 text-reflection-text placeholder:text-reflection-text-soft resize-none focus:bg-white/70 transition-colors"
+                className="min-h-[80px] bg-white/90 backdrop-blur-sm border-0 shadow-sm placeholder:text-reflection-text-soft/70 text-reflection-text focus-visible:ring-2 focus-visible:ring-white/50 resize-none focus:bg-white/70 transition-colors"
               />
             </div>
           </div>
