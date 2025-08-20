@@ -102,7 +102,7 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background overflow-x-hidden">
+    <div className="min-h-screen overflow-x-hidden" style={{ background: 'var(--bg-gradient)' }}>
       <div className="w-full max-w-none px-4 py-8 mx-auto">
         {/* Navigation Buttons */}
         <div className="w-full max-w-[600px] mx-auto mb-6">
@@ -132,22 +132,38 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Habit Tracker Widget */}
-          <MenstrualCycleTracker
-            accessCode={accessCode}
-            onFirstInteraction={handleFirstInteraction}
-          />
+        {/* Menstrual Cycle Widget */}
+        <div className="w-full max-w-[600px] mx-auto">
+          <div className="glass-container">
+            <h2 className="text-lg font-semibold text-foreground mb-4">Menštruačný cyklus</h2>
+            <MenstrualCycleTracker
+              accessCode={accessCode}
+              onFirstInteraction={handleFirstInteraction}
+            />
+          </div>
+        </div>
           
-          <HabitTracker 
-            selectedDate={selectedDate} 
-            onFirstInteraction={handleFirstInteraction}
-          />
+        {/* Habit Tracker Widget */}
+        <div className="w-full max-w-[600px] mx-auto">
+          <div className="glass-container">
+            <h2 className="text-lg font-semibold text-foreground mb-4">Moje návyky</h2>
+            <HabitTracker 
+              selectedDate={selectedDate} 
+              onFirstInteraction={handleFirstInteraction}
+            />
+          </div>
+        </div>
         
         {/* Reflection Widget */}
-        <ReflectionWidget 
-          selectedDate={selectedDate}
-          onFirstInteraction={handleFirstInteraction}
-        />
+        <div className="w-full max-w-[600px] mx-auto">
+          <div className="glass-container">
+            <h2 className="text-lg font-semibold text-foreground mb-4">Denná reflexia</h2>
+            <ReflectionWidget 
+              selectedDate={selectedDate}
+              onFirstInteraction={handleFirstInteraction}
+            />
+          </div>
+        </div>
         
         {!accessCode && (
           <div className="w-full max-w-[600px] mx-auto mt-4">

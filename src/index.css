@@ -93,6 +93,19 @@ All colors MUST be HSL.
     --mint: 150 31% 82%;
     --gold: 42 85% 72%;
     --shadow-elegant: 0 20px 50px -22px hsl(38 24% 30% / 0.25);
+    
+    /* Glassmorphism effects */
+    --glass-bg: hsla(0 0% 100% / 0.75);
+    --glass-border: white;
+    --glass-shadow: 0 8px 32px hsla(0 0% 0% / 0.1);
+    
+    /* Feminine Apple-like background */
+    --bg-gradient: linear-gradient(135deg, 
+      hsl(var(--sand)) 0%, 
+      hsl(var(--shell)) 25%, 
+      hsl(var(--seafoam)) 50%, 
+      hsl(var(--peach)) 75%, 
+      hsl(var(--lavender)) 100%);
   }
 
   .dark {
@@ -163,6 +176,19 @@ All colors MUST be HSL.
     --deep-green: 160 15% 75%;
     --deep-green-foreground: 210 25% 10%;
     --glass: 210 12% 12%;
+    
+    /* Glassmorphism effects - dark mode */
+    --glass-bg: hsla(222.2 84% 4.9% / 0.6);
+    --glass-border: hsla(210 40% 98% / 0.15);
+    --glass-shadow: 0 8px 32px hsla(0 0% 0% / 0.2);
+    
+    /* Feminine Apple-like background - dark mode */
+    --bg-gradient: linear-gradient(135deg, 
+      hsl(27 20% 15%) 0%, 
+      hsl(35 15% 20%) 25%, 
+      hsl(165 15% 25%) 50%, 
+      hsl(15 20% 22%) 75%, 
+      hsl(265 15% 20%) 100%);
   }
 }
 
@@ -188,5 +214,16 @@ All colors MUST be HSL.
     backdrop-filter: saturate(150%) blur(14px);
     border: 1px solid hsl(var(--sand) / 0.35);
     box-shadow: var(--shadow-elegant);
+  }
+
+  .glass-container {
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 2px solid var(--glass-border);
+    border-radius: 2rem;
+    box-shadow: var(--glass-shadow);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
   }
 }
