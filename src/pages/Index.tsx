@@ -167,15 +167,6 @@ const Index = () => {
           </div>
         )}
         
-        {accessCode && (
-          <div className="fixed bottom-4 right-4">
-            <StorageHealthIndicator 
-              accessCode={accessCode} 
-              onReconnect={reconnect}
-              showPersonalLink={true}
-            />
-          </div>
-        )}
         
         <AccessCodeSettings 
           open={showAccessCodeSettings}
