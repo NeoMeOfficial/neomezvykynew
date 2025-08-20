@@ -116,7 +116,7 @@ const Index = () => {
         {/* Back Button */}
         <div className="max-w-[600px] mx-auto mb-6">
           <Button 
-            onClick={() => window.history.back()}
+            onClick={() => window.location.href = 'https://neome.mvt.so/mj-de'}
             className="w-full flex items-center justify-center gap-2 rounded-lg py-3 px-4 text-sm font-medium border-0 shadow-sm transition-colors"
             style={{ 
               backgroundColor: '#5F3E31',
