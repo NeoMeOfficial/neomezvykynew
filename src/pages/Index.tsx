@@ -151,15 +151,15 @@ const Index = () => {
                   </>
                 ) : (
                   <>
-                    <p className="text-sm text-muted-foreground">
-                      Zadajte váš prístupový kód pre prístup k údajom
-                    </p>
                     <Button 
                       onClick={handleEnterCodeClick}
                       className="w-full"
                     >
                       Zadať prístupový kód
                     </Button>
+                    <p className="text-sm text-muted-foreground">
+                      Zadajte váš prístupový kód pre prístup k údajom
+                    </p>
                   </>
                 )}
               </div>
