@@ -40,8 +40,6 @@ export default function HabitTracker({ selectedDate, onFirstInteraction }: Habit
   
   const { habits, habitData, loading, updateHabitProgress, formatDate, startOfDay, hasAccessCode } = useCodeBasedHabits(handleSuccess);
   const { accessCode } = useAccessCode();
-  const [monthlyCalendarDate, setMonthlyCalendarDate] = useState(new Date());
-  const [showMonthlyCalendar, setShowMonthlyCalendar] = useState(false);
 
 
   const getHabitProgress = useCallback((habitId: string, date: Date) => {
@@ -108,29 +106,6 @@ export default function HabitTracker({ selectedDate, onFirstInteraction }: Habit
   return (
     <div className="w-full space-y-4">
       <div className="space-y-1.5">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Dialog open={showMonthlyCalendar} onOpenChange={setShowMonthlyCalendar}>
-                <DialogTrigger asChild>
-                  <Button variant="ghost" size="sm" className="p-1.5 bg-amber-100 hover:bg-amber-200 border border-amber-200 rounded-xl shadow-sm">
-                    <Calendar size={20} className="text-foreground" />
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-fit">
-                  <DialogHeader className="pb-0">
-                    <DialogTitle className="text-lg">Mesačný pohľad - Návyky</DialogTitle>
-                  </DialogHeader>
-                  <MonthlyCalendar
-                    habitData={habitData}
-                    selectedMonth={monthlyCalendarDate}
-                    onMonthChange={setMonthlyCalendarDate}
-                    habits={habits}
-                    formatDate={formatDate}
-                  />
-                </DialogContent>
-              </Dialog>
-            </div>
-          </div>
           {habits.map(habit => (
             <HabitCard
               key={habit.id}

@@ -65,7 +65,7 @@ export const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
         month={selectedMonth}
         modifiers={modifiers}
         modifiersStyles={modifiersStyles}
-        className={cn("pointer-events-auto text-sm scale-90 [&_table]:border-spacing-x-1 [&_td]:px-1 [&_th]:px-1")}
+        className={cn("rounded-md border glass-surface")}
         showOutsideDays={false}
       />
       

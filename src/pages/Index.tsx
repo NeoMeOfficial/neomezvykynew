@@ -9,11 +9,16 @@ import { AccessCodeSettings } from "@/components/AccessCodeSettings";
 import { StorageHealthIndicator } from "@/components/StorageHealthIndicator";
 import { DateNavigationHeader } from "@/components/DateNavigationHeader";
 import { Button } from "@/components/ui/button";
-import { Fingerprint, ArrowLeft } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Fingerprint, ArrowLeft, Calendar, NotebookPen } from "lucide-react";
 import { useAccessCode } from "@/hooks/useAccessCode";
 import { persistentStorage } from "@/lib/persistentStorage";
 import MenstrualCycleTracker from "@/features/cycle/MenstrualCycleTracker";
 import HabitCompletionCount from "@/components/HabitCompletionCount";
+import { MonthlyCalendar } from "@/components/MonthlyCalendar";
+import DiaryView from "@/components/DiaryView";
+import { useCodeBasedHabits } from "@/hooks/useCodeBasedHabits";
+import { useReflectionData } from "@/hooks/useReflectionData";
 
 const Index = () => {
   const { 
@@ -31,8 +36,15 @@ const Index = () => {
   const [showAccessCodeSettings, setShowAccessCodeSettings] = useState(false);
   const [showBiometricPrompt, setShowBiometricPrompt] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [monthlyCalendarDate, setMonthlyCalendarDate] = useState(new Date());
+  const [showMonthlyCalendar, setShowMonthlyCalendar] = useState(false);
+  const [showDiaryView, setShowDiaryView] = useState(false);
 
   const [hasInteracted, setHasInteracted] = useState(false);
+
+  // Get habit and reflection data for the widgets
+  const { habits, habitData, formatDate: habitFormatDate } = useCodeBasedHabits();
+  const { reflections } = useReflectionData();
 
   // Debug logging
   console.log('Index state:', { accessCode: !!accessCode, isMobile, isEnrolled, loading });
@@ -149,9 +161,30 @@ const Index = () => {
           <div className="glass-container">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-foreground">Moje návyky</h2>
-              <p className="text-sm text-muted-foreground">
-                <HabitCompletionCount selectedDate={selectedDate} />
-              </p>
+              <div className="flex items-center gap-2">
+                <p className="text-sm text-muted-foreground">
+                  <HabitCompletionCount selectedDate={selectedDate} />
+                </p>
+                <Dialog open={showMonthlyCalendar} onOpenChange={setShowMonthlyCalendar}>
+                  <DialogTrigger asChild>
+                    <Button variant="ghost" size="sm" className="p-1.5 bg-amber-100 hover:bg-amber-200 border border-amber-200 rounded-xl shadow-sm">
+                      <Calendar size={20} className="text-foreground" />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-fit">
+                    <DialogHeader className="pb-0">
+                      <DialogTitle className="text-lg">Mesačný pohľad - Návyky</DialogTitle>
+                    </DialogHeader>
+                    <MonthlyCalendar
+                      habitData={habitData}
+                      selectedMonth={monthlyCalendarDate}
+                      onMonthChange={setMonthlyCalendarDate}
+                      habits={habits}
+                      formatDate={habitFormatDate}
+                    />
+                  </DialogContent>
+                </Dialog>
+              </div>
             </div>
             <HabitTracker 
               selectedDate={selectedDate} 
@@ -165,9 +198,27 @@ const Index = () => {
           <div className="glass-container">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-foreground">Denná reflexia</h2>
-              <p className="text-sm text-muted-foreground">
-                Tvoj diár
-              </p>
+              <div className="flex items-center gap-2">
+                <p className="text-sm text-muted-foreground">
+                  Tvoj diár
+                </p>
+                <Dialog open={showDiaryView} onOpenChange={setShowDiaryView}>
+                  <DialogTrigger asChild>
+                    <Button variant="ghost" size="sm" className="p-1.5 bg-amber-100 hover:bg-amber-200 border border-amber-200 rounded-xl shadow-sm">
+                      <NotebookPen size={20} className="text-foreground" />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-2xl">
+                    <DialogHeader className="pb-0">
+                      <DialogTitle className="text-lg font-heading">Môj denník reflexií</DialogTitle>
+                    </DialogHeader>
+                    <DiaryView
+                      reflections={reflections}
+                      formatDate={habitFormatDate}
+                    />
+                  </DialogContent>
+                </Dialog>
+              </div>
             </div>
             <ReflectionWidget 
               selectedDate={selectedDate}

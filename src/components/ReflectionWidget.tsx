@@ -31,7 +31,7 @@ export default function ReflectionWidget({ selectedDate, onFirstInteraction }: R
     hasAccessCode 
   } = useReflectionData();
   
-  const [showDiaryView, setShowDiaryView] = useState(false);
+  
   const [wellDoneSaveStatus, setWellDoneSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [improveSaveStatus, setImproveSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   
@@ -137,26 +137,6 @@ export default function ReflectionWidget({ selectedDate, onFirstInteraction }: R
   return (
     <div className="w-full space-y-4">
       <div className="space-y-1.5">
-        <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Dialog open={showDiaryView} onOpenChange={setShowDiaryView}>
-                <DialogTrigger asChild>
-                  <Button variant="ghost" size="sm" className="p-1.5 bg-amber-100 hover:bg-amber-200 border border-amber-200 rounded-xl shadow-sm">
-                    <NotebookPen size={20} className="text-foreground" />
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-2xl">
-                  <DialogHeader className="pb-0">
-                    <DialogTitle className="text-lg font-heading">Môj denník reflexií</DialogTitle>
-                  </DialogHeader>
-                  <DiaryView
-                    reflections={reflections}
-                    formatDate={formatDate}
-                  />
-                </DialogContent>
-              </Dialog>
-            </div>
-          </div>
 
           {/* Motivational Quote */}
           <div className="bg-gradient-widget p-4 rounded-xl border border-widget-border/30 shadow-sm">
