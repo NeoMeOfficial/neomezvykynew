@@ -58,16 +58,17 @@ export default function ReflectionWidget({ selectedDate, onFirstInteraction }: R
     return motivationalQuotes[Math.abs(hash) % motivationalQuotes.length];
   }, [selectedDate, formatDate]);
 
-  // Debounced save functions
+  // Debounced save functions with refs to get current values
   const debouncedSaveWellDone = useCallback((value: string) => {
     if (wellDoneTimeoutRef.current) {
       clearTimeout(wellDoneTimeoutRef.current);
     }
     
     wellDoneTimeoutRef.current = setTimeout(async () => {
-      await updateReflection(selectedDate, value || null, improve || null);
+      const currentImprove = getReflection(selectedDate)?.improve || '';
+      await updateReflection(selectedDate, value || null, currentImprove || null);
     }, 500);
-  }, [selectedDate, improve, updateReflection]);
+  }, [selectedDate, updateReflection, getReflection]);
 
   const debouncedSaveImprove = useCallback((value: string) => {
     if (improveTimeoutRef.current) {
@@ -75,9 +76,10 @@ export default function ReflectionWidget({ selectedDate, onFirstInteraction }: R
     }
     
     improveTimeoutRef.current = setTimeout(async () => {
-      await updateReflection(selectedDate, wellDone || null, value || null);
+      const currentWellDone = getReflection(selectedDate)?.well_done || '';
+      await updateReflection(selectedDate, currentWellDone || null, value || null);
     }, 500);
-  }, [selectedDate, wellDone, updateReflection]);
+  }, [selectedDate, updateReflection, getReflection]);
 
   const handleWellDoneChange = useCallback((value: string) => {
     setWellDone(value);
