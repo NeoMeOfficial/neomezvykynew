@@ -101,10 +101,10 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-background overflow-x-hidden">
+      <div className="w-full max-w-none px-4 py-8 mx-auto">
         {/* Unified Date Navigation */}
-        <div className="max-w-[600px] mx-auto mb-6">
+        <div className="w-full max-w-[600px] mx-auto mb-6">
           <DateNavigationHeader
             currentDate={currentDateString}
             onDateChange={handleDateChange}
@@ -114,7 +114,7 @@ const Index = () => {
         </div>
 
         {/* Back Button */}
-        <div className="max-w-[600px] mx-auto mb-6">
+        <div className="w-full max-w-[600px] mx-auto mb-6">
           <Button 
             onClick={() => window.location.href = 'https://neome.mvt.so/mj-de'}
             className="w-full flex items-center justify-center gap-2 rounded-lg py-3 px-4 text-sm font-medium border-0 shadow-sm transition-colors"
@@ -141,7 +141,7 @@ const Index = () => {
         />
         
         {!accessCode && (
-          <div className="max-w-[600px] mx-auto mt-4">
+          <div className="w-full max-w-[600px] mx-auto mt-4">
             <div className="text-center p-4 bg-muted/50 rounded-lg border border-border/50">
               <div className="space-y-3">
                 {shouldOfferBiometric() ? (

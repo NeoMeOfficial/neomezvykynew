@@ -96,8 +96,8 @@ export default function HabitTracker({ selectedDate, onFirstInteraction }: Habit
 
   if (loading) {
     return (
-      <div className="bg-widget-bg p-1">
-        <div className="max-w-md mx-auto space-y-2">
+      <div className="bg-widget-bg p-1 w-full overflow-hidden">
+        <div className="w-full max-w-md mx-auto space-y-2">
           <div className="flex items-center justify-center py-8">
             <Loader2 className="h-6 w-6 text-widget-text-soft animate-spin" />
             <span className="ml-2 text-sm text-widget-text-soft">Načítavam návyky...</span>
@@ -108,8 +108,8 @@ export default function HabitTracker({ selectedDate, onFirstInteraction }: Habit
   }
 
   return (
-    <div className="bg-widget-bg p-3">
-      <div className="max-w-[600px] mx-auto space-y-4">
+    <div className="bg-widget-bg p-3 w-full overflow-hidden">
+      <div className="w-full max-w-[600px] mx-auto space-y-4">
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-heading font-semibold text-widget-text">Moje návyky</h2>
