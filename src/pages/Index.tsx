@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import HabitTracker from "@/components/HabitTracker";
+import ReflectionWidget from "@/components/ReflectionWidget";
 import { AccessCodeWelcome } from "@/components/AccessCodeWelcome";
 import { BiometricWelcome } from "@/components/BiometricWelcome";
 import { BiometricPrompt } from "@/components/BiometricPrompt";
 import { AccessCodeInput } from "@/components/AccessCodeInput";
 import { AccessCodeSettings } from "@/components/AccessCodeSettings";
 import { StorageHealthIndicator } from "@/components/StorageHealthIndicator";
+import { DateNavigationHeader } from "@/components/DateNavigationHeader";
 import { Button } from "@/components/ui/button";
 import { Fingerprint } from "lucide-react";
 import { useAccessCode } from "@/hooks/useAccessCode";
@@ -26,6 +28,7 @@ const Index = () => {
   const [showCodeInput, setShowCodeInput] = useState(false);
   const [showAccessCodeSettings, setShowAccessCodeSettings] = useState(false);
   const [showBiometricPrompt, setShowBiometricPrompt] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
 
   const [hasInteracted, setHasInteracted] = useState(false);
 
@@ -70,6 +73,20 @@ const Index = () => {
     setShowCodeInput(true);
   };
 
+  const handleDateChange = (dateString: string) => {
+    const newDate = new Date(dateString + 'T00:00:00');
+    setSelectedDate(newDate);
+  };
+
+  const formatDate = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const currentDateString = formatDate(selectedDate);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -86,10 +103,26 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
+        {/* Unified Date Navigation */}
+        <div className="max-w-[600px] mx-auto mb-6">
+          <DateNavigationHeader
+            currentDate={currentDateString}
+            onDateChange={handleDateChange}
+            hasAccessCode={!!accessCode}
+            onSettingsClick={handleSettingsClick}
+          />
+        </div>
+
+        {/* Habit Tracker Widget */}
         <HabitTracker 
+          selectedDate={selectedDate}
           onFirstInteraction={handleFirstInteraction} 
-          onSettingsClick={handleSettingsClick}
-          onEnterCodeClick={handleEnterCodeClick}
+        />
+        
+        {/* Reflection Widget */}
+        <ReflectionWidget 
+          selectedDate={selectedDate}
+          onFirstInteraction={handleFirstInteraction}
         />
         
         {!accessCode && (

@@ -61,7 +61,31 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				widget: {
+					bg: 'hsl(var(--widget-bg))',
+					card: 'hsl(var(--widget-card))',
+					border: 'hsl(var(--widget-border))',
+					text: 'hsl(var(--widget-text))',
+					'text-soft': 'hsl(var(--widget-text-soft))',
+					muted: 'hsl(var(--widget-muted))'
+				},
+				reflection: {
+					bg: 'hsl(var(--reflection-bg))',
+					card: 'hsl(var(--reflection-card))',
+					success: 'hsl(var(--reflection-success))',
+					improve: 'hsl(var(--reflection-improve))',
+					accent: 'hsl(var(--reflection-accent))',
+					muted: 'hsl(var(--reflection-muted))',
+					text: 'hsl(var(--reflection-text))',
+					'text-soft': 'hsl(var(--reflection-text-soft))',
+					border: 'hsl(var(--reflection-border))'
 				}
+			},
+			backgroundImage: {
+				'gradient-success': 'var(--gradient-success)',
+				'gradient-improve': 'var(--gradient-improve)',
+				'gradient-widget': 'var(--gradient-widget)'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

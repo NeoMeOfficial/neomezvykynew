@@ -24,12 +24,11 @@ const isSameDay = (date1: Date, date2: Date): boolean => {
 };
 
 interface HabitTrackerProps {
+  selectedDate: Date;
   onFirstInteraction?: () => void;
-  onSettingsClick?: () => void;
-  onEnterCodeClick?: () => void;
 }
 
-export default function HabitTracker({ onFirstInteraction, onSettingsClick, onEnterCodeClick }: HabitTrackerProps) {
+export default function HabitTracker({ selectedDate, onFirstInteraction }: HabitTrackerProps) {
   const [showSuccessIndicator, setShowSuccessIndicator] = useState(false);
   
   const handleSuccess = useCallback(() => {
@@ -41,7 +40,6 @@ export default function HabitTracker({ onFirstInteraction, onSettingsClick, onEn
   
   const { habits, habitData, loading, updateHabitProgress, formatDate, startOfDay, hasAccessCode } = useCodeBasedHabits(handleSuccess);
   const { accessCode } = useAccessCode();
-  const [selectedDate, setSelectedDate] = useState(new Date());
   const [monthlyCalendarDate, setMonthlyCalendarDate] = useState(new Date());
   const [showMonthlyCalendar, setShowMonthlyCalendar] = useState(false);
 
@@ -91,28 +89,6 @@ export default function HabitTracker({ onFirstInteraction, onSettingsClick, onEn
   }, [habits, getHabitProgress]);
 
 
-  const handleDateChange = useCallback((dateString: string) => {
-    const newDate = new Date(dateString + 'T00:00:00');
-    setSelectedDate(newDate);
-  }, []);
-
-  const hasNextDay = useMemo(() => {
-    const today = new Date();
-    return selectedDate < today;
-  }, [selectedDate]);
-
-  const currentDateString = useMemo(() => {
-    return formatDate(selectedDate);
-  }, [selectedDate, formatDate]);
-
-  const handleSettingsClick = useCallback(() => {
-    if (onSettingsClick) {
-      onSettingsClick();
-    } else {
-      // Fallback to opening monthly calendar if no settings handler provided
-      setShowMonthlyCalendar(true);
-    }
-  }, [onSettingsClick]);
 
   const completedCount = useMemo(() => {
     return habits.filter(habit => isHabitCompleted(habit.id, selectedDate)).length;
@@ -120,11 +96,11 @@ export default function HabitTracker({ onFirstInteraction, onSettingsClick, onEn
 
   if (loading) {
     return (
-      <div className="bg-background p-1">
+      <div className="bg-widget-bg p-1">
         <div className="max-w-md mx-auto space-y-2">
           <div className="flex items-center justify-center py-8">
-            <Loader2 className="h-6 w-6 text-muted-foreground animate-spin" />
-            <span className="ml-2 text-sm text-muted-foreground">Loading your habits...</span>
+            <Loader2 className="h-6 w-6 text-widget-text-soft animate-spin" />
+            <span className="ml-2 text-sm text-widget-text-soft">Načítavam návyky...</span>
           </div>
         </div>
       </div>
@@ -132,22 +108,13 @@ export default function HabitTracker({ onFirstInteraction, onSettingsClick, onEn
   }
 
   return (
-    <div className="bg-background p-3">
+    <div className="bg-widget-bg p-3">
       <div className="max-w-[600px] mx-auto space-y-4">
-        {/* Date Navigation Header */}
-        <DateNavigationHeader
-          currentDate={currentDateString}
-          onDateChange={handleDateChange}
-          isCompleted={completedCount === habits.length && habits.length > 0}
-          hasAccessCode={hasAccessCode}
-          onSettingsClick={handleSettingsClick}
-        />
-
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-foreground">Moje návyky</h2>
+            <h2 className="text-sm font-semibold text-widget-text">Moje návyky</h2>
             <div className="flex items-center space-x-2">
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-widget-text-soft">
                 {completedCount} z {habits.length} dokončených
               </p>
               <Dialog open={showMonthlyCalendar} onOpenChange={setShowMonthlyCalendar}>
@@ -158,7 +125,7 @@ export default function HabitTracker({ onFirstInteraction, onSettingsClick, onEn
                 </DialogTrigger>
                 <DialogContent className="max-w-fit">
                   <DialogHeader className="pb-0">
-                    <DialogTitle className="text-lg">Mesačný pohľad</DialogTitle>
+                    <DialogTitle className="text-lg">Mesačný pohľad - Návyky</DialogTitle>
                   </DialogHeader>
                   <MonthlyCalendar
                     habitData={habitData}
@@ -187,7 +154,7 @@ export default function HabitTracker({ onFirstInteraction, onSettingsClick, onEn
           <ConnectionStatus connected={hasAccessCode} />
           {hasAccessCode && accessCode && (
             <div className="text-center mt-2">
-              <p className="text-muted-foreground text-xs">Aktívny kód: {accessCode}</p>
+              <p className="text-widget-text-soft text-xs">Aktívny kód: {accessCode}</p>
             </div>
           )}
         </div>

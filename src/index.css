@@ -39,20 +39,37 @@ All colors MUST be HSL.
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
+    
+    /* Unified design tokens for both widgets */
+    --widget-bg: 0 0% 100%;
+    --widget-card: 0 0% 100%;
+    --widget-border: 0 0% 90%;
+    --widget-text: 0 0% 20%;
+    --widget-text-soft: 0 0% 45%;
+    --widget-muted: 0 0% 96%;
+    
+    /* Reflection-specific tokens that complement habit tracker */
+    --reflection-bg: 0 0% 100%;
+    --reflection-card: 0 0% 100%;
+    --reflection-success: 35 25% 92%;
+    --reflection-improve: 45 20% 94%;
+    --reflection-accent: 45 100% 70%;
+    --reflection-muted: 0 0% 96%;
+    --reflection-text: 0 0% 20%;
+    --reflection-text-soft: 0 0% 45%;
+    --reflection-border: 0 0% 90%;
+    
+    /* Unified gradients */
+    --gradient-success: linear-gradient(135deg, hsl(35 25% 92%) 0%, hsl(40 30% 90%) 100%);
+    --gradient-improve: linear-gradient(135deg, hsl(45 20% 94%) 0%, hsl(50 25% 92%) 100%);
+    --gradient-widget: linear-gradient(135deg, hsl(0 0% 98%) 0%, hsl(0 0% 96%) 100%);
   }
 
   .dark {
@@ -91,6 +108,30 @@ All colors MUST be HSL.
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    
+    /* Dark mode unified tokens */
+    --widget-bg: 222.2 84% 4.9%;
+    --widget-card: 217.2 32.6% 7%;
+    --widget-border: 217.2 32.6% 17.5%;
+    --widget-text: 210 40% 98%;
+    --widget-text-soft: 215 20.2% 65.1%;
+    --widget-muted: 217.2 32.6% 17.5%;
+    
+    /* Dark mode reflection tokens */
+    --reflection-bg: 222.2 84% 4.9%;
+    --reflection-card: 217.2 32.6% 7%;
+    --reflection-success: 35 25% 15%;
+    --reflection-improve: 45 20% 15%;
+    --reflection-accent: 45 80% 50%;
+    --reflection-muted: 217.2 32.6% 17.5%;
+    --reflection-text: 210 40% 98%;
+    --reflection-text-soft: 215 20.2% 65.1%;
+    --reflection-border: 217.2 32.6% 17.5%;
+    
+    /* Dark mode gradients */
+    --gradient-success: linear-gradient(135deg, hsl(35 25% 15%) 0%, hsl(40 30% 12%) 100%);
+    --gradient-improve: linear-gradient(135deg, hsl(45 20% 15%) 0%, hsl(50 25% 12%) 100%);
+    --gradient-widget: linear-gradient(135deg, hsl(217.2 32.6% 7%) 0%, hsl(217.2 32.6% 5%) 100%);
   }
 }
 
