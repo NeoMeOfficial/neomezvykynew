@@ -90,7 +90,7 @@ const Index = () => {
           <div className="max-w-[600px] mx-auto mt-4">
             <div className="text-center p-4 bg-muted/50 rounded-lg border border-border/50">
               <div className="space-y-3">
-                {isEnrolled ? (
+                {shouldOfferBiometric() ? (
                   <>
                     <p className="text-sm text-muted-foreground">
                       Použite Face ID pre rýchle prihlásenie
