@@ -80,8 +80,8 @@ export default function MenstrualCycleTracker({
             </p>
           </div>
 
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+          <div className="flex justify-end">
+            <div className="space-y-4 w-48">
               <div className="space-y-2">
                 <Label htmlFor="setupCycleLength">{UI_TEXT.cycleLength}</Label>
                 <div className="flex items-center space-x-2">
@@ -113,17 +113,17 @@ export default function MenstrualCycleTracker({
                   <span className="text-sm text-muted-foreground">{UI_TEXT.days}</span>
                 </div>
               </div>
-            </div>
 
-            <Button
-              onClick={() => setShowDatePicker(true)}
-              variant="hero"
-              size="lg"
-              className="w-full"
-            >
-              <CalendarIcon className="w-5 h-5 mr-2" />
-              {UI_TEXT.lastPeriod}
-            </Button>
+              <Button
+                onClick={() => setShowDatePicker(true)}
+                variant="hero"
+                size="lg"
+                className="w-full"
+              >
+                <CalendarIcon className="w-5 h-5 mr-2" />
+                {UI_TEXT.lastPeriod}
+              </Button>
+            </div>
           </div>
 
           <DatePickerModal

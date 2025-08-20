@@ -104,29 +104,29 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
       <div className="w-full max-w-none px-4 py-8 mx-auto">
-        {/* Unified Date Navigation */}
+        {/* Navigation Buttons */}
         <div className="w-full max-w-[600px] mx-auto mb-6">
-          <DateNavigationHeader
-            currentDate={currentDateString}
-            onDateChange={handleDateChange}
-            hasAccessCode={!!accessCode}
-            onSettingsClick={handleSettingsClick}
-          />
-        </div>
-
-        {/* Back Button */}
-        <div className="w-full max-w-[600px] mx-auto mb-6">
-          <Button 
-            onClick={() => window.location.href = 'https://neome.mvt.so/mj-de'}
-            className="w-full flex items-center justify-center gap-2 rounded-lg py-3 px-4 text-sm font-medium border-0 shadow-sm transition-colors"
-            style={{ 
-              backgroundColor: '#5F3E31',
-              color: '#F6F6F1'
-            }}
-          >
-            <ArrowLeft className="h-4 w-4" style={{ color: '#F6F6F1' }} />
-            Naspäť
-          </Button>
+          <div className="flex gap-3">
+            <Button 
+              onClick={() => window.location.href = 'https://neome.mvt.so/mj-de'}
+              size="sm"
+              className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium border-0 shadow-sm transition-colors"
+              style={{ 
+                backgroundColor: '#5F3E31',
+                color: '#F6F6F1'
+              }}
+            >
+              <ArrowLeft className="h-4 w-4" style={{ color: '#F6F6F1' }} />
+              Naspäť
+            </Button>
+            <Button 
+              onClick={handleEnterCodeClick}
+              size="sm"
+              className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium border border-border bg-background hover:bg-accent"
+            >
+              Login
+            </Button>
+          </div>
         </div>
 
         {/* Habit Tracker Widget */}
