@@ -28,6 +28,9 @@ const Index = () => {
 
   const [hasInteracted, setHasInteracted] = useState(false);
 
+  // Debug logging
+  console.log('Index state:', { accessCode: !!accessCode, isMobile, isEnrolled, loading });
+
   const handleFirstInteraction = () => {
     if (!hasInteracted && !accessCode) {
       setHasInteracted(true);
@@ -87,7 +90,7 @@ const Index = () => {
           <div className="max-w-[600px] mx-auto mt-4">
             <div className="text-center p-4 bg-muted/50 rounded-lg border border-border/50">
               <div className="space-y-3">
-                {isMobile && isEnrolled ? (
+                {isEnrolled ? (
                   <>
                     <p className="text-sm text-muted-foreground">
                       Použite Face ID pre rýchle prihlásenie
