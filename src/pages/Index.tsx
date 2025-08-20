@@ -19,7 +19,8 @@ const Index = () => {
     shouldOfferBiometric,
     isEnrolled,
     isMobile,
-    authenticateWithBiometrics
+    authenticateWithBiometrics,
+    enterAccessCode
   } = useAccessCode();
   const [showWelcome, setShowWelcome] = useState(false);
   const [showCodeInput, setShowCodeInput] = useState(false);
@@ -50,9 +51,14 @@ const Index = () => {
     setShowCodeInput(true);
   };
 
-  const handleBiometricSuccess = (code: string) => {
-    // Access code is already set by the authenticateWithBiometrics function
-    console.log('Biometric authentication successful for code:', code);
+  const handleBiometricSuccess = async (code: string) => {
+    try {
+      console.log('Biometric authentication successful for code:', code);
+      await enterAccessCode(code);
+      setShowBiometricPrompt(false);
+    } catch (error) {
+      console.error('Failed to enter access code from biometric auth:', error);
+    }
   };
 
   const handleShowBiometricPrompt = () => {
