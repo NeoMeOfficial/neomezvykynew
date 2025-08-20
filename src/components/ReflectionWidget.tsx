@@ -1,11 +1,10 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { Calendar, BookOpen, Lightbulb, Loader2 } from 'lucide-react';
+import { BookOpen, Lightbulb, Loader2, NotebookPen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { useReflectionData } from '../hooks/useReflectionData';
-import { MonthlyCalendar } from './MonthlyCalendar';
-import { ConnectionStatus } from './ConnectionStatus';
+import DiaryView from './DiaryView';
 
 interface ReflectionWidgetProps {
   selectedDate: Date;
@@ -32,8 +31,7 @@ export default function ReflectionWidget({ selectedDate, onFirstInteraction }: R
     hasAccessCode 
   } = useReflectionData();
   
-  const [showMonthlyCalendar, setShowMonthlyCalendar] = useState(false);
-  const [monthlyCalendarDate, setMonthlyCalendarDate] = useState(new Date());
+  const [showDiaryView, setShowDiaryView] = useState(false);
 
   const currentReflection = getReflection(selectedDate);
   const [wellDone, setWellDone] = useState(currentReflection?.well_done || '');
@@ -72,31 +70,6 @@ export default function ReflectionWidget({ selectedDate, onFirstInteraction }: R
   }, [selectedDate, wellDone, updateReflection, onFirstInteraction]);
 
   const isCompleted = isReflectionCompleted(selectedDate);
-  
-  // Transform reflection data for MonthlyCalendar
-  const reflectionHabitData = useMemo(() => {
-    const habitData: Record<string, Record<string, number>> = {};
-    const reflectionHabitId = 'reflection-daily';
-    habitData[reflectionHabitId] = {};
-    
-    Object.values(reflections).forEach(reflection => {
-      const completion = getCompletionPercentage(new Date(reflection.date + 'T00:00:00'));
-      habitData[reflectionHabitId][reflection.date] = completion / 100; // Convert to 0-1 range
-    });
-    
-    return habitData;
-  }, [reflections, getCompletionPercentage]);
-
-  const reflectionHabits = [
-    {
-      id: 'reflection-daily',
-      name: 'Denná reflexia',
-      emoji: '🤔',
-      color: '#E5B050',
-      target: 1,
-      unit: 'reflexia'
-    }
-  ];
 
   if (loading) {
     return (
@@ -121,21 +94,18 @@ export default function ReflectionWidget({ selectedDate, onFirstInteraction }: R
               <p className="text-sm text-widget-text-soft">
                 {isCompleted ? 'Dokončené' : 'Nedokončené'}
               </p>
-              <Dialog open={showMonthlyCalendar} onOpenChange={setShowMonthlyCalendar}>
+              <Dialog open={showDiaryView} onOpenChange={setShowDiaryView}>
                 <DialogTrigger asChild>
                   <Button variant="ghost" size="sm" className="p-1.5 bg-amber-100 hover:bg-amber-200 border border-amber-200 rounded-xl shadow-sm">
-                    <Calendar size={20} className="text-foreground" />
+                    <NotebookPen size={20} className="text-foreground" />
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-fit">
+                <DialogContent className="max-w-2xl">
                   <DialogHeader className="pb-0">
-                    <DialogTitle className="text-lg">Mesačný pohľad - Reflexie</DialogTitle>
+                    <DialogTitle className="text-lg font-heading">Môj denník reflexií</DialogTitle>
                   </DialogHeader>
-                  <MonthlyCalendar
-                    habitData={reflectionHabitData}
-                    selectedMonth={monthlyCalendarDate}
-                    onMonthChange={setMonthlyCalendarDate}
-                    habits={reflectionHabits}
+                  <DiaryView
+                    reflections={reflections}
                     formatDate={formatDate}
                   />
                 </DialogContent>
