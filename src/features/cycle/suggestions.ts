@@ -49,10 +49,10 @@ export function getMoodEmoji(mood: number): string {
 
 export function getPhaseColor(phaseKey: PhaseKey): string {
   switch (phaseKey) {
-    case "menstrual": return "hsl(var(--blush))";
-    case "follicular": return "hsl(var(--mint))";
-    case "ovulation": return "hsl(var(--gold))";
-    case "luteal": return "hsl(var(--lavender))";
+    case "menstrual": return "hsl(var(--destructive))"; // Red tone (0 79% 70%)
+    case "follicular": return "hsl(var(--mint))"; // Mint green (150 31% 82%)
+    case "ovulation": return "hsl(var(--lavender))"; // Purple tone (265 30% 92%)
+    case "luteal": return "hsl(var(--peach))"; // Coral/peach (17 80% 86%)
     default: return "hsl(var(--muted))";
   }
 }
