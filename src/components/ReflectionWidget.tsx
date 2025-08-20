@@ -126,9 +126,19 @@ export default function ReflectionWidget({ selectedDate, onFirstInteraction }: R
           <div className="space-y-3">
             {/* What went well */}
             <div className="bg-gradient-success p-4 rounded-xl border border-reflection-border/30 shadow-sm">
-              <div className="flex items-center gap-2 mb-3">
-                <BookOpen className="h-4 w-4 text-reflection-text" />
-                <h3 className="font-medium text-sm text-reflection-text">Čo sa mi dnes darilo?</h3>
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <BookOpen className="h-4 w-4 text-reflection-text" />
+                  <h3 className="font-medium text-sm text-reflection-text">Čo sa mi dnes darilo?</h3>
+                </div>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-7 px-2 text-xs bg-white/50 border-reflection-border/50 text-reflection-text hover:bg-white/70"
+                  onClick={() => handleWellDoneChange(wellDone)}
+                >
+                  Uložiť
+                </Button>
               </div>
               <Textarea
                 value={wellDone}
@@ -140,9 +150,19 @@ export default function ReflectionWidget({ selectedDate, onFirstInteraction }: R
 
             {/* What to improve */}
             <div className="bg-gradient-improve p-4 rounded-xl border border-reflection-border/30 shadow-sm">
-              <div className="flex items-center gap-2 mb-3">
-                <Lightbulb className="h-4 w-4 text-reflection-text" />
-                <h3 className="font-medium text-sm text-reflection-text">Čo môžem zlepšiť?</h3>
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Lightbulb className="h-4 w-4 text-reflection-text" />
+                  <h3 className="font-medium text-sm text-reflection-text">Čo môžem zlepšiť?</h3>
+                </div>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-7 px-2 text-xs bg-white/50 border-reflection-border/50 text-reflection-text hover:bg-white/70"
+                  onClick={() => handleImproveChange(improve)}
+                >
+                  Uložiť
+                </Button>
               </div>
               <Textarea
                 value={improve}
