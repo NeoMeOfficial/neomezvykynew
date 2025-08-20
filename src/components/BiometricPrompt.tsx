@@ -17,9 +17,10 @@ export const BiometricPrompt = ({
   onSuccess, 
   onFallbackToCode 
 }: BiometricPromptProps) => {
-  const { authenticateWithBiometric } = useBiometricAuth();
+  const { authenticateWithBiometric, clearBiometric, checkIframePermissions } = useBiometricAuth();
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [error, setError] = useState<string>('');
+  const [showResetOption, setShowResetOption] = useState(false);
 
   const handleBiometricAuth = async () => {
     setIsAuthenticating(true);
@@ -49,6 +50,17 @@ export const BiometricPrompt = ({
     onFallbackToCode();
   };
 
+  const handleResetFaceID = async () => {
+    await clearBiometric();
+    setError('');
+    setShowResetOption(false);
+    onOpenChange(false);
+    onFallbackToCode();
+  };
+
+  // Check iframe permissions
+  const iframePermissions = checkIframePermissions();
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
@@ -61,6 +73,17 @@ export const BiometricPrompt = ({
             Použite Face ID alebo Touch ID na prihlásenie do aplikácie
           </DialogDescription>
         </DialogHeader>
+        
+        {iframePermissions.inIframe && !iframePermissions.hasPermissions && (
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
+            <p className="text-sm text-yellow-800">
+              ⚠️ Pre správnu funkčnosť Face ID v iframe je potrebné pridať atribút: 
+              <code className="bg-yellow-100 px-1 rounded text-xs ml-1">
+                allow="publickey-credentials-get 'src'; publickey-credentials-create 'src'"
+              </code>
+            </p>
+          </div>
+        )}
         
         <div className="space-y-6">
           <div className="bg-accent/50 p-6 rounded-lg border border-accent text-center">
@@ -76,7 +99,39 @@ export const BiometricPrompt = ({
                 <AlertCircle className="h-5 w-5 text-destructive mt-0.5 flex-shrink-0" />
                 <div>
                   <p className="text-sm text-destructive font-medium">{error}</p>
+                  {!showResetOption && (
+                    <button 
+                      onClick={() => setShowResetOption(true)}
+                      className="text-xs text-destructive underline mt-2 hover:no-underline"
+                    >
+                      Problémy s Face ID? Resetovať nastavenia
+                    </button>
+                  )}
                 </div>
+              </div>
+            </div>
+          )}
+
+          {showResetOption && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <p className="text-sm text-blue-800 mb-2">
+                Resetovanie vymaže uložené Face ID údaje. Budete si ich musieť znovu nastaviť.
+              </p>
+              <div className="flex gap-2">
+                <Button 
+                  onClick={handleResetFaceID}
+                  size="sm"
+                  variant="destructive"
+                >
+                  Resetovať Face ID
+                </Button>
+                <Button 
+                  onClick={() => setShowResetOption(false)}
+                  size="sm"
+                  variant="outline"
+                >
+                  Zrušiť
+                </Button>
               </div>
             </div>
           )}

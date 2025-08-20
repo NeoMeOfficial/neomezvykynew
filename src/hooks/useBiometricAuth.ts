@@ -185,7 +185,7 @@ export const useBiometricAuth = () => {
             userVerification: 'required',
           },
           timeout: 60000,
-          attestation: 'direct',
+          attestation: 'none', // Avoid attestation for better iframe compatibility
         },
       }) as PublicKeyCredential;
 
@@ -277,6 +277,23 @@ export const useBiometricAuth = () => {
     return isMobile && isSupported && isAvailable;
   }, [isMobile, isSupported, isAvailable]);
 
+  // Check if running in iframe and permissions are properly delegated
+  const checkIframePermissions = useCallback(() => {
+    if (window.self !== window.top) {
+      // Running in iframe
+      try {
+        // Test if WebAuthn is accessible
+        if (!navigator.credentials) {
+          return { inIframe: true, hasPermissions: false, error: 'WebAuthn not available in iframe' };
+        }
+        return { inIframe: true, hasPermissions: true, error: null };
+      } catch (error) {
+        return { inIframe: true, hasPermissions: false, error: 'WebAuthn permissions not delegated to iframe' };
+      }
+    }
+    return { inIframe: false, hasPermissions: true, error: null };
+  }, []);
+
   return {
     isSupported,
     isAvailable,
@@ -289,5 +306,6 @@ export const useBiometricAuth = () => {
     clearBiometric,
     shouldOfferBiometric,
     checkBiometricCapability,
+    checkIframePermissions,
   };
 };
