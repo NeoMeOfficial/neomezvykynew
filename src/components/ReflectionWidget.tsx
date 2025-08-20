@@ -92,7 +92,7 @@ export default function ReflectionWidget({ selectedDate, onFirstInteraction }: R
             <h2 className="text-lg font-heading font-semibold text-widget-text">Denná reflexia</h2>
             <div className="flex items-center space-x-2">
               <p className="text-sm text-widget-text-soft">
-                {isCompleted ? 'Dokončené' : 'Nedokončené'}
+                Tvoj diár
               </p>
               <Dialog open={showDiaryView} onOpenChange={setShowDiaryView}>
                 <DialogTrigger asChild>
