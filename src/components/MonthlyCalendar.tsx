@@ -56,7 +56,7 @@ export const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       <Calendar
         mode="single"
         selected={selectedDate}
@@ -70,24 +70,24 @@ export const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
       />
       
       {selectedDate && (
-        <div className="glass-surface rounded-lg p-3">
-          <h4 className="font-medium mb-2 text-sm text-foreground">
+        <div className="glass-surface rounded-lg p-2">
+          <h4 className="font-medium mb-1.5 text-xs text-foreground">
             {selectedDate.toLocaleDateString('sk-SK', { 
               weekday: 'long',
               day: 'numeric',
               month: 'long'
             })}
           </h4>
-          <div className="space-y-1.5">
+          <div className="space-y-1">
             {habits.map(habit => {
               const dateStr = formatDate(selectedDate);
               const value = habitData[habit.id]?.[dateStr] || 0;
               const isCompleted = value >= habit.target;
               
               return (
-                <div key={habit.id} className="flex items-center justify-between p-2 rounded-md bg-background/30 backdrop-blur-sm">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm">{habit.emoji}</span>
+                <div key={habit.id} className="flex items-center justify-between p-1.5 rounded-md bg-background/30 backdrop-blur-sm">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs">{habit.emoji}</span>
                     <span className="text-xs font-medium text-foreground/80">{habit.name}</span>
                   </div>
                   <div className={`text-xs font-semibold ${isCompleted ? 'text-green-600' : 'text-foreground/60'}`}>
@@ -100,9 +100,9 @@ export const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
         </div>
       )}
 
-      <div className="glass-surface rounded-lg p-2.5">
-        <h4 className="text-xs font-medium text-foreground/80 mb-2">Legenda</h4>
-        <div className="grid grid-cols-1 gap-1.5 text-xs">
+      <div className="glass-surface rounded-lg p-2">
+        <h4 className="text-xs font-medium text-foreground/80 mb-1.5">Legenda</h4>
+        <div className="grid grid-cols-1 gap-1 text-xs">
           <div className="flex items-center gap-1.5">
             <div className="w-2 h-2 rounded bg-green-500"></div>
             <span className="text-foreground/70 text-xs">Všetky návyky dokončené</span>

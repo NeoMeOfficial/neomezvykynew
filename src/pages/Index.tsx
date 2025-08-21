@@ -172,12 +172,12 @@ const Index = () => {
                       <Calendar size={20} className="text-foreground" />
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="glass-container border-0 backdrop-blur-xl shadow-2xl max-w-sm mx-2">
-                    <DialogHeader className="pb-3">
+                  <DialogContent className="glass-container border-0 backdrop-blur-xl shadow-2xl max-w-xs mx-2 max-h-[85vh] overflow-y-auto">
+                    <DialogHeader className="pb-2">
                       <div className="flex items-center justify-between">
-                        <DialogTitle className="text-lg font-semibold text-foreground flex items-center gap-2">
-                          <div className="p-1.5 rounded-lg bg-primary/10">
-                            <Calendar size={16} className="text-primary" />
+                        <DialogTitle className="text-base font-semibold text-foreground flex items-center gap-2">
+                          <div className="p-1 rounded-md bg-primary/10">
+                            <Calendar size={14} className="text-primary" />
                           </div>
                           Mesačný pohľad
                         </DialogTitle>
@@ -185,13 +185,13 @@ const Index = () => {
                           variant="ghost" 
                           size="sm" 
                           onClick={() => setShowMonthlyCalendar(false)}
-                          className="text-muted-foreground hover:text-foreground"
+                          className="text-muted-foreground hover:text-foreground h-8 w-8 p-0"
                         >
                           Zatvoriť
                         </Button>
                       </div>
                     </DialogHeader>
-                    <div className="px-1">
+                    <div className="px-0">
                       <MonthlyCalendar
                         habitData={habitData}
                         selectedMonth={monthlyCalendarDate}
