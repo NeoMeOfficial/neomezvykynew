@@ -172,8 +172,8 @@ const Index = () => {
                       <Calendar size={20} className="text-foreground" />
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="glass-container border-0 backdrop-blur-xl shadow-2xl max-w-xs mx-2 max-h-[85vh] overflow-hidden">
-                    <DialogHeader className="pb-2">
+                  <DialogContent className="glass-container border-0 backdrop-blur-xl shadow-2xl max-w-xs mx-2 max-h-[80vh] overflow-hidden">
+                    <DialogHeader className="pb-2 flex-shrink-0">
                       <div className="flex items-center justify-between">
                         <DialogTitle className="text-base font-semibold text-foreground flex items-center gap-2">
                           <div className="p-1 rounded-md bg-primary/10">
@@ -191,7 +191,7 @@ const Index = () => {
                         </Button>
                       </div>
                     </DialogHeader>
-                    <div className="px-0 overflow-hidden">
+                    <div className="px-0 overflow-y-auto flex-1 min-h-0">
                       <MonthlyCalendar
                         habitData={habitData}
                         selectedMonth={monthlyCalendarDate}
