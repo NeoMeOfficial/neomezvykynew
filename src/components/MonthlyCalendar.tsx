@@ -56,18 +56,20 @@ export const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
   };
 
   return (
-    <div className="space-y-2">
-      <Calendar
-        mode="single"
-        selected={selectedDate}
-        onSelect={setSelectedDate}
-        onMonthChange={onMonthChange}
-        month={selectedMonth}
-        modifiers={modifiers}
-        modifiersStyles={modifiersStyles}
-        className={cn("rounded-xl border-0")}
-        showOutsideDays={false}
-      />
+    <div className="space-y-2 touch-none select-none" style={{ touchAction: 'manipulation' }}>
+      <div className="overflow-hidden">
+        <Calendar
+          mode="single"
+          selected={selectedDate}
+          onSelect={setSelectedDate}
+          onMonthChange={onMonthChange}
+          month={selectedMonth}
+          modifiers={modifiers}
+          modifiersStyles={modifiersStyles}
+          className={cn("rounded-xl border-0 w-full")}
+          showOutsideDays={false}
+        />
+      </div>
       
       {selectedDate && (
         <div className="glass-surface rounded-lg p-2">
@@ -99,24 +101,6 @@ export const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
           </div>
         </div>
       )}
-
-      <div className="glass-surface rounded-lg p-2">
-        <h4 className="text-xs font-medium text-foreground/80 mb-1.5">Legenda</h4>
-        <div className="grid grid-cols-1 gap-1 text-xs">
-          <div className="flex items-center gap-1.5">
-            <div className="w-2 h-2 rounded bg-green-500"></div>
-            <span className="text-foreground/70 text-xs">Všetky návyky dokončené</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-2 h-2 rounded bg-yellow-500"></div>
-            <span className="text-foreground/70 text-xs">Čiastočne dokončené</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-2 h-2 rounded bg-muted"></div>
-            <span className="text-foreground/70 text-xs">Bez aktivity</span>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };
