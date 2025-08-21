@@ -56,7 +56,7 @@ export const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
   };
 
   return (
-    <div>
+    <div className="space-y-3">
       <Calendar
         mode="single"
         selected={selectedDate}
@@ -69,46 +69,28 @@ export const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
         showOutsideDays={false}
       />
       
-      <div className="glass-surface rounded-xl p-4 mt-4 space-y-3">
-        <h4 className="text-sm font-semibold text-foreground/80 mb-3">Legenda</h4>
-        <div className="grid grid-cols-1 gap-2 text-xs">
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded bg-green-500 shadow-sm"></div>
-            <span className="text-foreground/70">Všetky návyky dokončené</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded bg-yellow-500 shadow-sm"></div>
-            <span className="text-foreground/70">Čiastočne dokončené</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded bg-muted shadow-sm"></div>
-            <span className="text-foreground/70">Bez aktivity</span>
-          </div>
-        </div>
-      </div>
-
       {selectedDate && (
-        <div className="glass-surface rounded-xl p-4 mt-4">
-          <h4 className="font-semibold mb-3 text-sm text-foreground">
+        <div className="glass-surface rounded-lg p-3">
+          <h4 className="font-medium mb-2 text-sm text-foreground">
             {selectedDate.toLocaleDateString('sk-SK', { 
               weekday: 'long',
               day: 'numeric',
               month: 'long'
             })}
           </h4>
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             {habits.map(habit => {
               const dateStr = formatDate(selectedDate);
               const value = habitData[habit.id]?.[dateStr] || 0;
               const isCompleted = value >= habit.target;
               
               return (
-                <div key={habit.id} className="flex items-center justify-between p-2 rounded-lg bg-background/30 backdrop-blur-sm">
+                <div key={habit.id} className="flex items-center justify-between p-2 rounded-md bg-background/30 backdrop-blur-sm">
                   <div className="flex items-center gap-2">
-                    <span className="text-base">{habit.emoji}</span>
-                    <span className="text-sm font-medium text-foreground/80">{habit.name}</span>
+                    <span className="text-sm">{habit.emoji}</span>
+                    <span className="text-xs font-medium text-foreground/80">{habit.name}</span>
                   </div>
-                  <div className={`text-sm font-semibold ${isCompleted ? 'text-green-600' : 'text-foreground/60'}`}>
+                  <div className={`text-xs font-semibold ${isCompleted ? 'text-green-600' : 'text-foreground/60'}`}>
                     {habit.name === 'Hydratácia' ? Number(value).toFixed(1) : Math.round(Number(value))} / {habit.target} {habit.unit}
                   </div>
                 </div>
@@ -117,6 +99,24 @@ export const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
           </div>
         </div>
       )}
+
+      <div className="glass-surface rounded-lg p-2.5">
+        <h4 className="text-xs font-medium text-foreground/80 mb-2">Legenda</h4>
+        <div className="grid grid-cols-1 gap-1.5 text-xs">
+          <div className="flex items-center gap-1.5">
+            <div className="w-2 h-2 rounded bg-green-500"></div>
+            <span className="text-foreground/70 text-xs">Všetky návyky dokončené</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-2 h-2 rounded bg-yellow-500"></div>
+            <span className="text-foreground/70 text-xs">Čiastočne dokončené</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-2 h-2 rounded bg-muted"></div>
+            <span className="text-foreground/70 text-xs">Bez aktivity</span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
