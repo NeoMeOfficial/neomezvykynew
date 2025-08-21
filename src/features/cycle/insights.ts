@@ -18,10 +18,10 @@ export const PHASE_INSIGHTS: Record<PhaseKey, {
     title: "Čas na oddych",
     description: "Telo sa regeneruje a pripravuje na nový cyklus.",
     recommendations: [
-      "Doprajte si viac odpočinku",
-      "Jemné cvičenie ako jóga", 
-      "Teplé nápoje a výživná strava",
-      "Počúvajte svoje telo"
+      "Teraz je čas dopriať si viac odpočinku a byť k sebe jemná",
+      "Skúste jemné cvičenie ako jógu alebo precházky",
+      "Teplé nápoje a výživná strava vám pomôžu cítiť sa lepšie",
+      "Počúvajte svoje telo a nedávajte na seba príliš veľký tlak"
     ],
     energy: "Nižšia energia",
     mood: "Introspektívna nálada"
@@ -30,10 +30,10 @@ export const PHASE_INSIGHTS: Record<PhaseKey, {
     title: "Rastúca energia",
     description: "Hormóny sa zvyšujú, cítite sa čoraz lepšie.",
     recommendations: [
-      "Ideálny čas na nové projekty",
-      "Kardio cvičenie",
-      "Sociálne aktivity",
-      "Plánovanie a ciele"
+      "Toto je ideálny čas na spustenie nových projektov a výziev",
+      "Vaše telo zvládne náročnejšie kardio cvičenie",
+      "Využite túto energiu na sociálne aktivity a stretávanie sa s priateľmi",
+      "Plánujte si ciele a užívajte si túto pozitívnu fázu"
     ],
     energy: "Rastúca energia",
     mood: "Optimistická nálada"
@@ -42,10 +42,10 @@ export const PHASE_INSIGHTS: Record<PhaseKey, {
     title: "Vrchol cyklu",
     description: "Najvyššia energia a sebavedomie.",
     recommendations: [
-      "Náročné cvičenie",
-      "Dôležité stretnutia",
-      "Kreatívne projekty",
-      "Komunikácia s ostatnými"
+      "Využite túto energiu na najnáročnejšie cvičenie a športové aktivity",
+      "Ideálny čas na dôležité stretnutia, prezentácie a rozhodnutia",
+      "Vaša kreativita je na vrchole, venujte sa kreatívnym projektom",
+      "Komunikujte otvorene s ostatnými, máte prirodzené charisma"
     ],
     energy: "Maximálna energia",
     mood: "Sebavedomá nálada"
@@ -54,10 +54,10 @@ export const PHASE_INSIGHTS: Record<PhaseKey, {
     title: "Príprava na odpočinok",
     description: "Energia postupne klesá, telo sa pripravuje na menštruáciu.",
     recommendations: [
-      "Dokončovanie úloh",
-      "Miernejšie cvičenie", 
-      "Zdravé jedlo",
-      "Príprava na menštruáciu"
+      "Sústreďte sa na dokončovanie rozpracovaných úloh",
+      "Zvoľte tempo a prejdite na miernejšie cvičenie ako pilates",
+      "Jedzte zdravé a výživné jedlá, ktoré vás nasýtia",
+      "Pripravte sa mentálne aj prakticky na nadchádzajúcu menštruáciu"
     ],
     energy: "Klesajúca energia",
     mood: "Pokojnejšia nálada"

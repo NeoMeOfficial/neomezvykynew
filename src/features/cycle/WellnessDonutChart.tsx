@@ -129,12 +129,12 @@ export function WellnessDonutChart({ derivedState, onEditClick, className = "" }
           </div>
         </div>
         
-        {/* Glass-style edit button at 6 o'clock */}
+        {/* Glass-style edit button at top right */}
         <Button
           variant="glass"
           size="icon"
           onClick={onEditClick}
-          className="absolute bottom-[-12px] left-1/2 transform -translate-x-1/2 w-8 h-8 backdrop-blur-[14px] bg-white/50 border border-white/20 shadow-elegant"
+          className="absolute top-[-12px] right-[-12px] w-8 h-8 backdrop-blur-[14px] bg-white/50 border border-white/20 shadow-elegant"
           aria-label={UI_TEXT.edit}
         >
           <Settings className="w-4 h-4" />
