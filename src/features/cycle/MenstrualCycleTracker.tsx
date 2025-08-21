@@ -77,7 +77,7 @@ export default function MenstrualCycleTracker({
           </div>
 
           <div className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 sm:items-end">
+            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="setupCycleLength" className="text-sm font-medium text-widget-text block">
                   {UI_TEXT.cycleLength}
@@ -90,7 +90,7 @@ export default function MenstrualCycleTracker({
                   value={setupCycleLength}
                   onChange={(e) => setSetupCycleLength(Number(e.target.value))}
                   placeholder="28 dni"
-                  className="w-full sm:w-20 text-base"
+                  className="w-full text-base"
                 />
               </div>
 
@@ -106,24 +106,20 @@ export default function MenstrualCycleTracker({
                   value={setupPeriodLength}
                   onChange={(e) => setSetupPeriodLength(Number(e.target.value))}
                   placeholder="5 dni"
-                  className="w-full sm:w-20 text-base"
+                  className="w-full text-base"
                 />
               </div>
+            </div>
 
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-widget-text block">
-                  {UI_TEXT.lastPeriod}
-                </Label>
-                <Button
-                  onClick={() => setShowDatePicker(true)}
-                  variant="outline"
-                  size="sm"
-                  className="w-full sm:w-auto px-3 py-2 text-sm"
-                >
-                  <CalendarIcon className="w-4 h-4 mr-2" />
-                  {UI_TEXT.selectDate}
-                </Button>
-              </div>
+            <div className="pt-2">
+              <Button
+                onClick={() => setShowDatePicker(true)}
+                variant="outline"
+                className="w-full flex items-center justify-center gap-2 py-3 text-base"
+              >
+                <CalendarIcon className="w-5 h-5" />
+                {UI_TEXT.lastPeriod}
+              </Button>
             </div>
           </div>
 
