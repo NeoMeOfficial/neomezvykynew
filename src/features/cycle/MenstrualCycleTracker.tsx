@@ -145,9 +145,6 @@ export default function MenstrualCycleTracker({
       <div className="mb-6">
         <div className="flex items-center justify-between mb-2">
           <div>
-            <h2 className="text-lg font-semibold text-widget-text">
-              Menštruačný cyklus
-            </h2>
             <p className="text-xs text-widget-text-soft">
               {UI_TEXT.expectedPeriod} {formatDateSk(nextPeriodDate)}
             </p>
