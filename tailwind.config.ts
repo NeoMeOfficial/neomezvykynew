@@ -93,6 +93,10 @@ export default {
 				ctaTo: 'hsl(var(--cta-to))',
 				// Palette tokens
 				peach: 'hsl(var(--peach))',
+				'peach-orange': {
+					DEFAULT: 'hsl(var(--peach-orange))',
+					foreground: 'hsl(var(--peach-orange-foreground))'
+				},
 				blush: 'hsl(var(--blush))',
 				lavender: 'hsl(var(--lavender))',
 				mint: 'hsl(var(--mint))',

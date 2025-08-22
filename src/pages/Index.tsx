@@ -153,10 +153,10 @@ const Index = () => {
             {shouldOfferBiometric() ? (
               <Button 
                 onClick={handleShowBiometricPrompt}
-                className="glass-surface flex items-center justify-center gap-2 rounded-3xl py-3 px-4 text-sm font-medium border-0 backdrop-blur-md transition-all hover:bg-background/30"
+                className="bg-peach-orange text-peach-orange-foreground hover:bg-peach-orange/90 flex items-center justify-center gap-2 rounded-3xl py-3 px-4 text-sm font-medium border-0 transition-all shadow-lg"
               >
                 <Fingerprint className="h-4 w-4" />
-                Prihlásiť sa s Face ID/Touch ID
+                Uložiť si svoje informácie
               </Button>
             ) : (
               <Button 
