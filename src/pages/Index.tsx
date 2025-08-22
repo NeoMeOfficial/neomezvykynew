@@ -19,6 +19,11 @@ import { MonthlyCalendar } from "@/components/MonthlyCalendar";
 import DiaryView from "@/components/DiaryView";
 import { useCodeBasedHabits } from "@/hooks/useCodeBasedHabits";
 import { useReflectionData } from "@/hooks/useReflectionData";
+import { useTemporaryHabits } from "@/hooks/useTemporaryHabits";
+import { useTemporaryReflections } from "@/hooks/useTemporaryReflections";
+import { SaveProgressDialog } from "@/components/SaveProgressDialog";
+import { TemporaryDataIndicator } from "@/components/TemporaryDataIndicator";
+import { temporaryStorage } from "@/lib/temporaryStorage";
 
 const Index = () => {
   const { 
@@ -39,12 +44,23 @@ const Index = () => {
   const [monthlyCalendarDate, setMonthlyCalendarDate] = useState(new Date());
   const [showMonthlyCalendar, setShowMonthlyCalendar] = useState(false);
   const [showDiaryView, setShowDiaryView] = useState(false);
+  const [showSaveProgressDialog, setShowSaveProgressDialog] = useState(false);
 
   const [hasInteracted, setHasInteracted] = useState(false);
 
   // Get habit and reflection data for the widgets
-  const { habits, habitData, formatDate: habitFormatDate } = useCodeBasedHabits();
-  const { reflections } = useReflectionData();
+  // Use temporary data hooks when no access code is available
+  const realHabitsData = useCodeBasedHabits();
+  const realReflectionData = useReflectionData();
+  const tempHabitsData = useTemporaryHabits();
+  const tempReflectionData = useTemporaryReflections();
+  
+  // Choose data source based on access code availability
+  const habitsData = accessCode ? realHabitsData : tempHabitsData;
+  const reflectionData = accessCode ? realReflectionData : tempReflectionData;
+  
+  const { habits, habitData, formatDate: habitFormatDate } = habitsData;
+  const { reflections } = reflectionData;
 
   // Debug logging
   console.log('Index state:', { accessCode: !!accessCode, isMobile, isEnrolled, loading });
@@ -52,7 +68,7 @@ const Index = () => {
   const handleFirstInteraction = () => {
     if (!hasInteracted && !accessCode) {
       setHasInteracted(true);
-      setShowWelcome(true);
+      // Don't show welcome immediately - let users explore first
     }
   };
 
@@ -121,7 +137,14 @@ const Index = () => {
         <div className="w-full max-w-[600px] mx-auto mb-4 sm:mb-6">
           <div className="grid gap-3" style={{ gridTemplateColumns: shouldOfferBiometric() ? '1fr 2fr' : '1fr 1fr' }}>
             <Button 
-              onClick={() => window.location.href = 'https://neome.mvt.so/mj-de'}
+              onClick={() => {
+                // Check if user has temporary data and prompt to save
+                if (!accessCode && temporaryStorage.hasTemporaryData()) {
+                  setShowSaveProgressDialog(true);
+                } else {
+                  window.location.href = 'https://neome.mvt.so/mj-de';
+                }
+              }}
               className="glass-surface flex items-center justify-center gap-2 rounded-3xl py-3 px-3 text-sm font-medium border-0 backdrop-blur-md transition-all hover:bg-background/30"
             >
               <ArrowLeft className="h-4 w-4" />
@@ -144,6 +167,23 @@ const Index = () => {
               </Button>
             )}
           </div>
+        </div>
+
+        {/* Temporary Data Indicator */}
+        {!accessCode && temporaryStorage.isSessionActive() && (
+          <div className="w-full max-w-[600px] mx-auto mb-4">
+            <TemporaryDataIndicator />
+          </div>
+        )}
+
+        {/* Date Navigation */}
+        <div className="w-full max-w-[600px] mx-auto mb-4">
+          <DateNavigationHeader
+            currentDate={currentDateString}
+            onDateChange={handleDateChange}
+            hasAccessCode={!!accessCode}
+            onSettingsClick={handleSettingsClick}
+          />
         </div>
 
         {/* Menstrual Cycle Widget */}
@@ -230,10 +270,10 @@ const Index = () => {
                     <DialogHeader className="pb-0">
                       <DialogTitle className="text-lg font-heading">Môj denník reflexií</DialogTitle>
                     </DialogHeader>
-                    <DiaryView
-                      reflections={reflections}
-                      formatDate={habitFormatDate}
-                    />
+                     <DiaryView
+                       reflections={accessCode ? reflections as Record<string, any> : {}}
+                       formatDate={habitFormatDate}
+                     />
                   </DialogContent>
                 </Dialog>
               </div>
@@ -293,6 +333,22 @@ const Index = () => {
         <AccessCodeInput 
           open={showCodeInput} 
           onOpenChange={setShowCodeInput} 
+        />
+
+        <SaveProgressDialog
+          isOpen={showSaveProgressDialog}
+          onSave={() => {
+            setShowSaveProgressDialog(false);
+            setShowWelcome(true);
+          }}
+          onDiscard={() => {
+            temporaryStorage.clearAll();
+            setShowSaveProgressDialog(false);
+            window.location.href = 'https://neome.mvt.so/mj-de';
+          }}
+          onCancel={() => {
+            setShowSaveProgressDialog(false);
+          }}
         />
       </div>
     </div>

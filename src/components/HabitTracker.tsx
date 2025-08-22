@@ -3,6 +3,7 @@ import { Calendar, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useCodeBasedHabits } from '../hooks/useCodeBasedHabits';
+import { useTemporaryHabits } from '../hooks/useTemporaryHabits';
 import { useAccessCode } from '../hooks/useAccessCode';
 import { HabitCard } from './HabitCard';
 import { MonthlyCalendar } from './MonthlyCalendar';
@@ -38,8 +39,13 @@ export default function HabitTracker({ selectedDate, onFirstInteraction }: Habit
     }, 1200);
   }, []);
   
-  const { habits, habitData, loading, updateHabitProgress, formatDate, startOfDay, hasAccessCode } = useCodeBasedHabits(handleSuccess);
   const { accessCode } = useAccessCode();
+  const realHabitsData = useCodeBasedHabits(handleSuccess);
+  const tempHabitsData = useTemporaryHabits(handleSuccess);
+  
+  // Use appropriate data source based on access code availability
+  const { habits, habitData, loading, updateHabitProgress, formatDate, startOfDay, hasAccessCode } = 
+    accessCode ? realHabitsData : tempHabitsData;
 
 
   const getHabitProgress = useCallback((habitId: string, date: Date) => {

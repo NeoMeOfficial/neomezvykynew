@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAccessCode } from '@/hooks/useAccessCode';
+import { transferTemporaryDataToPermanent } from '@/lib/dataTransfer';
+import { temporaryStorage } from '@/lib/temporaryStorage';
 
 interface AccessCodeWelcomeProps {
   open: boolean;
@@ -35,6 +37,12 @@ export const AccessCodeWelcome = ({ open, onOpenChange, onEnterExistingCode }: A
 
     try {
       const finalCode = await setCustomAccessCode(customCode);
+      
+      // Transfer any temporary data to permanent storage
+      if (temporaryStorage.hasTemporaryData()) {
+        await transferTemporaryDataToPermanent(finalCode);
+      }
+      
       setGeneratedCode(finalCode);
       setStep('code');
     } catch (error) {

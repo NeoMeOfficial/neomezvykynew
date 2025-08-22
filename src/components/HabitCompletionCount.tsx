@@ -1,12 +1,20 @@
 import React, { useMemo } from 'react';
 import { useCodeBasedHabits } from '../hooks/useCodeBasedHabits';
+import { useTemporaryHabits } from '../hooks/useTemporaryHabits';
+import { useAccessCode } from '../hooks/useAccessCode';
 
 interface HabitCompletionCountProps {
   selectedDate: Date;
 }
 
 export default function HabitCompletionCount({ selectedDate }: HabitCompletionCountProps) {
-  const { habits, habitData, loading, formatDate, startOfDay } = useCodeBasedHabits();
+  const { accessCode } = useAccessCode();
+  const realHabitsData = useCodeBasedHabits();
+  const tempHabitsData = useTemporaryHabits();
+  
+  // Use appropriate data source based on access code availability
+  const { habits, habitData, loading, formatDate, startOfDay } = 
+    accessCode ? realHabitsData : tempHabitsData;
 
   const isHabitCompleted = (habitId: string, date: Date) => {
     const habit = habits.find(h => h.id === habitId);

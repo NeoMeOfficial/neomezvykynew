@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { useReflectionData } from '../hooks/useReflectionData';
+import { useTemporaryReflections } from '../hooks/useTemporaryReflections';
+import { useAccessCode } from '../hooks/useAccessCode';
 import DiaryView from './DiaryView';
 
 interface ReflectionWidgetProps {
@@ -20,6 +22,11 @@ const motivationalQuotes = [
 ];
 
 export default function ReflectionWidget({ selectedDate, onFirstInteraction }: ReflectionWidgetProps) {
+  const { accessCode } = useAccessCode();
+  const realReflectionData = useReflectionData();
+  const tempReflectionData = useTemporaryReflections();
+  
+  // Use appropriate data source based on access code availability
   const { 
     reflections, 
     loading, 
@@ -29,7 +36,7 @@ export default function ReflectionWidget({ selectedDate, onFirstInteraction }: R
     getCompletionPercentage,
     formatDate,
     hasAccessCode 
-  } = useReflectionData();
+  } = accessCode ? realReflectionData : tempReflectionData;
   
   
   const [wellDoneSaveStatus, setWellDoneSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
