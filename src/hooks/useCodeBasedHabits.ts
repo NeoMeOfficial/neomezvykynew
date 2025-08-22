@@ -20,27 +20,35 @@ export const useCodeBasedHabits = (onSuccess?: () => void) => {
   const defaultHabits: Habit[] = [
     { 
       id: 'water', 
-      name: 'Hydratácia', 
+      name: 'Voda', 
       emoji: '💧', 
-      color: '#80B9C8',
-      target: 2,
-      unit: 'L'
+      color: '#3B82F6',
+      target: 8,
+      unit: 'pohárov'
     },
     { 
       id: 'steps', 
-      name: 'Pohyb', 
+      name: 'Kroky', 
       emoji: '👟', 
-      color: '#E5B050',
+      color: '#10B981',
       target: 10000,
       unit: 'krokov'
     },
     { 
       id: 'nutrition', 
-      name: 'Výživa', 
+      name: 'Zdravé jedlo', 
       emoji: '🥗', 
-      color: '#B2D9C4',
-      target: 3,
-      unit: 'jedál'
+      color: '#F59E0B',
+      target: 5,
+      unit: 'porcií'
+    },
+    { 
+      id: 'exercise', 
+      name: 'Cvičenie-strečing', 
+      emoji: '🧘‍♀️', 
+      color: '#EF4444',
+      target: 30,
+      unit: 'minút'
     },
   ];
 

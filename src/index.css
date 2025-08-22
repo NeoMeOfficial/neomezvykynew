@@ -220,7 +220,7 @@ All colors MUST be HSL.
     background: var(--glass-bg);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 2px solid var(--glass-border);
+    border: 1px solid var(--glass-border);
     border-radius: 2rem;
     box-shadow: var(--glass-shadow);
     padding: 1rem;

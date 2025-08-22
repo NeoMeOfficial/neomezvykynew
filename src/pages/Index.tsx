@@ -7,7 +7,7 @@ import { BiometricPrompt } from "@/components/BiometricPrompt";
 import { AccessCodeInput } from "@/components/AccessCodeInput";
 import { AccessCodeSettings } from "@/components/AccessCodeSettings";
 import { StorageHealthIndicator } from "@/components/StorageHealthIndicator";
-import { DateNavigationHeader } from "@/components/DateNavigationHeader";
+
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Fingerprint, ArrowLeft, Calendar, NotebookPen } from "lucide-react";
@@ -176,15 +176,6 @@ const Index = () => {
           </div>
         )}
 
-        {/* Date Navigation */}
-        <div className="w-full max-w-[600px] mx-auto mb-4">
-          <DateNavigationHeader
-            currentDate={currentDateString}
-            onDateChange={handleDateChange}
-            hasAccessCode={!!accessCode}
-            onSettingsClick={handleSettingsClick}
-          />
-        </div>
 
         {/* Menstrual Cycle Widget */}
         <div className="w-full max-w-[600px] mx-auto">
