@@ -16,23 +16,23 @@ export function SaveProgressDialog({ isOpen, onSave, onDiscard, onCancel }: Save
 
   return (
     <Dialog open={isOpen} onOpenChange={() => onCancel()}>
-      <DialogContent className="max-w-md mx-4">
+      <DialogContent className="max-w-md mx-4 w-[calc(100vw-2rem)]">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-lg">
+          <DialogTitle className="flex items-center gap-2 text-mobile-lg md:text-lg">
             <Save className="h-5 w-5 text-primary" />
-            Uložiť pokrok?
+            Chceš si anonymne uložiť zadané údaje?
           </DialogTitle>
         </DialogHeader>
         
         <div className="space-y-4">
-          <div className="bg-gradient-to-r from-primary/10 to-primary/5 p-4 rounded-lg border border-primary/20">
+          <div className="bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950/30 dark:to-amber-950/30 p-4 rounded-lg border border-orange-200 dark:border-orange-800">
             <div className="flex items-start gap-3">
               <Lightbulb className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
               <div className="space-y-2">
-                <p className="text-sm font-medium text-foreground">
+                <p className="text-mobile-sm md:text-sm font-medium text-foreground">
                   Máš neuložené údaje, ktoré sa stratia ak odídeš bez vytvorenia kódu.
                 </p>
-                <div className="text-xs text-muted-foreground space-y-1">
+                <div className="text-mobile-xs md:text-xs text-muted-foreground space-y-1">
                   {dataSummary.habitEntries > 0 && (
                     <div>• {dataSummary.habitEntries} záznamov návykov</div>
                   )}
@@ -50,7 +50,7 @@ export function SaveProgressDialog({ isOpen, onSave, onDiscard, onCancel }: Save
           <div className="flex flex-col gap-2">
             <Button 
               onClick={onSave}
-              className="w-full bg-primary hover:bg-primary/90"
+              className="w-full bg-primary hover:bg-primary/90 text-mobile-sm md:text-sm"
               size="lg"
             >
               <Save className="h-4 w-4 mr-2" />
@@ -60,7 +60,7 @@ export function SaveProgressDialog({ isOpen, onSave, onDiscard, onCancel }: Save
             <Button 
               onClick={onDiscard}
               variant="outline"
-              className="w-full"
+              className="w-full text-mobile-sm md:text-sm"
               size="lg"
             >
               <X className="h-4 w-4 mr-2" />
@@ -70,7 +70,7 @@ export function SaveProgressDialog({ isOpen, onSave, onDiscard, onCancel }: Save
             <Button 
               onClick={onCancel}
               variant="ghost"
-              className="w-full"
+              className="w-full text-mobile-sm md:text-sm"
             >
               Zrušiť
             </Button>

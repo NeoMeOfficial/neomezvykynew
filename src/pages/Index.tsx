@@ -145,7 +145,7 @@ const Index = () => {
                   window.location.href = 'https://neome.mvt.so/mj-de';
                 }
               }}
-              className="glass-surface flex items-center justify-center gap-2 rounded-3xl py-3 px-3 text-sm md:text-sm text-mobile-sm font-medium border-0 backdrop-blur-md transition-all hover:bg-background/30"
+              className="glass-surface flex items-center justify-center gap-2 rounded-3xl py-3 px-3 text-mobile-sm md:text-sm font-medium border-0 backdrop-blur-md transition-all hover:bg-background/30"
             >
               <ArrowLeft className="h-4 w-4" />
               Naspäť
@@ -153,7 +153,7 @@ const Index = () => {
             {shouldOfferBiometric() ? (
               <Button 
                 onClick={handleShowBiometricPrompt}
-                className="bg-peach-orange text-peach-orange-foreground hover:bg-peach-orange/90 flex items-center justify-center gap-2 rounded-3xl py-3 px-4 text-sm md:text-sm text-mobile-sm font-medium border-0 transition-all shadow-lg"
+                className="bg-peach-orange text-peach-orange-foreground hover:bg-peach-orange/90 flex items-center justify-center gap-2 rounded-3xl py-3 px-4 text-mobile-sm md:text-sm font-medium border-0 transition-all shadow-lg"
               >
                 <Fingerprint className="h-4 w-4" />
                 Uložiť si svoje informácie
@@ -161,7 +161,7 @@ const Index = () => {
             ) : (
               <Button 
                 onClick={handleEnterCodeClick}
-                className="glass-surface flex items-center justify-center gap-2 rounded-3xl py-3 px-4 text-sm md:text-sm text-mobile-sm font-medium border-0 backdrop-blur-md transition-all hover:bg-background/30"
+                className="glass-surface flex items-center justify-center gap-2 rounded-3xl py-3 px-4 text-mobile-sm md:text-sm font-medium border-0 backdrop-blur-md transition-all hover:bg-background/30"
               >
                 Prihlásenie
               </Button>
