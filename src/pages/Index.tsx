@@ -145,7 +145,7 @@ const Index = () => {
                   window.location.href = 'https://neome.mvt.so/mj-de';
                 }
               }}
-              className="glass-surface flex items-center justify-center gap-2 rounded-3xl py-3 px-3 text-sm font-medium border-0 backdrop-blur-md transition-all hover:bg-background/30"
+              className="glass-surface flex items-center justify-center gap-2 rounded-3xl py-3 px-3 text-sm md:text-sm text-mobile-sm font-medium border-0 backdrop-blur-md transition-all hover:bg-background/30"
             >
               <ArrowLeft className="h-4 w-4" />
               Naspäť
@@ -153,7 +153,7 @@ const Index = () => {
             {shouldOfferBiometric() ? (
               <Button 
                 onClick={handleShowBiometricPrompt}
-                className="bg-peach-orange text-peach-orange-foreground hover:bg-peach-orange/90 flex items-center justify-center gap-2 rounded-3xl py-3 px-4 text-sm font-medium border-0 transition-all shadow-lg"
+                className="bg-peach-orange text-peach-orange-foreground hover:bg-peach-orange/90 flex items-center justify-center gap-2 rounded-3xl py-3 px-4 text-sm md:text-sm text-mobile-sm font-medium border-0 transition-all shadow-lg"
               >
                 <Fingerprint className="h-4 w-4" />
                 Uložiť si svoje informácie
@@ -161,7 +161,7 @@ const Index = () => {
             ) : (
               <Button 
                 onClick={handleEnterCodeClick}
-                className="glass-surface flex items-center justify-center gap-2 rounded-3xl py-3 px-4 text-sm font-medium border-0 backdrop-blur-md transition-all hover:bg-background/30"
+                className="glass-surface flex items-center justify-center gap-2 rounded-3xl py-3 px-4 text-sm md:text-sm text-mobile-sm font-medium border-0 backdrop-blur-md transition-all hover:bg-background/30"
               >
                 Prihlásenie
               </Button>
@@ -180,7 +180,7 @@ const Index = () => {
         {/* Menstrual Cycle Widget */}
         <div className="w-full max-w-[600px] mx-auto">
           <div className="glass-container">
-            <h2 className="text-lg font-semibold text-foreground mb-4">Menštruačný cyklus</h2>
+            <h2 className="text-lg md:text-lg text-mobile-lg font-semibold text-foreground mb-4">Menštruačný cyklus</h2>
             <MenstrualCycleTracker
               accessCode={accessCode}
               onFirstInteraction={handleFirstInteraction}
@@ -192,9 +192,9 @@ const Index = () => {
         <div className="w-full max-w-[600px] mx-auto">
           <div className="glass-container">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-foreground">Moje návyky</h2>
+              <h2 className="text-lg md:text-lg text-mobile-lg font-semibold text-foreground">Moje návyky</h2>
               <div className="flex items-center gap-2">
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm md:text-sm text-mobile-sm text-muted-foreground">
                   <HabitCompletionCount selectedDate={selectedDate} />
                 </p>
                 <Dialog open={showMonthlyCalendar} onOpenChange={setShowMonthlyCalendar}>
@@ -246,9 +246,9 @@ const Index = () => {
         <div className="w-full max-w-[600px] mx-auto">
           <div className="glass-container">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-foreground">Denná reflexia</h2>
+              <h2 className="text-lg md:text-lg text-mobile-lg font-semibold text-foreground">Denná reflexia</h2>
               <div className="flex items-center gap-2">
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm md:text-sm text-mobile-sm text-muted-foreground">
                   Tvoj diár
                 </p>
                 <Dialog open={showDiaryView} onOpenChange={setShowDiaryView}>
@@ -286,7 +286,7 @@ const Index = () => {
                 >
                   Zadať prístupový kód
                 </Button>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm md:text-sm text-mobile-sm text-muted-foreground">
                   Zadajte váš prístupový kód pre prístup k údajom
                 </p>
               </div>

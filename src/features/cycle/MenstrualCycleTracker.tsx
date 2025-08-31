@@ -71,7 +71,7 @@ export default function MenstrualCycleTracker({
     return (
       <div className="w-full space-y-6">
           <div>
-            <p className="text-widget-text-soft text-sm">
+            <p className="text-widget-text-soft text-sm md:text-sm text-mobile-sm">
               {UI_TEXT.welcome}
             </p>
           </div>
@@ -79,7 +79,7 @@ export default function MenstrualCycleTracker({
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="setupCycleLength" className="text-sm font-medium text-widget-text block">
+                <Label htmlFor="setupCycleLength" className="text-sm md:text-sm text-mobile-sm font-medium text-widget-text block">
                   {UI_TEXT.cycleLength}
                 </Label>
                 <Input
@@ -95,7 +95,7 @@ export default function MenstrualCycleTracker({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="setupPeriodLength" className="text-sm font-medium text-widget-text block">
+                <Label htmlFor="setupPeriodLength" className="text-sm md:text-sm text-mobile-sm font-medium text-widget-text block">
                   {UI_TEXT.periodLength}
                 </Label>
                 <Input
@@ -145,7 +145,7 @@ export default function MenstrualCycleTracker({
       <div className="mb-6">
         <div className="flex items-center justify-between mb-2">
           <div>
-            <p className="text-xs text-widget-text-soft">
+            <p className="text-xs md:text-xs text-mobile-xs text-widget-text-soft">
               {UI_TEXT.expectedPeriod} {formatDateSk(nextPeriodDate)}
             </p>
           </div>

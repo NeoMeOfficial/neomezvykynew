@@ -35,10 +35,10 @@ export default function DiaryView({ reflections, formatDate }: DiaryViewProps) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
         <BookOpen className="h-12 w-12 text-widget-text-soft mb-4" />
-        <h3 className="text-lg font-heading font-semibold text-widget-text mb-2">
+        <h3 className="text-lg md:text-lg text-mobile-lg font-heading font-semibold text-widget-text mb-2">
           Tvoj denník je prázdny
         </h3>
-        <p className="text-sm text-widget-text-soft">
+        <p className="text-sm md:text-sm text-mobile-sm text-widget-text-soft">
           Začni písať svoje prvé reflexie a vybuduj si návyk každodenného zamýšľania.
         </p>
       </div>
@@ -56,7 +56,7 @@ export default function DiaryView({ reflections, formatDate }: DiaryViewProps) {
               {/* Date Header */}
               <div className="flex items-center gap-2 pb-2 border-b border-widget-border/30">
                 <BookOpen className="h-4 w-4 text-reflection-accent" />
-                <h3 className="text-sm font-heading font-semibold text-widget-text capitalize">
+                <h3 className="text-sm md:text-sm text-mobile-sm font-heading font-semibold text-widget-text capitalize">
                   {formatDisplayDate(reflection.date)}
                 </h3>
               </div>
@@ -68,9 +68,9 @@ export default function DiaryView({ reflections, formatDate }: DiaryViewProps) {
                     <div className="bg-gradient-success p-4 rounded-xl border border-reflection-border/30">
                       <div className="flex items-center gap-2 mb-2">
                         <BookOpen className="h-3 w-3 text-reflection-text" />
-                        <span className="text-xs font-medium text-reflection-text">Čo sa mi darilo</span>
+                        <span className="text-xs md:text-xs text-mobile-xs font-medium text-reflection-text">Čo sa mi darilo</span>
                       </div>
-                      <p className="text-sm text-reflection-text leading-relaxed">
+                      <p className="text-sm md:text-sm text-mobile-sm text-reflection-text leading-relaxed">
                         {reflection.well_done}
                       </p>
                     </div>
@@ -81,9 +81,9 @@ export default function DiaryView({ reflections, formatDate }: DiaryViewProps) {
                     <div className="bg-gradient-improve p-4 rounded-xl border border-reflection-border/30">
                       <div className="flex items-center gap-2 mb-2">
                         <Lightbulb className="h-3 w-3 text-reflection-text" />
-                        <span className="text-xs font-medium text-reflection-text">Čo môžem zlepšiť</span>
+                        <span className="text-xs md:text-xs text-mobile-xs font-medium text-reflection-text">Čo môžem zlepšiť</span>
                       </div>
-                      <p className="text-sm text-reflection-text leading-relaxed">
+                      <p className="text-sm md:text-sm text-mobile-sm text-reflection-text leading-relaxed">
                         {reflection.improve}
                       </p>
                     </div>
@@ -91,7 +91,7 @@ export default function DiaryView({ reflections, formatDate }: DiaryViewProps) {
                 </div>
               ) : (
                 <div className="bg-widget-bg-soft p-4 rounded-xl border border-widget-border/20">
-                  <p className="text-sm text-widget-text-soft italic text-center">
+                  <p className="text-sm md:text-sm text-mobile-sm text-widget-text-soft italic text-center">
                     Žiadna reflexia k tomuto dňu
                   </p>
                 </div>
