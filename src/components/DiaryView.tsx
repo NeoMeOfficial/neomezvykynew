@@ -68,7 +68,7 @@ export default function DiaryView({ reflections, formatDate }: DiaryViewProps) {
                     <div className="bg-gradient-success p-4 rounded-xl border border-reflection-border/30">
                       <div className="flex items-center gap-2 mb-2">
                         <BookOpen className="h-3 w-3 text-reflection-text" />
-                        <span className="text-xs md:text-xs text-mobile-xs font-medium text-reflection-text">Čo sa mi darilo</span>
+                        <span className="text-mobile-xs md:text-xs font-medium text-reflection-text">Čo sa mi darilo</span>
                       </div>
                       <p className="text-sm md:text-sm text-mobile-sm text-reflection-text leading-relaxed">
                         {reflection.well_done}
@@ -81,7 +81,7 @@ export default function DiaryView({ reflections, formatDate }: DiaryViewProps) {
                     <div className="bg-gradient-improve p-4 rounded-xl border border-reflection-border/30">
                       <div className="flex items-center gap-2 mb-2">
                         <Lightbulb className="h-3 w-3 text-reflection-text" />
-                        <span className="text-xs md:text-xs text-mobile-xs font-medium text-reflection-text">Čo môžem zlepšiť</span>
+                        <span className="text-mobile-xs md:text-xs font-medium text-reflection-text">Čo môžem zlepšiť</span>
                       </div>
                       <p className="text-sm md:text-sm text-mobile-sm text-reflection-text leading-relaxed">
                         {reflection.improve}

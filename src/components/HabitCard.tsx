@@ -47,7 +47,7 @@ export const HabitCard = memo<HabitCardProps>(({
                 <div className={`font-medium text-base md:text-base text-mobile-base ${isCompleted ? 'line-through' : ''}`}>
                   {habit.name}
                 </div>
-                <div className="text-xs md:text-xs text-mobile-xs text-muted-foreground">
+                <div className="text-mobile-xs md:text-xs text-muted-foreground">
                   Cieľ: {habit.target} {habit.unit}
                 </div>
               </div>
@@ -86,7 +86,7 @@ export const HabitCard = memo<HabitCardProps>(({
             {streak > 0 && (
               <div className="flex items-center justify-center gap-1 text-amber-700">
                 <span aria-hidden className="text-sm">🏆</span>
-                <span className="font-medium text-xs md:text-xs text-mobile-xs">
+                <span className="font-medium text-mobile-xs md:text-xs">
                   {streak} {streak > 1 ? 'dní' : 'deň'} série!
                 </span>
               </div>
