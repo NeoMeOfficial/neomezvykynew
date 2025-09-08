@@ -180,7 +180,7 @@ const Index = () => {
         {/* Menstrual Cycle Widget */}
         <div className="w-full max-w-[600px] mx-auto">
           <div className="glass-container">
-            <h2 className="text-lg md:text-lg text-mobile-lg font-semibold text-foreground mb-4">Menštruačný cyklus</h2>
+            <h2 className="text-mobile-lg md:text-lg font-semibold text-foreground mb-4">Menštruačný cyklus</h2>
             <MenstrualCycleTracker
               accessCode={accessCode}
               onFirstInteraction={handleFirstInteraction}
@@ -192,9 +192,9 @@ const Index = () => {
         <div className="w-full max-w-[600px] mx-auto">
           <div className="glass-container">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg md:text-lg text-mobile-lg font-semibold text-foreground">Moje návyky</h2>
+              <h2 className="text-mobile-lg md:text-lg font-semibold text-foreground">Moje návyky</h2>
               <div className="flex items-center gap-2">
-                <p className="text-sm md:text-sm text-mobile-sm text-muted-foreground">
+                <p className="text-mobile-sm md:text-sm text-muted-foreground">
                   <HabitCompletionCount selectedDate={selectedDate} />
                 </p>
                 <Dialog open={showMonthlyCalendar} onOpenChange={setShowMonthlyCalendar}>
@@ -246,9 +246,9 @@ const Index = () => {
         <div className="w-full max-w-[600px] mx-auto">
           <div className="glass-container">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg md:text-lg text-mobile-lg font-semibold text-foreground">Denná reflexia</h2>
+              <h2 className="text-mobile-lg md:text-lg font-semibold text-foreground">Denná reflexia</h2>
               <div className="flex items-center gap-2">
-                <p className="text-sm md:text-sm text-mobile-sm text-muted-foreground">
+                <p className="text-mobile-sm md:text-sm text-muted-foreground">
                   Tvoj diár
                 </p>
                 <Dialog open={showDiaryView} onOpenChange={setShowDiaryView}>
@@ -286,7 +286,7 @@ const Index = () => {
                 >
                   Zadať prístupový kód
                 </Button>
-                <p className="text-sm md:text-sm text-mobile-sm text-muted-foreground">
+                <p className="text-mobile-sm md:text-sm text-muted-foreground">
                   Zadajte váš prístupový kód pre prístup k údajom
                 </p>
               </div>

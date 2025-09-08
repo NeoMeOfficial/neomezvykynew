@@ -69,14 +69,14 @@ export default function MenstrualCycleTracker({
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="setupCycleLength" className="text-sm md:text-sm text-mobile-sm font-medium text-widget-text block">
+                <Label htmlFor="setupCycleLength" className="text-mobile-sm md:text-sm font-medium text-widget-text block">
                   {UI_TEXT.cycleLength}
                 </Label>
                 <Input id="setupCycleLength" type="number" min="21" max="45" value={setupCycleLength} onChange={e => setSetupCycleLength(Number(e.target.value))} placeholder="28 dni" className="w-full text-base" />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="setupPeriodLength" className="text-sm md:text-sm text-mobile-sm font-medium text-widget-text block">
+                <Label htmlFor="setupPeriodLength" className="text-mobile-sm md:text-sm font-medium text-widget-text block">
                   {UI_TEXT.periodLength}
                 </Label>
                 <Input id="setupPeriodLength" type="number" min="2" max="10" value={setupPeriodLength} onChange={e => setSetupPeriodLength(Number(e.target.value))} placeholder="5 dni" className="w-full text-base" />
