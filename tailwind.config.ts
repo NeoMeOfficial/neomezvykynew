@@ -107,7 +107,7 @@ export default {
 				'body': ['Alegreya Sans', 'sans-serif'],
 			},
 			fontSize: {
-				'mobile-xs': ['32px', { lineHeight: '44px', letterSpacing: '0.01em' }],
+				'mobile-xs': ['38px', { lineHeight: '50px', letterSpacing: '0.01em' }],
 				'mobile-sm': ['36px', { lineHeight: '52px', letterSpacing: '0.01em' }],
 				'mobile-base': ['20px', { lineHeight: '28px', letterSpacing: '0.01em' }],
 				'mobile-lg': ['36px', { lineHeight: '51px', letterSpacing: '0.01em' }],
