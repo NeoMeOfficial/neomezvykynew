@@ -44,16 +44,16 @@ export const HabitCard = memo<HabitCardProps>(({
             <div className="flex items-center space-x-2 flex-1">
               <span className="text-xl">{habit.emoji}</span>
               <div className="text-left flex-1">
-                <div className={`font-medium text-mobile-base md:text-base ${isCompleted ? 'line-through' : ''}`}>
+                <div className={`font-medium text-mobile-lg md:text-base ${isCompleted ? 'line-through' : ''}`}>
                   {habit.name}
                 </div>
-                <div className="text-mobile-xs md:text-xs text-muted-foreground">
+                <div className="text-mobile-sm md:text-sm text-muted-foreground">
                   Cieľ: {habit.target} {habit.unit}
                 </div>
               </div>
             </div>
             <div className="text-right">
-              <div className="text-mobile-sm md:text-sm font-bold">
+              <div className="text-mobile-lg md:text-lg font-bold">
                 {habit.name === 'Hydratácia' ? Number(progress).toFixed(1) : Math.round(Number(progress))} {habit.unit}
               </div>
               {isCompleted && (
@@ -86,7 +86,7 @@ export const HabitCard = memo<HabitCardProps>(({
             {streak > 0 && (
               <div className="flex items-center justify-center gap-1 text-amber-700">
                 <span aria-hidden className="text-sm">🏆</span>
-                <span className="font-medium text-mobile-xs md:text-xs">
+                <span className="font-medium text-mobile-sm md:text-sm">
                   {streak} {streak > 1 ? 'dní' : 'deň'} série!
                 </span>
               </div>

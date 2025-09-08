@@ -107,12 +107,14 @@ export default {
 				'body': ['Alegreya Sans', 'sans-serif'],
 			},
 			fontSize: {
-				'mobile-xs': ['14px', { lineHeight: '20px', letterSpacing: '0.01em' }],
-				'mobile-sm': ['36px', { lineHeight: '52px', letterSpacing: '0.01em' }],
-				'mobile-base': ['20px', { lineHeight: '28px', letterSpacing: '0.01em' }],
-				'mobile-lg': ['36px', { lineHeight: '51px', letterSpacing: '0.01em' }],
-				'mobile-xl': ['42px', { lineHeight: '57px', letterSpacing: '0.01em' }],
-				'mobile-2xl': ['48px', { lineHeight: '66px', letterSpacing: '0.01em' }],
+				// Optimized for readability - minimum 16px for body text on mobile
+				'mobile-xs': ['12px', { lineHeight: '18px', letterSpacing: '0.01em' }], // Labels, captions
+				'mobile-sm': ['14px', { lineHeight: '21px', letterSpacing: '0.01em' }], // Small text, metadata
+				'mobile-base': ['16px', { lineHeight: '24px', letterSpacing: '0.01em' }], // Body text (minimum readable size)
+				'mobile-lg': ['18px', { lineHeight: '28px', letterSpacing: '0.01em' }], // Subheadings
+				'mobile-xl': ['20px', { lineHeight: '30px', letterSpacing: '0.01em' }], // Section headings
+				'mobile-2xl': ['24px', { lineHeight: '32px', letterSpacing: '0.01em' }], // Page titles
+				'mobile-3xl': ['28px', { lineHeight: '36px', letterSpacing: '0.01em' }], // Hero headings
 			},
 			backgroundImage: {
 				'gradient-success': 'var(--gradient-success)',
