@@ -107,12 +107,12 @@ export default {
 				'body': ['Alegreya Sans', 'sans-serif'],
 			},
 			fontSize: {
-				'mobile-xs': ['16px', { lineHeight: '22px', letterSpacing: '0.01em' }],
-				'mobile-sm': ['18px', { lineHeight: '26px', letterSpacing: '0.01em' }],
-				'mobile-base': ['20px', { lineHeight: '30px', letterSpacing: '0.01em' }],
-				'mobile-lg': ['24px', { lineHeight: '34px', letterSpacing: '0.01em' }],
-				'mobile-xl': ['28px', { lineHeight: '38px', letterSpacing: '0.01em' }],
-				'mobile-2xl': ['32px', { lineHeight: '44px', letterSpacing: '0.01em' }],
+				'mobile-xs': ['24px', { lineHeight: '33px', letterSpacing: '0.01em' }],
+				'mobile-sm': ['27px', { lineHeight: '39px', letterSpacing: '0.01em' }],
+				'mobile-base': ['30px', { lineHeight: '45px', letterSpacing: '0.01em' }],
+				'mobile-lg': ['36px', { lineHeight: '51px', letterSpacing: '0.01em' }],
+				'mobile-xl': ['42px', { lineHeight: '57px', letterSpacing: '0.01em' }],
+				'mobile-2xl': ['48px', { lineHeight: '66px', letterSpacing: '0.01em' }],
 			},
 			backgroundImage: {
 				'gradient-success': 'var(--gradient-success)',
