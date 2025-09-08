@@ -103,16 +103,16 @@ export default {
 				gold: 'hsl(var(--gold))'
 			},
 			fontFamily: {
-				'heading': ['Lexend Deca', 'sans-serif'],
-				'body': ['Open Sans', 'sans-serif'],
+				'heading': ['Alegreya Sans', 'sans-serif'],
+				'body': ['Alegreya Sans', 'sans-serif'],
 			},
 			fontSize: {
-				'mobile-xs': ['15px', { lineHeight: '20px' }],
-				'mobile-sm': ['17.5px', { lineHeight: '24px' }],
-				'mobile-base': ['20px', { lineHeight: '28px' }],
-				'mobile-lg': ['22.5px', { lineHeight: '32px' }],
-				'mobile-xl': ['25px', { lineHeight: '36px' }],
-				'mobile-2xl': ['30px', { lineHeight: '40px' }],
+				'mobile-xs': ['16px', { lineHeight: '22px', letterSpacing: '0.01em' }],
+				'mobile-sm': ['18px', { lineHeight: '26px', letterSpacing: '0.01em' }],
+				'mobile-base': ['20px', { lineHeight: '30px', letterSpacing: '0.01em' }],
+				'mobile-lg': ['24px', { lineHeight: '34px', letterSpacing: '0.01em' }],
+				'mobile-xl': ['28px', { lineHeight: '38px', letterSpacing: '0.01em' }],
+				'mobile-2xl': ['32px', { lineHeight: '44px', letterSpacing: '0.01em' }],
 			},
 			backgroundImage: {
 				'gradient-success': 'var(--gradient-success)',
