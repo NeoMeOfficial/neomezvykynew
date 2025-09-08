@@ -12,17 +12,15 @@ import { DatePickerModal } from './DatePickerModal';
 import { SettingsModal } from './SettingsModal';
 import { UI_TEXT } from './insights';
 import { formatDateSk, getNextPeriodDate } from './utils';
-
 interface MenstrualCycleTrackerProps {
   accessCode?: string;
   compact?: boolean;
   onFirstInteraction?: () => void;
 }
-
-export default function MenstrualCycleTracker({ 
-  accessCode, 
+export default function MenstrualCycleTracker({
+  accessCode,
   compact = false,
-  onFirstInteraction 
+  onFirstInteraction
 }: MenstrualCycleTrackerProps) {
   const {
     cycleData,
@@ -32,46 +30,38 @@ export default function MenstrualCycleTracker({
     setCycleLength,
     setPeriodLength
   } = useCycleData(accessCode);
-
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [setupCycleLength, setSetupCycleLength] = useState(28);
   const [setupPeriodLength, setSetupPeriodLength] = useState(5);
-
   const handleFirstInteraction = () => {
     onFirstInteraction?.();
   };
-
   const handleSetupComplete = (date: Date) => {
     setLastPeriodStart(date);
     setCycleLength(setupCycleLength);
     setPeriodLength(setupPeriodLength);
     handleFirstInteraction();
   };
-
   const handleDateSelect = (date: Date) => {
     setLastPeriodStart(date);
     handleFirstInteraction();
   };
-
   if (loading) {
-    return (
-      <div className="bg-widget-bg p-3 w-full overflow-hidden">
+    return <div className="bg-widget-bg p-3 w-full overflow-hidden">
         <div className="w-full max-w-[600px] mx-auto space-y-2">
           <div className="flex items-center justify-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
           </div>
         </div>
-      </div>
-    );
+      </div>;
   }
 
   // Welcome screen for first-time setup
   if (!cycleData.lastPeriodStart) {
-    return (
-      <div className="w-full space-y-6">
+    return <div className="w-full space-y-6">
           <div>
-            <p className="text-widget-text-soft text-sm md:text-sm text-mobile-sm">
+            <p className="text-widget-text-soft md:text-sm text-lg">
               {UI_TEXT.welcome}
             </p>
           </div>
@@ -82,66 +72,31 @@ export default function MenstrualCycleTracker({
                 <Label htmlFor="setupCycleLength" className="text-sm md:text-sm text-mobile-sm font-medium text-widget-text block">
                   {UI_TEXT.cycleLength}
                 </Label>
-                <Input
-                  id="setupCycleLength"
-                  type="number"
-                  min="21"
-                  max="45"
-                  value={setupCycleLength}
-                  onChange={(e) => setSetupCycleLength(Number(e.target.value))}
-                  placeholder="28 dni"
-                  className="w-full text-base"
-                />
+                <Input id="setupCycleLength" type="number" min="21" max="45" value={setupCycleLength} onChange={e => setSetupCycleLength(Number(e.target.value))} placeholder="28 dni" className="w-full text-base" />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="setupPeriodLength" className="text-sm md:text-sm text-mobile-sm font-medium text-widget-text block">
                   {UI_TEXT.periodLength}
                 </Label>
-                <Input
-                  id="setupPeriodLength"
-                  type="number"
-                  min="2"
-                  max="10"
-                  value={setupPeriodLength}
-                  onChange={(e) => setSetupPeriodLength(Number(e.target.value))}
-                  placeholder="5 dni"
-                  className="w-full text-base"
-                />
+                <Input id="setupPeriodLength" type="number" min="2" max="10" value={setupPeriodLength} onChange={e => setSetupPeriodLength(Number(e.target.value))} placeholder="5 dni" className="w-full text-base" />
               </div>
             </div>
 
             <div className="pt-2">
-              <Button
-                onClick={() => setShowDatePicker(true)}
-                variant="outline"
-                className="w-full flex items-center justify-center gap-2 py-3 text-base"
-              >
+              <Button onClick={() => setShowDatePicker(true)} variant="outline" className="w-full flex items-center justify-center gap-2 py-3 text-base">
                 <CalendarIcon className="w-5 h-5" />
                 {UI_TEXT.lastPeriod}
               </Button>
             </div>
           </div>
 
-          <DatePickerModal
-            isOpen={showDatePicker}
-            onClose={() => setShowDatePicker(false)}
-            onDateSelect={handleSetupComplete}
-            derivedState={derivedState}
-            cycleLength={setupCycleLength}
-            periodLength={setupPeriodLength}
-            lastPeriodStart={null}
-          />
-        </div>
-    );
+          <DatePickerModal isOpen={showDatePicker} onClose={() => setShowDatePicker(false)} onDateSelect={handleSetupComplete} derivedState={derivedState} cycleLength={setupCycleLength} periodLength={setupPeriodLength} lastPeriodStart={null} />
+        </div>;
   }
-
   if (!derivedState) return null;
-
   const nextPeriodDate = getNextPeriodDate(cycleData.lastPeriodStart!, cycleData.cycleLength);
-
-  return (
-    <div className="w-full space-y-4">
+  return <div className="w-full space-y-4">
       <div className="mb-6">
         <div className="flex items-center justify-between mb-3">
           <div>
@@ -167,51 +122,24 @@ export default function MenstrualCycleTracker({
         <TabsContent value="today" className="space-y-5">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <SuggestedToday derivedState={derivedState} />
-            <WellnessDonutChart 
-              derivedState={derivedState} 
-              onEditClick={() => setShowSettings(true)} 
-            />
+            <WellnessDonutChart derivedState={derivedState} onEditClick={() => setShowSettings(true)} />
           </div>
         </TabsContent>
 
         <TabsContent value="overview" className="space-y-5">
-          <PhaseOverview 
-            phaseRanges={derivedState.phaseRanges}
-            currentPhase={derivedState.currentPhase}
-          />
+          <PhaseOverview phaseRanges={derivedState.phaseRanges} currentPhase={derivedState.currentPhase} />
         </TabsContent>
       </Tabs>
 
       <div className="mt-5 pt-5 border-t border-widget-border">
-        <Button
-          variant="glass"
-          size="sm"
-          onClick={() => setShowDatePicker(true)}
-          className="w-full"
-        >
+        <Button variant="glass" size="sm" onClick={() => setShowDatePicker(true)} className="w-full">
           <CalendarIcon className="w-4 h-4 mr-2" />
           {UI_TEXT.newPeriod}
         </Button>
       </div>
 
-      <DatePickerModal
-        isOpen={showDatePicker}
-        onClose={() => setShowDatePicker(false)}
-        onDateSelect={handleDateSelect}
-        derivedState={derivedState}
-        cycleLength={cycleData.cycleLength}
-        periodLength={cycleData.periodLength}
-        lastPeriodStart={cycleData.lastPeriodStart}
-        title={UI_TEXT.newPeriod}
-      />
+      <DatePickerModal isOpen={showDatePicker} onClose={() => setShowDatePicker(false)} onDateSelect={handleDateSelect} derivedState={derivedState} cycleLength={cycleData.cycleLength} periodLength={cycleData.periodLength} lastPeriodStart={cycleData.lastPeriodStart} title={UI_TEXT.newPeriod} />
 
-      <SettingsModal
-        isOpen={showSettings}
-        onClose={() => setShowSettings(false)}
-        cycleData={cycleData}
-        onUpdateCycleLength={setCycleLength}
-        onUpdatePeriodLength={setPeriodLength}
-      />
-    </div>
-  );
+      <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} cycleData={cycleData} onUpdateCycleLength={setCycleLength} onUpdatePeriodLength={setPeriodLength} />
+    </div>;
 }
