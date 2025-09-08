@@ -39,7 +39,7 @@ export const HabitCard = memo<HabitCardProps>(({
           borderColor: !isCompleted ? `${habit.color}15` : undefined
         }}
       >
-        <div className="space-y-1.5">
+        <div className="space-y-2.5">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2 flex-1">
               <span className="text-xl">{habit.emoji}</span>
@@ -70,7 +70,7 @@ export const HabitCard = memo<HabitCardProps>(({
             </div>
           </div>
           
-          <div className="w-full space-y-1">
+          <div className="w-full space-y-2">
             <CustomSlider
               value={[progress]}
               onValueChange={(value) => {

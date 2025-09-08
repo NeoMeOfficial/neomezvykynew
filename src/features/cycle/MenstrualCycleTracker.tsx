@@ -143,7 +143,7 @@ export default function MenstrualCycleTracker({
   return (
     <div className="w-full space-y-4">
       <div className="mb-6">
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center justify-between mb-3">
           <div>
             <p className="text-xs md:text-xs text-mobile-xs text-widget-text-soft">
               {UI_TEXT.expectedPeriod} {formatDateSk(nextPeriodDate)}
@@ -152,7 +152,7 @@ export default function MenstrualCycleTracker({
         </div>
       </div>
 
-      <Tabs defaultValue="today" className="space-y-4">
+      <Tabs defaultValue="today" className="space-y-5">
         <TabsList className="grid w-full grid-cols-2 glass-surface">
           <TabsTrigger value="today" className="flex items-center gap-2">
             <TrendingUp className="w-4 h-4" />
@@ -164,7 +164,7 @@ export default function MenstrualCycleTracker({
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="today" className="space-y-4">
+        <TabsContent value="today" className="space-y-5">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <SuggestedToday derivedState={derivedState} />
             <WellnessDonutChart 
@@ -174,7 +174,7 @@ export default function MenstrualCycleTracker({
           </div>
         </TabsContent>
 
-        <TabsContent value="overview" className="space-y-4">
+        <TabsContent value="overview" className="space-y-5">
           <PhaseOverview 
             phaseRanges={derivedState.phaseRanges}
             currentPhase={derivedState.currentPhase}
@@ -182,7 +182,7 @@ export default function MenstrualCycleTracker({
         </TabsContent>
       </Tabs>
 
-      <div className="mt-4 pt-4 border-t border-widget-border">
+      <div className="mt-5 pt-5 border-t border-widget-border">
         <Button
           variant="glass"
           size="sm"
