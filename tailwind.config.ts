@@ -109,7 +109,7 @@ export default {
 			fontSize: {
 				'mobile-xs': ['32px', { lineHeight: '44px', letterSpacing: '0.01em' }],
 				'mobile-sm': ['36px', { lineHeight: '52px', letterSpacing: '0.01em' }],
-				'mobile-base': ['24px', { lineHeight: '32px', letterSpacing: '0.01em' }],
+				'mobile-base': ['20px', { lineHeight: '28px', letterSpacing: '0.01em' }],
 				'mobile-lg': ['36px', { lineHeight: '51px', letterSpacing: '0.01em' }],
 				'mobile-xl': ['42px', { lineHeight: '57px', letterSpacing: '0.01em' }],
 				'mobile-2xl': ['48px', { lineHeight: '66px', letterSpacing: '0.01em' }],
