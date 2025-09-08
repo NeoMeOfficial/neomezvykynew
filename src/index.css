@@ -104,10 +104,8 @@ All colors MUST be HSL.
     /* Feminine Apple-like background */
     --bg-gradient: linear-gradient(135deg, 
       hsl(var(--sand)) 0%, 
-      hsl(var(--shell)) 25%, 
-      hsl(var(--seafoam)) 50%, 
-      hsl(var(--peach)) 75%, 
-      hsl(var(--lavender)) 100%);
+      hsl(var(--shell)) 50%, 
+      hsl(var(--peach)) 100%);
   }
 
   .dark {
