@@ -131,7 +131,7 @@ export default function MenstrualCycleTracker({
         </TabsContent>
       </Tabs>
 
-      <div className="mt-5 pt-5 border-t border-widget-border">
+      <div className="mt-2">
         <Button variant="glass" size="sm" onClick={() => setShowDatePicker(true)} className="w-full">
           <CalendarIcon className="w-4 h-4 mr-2" />
           {UI_TEXT.newPeriod}
