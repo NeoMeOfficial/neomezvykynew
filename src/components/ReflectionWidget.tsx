@@ -192,7 +192,7 @@ export default function ReflectionWidget({ selectedDate, onFirstInteraction }: R
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <Lightbulb className="h-4 w-4 text-reflection-text" />
-                  <h3 className="font-medium text-sm text-reflection-text">Čo môžem zlepšiť?</h3>
+                  <h3 className="font-medium text-lg text-reflection-text">Čo môžem zlepšiť?</h3>
                 </div>
                 <Button
                   size="sm"
