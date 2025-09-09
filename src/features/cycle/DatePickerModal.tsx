@@ -71,8 +71,8 @@ export function DatePickerModal({
           </DialogTitle>
         </DialogHeader>
         
-        <div className="space-y-6">
-          <div className="glass-surface rounded-2xl p-2 max-w-none w-full text-base md:text-lg">
+        <div className="space-y-2 -mt-4">
+          <div className="glass-surface rounded-2xl p-1 w-full max-w-md mx-auto">
             <Calendar
               mode="single"
               selected={selectedDate}
