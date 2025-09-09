@@ -122,23 +122,13 @@ export const AccessCodeValidation: React.FC<AccessCodeValidationProps> = ({
                 Kúpiť prístup k NeoMe
               </Button>
 
-              <Button 
-                type="button" 
-                variant="ghost" 
-                className="w-full" 
-                onClick={handleClose}
-                disabled={loading}
-              >
-                Zrušiť
-              </Button>
+              <div className="w-full p-3 bg-muted/50 border border-border rounded-lg text-center">
+                <p className="text-sm text-muted-foreground">
+                  Prístupový kód je poskytovaný po zakúpení prístupu k aplikácii NeoMe.
+                </p>
+              </div>
             </div>
           </form>
-
-          <Alert>
-            <AlertDescription>
-              Prístupový kód je poskytovaný po zakúpení prístupu k aplikácii NeoMe.
-            </AlertDescription>
-          </Alert>
         </div>
       </DialogContent>
     </Dialog>
