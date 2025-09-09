@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import HabitTracker from "@/components/HabitTracker";
 import ReflectionWidget from "@/components/ReflectionWidget";
-import { AccessCodeWelcome } from "@/components/AccessCodeWelcome";
-import { BiometricWelcome } from "@/components/BiometricWelcome";
+import { AccessCodeValidation } from "@/components/AccessCodeValidation";
+import { PurchaseGatedBiometricWelcome } from "@/components/PurchaseGatedBiometricWelcome";
 import { BiometricPrompt } from "@/components/BiometricPrompt";
 import { AccessCodeInput } from "@/components/AccessCodeInput";
 import { AccessCodeSettings } from "@/components/AccessCodeSettings";
@@ -36,7 +36,9 @@ const Index = () => {
     authenticateWithBiometrics,
     enterAccessCode
   } = useAccessCode();
-  const [showWelcome, setShowWelcome] = useState(false);
+  const [showAccessCodeValidation, setShowAccessCodeValidation] = useState(false);
+  const [showBiometricSetup, setShowBiometricSetup] = useState(false);
+  const [validatedAccessCode, setValidatedAccessCode] = useState('');
   const [showCodeInput, setShowCodeInput] = useState(false);
   const [showAccessCodeSettings, setShowAccessCodeSettings] = useState(false);
   const [showBiometricPrompt, setShowBiometricPrompt] = useState(false);
@@ -76,7 +78,7 @@ const Index = () => {
     if (accessCode) {
       setShowAccessCodeSettings(true);
     } else {
-      setShowWelcome(true);
+      setShowAccessCodeValidation(true);
     }
   };
 
@@ -98,8 +100,14 @@ const Index = () => {
     setShowBiometricPrompt(true);
   };
 
+  const handleValidAccessCode = (code: string) => {
+    setValidatedAccessCode(code);
+    setShowAccessCodeValidation(false);
+    setShowBiometricSetup(true);
+  };
+
   const handleEnterExistingCode = () => {
-    setShowWelcome(false);
+    setShowAccessCodeValidation(false);
     setShowCodeInput(true);
   };
 
@@ -150,22 +158,13 @@ const Index = () => {
               <ArrowLeft className="h-4 w-4" />
               Naspäť
             </Button>
-            {shouldOfferBiometric() ? (
-              <Button 
-                onClick={handleShowBiometricPrompt}
-                className="bg-peach-orange text-peach-orange-foreground hover:bg-peach-orange/90 flex items-center justify-center gap-2 rounded-3xl py-3 px-4 text-mobile-sm md:text-sm font-medium border-0 transition-all shadow-lg"
-              >
-                <Fingerprint className="h-4 w-4" />
-                Uložiť si svoje informácie
-              </Button>
-            ) : (
-              <Button 
-                onClick={handleEnterCodeClick}
-                className="glass-surface flex items-center justify-center gap-2 rounded-3xl py-3 px-4 text-mobile-sm md:text-sm font-medium border-0 backdrop-blur-md transition-all hover:bg-background/30"
-              >
-                Prihlásenie
-              </Button>
-            )}
+            <Button 
+              onClick={() => setShowAccessCodeValidation(true)}
+              className="bg-peach-orange text-peach-orange-foreground hover:bg-peach-orange/90 flex items-center justify-center gap-2 rounded-3xl py-3 px-4 text-mobile-sm md:text-sm font-medium border-0 transition-all shadow-lg"
+            >
+              <Fingerprint className="h-4 w-4" />
+              Uložiť si svoje informácie
+            </Button>
           </div>
         </div>
 
@@ -300,19 +299,17 @@ const Index = () => {
           onOpenChange={setShowAccessCodeSettings}
         />
         
-        {shouldOfferBiometric() ? (
-          <BiometricWelcome
-            open={showWelcome}
-            onOpenChange={setShowWelcome}
-            onEnterExistingCode={handleEnterExistingCode}
-          />
-        ) : (
-          <AccessCodeWelcome
-            open={showWelcome}
-            onOpenChange={setShowWelcome}
-            onEnterExistingCode={handleEnterExistingCode}
-          />
-        )}
+        <AccessCodeValidation
+          open={showAccessCodeValidation}
+          onOpenChange={setShowAccessCodeValidation}
+          onValidCode={handleValidAccessCode}
+        />
+        
+        <PurchaseGatedBiometricWelcome
+          open={showBiometricSetup}
+          onOpenChange={setShowBiometricSetup}
+          validatedCode={validatedAccessCode}
+        />
         
         <BiometricPrompt
           open={showBiometricPrompt}
@@ -330,7 +327,7 @@ const Index = () => {
           isOpen={showSaveProgressDialog}
           onSave={() => {
             setShowSaveProgressDialog(false);
-            setShowWelcome(true);
+            setShowAccessCodeValidation(true);
           }}
           onDiscard={() => {
             temporaryStorage.clearAll();

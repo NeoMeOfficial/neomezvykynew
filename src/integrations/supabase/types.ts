@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      access_codes: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          is_used: boolean
+          used_at: string | null
+          used_by_user_id: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          is_used?: boolean
+          used_at?: string | null
+          used_by_user_id?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          is_used?: boolean
+          used_at?: string | null
+          used_by_user_id?: string | null
+        }
+        Relationships: []
+      }
       habit_entries: {
         Row: {
           access_code: string | null
@@ -135,6 +162,14 @@ export type Database = {
       generate_access_code: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      generate_random_code: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      populate_access_codes: {
+        Args: Record<PropertyKey, never>
+        Returns: number
       }
     }
     Enums: {
