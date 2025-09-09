@@ -11,7 +11,7 @@ export function SuggestedToday({ derivedState, className = "" }: SuggestedTodayP
   const suggestion = suggestForDay(derivedState.currentDay, derivedState.phaseRanges);
   
   return (
-    <div className={`pl-0 pr-6 py-6 animate-fade-in ${className}`}>
+    <div className={`pl-0 pr-6 pt-0 pb-6 animate-fade-in ${className}`}>
       <div className="space-y-4">
         {/* Energy Level */}
         <div>
