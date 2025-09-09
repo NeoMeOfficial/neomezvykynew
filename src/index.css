@@ -97,9 +97,9 @@ All colors MUST be HSL.
     --shadow-elegant: 0 20px 50px -22px hsl(38 24% 30% / 0.25);
     
     /* Glassmorphism effects */
-    --glass-bg: hsla(0 0% 100% / 0.6);
+    --glass-bg: hsla(0 0% 100% / 0.75);
     --glass-border: white;
-    --glass-shadow: 0 8px 32px hsla(0 0% 0% / 0.1);
+    --glass-shadow: 0 8px 32px hsla(0 0% 0% / 0.125);
     
     /* Feminine Apple-like background */
     --bg-gradient: linear-gradient(135deg, 
@@ -178,9 +178,9 @@ All colors MUST be HSL.
     --glass: 210 12% 12%;
     
     /* Glassmorphism effects - dark mode */
-    --glass-bg: hsla(222.2 84% 4.9% / 0.6);
-    --glass-border: hsla(210 40% 98% / 0.15);
-    --glass-shadow: 0 8px 32px hsla(0 0% 0% / 0.2);
+    --glass-bg: hsla(222.2 84% 4.9% / 0.75);
+    --glass-border: hsla(210 40% 98% / 0.1875);
+    --glass-shadow: 0 8px 32px hsla(0 0% 0% / 0.25);
     
     /* Feminine Apple-like background - dark mode */
     --bg-gradient: linear-gradient(135deg, 
