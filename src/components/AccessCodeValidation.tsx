@@ -106,6 +106,7 @@ export const AccessCodeValidation: React.FC<AccessCodeValidationProps> = ({
               <Button 
                 type="submit" 
                 className="w-full" 
+                style={{ backgroundColor: '#5F3E31' }}
                 disabled={loading || code.length !== 6}
               >
                 {loading ? 'Overujem...' : 'Overiť kód'}
