@@ -38,7 +38,7 @@ export const useCodeBasedHabits = (onSuccess?: () => void) => {
       id: 'nutrition', 
       name: 'Zdravé jedlo', 
       emoji: '🥗', 
-      color: '#F59E0B',
+      color: '#73A577',
       target: 5,
       unit: 'porcií'
     },
