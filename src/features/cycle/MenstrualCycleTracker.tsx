@@ -100,7 +100,7 @@ export default function MenstrualCycleTracker({
       <div className="mb-6">
         <div className="flex items-center justify-between mb-3">
           <div>
-            <p className="text-mobile-xs md:text-xs text-widget-text-soft">
+            <p className="text-mobile-sm md:text-sm text-widget-text-soft">
               {UI_TEXT.expectedPeriod} {formatDateSk(nextPeriodDate)}
             </p>
           </div>
