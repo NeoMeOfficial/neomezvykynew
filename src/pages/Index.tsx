@@ -153,8 +153,8 @@ const Index = () => {
                   window.location.href = 'https://neome.mvt.so/mj-de';
                 }
               }}
-              style={{ backgroundColor: '#f0ede4' }}
-              className="flex items-center justify-center gap-2 rounded-3xl py-3 px-3 text-mobile-sm md:text-sm font-medium border-0 backdrop-blur-md transition-all hover:opacity-90"
+              style={{ backgroundColor: '#f0ede4', borderColor: '#d4c9b8' }}
+              className="flex items-center justify-center gap-2 rounded-3xl py-3 px-3 text-mobile-sm md:text-sm font-medium border-2 backdrop-blur-md transition-all hover:opacity-90"
             >
               <ArrowLeft className="h-4 w-4" />
               Naspäť
