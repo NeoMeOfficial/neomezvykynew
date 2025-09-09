@@ -111,7 +111,7 @@ export default function HabitTracker({ selectedDate, onFirstInteraction }: Habit
 
   return (
     <div className="w-full space-y-4">
-      <div className="space-y-1.5 pr-1">
+      <div className="space-y-1.5">
           {habits.map(habit => (
             <HabitCard
               key={habit.id}
