@@ -149,7 +149,7 @@ export default function ReflectionWidget({ selectedDate, onFirstInteraction }: R
           <div className="bg-gradient-widget p-4 rounded-xl border border-widget-border/30 shadow-sm">
             <div className="flex items-center gap-2 mb-2">
               <Lightbulb className="h-4 w-4 text-reflection-accent" />
-              <span className="text-xs font-medium text-widget-text-soft">Dnes sa inšpiruj</span>
+              <h3 className="text-xs font-medium text-widget-text-soft">Dnes sa inšpiruj</h3>
             </div>
             <p className="text-sm text-widget-text italic">"{dailyQuote}"</p>
           </div>
