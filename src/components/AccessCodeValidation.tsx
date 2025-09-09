@@ -80,12 +80,6 @@ export const AccessCodeValidation: React.FC<AccessCodeValidationProps> = ({
         </DialogHeader>
         
         <div className="space-y-4">
-          <Alert>
-            <AlertDescription>
-              Prístupový kód je poskytovaný po zakúpení prístupu k aplikácii NeoMe.
-            </AlertDescription>
-          </Alert>
-
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="access-code">Prístupový kód (6 znakov)</Label>
@@ -138,6 +132,12 @@ export const AccessCodeValidation: React.FC<AccessCodeValidationProps> = ({
               </Button>
             </div>
           </form>
+
+          <Alert>
+            <AlertDescription>
+              Prístupový kód je poskytovaný po zakúpení prístupu k aplikácii NeoMe.
+            </AlertDescription>
+          </Alert>
         </div>
       </DialogContent>
     </Dialog>
