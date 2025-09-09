@@ -21,12 +21,12 @@ export function TemporaryDataIndicator({ className = '', onShowAccessCodeValidat
             Dočasné údaje
           </p>
           <p className="text-xs text-amber-700">
-            Tvoj pokrok sa neulozi bez{' '}
+            Tvoj pokrok sa neuloží bez{' '}
             <button 
               onClick={onShowAccessCodeValidation}
               className="underline hover:text-amber-800 transition-colors"
             >
-              zadania kodu
+              zadania kódu
             </button>
           </p>
         </div>
