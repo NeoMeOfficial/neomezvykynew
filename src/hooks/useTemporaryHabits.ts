@@ -13,9 +13,9 @@ export interface Habit {
 // Default habits for temporary use
 const DEFAULT_HABITS: Habit[] = [
   { id: 'water', name: 'Voda', emoji: '💧', color: '#3B82F6', target: 8, unit: 'pohárov' },
-  { id: 'steps', name: 'Kroky', emoji: '👟', color: '#F59E0B', target: 10000, unit: 'krokov' },
+  { id: 'steps', name: 'Kroky', emoji: '👟', color: '#89B0BC', target: 10000, unit: 'krokov' },
   { id: 'nutrition', name: 'Zdravé jedlo', emoji: '🥗', color: '#10B981', target: 5, unit: 'porcií' },
-  { id: 'exercise', name: 'Cvičenie-strečing', emoji: '🧘‍♀️', color: '#EF4444', target: 30, unit: 'minút' }
+  { id: 'exercise', name: 'Cvičenie-strečing', emoji: '🧘‍♀️', color: '#5F3E31', target: 30, unit: 'minút' }
 ];
 
 export function useTemporaryHabits(onSuccess?: () => void) {

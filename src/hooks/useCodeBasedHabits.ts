@@ -30,7 +30,7 @@ export const useCodeBasedHabits = (onSuccess?: () => void) => {
       id: 'steps', 
       name: 'Kroky', 
       emoji: '👟', 
-      color: '#F59E0B',
+      color: '#89B0BC',
       target: 10000,
       unit: 'krokov'
     },
@@ -46,7 +46,7 @@ export const useCodeBasedHabits = (onSuccess?: () => void) => {
       id: 'exercise', 
       name: 'Cvičenie-strečing', 
       emoji: '🧘‍♀️', 
-      color: '#EF4444',
+      color: '#5F3E31',
       target: 30,
       unit: 'minút'
     },
