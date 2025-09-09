@@ -56,15 +56,12 @@ export const HabitCard = memo<HabitCardProps>(({
               <div className="text-mobile-lg md:text-lg font-bold">
                 {habit.name === 'Hydratácia' ? Number(progress).toFixed(1) : Math.round(Number(progress))} {habit.unit}
               </div>
-              {isCompleted && (
-                <div 
-                  className="w-5 h-5 rounded-full border-2 flex items-center justify-center mx-auto mt-1"
-                  style={{
-                    borderColor: habit.color,
-                    backgroundColor: habit.color
-                  }}
-                >
-                  <Check size={12} className="text-white" />
+              {isCompleted && streak > 0 && (
+                <div className="flex items-center justify-center gap-1 text-amber-700">
+                  <span aria-hidden className="text-sm">🏆</span>
+                  <span className="font-medium text-mobile-sm md:text-sm">
+                    {streak} {streak > 1 ? 'dní' : 'deň'} série!
+                  </span>
                 </div>
               )}
             </div>
@@ -83,14 +80,6 @@ export const HabitCard = memo<HabitCardProps>(({
               className="w-full"
             />
             
-            {streak > 0 && (
-              <div className="flex items-center justify-center gap-1 text-amber-700">
-                <span aria-hidden className="text-sm">🏆</span>
-                <span className="font-medium text-mobile-sm md:text-sm">
-                  {streak} {streak > 1 ? 'dní' : 'deň'} série!
-                </span>
-              </div>
-            )}
           </div>
         </div>
       </div>
