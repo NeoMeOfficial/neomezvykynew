@@ -34,12 +34,11 @@ serve(async (req) => {
       );
     }
 
-    // Check if code exists and is not used
+    // Check if code exists
     const { data: accessCode, error: fetchError } = await supabase
       .from('access_codes')
       .select('*')
       .eq('code', code.toUpperCase())
-      .eq('is_used', false)
       .single();
 
     if (fetchError || !accessCode) {
@@ -47,7 +46,7 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ 
           valid: false, 
-          message: 'Neplatný alebo už použitý prístupový kód' 
+          message: 'Neplatný prístupový kód' 
         }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -55,27 +54,45 @@ serve(async (req) => {
       );
     }
 
-    // Mark code as used
-    const { error: updateError } = await supabase
-      .from('access_codes')
-      .update({ 
-        is_used: true, 
-        used_at: new Date().toISOString()
-      })
-      .eq('id', accessCode.id);
+    // Check if it's the test code - allow unlimited use
+    const isTestCode = code.toUpperCase() === 'ABCD12';
 
-    if (updateError) {
-      console.error('Error marking code as used:', updateError);
+    // For non-test codes, check if already used
+    if (!isTestCode && accessCode.is_used) {
       return new Response(
         JSON.stringify({ 
           valid: false, 
-          message: 'Chyba pri overovaní kódu' 
+          message: 'Tento kód už bol použitý' 
         }),
         { 
-          status: 500, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
         }
       );
+    }
+
+    // Mark code as used (except for test codes)
+    if (!isTestCode) {
+      const { error: updateError } = await supabase
+        .from('access_codes')
+        .update({ 
+          is_used: true, 
+          used_at: new Date().toISOString()
+        })
+        .eq('id', accessCode.id);
+
+      if (updateError) {
+        console.error('Error marking code as used:', updateError);
+        return new Response(
+          JSON.stringify({ 
+            valid: false, 
+            message: 'Chyba pri overovaní kódu' 
+          }),
+          { 
+            status: 500, 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        );
+      }
     }
 
     return new Response(
