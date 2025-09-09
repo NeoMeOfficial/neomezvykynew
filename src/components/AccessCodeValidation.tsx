@@ -74,7 +74,7 @@ export const AccessCodeValidation: React.FC<AccessCodeValidationProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md rounded-3xl">
         <DialogHeader>
           <DialogTitle className="text-center">Zadajte prístupový kód</DialogTitle>
         </DialogHeader>
