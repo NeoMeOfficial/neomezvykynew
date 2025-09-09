@@ -31,5 +31,18 @@ export default function HabitCompletionCount({ selectedDate }: HabitCompletionCo
 
   if (loading) return null;
 
-  return `${completedCount} z ${habits.length} dokončených`;
+  return (
+    <div className="flex items-center gap-1">
+      {[1, 2, 3, 4].map((trophyIndex) => (
+        <span
+          key={trophyIndex}
+          className={`text-lg transition-opacity duration-300 ${
+            trophyIndex <= completedCount ? 'opacity-100' : 'opacity-30'
+          }`}
+        >
+          🏆
+        </span>
+      ))}
+    </div>
+  );
 }

@@ -194,9 +194,9 @@ const Index = () => {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-mobile-lg md:text-lg font-semibold text-foreground">Moje návyky</h2>
               <div className="flex items-center gap-2">
-                <p className="text-mobile-sm md:text-sm text-muted-foreground">
+                <div className="flex items-center gap-1">
                   <HabitCompletionCount selectedDate={selectedDate} />
-                </p>
+                </div>
                 <Dialog open={showMonthlyCalendar} onOpenChange={setShowMonthlyCalendar}>
                   <DialogTrigger asChild>
                     <Button variant="ghost" size="sm" className="p-1.5 bg-amber-100 hover:bg-amber-200 border border-amber-200 rounded-xl shadow-sm">
