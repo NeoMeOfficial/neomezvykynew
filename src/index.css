@@ -77,37 +77,29 @@ All colors MUST be HSL.
     --chart-4: 0 0% 55%;
     --chart-5: 0 0% 50%;
 
-    /* Warm earthy palette tokens */
-    --sand: 35 30% 88%;
-    --shell: 28 25% 92%;
-    --seafoam: 45 25% 85%;
-    --deep-green: 120 20% 35%;
+    /* Glass morphism palette tokens */
+    --sand: 0 0% 95%;
+    --shell: 0 0% 98%;
+    --seafoam: 0 0% 90%;
+    --deep-green: 0 0% 30%;
     --deep-green-foreground: 0 0% 96%;
-    --glass: 25 20% 90%;
-    --chart-center: 35 25% 88%;
-    --cta-from: 25 35% 85%;
-    --cta-to: 35 30% 82%;
-    --peach: 15 40% 85%;
-    --peach-orange: 20 45% 75%;
+    --glass: 0 0% 97%;
+    --chart-center: 0 0% 95%;
+    --cta-from: 0 0% 96%;
+    --cta-to: 0 0% 94%;
+    --peach: 0 0% 92%;
+    --peach-orange: 0 0% 85%;
     --peach-orange-foreground: 0 0% 20%;
-    --blush: 8 35% 82%;
-    --lavender: 25 20% 88%;
-    --mint: 120 15% 82%;
-    --gold: 45 50% 70%;
+    --blush: 0 0% 88%;
+    --lavender: 0 0% 93%;
+    --mint: 0 0% 90%;
+    --gold: 0 0% 80%;
     --shadow-elegant: 0 20px 50px -22px hsl(38 24% 30% / 0.25);
     
-    /* Enhanced Glassmorphism effects */
-    --glass-bg: linear-gradient(135deg, hsla(25 20% 95% / 0.15), hsla(35 25% 90% / 0.25));
-    --glass-border: linear-gradient(135deg, hsla(45 30% 80% / 0.3), hsla(25 25% 85% / 0.4));
-    --glass-shadow: 0 12px 40px hsla(25 20% 40% / 0.15);
-    
-    /* Complex warm background */
-    --bg-complex: 
-      radial-gradient(circle at 20% 30%, hsla(35 40% 75% / 0.3) 0%, transparent 50%),
-      radial-gradient(circle at 80% 70%, hsla(15 35% 70% / 0.4) 0%, transparent 50%),
-      radial-gradient(circle at 60% 20%, hsla(45 30% 80% / 0.2) 0%, transparent 40%),
-      radial-gradient(circle at 30% 80%, hsla(25 45% 65% / 0.3) 0%, transparent 45%),
-      linear-gradient(135deg, hsl(28 25% 92%) 0%, hsl(35 30% 88%) 25%, hsl(45 25% 85%) 50%, hsl(25 35% 85%) 75%, hsl(15 40% 85%) 100%);
+    /* Glassmorphism effects */
+    --glass-bg: hsla(0 0% 100% / 0.4);
+    --glass-border: hsla(0 0% 100% / 0.8);
+    --glass-shadow: 0 8px 32px hsla(0 0% 0% / 0.05);
     
     /* Feminine Apple-like background */
     --bg-gradient: linear-gradient(135deg, 
@@ -220,39 +212,21 @@ All colors MUST be HSL.
 
   /* Utility classes */
   .glass-surface {
-    background: var(--glass-bg);
-    backdrop-filter: blur(25px);
-    -webkit-backdrop-filter: blur(25px);
-    border: 1px solid transparent;
-    background-clip: padding-box;
-    border-image: var(--glass-border) 1;
+    background-color: hsl(var(--glass) / 0.30);
+    backdrop-filter: saturate(120%) blur(16px);
+    border: 1px solid hsl(var(--glass-border) / 0.20);
     box-shadow: var(--glass-shadow);
   }
 
   .glass-container {
     background: var(--glass-bg);
-    backdrop-filter: blur(25px);
-    -webkit-backdrop-filter: blur(25px);
-    border: 1px solid transparent;
-    background-clip: padding-box;
-    border-image: var(--glass-border) 1;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
     border-radius: 2rem;
     box-shadow: var(--glass-shadow);
     padding: 1rem;
     margin-bottom: 1rem;
-    position: relative;
-  }
-  
-  .glass-container::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 2rem;
-    padding: 1px;
-    background: var(--glass-border);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask-composite: xor;
-    pointer-events: none;
   }
 
   /* Desktop spacing */
