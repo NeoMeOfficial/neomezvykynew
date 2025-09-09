@@ -35,6 +35,15 @@ export default function HabitCompletionCount({
   }, [habits, selectedDate, habitData]);
   if (loading) return null;
   return <div className="flex items-center gap-1">
-      {[1, 2, 3, 4].map(trophyIndex => {})}
+      {[1, 2, 3, 4].map(trophyIndex => (
+        <span 
+          key={trophyIndex}
+          className={`text-sm transition-opacity duration-300 ${
+            trophyIndex <= completedCount ? 'opacity-100' : 'opacity-30'
+          }`}
+        >
+          🏆
+        </span>
+      ))}
     </div>;
 }

@@ -143,7 +143,7 @@ const Index = () => {
       <div className="w-full max-w-none px-2 sm:px-4 py-4 sm:py-8 mx-auto">
         {/* Navigation Buttons */}
         <div className="w-full max-w-[600px] mx-auto mb-4 sm:mb-6">
-          <div className="grid gap-3 grid-cols-2">
+          <div className="grid gap-3" style={{ gridTemplateColumns: '30% 70%' }}>
             <Button 
               onClick={() => {
                 // Check if user has temporary data and prompt to save
@@ -160,7 +160,8 @@ const Index = () => {
             </Button>
             <Button 
               onClick={() => setShowAccessCodeValidation(true)}
-              className="bg-peach-orange text-peach-orange-foreground hover:bg-peach-orange/90 flex items-center justify-center gap-2 rounded-3xl py-3 px-4 text-mobile-sm md:text-sm font-medium border-0 transition-all shadow-lg"
+              style={{ backgroundColor: '#5F3E31' }}
+              className="text-white hover:opacity-90 flex items-center justify-center gap-2 rounded-3xl py-3 px-4 text-mobile-sm md:text-sm font-medium border-0 transition-all shadow-lg"
             >
               <Fingerprint className="h-4 w-4" />
               Uložiť si svoje informácie
