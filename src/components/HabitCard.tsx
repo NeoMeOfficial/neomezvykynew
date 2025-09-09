@@ -50,6 +50,14 @@ export const HabitCard = memo<HabitCardProps>(({
                 <div className="text-mobile-sm md:text-sm text-muted-foreground">
                   Cieľ: {habit.target} {habit.unit}
                 </div>
+                {streak > 0 && (
+                  <div className="flex items-center justify-center gap-1 text-amber-700">
+                    <Check size={12} className="text-amber-700" />
+                    <span className="font-medium text-mobile-sm md:text-sm">
+                      {streak} {streak > 1 ? 'dní' : 'deň'} série!
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
             <div className="text-right">
@@ -82,15 +90,6 @@ export const HabitCard = memo<HabitCardProps>(({
               accentColor={habit.color}
               className="w-full"
             />
-            
-            {streak > 0 && (
-              <div className="flex items-center justify-center gap-1 text-amber-700">
-                <span aria-hidden className="text-sm">🏆</span>
-                <span className="font-medium text-mobile-sm md:text-sm">
-                  {streak} {streak > 1 ? 'dní' : 'deň'} série!
-                </span>
-              </div>
-            )}
           </div>
         </div>
       </div>
