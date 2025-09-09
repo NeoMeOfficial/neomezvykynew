@@ -16,8 +16,8 @@ export function SuggestedToday({ derivedState, className = "" }: SuggestedTodayP
         {/* Energy Level */}
         <div>
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-foreground">Energia</span>
-            <span className="text-xs text-muted-foreground">{suggestion.energy}%</span>
+            <span className="text-base font-medium text-foreground">Energia</span>
+            <span className="text-sm text-muted-foreground">{suggestion.energy}%</span>
           </div>
           <div className="relative h-2 bg-muted rounded-full overflow-hidden">
             <div 
@@ -38,15 +38,15 @@ export function SuggestedToday({ derivedState, className = "" }: SuggestedTodayP
         {/* Mood Level */}
         <div>
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-foreground">Nálada</span>
-            <span className="text-xs text-muted-foreground">{suggestion.mood}/5</span>
+            <span className="text-base font-medium text-foreground">Nálada</span>
+            <span className="text-sm text-muted-foreground">{suggestion.mood}/5</span>
           </div>
           <div className="flex items-center justify-between">
             <div className="flex space-x-1">
               {[1, 2, 3, 4, 5].map((level) => (
                 <span
                   key={level}
-                  className={`text-lg transition-opacity duration-300 ${
+                  className={`text-xl transition-opacity duration-300 ${
                     level <= Math.round(suggestion.mood) ? 'opacity-100' : 'opacity-30'
                   }`}
                 >
@@ -58,7 +58,7 @@ export function SuggestedToday({ derivedState, className = "" }: SuggestedTodayP
                 </span>
               ))}
             </div>
-            <div className="text-2xl">
+            <div className="text-3xl">
               {getMoodEmoji(suggestion.mood)}
             </div>
           </div>
@@ -67,10 +67,10 @@ export function SuggestedToday({ derivedState, className = "" }: SuggestedTodayP
         {/* Current Phase */}
         <div className="pt-2 border-t border-border/50">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-foreground">
+            <span className="text-base font-medium text-foreground">
               {derivedState.currentPhase.name}
             </span>
-            <span className="text-xs text-muted-foreground">
+            <span className="text-sm text-muted-foreground">
               {derivedState.currentDay}. deň cyklu
             </span>
           </div>
