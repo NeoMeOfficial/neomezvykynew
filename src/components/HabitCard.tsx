@@ -36,7 +36,7 @@ export const HabitCard = memo<HabitCardProps>(({
         }`}
         style={{
           backgroundImage: !isCompleted ? `linear-gradient(to right, white, ${habit.color}20)` : undefined,
-          borderColor: !isCompleted ? `${habit.color}15` : undefined
+          borderColor: !isCompleted ? `${habit.color}23` : undefined
         }}
       >
         <div className="space-y-2.5">
