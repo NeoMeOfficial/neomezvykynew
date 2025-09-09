@@ -4,9 +4,10 @@ import { temporaryStorage } from '@/lib/temporaryStorage';
 
 interface TemporaryDataIndicatorProps {
   className?: string;
+  onShowAccessCodeValidation?: () => void;
 }
 
-export function TemporaryDataIndicator({ className = '' }: TemporaryDataIndicatorProps) {
+export function TemporaryDataIndicator({ className = '', onShowAccessCodeValidation }: TemporaryDataIndicatorProps) {
   if (!temporaryStorage.isSessionActive() || !temporaryStorage.hasTemporaryData()) {
     return null;
   }
@@ -20,7 +21,13 @@ export function TemporaryDataIndicator({ className = '' }: TemporaryDataIndicato
             Dočasné údaje
           </p>
           <p className="text-xs text-amber-700">
-            Tvoj pokrok sa neuloží natrvalo bez vytvorenia kódu
+            Tvoj pokrok sa neulozi bez{' '}
+            <button 
+              onClick={onShowAccessCodeValidation}
+              className="underline hover:text-amber-800 transition-colors"
+            >
+              zadania kodu
+            </button>
           </p>
         </div>
         <AlertCircle className="h-4 w-4 text-amber-500" />

@@ -173,7 +173,7 @@ const Index = () => {
         {/* Temporary Data Indicator */}
         {!accessCode && temporaryStorage.isSessionActive() && (
           <div className="w-full max-w-[600px] mx-auto mb-4">
-            <TemporaryDataIndicator />
+            <TemporaryDataIndicator onShowAccessCodeValidation={() => setShowAccessCodeValidation(true)} />
           </div>
         )}
 
