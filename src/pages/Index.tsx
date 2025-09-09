@@ -143,7 +143,7 @@ const Index = () => {
       <div className="w-full max-w-none px-2 sm:px-4 py-4 sm:py-8 mx-auto">
         {/* Navigation Buttons */}
         <div className="w-full max-w-[600px] mx-auto mb-4 sm:mb-6">
-          <div className="grid gap-3" style={{ gridTemplateColumns: shouldOfferBiometric() ? '1fr 2fr' : '1fr 1fr' }}>
+          <div className="grid gap-3 grid-cols-2">
             <Button 
               onClick={() => {
                 // Check if user has temporary data and prompt to save
