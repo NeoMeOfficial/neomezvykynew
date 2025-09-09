@@ -147,7 +147,7 @@ export default function ReflectionWidget({ selectedDate, onFirstInteraction }: R
 
           {/* Motivational Quote */}
           <div className="bg-gradient-widget py-4 px-1 rounded-xl border border-widget-border/30 shadow-sm">
-            <div className="text-center px-4">
+            <div className="text-left px-4">
               <p className="text-xl md:text-2xl text-widget-text italic font-medium">
                 "{dailyQuote}"
               </p>
