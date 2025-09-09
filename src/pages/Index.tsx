@@ -161,7 +161,7 @@ const Index = () => {
             <Button 
               onClick={() => setShowAccessCodeValidation(true)}
               style={{ backgroundColor: '#5F3E31' }}
-              className="text-white hover:opacity-90 flex items-center justify-center gap-2 rounded-3xl py-3 px-4 text-mobile-sm md:text-sm font-medium border-0 transition-all shadow-lg"
+              className="!text-white hover:opacity-90 flex items-center justify-center gap-2 rounded-3xl py-3 px-4 text-mobile-sm md:text-sm font-medium border-0 transition-all shadow-lg"
             >
               <Fingerprint className="h-4 w-4" />
               Uložiť si svoje informácie
