@@ -29,7 +29,7 @@ export const HabitCard = memo<HabitCardProps>(({
       } ${isCompleted ? 'opacity-80' : ''}`}
     >
       <div
-        className={`w-full p-2 rounded-xl border-2 ${
+        className={`w-full p-2 rounded-xl border ${
           isCompleted 
             ? 'bg-background text-muted-foreground border-border'
             : 'text-foreground border-border'
