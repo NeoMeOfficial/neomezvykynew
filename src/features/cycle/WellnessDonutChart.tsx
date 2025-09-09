@@ -28,8 +28,8 @@ export function WellnessDonutChart({ derivedState, onEditClick, className = "" }
   let cumulativeAngle = 0;
   
   return (
-    <div className={`glass-surface rounded-2xl p-6 ${className}`}>
-      <div className="relative w-full max-w-[200px] h-[200px] mx-auto">
+    <div className={`${className}`}>
+      <div className="relative w-full max-w-[300px] h-[300px] mx-auto">
         {/* SVG Donut Chart - 200x200px viewBox */}
         <svg viewBox="0 0 200 200" className="w-full h-full -rotate-90">
           {/* Base ring track */}
