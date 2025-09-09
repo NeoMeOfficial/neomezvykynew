@@ -108,7 +108,7 @@ export default function MenstrualCycleTracker({
       </div>
 
       <Tabs defaultValue="today" className="space-y-5">
-        <TabsList className="grid w-full grid-cols-2 glass-surface">
+        <TabsList className="grid w-full grid-cols-2 rounded-full bg-amber-50/50">
           <TabsTrigger value="today" className="flex items-center gap-2">
             <TrendingUp className="w-4 h-4" />
             {UI_TEXT.todayEstimate}
