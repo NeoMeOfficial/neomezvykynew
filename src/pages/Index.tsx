@@ -205,7 +205,7 @@ const Index = () => {
                     </Button>
                   </DialogTrigger>
                   <DialogContent 
-                    className="glass-container border-0 backdrop-blur-xl shadow-2xl max-w-none top-0 left-1/2 -translate-x-1/2 translate-y-0 w-[calc(100vw-8px)] max-h-[85vh] overflow-y-auto mt-2 sm:max-w-2xl sm:top-1/2 sm:-translate-y-1/2"
+                    className="glass-container border-0 backdrop-blur-xl shadow-2xl max-w-none top-0 left-1/2 -translate-x-1/2 translate-y-0 w-[calc(100vw-8px)] max-h-[85vh] overflow-y-auto mt-2 sm:max-w-4xl md:max-w-5xl lg:max-w-6xl sm:top-1/2 sm:-translate-y-1/2"
                     aria-describedby={undefined}
                   >
                     <DialogHeader className="pb-1 flex-shrink-0">
