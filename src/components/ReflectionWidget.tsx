@@ -180,7 +180,7 @@ export default function ReflectionWidget({ selectedDate, onFirstInteraction }: R
               <Textarea
                 value={wellDone}
                 onChange={(e) => handleWellDoneChange(e.target.value)}
-                placeholder="Napíš, čo sa ti dnes darilo, na čo si hrdý/á..."
+                placeholder="Napíš, čo sa ti dnes darilo, na čo si hrdá..."
                 className="min-h-[80px] bg-white/80 backdrop-blur-sm border-0 shadow-sm placeholder:text-reflection-text-soft/70 text-reflection-text focus-visible:ring-2 focus-visible:ring-white/50 resize-none focus:bg-white/70 transition-colors text-base"
               />
             </div>
