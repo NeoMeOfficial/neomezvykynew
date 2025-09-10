@@ -35,24 +35,24 @@ export function PhaseOverview({ phaseRanges, currentPhase, className = "" }: Pha
           <h4 className="text-base font-medium text-foreground">
             {insight.title}
           </h4>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-base text-muted-foreground">
             {insight.description}
           </p>
           
           <div className="pt-2 space-y-1">
-            <div className="flex justify-between text-sm">
+            <div className="flex justify-between text-base">
               <span className="text-muted-foreground">Energia:</span>
               <span className="text-foreground">{insight.energy}</span>
             </div>
-            <div className="flex justify-between text-sm">
+            <div className="flex justify-between text-base">
               <span className="text-muted-foreground">Nálada:</span>
               <span className="text-foreground">{insight.mood}</span>
             </div>
           </div>
           
           <div className="pt-2">
-            <h5 className="text-sm font-medium text-foreground mb-2">Odporúčania:</h5>
-            <p className="text-sm text-muted-foreground leading-relaxed">
+            <h5 className="text-base font-medium text-foreground mb-2">Odporúčania:</h5>
+            <p className="text-base text-muted-foreground leading-relaxed">
               {insight.recommendations.join('. ')}. Pamätajte, že každá žena je jedinečná a je dôležité počúvať svoje telo.
             </p>
           </div>
