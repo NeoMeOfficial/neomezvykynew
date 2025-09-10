@@ -147,7 +147,7 @@ export default function ReflectionWidget({ selectedDate, onFirstInteraction }: R
 
           {/* Motivational Quote */}
           <div className="text-left">
-            <p className="text-xl md:text-2xl text-widget-text italic font-medium">
+            <p className="text-lg md:text-xl text-widget-text italic font-medium">
               "{dailyQuote}"
             </p>
           </div>
