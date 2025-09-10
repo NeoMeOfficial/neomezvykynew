@@ -132,7 +132,7 @@ export default function MenstrualCycleTracker({
       </Tabs>
 
       <div className="mt-2">
-        <Button variant="glass" size="sm" onClick={() => setShowDatePicker(true)} className="w-full text-base">
+        <Button variant="hero" size="sm" onClick={() => setShowDatePicker(true)} className="w-full text-base">
           <CalendarIcon className="w-4 h-4 mr-2" />
           {UI_TEXT.newPeriod}
         </Button>
