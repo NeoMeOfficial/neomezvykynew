@@ -57,42 +57,44 @@ export function SettingsModal({
         </DialogHeader>
         
         <div className="space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="cycleLength">{UI_TEXT.cycleLength}</Label>
-            <div className="flex items-center space-x-2">
-              <Input
-                id="cycleLength"
-                type="number"
-                min="21"
-                max="45"
-                value={cycleLength}
-                onChange={(e) => setCycleLength(Number(e.target.value))}
-                className="w-20 text-base"
-              />
-              <span className="text-sm text-muted-foreground">{UI_TEXT.days}</span>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="cycleLength">{UI_TEXT.cycleLength}</Label>
+              <div className="flex items-center space-x-2">
+                <Input
+                  id="cycleLength"
+                  type="number"
+                  min="21"
+                  max="45"
+                  value={cycleLength}
+                  onChange={(e) => setCycleLength(Number(e.target.value))}
+                  className="w-16 text-base"
+                />
+                <span className="text-sm text-muted-foreground">{UI_TEXT.days}</span>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Obvykle 21-35 dní
+              </p>
             </div>
-            <p className="text-xs text-muted-foreground">
-              Obvykle 21-35 dní
-            </p>
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="periodLength">{UI_TEXT.periodLength}</Label>
-            <div className="flex items-center space-x-2">
-              <Input
-                id="periodLength"
-                type="number"
-                min="2"
-                max="10"
-                value={periodLength}
-                onChange={(e) => setPeriodLength(Number(e.target.value))}
-                className="w-20 text-base"
-              />
-              <span className="text-sm text-muted-foreground">{UI_TEXT.days}</span>
+            <div className="space-y-2">
+              <Label htmlFor="periodLength">{UI_TEXT.periodLength}</Label>
+              <div className="flex items-center space-x-2">
+                <Input
+                  id="periodLength"
+                  type="number"
+                  min="2"
+                  max="10"
+                  value={periodLength}
+                  onChange={(e) => setPeriodLength(Number(e.target.value))}
+                  className="w-16 text-base"
+                />
+                <span className="text-sm text-muted-foreground">{UI_TEXT.days}</span>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Obvykle 3-7 dní
+              </p>
             </div>
-            <p className="text-xs text-muted-foreground">
-              Obvykle 3-7 dní
-            </p>
           </div>
           
           {onEditPeriodStart && (
