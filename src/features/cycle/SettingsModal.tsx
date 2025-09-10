@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Settings, Check, X, Calendar as CalendarIcon } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 import {
   Dialog,
   DialogContent,
@@ -29,6 +30,7 @@ export function SettingsModal({
   onUpdatePeriodLength,
   onEditPeriodStart
 }: SettingsModalProps) {
+  const isMobile = useIsMobile();
   const [cycleLength, setCycleLength] = useState(cycleData.cycleLength);
   const [periodLength, setPeriodLength] = useState(cycleData.periodLength);
 
@@ -46,7 +48,7 @@ export function SettingsModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md sm:translate-y-[-35vh] translate-y-0 top-0 sm:top-[50%] sm:left-[50%] sm:translate-x-[-50%] left-[50%] translate-x-[-50%]">
+      <DialogContent className={`sm:max-w-md ${isMobile ? 'top-4 translate-y-0 left-[50%] translate-x-[-50%]' : 'translate-y-[-35vh]'}`}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Settings className="w-5 h-5" />
