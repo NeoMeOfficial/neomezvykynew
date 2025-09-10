@@ -67,8 +67,8 @@ export function DatePickerModal({
       >
         <DialogHeader className="pb-4">
           <DialogTitle className="text-xl font-semibold text-foreground flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-primary/10">
-              <CalendarIcon className="w-5 h-5 text-primary" />
+            <div className="p-2 rounded-xl" style={{ backgroundColor: 'hsl(var(--blush) / 0.15)' }}>
+              <CalendarIcon className="w-5 h-5" style={{ color: 'hsl(var(--blush))' }} />
             </div>
             {title}
           </DialogTitle>
