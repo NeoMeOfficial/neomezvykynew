@@ -216,17 +216,7 @@ const Index = () => {
                           </div>
                           Mesačný pohľad
                         </DialogTitle>
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm text-muted-foreground">Zatvoriť</span>
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            onClick={() => setShowMonthlyCalendar(false)}
-                            className="text-muted-foreground hover:text-foreground h-8 w-8 p-0"
-                          >
-                            ×
-                          </Button>
-                        </div>
+                        <span className="text-sm text-muted-foreground">Zatvoriť</span>
                       </div>
                     </DialogHeader>
                     <div className="overflow-y-auto flex-1 min-h-0">
