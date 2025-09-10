@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Settings, Check, X } from 'lucide-react';
+import { Settings, Check, X, Calendar as CalendarIcon } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -18,6 +18,7 @@ interface SettingsModalProps {
   cycleData: CycleData;
   onUpdateCycleLength: (length: number) => void;
   onUpdatePeriodLength: (length: number) => void;
+  onEditPeriodStart?: () => void;
 }
 
 export function SettingsModal({
@@ -25,7 +26,8 @@ export function SettingsModal({
   onClose,
   cycleData,
   onUpdateCycleLength,
-  onUpdatePeriodLength
+  onUpdatePeriodLength,
+  onEditPeriodStart
 }: SettingsModalProps) {
   const [cycleLength, setCycleLength] = useState(cycleData.cycleLength);
   const [periodLength, setPeriodLength] = useState(cycleData.periodLength);
@@ -44,7 +46,7 @@ export function SettingsModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md translate-y-[-15vh]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Settings className="w-5 h-5" />
@@ -90,6 +92,26 @@ export function SettingsModal({
               Obvykle 3-7 dní
             </p>
           </div>
+          
+          {onEditPeriodStart && (
+            <div className="space-y-2">
+              <Label>Začiatok poslednej menštruácie</Label>
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  onEditPeriodStart();
+                  onClose();
+                }}
+                className="w-full flex items-center gap-2"
+              >
+                <CalendarIcon className="w-4 h-4" />
+                Zmeniť dátum začiatku
+              </Button>
+              <p className="text-xs text-muted-foreground">
+                Kliknite pre zmenu dátumu poslednej menštruácie
+              </p>
+            </div>
+          )}
           
           <div className="flex gap-2 justify-end pt-4">
             <Button variant="outline" onClick={handleCancel}>

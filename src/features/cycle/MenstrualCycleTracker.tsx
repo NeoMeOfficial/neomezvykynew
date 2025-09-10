@@ -140,6 +140,13 @@ export default function MenstrualCycleTracker({
 
       <DatePickerModal isOpen={showDatePicker} onClose={() => setShowDatePicker(false)} onDateSelect={handleDateSelect} derivedState={derivedState} cycleLength={cycleData.cycleLength} periodLength={cycleData.periodLength} lastPeriodStart={cycleData.lastPeriodStart} title={UI_TEXT.newPeriod} />
 
-      <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} cycleData={cycleData} onUpdateCycleLength={setCycleLength} onUpdatePeriodLength={setPeriodLength} />
+      <SettingsModal 
+        isOpen={showSettings} 
+        onClose={() => setShowSettings(false)} 
+        cycleData={cycleData} 
+        onUpdateCycleLength={setCycleLength} 
+        onUpdatePeriodLength={setPeriodLength}
+        onEditPeriodStart={() => setShowDatePicker(true)}
+      />
     </div>;
 }
