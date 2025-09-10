@@ -237,3 +237,16 @@ All colors MUST be HSL.
     }
   }
 }
+
+/* Calendar period day styling with high specificity */
+.calendar-period-day {
+  background-color: hsl(var(--blush)) !important;
+  color: white !important;
+  border-radius: 8px !important;
+  font-weight: bold !important;
+}
+
+.calendar-period-day:hover {
+  background-color: hsl(var(--blush)) !important;
+  color: white !important;
+}

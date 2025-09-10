@@ -88,13 +88,8 @@ export function DatePickerModal({
                 period: (date) => 
                   lastPeriodStart ? isPeriodDate(date, lastPeriodStart, cycleLength, periodLength) : false
               }}
-              modifiersStyles={{
-                period: { 
-                  backgroundColor: 'hsl(var(--blush))', 
-                  color: 'white',
-                  borderRadius: '8px',
-                  fontWeight: 'bold'
-                }
+              modifiersClassNames={{
+                period: 'calendar-period-day'
               }}
               className="rounded-xl border-0 w-full pointer-events-auto"
               classNames={{
