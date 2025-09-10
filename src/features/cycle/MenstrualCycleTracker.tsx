@@ -109,11 +109,11 @@ export default function MenstrualCycleTracker({
 
       <Tabs defaultValue="today" className="space-y-5">
         <TabsList className="grid w-full grid-cols-2 rounded-full bg-amber-50/50">
-          <TabsTrigger value="today" className="flex items-center gap-2">
+          <TabsTrigger value="today" className="flex items-center gap-2 text-base">
             <TrendingUp className="w-4 h-4" />
             {UI_TEXT.todayEstimate}
           </TabsTrigger>
-          <TabsTrigger value="overview" className="flex items-center gap-2">
+          <TabsTrigger value="overview" className="flex items-center gap-2 text-base">
             <Lightbulb className="w-4 h-4" />
             {UI_TEXT.whatToDo}
           </TabsTrigger>
@@ -132,7 +132,7 @@ export default function MenstrualCycleTracker({
       </Tabs>
 
       <div className="mt-2">
-        <Button variant="glass" size="sm" onClick={() => setShowDatePicker(true)} className="w-full">
+        <Button variant="glass" size="sm" onClick={() => setShowDatePicker(true)} className="w-full text-base">
           <CalendarIcon className="w-4 h-4 mr-2" />
           {UI_TEXT.newPeriod}
         </Button>
