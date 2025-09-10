@@ -75,7 +75,7 @@ export function DatePickerModal({
         </DialogHeader>
         
         <div className="space-y-2 -mt-4">
-          <div className="glass-surface rounded-2xl p-1 w-full max-w-md mx-auto">
+          <div className="glass-surface rounded-2xl p-2 w-full">
             <Calendar
               mode="single"
               selected={selectedDate}
@@ -83,6 +83,7 @@ export function DatePickerModal({
               disabled={(date) => 
                 !validateDate(date, derivedState.minDate, derivedState.maxDate)
               }
+              weekStartsOn={1}
               modifiers={{
                 period: (date) => 
                   lastPeriodStart ? isPeriodDate(date, lastPeriodStart, cycleLength, periodLength) : false
@@ -95,7 +96,23 @@ export function DatePickerModal({
                   fontWeight: 'bold'
                 }
               }}
-              className="rounded-xl border-0"
+              className="rounded-xl border-0 w-full pointer-events-auto"
+              classNames={{
+                months: "flex flex-col w-full",
+                month: "w-full space-y-4",
+                table: "w-full border-collapse",
+                head_row: "flex w-full",
+                head_cell: "text-muted-foreground rounded-md w-full font-normal text-sm flex-1 text-center",
+                row: "flex w-full mt-2",
+                cell: "text-center text-sm p-1 relative flex-1 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
+                day: "h-10 w-full p-0 font-normal aria-selected:opacity-100 flex items-center justify-center text-sm",
+                day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
+                day_today: "bg-accent text-accent-foreground",
+                day_outside: "text-muted-foreground opacity-50",
+                day_disabled: "text-muted-foreground opacity-50",
+                day_range_middle: "aria-selected:bg-accent aria-selected:text-accent-foreground",
+                day_hidden: "invisible",
+              }}
             />
           </div>
           
