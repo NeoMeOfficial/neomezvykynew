@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar as CalendarIcon, TrendingUp, Lightbulb } from 'lucide-react';
+import { Calendar as CalendarIcon, TrendingUp, Lightbulb, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
@@ -122,7 +122,7 @@ export default function MenstrualCycleTracker({
         <TabsContent value="today" className="space-y-5">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <SuggestedToday derivedState={derivedState} />
-            <WellnessDonutChart derivedState={derivedState} onEditClick={() => setShowSettings(true)} />
+            <WellnessDonutChart derivedState={derivedState} />
           </div>
         </TabsContent>
 
@@ -131,10 +131,14 @@ export default function MenstrualCycleTracker({
         </TabsContent>
       </Tabs>
 
-      <div className="mt-2">
-        <Button variant="hero" size="sm" onClick={() => setShowDatePicker(true)} className="w-full text-base">
+      <div className="mt-2 grid grid-cols-2 gap-2">
+        <Button variant="hero" size="sm" onClick={() => setShowDatePicker(true)} className="text-base">
           <CalendarIcon className="w-4 h-4 mr-2" />
-          {UI_TEXT.newPeriod}
+          Menštruačný kalendár
+        </Button>
+        <Button variant="outline" size="sm" onClick={() => setShowSettings(true)} className="text-base">
+          <Settings className="w-4 h-4 mr-2" />
+          Nastavenia
         </Button>
       </div>
 

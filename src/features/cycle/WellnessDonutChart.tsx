@@ -7,7 +7,7 @@ import { UI_TEXT } from './insights';
 
 interface WellnessDonutChartProps {
   derivedState: DerivedState;
-  onEditClick: () => void;
+  onEditClick?: () => void;
   className?: string;
 }
 
@@ -130,17 +130,6 @@ export function WellnessDonutChart({ derivedState, onEditClick, className = "" }
             {UI_TEXT.day}
           </div>
         </div>
-        
-        {/* Glass-style edit button at top right */}
-        <Button
-          variant="glass"
-          size="icon"
-          onClick={onEditClick}
-          className="absolute top-[-12px] right-[-12px] w-8 h-8 backdrop-blur-[14px] bg-white/50 border border-white/20 shadow-elegant"
-          aria-label={UI_TEXT.edit}
-        >
-          <Settings className="w-4 h-4" />
-        </Button>
       </div>
     </div>
   );
