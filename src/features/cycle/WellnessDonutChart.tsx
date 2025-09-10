@@ -106,10 +106,11 @@ export function WellnessDonutChart({ derivedState, onEditClick, className = "" }
           <text
             x={100 + 90 * Math.cos((currentAngle * Math.PI) / 180)}
             y={100 + 90 * Math.sin((currentAngle * Math.PI) / 180)}
-            fontSize="10"
+            fontSize="12"
             fill="hsl(var(--foreground))"
             textAnchor="middle"
             dominantBaseline="middle"
+            fontWeight="600"
             className="rotate-90 transform-origin-center pointer-events-none"
           >
             {UI_TEXT.today}
@@ -118,13 +119,13 @@ export function WellnessDonutChart({ derivedState, onEditClick, className = "" }
         
         {/* Center content */}
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-          <div className="text-xs text-center mb-1" style={{ color: 'hsl(var(--foreground))' }}>
+          <div className="text-sm text-center mb-1 font-medium" style={{ color: 'hsl(var(--foreground))' }}>
             {currentPhase.name}
           </div>
-          <div className="text-2xl font-semibold" style={{ color: 'hsl(var(--foreground))' }}>
+          <div className="text-4xl font-bold" style={{ color: 'hsl(var(--foreground))' }}>
             {currentDay}
           </div>
-          <div className="text-[10px] text-center" style={{ color: 'hsl(var(--muted-foreground))' }}>
+          <div className="text-sm text-center font-medium" style={{ color: 'hsl(var(--muted-foreground))' }}>
             {UI_TEXT.day}
           </div>
         </div>
