@@ -134,7 +134,7 @@ export default function MenstrualCycleTracker({
       <div className="mt-2 grid grid-cols-2 gap-2">
         <Button variant="hero" size="sm" onClick={() => setShowDatePicker(true)} className="text-base">
           <CalendarIcon className="w-4 h-4 mr-2" />
-          Menštruačný kalendár
+          Kalendár
         </Button>
         <Button variant="outline" size="sm" onClick={() => setShowSettings(true)} className="text-base">
           <Settings className="w-4 h-4 mr-2" />
