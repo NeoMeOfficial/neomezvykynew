@@ -77,6 +77,7 @@ export const HabitCard = memo<HabitCardProps>(({
               max={habit.target}
               step={habit.name === 'Pohyb' ? 500 : habit.name === 'Hydratácia' ? 0.1 : 0.5}
               accentColor={habit.color}
+              emoji={habit.emoji}
               className="w-full"
             />
             

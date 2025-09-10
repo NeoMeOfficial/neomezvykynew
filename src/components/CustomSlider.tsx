@@ -6,6 +6,7 @@ interface CustomSliderProps {
   max: number;
   step: number;
   accentColor: string;
+  emoji?: string;
   className?: string;
 }
 
@@ -14,7 +15,8 @@ export const CustomSlider: React.FC<CustomSliderProps> = ({
   onValueChange, 
   max, 
   step, 
-  accentColor, 
+  accentColor,
+  emoji, 
   className 
 }) => {
   const [isDragging, setIsDragging] = useState(false);
@@ -92,14 +94,17 @@ export const CustomSlider: React.FC<CustomSliderProps> = ({
         />
       </div>
       <div 
-        className="block h-6 w-6 rounded-full border-2 bg-background shadow-lg ring-offset-background transition-all hover:scale-110 cursor-pointer" 
+        className="flex items-center justify-center h-7 w-7 rounded-full bg-background shadow-lg ring-offset-background transition-all hover:scale-110 cursor-pointer text-lg" 
         style={{ 
           borderColor: accentColor,
           left: `${percentage}%`,
-          marginLeft: '-12px',
-          position: 'absolute'
+          marginLeft: '-14px',
+          position: 'absolute',
+          border: emoji ? 'none' : `2px solid ${accentColor}`
         }}
-      />
+      >
+        {emoji || null}
+      </div>
     </div>
   );
 };
