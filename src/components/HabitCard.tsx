@@ -42,7 +42,6 @@ export const HabitCard = memo<HabitCardProps>(({
         <div className="space-y-2.5">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2 flex-1">
-              <span className="text-xl">{habit.emoji}</span>
               <div className="text-left flex-1">
                 <div className={`font-medium text-mobile-lg md:text-base ${isCompleted ? 'line-through' : ''}`}>
                   {habit.name}
