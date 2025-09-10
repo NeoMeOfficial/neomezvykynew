@@ -125,9 +125,10 @@ export function DatePickerModal({
               {UI_TEXT.cancel}
             </Button>
             <Button 
+              variant="hero"
               onClick={handleConfirm} 
               disabled={!selectedDate}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg"
+              className="shadow-lg"
             >
               <Check className="w-4 h-4 mr-2" />
               {UI_TEXT.save}
