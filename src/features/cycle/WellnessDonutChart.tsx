@@ -104,16 +104,17 @@ export function WellnessDonutChart({ derivedState, onEditClick, className = "" }
           
           {/* "DNES" label on marker */}
           <text
-            x={100 + 90 * Math.cos((currentAngle * Math.PI) / 180)}
-            y={100 + 90 * Math.sin((currentAngle * Math.PI) / 180)}
-            fontSize="12"
+            x={100 + 100 * Math.cos((currentAngle * Math.PI) / 180)}
+            y={100 + 100 * Math.sin((currentAngle * Math.PI) / 180)}
+            fontSize="14"
             fill="hsl(var(--foreground))"
             textAnchor="middle"
             dominantBaseline="middle"
-            fontWeight="600"
+            fontWeight="700"
             className="rotate-90 transform-origin-center pointer-events-none"
+            style={{ textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}
           >
-            {UI_TEXT.today}
+            Dnes
           </text>
         </svg>
         
