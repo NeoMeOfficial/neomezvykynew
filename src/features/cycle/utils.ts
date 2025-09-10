@@ -70,9 +70,22 @@ export function isPeriodDate(date: Date, lastPeriodStart: string, cycleLength: n
   
   const startDate = new Date(lastPeriodStart);
   const daysSince = differenceInDays(date, startDate);
-  const cycleDay = ((daysSince % cycleLength) + cycleLength) % cycleLength + 1;
   
-  return cycleDay <= periodLength || cycleDay > cycleLength - periodLength;
+  // Handle past periods (negative days)
+  if (daysSince < 0) {
+    const daysSinceAbs = Math.abs(daysSince);
+    const cyclesSince = Math.floor(daysSinceAbs / cycleLength);
+    const remainingDays = daysSinceAbs % cycleLength;
+    const daysFromPreviousPeriodStart = cycleLength - remainingDays;
+    return daysFromPreviousPeriodStart < periodLength;
+  }
+  
+  // Handle current and future periods
+  const cyclesSince = Math.floor(daysSince / cycleLength);
+  const dayInCurrentCycle = daysSince % cycleLength;
+  
+  // Check if it's within period length from any cycle start
+  return dayInCurrentCycle < periodLength;
 }
 
 export function validateDate(date: Date, minDate: Date, maxDate: Date): boolean {
