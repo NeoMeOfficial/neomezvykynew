@@ -250,3 +250,28 @@ All colors MUST be HSL.
   background-color: hsl(var(--blush)) !important;
   color: white !important;
 }
+
+/* Calendar habit completion day styling with high specificity */
+.calendar-completed-day {
+  background-color: hsl(142 76% 36%) !important;
+  color: white !important;
+  border-radius: 8px !important;
+  font-weight: bold !important;
+}
+
+.calendar-completed-day:hover {
+  background-color: hsl(142 76% 36%) !important;
+  opacity: 0.9 !important;
+}
+
+.calendar-partial-day {
+  background-color: hsl(45 93% 47%) !important;
+  color: white !important;
+  border-radius: 8px !important;
+  font-weight: 500 !important;
+}
+
+.calendar-partial-day:hover {
+  background-color: hsl(45 93% 47%) !important;
+  opacity: 0.9 !important;
+}
