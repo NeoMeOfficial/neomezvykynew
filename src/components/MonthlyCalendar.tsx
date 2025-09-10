@@ -110,10 +110,10 @@ export const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
               return (
                 <div key={habit.id} className="flex items-center justify-between p-1.5 rounded-md bg-background/30 backdrop-blur-sm">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-xs">{habit.emoji}</span>
-                    <span className="text-xs font-medium text-foreground/80">{habit.name}</span>
+                    <span className="text-sm">{habit.emoji}</span>
+                    <span className="text-sm font-medium text-foreground/80">{habit.name}</span>
                   </div>
-                  <div className={`text-xs font-semibold ${isCompleted ? 'text-green-600' : 'text-foreground/60'}`}>
+                  <div className={`text-sm font-semibold ${isCompleted ? 'text-green-600' : 'text-foreground/60'}`}>
                     {habit.name === 'Hydratácia' ? Number(value).toFixed(1) : Math.round(Number(value))} / {habit.target} {habit.unit}
                   </div>
                 </div>
