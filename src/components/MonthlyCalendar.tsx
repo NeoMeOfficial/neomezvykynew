@@ -56,8 +56,8 @@ export const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
   };
 
   return (
-    <div className="w-full space-y-4 touch-none select-none" style={{ touchAction: 'manipulation' }}>
-      <div className="glass-surface rounded-2xl p-1 w-full overflow-hidden">
+    <div className="w-full space-y-2 touch-none select-none" style={{ touchAction: 'manipulation' }}>
+      <div className="glass-surface rounded-2xl p-0.5 w-full overflow-hidden">
         <Calendar
           mode="single"
           selected={selectedDate}
@@ -66,7 +66,7 @@ export const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
           month={selectedMonth}
           modifiers={modifiers}
           modifiersStyles={modifiersStyles}
-          className={cn("rounded-xl border-0 w-full")}
+          className={cn("rounded-xl border-0 w-full pointer-events-auto")}
           showOutsideDays={false}
         />
       </div>
