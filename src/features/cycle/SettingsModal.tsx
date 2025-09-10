@@ -48,7 +48,14 @@ export function SettingsModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className={`sm:max-w-md ${isMobile ? 'top-4 translate-y-0 left-[50%] translate-x-[-50%]' : 'translate-y-[-35vh]'}`}>
+      <DialogContent 
+        className={`glass-container border-0 backdrop-blur-xl shadow-2xl ${
+          isMobile 
+            ? 'top-0 left-1/2 -translate-x-1/2 translate-y-0 w-[calc(100vw-32px)] max-h-[85vh] overflow-y-auto mx-2 mt-2' 
+            : 'sm:max-w-md sm:top-1/2 sm:-translate-y-1/2'
+        }`}
+        aria-describedby={undefined}
+      >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Settings className="w-5 h-5" />

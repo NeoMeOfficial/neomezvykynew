@@ -204,7 +204,10 @@ const Index = () => {
                       <Calendar size={20} className="text-foreground" />
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="glass-container border-0 backdrop-blur-xl shadow-2xl max-w-xs mx-2 max-h-[80vh] overflow-hidden">
+                  <DialogContent 
+                    className="glass-container border-0 backdrop-blur-xl shadow-2xl top-0 left-1/2 -translate-x-1/2 translate-y-0 w-[calc(100vw-32px)] max-h-[85vh] overflow-y-auto mx-2 mt-2 sm:max-w-md sm:top-1/2 sm:-translate-y-1/2"
+                    aria-describedby={undefined}
+                  >
                     <DialogHeader className="pb-2 flex-shrink-0">
                       <div className="flex items-center justify-between">
                         <DialogTitle className="text-base font-semibold text-foreground flex items-center gap-2">

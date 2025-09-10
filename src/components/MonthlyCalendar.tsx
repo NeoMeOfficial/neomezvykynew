@@ -57,7 +57,7 @@ export const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
 
   return (
     <div className="w-full space-y-4 touch-none select-none" style={{ touchAction: 'manipulation' }}>
-      <div className="overflow-hidden">
+      <div className="glass-surface rounded-2xl p-1 w-full overflow-hidden">
         <Calendar
           mode="single"
           selected={selectedDate}
