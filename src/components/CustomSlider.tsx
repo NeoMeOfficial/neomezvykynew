@@ -94,7 +94,7 @@ export const CustomSlider: React.FC<CustomSliderProps> = ({
         />
       </div>
       <div 
-        className="flex items-center justify-center h-7 w-7 rounded-full glass-surface shadow-lg transition-all hover:scale-110 cursor-pointer text-lg backdrop-blur-sm" 
+        className="flex items-center justify-center h-7 w-7 rounded-full bg-background shadow-lg ring-offset-background transition-all hover:scale-110 cursor-pointer text-lg" 
         style={{ 
           borderColor: accentColor,
           left: `${percentage}%`,
