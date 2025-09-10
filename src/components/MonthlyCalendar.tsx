@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Calendar } from '@/components/ui/calendar';
 import { Habit } from '@/hooks/useCodeBasedHabits';
 import { cn } from '@/lib/utils';
+import { sk } from 'date-fns/locale';
 
 interface MonthlyCalendarProps {
   habitData: Record<string, Record<string, number>>;
@@ -52,6 +53,7 @@ export const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
     <div className="w-full max-w-none space-y-2 touch-none select-none" style={{ touchAction: 'manipulation' }}>
       <div className="glass-surface rounded-2xl w-full max-w-none overflow-hidden">
         <Calendar
+          locale={sk}
           weekStartsOn={1}
           mode="single"
           selected={selectedDate}
