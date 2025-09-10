@@ -17,10 +17,10 @@ export function TemporaryDataIndicator({ className = '', onShowAccessCodeValidat
       <div className="flex items-center gap-2">
         <Clock className="h-4 w-4 text-amber-600" />
         <div className="flex-1">
-          <p className="text-sm font-medium text-amber-800">
+          <p className="text-base font-medium text-amber-800">
             Dočasné údaje
           </p>
-          <p className="text-xs text-amber-700">
+          <p className="text-sm text-amber-700">
             Tvoj pokrok sa neuloží bez{' '}
             <button 
               onClick={onShowAccessCodeValidation}
