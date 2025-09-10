@@ -46,7 +46,7 @@ export function SettingsModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md translate-y-[-35vh]">
+      <DialogContent className="sm:max-w-md sm:translate-y-[-35vh] translate-y-0">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Settings className="w-5 h-5" />
