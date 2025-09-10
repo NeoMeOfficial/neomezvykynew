@@ -35,15 +35,6 @@ export default function HabitCompletionCount({
   }, [habits, selectedDate, habitData]);
   if (loading) return null;
   return <div className="flex items-center gap-1">
-      {[1, 2, 3, 4].map(index => (
-        <span 
-          key={index}
-          className={`text-sm transition-opacity duration-300 ${
-            index <= completedCount ? 'opacity-100' : 'opacity-30'
-          }`}
-        >
-          ✓
-        </span>
-      ))}
+      {[1, 2, 3, 4].map(index => {})}
     </div>;
 }
