@@ -205,7 +205,7 @@ const Index = () => {
                     </Button>
                   </DialogTrigger>
                   <DialogContent 
-                    className="glass-container border-0 backdrop-blur-xl shadow-2xl top-0 left-1/2 -translate-x-1/2 translate-y-0 w-[calc(100vw-16px)] max-h-[85vh] overflow-y-auto mx-1 mt-2 sm:max-w-lg sm:top-1/2 sm:-translate-y-1/2"
+                    className="glass-container border-0 backdrop-blur-xl shadow-2xl top-0 left-1/2 -translate-x-1/2 translate-y-0 w-[calc(100vw-8px)] max-h-[85vh] overflow-y-auto mt-2 sm:max-w-2xl sm:top-1/2 sm:-translate-y-1/2"
                     aria-describedby={undefined}
                   >
                     <DialogHeader className="pb-1 flex-shrink-0">
@@ -226,7 +226,7 @@ const Index = () => {
                         </Button>
                       </div>
                     </DialogHeader>
-                    <div className="px-0 overflow-y-auto flex-1 min-h-0">
+                    <div className="overflow-y-auto flex-1 min-h-0">
                       <MonthlyCalendar
                         habitData={habitData}
                         selectedMonth={monthlyCalendarDate}
