@@ -146,12 +146,10 @@ export default function ReflectionWidget({ selectedDate, onFirstInteraction }: R
       <div className="space-y-1.5">
 
           {/* Motivational Quote */}
-          <div className="bg-gradient-widget py-4 px-1 rounded-xl border border-widget-border/30 shadow-sm">
-            <div className="text-left px-4">
-              <p className="text-xl md:text-2xl text-widget-text italic font-medium">
-                "{dailyQuote}"
-              </p>
-            </div>
+          <div className="text-left">
+            <p className="text-xl md:text-2xl text-widget-text italic font-medium">
+              "{dailyQuote}"
+            </p>
           </div>
 
           {/* Reflection Cards */}
