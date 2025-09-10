@@ -52,6 +52,7 @@ export const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
     <div className="w-full max-w-none space-y-2 touch-none select-none" style={{ touchAction: 'manipulation' }}>
       <div className="glass-surface rounded-2xl w-full max-w-none overflow-hidden">
         <Calendar
+          weekStartsOn={1}
           mode="single"
           selected={selectedDate}
           onSelect={setSelectedDate}
