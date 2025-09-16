@@ -90,7 +90,7 @@ All colors MUST be HSL.
     --peach: 17 80% 86%;
     --peach-orange: 15 85% 70%;
     --peach-orange-foreground: 0 0% 100%;
-    --blush: 345 75% 80%;
+    --blush: 355 100% 73%;
     --lavender: 265 30% 92%;
     --mint: 150 31% 82%;
     --gold: 42 85% 72%;
@@ -278,28 +278,28 @@ All colors MUST be HSL.
 
 /* Calendar fertility day styling */
 .calendar-fertility-day {
-  background-color: hsl(54 100% 71%) !important;
+  background-color: hsl(35 70% 75%) !important;
   color: hsl(0 0% 20%) !important;
   border-radius: 8px !important;
   font-weight: 500 !important;
-  border: 1px solid hsl(54 70% 60%) !important;
+  border: 1px solid hsl(35 70% 65%) !important;
 }
 
 .calendar-fertility-day:hover {
-  background-color: hsl(54 100% 65%) !important;
+  background-color: hsl(35 70% 70%) !important;
   color: hsl(0 0% 20%) !important;
 }
 
 /* Calendar ovulation day styling */
 .calendar-ovulation-day {
-  background-color: hsl(265 30% 82%) !important;
-  color: hsl(265 30% 20%) !important;
+  background-color: hsl(280 40% 80%) !important;
+  color: hsl(280 40% 25%) !important;
   border-radius: 8px !important;
   font-weight: 600 !important;
-  border: 1px solid hsl(265 30% 70%) !important;
+  border: 1px solid hsl(280 40% 70%) !important;
 }
 
 .calendar-ovulation-day:hover {
-  background-color: hsl(265 30% 75%) !important;
-  color: hsl(265 30% 20%) !important;
+  background-color: hsl(280 40% 75%) !important;
+  color: hsl(280 40% 25%) !important;
 }
