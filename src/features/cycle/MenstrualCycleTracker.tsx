@@ -121,7 +121,7 @@ export default function MenstrualCycleTracker({
 
         <TabsContent value="today" className="space-y-5">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <SuggestedToday derivedState={derivedState} />
+            <SuggestedToday derivedState={derivedState} accessCode={accessCode} />
             <WellnessDonutChart derivedState={derivedState} />
           </div>
         </TabsContent>

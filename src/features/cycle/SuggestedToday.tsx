@@ -1,13 +1,15 @@
 import React from 'react';
 import { DerivedState, Suggestion } from './types';
-import { suggestForDay, getEnergyColor, getMoodEmoji } from './suggestions';
+import { suggestForDay, getEnergyColor } from './suggestions';
+import { SymptomTracker } from './SymptomTracker';
 
 interface SuggestedTodayProps {
   derivedState: DerivedState;
   className?: string;
+  accessCode?: string;
 }
 
-export function SuggestedToday({ derivedState, className = "" }: SuggestedTodayProps) {
+export function SuggestedToday({ derivedState, className = "", accessCode }: SuggestedTodayProps) {
   const suggestion = suggestForDay(derivedState.currentDay, derivedState.phaseRanges);
   
   return (
@@ -35,34 +37,12 @@ export function SuggestedToday({ derivedState, className = "" }: SuggestedTodayP
           </div>
         </div>
 
-        {/* Mood Level */}
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-base font-medium text-foreground">Nálada</span>
-            <span className="text-sm text-muted-foreground">{suggestion.mood}/5</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <div className="flex space-x-1">
-              {[1, 2, 3, 4, 5].map((level) => (
-                <span
-                  key={level}
-                  className={`text-xl transition-opacity duration-300 ${
-                    level <= Math.round(suggestion.mood) ? 'opacity-100' : 'opacity-30'
-                  }`}
-                >
-                  {level === 1 && '😞'}
-                  {level === 2 && '😕'}
-                  {level === 3 && '🙂'}
-                  {level === 4 && '😊'}
-                  {level === 5 && '🤩'}
-                </span>
-              ))}
-            </div>
-            <div className="text-3xl">
-              {getMoodEmoji(suggestion.mood)}
-            </div>
-          </div>
-        </div>
+        {/* Symptom Tracker */}
+        <SymptomTracker 
+          currentPhase={derivedState.currentPhase.key}
+          currentDay={derivedState.currentDay}
+          accessCode={accessCode}
+        />
 
         {/* Current Phase */}
         <div className="pt-2 border-t border-border/50">
