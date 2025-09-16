@@ -63,7 +63,7 @@ export const NavigationWidget = ({
     }));
   };
 
-  const getIconSize = (isOpen: boolean) => isOpen ? 'w-10 h-10' : 'w-16 h-16';
+  const getIconSize = (isOpen: boolean) => isOpen ? 'w-12 h-12' : 'w-20 h-20';
 
   return (
     <div className="w-full max-w-[600px] mx-auto space-y-2">
@@ -74,7 +74,7 @@ export const NavigationWidget = ({
       >
         <div className="glass-container">
           <CollapsibleTrigger asChild>
-            <button className="w-full flex items-center gap-4 p-0 mb-4 text-left focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg">
+            <button className="w-full flex items-start gap-2 p-0 mb-1 text-left focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg">
               <img 
                 src={menstrualCalendarIcon} 
                 alt="Menstrual Calendar"
@@ -85,7 +85,7 @@ export const NavigationWidget = ({
               </h2>
             </button>
           </CollapsibleTrigger>
-          <CollapsibleContent className="animate-accordion-down pb-2">
+          <CollapsibleContent className="animate-accordion-down pb-1">
             <MenstrualCycleTracker
               accessCode={accessCode}
               onFirstInteraction={onFirstInteraction}
@@ -101,7 +101,7 @@ export const NavigationWidget = ({
       >
         <div className="glass-container">
           <CollapsibleTrigger asChild>
-            <button className="w-full flex items-center gap-4 p-0 mb-4 text-left focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg">
+            <button className="w-full flex items-start gap-2 p-0 mb-1 text-left focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg">
               <img 
                 src={habitsIcon} 
                 alt="Habits"
@@ -158,7 +158,7 @@ export const NavigationWidget = ({
               </div>
             </button>
           </CollapsibleTrigger>
-          <CollapsibleContent className="animate-accordion-down pb-2">
+          <CollapsibleContent className="animate-accordion-down pb-1">
             <HabitTracker 
               selectedDate={selectedDate} 
               onFirstInteraction={onFirstInteraction}
@@ -174,7 +174,7 @@ export const NavigationWidget = ({
       >
         <div className="glass-container">
           <CollapsibleTrigger asChild>
-            <button className="w-full flex items-center gap-4 p-0 mb-4 text-left focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg">
+            <button className="w-full flex items-start gap-2 p-0 mb-1 text-left focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg">
               <img 
                 src={reflectionIcon} 
                 alt="Daily Reflection"
@@ -215,7 +215,7 @@ export const NavigationWidget = ({
               </div>
             </button>
           </CollapsibleTrigger>
-          <CollapsibleContent className="animate-accordion-down pb-2">
+          <CollapsibleContent className="animate-accordion-down pb-1">
             <ReflectionWidget 
               selectedDate={selectedDate}
               onFirstInteraction={onFirstInteraction}
