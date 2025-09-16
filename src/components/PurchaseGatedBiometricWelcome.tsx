@@ -284,7 +284,7 @@ export const PurchaseGatedBiometricWelcome: React.FC<PurchaseGatedBiometricWelco
                 >
                   <ArrowLeft className="h-4 w-4" />
                 </Button>
-                Biometrické overenie
+                Vytvorenie nového kódu s Face ID
               </DialogTitle>
             </DialogHeader>
             
@@ -292,12 +292,12 @@ export const PurchaseGatedBiometricWelcome: React.FC<PurchaseGatedBiometricWelco
               <Alert>
                 <Smartphone className="h-4 w-4" />
                 <AlertDescription>
-                  Vytvorte si vlastný kód a aktivujte biometrické prihlásenie pre budúce použitie.
+                  Vytvorte si nový prístupový kód a aktivujte Face ID pre rýchle prihlásenie.
                 </AlertDescription>
               </Alert>
 
               <div className="space-y-2">
-                <Label htmlFor="biometric-code">Vlastný prístupový kód</Label>
+                <Label htmlFor="biometric-code">Nový prístupový kód</Label>
                 <Input
                   id="biometric-code"
                   type="text"
