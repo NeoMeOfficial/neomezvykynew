@@ -26,7 +26,7 @@ export const PurchaseGatedBiometricWelcome: React.FC<PurchaseGatedBiometricWelco
   const [biometricError, setBiometricError] = useState('');
   const [isValidating, setIsValidating] = useState(false);
 
-  const { setCustomAccessCode } = useAccessCode();
+  const { setCustomAccessCode, enterAccessCode } = useAccessCode();
   const { 
     registerBiometric, 
     shouldOfferBiometric, 
@@ -250,10 +250,14 @@ export const PurchaseGatedBiometricWelcome: React.FC<PurchaseGatedBiometricWelco
                   <Button 
                     onClick={async () => {
                       try {
+                        // Store the validated code properly
+                        await enterAccessCode(customCode);
                         await registerBiometric(customCode);
                         setStep('code');
                       } catch (biometricError: any) {
                         console.warn('Biometric registration failed:', biometricError);
+                        // Even if biometric fails, store the code
+                        await enterAccessCode(customCode);
                         setBiometricError('Face ID sa nepodarilo aktivovať, ale váš kód je platný.');
                         setStep('code');
                       }
@@ -266,7 +270,11 @@ export const PurchaseGatedBiometricWelcome: React.FC<PurchaseGatedBiometricWelco
                   </Button>
                 )}
                 <Button 
-                  onClick={() => setStep('code')} 
+                  onClick={async () => {
+                    // Store the validated code even without biometric
+                    await enterAccessCode(customCode);
+                    setStep('code');
+                  }} 
                   variant="outline" 
                   className="flex-1"
                 >
