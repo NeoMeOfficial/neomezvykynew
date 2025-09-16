@@ -74,7 +74,7 @@ export const NavigationWidget = ({
       >
         <div className="backdrop-blur-md bg-white/30 border border-white/40 rounded-2xl p-4 shadow-lg">
           <CollapsibleTrigger asChild>
-            <button className="w-full flex flex-col items-center gap-1 p-0 mb-1 text-center focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg">
+            <button className="w-full flex flex-col items-center gap-1 p-0 mb-1 text-center focus:outline-none rounded-lg">
               <img 
                 src={menstrualCalendarIcon} 
                 alt="Menstrual Calendar"
@@ -103,7 +103,7 @@ export const NavigationWidget = ({
       >
         <div className="backdrop-blur-md bg-white/30 border border-white/40 rounded-2xl p-4 shadow-lg">
           <CollapsibleTrigger asChild>
-            <button className="w-full flex flex-col items-center p-0 mb-1 text-center focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg">
+            <button className="w-full flex flex-col items-center p-0 mb-1 text-center focus:outline-none rounded-lg">
               <img 
                 src={habitsIcon} 
                 alt="Habits"
@@ -178,7 +178,7 @@ export const NavigationWidget = ({
       >
         <div className="backdrop-blur-md bg-white/30 border border-white/40 rounded-2xl p-4 shadow-lg">
           <CollapsibleTrigger asChild>
-            <button className="w-full flex flex-col items-center p-0 mb-1 text-center focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg">
+            <button className="w-full flex flex-col items-center p-0 mb-1 text-center focus:outline-none rounded-lg">
               <img 
                 src={reflectionIcon} 
                 alt="Daily Reflection"
