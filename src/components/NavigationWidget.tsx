@@ -74,7 +74,7 @@ export const NavigationWidget = ({
       >
         <div className="glass-container">
           <CollapsibleTrigger asChild>
-            <button className="w-full flex items-start gap-2 p-0 mb-1 text-left focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg">
+            <button className="w-full flex flex-col items-center gap-2 p-0 mb-1 text-center focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg">
               <img 
                 src={menstrualCalendarIcon} 
                 alt="Menstrual Calendar"
@@ -101,14 +101,14 @@ export const NavigationWidget = ({
       >
         <div className="glass-container">
           <CollapsibleTrigger asChild>
-            <button className="w-full flex items-start gap-2 p-0 mb-1 text-left focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg">
+            <button className="w-full flex flex-col items-center p-0 mb-1 text-center focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg">
               <img 
                 src={habitsIcon} 
                 alt="Habits"
-                className={`${getIconSize(openSections.habits)} transition-all duration-300 flex-shrink-0`}
+                className={`${getIconSize(openSections.habits)} transition-all duration-300 flex-shrink-0 mb-2`}
               />
               <div className="flex items-center justify-between w-full">
-                <h2 className="text-mobile-lg md:text-lg font-semibold text-foreground">
+                <h2 className="text-mobile-lg md:text-lg font-semibold text-foreground flex-1">
                   Moje návyky
                 </h2>
                 {openSections.habits && (
@@ -174,14 +174,14 @@ export const NavigationWidget = ({
       >
         <div className="glass-container">
           <CollapsibleTrigger asChild>
-            <button className="w-full flex items-start gap-2 p-0 mb-1 text-left focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg">
+            <button className="w-full flex flex-col items-center p-0 mb-1 text-center focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg">
               <img 
                 src={reflectionIcon} 
                 alt="Daily Reflection"
-                className={`${getIconSize(openSections.reflection)} transition-all duration-300 flex-shrink-0`}
+                className={`${getIconSize(openSections.reflection)} transition-all duration-300 flex-shrink-0 mb-2`}
               />
               <div className="flex items-center justify-between w-full">
-                <h2 className="text-mobile-lg md:text-lg font-semibold text-foreground">
+                <h2 className="text-mobile-lg md:text-lg font-semibold text-foreground flex-1">
                   Denná reflexia
                 </h2>
                 {openSections.reflection && (
