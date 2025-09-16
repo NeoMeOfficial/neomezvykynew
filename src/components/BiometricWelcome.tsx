@@ -294,6 +294,14 @@ export const BiometricWelcome = ({ open, onOpenChange, onEnterExistingCode }: Bi
                   Pokračovať bez Face ID
                 </Button>
               </div>
+              
+              <Button 
+                variant="ghost" 
+                onClick={handleBack}
+                className="w-full text-muted-foreground hover:bg-accent"
+              >
+                Späť
+              </Button>
             </div>
           </div>
         ) : step === 'custom' ? (
