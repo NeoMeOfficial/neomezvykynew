@@ -240,123 +240,64 @@ All colors MUST be HSL.
 
 /* Calendar period day styling with high specificity */
 .calendar-period-day {
-  position: relative !important;
-  background-color: transparent !important;
-  color: hsl(var(--foreground)) !important;
+  background-color: hsl(355 60% 90%) !important;
+  color: hsl(355 60% 35%) !important;
   border-radius: 8px !important;
   font-weight: bold !important;
 }
 
-.calendar-period-day::after {
-  content: "" !important;
-  position: absolute !important;
-  top: 2px !important;
-  right: 2px !important;
-  width: 8px !important;
-  height: 8px !important;
-  background-color: hsl(var(--blush)) !important;
-  border-radius: 50% !important;
-}
-
 .calendar-period-day:hover {
-  background-color: hsl(var(--muted)) !important;
-  color: hsl(var(--foreground)) !important;
+  background-color: hsl(355 60% 87%) !important;
+  color: hsl(355 60% 30%) !important;
 }
 
 /* Calendar habit completion day styling with high specificity */
 .calendar-completed-day {
-  position: relative !important;
-  background-color: transparent !important;
-  color: hsl(var(--foreground)) !important;
+  background-color: hsl(142 40% 88%) !important;
+  color: hsl(142 60% 25%) !important;
   border-radius: 8px !important;
   font-weight: bold !important;
 }
 
-.calendar-completed-day::after {
-  content: "" !important;
-  position: absolute !important;
-  top: 2px !important;
-  right: 2px !important;
-  width: 8px !important;
-  height: 8px !important;
-  background-color: hsl(142 76% 36%) !important;
-  border-radius: 50% !important;
-}
-
 .calendar-completed-day:hover {
-  background-color: hsl(var(--muted)) !important;
+  background-color: hsl(142 40% 85%) !important;
+  color: hsl(142 60% 20%) !important;
 }
 
 .calendar-partial-day {
-  position: relative !important;
-  background-color: transparent !important;
-  color: hsl(var(--foreground)) !important;
+  background-color: hsl(45 50% 88%) !important;
+  color: hsl(45 70% 30%) !important;
   border-radius: 8px !important;
   font-weight: 500 !important;
 }
 
-.calendar-partial-day::after {
-  content: "" !important;
-  position: absolute !important;
-  top: 50% !important;
-  left: 50% !important;
-  transform: translate(-50%, -50%) !important;
-  width: 6px !important;
-  height: 6px !important;
-  background-color: hsl(45 93% 47%) !important;
-  border-radius: 50% !important;
-}
-
 .calendar-partial-day:hover {
-  background-color: hsl(var(--muted)) !important;
+  background-color: hsl(45 50% 85%) !important;
+  color: hsl(45 70% 25%) !important;
 }
 
 /* Calendar fertility day styling */
 .calendar-fertility-day {
-  position: relative !important;
-  background-color: transparent !important;
-  color: hsl(var(--foreground)) !important;
+  background-color: hsl(25 50% 88%) !important;
+  color: hsl(25 70% 30%) !important;
   border-radius: 8px !important;
   font-weight: 500 !important;
 }
 
-.calendar-fertility-day::after {
-  content: "" !important;
-  position: absolute !important;
-  top: 2px !important;
-  left: 2px !important;
-  width: 8px !important;
-  height: 8px !important;
-  background-color: hsl(25 70% 65%) !important;
-  border-radius: 50% !important;
-}
-
 .calendar-fertility-day:hover {
-  background-color: hsl(var(--muted)) !important;
-  color: hsl(var(--foreground)) !important;
+  background-color: hsl(25 50% 85%) !important;
+  color: hsl(25 70% 25%) !important;
 }
 
 /* Calendar ovulation day styling */
 .calendar-ovulation-day {
-  position: relative !important;
-  background-color: transparent !important;
-  color: hsl(var(--foreground)) !important;
+  background-color: hsl(315 40% 88%) !important;
+  color: hsl(315 60% 30%) !important;
   border-radius: 8px !important;
   font-weight: 600 !important;
 }
 
-.calendar-ovulation-day::after {
-  content: "" !important;
-  position: absolute !important;
-  bottom: 2px !important;
-  right: 2px !important;
-  width: 8px !important;
-  height: 8px !important;
-  background-color: hsl(315 55% 65%) !important;
-  border-radius: 50% !important;
-}
-
 .calendar-ovulation-day:hover {
-  background-color: hsl(var(--muted)) !important;
-  color: hsl(var(--foreground)) !important;
+  background-color: hsl(315 40% 85%) !important;
+  color: hsl(315 60% 25%) !important;
 }
