@@ -130,15 +130,15 @@ export function DatePickerModal({
             <h4 className="text-sm font-medium text-foreground mb-3">Legenda:</h4>
             <div className="grid grid-cols-2 gap-3 text-xs">
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full border-2 border-red-400 bg-red-100"></div>
+                <div className="w-3 h-3 rounded-full bg-[hsl(355_75%_80%)]"></div>
                 <span className="text-foreground/80">Menštruácia</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full bg-yellow-300 border border-yellow-400"></div>
+                <div className="w-3 h-3 rounded-full bg-[hsl(25_70%_65%)]"></div>
                 <span className="text-foreground/80">Plodné dni</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full bg-purple-200 border border-purple-300"></div>
+                <div className="w-3 h-3 rounded-full bg-[hsl(315_55%_65%)]"></div>
                 <span className="text-foreground/80">Ovulácia</span>
               </div>
               <div className="flex items-center gap-2">
@@ -146,6 +146,9 @@ export function DatePickerModal({
                 <span className="text-foreground/80">Vybraný deň</span>
               </div>
             </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              Hľadajte malé farebné bodky na dátumoch v kalendári
+            </p>
           </div>
           
           <div className="flex gap-3 justify-end pt-2">
