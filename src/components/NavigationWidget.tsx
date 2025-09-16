@@ -72,7 +72,7 @@ export const NavigationWidget = ({
         open={openSections.cycle} 
         onOpenChange={() => toggleSection('cycle')}
       >
-        <div className="backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl p-4 shadow-lg">
+        <div className="backdrop-blur-md bg-white/30 border border-white/40 rounded-2xl p-4 shadow-lg">
           <CollapsibleTrigger asChild>
             <button className="w-full flex flex-col items-center gap-1 p-0 mb-1 text-center focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg">
               <img 
@@ -101,7 +101,7 @@ export const NavigationWidget = ({
         open={openSections.habits} 
         onOpenChange={() => toggleSection('habits')}
       >
-        <div className="backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl p-4 shadow-lg">
+        <div className="backdrop-blur-md bg-white/30 border border-white/40 rounded-2xl p-4 shadow-lg">
           <CollapsibleTrigger asChild>
             <button className="w-full flex flex-col items-center p-0 mb-1 text-center focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg">
               <img 
@@ -176,7 +176,7 @@ export const NavigationWidget = ({
         open={openSections.reflection} 
         onOpenChange={() => toggleSection('reflection')}
       >
-        <div className="backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl p-4 shadow-lg">
+        <div className="backdrop-blur-md bg-white/30 border border-white/40 rounded-2xl p-4 shadow-lg">
           <CollapsibleTrigger asChild>
             <button className="w-full flex flex-col items-center p-0 mb-1 text-center focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg">
               <img 
