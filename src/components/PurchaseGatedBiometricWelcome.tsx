@@ -7,6 +7,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Smartphone, Shield, ArrowLeft } from 'lucide-react';
 import { useBiometricAuth } from '@/hooks/useBiometricAuth';
 import { useAccessCode } from '@/hooks/useAccessCode';
+import { supabase } from '@/integrations/supabase/client';
 
 interface PurchaseGatedBiometricWelcomeProps {
   open: boolean;
@@ -19,10 +20,11 @@ export const PurchaseGatedBiometricWelcome: React.FC<PurchaseGatedBiometricWelco
   onOpenChange,
   validatedCode,
 }) => {
-  const [step, setStep] = useState<'welcome' | 'biometric' | 'custom' | 'code'>('welcome');
+  const [step, setStep] = useState<'welcome' | 'biometric' | 'custom' | 'code' | 'existing-biometric'>('welcome');
   const [customCode, setCustomCode] = useState('');
   const [error, setError] = useState('');
   const [biometricError, setBiometricError] = useState('');
+  const [isValidating, setIsValidating] = useState(false);
 
   const { setCustomAccessCode } = useAccessCode();
   const { 
@@ -33,7 +35,7 @@ export const PurchaseGatedBiometricWelcome: React.FC<PurchaseGatedBiometricWelco
   } = useBiometricAuth();
 
   const handleUseBiometric = () => {
-    setStep('biometric');
+    setStep('existing-biometric');
     setError('');
     setBiometricError('');
   };
@@ -95,10 +97,60 @@ export const PurchaseGatedBiometricWelcome: React.FC<PurchaseGatedBiometricWelco
     setBiometricError('');
   };
 
+  const handleLinkExistingCode = async () => {
+    if (!customCode.trim()) {
+      setError('Prosím zadajte váš existujúci kód');
+      return;
+    }
+
+    setIsValidating(true);
+    setError('');
+    setBiometricError('');
+
+    try {
+      // First validate the existing code
+      const { data, error } = await supabase.functions.invoke('validate-access-code', {
+        body: { code: customCode.toUpperCase() }
+      });
+
+      if (error || !data?.valid) {
+        setError(data?.message || 'Neplatný alebo už použitý kód');
+        setIsValidating(false);
+        return;
+      }
+
+      // Store the validated code
+      await setCustomAccessCode(customCode);
+      
+      // Try to register biometric with the existing code
+      try {
+        await registerBiometric(customCode);
+        setStep('code');
+      } catch (biometricError: any) {
+        console.warn('Biometric registration failed:', biometricError);
+        setBiometricError('Face ID sa nepodarilo aktivovať, ale váš kód je platný.');
+        setStep('code');
+      }
+    } catch (error: any) {
+      console.error('Failed to validate access code:', error);
+      setError('Nepodarilo sa overiť kód. Skúste to znovu.');
+    } finally {
+      setIsValidating(false);
+    }
+  };
+
+  const handleCreateNewCode = () => {
+    setStep('biometric');
+    setCustomCode('');
+    setError('');
+    setBiometricError('');
+  };
+
   const handleBack = () => {
     setStep('welcome');
     setError('');
     setBiometricError('');
+    setCustomCode('');
   };
 
   return (
@@ -126,7 +178,7 @@ export const PurchaseGatedBiometricWelcome: React.FC<PurchaseGatedBiometricWelco
                     variant="default"
                   >
                     <Smartphone className="h-4 w-4" />
-                    {isMobile ? 'Použiť Face ID / Touch ID' : 'Použiť biometrické overenie'}
+                    {isMobile ? 'Prepojiť s Face ID / Touch ID' : 'Prepojiť s biometrickým overením'}
                   </Button>
                 )}
 
@@ -136,6 +188,84 @@ export const PurchaseGatedBiometricWelcome: React.FC<PurchaseGatedBiometricWelco
                   className="w-full"
                 >
                   Vytvoriť vlastný prístupový kód
+                </Button>
+              </div>
+            </div>
+          </>
+        )}
+
+        {step === 'existing-biometric' && (
+          <>
+            <DialogHeader>
+              <DialogTitle className="text-center flex items-center justify-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="absolute left-4"
+                  onClick={handleBack}
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                </Button>
+                Prepojenie s Face ID
+              </DialogTitle>
+            </DialogHeader>
+            
+            <div className="space-y-4">
+              <Alert>
+                <Smartphone className="h-4 w-4" />
+                <AlertDescription>
+                  Zadajte váš existujúci kód a prepojíme ho s Face ID pre rýchle prihlásenie.
+                </AlertDescription>
+              </Alert>
+
+              <div className="space-y-2">
+                <Label htmlFor="existing-code">Váš existujúci prístupový kód</Label>
+                <Input
+                  id="existing-code"
+                  type="text"
+                  value={customCode}
+                  onChange={(e) => {
+                    setCustomCode(e.target.value.toUpperCase());
+                    setError('');
+                    setBiometricError('');
+                  }}
+                  placeholder="VÁŠKÓD"
+                  className="font-mono"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      handleLinkExistingCode();
+                    }
+                  }}
+                />
+              </div>
+
+              {error && (
+                <Alert variant="destructive">
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+
+              {biometricError && (
+                <Alert variant="destructive">
+                  <AlertDescription>{biometricError}</AlertDescription>
+                </Alert>
+              )}
+
+              <div className="space-y-2">
+                <Button 
+                  onClick={handleLinkExistingCode} 
+                  className="w-full"
+                  disabled={!customCode.trim() || isValidating}
+                >
+                  {isValidating ? 'Overuje sa...' : 'Prepojiť s Face ID'}
+                </Button>
+                
+                <Button 
+                  onClick={handleCreateNewCode} 
+                  variant="outline" 
+                  className="w-full"
+                >
+                  Vytvoriť nový kód s Face ID
                 </Button>
               </div>
             </div>
