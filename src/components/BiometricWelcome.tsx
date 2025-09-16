@@ -301,15 +301,6 @@ export const BiometricWelcome = ({ open, onOpenChange, onEnterExistingCode }: Bi
                 </Button>
               </div>
 
-              <div className="text-center">
-                <Button 
-                  variant="ghost" 
-                  onClick={handleCreateNewCode}
-                  className="text-sm text-muted-foreground"
-                >
-                  Alebo vytvoriť nový kód s Face ID
-                </Button>
-              </div>
             </div>
           </div>
         ) : step === 'biometric' ? (

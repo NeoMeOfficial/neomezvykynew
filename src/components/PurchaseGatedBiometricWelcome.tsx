@@ -139,13 +139,6 @@ export const PurchaseGatedBiometricWelcome: React.FC<PurchaseGatedBiometricWelco
     }
   };
 
-  const handleCreateNewCode = () => {
-    setStep('biometric');
-    setCustomCode('');
-    setError('');
-    setBiometricError('');
-  };
-
   const handleBack = () => {
     setStep('welcome');
     setError('');
@@ -251,143 +244,12 @@ export const PurchaseGatedBiometricWelcome: React.FC<PurchaseGatedBiometricWelco
                 </Alert>
               )}
 
-              <div className="space-y-2">
-                <Button 
-                  onClick={handleLinkExistingCode} 
-                  className="w-full"
-                  disabled={!customCode.trim() || isValidating}
-                >
-                  {isValidating ? 'Overuje sa...' : 'Prepojiť s Face ID'}
-                </Button>
-                
-                <Button 
-                  onClick={handleCreateNewCode} 
-                  variant="outline" 
-                  className="w-full"
-                >
-                  Vytvoriť nový kód s Face ID
-                </Button>
-              </div>
-            </div>
-          </>
-        )}
-
-        {step === 'biometric' && (
-          <>
-            <DialogHeader>
-              <DialogTitle className="text-center flex items-center justify-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="absolute left-4"
-                  onClick={handleBack}
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                </Button>
-                Vytvorenie nového kódu s Face ID
-              </DialogTitle>
-            </DialogHeader>
-            
-            <div className="space-y-4">
-              <Alert>
-                <Smartphone className="h-4 w-4" />
-                <AlertDescription>
-                  Vytvorte si nový prístupový kód a aktivujte Face ID pre rýchle prihlásenie.
-                </AlertDescription>
-              </Alert>
-
-              <div className="space-y-2">
-                <Label htmlFor="biometric-code">Nový prístupový kód</Label>
-                <Input
-                  id="biometric-code"
-                  type="text"
-                  value={customCode}
-                  onChange={(e) => setCustomCode(e.target.value)}
-                  placeholder="Zadajte vlastný kód..."
-                />
-              </div>
-
-              {error && (
-                <Alert variant="destructive">
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
-
-              {biometricError && (
-                <Alert variant="destructive">
-                  <AlertDescription>{biometricError}</AlertDescription>
-                </Alert>
-              )}
-
-              <div className="space-y-2">
-                <Button 
-                  onClick={handleRegisterBiometric} 
-                  className="w-full"
-                  disabled={!customCode.trim()}
-                >
-                  Aktivovať biometrické prihlásenie
-                </Button>
-                
-                <Button 
-                  onClick={handleCreateAccessCodeOnly} 
-                  variant="outline" 
-                  className="w-full"
-                  disabled={!customCode.trim()}
-                >
-                  Len vytvoriť kód (bez biometrie)
-                </Button>
-              </div>
-            </div>
-          </>
-        )}
-
-        {step === 'custom' && (
-          <>
-            <DialogHeader>
-              <DialogTitle className="text-center flex items-center justify-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="absolute left-4"
-                  onClick={handleBack}
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                </Button>
-                Vlastný prístupový kód
-              </DialogTitle>
-            </DialogHeader>
-            
-            <div className="space-y-4">
-              <Alert>
-                <Shield className="h-4 w-4" />
-                <AlertDescription>
-                  Vytvorte si vlastný kód pre prístup k vašim údajom.
-                </AlertDescription>
-              </Alert>
-
-              <div className="space-y-2">
-                <Label htmlFor="custom-code">Prístupový kód</Label>
-                <Input
-                  id="custom-code"
-                  type="text"
-                  value={customCode}
-                  onChange={(e) => setCustomCode(e.target.value)}
-                  placeholder="Zadajte vlastný kód..."
-                />
-              </div>
-
-              {error && (
-                <Alert variant="destructive">
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
-
               <Button 
-                onClick={handleCreateAccessCodeOnly} 
+                onClick={handleLinkExistingCode} 
                 className="w-full"
-                disabled={!customCode.trim()}
+                disabled={!customCode.trim() || isValidating}
               >
-                Vytvoriť prístupový kód
+                {isValidating ? 'Overuje sa...' : 'Prepojiť s Face ID'}
               </Button>
             </div>
           </>
