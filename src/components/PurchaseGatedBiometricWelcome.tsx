@@ -20,8 +20,8 @@ export const PurchaseGatedBiometricWelcome: React.FC<PurchaseGatedBiometricWelco
   onOpenChange,
   validatedCode,
 }) => {
-  const [step, setStep] = useState<'welcome' | 'biometric' | 'custom' | 'code' | 'existing-biometric'>('welcome');
-  const [customCode, setCustomCode] = useState('');
+  const [step, setStep] = useState<'welcome' | 'biometric' | 'custom' | 'code' | 'existing-biometric'>('existing-biometric');
+  const [customCode, setCustomCode] = useState(validatedCode || '');
   const [error, setError] = useState('');
   const [biometricError, setBiometricError] = useState('');
   const [isValidating, setIsValidating] = useState(false);
@@ -33,6 +33,15 @@ export const PurchaseGatedBiometricWelcome: React.FC<PurchaseGatedBiometricWelco
     isEnrolled,
     isMobile 
   } = useBiometricAuth();
+
+  // When component opens with a validated code, go directly to biometric setup
+  React.useEffect(() => {
+    if (validatedCode && open) {
+      console.log('PurchaseGatedBiometricWelcome: Starting with validated code:', validatedCode);
+      setCustomCode(validatedCode);
+      setStep('existing-biometric');
+    }
+  }, [validatedCode, open]);
 
   const handleUseBiometric = () => {
     setStep('existing-biometric');
