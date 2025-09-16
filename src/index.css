@@ -301,25 +301,3 @@ All colors MUST be HSL.
   background-color: hsl(315 40% 85%) !important;
   color: hsl(315 60% 25%) !important;
 }
-
-/* Today styling for cycle days - empty box with colored border */
-.calendar-period-day[aria-selected="false"].rdp-day_today {
-  background-color: transparent !important;
-  border: 2px solid hsl(355 60% 60%) !important;
-  color: hsl(355 60% 45%) !important;
-  font-weight: bold !important;
-}
-
-.calendar-fertility-day[aria-selected="false"].rdp-day_today {
-  background-color: transparent !important;
-  border: 2px solid hsl(25 50% 65%) !important;
-  color: hsl(25 70% 40%) !important;
-  font-weight: 600 !important;
-}
-
-.calendar-ovulation-day[aria-selected="false"].rdp-day_today {
-  background-color: transparent !important;
-  border: 2px solid hsl(315 40% 65%) !important;
-  color: hsl(315 60% 40%) !important;
-  font-weight: 600 !important;
-}
