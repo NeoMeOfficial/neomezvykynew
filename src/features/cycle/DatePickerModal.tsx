@@ -90,12 +90,23 @@ export function DatePickerModal({
                 fertility: (date) => 
                   lastPeriodStart ? isFertilityDate(date, lastPeriodStart, cycleLength) : false,
                 ovulation: (date) => 
-                  lastPeriodStart ? isOvulationDate(date, lastPeriodStart, cycleLength) : false
+                  lastPeriodStart ? isOvulationDate(date, lastPeriodStart, cycleLength) : false,
+                today: (date) => {
+                  const today = new Date();
+                  const isToday = date.toDateString() === today.toDateString();
+                  if (!isToday || !lastPeriodStart) return false;
+                  
+                  // Only apply today style if it's not in any cycle category
+                  return !isPeriodDate(date, lastPeriodStart, cycleLength, periodLength) &&
+                         !isFertilityDate(date, lastPeriodStart, cycleLength) &&
+                         !isOvulationDate(date, lastPeriodStart, cycleLength);
+                }
               }}
               modifiersClassNames={{
                 period: 'calendar-period-day',
                 fertility: 'calendar-fertility-day',
-                ovulation: 'calendar-ovulation-day'
+                ovulation: 'calendar-ovulation-day',
+                today: 'calendar-today'
               }}
               className="rounded-xl border-0 w-full pointer-events-auto"
               classNames={{
@@ -140,6 +151,10 @@ export function DatePickerModal({
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 rounded bg-[hsl(315_40%_88%)] border border-[hsl(315_40%_78%)]"></div>
                 <span className="text-foreground/80">Ovulácia</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded bg-[hsl(var(--sand))] border border-[hsl(38_40%_80%)]"></div>
+                <span className="text-foreground/80">Dnes</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 rounded-full bg-blue-500 border border-blue-600"></div>

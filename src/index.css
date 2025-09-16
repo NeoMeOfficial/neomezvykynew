@@ -301,3 +301,16 @@ All colors MUST be HSL.
   background-color: hsl(315 40% 85%) !important;
   color: hsl(315 60% 25%) !important;
 }
+
+/* Calendar today styling (when not in any cycle category) */
+.calendar-today {
+  background-color: hsl(var(--sand)) !important;
+  color: hsl(38 50% 30%) !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+}
+
+.calendar-today:hover {
+  background-color: hsl(38 40% 89%) !important;
+  color: hsl(38 50% 25%) !important;
+}
