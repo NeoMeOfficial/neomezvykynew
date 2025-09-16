@@ -63,7 +63,7 @@ export const NavigationWidget = ({
     }));
   };
 
-  const getIconSize = (isOpen: boolean) => isOpen ? 'w-8 h-8' : 'w-12 h-12';
+  const getIconSize = (isOpen: boolean) => isOpen ? 'w-10 h-10' : 'w-16 h-16';
 
   return (
     <div className="w-full max-w-[600px] mx-auto space-y-2">
@@ -85,7 +85,7 @@ export const NavigationWidget = ({
               </h2>
             </button>
           </CollapsibleTrigger>
-          <CollapsibleContent className="animate-accordion-down">
+          <CollapsibleContent className="animate-accordion-down pb-2">
             <MenstrualCycleTracker
               accessCode={accessCode}
               onFirstInteraction={onFirstInteraction}
@@ -158,7 +158,7 @@ export const NavigationWidget = ({
               </div>
             </button>
           </CollapsibleTrigger>
-          <CollapsibleContent className="animate-accordion-down">
+          <CollapsibleContent className="animate-accordion-down pb-2">
             <HabitTracker 
               selectedDate={selectedDate} 
               onFirstInteraction={onFirstInteraction}
@@ -215,7 +215,7 @@ export const NavigationWidget = ({
               </div>
             </button>
           </CollapsibleTrigger>
-          <CollapsibleContent className="animate-accordion-down">
+          <CollapsibleContent className="animate-accordion-down pb-2">
             <ReflectionWidget 
               selectedDate={selectedDate}
               onFirstInteraction={onFirstInteraction}
