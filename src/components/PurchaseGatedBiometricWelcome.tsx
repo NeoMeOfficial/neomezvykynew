@@ -217,36 +217,14 @@ export const PurchaseGatedBiometricWelcome: React.FC<PurchaseGatedBiometricWelco
               <Alert>
                 <Smartphone className="h-4 w-4" />
                 <AlertDescription>
-                  Zadajte váš existujúci kód a prepojíme ho s Face ID pre rýchle prihlásenie.
+                  Váš kód je platný! Chcete ho prepojiť s Face ID pre rýchle prihlásenie?
                 </AlertDescription>
               </Alert>
 
-              <div className="space-y-2">
-                <Label htmlFor="existing-code">Váš existujúci prístupový kód</Label>
-                <Input
-                  id="existing-code"
-                  type="text"
-                  value={customCode}
-                  onChange={(e) => {
-                    setCustomCode(e.target.value.toUpperCase());
-                    setError('');
-                    setBiometricError('');
-                  }}
-                  placeholder="VÁŠKÓD"
-                  className="font-mono"
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      handleLinkExistingCode();
-                    }
-                  }}
-                />
+              <div className="bg-muted p-4 rounded-lg text-center">
+                <p className="text-sm text-muted-foreground mb-2">Váš prístupový kód:</p>
+                <p className="text-lg font-mono font-semibold tracking-wider">{customCode}</p>
               </div>
-
-              {error && (
-                <Alert variant="destructive">
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
 
               {biometricError && (
                 <Alert variant="destructive">
