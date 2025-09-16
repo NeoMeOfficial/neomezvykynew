@@ -10,7 +10,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { DerivedState } from './types';
-import { validateDate, isPeriodDate, formatDateSk } from './utils';
+import { validateDate, isPeriodDate, formatDateSk, isFertilityDate, isOvulationDate } from './utils';
 import { UI_TEXT } from './insights';
 
 interface DatePickerModalProps {
@@ -86,10 +86,16 @@ export function DatePickerModal({
               weekStartsOn={1}
               modifiers={{
                 period: (date) => 
-                  lastPeriodStart ? isPeriodDate(date, lastPeriodStart, cycleLength, periodLength) : false
+                  lastPeriodStart ? isPeriodDate(date, lastPeriodStart, cycleLength, periodLength) : false,
+                fertility: (date) => 
+                  lastPeriodStart ? isFertilityDate(date, lastPeriodStart, cycleLength) : false,
+                ovulation: (date) => 
+                  lastPeriodStart ? isOvulationDate(date, lastPeriodStart, cycleLength) : false
               }}
               modifiersClassNames={{
-                period: 'calendar-period-day'
+                period: 'calendar-period-day',
+                fertility: 'calendar-fertility-day',
+                ovulation: 'calendar-ovulation-day'
               }}
               className="rounded-xl border-0 w-full pointer-events-auto"
               classNames={{
@@ -118,6 +124,29 @@ export function DatePickerModal({
               </p>
             </div>
           )}
+          
+          {/* Calendar Legend */}
+          <div className="glass-surface rounded-xl p-3">
+            <h4 className="text-sm font-medium text-foreground mb-3">Legenda:</h4>
+            <div className="grid grid-cols-2 gap-3 text-xs">
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded-full border-2 border-red-400 bg-red-100"></div>
+                <span className="text-foreground/80">Menštruácia</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded-full bg-yellow-300 border border-yellow-400"></div>
+                <span className="text-foreground/80">Plodné dni</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded-full bg-purple-200 border border-purple-300"></div>
+                <span className="text-foreground/80">Ovulácia</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded-full bg-blue-500 border border-blue-600"></div>
+                <span className="text-foreground/80">Vybraný deň</span>
+              </div>
+            </div>
+          </div>
           
           <div className="flex gap-3 justify-end pt-2">
             <Button variant="ghost" onClick={handleCancel} className="glass-surface border-0 hover:bg-background/50">

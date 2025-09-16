@@ -275,3 +275,31 @@ All colors MUST be HSL.
   background-color: hsl(45 93% 47%) !important;
   opacity: 0.9 !important;
 }
+
+/* Calendar fertility day styling */
+.calendar-fertility-day {
+  background-color: hsl(54 100% 71%) !important;
+  color: hsl(0 0% 20%) !important;
+  border-radius: 8px !important;
+  font-weight: 500 !important;
+  border: 1px solid hsl(54 70% 60%) !important;
+}
+
+.calendar-fertility-day:hover {
+  background-color: hsl(54 100% 65%) !important;
+  color: hsl(0 0% 20%) !important;
+}
+
+/* Calendar ovulation day styling */
+.calendar-ovulation-day {
+  background-color: hsl(265 30% 82%) !important;
+  color: hsl(265 30% 20%) !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  border: 1px solid hsl(265 30% 70%) !important;
+}
+
+.calendar-ovulation-day:hover {
+  background-color: hsl(265 30% 75%) !important;
+  color: hsl(265 30% 20%) !important;
+}

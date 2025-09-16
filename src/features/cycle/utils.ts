@@ -95,3 +95,67 @@ export function validateDate(date: Date, minDate: Date, maxDate: Date): boolean 
 export function formatDateSk(date: Date): string {
   return format(date, 'd.M.yyyy');
 }
+
+export function isFertilityDate(date: Date, lastPeriodStart: string, cycleLength: number): boolean {
+  if (!lastPeriodStart) return false;
+  
+  const startDate = new Date(lastPeriodStart);
+  const daysSince = differenceInDays(date, startDate);
+  
+  // Handle past periods (negative days)
+  if (daysSince < 0) {
+    const daysSinceAbs = Math.abs(daysSince);
+    const cyclesSince = Math.floor(daysSinceAbs / cycleLength);
+    const remainingDays = daysSinceAbs % cycleLength;
+    const dayInCurrentCycle = cycleLength - remainingDays;
+    
+    // Fertility window: typically 6 days (5 days before ovulation + ovulation day)
+    const ovulationDay = cycleLength - 14; // Typically day 14 in a 28-day cycle
+    const fertilityStart = ovulationDay - 5;
+    const fertilityEnd = ovulationDay + 1;
+    
+    return dayInCurrentCycle >= fertilityStart && dayInCurrentCycle <= fertilityEnd;
+  }
+  
+  // Handle current and future periods
+  const dayInCurrentCycle = (daysSince % cycleLength) + 1;
+  
+  // Fertility window: typically 6 days (5 days before ovulation + ovulation day)
+  const ovulationDay = cycleLength - 14; // Typically day 14 in a 28-day cycle
+  const fertilityStart = ovulationDay - 5;
+  const fertilityEnd = ovulationDay + 1;
+  
+  return dayInCurrentCycle >= fertilityStart && dayInCurrentCycle <= fertilityEnd;
+}
+
+export function isOvulationDate(date: Date, lastPeriodStart: string, cycleLength: number): boolean {
+  if (!lastPeriodStart) return false;
+  
+  const startDate = new Date(lastPeriodStart);
+  const daysSince = differenceInDays(date, startDate);
+  
+  // Handle past periods (negative days)
+  if (daysSince < 0) {
+    const daysSinceAbs = Math.abs(daysSince);
+    const cyclesSince = Math.floor(daysSinceAbs / cycleLength);
+    const remainingDays = daysSinceAbs % cycleLength;
+    const dayInCurrentCycle = cycleLength - remainingDays;
+    
+    // Ovulation typically occurs around day 14 (14 days before next period)
+    const ovulationDay = cycleLength - 14;
+    const ovulationStart = ovulationDay - 1;
+    const ovulationEnd = ovulationDay + 1;
+    
+    return dayInCurrentCycle >= ovulationStart && dayInCurrentCycle <= ovulationEnd;
+  }
+  
+  // Handle current and future periods
+  const dayInCurrentCycle = (daysSince % cycleLength) + 1;
+  
+  // Ovulation typically occurs around day 14 (14 days before next period)
+  const ovulationDay = cycleLength - 14;
+  const ovulationStart = ovulationDay - 1;
+  const ovulationEnd = ovulationDay + 1;
+  
+  return dayInCurrentCycle >= ovulationStart && dayInCurrentCycle <= ovulationEnd;
+}
