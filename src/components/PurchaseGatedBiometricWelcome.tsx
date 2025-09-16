@@ -122,15 +122,8 @@ export const PurchaseGatedBiometricWelcome: React.FC<PurchaseGatedBiometricWelco
       // Store the validated code
       await setCustomAccessCode(customCode);
       
-      // Try to register biometric with the existing code
-      try {
-        await registerBiometric(customCode);
-        setStep('code');
-      } catch (biometricError: any) {
-        console.warn('Biometric registration failed:', biometricError);
-        setBiometricError('Face ID sa nepodarilo aktivovať, ale váš kód je platný.');
-        setStep('code');
-      }
+      // Try to register biometric with the existing code, but transition to biometric step
+      setStep('existing-biometric');
     } catch (error: any) {
       console.error('Failed to validate access code:', error);
       setError('Nepodarilo sa overiť kód. Skúste to znovu.');
@@ -152,35 +145,52 @@ export const PurchaseGatedBiometricWelcome: React.FC<PurchaseGatedBiometricWelco
         {step === 'welcome' && (
           <>
             <DialogHeader>
-              <DialogTitle className="text-center">Zabezpečte si svoje údaje</DialogTitle>
+              <DialogTitle className="text-center">Zadajte váš existujúci kód</DialogTitle>
             </DialogHeader>
             
             <div className="space-y-4">
-              <Alert>
-                <Shield className="h-4 w-4" />
-                <AlertDescription>
-                  Vytvorte si bezpečný spôsob prístupu k vašim údajom v budúcnosti.
-                </AlertDescription>
-              </Alert>
+              <div className="space-y-2">
+                <Label htmlFor="existing-code">Váš existujúci prístupový kód</Label>
+                <Input
+                  id="existing-code"
+                  type="text"
+                  value={customCode}
+                  onChange={(e) => {
+                    setCustomCode(e.target.value.toUpperCase());
+                    setError('');
+                    setBiometricError('');
+                  }}
+                  placeholder="VÁŠKÓD"
+                  className="font-mono"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      handleLinkExistingCode();
+                    }
+                  }}
+                />
+              </div>
+
+              {error && (
+                <Alert variant="destructive">
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
 
               <div className="space-y-3">
-                {shouldOfferBiometric && (
-                  <Button 
-                    onClick={handleUseBiometric} 
-                    className="w-full gap-2"
-                    variant="default"
-                  >
-                    <Smartphone className="h-4 w-4" />
-                    {isMobile ? 'Prepojiť s Face ID / Touch ID' : 'Prepojiť s biometrickým overením'}
-                  </Button>
-                )}
+                <Button 
+                  onClick={handleLinkExistingCode} 
+                  className="w-full"
+                  disabled={!customCode.trim() || isValidating}
+                >
+                  {isValidating ? 'Overuje sa...' : 'Pokračovať'}
+                </Button>
 
                 <Button 
                   onClick={handleUseAccessCode} 
                   variant="outline" 
                   className="w-full"
                 >
-                  Vytvoriť vlastný prístupový kód
+                  Vytvoriť nový prístupový kód
                 </Button>
               </div>
             </div>
@@ -244,13 +254,34 @@ export const PurchaseGatedBiometricWelcome: React.FC<PurchaseGatedBiometricWelco
                 </Alert>
               )}
 
-              <Button 
-                onClick={handleLinkExistingCode} 
-                className="w-full"
-                disabled={!customCode.trim() || isValidating}
-              >
-                {isValidating ? 'Overuje sa...' : 'Prepojiť s Face ID'}
-              </Button>
+              <div className="flex gap-2">
+                {shouldOfferBiometric && (
+                  <Button 
+                    onClick={async () => {
+                      try {
+                        await registerBiometric(customCode);
+                        setStep('code');
+                      } catch (biometricError: any) {
+                        console.warn('Biometric registration failed:', biometricError);
+                        setBiometricError('Face ID sa nepodarilo aktivovať, ale váš kód je platný.');
+                        setStep('code');
+                      }
+                    }} 
+                    className="flex-1"
+                    disabled={isValidating}
+                  >
+                    <Smartphone className="h-4 w-4 mr-2" />
+                    Aktivovať Face ID
+                  </Button>
+                )}
+                <Button 
+                  onClick={() => setStep('code')} 
+                  variant="outline" 
+                  className="flex-1"
+                >
+                  Pokračovať bez Face ID
+                </Button>
+              </div>
             </div>
           </>
         )}

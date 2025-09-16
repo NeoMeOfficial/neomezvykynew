@@ -17,7 +17,7 @@ interface BiometricWelcomeProps {
 export const BiometricWelcome = ({ open, onOpenChange, onEnterExistingCode }: BiometricWelcomeProps) => {
   const { setCustomAccessCode, enterAccessCode } = useAccessCode();
   const { registerBiometric, shouldOfferBiometric } = useBiometricAuth();
-  const [step, setStep] = useState<'welcome' | 'biometric' | 'custom' | 'code' | 'existing-biometric'>('welcome');
+  const [step, setStep] = useState<'welcome' | 'biometric' | 'custom' | 'code'>('welcome');
   const [generatedCode, setGeneratedCode] = useState<string>('');
   const [customCode, setCustomCode] = useState<string>('');
   const [customCodeError, setCustomCodeError] = useState<string>('');
@@ -26,7 +26,7 @@ export const BiometricWelcome = ({ open, onOpenChange, onEnterExistingCode }: Bi
   const [isValidating, setIsValidating] = useState(false);
 
   const handleUseBiometric = () => {
-    setStep('existing-biometric');
+    setStep('biometric');
   };
 
   const handleUseAccessCode = () => {
@@ -125,24 +125,9 @@ export const BiometricWelcome = ({ open, onOpenChange, onEnterExistingCode }: Bi
 
       // Store the validated code
       await enterAccessCode(customCode);
-
-      // Now register biometric with the existing code
-      try {
-        await registerBiometric(customCode);
-        setGeneratedCode(customCode);
-        setStep('code');
-      } catch (biometricError: any) {
-        console.warn('Biometric registration failed:', biometricError);
-        
-        if (biometricError.userMessage) {
-          setBiometricError(`${biometricError.userMessage} Váš kód je však platný.`);
-        } else {
-          setBiometricError('Face ID sa nepodarilo aktivovať, ale váš kód je platný.');
-        }
-        
-        setGeneratedCode(customCode);
-        setStep('code');
-      }
+      
+      // Move to biometric step for Face ID linking
+      setStep('biometric');
     } catch (error: any) {
       console.error('Failed to validate access code:', error);
       setCustomCodeError('Nepodarilo sa overiť kód. Skúste to znovu.');
@@ -151,15 +136,8 @@ export const BiometricWelcome = ({ open, onOpenChange, onEnterExistingCode }: Bi
     }
   };
 
-  const handleCreateNewCode = () => {
-    setStep('biometric');
-    setCustomCode('');
-    setCustomCodeError('');
-    setBiometricError('');
-  };
-
   const handleBack = () => {
-    if (step === 'biometric' || step === 'custom' || step === 'existing-biometric') {
+    if (step === 'biometric' || step === 'custom') {
       setStep('welcome');
       setBiometricError('');
       setCustomCodeError('');
@@ -174,86 +152,17 @@ export const BiometricWelcome = ({ open, onOpenChange, onEnterExistingCode }: Bi
           <div className="space-y-6">
             <DialogHeader className="space-y-2">
               <DialogTitle className="text-xl font-semibold text-foreground">
-                Zadaj kód a nestratíš svoje návyky
+                Zadajte váš existujúci kód
               </DialogTitle>
               <DialogDescription className="text-muted-foreground">
-                Vyberte si spôsob ako si uložiť svoje návyky
+                Zadajte váš prístupový kód pre prístup k vašim údajom
               </DialogDescription>
             </DialogHeader>
             
-            <div className="bg-accent/50 p-4 rounded-lg border border-accent">
-              <div className="flex items-start gap-3">
-                <div className="w-5 h-5 bg-primary rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <span className="text-primary-foreground text-xs font-bold">i</span>
-                </div>
-                <div className="space-y-2">
-                  <h4 className="font-medium text-foreground">Prečo potrebujete prihlásenie:</h4>
-                  <ul className="text-sm text-muted-foreground space-y-1">
-                    <li>• Zachováte si súkromie a anonymitu</li>
-                    <li>• Budete si môcť prechádzať svoje návyky</li>
-                  </ul>
-                  <p className="text-sm text-muted-foreground font-medium">
-                    💡 Neuchovávame žiadne osobné údaje!
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              {shouldOfferBiometric() && (
-                <Button 
-                  onClick={handleUseBiometric} 
-                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
-                >
-                  <Fingerprint className="mr-2 h-4 w-4" />
-                  Prepojiť s Face ID / Touch ID
-                </Button>
-              )}
-              
-              <Button 
-                onClick={handleUseAccessCode}
-                variant={shouldOfferBiometric() ? "outline" : "default"}
-                className="w-full"
-              >
-                <Shield className="mr-2 h-4 w-4" />
-                Vytvoriť prístupový kód
-              </Button>
-              
-              {onEnterExistingCode && (
-                <Button 
-                  onClick={onEnterExistingCode}
-                  variant="outline"
-                  className="w-full"
-                >
-                  Mám už kód
-                </Button>
-              )}
-              
-              <Button 
-                variant="ghost" 
-                onClick={() => onOpenChange(false)} 
-                className="w-full text-muted-foreground hover:bg-accent"
-              >
-                Zrušiť
-              </Button>
-            </div>
-          </div>
-        ) : step === 'existing-biometric' ? (
-          <div className="space-y-6">
-            <DialogHeader className="space-y-2">
-              <DialogTitle className="text-xl font-semibold text-foreground flex items-center gap-2">
-                <Smartphone className="h-5 w-5" />
-                Prepojenie s Face ID
-              </DialogTitle>
-              <DialogDescription className="text-muted-foreground">
-                Zadajte váš existujúci kód alebo vytvorte nový pre Face ID
-              </DialogDescription>
-            </DialogHeader>
-
             <div className="space-y-4">
               <div>
                 <Label htmlFor="existing-code" className="font-medium">
-                  Váš existujúci prístupový kód
+                  Váš prístupový kód
                 </Label>
                 <Input
                   id="existing-code"
@@ -276,31 +185,42 @@ export const BiometricWelcome = ({ open, onOpenChange, onEnterExistingCode }: Bi
                 )}
               </div>
 
-              <div className="bg-accent/50 p-4 rounded-lg border border-accent">
-                <div className="flex items-start gap-3">
-                  <Fingerprint className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                  <div className="space-y-1">
-                    <h4 className="font-medium text-foreground">Prepojenie s Face ID</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Zadajte váš existujúci kód a prepojíme ho s Face ID pre rýchle prihlásenie
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex gap-2">
+              <div className="space-y-3">
                 <Button 
                   onClick={handleLinkExistingCode} 
-                  className="flex-1"
-                  disabled={isValidating}
+                  className="w-full"
+                  disabled={!customCode.trim() || isValidating}
                 >
-                  {isValidating ? 'Overuje sa...' : 'Prepojiť s Face ID'}
+                  {isValidating ? 'Overuje sa...' : 'Pokračovať'}
                 </Button>
-                <Button variant="outline" onClick={handleBack} className="flex-1">
-                  Späť
+                
+                <Button 
+                  onClick={handleUseAccessCode}
+                  variant="outline"
+                  className="w-full"
+                >
+                  <Shield className="mr-2 h-4 w-4" />
+                  Vytvoriť nový prístupový kód
+                </Button>
+                
+                {onEnterExistingCode && (
+                  <Button 
+                    onClick={onEnterExistingCode}
+                    variant="outline"
+                    className="w-full"
+                  >
+                    Mám už kód
+                  </Button>
+                )}
+                
+                <Button 
+                  variant="ghost" 
+                  onClick={() => onOpenChange(false)} 
+                  className="w-full text-muted-foreground hover:bg-accent"
+                >
+                  Zrušiť
                 </Button>
               </div>
-
             </div>
           </div>
         ) : step === 'biometric' ? (
@@ -308,37 +228,18 @@ export const BiometricWelcome = ({ open, onOpenChange, onEnterExistingCode }: Bi
             <DialogHeader className="space-y-2">
               <DialogTitle className="text-xl font-semibold text-foreground flex items-center gap-2">
                 <Smartphone className="h-5 w-5" />
-                Nastavenie Face ID
+                Prepojenie s Face ID
               </DialogTitle>
               <DialogDescription className="text-muted-foreground">
-                Vytvorte si nový prístupový kód s Face ID
+                Váš kód je platný! Chcete ho prepojiť s Face ID?
               </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-4">
-              <div>
-                <Label htmlFor="biometric-code" className="font-medium">
-                  Váš vlastný kód <span className="text-primary font-bold">(minimálne 4 znaky)</span>
-                </Label>
-                <Input
-                  id="biometric-code"
-                  value={customCode}
-                  onChange={(e) => {
-                    setCustomCode(e.target.value.toUpperCase());
-                    setCustomCodeError('');
-                    setBiometricError('');
-                  }}
-                  placeholder="MOJKOD (min. 4 znaky)"
-                  className="font-mono"
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      handleRegisterBiometric();
-                    }
-                  }}
-                />
-                {(customCodeError || biometricError) && (
-                  <p className="text-sm text-destructive mt-1">{customCodeError || biometricError}</p>
-                )}
+              <div className="bg-muted p-4 rounded-lg text-center">
+                <div className="font-mono text-xl font-bold tracking-wider">
+                  {customCode}
+                </div>
               </div>
 
               <div className="bg-accent/50 p-4 rounded-lg border border-accent">
@@ -347,22 +248,50 @@ export const BiometricWelcome = ({ open, onOpenChange, onEnterExistingCode }: Bi
                   <div className="space-y-1">
                     <h4 className="font-medium text-foreground">Face ID/Touch ID</h4>
                     <p className="text-sm text-muted-foreground">
-                      Po zadaní kódu sa aktivuje biometrické prihlásenie pre vaše zariadenie
+                      Aktivujte biometrické prihlásenie pre rýchly prístup v budúcnosti
                     </p>
                   </div>
                 </div>
               </div>
 
+              {biometricError && (
+                <p className="text-sm text-destructive mt-1">{biometricError}</p>
+              )}
+
               <div className="flex gap-2">
+                {shouldOfferBiometric() && (
+                  <Button 
+                    onClick={async () => {
+                      setIsRegistering(true);
+                      setBiometricError('');
+                      try {
+                        await registerBiometric(customCode);
+                        setGeneratedCode(customCode);
+                        setStep('code');
+                      } catch (error: any) {
+                        setBiometricError(error.userMessage || 'Face ID sa nepodarilo aktivovať');
+                        setGeneratedCode(customCode);
+                        setStep('code');
+                      } finally {
+                        setIsRegistering(false);
+                      }
+                    }} 
+                    className="flex-1"
+                    disabled={isRegistering}
+                  >
+                    <Fingerprint className="mr-2 h-4 w-4" />
+                    {isRegistering ? 'Nastavuje sa...' : 'Aktivovať Face ID'}
+                  </Button>
+                )}
                 <Button 
-                  onClick={handleRegisterBiometric} 
+                  variant="outline" 
+                  onClick={() => {
+                    setGeneratedCode(customCode);
+                    setStep('code');
+                  }} 
                   className="flex-1"
-                  disabled={isRegistering}
                 >
-                  {isRegistering ? 'Nastavuje sa...' : 'Aktivovať Face ID'}
-                </Button>
-                <Button variant="outline" onClick={handleBack} className="flex-1">
-                  Späť
+                  Pokračovať bez Face ID
                 </Button>
               </div>
             </div>
@@ -422,7 +351,7 @@ export const BiometricWelcome = ({ open, onOpenChange, onEnterExistingCode }: Bi
             <div className="space-y-4">
               <div className="bg-muted p-4 rounded-lg text-center">
                 <div className="font-mono text-xl font-bold tracking-wider">
-                  {generatedCode}
+                  {generatedCode || customCode}
                 </div>
               </div>
               
