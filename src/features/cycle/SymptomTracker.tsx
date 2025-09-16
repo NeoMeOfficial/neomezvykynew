@@ -110,9 +110,6 @@ export function SymptomTracker({ currentPhase, currentDay, accessCode }: Symptom
       <div>
         <div className="flex items-center justify-between mb-2">
           <span className="text-base font-medium text-foreground">Príznaky</span>
-          <span className="text-sm text-muted-foreground">
-            {getPhaseDisplayName(currentPhase)} - {currentDay}. deň
-          </span>
         </div>
         <p className="text-sm text-muted-foreground mb-3">
           Zaznamenajte príznaky pre lekársku konzultáciu

@@ -1,6 +1,6 @@
 import React from 'react';
 import { DerivedState, Suggestion } from './types';
-import { suggestForDay, getEnergyColor } from './suggestions';
+import { suggestForDay, getEnergyColor, getMoodEmoji } from './suggestions';
 import { SymptomTracker } from './SymptomTracker';
 
 interface SuggestedTodayProps {
@@ -44,14 +44,18 @@ export function SuggestedToday({ derivedState, className = "", accessCode }: Sug
           accessCode={accessCode}
         />
 
-        {/* Current Phase */}
+        {/* Mood Section */}
         <div className="pt-2 border-t border-border/50">
           <div className="flex items-center justify-between">
-            <span className="text-base font-medium text-foreground">
-              {derivedState.currentPhase.name}
-            </span>
+            <span className="text-base font-medium text-foreground">Nálada</span>
             <span className="text-sm text-muted-foreground">
               {derivedState.currentDay}. deň cyklu
+            </span>
+          </div>
+          <div className="flex items-center gap-2 mt-2">
+            <span className="text-2xl">{getMoodEmoji(suggestion.mood)}</span>
+            <span className="text-sm text-muted-foreground">
+              {suggestion.mood}/5.0
             </span>
           </div>
         </div>

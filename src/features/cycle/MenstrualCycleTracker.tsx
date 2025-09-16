@@ -91,7 +91,7 @@ export default function MenstrualCycleTracker({
             </div>
           </div>
 
-          <DatePickerModal isOpen={showDatePicker} onClose={() => setShowDatePicker(false)} onDateSelect={handleSetupComplete} derivedState={derivedState} cycleLength={setupCycleLength} periodLength={setupPeriodLength} lastPeriodStart={null} />
+          <DatePickerModal isOpen={showDatePicker} onClose={() => setShowDatePicker(false)} onDateSelect={handleSetupComplete} derivedState={derivedState} cycleLength={setupCycleLength} periodLength={setupPeriodLength} lastPeriodStart={null} accessCode={accessCode} />
         </div>;
   }
   if (!derivedState) return null;
@@ -142,7 +142,7 @@ export default function MenstrualCycleTracker({
         </Button>
       </div>
 
-      <DatePickerModal isOpen={showDatePicker} onClose={() => setShowDatePicker(false)} onDateSelect={handleDateSelect} derivedState={derivedState} cycleLength={cycleData.cycleLength} periodLength={cycleData.periodLength} lastPeriodStart={cycleData.lastPeriodStart} title={UI_TEXT.newPeriod} />
+      <DatePickerModal isOpen={showDatePicker} onClose={() => setShowDatePicker(false)} onDateSelect={handleDateSelect} derivedState={derivedState} cycleLength={cycleData.cycleLength} periodLength={cycleData.periodLength} lastPeriodStart={cycleData.lastPeriodStart} title={UI_TEXT.newPeriod} accessCode={accessCode} />
 
       <SettingsModal 
         isOpen={showSettings} 

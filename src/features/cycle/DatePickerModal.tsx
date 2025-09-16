@@ -12,6 +12,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { DerivedState } from './types';
 import { validateDate, isPeriodDate, formatDateSk, isFertilityDate, isOvulationDate } from './utils';
 import { UI_TEXT } from './insights';
+import { HistoricalSymptoms } from './HistoricalSymptoms';
 
 interface DatePickerModalProps {
   isOpen: boolean;
@@ -22,6 +23,7 @@ interface DatePickerModalProps {
   periodLength: number;
   lastPeriodStart: string | null;
   title?: string;
+  accessCode?: string;
 }
 
 export function DatePickerModal({
@@ -32,7 +34,8 @@ export function DatePickerModal({
   cycleLength,
   periodLength,
   lastPeriodStart,
-  title = UI_TEXT.lastPeriod
+  title = UI_TEXT.lastPeriod,
+  accessCode
 }: DatePickerModalProps) {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
 
@@ -129,10 +132,13 @@ export function DatePickerModal({
           </div>
           
           {selectedDate && (
-            <div className="glass-surface rounded-xl p-3 text-center">
-              <p className="text-sm font-medium text-foreground/80">
-                Vybraný dátum: <span className="text-foreground font-semibold">{formatDateSk(selectedDate)}</span>
-              </p>
+            <div className="glass-surface rounded-xl p-3">
+              <div className="text-center mb-3">
+                <p className="text-sm font-medium text-foreground/80">
+                  Vybraný dátum: <span className="text-foreground font-semibold">{formatDateSk(selectedDate)}</span>
+                </p>
+              </div>
+              <HistoricalSymptoms date={selectedDate} accessCode={accessCode} />
             </div>
           )}
           
