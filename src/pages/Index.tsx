@@ -1,22 +1,16 @@
 import { useState, useEffect } from 'react';
-import HabitTracker from "@/components/HabitTracker";
-import ReflectionWidget from "@/components/ReflectionWidget";
 import { AccessCodeValidation } from "@/components/AccessCodeValidation";
 import { PurchaseGatedBiometricWelcome } from "@/components/PurchaseGatedBiometricWelcome";
 import { BiometricPrompt } from "@/components/BiometricPrompt";
 import { AccessCodeInput } from "@/components/AccessCodeInput";
 import { AccessCodeSettings } from "@/components/AccessCodeSettings";
 import { StorageHealthIndicator } from "@/components/StorageHealthIndicator";
+import { NavigationWidget } from "@/components/NavigationWidget";
 
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Fingerprint, ArrowLeft, Calendar, NotebookPen } from "lucide-react";
+import { Fingerprint, ArrowLeft } from "lucide-react";
 import { useAccessCode } from "@/hooks/useAccessCode";
 import { persistentStorage } from "@/lib/persistentStorage";
-import MenstrualCycleTracker from "@/features/cycle/MenstrualCycleTracker";
-import HabitCompletionCount from "@/components/HabitCompletionCount";
-import { MonthlyCalendar } from "@/components/MonthlyCalendar";
-import DiaryView from "@/components/DiaryView";
 import { useCodeBasedHabits } from "@/hooks/useCodeBasedHabits";
 import { useReflectionData } from "@/hooks/useReflectionData";
 import { useTemporaryHabits } from "@/hooks/useTemporaryHabits";
@@ -178,100 +172,22 @@ const Index = () => {
         )}
 
 
-        {/* Menstrual Cycle Widget */}
-        <div className="w-full max-w-[600px] mx-auto">
-          <div className="glass-container">
-            <h2 className="text-mobile-lg md:text-lg font-semibold text-foreground mb-4">Menštruačný cyklus</h2>
-            <MenstrualCycleTracker
-              accessCode={accessCode}
-              onFirstInteraction={handleFirstInteraction}
-            />
-          </div>
-        </div>
-          
-        {/* Habit Tracker Widget */}
-        <div className="w-full max-w-[600px] mx-auto">
-          <div className="glass-container">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-mobile-lg md:text-lg font-semibold text-foreground">Moje návyky</h2>
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1">
-                  <HabitCompletionCount selectedDate={selectedDate} />
-                </div>
-                <Dialog open={showMonthlyCalendar} onOpenChange={setShowMonthlyCalendar}>
-                  <DialogTrigger asChild>
-                    <Button variant="ghost" size="sm" className="p-1.5 bg-amber-100 hover:bg-amber-200 border border-amber-200 rounded-xl shadow-sm">
-                      <Calendar size={20} className="text-foreground" />
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent 
-                    className="glass-container border-0 backdrop-blur-xl shadow-2xl max-w-none top-0 left-1/2 -translate-x-1/2 translate-y-0 w-[calc(100vw-8px)] max-h-[85vh] overflow-y-auto mt-2 sm:max-w-4xl md:max-w-5xl lg:max-w-6xl sm:top-1/2 sm:-translate-y-1/2"
-                    aria-describedby={undefined}
-                  >
-                    <DialogHeader className="pb-1 flex-shrink-0">
-                      <div className="flex items-center justify-between">
-                        <DialogTitle className="text-base font-semibold text-foreground flex items-center gap-2">
-                          <div className="p-1 rounded-md bg-primary/10">
-                            <Calendar size={14} className="text-primary" />
-                          </div>
-                          Mesačný pohľad
-                        </DialogTitle>
-                        <span className="text-sm text-muted-foreground">Zatvoriť</span>
-                      </div>
-                    </DialogHeader>
-                    <div className="overflow-y-auto flex-1 min-h-0">
-                      <MonthlyCalendar
-                        habitData={habitData}
-                        selectedMonth={monthlyCalendarDate}
-                        onMonthChange={setMonthlyCalendarDate}
-                        habits={habits}
-                        formatDate={habitFormatDate}
-                      />
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </div>
-            </div>
-            <HabitTracker 
-              selectedDate={selectedDate} 
-              onFirstInteraction={handleFirstInteraction}
-            />
-          </div>
-        </div>
-        
-        {/* Reflection Widget */}
-        <div className="w-full max-w-[600px] mx-auto">
-          <div className="glass-container">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-mobile-lg md:text-lg font-semibold text-foreground">Denná reflexia</h2>
-              <div className="flex items-center gap-2">
-                <p className="text-mobile-sm md:text-sm text-muted-foreground">
-                  Tvoj diár
-                </p>
-                <Dialog open={showDiaryView} onOpenChange={setShowDiaryView}>
-                  <DialogTrigger asChild>
-                    <Button variant="ghost" size="sm" className="p-1.5 bg-amber-100 hover:bg-amber-200 border border-amber-200 rounded-xl shadow-sm">
-                      <NotebookPen size={20} className="text-foreground" />
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-2xl">
-                    <DialogHeader className="pb-0">
-                      <DialogTitle className="text-lg font-heading">Môj denník reflexií</DialogTitle>
-                    </DialogHeader>
-                     <DiaryView
-                       reflections={accessCode ? reflections as Record<string, any> : {}}
-                       formatDate={habitFormatDate}
-                     />
-                  </DialogContent>
-                </Dialog>
-              </div>
-            </div>
-            <ReflectionWidget 
-              selectedDate={selectedDate}
-              onFirstInteraction={handleFirstInteraction}
-            />
-          </div>
-        </div>
+        {/* Navigation Widget with Collapsible Sections */}
+        <NavigationWidget
+          accessCode={accessCode}
+          selectedDate={selectedDate}
+          onFirstInteraction={handleFirstInteraction}
+          habitData={habitData}
+          habits={habits}
+          formatDate={habitFormatDate}
+          reflections={reflections as Record<string, any>}
+          monthlyCalendarDate={monthlyCalendarDate}
+          setMonthlyCalendarDate={setMonthlyCalendarDate}
+          showMonthlyCalendar={showMonthlyCalendar}
+          setShowMonthlyCalendar={setShowMonthlyCalendar}
+          showDiaryView={showDiaryView}
+          setShowDiaryView={setShowDiaryView}
+        />
         
         {!accessCode && !shouldOfferBiometric() && (
           <div className="w-full max-w-[600px] mx-auto mt-4">
