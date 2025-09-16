@@ -117,6 +117,8 @@ export const BiometricWelcome = ({ open, onOpenChange, onEnterExistingCode }: Bi
         body: { code: customCode.toUpperCase() }
       });
 
+      console.log('BiometricWelcome: Validation result:', { data, error, code: customCode });
+
       if (error || !data?.valid) {
         setCustomCodeError(data?.message || 'Neplatný alebo už použitý kód');
         setIsValidating(false);
@@ -125,6 +127,8 @@ export const BiometricWelcome = ({ open, onOpenChange, onEnterExistingCode }: Bi
 
       // Store the validated code
       await enterAccessCode(customCode);
+      
+      console.log('BiometricWelcome: Moving to biometric step with code:', customCode);
       
       // Move to biometric step for Face ID linking
       setStep('biometric');

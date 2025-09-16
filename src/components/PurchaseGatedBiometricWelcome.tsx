@@ -113,6 +113,8 @@ export const PurchaseGatedBiometricWelcome: React.FC<PurchaseGatedBiometricWelco
         body: { code: customCode.toUpperCase() }
       });
 
+      console.log('PurchaseGatedBiometricWelcome: Validation result:', { data, error, code: customCode });
+
       if (error || !data?.valid) {
         setError(data?.message || 'Neplatný alebo už použitý kód');
         setIsValidating(false);
@@ -121,6 +123,8 @@ export const PurchaseGatedBiometricWelcome: React.FC<PurchaseGatedBiometricWelco
 
       // Store the validated code
       await setCustomAccessCode(customCode);
+      
+      console.log('PurchaseGatedBiometricWelcome: Moving to existing-biometric step with code:', customCode);
       
       // Try to register biometric with the existing code, but transition to biometric step
       setStep('existing-biometric');
