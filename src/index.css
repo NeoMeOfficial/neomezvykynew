@@ -304,13 +304,13 @@ All colors MUST be HSL.
 
 /* Calendar today styling (when not in any cycle category) */
 .calendar-today {
-  background-color: hsl(var(--sand)) !important;
-  color: hsl(38 50% 30%) !important;
+  background-color: hsl(45 85% 70%) !important;
+  color: hsl(45 90% 25%) !important;
   border-radius: 8px !important;
   font-weight: 600 !important;
 }
 
 .calendar-today:hover {
-  background-color: hsl(38 40% 89%) !important;
-  color: hsl(38 50% 25%) !important;
+  background-color: hsl(45 85% 65%) !important;
+  color: hsl(45 90% 20%) !important;
 }

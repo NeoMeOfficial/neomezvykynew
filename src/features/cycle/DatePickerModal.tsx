@@ -153,12 +153,8 @@ export function DatePickerModal({
                 <span className="text-foreground/80">Ovulácia</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded bg-[hsl(var(--sand))] border border-[hsl(38_40%_80%)]"></div>
+                <div className="w-4 h-4 rounded bg-[hsl(45_85%_70%)] border border-[hsl(45_85%_60%)]"></div>
                 <span className="text-foreground/80">Dnes</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full bg-blue-500 border border-blue-600"></div>
-                <span className="text-foreground/80">Vybraný deň</span>
               </div>
             </div>
           </div>
