@@ -133,7 +133,7 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen overflow-x-hidden" style={{ background: 'var(--bg-gradient)' }}>
+    <div className="min-h-screen overflow-x-hidden bg-white">
       <div className="w-full max-w-none px-2 sm:px-4 py-4 sm:py-8 mx-auto">
         {/* Navigation Buttons */}
         <div className="w-full max-w-[600px] mx-auto mb-4 sm:mb-6">

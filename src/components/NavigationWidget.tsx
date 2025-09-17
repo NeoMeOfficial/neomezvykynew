@@ -72,7 +72,7 @@ export const NavigationWidget = ({
         open={openSections.cycle} 
         onOpenChange={() => toggleSection('cycle')}
       >
-        <div className={`backdrop-blur-md ${openSections.cycle ? 'bg-white/70' : 'bg-white/30'} border border-white/40 rounded-2xl p-4 shadow-lg transition-colors duration-300`}>
+        <div className={`backdrop-blur-md bg-white border border-white/40 rounded-2xl p-4 shadow-lg transition-all duration-300`}>
           <CollapsibleTrigger asChild>
             <button className="w-full flex flex-col items-center gap-1 p-0 mb-1 text-center focus:outline-none rounded-lg">
               <img 
@@ -99,7 +99,7 @@ export const NavigationWidget = ({
         open={openSections.habits} 
         onOpenChange={() => toggleSection('habits')}
       >
-        <div className={`backdrop-blur-md ${openSections.habits ? 'bg-white/70' : 'bg-white/30'} border border-white/40 rounded-2xl p-4 shadow-lg transition-colors duration-300`}>
+        <div className={`backdrop-blur-md bg-white border border-white/40 rounded-2xl p-4 shadow-lg transition-all duration-300`}>
           <CollapsibleTrigger asChild>
             <button className="w-full flex flex-col items-center p-0 mb-1 text-center focus:outline-none rounded-lg">
               <img 
@@ -174,7 +174,7 @@ export const NavigationWidget = ({
         open={openSections.reflection} 
         onOpenChange={() => toggleSection('reflection')}
       >
-        <div className={`backdrop-blur-md ${openSections.reflection ? 'bg-white/70' : 'bg-white/30'} border border-white/40 rounded-2xl p-4 shadow-lg transition-colors duration-300`}>
+        <div className={`backdrop-blur-md bg-white border border-white/40 rounded-2xl p-4 shadow-lg transition-all duration-300`}>
           <CollapsibleTrigger asChild>
             <button className="w-full flex flex-col items-center p-0 mb-1 text-center focus:outline-none rounded-lg">
               <img 
