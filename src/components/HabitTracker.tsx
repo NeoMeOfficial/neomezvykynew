@@ -111,7 +111,27 @@ export default function HabitTracker({ selectedDate, onFirstInteraction }: Habit
 
   return (
     <div className="w-full space-y-4">
-      <div className="space-y-1.5">
+      {/* Habits Header Card */}
+      <div className="symptom-glass rounded-2xl p-4" style={{ backgroundColor: '#FBF8F9' }}>
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="font-semibold text-lg" style={{ color: '#955F6A' }}>
+              Moje návyky
+            </h3>
+            <p className="text-sm" style={{ color: '#955F6A' }}>
+              {completedCount} z {habits.length} splnených
+            </p>
+          </div>
+          <div className="text-right">
+            <div className="text-2xl font-bold" style={{ color: '#955F6A' }}>
+              {habits.length > 0 ? Math.round((completedCount / habits.length) * 100) : 0}%
+            </div>
+            <div className="text-xs text-muted-foreground">Úspešnosť</div>
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-3">
           {habits.map(habit => (
             <HabitCard
               key={habit.id}

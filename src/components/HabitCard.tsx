@@ -29,14 +29,14 @@ export const HabitCard = memo<HabitCardProps>(({
       } ${isCompleted ? 'opacity-80' : ''}`}
     >
       <div
-        className={`w-full p-2 rounded-xl border ${
+        className={`w-full p-4 rounded-2xl symptom-glass transition-all duration-300 ${
           isCompleted 
-            ? 'bg-background text-muted-foreground border-border'
-            : 'text-foreground border-border'
+            ? 'opacity-70'
+            : ''
         }`}
         style={{
-          backgroundImage: !isCompleted ? `linear-gradient(to right, white, ${habit.color}20)` : undefined,
-          borderColor: !isCompleted ? `${habit.color}23` : undefined
+          backgroundColor: '#FBF8F9',
+          ...(isCompleted && { filter: 'grayscale(0.3)' })
         }}
       >
         <div className="space-y-2.5">
