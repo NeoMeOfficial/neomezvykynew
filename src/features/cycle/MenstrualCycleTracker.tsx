@@ -69,14 +69,14 @@ export default function MenstrualCycleTracker({
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="setupCycleLength" className="text-mobile-sm md:text-sm font-medium text-widget-text block">
+                <Label htmlFor="setupCycleLength" className="text-mobile-sm md:text-sm font-medium block" style={{ color: '#955F6A' }}>
                   {UI_TEXT.cycleLength}
                 </Label>
                 <Input id="setupCycleLength" type="number" min="21" max="45" value={setupCycleLength} onChange={e => setSetupCycleLength(Number(e.target.value))} placeholder="28 dni" className="w-full text-base" />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="setupPeriodLength" className="text-mobile-sm md:text-sm font-medium text-widget-text block">
+                <Label htmlFor="setupPeriodLength" className="text-mobile-sm md:text-sm font-medium block" style={{ color: '#955F6A' }}>
                   {UI_TEXT.periodLength}
                 </Label>
                 <Input id="setupPeriodLength" type="number" min="2" max="10" value={setupPeriodLength} onChange={e => setSetupPeriodLength(Number(e.target.value))} placeholder="5 dni" className="w-full text-base" />
@@ -103,12 +103,12 @@ export default function MenstrualCycleTracker({
           <div className="text-center space-y-1">
             <div className="flex items-center justify-center gap-3">
               <div className="w-2 h-2 rounded-full bg-rose-400"></div>
-              <p className="text-base font-medium text-gray-800">
+              <p className="text-base font-medium" style={{ color: '#955F6A' }}>
                 Očakávaná menštruácia {formatDateSk(nextPeriodDate)}
               </p>
               <div className="w-2 h-2 rounded-full bg-rose-400"></div>
             </div>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm" style={{ color: '#955F6A' }}>
               {derivedState.currentDay}. deň cyklu
             </p>
           </div>
