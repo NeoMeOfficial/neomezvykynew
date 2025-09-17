@@ -158,7 +158,7 @@ export default function MenstrualCycleTracker({
         </Button>
         <Button 
           onClick={() => setShowSettings(true)} 
-          className="flex items-center gap-2 text-base bg-gradient-to-r from-rose-50/80 to-pink-50/80 border border-rose-200/30 backdrop-blur-sm rounded-3xl px-6 py-3 symptom-glass hover:from-rose-50 hover:to-pink-50 transition-all"
+          className="flex items-center gap-2 text-base bg-gradient-to-r from-rose-50 to-pink-50 border border-rose-200/30 rounded-3xl px-6 py-3 symptom-glass hover:from-rose-50 hover:to-pink-50 transition-all"
           style={{ color: '#F4415F' }}
         >
           <Settings className="w-4 h-4" />
