@@ -109,9 +109,9 @@ export function SymptomTracker({ currentPhase, currentDay, accessCode }: Symptom
       {/* Header */}
       <div>
         <div className="flex items-center justify-between mb-2">
-          <span className="text-base font-medium text-foreground">Príznaky</span>
+          <span className="text-base font-medium" style={{ color: '#955F6A' }}>Príznaky</span>
         </div>
-        <p className="text-sm text-muted-foreground mb-3">
+        <p className="text-sm mb-3" style={{ color: '#955F6A' }}>
           Zaznamenajte príznaky pre lekársku konzultáciu
         </p>
       </div>
@@ -129,7 +129,8 @@ export function SymptomTracker({ currentPhase, currentDay, accessCode }: Symptom
             }`}
             onClick={() => toggleSymptom(symptom.id)}
             style={{
-              backgroundColor: selectedSymptoms.includes(symptom.id) ? undefined : '#FBF8F9'
+              backgroundColor: selectedSymptoms.includes(symptom.id) ? undefined : '#FBF8F9',
+              color: selectedSymptoms.includes(symptom.id) ? undefined : '#955F6A'
             }}
           >
             <span className="mr-1.5">{symptom.icon}</span>

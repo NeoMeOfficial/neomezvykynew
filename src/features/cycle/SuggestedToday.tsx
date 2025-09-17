@@ -18,7 +18,7 @@ export function SuggestedToday({ derivedState, className = "", accessCode }: Sug
         {/* Energy Level */}
         <div>
           <div className="flex items-center justify-between mb-2">
-            <span className="text-base font-medium text-foreground">Energia</span>
+            <span className="text-base font-medium" style={{ color: '#955F6A' }}>Energia</span>
             <span className="text-sm text-muted-foreground">{suggestion.energy}%</span>
           </div>
           <div className="relative h-2 bg-muted rounded-full overflow-hidden">
