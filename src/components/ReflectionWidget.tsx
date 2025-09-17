@@ -143,79 +143,106 @@ export default function ReflectionWidget({ selectedDate, onFirstInteraction }: R
 
   return (
     <div className="w-full space-y-4">
-      <div className="space-y-1.5">
-
-          {/* Motivational Quote */}
-          <div className="text-left">
-            <p className="text-lg md:text-xl text-widget-text italic font-medium">
-              "{dailyQuote}"
-            </p>
+      {/* Reflection Header Card */}
+      <div className="symptom-glass rounded-2xl p-4" style={{ backgroundColor: '#FBF8F9' }}>
+        <div className="text-center space-y-2">
+          <div className="flex items-center justify-center gap-2">
+            <BookOpen className="w-5 h-5" style={{ color: '#955F6A' }} />
+            <h3 className="font-semibold text-lg" style={{ color: '#955F6A' }}>
+              Denná reflexia
+            </h3>
           </div>
+          <p className="text-base italic font-medium" style={{ color: '#955F6A' }}>
+            "{dailyQuote}"
+          </p>
+        </div>
+      </div>
 
-          {/* Reflection Cards */}
-          <div className="space-y-3">
-            {/* What went well */}
-            <div className="bg-gradient-success p-4 rounded-xl border border-reflection-border/30 shadow-sm">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <h3 className="font-medium text-lg text-reflection-text">Čo sa mi dnes darilo?</h3>
-                </div>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="h-7 px-2 text-xs bg-white/50 border-reflection-border/50 text-reflection-text hover:bg-white/70"
-                  onClick={handleWellDoneSave}
-                  disabled={wellDoneSaveStatus === 'saving'}
-                >
-                  {wellDoneSaveStatus === 'saved' ? (
-                    <Check className="h-3 w-3 text-green-600" />
-                  ) : wellDoneSaveStatus === 'saving' ? (
-                    <Loader2 className="h-3 w-3 animate-spin" />
-                  ) : (
-                    'Uložiť'
-                  )}
-                </Button>
-              </div>
-              <Textarea
-                value={wellDone}
-                onChange={(e) => handleWellDoneChange(e.target.value)}
-                placeholder="Napíš, čo sa ti dnes darilo, na čo si hrdá..."
-                className="min-h-[80px] bg-white/80 backdrop-blur-sm border-0 shadow-sm placeholder:text-reflection-text-soft/70 text-reflection-text focus-visible:ring-2 focus-visible:ring-white/50 resize-none focus:bg-white/70 transition-colors text-base"
-              />
+      <div className="space-y-3">
+        {/* What went well */}
+        <div className="symptom-glass rounded-2xl p-4" style={{ backgroundColor: '#FBF8F9' }}>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <BookOpen className="w-4 h-4" style={{ color: '#955F6A' }} />
+              <h3 className="font-medium text-lg" style={{ color: '#955F6A' }}>
+                Čo sa mi dnes darilo?
+              </h3>
             </div>
-
-            {/* What to improve */}
-            <div className="bg-gradient-improve p-4 rounded-xl border border-reflection-border/30 shadow-sm">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <h3 className="font-medium text-lg text-reflection-text">Čo môžem zlepšiť?</h3>
-                </div>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="h-7 px-2 text-xs bg-white/50 border-reflection-border/50 text-reflection-text hover:bg-white/70"
-                  onClick={handleImproveSave}
-                  disabled={improveSaveStatus === 'saving'}
-                >
-                  {improveSaveStatus === 'saved' ? (
-                    <Check className="h-3 w-3 text-green-600" />
-                  ) : improveSaveStatus === 'saving' ? (
-                    <Loader2 className="h-3 w-3 animate-spin" />
-                  ) : (
-                    'Uložiť'
-                  )}
-                </Button>
-              </div>
-              <Textarea
-                value={improve}
-                onChange={(e) => handleImproveChange(e.target.value)}
-                placeholder="Čo by si chcel/a zajtra urobiť lepšie alebo inak..."
-                className="min-h-[80px] bg-white/90 backdrop-blur-sm border-0 shadow-sm placeholder:text-reflection-text-soft/70 text-reflection-text focus-visible:ring-2 focus-visible:ring-white/50 resize-none focus:bg-white/70 transition-colors text-base"
-              />
-            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-7 px-2 text-xs symptom-glass"
+              style={{ 
+                backgroundColor: '#FBF8F9',
+                color: '#955F6A',
+                borderColor: 'rgba(255, 255, 255, 0.6)'
+              }}
+              onClick={handleWellDoneSave}
+              disabled={wellDoneSaveStatus === 'saving'}
+            >
+              {wellDoneSaveStatus === 'saved' ? (
+                <Check className="h-3 w-3 text-green-600" />
+              ) : wellDoneSaveStatus === 'saving' ? (
+                <Loader2 className="h-3 w-3 animate-spin" />
+              ) : (
+                'Uložiť'
+              )}
+            </Button>
           </div>
+          <Textarea
+            value={wellDone}
+            onChange={(e) => handleWellDoneChange(e.target.value)}
+            placeholder="Napíš, čo sa ti dnes darilo, na čo si hrdá..."
+            className="min-h-[80px] symptom-glass border-0 resize-none focus:bg-white/70 transition-colors text-base"
+            style={{ 
+              backgroundColor: '#FBF8F9',
+              color: '#955F6A'
+            }}
+          />
         </div>
 
+        {/* What to improve */}
+        <div className="symptom-glass rounded-2xl p-4" style={{ backgroundColor: '#FBF8F9' }}>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Lightbulb className="w-4 h-4" style={{ color: '#955F6A' }} />
+              <h3 className="font-medium text-lg" style={{ color: '#955F6A' }}>
+                Čo môžem zlepšiť?
+              </h3>
+            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-7 px-2 text-xs symptom-glass"
+              style={{ 
+                backgroundColor: '#FBF8F9',
+                color: '#955F6A',
+                borderColor: 'rgba(255, 255, 255, 0.6)'
+              }}
+              onClick={handleImproveSave}
+              disabled={improveSaveStatus === 'saving'}
+            >
+              {improveSaveStatus === 'saved' ? (
+                <Check className="h-3 w-3 text-green-600" />
+              ) : improveSaveStatus === 'saving' ? (
+                <Loader2 className="h-3 w-3 animate-spin" />
+              ) : (
+                'Uložiť'
+              )}
+            </Button>
+          </div>
+          <Textarea
+            value={improve}
+            onChange={(e) => handleImproveChange(e.target.value)}
+            placeholder="Čo by si chcel/a zajtra urobiť lepšie alebo inak..."
+            className="min-h-[80px] symptom-glass border-0 resize-none focus:bg-white/70 transition-colors text-base"
+            style={{ 
+              backgroundColor: '#FBF8F9',
+              color: '#955F6A'
+            }}
+          />
+        </div>
       </div>
+    </div>
   );
 }
