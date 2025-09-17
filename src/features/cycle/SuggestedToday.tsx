@@ -20,17 +20,37 @@ export function SuggestedToday({ derivedState, className = "", accessCode }: Sug
           {/* Energy Level */}
           <div className="flex items-center justify-between">
             <span className="text-base font-medium" style={{ color: '#955F6A' }}>Energia</span>
-            <span className="text-sm text-muted-foreground">{suggestion.energy}%</span>
+            <div className="flex items-center gap-2">
+              <div className="relative h-2 w-16 bg-muted rounded-full overflow-hidden">
+                <div 
+                  className="absolute left-0 top-0 h-full rounded-full transition-all duration-500"
+                  style={{
+                    width: `${suggestion.energy}%`,
+                    background: `linear-gradient(90deg, ${getEnergyColor(suggestion.energy)}, hsl(var(--peach)))`
+                  }}
+                />
+              </div>
+              <span className="text-xs text-muted-foreground w-8">{suggestion.energy}%</span>
+            </div>
           </div>
           
           {/* Mood Section */}
           <div className="flex items-center justify-between">
             <span className="text-base font-medium" style={{ color: '#955F6A' }}>Nálada</span>
             <div className="flex items-center gap-2">
-              <span className="text-2xl">{getMoodEmoji(suggestion.mood)}</span>
-              <span className="text-sm text-muted-foreground">
-                {suggestion.mood}/5.0
-              </span>
+              <div className="flex gap-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <div
+                    key={star}
+                    className={`w-2 h-2 rounded-full transition-all ${
+                      star <= Math.round(suggestion.mood) 
+                        ? 'bg-yellow-400' 
+                        : 'bg-muted'
+                    }`}
+                  />
+                ))}
+              </div>
+              <span className="text-xl">{getMoodEmoji(suggestion.mood)}</span>
             </div>
           </div>
         </div>
