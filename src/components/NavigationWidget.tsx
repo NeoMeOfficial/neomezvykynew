@@ -99,22 +99,13 @@ export const NavigationWidget = ({
         open={openSections.habits} 
         onOpenChange={() => toggleSection('habits')}
       >
-        <div className={`backdrop-blur-md bg-white border border-white/40 rounded-2xl p-4 shadow-lg transition-all duration-300`}>
-          <CollapsibleTrigger asChild>
-            <button className="w-full flex flex-col items-center p-0 mb-1 text-center focus:outline-none rounded-lg">
-              <img 
-                src={habitsIcon} 
-                alt="Habits"
-                className={`${getIconSize(openSections.habits)} transition-all duration-300 flex-shrink-0`}
-              />
-              <h2 className="text-mobile-lg md:text-lg font-semibold text-foreground mt-1">
-                Moje návyky
-              </h2>
-            </button>
-          </CollapsibleTrigger>
+        <div className={`backdrop-blur-md bg-white border border-white/40 rounded-2xl p-4 shadow-lg transition-all duration-300 relative`}>
+          {/* Top Right Controls for Habits */}
           {openSections.habits && (
-            <div className="flex items-center justify-center gap-2 mt-2 mb-1">
-              <HabitCompletionCount selectedDate={selectedDate} />
+            <div className="absolute top-3 right-3 flex items-center gap-2">
+              <div className="text-base font-medium text-foreground">
+                Tvoj kalendár
+              </div>
               <Dialog open={showMonthlyCalendar} onOpenChange={setShowMonthlyCalendar}>
                 <DialogTrigger asChild>
                   <Button 
@@ -154,6 +145,26 @@ export const NavigationWidget = ({
               </Dialog>
             </div>
           )}
+          
+          <CollapsibleTrigger asChild>
+            <button className="w-full flex flex-col items-center p-0 mb-1 text-center focus:outline-none rounded-lg">
+              <img 
+                src={habitsIcon} 
+                alt="Habits"
+                className={`${getIconSize(openSections.habits)} transition-all duration-300 flex-shrink-0`}
+              />
+              <h2 className="text-mobile-lg md:text-lg font-semibold text-foreground mt-1">
+                Moje návyky
+              </h2>
+            </button>
+          </CollapsibleTrigger>
+          
+          {openSections.habits && (
+            <div className="flex items-center justify-center mt-2 mb-1">
+              <HabitCompletionCount selectedDate={selectedDate} />
+            </div>
+          )}
+          
           <CollapsibleContent className="animate-accordion-down pb-1">
             <div className="glass-container mt-3">
               <HabitTracker 
@@ -170,24 +181,13 @@ export const NavigationWidget = ({
         open={openSections.reflection} 
         onOpenChange={() => toggleSection('reflection')}
       >
-        <div className={`backdrop-blur-md bg-white border border-white/40 rounded-2xl p-4 shadow-lg transition-all duration-300`}>
-          <CollapsibleTrigger asChild>
-            <button className="w-full flex flex-col items-center p-0 mb-1 text-center focus:outline-none rounded-lg">
-              <img 
-                src={reflectionIcon} 
-                alt="Daily Reflection"
-                className={`${getIconSize(openSections.reflection)} transition-all duration-300 flex-shrink-0`}
-              />
-              <h2 className="text-mobile-lg md:text-lg font-semibold text-foreground mt-1">
-                Denná reflexia
-              </h2>
-            </button>
-          </CollapsibleTrigger>
+        <div className={`backdrop-blur-md bg-white border border-white/40 rounded-2xl p-4 shadow-lg transition-all duration-300 relative`}>
+          {/* Top Right Controls for Reflection */}
           {openSections.reflection && (
-            <div className="flex items-center justify-center gap-2 mt-2 mb-1">
-              <p className="text-mobile-sm md:text-sm text-muted-foreground">
+            <div className="absolute top-3 right-3 flex items-center gap-2">
+              <div className="text-base font-medium text-foreground">
                 Tvoj diár
-              </p>
+              </div>
               <Dialog open={showDiaryView} onOpenChange={setShowDiaryView}>
                 <DialogTrigger asChild>
                   <Button 
@@ -211,6 +211,20 @@ export const NavigationWidget = ({
               </Dialog>
             </div>
           )}
+          
+          <CollapsibleTrigger asChild>
+            <button className="w-full flex flex-col items-center p-0 mb-1 text-center focus:outline-none rounded-lg">
+              <img 
+                src={reflectionIcon} 
+                alt="Daily Reflection"
+                className={`${getIconSize(openSections.reflection)} transition-all duration-300 flex-shrink-0`}
+              />
+              <h2 className="text-mobile-lg md:text-lg font-semibold text-foreground mt-1">
+                Denná reflexia
+              </h2>
+            </button>
+          </CollapsibleTrigger>
+          
           <CollapsibleContent className="animate-accordion-down pb-1">
             <div className="glass-container mt-3">
               <ReflectionWidget 
