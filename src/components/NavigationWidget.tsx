@@ -166,12 +166,10 @@ export const NavigationWidget = ({
           )}
           
           <CollapsibleContent className="animate-accordion-down pb-1">
-            <div className="glass-container mt-3">
-              <HabitTracker 
-                selectedDate={selectedDate} 
-                onFirstInteraction={onFirstInteraction}
-              />
-            </div>
+            <HabitTracker 
+              selectedDate={selectedDate} 
+              onFirstInteraction={onFirstInteraction}
+            />
           </CollapsibleContent>
         </div>
       </Collapsible>
@@ -226,12 +224,10 @@ export const NavigationWidget = ({
           </CollapsibleTrigger>
           
           <CollapsibleContent className="animate-accordion-down pb-1">
-            <div className="glass-container mt-3">
-              <ReflectionWidget 
-                selectedDate={selectedDate}
-                onFirstInteraction={onFirstInteraction}
-              />
-            </div>
+            <ReflectionWidget 
+              selectedDate={selectedDate}
+              onFirstInteraction={onFirstInteraction}
+            />
           </CollapsibleContent>
         </div>
       </Collapsible>
