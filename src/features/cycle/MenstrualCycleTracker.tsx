@@ -97,11 +97,19 @@ export default function MenstrualCycleTracker({
   if (!derivedState) return null;
   const nextPeriodDate = getNextPeriodDate(cycleData.lastPeriodStart!, cycleData.cycleLength);
   return <div className="w-full space-y-4">
-      <div className="mb-6">
-        <div className="flex items-center justify-between mb-3">
-          <div>
-            <p className="text-base text-widget-text-soft">
-              {UI_TEXT.expectedPeriod} {formatDateSk(nextPeriodDate)}
+      {/* Cycle Information Card */}
+      <div className="bg-gradient-to-r from-rose-50 to-pink-50 border border-rose-200/50 rounded-2xl p-4 shadow-sm">
+        <div className="flex items-center justify-center">
+          <div className="text-center space-y-1">
+            <div className="flex items-center justify-center gap-3">
+              <div className="w-2 h-2 rounded-full bg-rose-400"></div>
+              <p className="text-base font-medium text-gray-800">
+                Očakávaná menštruácia {formatDateSk(nextPeriodDate)}
+              </p>
+              <div className="w-2 h-2 rounded-full bg-rose-400"></div>
+            </div>
+            <p className="text-sm text-gray-600">
+              {derivedState.currentDay}. deň cyklu
             </p>
           </div>
         </div>
