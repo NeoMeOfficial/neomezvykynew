@@ -149,7 +149,7 @@ export default function ReflectionWidget({ selectedDate, onFirstInteraction }: R
           <div className="flex items-center justify-center gap-2">
             <BookOpen className="w-5 h-5" style={{ color: '#955F6A' }} />
             <h3 className="font-semibold text-lg" style={{ color: '#955F6A' }}>
-              Denná reflexia
+              Pripomeň si
             </h3>
           </div>
           <p className="text-base italic font-medium" style={{ color: '#955F6A' }}>
