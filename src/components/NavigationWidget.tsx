@@ -103,7 +103,7 @@ export const NavigationWidget = ({
           {/* Top Right Controls for Habits */}
           {openSections.habits && (
             <div className="absolute top-3 right-3 flex items-center gap-2">
-              <div className="text-base font-medium text-foreground">
+              <div className="text-sm font-medium text-foreground">
                 Tvoj kalendár
               </div>
               <Dialog open={showMonthlyCalendar} onOpenChange={setShowMonthlyCalendar}>
@@ -183,7 +183,7 @@ export const NavigationWidget = ({
           {/* Top Right Controls for Reflection */}
           {openSections.reflection && (
             <div className="absolute top-3 right-3 flex items-center gap-2">
-              <div className="text-base font-medium text-foreground">
+              <div className="text-sm font-medium text-foreground">
                 Tvoj diár
               </div>
               <Dialog open={showDiaryView} onOpenChange={setShowDiaryView}>
