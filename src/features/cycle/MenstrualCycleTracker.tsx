@@ -119,7 +119,8 @@ export default function MenstrualCycleTracker({
         <TabsList className="grid w-full grid-cols-2 gap-3 bg-transparent p-0">
           <TabsTrigger 
             value="today" 
-            className="flex items-center gap-2 text-base bg-gradient-primary text-white font-semibold rounded-3xl px-6 py-3 shadow-[var(--shadow-elegant)] hover:opacity-90 transition-opacity data-[state=active]:bg-gradient-primary data-[state=active]:text-white data-[state=inactive]:bg-gradient-primary data-[state=inactive]:text-white"
+            className="flex items-center gap-2 text-base bg-gradient-primary font-semibold rounded-3xl px-6 py-3 shadow-[var(--shadow-elegant)] hover:opacity-90 transition-opacity data-[state=active]:bg-gradient-primary data-[state=inactive]:bg-gradient-primary"
+            style={{ color: '#F4415F' }}
           >
             <TrendingUp className="w-4 h-4" />
             {UI_TEXT.todayEstimate}
