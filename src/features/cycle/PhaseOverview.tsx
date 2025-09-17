@@ -15,8 +15,9 @@ export function PhaseOverview({ phaseRanges, currentPhase, className = "" }: Pha
   return (
     <div className={`${className}`}>
       <div
-        className="glass-surface rounded-xl p-4 transition-all duration-300 ring-2 ring-opacity-50"
+        className="symptom-glass rounded-xl p-4 transition-all duration-300 ring-2 ring-opacity-50"
         style={{
+          backgroundColor: '#FBF8F9',
           boxShadow: `0 0 0 2px ${getPhaseColor(currentPhase.key)}`
         }}
       >

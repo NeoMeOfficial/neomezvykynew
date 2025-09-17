@@ -28,7 +28,7 @@ export function WellnessDonutChart({ derivedState, onEditClick, className = "" }
   let cumulativeAngle = 0;
   
   return (
-    <div className={`${className}`}>
+    <div className={`symptom-glass rounded-xl p-4 ${className}`} style={{ backgroundColor: '#FBF8F9' }}>
       <div className="relative w-full max-w-[300px] h-[250px] mx-auto">
         {/* SVG Donut Chart - adjusted viewBox to remove vertical padding */}
         <svg viewBox="0 25 200 150" className="w-full h-full -rotate-90">

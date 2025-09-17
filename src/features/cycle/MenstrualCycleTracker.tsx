@@ -98,7 +98,7 @@ export default function MenstrualCycleTracker({
   const nextPeriodDate = getNextPeriodDate(cycleData.lastPeriodStart!, cycleData.cycleLength);
   return <div className="w-full space-y-4">
       {/* Cycle Information Card */}
-      <div className="bg-gradient-to-r from-rose-50 to-pink-50 border border-rose-200/50 rounded-2xl p-4 shadow-sm">
+      <div className="symptom-glass rounded-2xl p-4" style={{ backgroundColor: '#FBF8F9' }}>
         <div className="flex items-center justify-center">
           <div className="text-center space-y-1">
             <div className="flex items-center justify-center gap-3">
@@ -119,7 +119,7 @@ export default function MenstrualCycleTracker({
         <TabsList className="grid w-full grid-cols-2 gap-3 bg-transparent p-0">
           <TabsTrigger 
             value="today" 
-            className="flex items-center gap-2 text-base bg-gradient-primary font-semibold rounded-3xl px-6 py-3 shadow-[var(--shadow-elegant)] hover:opacity-90 transition-opacity data-[state=active]:bg-gradient-primary data-[state=inactive]:bg-gradient-primary"
+            className="flex items-center gap-2 text-base bg-gradient-primary font-semibold rounded-3xl px-6 py-3 symptom-glass hover:opacity-90 transition-opacity data-[state=active]:bg-gradient-primary data-[state=inactive]:bg-gradient-primary"
             style={{ color: '#F4415F' }}
           >
             <TrendingUp className="w-4 h-4" />
@@ -127,7 +127,7 @@ export default function MenstrualCycleTracker({
           </TabsTrigger>
           <TabsTrigger 
             value="overview" 
-            className="flex items-center gap-2 text-base bg-gradient-to-r from-rose-50/80 to-pink-50/80 border border-rose-200/30 backdrop-blur-sm rounded-3xl px-6 py-3 hover:from-rose-50 hover:to-pink-50 transition-all data-[state=active]:from-rose-50 data-[state=active]:to-pink-50 data-[state=inactive]:from-rose-50/80 data-[state=inactive]:to-pink-50/80"
+            className="flex items-center gap-2 text-base bg-gradient-to-r from-rose-50/80 to-pink-50/80 border border-rose-200/30 backdrop-blur-sm rounded-3xl px-6 py-3 symptom-glass hover:from-rose-50 hover:to-pink-50 transition-all data-[state=active]:from-rose-50 data-[state=active]:to-pink-50 data-[state=inactive]:from-rose-50/80 data-[state=inactive]:to-pink-50/80"
             style={{ color: '#F4415F' }}
           >
             <Lightbulb className="w-4 h-4" />

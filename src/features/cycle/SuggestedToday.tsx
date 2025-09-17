@@ -13,7 +13,7 @@ export function SuggestedToday({ derivedState, className = "", accessCode }: Sug
   const suggestion = suggestForDay(derivedState.currentDay, derivedState.phaseRanges);
   
   return (
-    <div className={`pl-0 pr-0 pt-0 pb-6 animate-fade-in ${className}`}>
+    <div className={`pl-0 pr-0 pt-0 pb-6 animate-fade-in symptom-glass rounded-xl p-4 ${className}`} style={{ backgroundColor: '#FBF8F9' }}>
       <div className="space-y-4">
         {/* Energy Level */}
         <div>
@@ -47,7 +47,7 @@ export function SuggestedToday({ derivedState, className = "", accessCode }: Sug
         {/* Mood Section */}
         <div className="pt-2 border-t border-border/50">
           <div className="flex items-center justify-between">
-            <span className="text-base font-medium text-foreground">Nálada</span>
+            <span className="text-base font-medium" style={{ color: '#955F6A' }}>Nálada</span>
             <span className="text-sm text-muted-foreground">
               {derivedState.currentDay}. deň cyklu
             </span>
