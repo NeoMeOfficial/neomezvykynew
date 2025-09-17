@@ -148,12 +148,20 @@ export default function MenstrualCycleTracker({
       </Tabs>
 
       <div className="mt-2 grid grid-cols-2 gap-2">
-        <Button variant="hero" size="sm" onClick={() => setShowDatePicker(true)} className="text-base">
-          <CalendarIcon className="w-4 h-4 mr-2" />
+        <Button 
+          onClick={() => setShowDatePicker(true)} 
+          className="flex items-center gap-2 text-base bg-gradient-primary font-semibold rounded-3xl px-6 py-3 symptom-glass hover:opacity-90 transition-opacity"
+          style={{ color: '#F4415F' }}
+        >
+          <CalendarIcon className="w-4 h-4" />
           Kalendár
         </Button>
-        <Button variant="outline" size="sm" onClick={() => setShowSettings(true)} className="text-base">
-          <Settings className="w-4 h-4 mr-2" />
+        <Button 
+          onClick={() => setShowSettings(true)} 
+          className="flex items-center gap-2 text-base bg-gradient-to-r from-rose-50/80 to-pink-50/80 border border-rose-200/30 backdrop-blur-sm rounded-3xl px-6 py-3 symptom-glass hover:from-rose-50 hover:to-pink-50 transition-all"
+          style={{ color: '#F4415F' }}
+        >
+          <Settings className="w-4 h-4" />
           Nastavenia
         </Button>
       </div>
