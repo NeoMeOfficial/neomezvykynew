@@ -106,6 +106,14 @@ All colors MUST be HSL.
     --glass-border: white;
     --glass-shadow: 0 8px 32px hsla(0 0% 0% / 0.125);
     
+    /* 3D Glass morphism for symptoms */
+    --symptom-glass-bg: #FBF8F9;
+    --symptom-glass-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), 
+                            0 1px 4px rgba(0, 0, 0, 0.04),
+                            inset 0 1px 0 rgba(255, 255, 255, 0.8),
+                            inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+    --symptom-glass-border: rgba(255, 255, 255, 0.6);
+    
     /* Feminine Apple-like background */
     --bg-gradient: linear-gradient(135deg, 
       hsl(var(--sand)) 0%, 
@@ -240,6 +248,24 @@ All colors MUST be HSL.
       padding: 1.5rem;
       margin-bottom: 1.5rem;
     }
+  }
+  
+  /* 3D Glass morphism effect for symptoms */
+  .symptom-glass {
+    background: var(--symptom-glass-bg);
+    border: 1px solid var(--symptom-glass-border);
+    box-shadow: var(--symptom-glass-shadow);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: all 0.2s ease;
+  }
+  
+  .symptom-glass:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12), 
+                0 2px 6px rgba(0, 0, 0, 0.06),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.08);
   }
 }
 
