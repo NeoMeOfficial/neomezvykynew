@@ -117,6 +117,7 @@ export default {
 				'mobile-3xl': ['28px', { lineHeight: '36px', letterSpacing: '0.01em' }], // Hero headings
 			},
 			backgroundImage: {
+				'gradient-primary': 'var(--gradient-primary)',
 				'gradient-success': 'var(--gradient-success)',
 				'gradient-improve': 'var(--gradient-improve)',
 				'gradient-widget': 'var(--gradient-widget)'

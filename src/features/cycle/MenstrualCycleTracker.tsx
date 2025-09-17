@@ -116,12 +116,18 @@ export default function MenstrualCycleTracker({
       </div>
 
       <Tabs defaultValue="today" className="space-y-5">
-        <TabsList className="grid w-full grid-cols-2 rounded-full bg-amber-50/50">
-          <TabsTrigger value="today" className="flex items-center gap-2 text-base">
+        <TabsList className="grid w-full grid-cols-2 gap-3 bg-transparent p-0">
+          <TabsTrigger 
+            value="today" 
+            className="flex items-center gap-2 text-base bg-gradient-primary text-white font-semibold rounded-3xl px-6 py-3 shadow-[var(--shadow-elegant)] hover:opacity-90 transition-opacity data-[state=active]:bg-gradient-primary data-[state=active]:text-white data-[state=inactive]:bg-gradient-primary data-[state=inactive]:text-white"
+          >
             <TrendingUp className="w-4 h-4" />
             {UI_TEXT.todayEstimate}
           </TabsTrigger>
-          <TabsTrigger value="overview" className="flex items-center gap-2 text-base">
+          <TabsTrigger 
+            value="overview" 
+            className="flex items-center gap-2 text-base bg-white/5 text-gray-700 border border-white/20 backdrop-blur-sm rounded-3xl px-6 py-3 hover:bg-white/10 transition-colors data-[state=active]:bg-white/10 data-[state=active]:text-gray-700 data-[state=inactive]:bg-white/5 data-[state=inactive]:text-gray-700"
+          >
             <Lightbulb className="w-4 h-4" />
             {UI_TEXT.whatToDo}
           </TabsTrigger>
