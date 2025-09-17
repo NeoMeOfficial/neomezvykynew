@@ -126,7 +126,7 @@ export default function MenstrualCycleTracker({
           </TabsTrigger>
           <TabsTrigger 
             value="overview" 
-            className="flex items-center gap-2 text-base bg-white/5 text-gray-700 border border-white/20 backdrop-blur-sm rounded-3xl px-6 py-3 hover:bg-white/10 transition-colors data-[state=active]:bg-white/10 data-[state=active]:text-gray-700 data-[state=inactive]:bg-white/5 data-[state=inactive]:text-gray-700"
+            className="flex items-center gap-2 text-base bg-gradient-to-r from-rose-50/80 to-pink-50/80 text-rose-700 border border-rose-200/30 backdrop-blur-sm rounded-3xl px-6 py-3 hover:from-rose-50 hover:to-pink-50 transition-all data-[state=active]:from-rose-50 data-[state=active]:to-pink-50 data-[state=active]:text-rose-700 data-[state=inactive]:from-rose-50/80 data-[state=inactive]:to-pink-50/80 data-[state=inactive]:text-rose-700"
           >
             <Lightbulb className="w-4 h-4" />
             {UI_TEXT.whatToDo}
