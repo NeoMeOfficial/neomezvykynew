@@ -103,8 +103,8 @@ export default {
 				gold: 'hsl(var(--gold))'
 			},
 			fontFamily: {
-				'heading': ['Alegreya Sans', 'sans-serif'],
-				'body': ['Alegreya Sans', 'sans-serif'],
+				'heading': ['Raleway', 'sans-serif'],
+				'body': ['Raleway', 'sans-serif'],
 			},
 			fontSize: {
 				// Optimized for readability - minimum 16px for body text on mobile
