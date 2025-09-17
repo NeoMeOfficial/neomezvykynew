@@ -86,12 +86,10 @@ export const NavigationWidget = ({
             </button>
           </CollapsibleTrigger>
           <CollapsibleContent className="animate-accordion-down pb-1">
-            <div className="glass-container mt-3">
-              <MenstrualCycleTracker
-                accessCode={accessCode}
-                onFirstInteraction={onFirstInteraction}
-              />
-            </div>
+            <MenstrualCycleTracker
+              accessCode={accessCode}
+              onFirstInteraction={onFirstInteraction}
+            />
           </CollapsibleContent>
         </div>
       </Collapsible>
