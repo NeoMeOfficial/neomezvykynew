@@ -61,7 +61,7 @@ export default function MenstrualCycleTracker({
   if (!cycleData.lastPeriodStart) {
     return <div className="w-full space-y-6">
           <div>
-            <p className="text-widget-text-soft md:text-sm text-lg">
+            <p className="md:text-sm text-lg" style={{ color: '#955F6A' }}>
               {UI_TEXT.welcome}
             </p>
           </div>
@@ -126,7 +126,8 @@ export default function MenstrualCycleTracker({
           </TabsTrigger>
           <TabsTrigger 
             value="overview" 
-            className="flex items-center gap-2 text-base bg-gradient-to-r from-rose-50/80 to-pink-50/80 text-rose-700 border border-rose-200/30 backdrop-blur-sm rounded-3xl px-6 py-3 hover:from-rose-50 hover:to-pink-50 transition-all data-[state=active]:from-rose-50 data-[state=active]:to-pink-50 data-[state=active]:text-rose-700 data-[state=inactive]:from-rose-50/80 data-[state=inactive]:to-pink-50/80 data-[state=inactive]:text-rose-700"
+            className="flex items-center gap-2 text-base bg-gradient-to-r from-rose-50/80 to-pink-50/80 border border-rose-200/30 backdrop-blur-sm rounded-3xl px-6 py-3 hover:from-rose-50 hover:to-pink-50 transition-all data-[state=active]:from-rose-50 data-[state=active]:to-pink-50 data-[state=inactive]:from-rose-50/80 data-[state=inactive]:to-pink-50/80"
+            style={{ color: '#F4415F' }}
           >
             <Lightbulb className="w-4 h-4" />
             {UI_TEXT.whatToDo}
