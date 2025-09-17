@@ -147,16 +147,16 @@ const Index = () => {
                   window.location.href = 'https://neome.mvt.so/mj-de';
                 }
               }}
-              style={{ backgroundColor: '#f0ede4', borderColor: '#d4c9b8' }}
-              className="flex items-center justify-center gap-2 rounded-3xl py-3 px-3 text-mobile-sm md:text-sm font-medium border-1 backdrop-blur-md transition-all hover:opacity-90"
+              className="flex items-center justify-center gap-2 rounded-3xl py-3 px-3 text-mobile-sm md:text-sm font-medium symptom-glass transition-all hover:opacity-90"
+              style={{ backgroundColor: '#FBF8F9', color: '#955F6A' }}
             >
               <ArrowLeft className="h-4 w-4" />
               Naspäť
             </Button>
             <Button 
               onClick={() => setShowAccessCodeValidation(true)}
-              style={{ backgroundColor: '#5F3E31' }}
-              className="!text-white hover:opacity-90 flex items-center justify-center gap-2 rounded-3xl py-3 px-4 text-mobile-sm md:text-sm font-medium border-0 transition-all shadow-lg"
+              className="flex items-center justify-center gap-2 rounded-3xl py-3 px-4 text-mobile-sm md:text-sm font-medium symptom-glass transition-all hover:opacity-90"
+              style={{ backgroundColor: '#FBF8F9', color: '#955F6A' }}
             >
               <Fingerprint className="h-4 w-4" />
               Uložiť si svoje informácie
