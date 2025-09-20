@@ -67,12 +67,11 @@ export function WellnessDonutChart({ derivedState, onEditClick, className = "" }
                     cx={dotX}
                     cy={dotY}
                     r="10"
-                    fill="hsl(var(--peach) / 0.2)"
-                    stroke="hsl(var(--peach) / 0.4)"
+                    fill="hsl(var(--peach) / 0.35)"
+                    stroke="hsl(var(--peach) / 0.55)"
                     strokeWidth="1"
-                    className="animate-pulse"
                     style={{
-                      filter: 'drop-shadow(0 0 8px hsl(var(--peach) / 0.3))'
+                      filter: 'drop-shadow(0 0 8px hsl(var(--peach) / 0.45))'
                     }}
                   />
                 )}
@@ -84,7 +83,7 @@ export function WellnessDonutChart({ derivedState, onEditClick, className = "" }
                   r={isToday ? "5" : "3"}
                   fill={phaseColor}
                   opacity={isCurrentPhase ? 1 : 0.7}
-                  className={`transition-all duration-300 ${isToday ? 'animate-pulse' : ''}`}
+                  className={`transition-all duration-300`}
                   stroke={isToday ? "hsl(var(--background))" : "none"}
                   strokeWidth={isToday ? "1" : "0"}
                 />
