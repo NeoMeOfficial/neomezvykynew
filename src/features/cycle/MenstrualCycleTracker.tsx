@@ -100,17 +100,17 @@ export default function MenstrualCycleTracker({
       {/* Cycle Information Card */}
       <div className="symptom-glass rounded-2xl p-4" style={{ backgroundColor: '#FBF8F9' }}>
         <div className="flex items-center justify-center">
-          <div className="text-center space-y-1">
+          <div className="text-center space-y-3">
             <div className="flex items-center justify-center gap-3">
               <div className="w-2 h-2 rounded-full bg-rose-400"></div>
               <p className="text-base font-medium" style={{ color: '#955F6A' }}>
-                Očakávaná menštruácia {formatDateSk(nextPeriodDate)}
+                Očakávaná menštruácia
               </p>
               <div className="w-2 h-2 rounded-full bg-rose-400"></div>
             </div>
-            <p className="text-sm" style={{ color: '#955F6A' }}>
-              {derivedState.currentDay}. deň cyklu
-            </p>
+            <Button variant="secondary" className="px-4 py-2 text-sm font-medium">
+              {formatDateSk(nextPeriodDate)}
+            </Button>
           </div>
         </div>
       </div>
@@ -136,9 +136,9 @@ export default function MenstrualCycleTracker({
         </TabsList>
 
         <TabsContent value="today" className="space-y-5">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <SuggestedToday derivedState={derivedState} accessCode={accessCode} />
+          <div className="space-y-4">
             <WellnessDonutChart derivedState={derivedState} />
+            <SuggestedToday derivedState={derivedState} accessCode={accessCode} />
           </div>
         </TabsContent>
 
