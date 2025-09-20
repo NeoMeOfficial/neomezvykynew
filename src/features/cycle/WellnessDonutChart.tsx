@@ -44,41 +44,51 @@ export function WellnessDonutChart({ derivedState, onEditClick, className = "" }
             opacity="0.3"
           />
           
-          {/* Phase rings */}
-          {phaseRanges.map((phase, index) => {
-            const angle = phaseAngles[index];
-            const startAngle = cumulativeAngle;
-            const endAngle = cumulativeAngle + angle;
+          {/* Day dots */}
+          {Array.from({ length: cycleLength }, (_, index) => {
+            const day = index + 1;
+            const dayAngle = ((day - 1) / cycleLength) * 360;
+            const dayAngleRad = (dayAngle * Math.PI) / 180;
             
-            // Convert angles to radians and calculate path
-            const startAngleRad = (startAngle * Math.PI) / 180;
-            const endAngleRad = (endAngle * Math.PI) / 180;
+            const dotX = 100 + 74 * Math.cos(dayAngleRad);
+            const dotY = 100 + 74 * Math.sin(dayAngleRad);
             
-            const x1 = 100 + 74 * Math.cos(startAngleRad);
-            const y1 = 100 + 74 * Math.sin(startAngleRad);
-            const x2 = 100 + 74 * Math.cos(endAngleRad);
-            const y2 = 100 + 74 * Math.sin(endAngleRad);
-            
-            const largeArcFlag = angle > 180 ? 1 : 0;
-            
-            const pathData = [
-              `M ${x1} ${y1}`,
-              `A 74 74 0 ${largeArcFlag} 1 ${x2} ${y2}`
-            ].join(' ');
-            
-            cumulativeAngle = endAngle;
+            // Find which phase this day belongs to
+            const dayPhase = phaseRanges.find(phase => day >= phase.start && day <= phase.end);
+            const phaseColor = dayPhase ? getPhaseColor(dayPhase.key) : 'hsl(var(--muted))';
+            const isCurrentPhase = dayPhase?.key === currentPhase.key;
+            const isToday = day === currentDay;
             
             return (
-              <path
-                key={phase.key}
-                d={pathData}
-                fill="none"
-                stroke={getPhaseColor(phase.key)}
-                strokeWidth="12"
-                strokeLinecap="round"
-                opacity={phase.key === currentPhase.key ? 1 : 0.7}
-                className="transition-opacity duration-300"
-              />
+              <g key={day}>
+                {/* Today's background circle */}
+                {isToday && (
+                  <circle
+                    cx={dotX}
+                    cy={dotY}
+                    r="10"
+                    fill="hsl(var(--peach) / 0.2)"
+                    stroke="hsl(var(--peach) / 0.4)"
+                    strokeWidth="1"
+                    className="animate-pulse"
+                    style={{
+                      filter: 'drop-shadow(0 0 8px hsl(var(--peach) / 0.3))'
+                    }}
+                  />
+                )}
+                
+                {/* Day dot */}
+                <circle
+                  cx={dotX}
+                  cy={dotY}
+                  r={isToday ? "5" : "3"}
+                  fill={phaseColor}
+                  opacity={isCurrentPhase ? 1 : 0.7}
+                  className={`transition-all duration-300 ${isToday ? 'animate-pulse' : ''}`}
+                  stroke={isToday ? "hsl(var(--background))" : "none"}
+                  strokeWidth={isToday ? "1" : "0"}
+                />
+              </g>
             );
           })}
           
@@ -89,17 +99,6 @@ export function WellnessDonutChart({ derivedState, onEditClick, className = "" }
             r="66"
             fill="hsl(var(--chart-center))"
             className="transition-colors duration-300 cursor-pointer hover:fill-[hsl(var(--chart-center)_/_0.9)]"
-          />
-          
-          {/* Today marker */}
-          <circle
-            cx={100 + 74 * Math.cos((currentAngle * Math.PI) / 180)}
-            cy={100 + 74 * Math.sin((currentAngle * Math.PI) / 180)}
-            r="4"
-            fill="hsl(var(--peach))"
-            stroke="hsl(var(--foreground) / 0.6)"
-            strokeWidth="1"
-            className="animate-pulse"
           />
           
           {/* "DNES" label on marker */}
