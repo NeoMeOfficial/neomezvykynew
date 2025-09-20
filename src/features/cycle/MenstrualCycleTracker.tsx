@@ -12,6 +12,7 @@ import { DatePickerModal } from './DatePickerModal';
 import { SettingsModal } from './SettingsModal';
 import { UI_TEXT } from './insights';
 import { formatDateSk, getNextPeriodDate } from './utils';
+import { PhaseKey } from './types';
 interface MenstrualCycleTrackerProps {
   accessCode?: string;
   compact?: boolean;
@@ -34,6 +35,7 @@ export default function MenstrualCycleTracker({
   const [showSettings, setShowSettings] = useState(false);
   const [setupCycleLength, setSetupCycleLength] = useState(28);
   const [setupPeriodLength, setSetupPeriodLength] = useState(5);
+  const [selectedPhase, setSelectedPhase] = useState<PhaseKey | null>(null);
   const handleFirstInteraction = () => {
     onFirstInteraction?.();
   };
@@ -121,7 +123,25 @@ export default function MenstrualCycleTracker({
       <Tabs defaultValue="today" className="space-y-5">
         <TabsContent value="today" className="space-y-5">
           <div className="space-y-4">
-            <WellnessDonutChart derivedState={derivedState} />
+            {/* Phase selector buttons */}
+            <div className="flex flex-wrap gap-2 justify-center">
+              {derivedState.phaseRanges.map((phase) => (
+                <Button
+                  key={phase.key}
+                  onClick={() => setSelectedPhase(selectedPhase === phase.key ? null : phase.key)}
+                  variant={selectedPhase === phase.key ? "default" : "outline"}
+                  className={`text-sm px-3 py-1 rounded-full transition-all ${
+                    selectedPhase === phase.key 
+                      ? 'bg-gradient-primary border-none symptom-glass'
+                      : 'bg-gradient-to-r from-rose-50/80 to-pink-50/80 border border-rose-200/30 symptom-glass hover:from-rose-50 hover:to-pink-50'
+                  }`}
+                  style={{ color: '#F4415F' }}
+                >
+                  {phase.name}
+                </Button>
+              ))}
+            </div>
+            <WellnessDonutChart derivedState={derivedState} selectedPhase={selectedPhase} />
           </div>
         </TabsContent>
 

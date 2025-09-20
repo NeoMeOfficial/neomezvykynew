@@ -1,7 +1,7 @@
 import React from 'react';
 import { Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { DerivedState } from './types';
+import { DerivedState, PhaseKey } from './types';
 import { getPhaseColor } from './suggestions';
 import { UI_TEXT } from './insights';
 
@@ -9,11 +9,19 @@ interface WellnessDonutChartProps {
   derivedState: DerivedState;
   onEditClick?: () => void;
   className?: string;
+  selectedPhase?: PhaseKey | null;
 }
 
-export function WellnessDonutChart({ derivedState, onEditClick, className = "" }: WellnessDonutChartProps) {
+export function WellnessDonutChart({ derivedState, onEditClick, className = "", selectedPhase }: WellnessDonutChartProps) {
   const { currentDay, phaseRanges, currentPhase } = derivedState;
   const cycleLength = phaseRanges[phaseRanges.length - 1].end;
+  
+  // Find selected phase and calculate days until it
+  const selectedPhaseRange = selectedPhase ? phaseRanges.find(p => p.key === selectedPhase) : null;
+  const daysUntilSelectedPhase = selectedPhaseRange ? 
+    (selectedPhaseRange.start > currentDay ? 
+      selectedPhaseRange.start - currentDay : 
+      (cycleLength - currentDay + selectedPhaseRange.start)) : 0;
   
   // Calculate angles for each phase
   const phaseAngles = phaseRanges.map(phase => {
@@ -58,6 +66,8 @@ export function WellnessDonutChart({ derivedState, onEditClick, className = "" }
             const phaseColor = dayPhase ? getPhaseColor(dayPhase.key) : 'hsl(var(--muted))';
             const isCurrentPhase = dayPhase?.key === currentPhase.key;
             const isToday = day === currentDay;
+            const isSelectedPhase = selectedPhase && dayPhase?.key === selectedPhase;
+            const shouldHighlight = selectedPhase ? isSelectedPhase : isCurrentPhase;
             
             return (
               <g key={day}>
@@ -80,12 +90,12 @@ export function WellnessDonutChart({ derivedState, onEditClick, className = "" }
                 <circle
                   cx={dotX}
                   cy={dotY}
-                  r={isToday ? "5" : "3"}
+                  r={isToday ? "5" : (shouldHighlight ? "4" : "3")}
                   fill={phaseColor}
-                  opacity={isCurrentPhase ? 1 : 0.7}
+                  opacity={shouldHighlight ? 1 : 0.7}
                   className={`transition-all duration-300`}
-                  stroke={isToday ? "hsl(var(--background))" : "none"}
-                  strokeWidth={isToday ? "1" : "0"}
+                  stroke={isToday ? "hsl(var(--background))" : (shouldHighlight ? phaseColor : "none")}
+                  strokeWidth={isToday ? "1" : (shouldHighlight ? "1" : "0")}
                 />
               </g>
             );
@@ -118,15 +128,31 @@ export function WellnessDonutChart({ derivedState, onEditClick, className = "" }
         
         {/* Center content */}
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-          <div className="text-sm text-center mb-1 font-medium" style={{ color: 'hsl(var(--foreground))' }}>
-            {currentPhase.name}
-          </div>
-          <div className="text-4xl font-bold" style={{ color: 'hsl(var(--foreground))' }}>
-            {currentDay}
-          </div>
-          <div className="text-sm text-center font-medium" style={{ color: 'hsl(var(--muted-foreground))' }}>
-            {UI_TEXT.day}
-          </div>
+          {selectedPhase && selectedPhaseRange ? (
+            <>
+              <div className="text-sm text-center mb-1 font-medium" style={{ color: 'hsl(var(--foreground))' }}>
+                {selectedPhaseRange.name}
+              </div>
+              <div className="text-4xl font-bold" style={{ color: 'hsl(var(--foreground))' }}>
+                {daysUntilSelectedPhase}
+              </div>
+              <div className="text-sm text-center font-medium" style={{ color: 'hsl(var(--muted-foreground))' }}>
+                {daysUntilSelectedPhase === 0 ? 'dnes' : 'dní'}
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="text-sm text-center mb-1 font-medium" style={{ color: 'hsl(var(--foreground))' }}>
+                {currentPhase.name}
+              </div>
+              <div className="text-4xl font-bold" style={{ color: 'hsl(var(--foreground))' }}>
+                {currentDay}
+              </div>
+              <div className="text-sm text-center font-medium" style={{ color: 'hsl(var(--muted-foreground))' }}>
+                {UI_TEXT.day}
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>
