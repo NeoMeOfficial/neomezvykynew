@@ -16,10 +16,12 @@ export function WellnessDonutChart({ derivedState, onEditClick, className = "", 
   const { currentDay, phaseRanges, currentPhase } = derivedState;
   const cycleLength = phaseRanges[phaseRanges.length - 1].end;
   
-  // Find selected phase and calculate days until it starts
+  // Find selected phase and calculate days until it starts or ends
   const selectedPhaseRange = selectedPhase ? phaseRanges.find(p => p.key === selectedPhase) : null;
+  const isCurrentlyInSelectedPhase = selectedPhaseRange && currentDay >= selectedPhaseRange.start && currentDay <= selectedPhaseRange.end;
   const daysUntilSelectedPhase = selectedPhaseRange ? 
-    (currentDay >= selectedPhaseRange.start && currentDay <= selectedPhaseRange.end ? 0 : // Currently in the phase
+    (isCurrentlyInSelectedPhase ? 
+       selectedPhaseRange.end - currentDay : // Days left in current phase
      selectedPhaseRange.start > currentDay ? 
        selectedPhaseRange.start - currentDay : // Phase is coming up this cycle
        (cycleLength - currentDay + selectedPhaseRange.start)) : 0; // Phase is in next cycle
@@ -138,7 +140,10 @@ export function WellnessDonutChart({ derivedState, onEditClick, className = "", 
                 {daysUntilSelectedPhase}
               </div>
               <div className="text-sm text-center font-medium" style={{ color: 'hsl(var(--muted-foreground))' }}>
-                {daysUntilSelectedPhase === 0 ? 'práve teraz' : (daysUntilSelectedPhase === 1 ? 'deň' : 'dní')}
+                {isCurrentlyInSelectedPhase ? 
+                  (daysUntilSelectedPhase === 0 ? 'posledný deň' : (daysUntilSelectedPhase === 1 ? 'deň zostáva' : 'dní zostáva')) :
+                  (daysUntilSelectedPhase === 1 ? 'deň' : 'dní')
+                }
               </div>
             </>
           ) : (
