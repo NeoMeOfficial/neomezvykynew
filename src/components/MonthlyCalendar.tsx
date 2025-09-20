@@ -10,6 +10,7 @@ interface MonthlyCalendarProps {
   onMonthChange: (date: Date) => void;
   habits: Habit[];
   formatDate: (date: Date) => string;
+  accessCode?: string;
 }
 
 export const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
@@ -17,7 +18,8 @@ export const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
   selectedMonth,
   onMonthChange,
   habits,
-  formatDate
+  formatDate,
+  accessCode
 }) => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
 
@@ -31,6 +33,23 @@ export const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
       totalProgress += progress;
     });
     return (totalProgress / habits.length) * 100;
+  };
+
+  const getDateSymptoms = (date: Date) => {
+    const dateStr = formatDate(date);
+    const symptomsKey = accessCode 
+      ? `symptoms_${accessCode}_${dateStr}` 
+      : `temp_symptoms_${dateStr}`;
+    const savedSymptoms = localStorage.getItem(symptomsKey);
+    return savedSymptoms ? JSON.parse(savedSymptoms) : [];
+  };
+
+  const getDateNotes = (date: Date) => {
+    const dateStr = formatDate(date);
+    const notesKey = accessCode 
+      ? `notes_${accessCode}_${dateStr}` 
+      : `temp_notes_${dateStr}`;
+    return localStorage.getItem(notesKey) || '';
   };
 
   const modifiers = {
@@ -119,9 +138,54 @@ export const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
                     {habit.name === 'Hydratácia' ? Number(value).toFixed(1) : Math.round(Number(value))} / {habit.target} {habit.unit}
                   </div>
                 </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+            
+            {/* Symptoms and Notes Display */}
+            <div className="mt-3 space-y-2">
+              {(() => {
+                const symptoms = getDateSymptoms(selectedDate);
+                const notes = getDateNotes(selectedDate);
+                
+                if (symptoms.length === 0 && !notes.trim()) return null;
+                
+                return (
+                  <div className="border-t border-muted pt-2">
+                    {symptoms.length > 0 && (
+                      <div className="mb-2">
+                        <h5 className="text-xs font-medium text-foreground/60 mb-1">Príznaky:</h5>
+                        <div className="flex flex-wrap gap-1">
+                          {symptoms.map((symptomId: string) => {
+                            // Import symptoms map here since we need it
+                            const symptomEmojis: Record<string, string> = {
+                              'cramps': '💢', 'heavy_flow': '🩸', 'back_pain': '🦴', 'headache': '🤕',
+                              'fatigue': '😴', 'nausea': '🤢', 'energy_boost': '⚡', 'good_mood': '😊',
+                              'clear_skin': '✨', 'motivation': '🎯', 'increased_libido': '💖',
+                              'cervical_mucus': '💧', 'ovulation_pain': '⚠️', 'breast_tenderness': '🤱',
+                              'bloating': '🎈', 'mood_swings': '🎭', 'food_cravings': '🍫',
+                              'irritability': '😤', 'acne': '🔴', 'sleep_issues': '🌙',
+                              'anxiety': '😰', 'depression': '😔'
+                            };
+                            return (
+                              <span key={symptomId} className="text-sm">
+                                {symptomEmojis[symptomId] || '📝'}
+                              </span>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                    {notes.trim() && (
+                      <div>
+                        <h5 className="text-xs font-medium text-foreground/60 mb-1">Poznámky:</h5>
+                        <p className="text-xs text-foreground/70 line-clamp-2">{notes}</p>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+            </div>
         </div>
       )}
     </div>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 import { Save, RotateCcw } from 'lucide-react';
 import { PhaseKey } from './types';
 
@@ -51,6 +52,7 @@ interface SymptomTrackerProps {
 
 export function SymptomTracker({ currentPhase, currentDay, accessCode }: SymptomTrackerProps) {
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
+  const [notes, setNotes] = useState<string>('');
   const [hasChanges, setHasChanges] = useState(false);
 
   // Filter symptoms relevant to current phase
@@ -58,15 +60,24 @@ export function SymptomTracker({ currentPhase, currentDay, accessCode }: Symptom
     symptom.phases.includes(currentPhase)
   );
 
-  // Load saved symptoms for today
+  // Load saved symptoms and notes for today
   useEffect(() => {
-    const storageKey = accessCode 
-      ? `symptoms_${accessCode}_${new Date().toISOString().split('T')[0]}` 
-      : `temp_symptoms_${new Date().toISOString().split('T')[0]}`;
+    const today = new Date().toISOString().split('T')[0];
+    const symptomsKey = accessCode 
+      ? `symptoms_${accessCode}_${today}` 
+      : `temp_symptoms_${today}`;
+    const notesKey = accessCode 
+      ? `notes_${accessCode}_${today}` 
+      : `temp_notes_${today}`;
     
-    const saved = localStorage.getItem(storageKey);
-    if (saved) {
-      setSelectedSymptoms(JSON.parse(saved));
+    const savedSymptoms = localStorage.getItem(symptomsKey);
+    const savedNotes = localStorage.getItem(notesKey);
+    
+    if (savedSymptoms) {
+      setSelectedSymptoms(JSON.parse(savedSymptoms));
+    }
+    if (savedNotes) {
+      setNotes(savedNotes);
     }
   }, [accessCode]);
 
@@ -81,16 +92,22 @@ export function SymptomTracker({ currentPhase, currentDay, accessCode }: Symptom
   };
 
   const saveSymptoms = () => {
-    const storageKey = accessCode 
-      ? `symptoms_${accessCode}_${new Date().toISOString().split('T')[0]}` 
-      : `temp_symptoms_${new Date().toISOString().split('T')[0]}`;
+    const today = new Date().toISOString().split('T')[0];
+    const symptomsKey = accessCode 
+      ? `symptoms_${accessCode}_${today}` 
+      : `temp_symptoms_${today}`;
+    const notesKey = accessCode 
+      ? `notes_${accessCode}_${today}` 
+      : `temp_notes_${today}`;
     
-    localStorage.setItem(storageKey, JSON.stringify(selectedSymptoms));
+    localStorage.setItem(symptomsKey, JSON.stringify(selectedSymptoms));
+    localStorage.setItem(notesKey, notes);
     setHasChanges(false);
   };
 
   const resetSymptoms = () => {
     setSelectedSymptoms([]);
+    setNotes('');
     setHasChanges(true);
   };
 
@@ -139,6 +156,30 @@ export function SymptomTracker({ currentPhase, currentDay, accessCode }: Symptom
         ))}
       </div>
 
+      {/* Notes Section */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <span className="text-base font-medium" style={{ color: '#955F6A' }}>Poznámky</span>
+        </div>
+        <p className="text-sm mb-3" style={{ color: '#955F6A' }}>
+          Zaznamenajte ďalšie informácie o vašom dni
+        </p>
+        <Textarea
+          value={notes}
+          onChange={(e) => {
+            setNotes(e.target.value);
+            setHasChanges(true);
+          }}
+          placeholder="Napíšte poznámky o vašom dni..."
+          className="min-h-[80px] resize-none"
+          style={{
+            backgroundColor: '#FBF8F9',
+            borderColor: '#E5D4D7',
+            color: '#955F6A'
+          }}
+        />
+      </div>
+
       {/* Action Buttons */}
       {hasChanges && (
         <div className="flex gap-2 pt-2">
@@ -163,9 +204,11 @@ export function SymptomTracker({ currentPhase, currentDay, accessCode }: Symptom
       )}
 
       {/* Selected Count */}
-      {selectedSymptoms.length > 0 && (
+      {(selectedSymptoms.length > 0 || notes.trim()) && (
         <div className="text-xs text-muted-foreground pt-1">
-          Zaznamenaných: {selectedSymptoms.length} príznakov
+          {selectedSymptoms.length > 0 && `Zaznamenaných: ${selectedSymptoms.length} príznakov`}
+          {selectedSymptoms.length > 0 && notes.trim() && ' • '}
+          {notes.trim() && 'Poznámky pridané'}
         </div>
       )}
     </div>

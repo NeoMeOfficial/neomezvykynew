@@ -139,6 +139,7 @@ export const NavigationWidget = ({
                       onMonthChange={setMonthlyCalendarDate}
                       habits={habits}
                       formatDate={formatDate}
+                      accessCode={accessCode}
                     />
                   </div>
                 </DialogContent>
