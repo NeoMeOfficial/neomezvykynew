@@ -116,6 +116,18 @@ export default function MenstrualCycleTracker({
       </div>
 
       <Tabs defaultValue="today" className="space-y-5">
+        <TabsContent value="today" className="space-y-5">
+          <div className="space-y-4">
+            <WellnessDonutChart derivedState={derivedState} />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="overview" className="space-y-5">
+          <div className="space-y-4">
+            <WellnessDonutChart derivedState={derivedState} />
+          </div>
+        </TabsContent>
+
         <TabsList className="grid w-full grid-cols-2 gap-3 bg-transparent p-0">
           <TabsTrigger 
             value="today" 
@@ -135,14 +147,11 @@ export default function MenstrualCycleTracker({
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="today" className="space-y-5">
-          <div className="space-y-4">
-            <WellnessDonutChart derivedState={derivedState} />
-            <SuggestedToday derivedState={derivedState} accessCode={accessCode} />
-          </div>
+        <TabsContent value="today" className="mt-5">
+          <SuggestedToday derivedState={derivedState} accessCode={accessCode} />
         </TabsContent>
 
-        <TabsContent value="overview" className="space-y-5">
+        <TabsContent value="overview" className="mt-5">
           <PhaseOverview phaseRanges={derivedState.phaseRanges} currentPhase={derivedState.currentPhase} />
         </TabsContent>
       </Tabs>
