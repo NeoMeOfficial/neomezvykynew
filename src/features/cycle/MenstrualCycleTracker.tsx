@@ -108,7 +108,10 @@ export default function MenstrualCycleTracker({
               </p>
               <div className="w-2 h-2 rounded-full bg-rose-400"></div>
             </div>
-            <Button variant="secondary" className="px-4 py-2 text-sm font-medium">
+            <Button 
+              className="px-4 py-2 text-sm font-medium bg-gradient-to-r from-rose-50 to-pink-50 border border-rose-200/30 rounded-3xl symptom-glass hover:from-rose-50 hover:to-pink-50 transition-all"
+              style={{ color: '#F4415F' }}
+            >
               {formatDateSk(nextPeriodDate)}
             </Button>
           </div>
