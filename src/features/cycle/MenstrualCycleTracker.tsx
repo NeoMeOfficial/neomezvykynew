@@ -124,13 +124,13 @@ export default function MenstrualCycleTracker({
         <TabsContent value="today" className="space-y-5">
           <div className="space-y-4">
             {/* Phase selector buttons */}
-            <div className="flex flex-wrap gap-2 justify-center">
+            <div className="flex gap-1 justify-center overflow-x-auto">
               {derivedState.phaseRanges.map((phase) => (
                 <Button
                   key={phase.key}
                   onClick={() => setSelectedPhase(selectedPhase === phase.key ? null : phase.key)}
                   variant={selectedPhase === phase.key ? "default" : "outline"}
-                  className={`text-sm px-3 py-1 rounded-full transition-all ${
+                  className={`text-xs px-2 py-1 rounded-full transition-all whitespace-nowrap flex-shrink-0 ${
                     selectedPhase === phase.key 
                       ? 'bg-gradient-primary border-none symptom-glass'
                       : 'bg-gradient-to-r from-rose-50/80 to-pink-50/80 border border-rose-200/30 symptom-glass hover:from-rose-50 hover:to-pink-50'
