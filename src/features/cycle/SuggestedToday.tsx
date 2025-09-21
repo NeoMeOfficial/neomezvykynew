@@ -55,13 +55,98 @@ export function SuggestedToday({
           <div className="space-y-3">
             
             
-            {/* Motivational Message */}
-            <div className="bg-gradient-to-r from-rose-50/80 to-pink-50/80 border border-rose-200/30 rounded-xl p-3">
-              <p className="text-sm font-medium text-center" style={{
-              color: '#F4415F'
-            }}>
-                {getMotivationalMessage()}
-              </p>
+            {/* Enhanced Cycle Stage Explanation */}
+            <div className="bg-gradient-to-r from-rose-50/80 to-pink-50/80 border border-rose-200/30 rounded-xl p-4 space-y-3">
+              {/* Current Phase Title */}
+              <div className="text-center">
+                <h3 className="text-lg font-bold mb-1" style={{ color: '#F4415F' }}>
+                  {phaseInsights.title} - Deň {dayInPhase + 1}
+                </h3>
+                <p className="text-sm font-medium" style={{ color: '#955F6A' }}>
+                  {phaseInsights.description}
+                </p>
+              </div>
+
+              {/* What's Happening Now */}
+              <div className="space-y-2">
+                <h4 className="text-sm font-semibold" style={{ color: '#F4415F' }}>
+                  🔄 Čo sa práve deje vo vašom tele:
+                </h4>
+                <p className="text-sm leading-relaxed" style={{ color: '#955F6A' }}>
+                  {(() => {
+                    const currentDescription = phaseInsights.dailyFocus[dailyFocusIndex];
+                    switch (suggestion.phaseKey) {
+                      case "menstrual":
+                        return `Vaše telo sa zbavuje starej výstelky maternice. ${currentDescription} Hormóny estrogén a progesterón jsou na najnižšej úrovni, čo môže spôsobovať únavu a potrebu odpočinku.`;
+                      case "follicular":
+                        return `Vaše telo sa pripravuje na ovuláciu. ${currentDescription} Hladina estrogénu postupne stúpa, dodávajúc vám energiu a zlepšujúc náladu každým dňom.`;
+                      case "ovulation":
+                        return `Práve prebieha ovulácia! ${currentDescription} Estrogén je na vrchole a vaše telo je pripravené na možné počatie. Cítite sa energicky a atraktívne.`;
+                      case "luteal":
+                        return `Po ovulácii sa telo pripravuje buď na tehotenstvo alebo na menštruáciu. ${currentDescription} Progesterón postupne klesá a môžete pociťovať prvé príznaky PMS.`;
+                      default:
+                        return currentDescription;
+                    }
+                  })()}
+                </p>
+              </div>
+
+              {/* Yesterday vs Today */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-white/40 rounded-lg p-2">
+                  <h5 className="text-xs font-semibold mb-1" style={{ color: '#F4415F' }}>
+                    🕐 Včera
+                  </h5>
+                  <p className="text-xs" style={{ color: '#955F6A' }}>
+                    {(() => {
+                      const yesterdayDay = derivedState.currentDay - 1;
+                      const yesterdaySuggestion = suggestForDay(yesterdayDay > 0 ? yesterdayDay : derivedState.phaseRanges.reduce((total, phase) => total + (phase.end - phase.start + 1), 0), derivedState.phaseRanges);
+                      const energyChange = suggestion.energy - yesterdaySuggestion.energy;
+                      return energyChange > 0 ? `Energia rástla (+${energyChange}%)` : energyChange < 0 ? `Energia klesala (${energyChange}%)` : 'Energia stabilná';
+                    })()}
+                  </p>
+                </div>
+                <div className="bg-white/40 rounded-lg p-2">
+                  <h5 className="text-xs font-semibold mb-1" style={{ color: '#F4415F' }}>
+                    ✨ Dnes
+                  </h5>
+                  <p className="text-xs" style={{ color: '#955F6A' }}>
+                    {suggestion.energy >= 70 ? 'Vysoká energia!' : suggestion.energy >= 50 ? 'Stredná energia' : 'Pokojná energia'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Tomorrow Teaser */}
+              <div className="bg-gradient-to-r from-pink-50/60 to-rose-50/60 border border-pink-200/40 rounded-lg p-3">
+                <h4 className="text-sm font-semibold mb-1" style={{ color: '#F4415F' }}>
+                  🔮 Čo vás čaká zajtra?
+                </h4>
+                <p className="text-sm" style={{ color: '#955F6A' }}>
+                  {(() => {
+                    const tomorrowDay = derivedState.currentDay + 1;
+                    const daysToNextPhase = derivedState.currentPhase.end - derivedState.currentDay;
+                    
+                    if (daysToNextPhase <= 1) {
+                      return `Zajtra začína nová fáza: ${nextPhaseInsights.title}! Pripravte sa na ${nextPhaseInsights.energy.toLowerCase()} a ${nextPhaseInsights.mood.toLowerCase()}.`;
+                    } else {
+                      const tomorrowSuggestion = suggestForDay(tomorrowDay, derivedState.phaseRanges);
+                      const energyChange = tomorrowSuggestion.energy - suggestion.energy;
+                      return energyChange > 0 
+                        ? `Energia bude rásť ešё viac! Perfektný čas na plánovanie náročnejších úloh.`
+                        : energyChange < 0 
+                        ? `Energia mierne poklesne. Ideálny čas na relaxačné aktivity a sebaopateru.`
+                        : `Energia zostane stabilná. Pokračujte v rovnakom tempe ako dnes.`;
+                    }
+                  })()}
+                </p>
+              </div>
+
+              {/* Motivational Message */}
+              <div className="text-center pt-1">
+                <p className="text-sm font-medium" style={{ color: '#F4415F' }}>
+                  {getMotivationalMessage()}
+                </p>
+              </div>
             </div>
             
             {/* Energy & Mood Labels */}
