@@ -73,7 +73,7 @@ export function SuggestedToday({ derivedState, className = "", accessCode }: Sug
 
         {/* Energy Level Container with Indicators */}
         <div className="symptom-glass rounded-xl p-4 space-y-3" style={{ backgroundColor: '#FBF8F9' }}>
-          {/* Energy Level with Visual Indicator */}
+          {/* Energy Level with Battery Indicator */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-base font-medium" style={{ color: '#955F6A' }}>Energia</span>
@@ -81,22 +81,30 @@ export function SuggestedToday({ derivedState, className = "", accessCode }: Sug
                 {suggestion.energy}%
               </span>
             </div>
-            <div className="relative h-3 w-full bg-gradient-to-r from-rose-50/50 to-pink-50/50 rounded-full overflow-hidden border border-rose-200/30">
-              <div 
-                className="absolute left-0 top-0 h-full rounded-full transition-all duration-700 shadow-sm"
-                style={{
-                  width: `${suggestion.energy}%`,
-                  background: `linear-gradient(90deg, ${getEnergyColor(suggestion.energy)}, ${getEnergyColor(suggestion.energy)}80)`
-                }}
-              />
-              <div 
-                className="absolute top-0 h-full w-1 bg-white/60 rounded-full shadow-sm transition-all duration-700"
-                style={{ left: `${suggestion.energy}%` }}
-              />
+            <div className="flex items-center justify-center gap-3">
+              {/* Battery Icon */}
+              <div className="relative">
+                <div className="w-12 h-6 border-2 rounded-sm" style={{ borderColor: '#955F6A' }}>
+                  <div 
+                    className="h-full rounded-sm transition-all duration-700"
+                    style={{
+                      width: `${suggestion.energy}%`,
+                      backgroundColor: getEnergyColor(suggestion.energy)
+                    }}
+                  />
+                </div>
+                <div 
+                  className="absolute -right-1 top-1/2 w-1 h-3 rounded-r-sm transform -translate-y-1/2"
+                  style={{ backgroundColor: '#955F6A' }}
+                />
+              </div>
+              <span className="text-sm font-medium" style={{ color: '#955F6A' }}>
+                {suggestion.energy >= 80 ? '🔋' : suggestion.energy >= 60 ? '🔋' : suggestion.energy >= 40 ? '🪫' : '🪫'}
+              </span>
             </div>
           </div>
           
-          {/* Mood Section with Visual Indicator */}
+          {/* Mood Section with Emoji Indicator */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-base font-medium" style={{ color: '#955F6A' }}>Nálada</span>
@@ -107,16 +115,18 @@ export function SuggestedToday({ derivedState, className = "", accessCode }: Sug
                 </span>
               </div>
             </div>
-            <div className="flex gap-1 justify-center">
+            <div className="flex items-center justify-center gap-2">
               {[1, 2, 3, 4, 5].map((level) => (
-                <div
+                <span
                   key={level}
-                  className={`h-3 w-6 rounded-full transition-all duration-500 ${
-                    level <= Math.round(suggestion.mood) 
-                      ? 'bg-gradient-to-r from-yellow-300 to-yellow-400 shadow-sm' 
-                      : 'bg-gradient-to-r from-rose-50/80 to-pink-50/80 border border-rose-200/30'
-                  }`}
-                />
+                  className="text-lg transition-all duration-500"
+                  style={{
+                    opacity: level <= Math.round(suggestion.mood) ? 1 : 0.3,
+                    filter: level <= Math.round(suggestion.mood) ? 'none' : 'grayscale(100%)'
+                  }}
+                >
+                  {level <= 1 ? '😞' : level <= 2 ? '😕' : level <= 3 ? '😐' : level <= 4 ? '🙂' : '🤩'}
+                </span>
               ))}
             </div>
           </div>
