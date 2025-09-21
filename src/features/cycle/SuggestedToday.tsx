@@ -67,7 +67,7 @@ export function SuggestedToday({
             </p>
           </div>
 
-          {/* What to Expect Today */}
+          {/* What to Expect Today - Combined */}
           <div className="bg-gradient-to-r from-rose-50/60 to-pink-50/60 border border-rose-200/30 rounded-xl p-4">
             <h4 className="text-sm font-semibold mb-2" style={{
             color: '#F4415F'
@@ -80,69 +80,15 @@ export function SuggestedToday({
               {(() => {
               switch (suggestion.phaseKey) {
                 case "menstrual":
-                  return `Môžete sa cítiť unavene a potrebovať viac odpočinku. Bolesť a kŕče sú normálne. Doprajte si pokoj, teplé nápoje a jemné pohyby.`;
+                  return `Môžete sa cítiť unavene a potrebovať viac odpočinku. Bolesť a kŕče sú normálne. Vaša energia je nízka (${suggestion.energy}%), preto sa zamerajte na jemné aktivity, teplé nápoje a dostatok spánku. Môžete byť emotívnejšia ako obvykle - buďte k sebe zhovievavá.`;
                 case "follicular":
-                  return `Každým dňom sa budete cítiť energickejšie a optimistickejšie. Vaša motivácia rastie a je to ideálny čas na nové projekty a aktivity.`;
+                  return `Každým dňom sa budete cítiť energickejšie a optimistickejšie. Vaša energia rastie na ${suggestion.energy}% a motivácia sa zvyšuje. Je to ideálny čas na nové projekty a aktívnejší pohyb. Nálada sa zlepšuje a cítite sa stále pozitívnejšie.`;
                 case "ovulation":
-                  return `Cítite sa na vrchole svojich síl! Ste sebavedomá, energická a sociálna. Využite tento čas na dôležité úlohy a stretnutia.`;
+                  return `Cítite sa na vrchole svojich síl! Vaša energia je na maximum (${suggestion.energy}%) a ste sebavedomá, energická a sociálna. Využite tento čas na dôležité úlohy, intenzívne aktivity a stretnutia. Nálada je vynikajúca a máte chuť na spoločenské aktivity.`;
                 case "luteal":
-                  return `Môžete sa cítiť menej energicky a potrebovať viac času na odpočinok. Nálada môže kolísať, čo je úplne normálne.`;
+                  return `Môžete sa cítiť menej energicky (${suggestion.energy}%) a potrebovať viac času na odpočinok. Energia postupne klesá, preto potrebujete pravidelné jedlá a menej náročné aktivity. Nálada môže kolísať - môžete sa cítiť podráždenejšia alebo úzkostlivejšia. Je to normálne, buďte k sebe trpezlivá.`;
                 default:
                   return phaseInsights.dailyFocus[dailyFocusIndex];
-              }
-            })()}
-            </p>
-          </div>
-
-          {/* Energy Expectations */}
-          <div className="bg-gradient-to-r from-amber-50/60 to-yellow-50/60 border border-amber-200/30 rounded-xl p-4">
-            <h4 className="text-sm font-semibold mb-2" style={{
-            color: '#F4415F'
-          }}>
-              Vaša energia dnes ({suggestion.energy}%):
-            </h4>
-            <p className="text-sm leading-relaxed" style={{
-            color: '#955F6A'
-          }}>
-              {(() => {
-              switch (suggestion.phaseKey) {
-                case "menstrual":
-                  return `Nízka energia je normálna. Zamerajte sa na jemné aktivity, dostatok spánku a výživné jedlá. Vyhýbajte sa náročným cvičeniam.`;
-                case "follicular":
-                  return `Vaša energia rastie! Môžete postupne zvyšovať aktivitu. Ideálny čas na plánovanie a začínanie nových vecí.`;
-                case "ovulation":
-                  return `Máte maximum energie! Využite ju na náročné úlohy, intenzívne cvičenie a dôležité rozhodnutia.`;
-                case "luteal":
-                  return `Energia postupne klesá. Potrebujete pravidelné jedlá, viac odpočinku a menej náročné aktivity.`;
-                default:
-                  return `Energia je na úrovni ${suggestion.energy}%.`;
-              }
-            })()}
-            </p>
-          </div>
-
-          {/* Mood & Emotional Expectations */}
-          <div className="bg-gradient-to-r from-purple-50/60 to-violet-50/60 border border-purple-200/30 rounded-xl p-4">
-            <h4 className="text-sm font-semibold mb-2" style={{
-            color: '#F4415F'
-          }}>
-              Ako sa môžete cítiť:
-            </h4>
-            <p className="text-sm leading-relaxed" style={{
-            color: '#955F6A'
-          }}>
-              {(() => {
-              switch (suggestion.phaseKey) {
-                case "menstrual":
-                  return `Môžete byť emotívnejšia ako obvykle. Smútok alebo úzkosť sú normálne. Buďte k sebe zhovievavá a doprajte si čas na regeneráciu.`;
-                case "follicular":
-                  return `Vaša nálada sa zlepšuje! Cítite sa optimistickejšie, motivovanejšie a máte chuť na nové výzvy.`;
-                case "ovulation":
-                  return `Cítite sa fantasticky! Ste sebavedomá, atraktívna a máte chuť na spoločenské aktivity a nové kontakty.`;
-                case "luteal":
-                  return `Nálada môže kolísať. Môžete sa cítiť podráždenejšia alebo úzkostlivejšia. Je to normálne - buďte k sebe trpezlivá.`;
-                default:
-                  return `Nálada je na úrovni ${Math.round(suggestion.mood)}/5.`;
               }
             })()}
             </p>
