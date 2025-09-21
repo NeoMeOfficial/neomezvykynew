@@ -84,7 +84,7 @@ export function SuggestedToday({ derivedState, className = "", accessCode }: Sug
             <div className="flex items-center justify-center gap-3">
               {/* Battery Icon */}
               <div className="relative">
-                <div className="w-12 h-6 border-2 rounded-sm" style={{ borderColor: '#955F6A' }}>
+                <div className="w-12 h-6 border-2 rounded-sm" style={{ borderColor: '#F4415F' }}>
                   <div 
                     className="h-full rounded-sm transition-all duration-700"
                     style={{
@@ -95,7 +95,7 @@ export function SuggestedToday({ derivedState, className = "", accessCode }: Sug
                 </div>
                 <div 
                   className="absolute -right-1 top-1/2 w-1 h-3 rounded-r-sm transform -translate-y-1/2"
-                  style={{ backgroundColor: '#955F6A' }}
+                  style={{ backgroundColor: '#F4415F' }}
                 />
               </div>
               <span className="text-sm font-medium" style={{ color: '#955F6A' }}>
