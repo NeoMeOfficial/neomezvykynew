@@ -122,10 +122,10 @@ export const PHASE_INSIGHTS: Record<PhaseKey, {
       "Zamerajte sa na výživu ktorá vás udrží v energii"
     ],
     strava: [
-      ["Jedzte komplexné sacharidy ako ovos a quinoa", "Konzumujte tmavú čokoládu pre serotonín", "Pridajte do stravy tekvicové semienka pre horčík"],
-      ["Pripravte si výdatné polievky s luštěninami", "Jedzte sladké zemiaky pre stabilnú energiu", "Konzumujte zelené listy pre vitamíny skupiny B"],
-      ["Pridajte do jedál avokádo pre zdravé tuky", "Jedzte ryby pre omega-3 a protein", "Pite bylinkové čaje ako medovka proti napätiu"],
-      ["Konzumujte orechy a semienka pred menštruáciou", "Jedzte červené mäso pre železo", "Pridajte škoricou pre reguláciu cukru v krvi"]
+      ["Jedzte komplexné sacharidy ako ovos a quinoa - poskytujú stabilnú energiu bez prudkých výkyvov cukru v krvi, čo pomáha udržať vyrovnanú náladu", "Konzumujte tmavú čokoládu pre serotonín - obsahuje tryptofán a magnesium, ktoré prirodzene zvyšujú hladinu hormónu šťastia a znižujú stres", "Pridajte do stravy tekvicové semienka pre horčík - tento minerál uvoľňuje svaly, znižuje úzkosť a zlepšuje kvalitu spánku"],
+      ["Pripravte si výdatné polievky s luštěninami - bohaté na proteíny a vlákninu, ktoré udržujú pocit sýtosti a stabilizujú hladinu cukru v krvi", "Jedzte sladké zemiaky pre stabilnú energiu - obsahujú komplexné sacharidy a beta-karotén, ktorý podporuje imunitný systém", "Konzumujte zelené listy pre vitamíny skupiny B - podporujú nervový systém a pomáhajú telu zvládať stres počas PMS"],
+      ["Pridajte do jedál avokádo pre zdravé tuky - obsahuje omega-3 mastné kyseliny, ktoré znižujú zápal a podporujú hormonálnu rovnováhu", "Jedzte ryby pre omega-3 a protein - tieto mastné kyseliny zmierňujú bolesti a zlepšujú náladu, protein udržuje stabilnú energiu", "Pite bylinkové čaje ako medovka proti napätiu - má prirodzené upokojujúce účinky a pomáha relaxovať svaly"],
+      ["Konzumujte orechy a semienka pred menštruáciou - bohaté na magnesium a zdravé tuky, ktoré zmierňujú kŕče a podporujú hormonálnu produkciu", "Jedzte červené mäso pre železo - pomáha predchádzať únave a anémii, ktoré môžu vzniknúť počas menštruácie", "Pridajte škoricu pre reguláciu cukru v krvi - pomáha stabilizovať hladinu glukózy a znižuje chute na sladké"]
     ],
     pohyb: [
       ["Cvičte pilates pre posilnenie a flexibilitu", "Urobte si miernu precházku s kamarátkou", "Venujte sa gentle flow jóge"],
