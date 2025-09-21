@@ -53,17 +53,13 @@ export function SuggestedToday({
         backgroundColor: '#FBF8F9'
       }}>
           <div className="space-y-3">
-            <p className="text-sm" style={{
-            color: '#955F6A'
-          }}>
-              {phaseDuration} dní • {phaseInsights.description}
-            </p>
+            
             
             {/* Motivational Message */}
             <div className="bg-gradient-to-r from-rose-50/80 to-pink-50/80 border border-rose-200/30 rounded-xl p-3">
               <p className="text-sm font-medium text-center" style={{
-                color: '#F4415F'
-              }}>
+              color: '#F4415F'
+            }}>
                 {getMotivationalMessage()}
               </p>
             </div>
@@ -74,39 +70,37 @@ export function SuggestedToday({
                 {/* Energia row with battery indicator */}
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-xs font-medium" style={{
-                    color: '#955F6A'
-                  }}>Energia</p>
+                  color: '#955F6A'
+                }}>Energia</p>
                   <div className="flex items-center gap-2">
                     <div className="relative">
                       <div className="w-8 h-4 border-2 rounded-sm" style={{
-                        borderColor: '#F4415F'
-                      }}>
+                      borderColor: '#F4415F'
+                    }}>
                         <div className="h-full rounded-sm transition-all duration-700" style={{
-                          width: `${suggestion.energy}%`,
-                          backgroundColor: '#F4A6B8'
-                        }} />
+                        width: `${suggestion.energy}%`,
+                        backgroundColor: '#F4A6B8'
+                      }} />
                       </div>
                       <div className="absolute -right-0.5 top-1/2 w-0.5 h-2 rounded-r-sm transform -translate-y-1/2" style={{
-                        backgroundColor: '#F4415F'
-                      }} />
+                      backgroundColor: '#F4415F'
+                    }} />
                     </div>
                     <span className="text-xs font-bold" style={{
-                      color: '#F4415F'
-                    }}>
+                    color: '#F4415F'
+                  }}>
                       {suggestion.energy}%
                     </span>
                   </div>
                 </div>
                 {/* Description and additional context */}
                 <p className="text-sm font-semibold text-center mb-1" style={{
-                  color: '#F4415F'
-                }}>{phaseInsights.energy}</p>
+                color: '#F4415F'
+              }}>{phaseInsights.energy}</p>
                 <p className="text-xs text-center" style={{
-                  color: '#955F6A'
-                }}>
-                  {suggestion.energy >= 70 ? 'Vysoká energia - využite ju na náročné úlohy' : 
-                   suggestion.energy >= 50 ? 'Stredná energia - vhodná na bežné aktivity' :
-                   'Nízka energia - zamerajte sa na odpočinok'}
+                color: '#955F6A'
+              }}>
+                  {suggestion.energy >= 70 ? 'Vysoká energia - využite ju na náročné úlohy' : suggestion.energy >= 50 ? 'Stredná energia - vhodná na bežné aktivity' : 'Nízka energia - zamerajte sa na odpočinok'}
                 </p>
               </div>
               
@@ -114,27 +108,25 @@ export function SuggestedToday({
                 {/* Nálada row with emojis */}
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-xs font-medium" style={{
-                    color: '#955F6A'
-                  }}>Nálada</p>
+                  color: '#955F6A'
+                }}>Nálada</p>
                   <div className="flex items-center gap-1">
                     {[1, 2, 3, 4, 5].map(level => <span key={level} className="text-xs transition-all duration-500" style={{
-                      opacity: level <= Math.round(suggestion.mood) ? 1 : 0.3,
-                      filter: level <= Math.round(suggestion.mood) ? 'none' : 'grayscale(100%)'
-                    }}>
+                    opacity: level <= Math.round(suggestion.mood) ? 1 : 0.3,
+                    filter: level <= Math.round(suggestion.mood) ? 'none' : 'grayscale(100%)'
+                  }}>
                         {level <= 1 ? '😞' : level <= 2 ? '😕' : level <= 3 ? '😐' : level <= 4 ? '🙂' : '🤩'}
                       </span>)}
                   </div>
                 </div>
                 {/* Description and additional context */}
                 <p className="text-sm font-semibold text-center mb-1" style={{
-                  color: '#F4415F'
-                }}>{phaseInsights.mood}</p>
+                color: '#F4415F'
+              }}>{phaseInsights.mood}</p>
                 <p className="text-xs text-center" style={{
-                  color: '#955F6A'
-                }}>
-                  {Math.round(suggestion.mood) >= 4 ? 'Skvelá nálada - ideálny čas na sociálne aktivity' :
-                   Math.round(suggestion.mood) >= 3 ? 'Stabilná nálada - vyvážený deň' :
-                   'Pokojná nálada - vhodný čas na relaxáciu'}
+                color: '#955F6A'
+              }}>
+                  {Math.round(suggestion.mood) >= 4 ? 'Skvelá nálada - ideálny čas na sociálne aktivity' : Math.round(suggestion.mood) >= 3 ? 'Stabilná nálada - vyvážený deň' : 'Pokojná nálada - vhodný čas na relaxáciu'}
                 </p>
               </div>
             </div>
