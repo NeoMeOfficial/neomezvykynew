@@ -148,7 +148,7 @@ export function WellnessDonutChart({ derivedState, onEditClick, className = "", 
           {selectedOutcome ? (
             <>
               <div className="text-sm text-center mb-1 font-medium" style={{ color: 'hsl(var(--foreground))' }}>
-                {selectedOutcome === 'next-period' ? 'Dalšia perioda' : 'Plodné dni'}
+                {selectedOutcome === 'next-period' ? 'Ďalšia perioda začne o' : 'Plodné dni'}
               </div>
               <div className="text-4xl font-bold" style={{ color: 'hsl(var(--foreground))' }}>
                 {(() => {
