@@ -161,8 +161,8 @@ export function WellnessDonutChart({ derivedState, onEditClick, className = "", 
                     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                     
                     if (diffDays <= 0) return 'Dnes';
-                    if (diffDays === 1) return 'Zajtra';
-                    return diffDays;
+                    if (diffDays === 1) return 'o Zajtra';
+                    return `o ${diffDays}`;
                   } else {
                     // Fertile days calculation (ovulation is around day 14 in a 28-day cycle)
                     const ovulationDay = Math.round(cycleData.cycleLength * 0.5);
