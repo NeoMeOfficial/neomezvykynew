@@ -150,7 +150,7 @@ export function WellnessDonutChart({ derivedState, onEditClick, className = "", 
               <div className="text-sm text-center mb-1 font-medium" style={{ color: 'hsl(var(--foreground))' }}>
                 {selectedOutcome === 'next-period' ? 
                   (currentPhase.key === 'menstrual' ? 'Period už iba' : 'Ďalšia perioda začne') : 
-                  'Plodné dni'}
+                  'Plodné dni začnú'}
               </div>
               <div className="text-4xl font-bold" style={{ color: 'hsl(var(--foreground))' }}>
                 {(() => {
@@ -191,14 +191,22 @@ export function WellnessDonutChart({ derivedState, onEditClick, className = "", 
                     const fertileStart = ovulationDay - 5;
                     const fertileEnd = ovulationDay + 1;
                     
+                    let daysToShow;
                     if (derivedState.currentDay >= fertileStart && derivedState.currentDay <= fertileEnd) {
-                      return fertileEnd - derivedState.currentDay + 1;
+                      daysToShow = fertileEnd - derivedState.currentDay + 1;
                     } else if (derivedState.currentDay < fertileStart) {
-                      return fertileStart - derivedState.currentDay;
+                      daysToShow = fertileStart - derivedState.currentDay;
                     } else {
                       const nextFertileStart = fertileStart + cycleData.cycleLength;
-                      return nextFertileStart - derivedState.currentDay;
+                      daysToShow = nextFertileStart - derivedState.currentDay;
                     }
+                    
+                    return (
+                      <>
+                        <span className="text-2xl">o </span>
+                        {daysToShow}
+                      </>
+                    );
                   }
                 })()}
               </div>
