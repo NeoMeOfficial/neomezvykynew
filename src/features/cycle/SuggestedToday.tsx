@@ -105,9 +105,14 @@ export function SuggestedToday({
         </div>
 
         {/* Symptom Tracker Container */}
-        <div className="symptom-glass rounded-xl p-4" style={{
+        <div className="symptom-glass rounded-xl p-4 space-y-4" style={{
         backgroundColor: '#FBF8F9'
       }}>
+          <h3 className="text-lg font-bold text-center" style={{
+            color: '#F4415F'
+          }}>
+            Zaznač si to podstatné
+          </h3>
           <SymptomTracker currentPhase={derivedState.currentPhase.key} currentDay={derivedState.currentDay} accessCode={accessCode} />
         </div>
       </div>
