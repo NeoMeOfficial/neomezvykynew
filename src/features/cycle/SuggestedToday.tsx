@@ -65,7 +65,7 @@ export function SuggestedToday({
           {/* What's Happening in Body */}
           <div className="bg-gradient-to-r from-rose-50/60 to-pink-50/60 border border-rose-200/30 rounded-xl p-4">
             <h4 className="text-sm font-semibold mb-2" style={{ color: '#F4415F' }}>
-              🔄 Čo sa práve deje vo vašom tele:
+              Čo sa práve deje vo vašom tele:
             </h4>
             <p className="text-sm leading-relaxed" style={{ color: '#955F6A' }}>
               {(() => {
@@ -88,7 +88,7 @@ export function SuggestedToday({
           {/* Energy Level & Sources */}
           <div className="bg-gradient-to-r from-amber-50/60 to-yellow-50/60 border border-amber-200/30 rounded-xl p-4">
             <h4 className="text-sm font-semibold mb-2" style={{ color: '#F4415F' }}>
-              ⚡ Energia a jej zdroje:
+              Energia a jej zdroje:
             </h4>
             <p className="text-sm leading-relaxed" style={{ color: '#955F6A' }}>
               {(() => {
@@ -111,7 +111,7 @@ export function SuggestedToday({
           {/* Mood, Stress & Emotions */}
           <div className="bg-gradient-to-r from-purple-50/60 to-violet-50/60 border border-purple-200/30 rounded-xl p-4">
             <h4 className="text-sm font-semibold mb-2" style={{ color: '#F4415F' }}>
-              💭 Nálada a emócie:
+              Nálada a emócie:
             </h4>
             <p className="text-sm leading-relaxed" style={{ color: '#955F6A' }}>
               {(() => {
