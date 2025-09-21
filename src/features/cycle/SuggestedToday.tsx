@@ -80,13 +80,13 @@ export function SuggestedToday({
               {(() => {
               switch (suggestion.phaseKey) {
                 case "menstrual":
-                  return `Môžete sa cítiť unavene a potrebovať viac odpočinku. Bolesť a kŕče sú normálne. Vaša energia je nízka (${suggestion.energy}%), preto sa zamerajte na jemné aktivity, teplé nápoje a dostatok spánku. Môžete byť emotívnejšia ako obvykle - buďte k sebe zhovievavá.`;
+                  return `Môžeš sa cítiť unavene a potrebovať viac odpočinku. Bolesť a kŕče sú normálne. Tvoja energia je nízka (${suggestion.energy}%), preto sa zameraj na jemné aktivity, teplé nápoje a dostatok spánku. Môžeš byť emotívnejšia ako obvykle - buď k sebe zhovievavá.`;
                 case "follicular":
-                  return `Každým dňom sa budete cítiť energickejšie a optimistickejšie. Vaša energia rastie na ${suggestion.energy}% a motivácia sa zvyšuje. Je to ideálny čas na nové projekty a aktívnejší pohyb. Nálada sa zlepšuje a cítite sa stále pozitívnejšie.`;
+                  return `Každým dňom sa budeš cítiť energickejšie a optimistickejšie. Tvoja energia rastie na ${suggestion.energy}% a motivácia sa zvyšuje. Je to ideálny čas na nové projekty a aktívnejší pohyb. Nálada sa zlepšuje a cítiš sa stále pozitívnejšie.`;
                 case "ovulation":
-                  return `Cítite sa na vrchole svojich síl! Vaša energia je na maximum (${suggestion.energy}%) a ste sebavedomá, energická a sociálna. Využite tento čas na dôležité úlohy, intenzívne aktivity a stretnutia. Nálada je vynikajúca a máte chuť na spoločenské aktivity.`;
+                  return `Cítiš sa na vrchole svojich síl! Tvoja energia je na maximum (${suggestion.energy}%) a si sebavedomá, energická a sociálna. Využi tento čas na dôležité úlohy, intenzívne aktivity a stretnutia. Nálada je vynikajúca a máš chuť na spoločenské aktivity.`;
                 case "luteal":
-                  return `Môžete sa cítiť menej energicky (${suggestion.energy}%) a potrebovať viac času na odpočinok. Energia postupne klesá, preto potrebujete pravidelné jedlá a menej náročné aktivity. Nálada môže kolísať - môžete sa cítiť podráždenejšia alebo úzkostlivejšia. Je to normálne, buďte k sebe trpezlivá.`;
+                  return `Môžeš sa cítiť menej energicky (${suggestion.energy}%) a potrebovať viac času na odpočinok. Energia postupne klesá, preto potrebuješ pravidelné jedlá a menej náročné aktivity. Nálada môže kolísať - môžeš sa cítiť podráždenejšia alebo úzkostlivejšia. Je to normálne, buď k sebe trpezlivá.`;
                 default:
                   return phaseInsights.dailyFocus[dailyFocusIndex];
               }
