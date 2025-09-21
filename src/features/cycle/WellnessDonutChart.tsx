@@ -1,30 +1,40 @@
 import React from 'react';
 import { Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { DerivedState, PhaseKey } from './types';
+import { DerivedState, PhaseKey, CycleData } from './types';
 import { getPhaseColor } from './suggestions';
+import { isPeriodDate, isFertilityDate, getNextPeriodDate } from './utils';
+
+type OutcomeType = 'next-period' | 'fertile-days';
 import { UI_TEXT } from './insights';
 
 interface WellnessDonutChartProps {
   derivedState: DerivedState;
   onEditClick?: () => void;
   className?: string;
-  selectedPhase?: PhaseKey | null;
+  selectedOutcome?: OutcomeType | null;
+  cycleData?: CycleData;
 }
 
-export function WellnessDonutChart({ derivedState, onEditClick, className = "", selectedPhase }: WellnessDonutChartProps) {
+export function WellnessDonutChart({ derivedState, onEditClick, className = "", selectedOutcome, cycleData }: WellnessDonutChartProps) {
   const { currentDay, phaseRanges, currentPhase } = derivedState;
   const cycleLength = phaseRanges[phaseRanges.length - 1].end;
   
-  // Find selected phase and calculate days until it starts or ends
-  const selectedPhaseRange = selectedPhase ? phaseRanges.find(p => p.key === selectedPhase) : null;
-  const isCurrentlyInSelectedPhase = selectedPhaseRange && currentDay >= selectedPhaseRange.start && currentDay <= selectedPhaseRange.end;
-  const daysUntilSelectedPhase = selectedPhaseRange ? 
-    (isCurrentlyInSelectedPhase ? 
-       selectedPhaseRange.end - currentDay : // Days left in current phase
-     selectedPhaseRange.start > currentDay ? 
-       selectedPhaseRange.start - currentDay : // Phase is coming up this cycle
-       (cycleLength - currentDay + selectedPhaseRange.start)) : 0; // Phase is in next cycle
+  // Helper function to check if a day should be highlighted
+  const isDayHighlighted = (day: number): boolean => {
+    if (!selectedOutcome || !cycleData?.lastPeriodStart) return false;
+    
+    const dayDate = new Date(cycleData.lastPeriodStart);
+    dayDate.setDate(dayDate.getDate() + day - 1);
+    
+    if (selectedOutcome === 'next-period') {
+      return isPeriodDate(dayDate, cycleData.lastPeriodStart, cycleData.cycleLength, cycleData.periodLength);
+    } else if (selectedOutcome === 'fertile-days') {
+      return isFertilityDate(dayDate, cycleData.lastPeriodStart, cycleData.cycleLength);
+    }
+    
+    return false;
+  };
   
   // Calculate angles for each phase
   const phaseAngles = phaseRanges.map(phase => {
@@ -69,8 +79,8 @@ export function WellnessDonutChart({ derivedState, onEditClick, className = "", 
             const phaseColor = dayPhase ? getPhaseColor(dayPhase.key) : 'hsl(var(--muted))';
             const isCurrentPhase = dayPhase?.key === currentPhase.key;
             const isToday = day === currentDay;
-            const isSelectedPhase = selectedPhase && dayPhase?.key === selectedPhase;
-            const shouldHighlight = selectedPhase ? isSelectedPhase : isCurrentPhase;
+            const isHighlighted = isDayHighlighted(day);
+            const shouldHighlight = selectedOutcome ? isHighlighted : isCurrentPhase;
             
             return (
               <g key={day}>
@@ -94,10 +104,14 @@ export function WellnessDonutChart({ derivedState, onEditClick, className = "", 
                   cx={dotX}
                   cy={dotY}
                   r={isToday ? "5" : (shouldHighlight ? "4" : "3")}
-                  fill={phaseColor}
+                  fill={
+                    isToday ? '#F4415F' : 
+                    shouldHighlight && selectedOutcome ? (selectedOutcome === 'next-period' ? '#F4415F' : '#FF8A9B') : 
+                    phaseColor
+                  }
                   opacity={shouldHighlight ? 1 : 0.7}
                   className={`transition-all duration-300`}
-                  stroke={isToday ? "hsl(var(--background))" : (shouldHighlight ? phaseColor : "none")}
+                  stroke={isToday ? "hsl(var(--background))" : (shouldHighlight ? "white" : "none")}
                   strokeWidth={isToday ? "1" : (shouldHighlight ? "1" : "0")}
                 />
               </g>
@@ -131,19 +145,58 @@ export function WellnessDonutChart({ derivedState, onEditClick, className = "", 
         
         {/* Center content */}
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-          {selectedPhase && selectedPhaseRange ? (
+          {selectedOutcome ? (
             <>
               <div className="text-sm text-center mb-1 font-medium" style={{ color: 'hsl(var(--foreground))' }}>
-                {selectedPhaseRange.name}
+                {selectedOutcome === 'next-period' ? 'Dalšia perioda' : 'Plodné dni'}
               </div>
               <div className="text-4xl font-bold" style={{ color: 'hsl(var(--foreground))' }}>
-                {daysUntilSelectedPhase}
+                {(() => {
+                  if (!cycleData?.lastPeriodStart) return '';
+                  
+                  if (selectedOutcome === 'next-period') {
+                    const nextPeriod = getNextPeriodDate(cycleData.lastPeriodStart, cycleData.cycleLength);
+                    const today = new Date();
+                    const diffTime = nextPeriod.getTime() - today.getTime();
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    
+                    if (diffDays <= 0) return 'Dnes';
+                    if (diffDays === 1) return 'Zajtra';
+                    return diffDays;
+                  } else {
+                    // Fertile days calculation (ovulation is around day 14 in a 28-day cycle)
+                    const ovulationDay = Math.round(cycleData.cycleLength * 0.5);
+                    const fertileStart = ovulationDay - 5;
+                    const fertileEnd = ovulationDay + 1;
+                    
+                    if (derivedState.currentDay >= fertileStart && derivedState.currentDay <= fertileEnd) {
+                      return fertileEnd - derivedState.currentDay + 1;
+                    } else if (derivedState.currentDay < fertileStart) {
+                      return fertileStart - derivedState.currentDay;
+                    } else {
+                      const nextFertileStart = fertileStart + cycleData.cycleLength;
+                      return nextFertileStart - derivedState.currentDay;
+                    }
+                  }
+                })()}
               </div>
               <div className="text-sm text-center font-medium" style={{ color: 'hsl(var(--muted-foreground))' }}>
-                {isCurrentlyInSelectedPhase ? 
-                  (daysUntilSelectedPhase === 0 ? 'posledný deň' : (daysUntilSelectedPhase === 1 ? 'deň zostáva' : 'dní zostáva')) :
-                  (daysUntilSelectedPhase === 1 ? 'deň' : 'dní')
-                }
+                {(() => {
+                  if (!cycleData?.lastPeriodStart) return '';
+                  
+                  if (selectedOutcome === 'next-period') {
+                    const nextPeriod = getNextPeriodDate(cycleData.lastPeriodStart, cycleData.cycleLength);
+                    const today = new Date();
+                    const diffTime = nextPeriod.getTime() - today.getTime();
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    
+                    if (diffDays <= 0) return '';
+                    if (diffDays === 1) return '';
+                    return 'dní';
+                  } else {
+                    return 'dní';
+                  }
+                })()}
               </div>
             </>
           ) : (

@@ -13,6 +13,9 @@ import { SettingsModal } from './SettingsModal';
 import { UI_TEXT } from './insights';
 import { formatDateSk, getNextPeriodDate } from './utils';
 import { PhaseKey } from './types';
+
+type OutcomeType = 'next-period' | 'fertile-days';
+
 interface MenstrualCycleTrackerProps {
   accessCode?: string;
   compact?: boolean;
@@ -35,7 +38,7 @@ export default function MenstrualCycleTracker({
   const [showSettings, setShowSettings] = useState(false);
   const [setupCycleLength, setSetupCycleLength] = useState(28);
   const [setupPeriodLength, setSetupPeriodLength] = useState(5);
-  const [selectedPhase, setSelectedPhase] = useState<PhaseKey | null>(null);
+  const [selectedOutcome, setSelectedOutcome] = useState<OutcomeType | null>(null);
   const handleFirstInteraction = () => {
     onFirstInteraction?.();
   };
@@ -123,25 +126,28 @@ export default function MenstrualCycleTracker({
       <Tabs defaultValue="today" className="space-y-5">
         <TabsContent value="today" className="space-y-5">
           <div className="space-y-4">
-            {/* Phase selector buttons */}
+            {/* Outcome selector buttons */}
             <div className="flex gap-2 justify-center overflow-x-auto px-2 py-1 -mx-2">
-              {derivedState.phaseRanges.map((phase) => (
+              {[
+                { key: 'next-period' as OutcomeType, name: 'Dalšia perioda' },
+                { key: 'fertile-days' as OutcomeType, name: 'Plodné dni' }
+              ].map((outcome) => (
                 <Button
-                  key={phase.key}
-                  onClick={() => setSelectedPhase(selectedPhase === phase.key ? null : phase.key)}
-                  variant={selectedPhase === phase.key ? "default" : "outline"}
+                  key={outcome.key}
+                  onClick={() => setSelectedOutcome(selectedOutcome === outcome.key ? null : outcome.key)}
+                  variant={selectedOutcome === outcome.key ? "default" : "outline"}
                   className={`text-sm px-3 py-1.5 rounded-full transition-all whitespace-nowrap flex-shrink-0 ${
-                    selectedPhase === phase.key 
+                    selectedOutcome === outcome.key 
                       ? 'bg-gradient-primary border-none symptom-glass shadow-sm'
                       : 'bg-gradient-to-r from-rose-50/80 to-pink-50/80 border border-rose-200/30 symptom-glass hover:from-rose-50 hover:to-pink-50 shadow-sm'
                   }`}
                   style={{ color: '#F4415F' }}
                 >
-                  {phase.name}
+                  {outcome.name}
                 </Button>
               ))}
             </div>
-            <WellnessDonutChart derivedState={derivedState} selectedPhase={selectedPhase} />
+            <WellnessDonutChart derivedState={derivedState} selectedOutcome={selectedOutcome} cycleData={cycleData} />
           </div>
         </TabsContent>
 
