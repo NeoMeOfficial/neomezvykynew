@@ -22,22 +22,23 @@ export function SuggestedToday({ derivedState, className = "", accessCode }: Sug
   return (
     <div className={`animate-fade-in ${className}`}>
       <div className="space-y-4">
-        {/* Stage Information */}
+        {/* Phase Information */}
         <div className="symptom-glass rounded-xl p-4 space-y-3" style={{ backgroundColor: '#FBF8F9' }}>
           <div className="space-y-3">
-            <div className="flex items-center gap-3">
-              <div className="w-2 h-2 rounded-full bg-rose-400"></div>
-              <h3 className="text-base font-medium" style={{ color: '#955F6A' }}>
-                {phaseInsights.title}
-              </h3>
-            </div>
             <p className="text-sm" style={{ color: '#955F6A' }}>
-              {phaseInsights.stageIntensity}
+              {phaseDuration} dní • {phaseInsights.description}
             </p>
-            <div className="bg-gradient-to-r from-rose-50/80 to-pink-50/80 border border-rose-200/30 rounded-xl p-3">
-              <p className="text-sm font-medium" style={{ color: '#F4415F' }}>
-                {phaseInsights.dailyFocus[dailyFocusIndex]}
-              </p>
+            
+            {/* Energy & Mood Labels */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="text-center p-3 bg-gradient-to-r from-rose-50/80 to-pink-50/80 border border-rose-200/30 rounded-xl">
+                <p className="text-xs font-medium mb-1" style={{ color: '#955F6A' }}>Energia</p>
+                <p className="text-sm font-semibold" style={{ color: '#F4415F' }}>{phaseInsights.energy}</p>
+              </div>
+              <div className="text-center p-3 bg-gradient-to-r from-rose-50/80 to-pink-50/80 border border-rose-200/30 rounded-xl">
+                <p className="text-xs font-medium mb-1" style={{ color: '#955F6A' }}>Nálada</p>
+                <p className="text-sm font-semibold" style={{ color: '#F4415F' }}>{phaseInsights.mood}</p>
+              </div>
             </div>
           </div>
         </div>

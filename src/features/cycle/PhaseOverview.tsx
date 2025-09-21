@@ -25,28 +25,6 @@ export function PhaseOverview({ phaseRanges, currentPhase, className = "" }: Pha
         }}
       >
         <div className="space-y-4">
-          {/* Phase Header */}
-          <div className="text-center space-y-2">
-            <h2 className="text-xl font-semibold" style={{ color: '#955F6A' }}>
-              {insights.title}
-            </h2>
-            <p className="text-sm" style={{ color: '#955F6A' }}>
-              {currentPhase.end - currentPhase.start + 1} dní • {insights.description}
-            </p>
-          </div>
-
-          {/* Energy & Mood */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="text-center p-3 bg-gradient-to-r from-rose-50/80 to-pink-50/80 border border-rose-200/30 rounded-xl">
-              <p className="text-xs font-medium mb-1" style={{ color: '#955F6A' }}>Energia</p>
-              <p className="text-sm font-semibold" style={{ color: '#F4415F' }}>{insights.energy}</p>
-            </div>
-            <div className="text-center p-3 bg-gradient-to-r from-rose-50/80 to-pink-50/80 border border-rose-200/30 rounded-xl">
-              <p className="text-xs font-medium mb-1" style={{ color: '#955F6A' }}>Nálada</p>
-              <p className="text-sm font-semibold" style={{ color: '#F4415F' }}>{insights.mood}</p>
-            </div>
-          </div>
-
           {/* Three Category Recommendations */}
           <div className="space-y-4">
             {/* Strava */}
