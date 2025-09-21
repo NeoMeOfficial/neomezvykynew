@@ -148,7 +148,9 @@ export function WellnessDonutChart({ derivedState, onEditClick, className = "", 
           {selectedOutcome ? (
             <>
               <div className="text-sm text-center mb-1 font-medium" style={{ color: 'hsl(var(--foreground))' }}>
-                {selectedOutcome === 'next-period' ? 'Ďalšia perioda začne o' : 'Plodné dni'}
+                {selectedOutcome === 'next-period' ? 
+                  (currentPhase.key === 'menstrual' ? 'Period už iba' : 'Ďalšia perioda začne') : 
+                  'Plodné dni'}
               </div>
               <div className="text-4xl font-bold" style={{ color: 'hsl(var(--foreground))' }}>
                 {(() => {
@@ -161,18 +163,28 @@ export function WellnessDonutChart({ derivedState, onEditClick, className = "", 
                     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                     
                     if (diffDays <= 0) return 'Dnes';
-                    if (diffDays === 1) return (
-                      <>
-                        <span className="text-2xl">o </span>
-                        Zajtra
-                      </>
-                    );
-                    return (
-                      <>
-                        <span className="text-2xl">o </span>
-                        {diffDays}
-                      </>
-                    );
+                    if (diffDays === 1) {
+                      if (currentPhase.key === 'menstrual') {
+                        return 'Zajtra';
+                      } else {
+                        return (
+                          <>
+                            <span className="text-2xl">o </span>
+                            Zajtra
+                          </>
+                        );
+                      }
+                    }
+                    if (currentPhase.key === 'menstrual') {
+                      return diffDays;
+                    } else {
+                      return (
+                        <>
+                          <span className="text-2xl">o </span>
+                          {diffDays}
+                        </>
+                      );
+                    }
                   } else {
                     // Fertile days calculation (ovulation is around day 14 in a 28-day cycle)
                     const ovulationDay = Math.round(cycleData.cycleLength * 0.5);
