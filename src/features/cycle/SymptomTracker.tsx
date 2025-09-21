@@ -161,8 +161,8 @@ export function SymptomTracker({ currentPhase, currentDay, accessCode }: Symptom
         <div className="flex items-center justify-between">
           <span className="text-base font-medium" style={{ color: '#955F6A' }}>Poznámky</span>
         </div>
-        <p className="text-sm mb-3" style={{ color: '#955F6A' }}>
-          Zaznamenajte ďalšie informácie o vašom dni
+        <p className="text-sm leading-relaxed" style={{ color: '#955F6A' }}>
+          Napis si poznámky o svojom dni
         </p>
         <Textarea
           value={notes}
