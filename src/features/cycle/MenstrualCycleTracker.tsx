@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { useCycleData } from './useCycleData';
+import { useSupabaseCycleData } from './useSupabaseCycleData';
 import { SuggestedToday } from './SuggestedToday';
 import { WellnessDonutChart } from './WellnessDonutChart';
 import { PhaseOverview } from './PhaseOverview';
@@ -33,7 +33,7 @@ export default function MenstrualCycleTracker({
     setLastPeriodStart,
     setCycleLength,
     setPeriodLength
-  } = useCycleData(accessCode);
+  } = useSupabaseCycleData(accessCode);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [setupCycleLength, setSetupCycleLength] = useState(28);

@@ -41,6 +41,42 @@ export type Database = {
         }
         Relationships: []
       }
+      cycle_data: {
+        Row: {
+          access_code: string
+          created_at: string
+          custom_settings: Json
+          cycle_length: number
+          history: Json | null
+          id: string
+          last_period_start: string | null
+          period_length: number
+          updated_at: string
+        }
+        Insert: {
+          access_code: string
+          created_at?: string
+          custom_settings?: Json
+          cycle_length?: number
+          history?: Json | null
+          id?: string
+          last_period_start?: string | null
+          period_length?: number
+          updated_at?: string
+        }
+        Update: {
+          access_code?: string
+          created_at?: string
+          custom_settings?: Json
+          cycle_length?: number
+          history?: Json | null
+          id?: string
+          last_period_start?: string | null
+          period_length?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       habit_entries: {
         Row: {
           access_code: string | null
