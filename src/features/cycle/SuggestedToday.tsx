@@ -69,18 +69,63 @@ export function SuggestedToday({
             </h4>
             <p className="text-sm leading-relaxed" style={{ color: '#955F6A' }}>
               {(() => {
-                const currentDescription = phaseInsights.dailyFocus[dailyFocusIndex];
                 switch (suggestion.phaseKey) {
                   case "menstrual":
-                    return `Vaše telo sa zbavuje starej výstelky maternice. ${currentDescription} Hormóny estrogén a progesterón jsou na najnižšej úrovni, čo môže spôsobovať únavu a potrebu odpočinku.`;
+                    return `Vaše telo sa zbavuje starej výstelky maternice. Hormóny estrogén a progesterón sú na najnižšej úrovni. Maternica sa zmršťuje, aby odstránila endometrium z predchádzajúceho cyklu.`;
                   case "follicular":
-                    return `Vaše telo sa pripravuje na ovuláciu. ${currentDescription} Hladina estrogénu postupne stúpa, dodávajúc vám energiu a zlepšujúc náladu každým dňom.`;
+                    return `Vaše telo sa pripravuje na ovuláciu. Hypofýza uvoľňuje FSH, ktorý stimuluje rast vajíčok. Hladina estrogénu postupne stúpa a endometrium sa začína obnovať.`;
                   case "ovulation":
-                    return `Práve prebieha ovulácia! ${currentDescription} Estrogén je na vrchole a vaše telo je pripravené na možné počatie. Cítite sa energicky a atraktívne.`;
+                    return `Práve prebieha ovulácia! Zrelé vajíčko sa uvoľňuje z vaječníka. Estrogén je na vrchole a LH spúšťa ovuláciu. Vaše telo je pripravené na možné počatie.`;
                   case "luteal":
-                    return `Po ovulácii sa telo pripravuje buď na tehotenstvo alebo na menštruáciu. ${currentDescription} Progesterón postupne klesá a môžete pociťovať prvé príznaky PMS.`;
+                    return `Po ovulácii sa tvorí žlté teliesko, ktoré produkuje progesterón. Endometrium sa zahušťuje. Ak nedôjde k oplodneniu, hormóny začnú klesať.`;
                   default:
-                    return currentDescription;
+                    return phaseInsights.dailyFocus[dailyFocusIndex];
+                }
+              })()}
+            </p>
+          </div>
+
+          {/* Energy Level & Sources */}
+          <div className="bg-gradient-to-r from-amber-50/60 to-yellow-50/60 border border-amber-200/30 rounded-xl p-4">
+            <h4 className="text-sm font-semibold mb-2" style={{ color: '#F4415F' }}>
+              ⚡ Energia a jej zdroje:
+            </h4>
+            <p className="text-sm leading-relaxed" style={{ color: '#955F6A' }}>
+              {(() => {
+                switch (suggestion.phaseKey) {
+                  case "menstrual":
+                    return `Energia je na najnižšej úrovni (${suggestion.energy}%). Vaše telo potrebuje odpočinok a regeneráciu. Zamerajte sa na jemné aktivity, teplé jedlá a dostatok spánku. Vyhýbajte sa intenzívnemu cvičeniu.`;
+                  case "follicular":
+                    return `Energia postupne rastie (${suggestion.energy}%). Stúpajúci estrogén dodává energiu a zlepšuje metabolizmus. Ideálny čas na plánovanie nových projektov a aktívnejší pohyb.`;
+                  case "ovulation":
+                    return `Energia je na vrchole (${suggestion.energy}%)! Vysoký estrogén a testosterón vám dodávajú silu a motiváciu. Využite tento čas na náročné úlohy a intenzívne aktivity.`;
+                  case "luteal":
+                    return `Energia postupne klesá (${suggestion.energy}%). Progesterón má upokojujúci účinok. Potrebujete viac odpočinku a pravidelné jedlá na udržanie stabilnej hladiny cukru.`;
+                  default:
+                    return `Energia je na úrovni ${suggestion.energy}%.`;
+                }
+              })()}
+            </p>
+          </div>
+
+          {/* Mood, Stress & Emotions */}
+          <div className="bg-gradient-to-r from-purple-50/60 to-violet-50/60 border border-purple-200/30 rounded-xl p-4">
+            <h4 className="text-sm font-semibold mb-2" style={{ color: '#F4415F' }}>
+              💭 Nálada a emócie:
+            </h4>
+            <p className="text-sm leading-relaxed" style={{ color: '#955F6A' }}>
+              {(() => {
+                switch (suggestion.phaseKey) {
+                  case "menstrual":
+                    return `Nálada môže byť kolísavá. Nízke hormóny môžu spôsobovať smútok alebo úzkosť. Je normálne cítiť sa emotívnejšie. Doprajte si pokoj a sebautrpezlivosť.`;
+                  case "follicular":
+                    return `Nálada sa zlepšuje každým dňom! Rastúci estrogén podporuje tvorbu serotonínu - hormónu šťastia. Cítite sa optimistickejšie a motivovanejšie.`;
+                  case "ovulation":
+                    return `Nálada je vynikajúca! Vysoký estrogén vás robí sebavedomejšou a sociálnejšou. Prirodzene sa cítite atraktívnejšie a máte chuť na spoločenské aktivity.`;
+                  case "luteal":
+                    return `Nálada môže kolísať. Klesajúci progesterón môže spôsobovať podráždenosť, úzkosť alebo smútok. PMS príznaky sú normálne - buďte k sebe zhovievavá.`;
+                  default:
+                    return `Nálada je na úrovni ${Math.round(suggestion.mood)}/5.`;
                 }
               })()}
             </p>
