@@ -170,8 +170,8 @@ export function SymptomTracker({ currentPhase, currentDay, accessCode }: Symptom
             setNotes(e.target.value);
             setHasChanges(true);
           }}
-          placeholder="Napis si poznámky o svojom dni"
-          className="min-h-[80px] resize-none"
+          placeholder="Napíš si poznámky o svojom dni"
+          className="min-h-[80px] resize-none placeholder:text-[#955F6A]"
           style={{
             backgroundColor: '#FBF8F9',
             borderColor: '#E5D4D7',
