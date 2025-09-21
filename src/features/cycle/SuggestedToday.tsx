@@ -61,53 +61,58 @@ export function SuggestedToday({
             
             {/* Energy & Mood Labels */}
             <div className="grid grid-cols-2 gap-4">
-              <div className="text-center p-3 bg-gradient-to-r from-rose-50/80 to-pink-50/80 border border-rose-200/30 rounded-xl">
-                <p className="text-xs font-medium mb-1" style={{
-                color: '#955F6A'
-              }}>Energia</p>
-                <p className="text-sm font-semibold mb-2" style={{
-                color: '#F4415F'
-              }}>{phaseInsights.energy}</p>
-                
-                {/* Battery Indicator */}
-                <div className="flex items-center justify-center gap-2">
-                  <div className="relative">
-                    <div className="w-8 h-4 border border-rose-300 rounded-sm">
-                      <div className="h-full rounded-sm transition-all duration-700" style={{
-                      width: `${suggestion.energy}%`,
-                      backgroundColor: '#F4A6B8'
-                    }} />
+              <div className="p-3 bg-gradient-to-r from-rose-50/80 to-pink-50/80 border border-rose-200/30 rounded-xl">
+                {/* Energia row with battery indicator */}
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-xs font-medium" style={{
+                    color: '#955F6A'
+                  }}>Energia</p>
+                  <div className="flex items-center gap-2">
+                    <div className="relative">
+                      <div className="w-8 h-4 border-2 rounded-sm" style={{
+                        borderColor: '#F4415F'
+                      }}>
+                        <div className="h-full rounded-sm transition-all duration-700" style={{
+                          width: `${suggestion.energy}%`,
+                          backgroundColor: '#F4A6B8'
+                        }} />
+                      </div>
+                      <div className="absolute -right-0.5 top-1/2 w-0.5 h-2 rounded-r-sm transform -translate-y-1/2" style={{
+                        backgroundColor: '#F4415F'
+                      }} />
                     </div>
-                    <div className="absolute -right-0.5 top-1/2 w-0.5 h-2 rounded-r-sm transform -translate-y-1/2" style={{
-                    backgroundColor: '#F4415F'
-                  }} />
+                    <span className="text-xs font-bold" style={{
+                      color: '#F4415F'
+                    }}>
+                      {suggestion.energy}%
+                    </span>
                   </div>
-                  <span className="text-xs font-bold" style={{
-                  color: '#F4415F'
-                }}>
-                    {suggestion.energy}%
-                  </span>
                 </div>
+                {/* Description row */}
+                <p className="text-sm font-semibold text-center" style={{
+                  color: '#F4415F'
+                }}>{phaseInsights.energy}</p>
               </div>
               
-              <div className="text-center p-3 bg-gradient-to-r from-rose-50/80 to-pink-50/80 border border-rose-200/30 rounded-xl">
-                <p className="text-xs font-medium mb-1" style={{
-                color: '#955F6A'
-              }}>Nálada</p>
-                <p className="text-sm font-semibold mb-2" style={{
-                color: '#F4415F'
-              }}>{phaseInsights.mood}</p>
-                
-                {/* Mood Emoji Indicators */}
-                <div className="flex items-center justify-center gap-1">
-                  {[1, 2, 3, 4, 5].map(level => <span key={level} className="text-xs transition-all duration-500" style={{
-                  opacity: level <= Math.round(suggestion.mood) ? 1 : 0.3,
-                  filter: level <= Math.round(suggestion.mood) ? 'none' : 'grayscale(100%)'
-                }}>
-                      {level <= 1 ? '😞' : level <= 2 ? '😕' : level <= 3 ? '😐' : level <= 4 ? '🙂' : '🤩'}
-                    </span>)}
+              <div className="p-3 bg-gradient-to-r from-rose-50/80 to-pink-50/80 border border-rose-200/30 rounded-xl">
+                {/* Nálada row with emojis */}
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-xs font-medium" style={{
+                    color: '#955F6A'
+                  }}>Nálada</p>
+                  <div className="flex items-center gap-1">
+                    {[1, 2, 3, 4, 5].map(level => <span key={level} className="text-xs transition-all duration-500" style={{
+                      opacity: level <= Math.round(suggestion.mood) ? 1 : 0.3,
+                      filter: level <= Math.round(suggestion.mood) ? 'none' : 'grayscale(100%)'
+                    }}>
+                        {level <= 1 ? '😞' : level <= 2 ? '😕' : level <= 3 ? '😐' : level <= 4 ? '🙂' : '🤩'}
+                      </span>)}
+                  </div>
                 </div>
-                
+                {/* Description row */}
+                <p className="text-sm font-semibold text-center" style={{
+                  color: '#F4415F'
+                }}>{phaseInsights.mood}</p>
               </div>
             </div>
           </div>
