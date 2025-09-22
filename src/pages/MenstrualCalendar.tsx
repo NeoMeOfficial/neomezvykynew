@@ -16,9 +16,11 @@ const MenstrualCalendar = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background p-4">
-      <div className="max-w-md mx-auto">
-        <MenstrualCycleTracker accessCode={accessCode} />
+    <div className="min-h-screen overflow-x-hidden bg-white">
+      <div className="w-full max-w-none px-2 sm:px-4 py-4 sm:py-8 mx-auto">
+        <div className="w-full max-w-[600px] mx-auto">
+          <MenstrualCycleTracker accessCode={accessCode} />
+        </div>
       </div>
     </div>
   );
