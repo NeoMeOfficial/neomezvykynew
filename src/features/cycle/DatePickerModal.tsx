@@ -122,7 +122,7 @@ export function DatePickerModal({
                 head_cell: "text-muted-foreground rounded-md w-full font-normal text-xs flex-1 text-center py-1",
                 row: "flex w-full mt-1",
                 cell: "text-center text-sm p-0 relative flex-1 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-                day: "h-8 w-full p-0 font-normal aria-selected:opacity-100 flex items-center justify-center text-xs hover:bg-accent hover:text-accent-foreground rounded-md",
+                day: "h-10 w-full p-0 font-normal aria-selected:opacity-100 flex items-center justify-center text-sm hover:bg-accent hover:text-accent-foreground rounded-md",
                 day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
                 day_today: "bg-accent text-accent-foreground font-semibold",
                 day_outside: "text-muted-foreground opacity-30",
@@ -145,27 +145,6 @@ export function DatePickerModal({
             </div>
           )}
           
-          {/* Compact Legend */}
-          <div className="glass-surface rounded-xl p-2">
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <div className="flex items-center gap-1">
-                <div className="w-3 h-3 rounded bg-[hsl(355_60%_90%)]"></div>
-                <span className="text-foreground/70">Menštruácia</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <div className="w-3 h-3 rounded bg-[hsl(25_50%_88%)]"></div>
-                <span className="text-foreground/70">Plodné dni</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <div className="w-3 h-3 rounded bg-[hsl(315_40%_88%)]"></div>
-                <span className="text-foreground/70">Ovulácia</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <div className="w-3 h-3 rounded bg-[hsl(45_85%_70%)]"></div>
-                <span className="text-foreground/70">Dnes</span>
-              </div>
-            </div>
-          </div>
           
           <div className="flex gap-2 justify-end pt-1">
             <Button variant="ghost" onClick={handleCancel} size="sm" className="text-sm">
@@ -173,11 +152,11 @@ export function DatePickerModal({
               Zrušiť
             </Button>
             <Button 
-              variant="hero"
               onClick={handleConfirm} 
               disabled={!selectedDate}
               size="sm" 
-              className="text-sm"
+              className="text-sm bg-gradient-to-r from-rose-50 to-pink-50 border border-rose-200/30 rounded-3xl symptom-glass hover:from-rose-50 hover:to-pink-50 transition-all"
+              style={{ color: '#F4415F' }}
             >
               <Check className="w-4 h-4 mr-1" />
               Potvrdiť
