@@ -65,7 +65,8 @@ export function DatePickerModal({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
-        className="glass-container border-0 backdrop-blur-xl shadow-2xl max-w-md w-[95vw] max-h-[90vh] overflow-y-auto"
+        className="symptom-glass border-0 max-w-md w-[95vw] max-h-[90vh] overflow-y-auto"
+        style={{ backgroundColor: '#FBF8F9' }}
         aria-describedby={undefined}
       >
         <DialogHeader className="pb-2 text-center">
