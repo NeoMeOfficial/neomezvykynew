@@ -421,25 +421,30 @@ All colors MUST be HSL.
   color: #F4415F !important;
   background-color: transparent !important;
   border: none !important;
+  border-radius: 8px !important;
 }
 
 .cycle-calendar-day:hover {
   background-color: rgba(244, 65, 95, 0.1) !important;
   color: #F4415F !important;
+  border-radius: 8px !important;
 }
 
 .cycle-calendar-selected {
   background-color: #F4415F !important;
   color: white !important;
+  border-radius: 8px !important;
 }
 
 .cycle-calendar-today {
   background-color: rgba(244, 65, 95, 0.2) !important;
   color: #F4415F !important;
   font-weight: 600 !important;
+  border-radius: 8px !important;
 }
 
 .cycle-calendar-disabled {
   color: rgba(244, 65, 95, 0.4) !important;
   opacity: 0.5 !important;
+  border-radius: 8px !important;
 }
