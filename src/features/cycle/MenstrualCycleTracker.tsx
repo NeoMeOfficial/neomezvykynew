@@ -64,35 +64,72 @@ export default function MenstrualCycleTracker({
 
   // Welcome screen for first-time setup
   if (!cycleData.lastPeriodStart) {
-    return <div className="w-full space-y-6">
-          <div>
-            <p className="md:text-sm text-lg" style={{ color: '#955F6A' }}>
-              {UI_TEXT.welcome}
-            </p>
-          </div>
-
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="setupCycleLength" className="text-mobile-sm md:text-sm font-medium block" style={{ color: '#955F6A' }}>
-                  {UI_TEXT.cycleLength}
-                </Label>
-                <Input id="setupCycleLength" type="number" min="21" max="45" value={setupCycleLength} onChange={e => setSetupCycleLength(Number(e.target.value))} placeholder="28 dni" className="w-full text-base" />
+    return <div className="w-full space-y-4">
+          {/* Welcome questionnaire in glass container */}
+          <div className="symptom-glass rounded-2xl p-4" style={{ backgroundColor: '#FBF8F9' }}>
+            <div className="space-y-6">
+              {/* Welcome title with decorative dots like the period date */}
+              <div className="flex items-center justify-center">
+                <div className="text-center space-y-3">
+                  <div className="flex items-center justify-center gap-3">
+                    <div className="w-2 h-2 rounded-full bg-rose-400"></div>
+                    <p className="text-base font-medium" style={{ color: '#955F6A' }}>
+                      {UI_TEXT.welcome}
+                    </p>
+                    <div className="w-2 h-2 rounded-full bg-rose-400"></div>
+                  </div>
+                </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="setupPeriodLength" className="text-mobile-sm md:text-sm font-medium block" style={{ color: '#955F6A' }}>
-                  {UI_TEXT.periodLength}
-                </Label>
-                <Input id="setupPeriodLength" type="number" min="2" max="10" value={setupPeriodLength} onChange={e => setSetupPeriodLength(Number(e.target.value))} placeholder="5 dni" className="w-full text-base" />
-              </div>
-            </div>
+              {/* Input fields section */}
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="setupCycleLength" className="text-sm font-medium block" style={{ color: '#955F6A' }}>
+                      {UI_TEXT.cycleLength}
+                    </Label>
+                    <Input 
+                      id="setupCycleLength" 
+                      type="number" 
+                      min="21" 
+                      max="45" 
+                      value={setupCycleLength} 
+                      onChange={e => setSetupCycleLength(Number(e.target.value))} 
+                      placeholder="28 dni" 
+                      className="w-full text-base bg-gradient-to-r from-rose-50 to-pink-50 border border-rose-200/30 rounded-xl symptom-glass hover:from-rose-50 hover:to-pink-50 transition-all"
+                      style={{ color: '#F4415F' }}
+                    />
+                  </div>
 
-            <div className="pt-2">
-              <Button onClick={() => setShowDatePicker(true)} variant="outline" className="w-full flex items-center justify-center gap-2 py-3 text-base">
-                <CalendarIcon className="w-5 h-5" />
-                {UI_TEXT.lastPeriod}
-              </Button>
+                  <div className="space-y-2">
+                    <Label htmlFor="setupPeriodLength" className="text-sm font-medium block" style={{ color: '#955F6A' }}>
+                      {UI_TEXT.periodLength}
+                    </Label>
+                    <Input 
+                      id="setupPeriodLength" 
+                      type="number" 
+                      min="2" 
+                      max="10" 
+                      value={setupPeriodLength} 
+                      onChange={e => setSetupPeriodLength(Number(e.target.value))} 
+                      placeholder="5 dni" 
+                      className="w-full text-base bg-gradient-to-r from-rose-50 to-pink-50 border border-rose-200/30 rounded-xl symptom-glass hover:from-rose-50 hover:to-pink-50 transition-all"
+                      style={{ color: '#F4415F' }}
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-2">
+                  <Button 
+                    onClick={() => setShowDatePicker(true)} 
+                    className="w-full flex items-center justify-center gap-2 py-3 text-base bg-gradient-to-r from-rose-50 to-pink-50 border border-rose-200/30 rounded-3xl symptom-glass hover:from-rose-50 hover:to-pink-50 transition-all"
+                    style={{ color: '#F4415F' }}
+                  >
+                    <CalendarIcon className="w-5 h-5" />
+                    {UI_TEXT.lastPeriod}
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
 
