@@ -36,6 +36,7 @@ export default function MenstrualCycleTracker({
   } = useSupabaseCycleData(accessCode);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [setupAge, setSetupAge] = useState(25);
   const [setupCycleLength, setSetupCycleLength] = useState(28);
   const [setupPeriodLength, setSetupPeriodLength] = useState(5);
   const [selectedOutcome, setSelectedOutcome] = useState<OutcomeType | null>(null);
@@ -83,6 +84,25 @@ export default function MenstrualCycleTracker({
 
               {/* Input fields section */}
               <div className="space-y-4">
+                {/* Age field - first */}
+                <div className="space-y-2">
+                  <Label htmlFor="setupAge" className="text-sm font-medium block" style={{ color: '#955F6A' }}>
+                    Vek
+                  </Label>
+                  <Input 
+                    id="setupAge" 
+                    type="number" 
+                    min="13" 
+                    max="60" 
+                    value={setupAge} 
+                    onChange={e => setSetupAge(Number(e.target.value))} 
+                    placeholder="25 rokov" 
+                    className="w-full text-base bg-gradient-to-r from-rose-50 to-pink-50 border border-rose-200/30 rounded-xl symptom-glass hover:from-rose-50 hover:to-pink-50 transition-all"
+                    style={{ color: '#F4415F' }}
+                  />
+                </div>
+
+                {/* Cycle and period length - second row */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="setupCycleLength" className="text-sm font-medium block" style={{ color: '#955F6A' }}>
