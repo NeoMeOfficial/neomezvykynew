@@ -402,38 +402,44 @@ All colors MUST be HSL.
   opacity: 1 !important;
 }
 
-/* Calendar navigation styling */
-.slovak-calendar .rdp-nav button {
-  color: #F4415F !important;
-}
-
-.slovak-calendar .rdp-caption_label {
+/* Custom calendar styling with our controlled classes */
+.cycle-calendar-label {
   color: #F4415F !important;
   font-weight: 600 !important;
 }
 
-/* Calendar day numbers - more specific selectors to override button variants */
-.slovak-calendar button.rdp-day {
+.cycle-calendar-nav-button {
   color: #F4415F !important;
 }
 
-.slovak-calendar button.rdp-day:hover:not(.rdp-day_disabled) {
+.cycle-calendar-nav-button:hover {
+  color: #F4415F !important;
+  opacity: 1 !important;
+}
+
+.cycle-calendar-day {
+  color: #F4415F !important;
+  background-color: transparent !important;
+  border: none !important;
+}
+
+.cycle-calendar-day:hover {
   background-color: rgba(244, 65, 95, 0.1) !important;
   color: #F4415F !important;
 }
 
-.slovak-calendar button.rdp-day_selected {
+.cycle-calendar-selected {
   background-color: #F4415F !important;
   color: white !important;
 }
 
-.slovak-calendar button.rdp-day_today {
+.cycle-calendar-today {
   background-color: rgba(244, 65, 95, 0.2) !important;
   color: #F4415F !important;
   font-weight: 600 !important;
 }
 
-.slovak-calendar button.rdp-day_disabled {
+.cycle-calendar-disabled {
   color: rgba(244, 65, 95, 0.4) !important;
   opacity: 0.5 !important;
 }
