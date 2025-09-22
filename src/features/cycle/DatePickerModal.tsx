@@ -139,16 +139,27 @@ export function DatePickerModal({
             />
           </div>
           
-          {selectedDate && (
-            <div className="glass-surface rounded-xl p-3">
-              <div className="text-center mb-2">
-                <p className="text-sm font-medium" style={{ color: 'hsl(var(--cycle-secondary-text))' }}>
-                  📅 {formatDateSk(selectedDate)}
-                </p>
+          {selectedDate && (() => {
+            const dateStr = selectedDate.toISOString().split('T')[0];
+            const storageKey = accessCode 
+              ? `symptoms_${accessCode}_${dateStr}` 
+              : `temp_symptoms_${dateStr}`;
+            const savedSymptoms = localStorage.getItem(storageKey);
+            const symptoms = savedSymptoms ? JSON.parse(savedSymptoms) : [];
+            
+            if (symptoms.length === 0) return null;
+            
+            return (
+              <div className="glass-surface rounded-xl p-3">
+                <div className="text-center mb-2">
+                  <p className="text-sm font-medium" style={{ color: 'hsl(var(--cycle-secondary-text))' }}>
+                    📅 {formatDateSk(selectedDate)}
+                  </p>
+                </div>
+                <HistoricalSymptoms date={selectedDate} accessCode={accessCode} />
               </div>
-              <HistoricalSymptoms date={selectedDate} accessCode={accessCode} />
-            </div>
-          )}
+            );
+          })()}
           
           
           <div className="flex gap-2 justify-end pt-1">
