@@ -65,7 +65,7 @@ export function DatePickerModal({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
-        className="symptom-glass no-hover border-0 max-w-md w-[95vw] max-h-[90vh] overflow-y-auto"
+        className="calendar-dialog-container border-0 max-w-md w-[95vw] max-h-[90vh] overflow-y-auto"
         style={{ backgroundColor: '#FBF8F9' }}
         aria-describedby={undefined}
       >
@@ -78,7 +78,7 @@ export function DatePickerModal({
         
         
         <div className="space-y-3">
-          <div className="symptom-glass no-hover rounded-2xl p-4" style={{ backgroundColor: '#FBF8F9' }}>
+          <div className="calendar-inner-container rounded-2xl p-4" style={{ backgroundColor: '#FBF8F9' }}>
             <Calendar
               mode="single"
               selected={selectedDate}
