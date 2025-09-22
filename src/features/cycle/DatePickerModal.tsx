@@ -65,7 +65,7 @@ export function DatePickerModal({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
-        className="symptom-glass border-0 max-w-md w-[95vw] max-h-[90vh] overflow-y-auto"
+        className="symptom-glass border-0 max-w-md w-[95vw] max-h-[90vh] overflow-y-auto hover:transform-none"
         style={{ backgroundColor: '#FBF8F9' }}
         aria-describedby={undefined}
       >
