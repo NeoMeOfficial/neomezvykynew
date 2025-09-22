@@ -149,8 +149,15 @@ export function WellnessDonutChart({ derivedState, onEditClick, className = "", 
             <>
               <div className="text-sm text-center mb-1 font-medium" style={{ color: 'hsl(var(--foreground))' }}>
                 {selectedOutcome === 'next-period' ? 
-                  (currentPhase.key === 'menstrual' ? 'Period už iba' : 'Ďalšia perioda začne') : 
-                  'Plodné dni začnú'}
+                  (currentPhase.key === 'menstrual' ? 'Period končia o' : 'Ďalšia perioda začne') : 
+                  (() => {
+                    // Check if we're currently in fertile days
+                    const ovulationDay = Math.round((cycleData?.cycleLength || 28) * 0.5);
+                    const fertileStart = ovulationDay - 5;
+                    const fertileEnd = ovulationDay + 1;
+                    const inFertileDays = derivedState.currentDay >= fertileStart && derivedState.currentDay <= fertileEnd;
+                    return inFertileDays ? 'Plodné dni končia o' : 'Plodné dni začnú';
+                  })()}
               </div>
               <div className="text-4xl font-bold" style={{ color: 'hsl(var(--foreground))' }}>
                 {(() => {
