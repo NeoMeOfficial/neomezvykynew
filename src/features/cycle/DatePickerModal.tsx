@@ -77,7 +77,7 @@ export function DatePickerModal({
         
         
         <div className="space-y-3">
-          <div className="glass-container border-0 backdrop-blur-xl shadow-2xl rounded-2xl p-4">
+          <div className="symptom-glass rounded-2xl p-4" style={{ backgroundColor: '#FBF8F9' }}>
             <Calendar
               mode="single"
               selected={selectedDate}
