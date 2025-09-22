@@ -345,3 +345,25 @@ All colors MUST be HSL.
   background-color: hsl(45 85% 65%) !important;
   color: hsl(45 90% 20%) !important;
 }
+
+/* Slovak day names for calendar */
+.slovak-calendar .rdp-head_cell:nth-child(1)::before { content: "Pon"; }
+.slovak-calendar .rdp-head_cell:nth-child(2)::before { content: "Uto"; }
+.slovak-calendar .rdp-head_cell:nth-child(3)::before { content: "Str"; }
+.slovak-calendar .rdp-head_cell:nth-child(4)::before { content: "Štv"; }
+.slovak-calendar .rdp-head_cell:nth-child(5)::before { content: "Pia"; }
+.slovak-calendar .rdp-head_cell:nth-child(6)::before { content: "Sob"; }
+.slovak-calendar .rdp-head_cell:nth-child(7)::before { content: "Ned"; }
+
+.slovak-calendar .rdp-head_cell {
+  position: relative;
+  text-indent: -9999px;
+}
+
+.slovak-calendar .rdp-head_cell::before {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  text-indent: 0;
+}

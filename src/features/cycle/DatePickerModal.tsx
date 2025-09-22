@@ -75,8 +75,9 @@ export function DatePickerModal({
           </DialogTitle>
         </DialogHeader>
         
+        
         <div className="space-y-3">
-          <div className="glass-surface rounded-xl p-3">
+          <div className="glass-container border-0 backdrop-blur-xl shadow-2xl rounded-2xl p-4">
             <Calendar
               mode="single"
               selected={selectedDate}
@@ -109,7 +110,7 @@ export function DatePickerModal({
                 ovulation: 'calendar-ovulation-day',
                 today: 'calendar-today'
               }}
-              className="rounded-lg border-0 w-full pointer-events-auto"
+              className="rounded-lg border-0 w-full pointer-events-auto slovak-calendar"
               classNames={{
                 months: "flex flex-col w-full",
                 month: "w-full space-y-2",
