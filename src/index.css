@@ -347,23 +347,21 @@ All colors MUST be HSL.
 }
 
 /* Slovak day names for calendar */
-.slovak-calendar .rdp-head_cell:nth-child(1)::before { content: "Pon"; }
-.slovak-calendar .rdp-head_cell:nth-child(2)::before { content: "Uto"; }
-.slovak-calendar .rdp-head_cell:nth-child(3)::before { content: "Str"; }
-.slovak-calendar .rdp-head_cell:nth-child(4)::before { content: "Štv"; }
-.slovak-calendar .rdp-head_cell:nth-child(5)::before { content: "Pia"; }
-.slovak-calendar .rdp-head_cell:nth-child(6)::before { content: "Sob"; }
-.slovak-calendar .rdp-head_cell:nth-child(7)::before { content: "Ned"; }
+.slovak-calendar .rdp-head_cell:nth-child(1)::after { content: "Pon"; }
+.slovak-calendar .rdp-head_cell:nth-child(2)::after { content: "Uto"; }
+.slovak-calendar .rdp-head_cell:nth-child(3)::after { content: "Str"; }
+.slovak-calendar .rdp-head_cell:nth-child(4)::after { content: "Štv"; }
+.slovak-calendar .rdp-head_cell:nth-child(5)::after { content: "Pia"; }
+.slovak-calendar .rdp-head_cell:nth-child(6)::after { content: "Sob"; }
+.slovak-calendar .rdp-head_cell:nth-child(7)::after { content: "Ned"; }
 
 .slovak-calendar .rdp-head_cell {
+  font-size: 0 !important;
   position: relative;
-  text-indent: -9999px;
 }
 
-.slovak-calendar .rdp-head_cell::before {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  text-indent: 0;
+.slovak-calendar .rdp-head_cell::after {
+  font-size: 1rem !important;
+  font-weight: 500;
+  color: hsl(var(--muted-foreground));
 }
