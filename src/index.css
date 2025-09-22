@@ -412,12 +412,28 @@ All colors MUST be HSL.
   font-weight: 600 !important;
 }
 
-/* Calendar day numbers */
-.slovak-calendar .rdp-day {
+/* Calendar day numbers - more specific selectors to override button variants */
+.slovak-calendar button.rdp-day {
   color: hsl(var(--cycle-body-text)) !important;
 }
 
-.slovak-calendar .rdp-day:hover:not(.rdp-day_disabled) {
+.slovak-calendar button.rdp-day:hover:not(.rdp-day_disabled) {
   background-color: hsl(var(--blush) / 0.2) !important;
   color: hsl(var(--cycle-secondary-text)) !important;
+}
+
+.slovak-calendar button.rdp-day_selected {
+  background-color: hsl(var(--blush)) !important;
+  color: white !important;
+}
+
+.slovak-calendar button.rdp-day_today {
+  background-color: hsl(var(--blush) / 0.3) !important;
+  color: hsl(var(--cycle-secondary-text)) !important;
+  font-weight: 600 !important;
+}
+
+.slovak-calendar button.rdp-day_disabled {
+  color: hsl(var(--muted-foreground)) !important;
+  opacity: 0.5 !important;
 }
