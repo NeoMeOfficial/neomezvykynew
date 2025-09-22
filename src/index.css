@@ -404,36 +404,36 @@ All colors MUST be HSL.
 
 /* Calendar navigation styling */
 .slovak-calendar .rdp-nav button {
-  color: hsl(var(--cycle-secondary-text)) !important;
+  color: #F4415F !important;
 }
 
 .slovak-calendar .rdp-caption_label {
-  color: hsl(var(--cycle-secondary-text)) !important;
+  color: #F4415F !important;
   font-weight: 600 !important;
 }
 
 /* Calendar day numbers - more specific selectors to override button variants */
 .slovak-calendar button.rdp-day {
-  color: hsl(var(--cycle-body-text)) !important;
+  color: #F4415F !important;
 }
 
 .slovak-calendar button.rdp-day:hover:not(.rdp-day_disabled) {
-  background-color: hsl(var(--blush) / 0.2) !important;
-  color: hsl(var(--cycle-secondary-text)) !important;
+  background-color: rgba(244, 65, 95, 0.1) !important;
+  color: #F4415F !important;
 }
 
 .slovak-calendar button.rdp-day_selected {
-  background-color: hsl(var(--blush)) !important;
+  background-color: #F4415F !important;
   color: white !important;
 }
 
 .slovak-calendar button.rdp-day_today {
-  background-color: hsl(var(--blush) / 0.3) !important;
-  color: hsl(var(--cycle-secondary-text)) !important;
+  background-color: rgba(244, 65, 95, 0.2) !important;
+  color: #F4415F !important;
   font-weight: 600 !important;
 }
 
 .slovak-calendar button.rdp-day_disabled {
-  color: hsl(var(--muted-foreground)) !important;
+  color: rgba(244, 65, 95, 0.4) !important;
   opacity: 0.5 !important;
 }
