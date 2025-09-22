@@ -110,7 +110,7 @@ export function DatePickerModal({
                 ovulation: 'calendar-ovulation-day',
                 today: 'calendar-today'
               }}
-              className="rounded-lg border-0 w-full pointer-events-auto slovak-calendar"
+              className="p-3 pointer-events-auto slovak-calendar"
               fixedWeeks
             />
           </div>
