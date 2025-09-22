@@ -111,26 +111,6 @@ export function DatePickerModal({
                 today: 'calendar-today'
               }}
               className="rounded-lg border-0 w-full pointer-events-auto slovak-calendar"
-              classNames={{
-                months: "flex flex-col w-full",
-                month: "w-full space-y-2",
-                caption: "flex justify-center pt-1 relative items-center text-sm font-medium",
-                caption_label: "text-sm font-medium",
-                nav: "space-x-1 flex items-center",
-                nav_button: "inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-7 w-7",
-                table: "w-full border-collapse",
-                head_row: "flex w-full",
-                head_cell: "text-muted-foreground rounded-md w-full font-normal text-xs flex-1 text-center py-1",
-                row: "flex w-full mt-1",
-                cell: "text-center text-sm p-0 relative flex-1 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-                day: "h-10 w-full p-0 font-normal aria-selected:opacity-100 flex items-center justify-center text-sm hover:bg-accent hover:text-accent-foreground rounded-md",
-                day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
-                day_today: "bg-accent text-accent-foreground font-semibold",
-                day_outside: "text-muted-foreground opacity-30",
-                day_disabled: "text-muted-foreground opacity-30 cursor-not-allowed",
-                day_range_middle: "aria-selected:bg-accent aria-selected:text-accent-foreground",
-                day_hidden: "invisible",
-              }}
               fixedWeeks
             />
           </div>

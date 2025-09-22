@@ -347,6 +347,16 @@ All colors MUST be HSL.
 }
 
 /* Slovak day names for calendar */
+.slovak-calendar .rdp-head_cell {
+  position: relative;
+  overflow: hidden;
+}
+
+.slovak-calendar .rdp-head_cell * {
+  opacity: 0 !important;
+  position: absolute !important;
+}
+
 .slovak-calendar .rdp-head_cell:nth-child(1)::after { content: "Pon"; }
 .slovak-calendar .rdp-head_cell:nth-child(2)::after { content: "Uto"; }
 .slovak-calendar .rdp-head_cell:nth-child(3)::after { content: "Str"; }
@@ -355,13 +365,13 @@ All colors MUST be HSL.
 .slovak-calendar .rdp-head_cell:nth-child(6)::after { content: "Sob"; }
 .slovak-calendar .rdp-head_cell:nth-child(7)::after { content: "Ned"; }
 
-.slovak-calendar .rdp-head_cell {
-  font-size: 0 !important;
-  position: relative;
-}
-
 .slovak-calendar .rdp-head_cell::after {
-  font-size: 1rem !important;
-  font-weight: 500;
-  color: hsl(var(--muted-foreground));
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  color: hsl(var(--muted-foreground)) !important;
+  opacity: 1 !important;
 }
