@@ -267,6 +267,15 @@ All colors MUST be HSL.
                 inset 0 1px 0 rgba(255, 255, 255, 0.9),
                 inset 0 -1px 0 rgba(0, 0, 0, 0.08);
   }
+
+  /* Override hover effects for dialog containers */
+  .symptom-glass.no-hover:hover {
+    transform: none !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1), 
+                0 1px 4px rgba(0, 0, 0, 0.05),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.08) !important;
+  }
 }
 
 /* Calendar period day styling with high specificity */
