@@ -64,7 +64,7 @@ export function SettingsModal({
         </DialogHeader>
         
         <div className="space-y-6">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="cycleLength">{UI_TEXT.cycleLength}</Label>
               <div className="flex items-center space-x-2">
@@ -75,7 +75,7 @@ export function SettingsModal({
                   max="45"
                   value={cycleLength}
                   onChange={(e) => setCycleLength(Number(e.target.value))}
-                  className="w-16 text-base"
+                  className="w-full sm:w-16 text-base"
                 />
                 <span className="text-sm text-muted-foreground">{UI_TEXT.days}</span>
               </div>
@@ -94,7 +94,7 @@ export function SettingsModal({
                   max="10"
                   value={periodLength}
                   onChange={(e) => setPeriodLength(Number(e.target.value))}
-                  className="w-16 text-base"
+                  className="w-full sm:w-16 text-base"
                 />
                 <span className="text-sm text-muted-foreground">{UI_TEXT.days}</span>
               </div>
