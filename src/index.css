@@ -398,6 +398,26 @@ All colors MUST be HSL.
   transform: translate(-50%, -50%);
   font-size: 0.75rem !important;
   font-weight: 500 !important;
-  color: hsl(var(--muted-foreground)) !important;
+  color: hsl(var(--cycle-body-text)) !important;
   opacity: 1 !important;
+}
+
+/* Calendar navigation styling */
+.slovak-calendar .rdp-nav button {
+  color: hsl(var(--cycle-secondary-text)) !important;
+}
+
+.slovak-calendar .rdp-caption_label {
+  color: hsl(var(--cycle-secondary-text)) !important;
+  font-weight: 600 !important;
+}
+
+/* Calendar day numbers */
+.slovak-calendar .rdp-day {
+  color: hsl(var(--cycle-body-text)) !important;
+}
+
+.slovak-calendar .rdp-day:hover:not(.rdp-day_disabled) {
+  background-color: hsl(var(--blush) / 0.2) !important;
+  color: hsl(var(--cycle-secondary-text)) !important;
 }

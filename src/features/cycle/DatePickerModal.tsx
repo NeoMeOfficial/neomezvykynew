@@ -70,8 +70,8 @@ export function DatePickerModal({
         aria-describedby={undefined}
       >
         <DialogHeader className="pb-2 text-center">
-          <DialogTitle className="text-lg font-semibold text-foreground flex items-center justify-center gap-2">
-            <CalendarIcon className="w-4 h-4" style={{ color: 'hsl(var(--blush))' }} />
+          <DialogTitle className="text-lg font-semibold flex items-center justify-center gap-2" style={{ color: 'hsl(var(--cycle-secondary-text))' }}>
+            <CalendarIcon className="w-4 h-4" style={{ color: 'hsl(var(--cycle-secondary-text))' }} />
             {title}
           </DialogTitle>
         </DialogHeader>
@@ -119,7 +119,7 @@ export function DatePickerModal({
           {selectedDate && (
             <div className="glass-surface rounded-xl p-3">
               <div className="text-center mb-2">
-                <p className="text-sm font-medium text-foreground">
+                <p className="text-sm font-medium" style={{ color: 'hsl(var(--cycle-secondary-text))' }}>
                   📅 {formatDateSk(selectedDate)}
                 </p>
               </div>
@@ -138,7 +138,7 @@ export function DatePickerModal({
               disabled={!selectedDate}
               size="sm" 
               className="text-sm bg-gradient-to-r from-rose-50 to-pink-50 border border-rose-200/30 rounded-3xl symptom-glass hover:from-rose-50 hover:to-pink-50 transition-all"
-              style={{ color: '#F4415F' }}
+              style={{ color: 'hsl(var(--cycle-secondary-text))' }}
             >
               <Check className="w-4 h-4 mr-1" />
               Potvrdiť
