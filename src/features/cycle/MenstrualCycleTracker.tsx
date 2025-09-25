@@ -179,6 +179,26 @@ export default function MenstrualCycleTracker({
                     {UI_TEXT.lastPeriod}
                   </Button>
                 </div>
+
+                {/* Navigation buttons */}
+                <div className="flex gap-3 pt-4">
+                  <Button 
+                    onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
+                    disabled={currentStep === 1}
+                    className="flex-1 py-3 text-base bg-gradient-to-r from-rose-50/80 to-pink-50/80 border border-rose-200/30 rounded-3xl symptom-glass hover:from-rose-50 hover:to-pink-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{ color: '#F4415F' }}
+                  >
+                    Späť
+                  </Button>
+                  <Button 
+                    onClick={() => handleStepComplete(currentStep)}
+                    disabled={currentStep === totalSteps}
+                    className="flex-1 py-3 text-base bg-gradient-primary font-semibold rounded-3xl symptom-glass hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{ color: '#F4415F' }}
+                  >
+                    Dopredu
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
