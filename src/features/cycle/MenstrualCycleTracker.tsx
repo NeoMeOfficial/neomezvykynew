@@ -52,7 +52,7 @@ export default function MenstrualCycleTracker({
   const [currentStep, setCurrentStep] = useState(1);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [selectedPMSSymptoms, setSelectedPMSSymptoms] = useState<string[]>([]);
-  const totalSteps = 7;
+  const totalSteps = 5;
   const handleFirstInteraction = () => {
     onFirstInteraction?.();
   };
@@ -112,13 +112,11 @@ export default function MenstrualCycleTracker({
                   <div className="flex items-center justify-center gap-3">
                     <div className="w-2 h-2 rounded-full bg-rose-400"></div>
                     <p className="text-base font-medium" style={{ color: '#955F6A' }}>
-                      {currentStep === 1 ? UI_TEXT.welcome : 
+                       {currentStep === 1 ? UI_TEXT.welcome : 
                        currentStep === 2 ? "Dĺžka cyklu" :
                        currentStep === 3 ? "Dĺžka menštruácie" :
                        currentStep === 4 ? "PMS symptómy" :
-                       currentStep === 5 ? "Súhrn" :
-                       currentStep === 6 ? "Posledná menštruácia" :
-                       "Dokončenie"}
+                       "Posledná menštruácia"}
                     </p>
                     <div className="w-2 h-2 rounded-full bg-rose-400"></div>
                   </div>
@@ -299,34 +297,8 @@ export default function MenstrualCycleTracker({
                 </div>
               )}
 
-              {/* Step 5: Period Symptoms */}
+              {/* Step 5: Last Period Date */}
               {currentStep === 5 && (
-                <div className="space-y-4 text-center">
-                  <p className="text-sm" style={{ color: '#955F6A' }}>
-                    Vyber symptómy, ktoré zvyčajne zažívaš počas menštruácie:
-                  </p>
-                  <div className="text-center text-xs" style={{ color: '#955F6A' }}>
-                    (Táto sekcia bude implementovaná v ďalšom kroku)
-                  </div>
-                </div>
-              )}
-
-              {/* Step 6: Summary */}
-              {currentStep === 6 && (
-                <div className="space-y-4 text-center">
-                  <p className="text-sm" style={{ color: '#955F6A' }}>
-                    Súhrn tvojich údajov:
-                  </p>
-                  <div className="space-y-2 text-sm" style={{ color: '#955F6A' }}>
-                    <p>Vek: {setupAge} rokov</p>
-                    <p>Dĺžka cyklu: {setupCycleLength} dni</p>
-                    <p>Dĺžka menštruácie: {setupPeriodLength} dni</p>
-                  </div>
-                </div>
-              )}
-
-              {/* Step 7: Last Period Date */}
-              {currentStep === 7 && (
                 <div className="space-y-4">
                   <div className="pt-2">
                     <Button 
