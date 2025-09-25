@@ -22,7 +22,7 @@ const defaultCycleData: CycleData = {
 
 export function useCycleData(accessCode?: string) {
   const [cycleData, setCycleData] = useState<CycleData>(defaultCycleData);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false); // Changed to false for instant loading
   const [derivedState, setDerivedState] = useState<DerivedState | null>(null);
   const saveTimeoutRef = useRef<NodeJS.Timeout>();
 
@@ -31,8 +31,8 @@ export function useCycleData(accessCode?: string) {
     return accessCode ? `${STORAGE_KEY}_${accessCode}` : STORAGE_KEY;
   }, [accessCode]);
 
-  // Load data from storage
-  const loadCycleData = useCallback(async () => {
+  // Load data from storage (instant, synchronous)
+  const loadCycleData = useCallback(() => {
     try {
       const storageKey = getStorageKey();
       const stored = localStorage.getItem(storageKey);
@@ -51,9 +51,8 @@ export function useCycleData(accessCode?: string) {
       }
     } catch (error) {
       console.error('Failed to load cycle data:', error);
-    } finally {
-      setLoading(false);
     }
+    // No loading state - instant render
   }, [getStorageKey]);
 
   // Save data to storage with debouncing
@@ -128,14 +127,12 @@ export function useCycleData(accessCode?: string) {
     });
   }, [updateCycleData, cycleData.customSettings]);
 
-  // Calculate derived state when cycle data changes
+  // Calculate derived state immediately when cycle data changes
   useEffect(() => {
-    if (!loading) {
-      setDerivedState(getDerivedState(cycleData));
-    }
-  }, [cycleData, loading]);
+    setDerivedState(getDerivedState(cycleData));
+  }, [cycleData]);
 
-  // Load data on mount and access code change
+  // Load data on mount and access code change (synchronous for instant loading)
   useEffect(() => {
     loadCycleData();
   }, [loadCycleData]);

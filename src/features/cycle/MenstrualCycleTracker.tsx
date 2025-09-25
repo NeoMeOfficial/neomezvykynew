@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { useSupabaseCycleData } from './useSupabaseCycleData';
+import { useCycleData } from './useCycleData';
 import { SuggestedToday } from './SuggestedToday';
 import { WellnessDonutChart } from './WellnessDonutChart';
 import { PhaseOverview } from './PhaseOverview';
@@ -38,7 +38,7 @@ export default function MenstrualCycleTracker({
     setLastPeriodStart,
     setCycleLength,
     setPeriodLength
-  } = useSupabaseCycleData(accessCode);
+  } = useCycleData(accessCode);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [setupAge, setSetupAge] = useState(25);
