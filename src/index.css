@@ -211,11 +211,12 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground font-body;
+    @apply bg-background text-foreground;
     overflow-x: hidden;
     width: 100%;
     letter-spacing: 0.01em;
     line-height: 1.7;
+    font-family: 'Raleway', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   }
   
   /* Prevent iOS zoom on input focus */

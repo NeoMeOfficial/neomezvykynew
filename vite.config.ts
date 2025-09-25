@@ -19,4 +19,33 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    // Optimize for better loading performance
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Split vendor chunks for better caching
+          vendor: ['react', 'react-dom'],
+          ui: ['@radix-ui/react-dialog', '@radix-ui/react-popover', '@radix-ui/react-select'],
+          charts: ['recharts'],
+          dates: ['date-fns'],
+          supabase: ['@supabase/supabase-js'],
+        }
+      }
+    },
+    // Enable compression
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+      }
+    }
+  },
+  // Enable gzip compression for better network performance
+  preview: {
+    headers: {
+      'Cache-Control': 'public, max-age=31536000',
+    }
+  }
 }));

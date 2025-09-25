@@ -1,5 +1,8 @@
 import { useAccessCode } from "@/hooks/useAccessCode";
-import MenstrualCycleTracker from "@/features/cycle/MenstrualCycleTracker";
+import { lazy, Suspense } from "react";
+
+// Lazy load the heavy cycle tracker component
+const MenstrualCycleTracker = lazy(() => import("@/features/cycle/MenstrualCycleTracker"));
 
 const MenstrualCalendar = () => {
   const { accessCode, loading } = useAccessCode();
@@ -19,7 +22,16 @@ const MenstrualCalendar = () => {
     <div className="min-h-screen overflow-x-hidden bg-white">
       <div className="w-full max-w-none px-2 sm:px-4 py-4 sm:py-8 mx-auto">
         <div className="w-full max-w-[600px] mx-auto">
-          <MenstrualCycleTracker accessCode={accessCode} />
+          <Suspense fallback={
+            <div className="flex items-center justify-center p-8">
+              <div className="text-center space-y-2">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-rose-400 mx-auto" />
+                <div className="text-sm text-gray-500">Loading cycle tracker...</div>
+              </div>
+            </div>
+          }>
+            <MenstrualCycleTracker accessCode={accessCode} />
+          </Suspense>
         </div>
       </div>
     </div>

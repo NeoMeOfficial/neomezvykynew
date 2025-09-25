@@ -1,11 +1,14 @@
-import { useState, useEffect } from 'react';
-import { AccessCodeValidation } from "@/components/AccessCodeValidation";
-import { PurchaseGatedBiometricWelcome } from "@/components/PurchaseGatedBiometricWelcome";
-import { BiometricPrompt } from "@/components/BiometricPrompt";
-import { AccessCodeInput } from "@/components/AccessCodeInput";
-import { AccessCodeSettings } from "@/components/AccessCodeSettings";
-import { StorageHealthIndicator } from "@/components/StorageHealthIndicator";
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { NavigationWidget } from "@/components/NavigationWidget";
+
+// Lazy load heavy components that may not be immediately needed
+const AccessCodeValidation = lazy(() => import("@/components/AccessCodeValidation").then(m => ({ default: m.AccessCodeValidation })));
+const PurchaseGatedBiometricWelcome = lazy(() => import("@/components/PurchaseGatedBiometricWelcome").then(m => ({ default: m.PurchaseGatedBiometricWelcome })));
+const BiometricPrompt = lazy(() => import("@/components/BiometricPrompt").then(m => ({ default: m.BiometricPrompt })));
+const AccessCodeInput = lazy(() => import("@/components/AccessCodeInput").then(m => ({ default: m.AccessCodeInput })));
+const AccessCodeSettings = lazy(() => import("@/components/AccessCodeSettings").then(m => ({ default: m.AccessCodeSettings })));
+const SaveProgressDialog = lazy(() => import("@/components/SaveProgressDialog").then(m => ({ default: m.SaveProgressDialog })));
+const TemporaryDataIndicator = lazy(() => import("@/components/TemporaryDataIndicator").then(m => ({ default: m.TemporaryDataIndicator })));
 
 import { Button } from "@/components/ui/button";
 import { Fingerprint, ArrowLeft } from "lucide-react";
@@ -15,9 +18,14 @@ import { useCodeBasedHabits } from "@/hooks/useCodeBasedHabits";
 import { useReflectionData } from "@/hooks/useReflectionData";
 import { useTemporaryHabits } from "@/hooks/useTemporaryHabits";
 import { useTemporaryReflections } from "@/hooks/useTemporaryReflections";
-import { SaveProgressDialog } from "@/components/SaveProgressDialog";
-import { TemporaryDataIndicator } from "@/components/TemporaryDataIndicator";
 import { temporaryStorage } from "@/lib/temporaryStorage";
+
+// Component loader for lazy components
+const ComponentLoader = () => (
+  <div className="flex items-center justify-center p-2">
+    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-rose-400" />
+  </div>
+);
 
 const Index = () => {
   const { 
@@ -167,7 +175,9 @@ const Index = () => {
         {/* Temporary Data Indicator */}
         {!accessCode && temporaryStorage.isSessionActive() && (
           <div className="w-full max-w-[600px] mx-auto mb-4">
-            <TemporaryDataIndicator onShowAccessCodeValidation={() => setShowAccessCodeValidation(true)} />
+            <Suspense fallback={<ComponentLoader />}>
+              <TemporaryDataIndicator onShowAccessCodeValidation={() => setShowAccessCodeValidation(true)} />
+            </Suspense>
           </div>
         )}
 
@@ -208,50 +218,52 @@ const Index = () => {
         )}
         
         
-        <AccessCodeSettings 
-          open={showAccessCodeSettings}
-          onOpenChange={setShowAccessCodeSettings}
-        />
-        
-        <AccessCodeValidation
-          open={showAccessCodeValidation}
-          onOpenChange={setShowAccessCodeValidation}
-          onValidCode={handleValidAccessCode}
-        />
-        
-        <PurchaseGatedBiometricWelcome
-          open={showBiometricSetup}
-          onOpenChange={setShowBiometricSetup}
-          validatedCode={validatedAccessCode}
-        />
-        
-        <BiometricPrompt
-          open={showBiometricPrompt}
-          onOpenChange={setShowBiometricPrompt}
-          onSuccess={handleBiometricSuccess}
-          onFallbackToCode={handleEnterCodeClick}
-        />
-        
-        <AccessCodeInput 
-          open={showCodeInput} 
-          onOpenChange={setShowCodeInput} 
-        />
+        <Suspense fallback={<ComponentLoader />}>
+          <AccessCodeSettings 
+            open={showAccessCodeSettings}
+            onOpenChange={setShowAccessCodeSettings}
+          />
+          
+          <AccessCodeValidation
+            open={showAccessCodeValidation}
+            onOpenChange={setShowAccessCodeValidation}
+            onValidCode={handleValidAccessCode}
+          />
+          
+          <PurchaseGatedBiometricWelcome
+            open={showBiometricSetup}
+            onOpenChange={setShowBiometricSetup}
+            validatedCode={validatedAccessCode}
+          />
+          
+          <BiometricPrompt
+            open={showBiometricPrompt}
+            onOpenChange={setShowBiometricPrompt}
+            onSuccess={handleBiometricSuccess}
+            onFallbackToCode={handleEnterCodeClick}
+          />
+          
+          <AccessCodeInput 
+            open={showCodeInput} 
+            onOpenChange={setShowCodeInput} 
+          />
 
-        <SaveProgressDialog
-          isOpen={showSaveProgressDialog}
-          onSave={() => {
-            setShowSaveProgressDialog(false);
-            setShowAccessCodeValidation(true);
-          }}
-          onDiscard={() => {
-            temporaryStorage.clearAll();
-            setShowSaveProgressDialog(false);
-            window.location.href = 'https://neome.mvt.so/mj-de';
-          }}
-          onCancel={() => {
-            setShowSaveProgressDialog(false);
-          }}
-        />
+          <SaveProgressDialog
+            isOpen={showSaveProgressDialog}
+            onSave={() => {
+              setShowSaveProgressDialog(false);
+              setShowAccessCodeValidation(true);
+            }}
+            onDiscard={() => {
+              temporaryStorage.clearAll();
+              setShowSaveProgressDialog(false);
+              window.location.href = 'https://neome.mvt.so/mj-de';
+            }}
+            onCancel={() => {
+              setShowSaveProgressDialog(false);
+            }}
+          />
+        </Suspense>
       </div>
     </div>
   );
