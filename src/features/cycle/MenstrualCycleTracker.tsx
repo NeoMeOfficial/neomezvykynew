@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { Calendar as CalendarIcon, TrendingUp, Lightbulb, Settings } from 'lucide-react';
+import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useSupabaseCycleData } from './useSupabaseCycleData';
 import { SuggestedToday } from './SuggestedToday';
 import { WellnessDonutChart } from './WellnessDonutChart';
@@ -41,6 +44,8 @@ export default function MenstrualCycleTracker({
   const [setupCycleLength, setSetupCycleLength] = useState(28);
   const [setupPeriodLength, setSetupPeriodLength] = useState(5);
   const [selectedOutcome, setSelectedOutcome] = useState<OutcomeType | null>(null);
+  const [cycleStartDate, setCycleStartDate] = useState<Date>();
+  const [cycleEndDate, setCycleEndDate] = useState<Date>();
   
   // Questionnaire progress state
   const [currentStep, setCurrentStep] = useState(1);
@@ -142,22 +147,79 @@ export default function MenstrualCycleTracker({
 
               {/* Step 2: Cycle Length */}
               {currentStep === 2 && (
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="setupCycleLength" className="text-sm font-medium block" style={{ color: '#955F6A' }}>
-                      {UI_TEXT.cycleLength}
+                <div className="space-y-6">
+                  <div className="space-y-4">
+                    <Label className="text-sm font-medium block" style={{ color: '#955F6A' }}>
+                      Vyber začiatok a koniec svojho posledného cyklu
                     </Label>
-                    <Input 
-                      id="setupCycleLength" 
-                      type="number" 
-                      min="21" 
-                      max="45" 
-                      value={setupCycleLength} 
-                      onChange={e => setSetupCycleLength(Number(e.target.value))} 
-                      placeholder="28 dni" 
-                      className="w-full text-base bg-gradient-to-r from-rose-50 to-pink-50 border border-rose-200/30 rounded-xl symptom-glass hover:from-rose-50 hover:to-pink-50 transition-all"
-                      style={{ color: '#F4415F' }}
-                    />
+                    
+                    <div className="space-y-4">
+                      {/* Start Date */}
+                      <div className="space-y-2">
+                        <Label className="text-xs font-medium block" style={{ color: '#955F6A' }}>
+                          Začiatok cyklu
+                        </Label>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              className="w-full justify-start text-left font-normal bg-gradient-to-r from-rose-50 to-pink-50 border border-rose-200/30 rounded-xl symptom-glass hover:from-rose-50 hover:to-pink-50 transition-all"
+                              style={{ color: '#F4415F' }}
+                            >
+                              <CalendarIcon className="mr-2 h-4 w-4" />
+                              {cycleStartDate ? format(cycleStartDate, "PPP") : <span>Vyber dátum</span>}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={cycleStartDate}
+                              onSelect={setCycleStartDate}
+                              initialFocus
+                              className="p-3 pointer-events-auto"
+                            />
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+
+                      {/* End Date */}
+                      <div className="space-y-2">
+                        <Label className="text-xs font-medium block" style={{ color: '#955F6A' }}>
+                          Koniec cyklu
+                        </Label>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              className="w-full justify-start text-left font-normal bg-gradient-to-r from-rose-50 to-pink-50 border border-rose-200/30 rounded-xl symptom-glass hover:from-rose-50 hover:to-pink-50 transition-all"
+                              style={{ color: '#F4415F' }}
+                            >
+                              <CalendarIcon className="mr-2 h-4 w-4" />
+                              {cycleEndDate ? format(cycleEndDate, "PPP") : <span>Vyber dátum</span>}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={cycleEndDate}
+                              onSelect={setCycleEndDate}
+                              disabled={(date) => cycleStartDate ? date <= cycleStartDate : false}
+                              initialFocus
+                              className="p-3 pointer-events-auto"
+                            />
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+
+                      {/* Calculated cycle length */}
+                      {cycleStartDate && cycleEndDate && (
+                        <div className="mt-4 p-3 bg-gradient-to-r from-rose-50 to-pink-50 border border-rose-200/30 rounded-xl">
+                          <p className="text-sm font-medium" style={{ color: '#955F6A' }}>
+                            Dĺžka cyklu: {Math.ceil((cycleEndDate.getTime() - cycleStartDate.getTime()) / (1000 * 60 * 60 * 24))} dni
+                          </p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               )}
