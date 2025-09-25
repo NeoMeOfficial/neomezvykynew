@@ -153,73 +153,48 @@ export default function MenstrualCycleTracker({
                       Vyber začiatok a koniec svojho posledného cyklu
                     </Label>
                     
-                    <div className="space-y-4">
-                      {/* Start Date */}
-                      <div className="space-y-2">
-                        <Label className="text-xs font-medium block" style={{ color: '#955F6A' }}>
-                          Začiatok cyklu
-                        </Label>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              className="w-full justify-start text-left font-normal bg-gradient-to-r from-rose-50 to-pink-50 border border-rose-200/30 rounded-xl symptom-glass hover:from-rose-50 hover:to-pink-50 transition-all"
-                              style={{ color: '#F4415F' }}
-                            >
-                              <CalendarIcon className="mr-2 h-4 w-4" />
-                              {cycleStartDate ? format(cycleStartDate, "PPP") : <span>Vyber dátum</span>}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                              mode="single"
-                              selected={cycleStartDate}
-                              onSelect={setCycleStartDate}
-                              initialFocus
-                              className="p-3 pointer-events-auto"
-                            />
-                          </PopoverContent>
-                        </Popover>
-                      </div>
-
-                      {/* End Date */}
-                      <div className="space-y-2">
-                        <Label className="text-xs font-medium block" style={{ color: '#955F6A' }}>
-                          Koniec cyklu
-                        </Label>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              className="w-full justify-start text-left font-normal bg-gradient-to-r from-rose-50 to-pink-50 border border-rose-200/30 rounded-xl symptom-glass hover:from-rose-50 hover:to-pink-50 transition-all"
-                              style={{ color: '#F4415F' }}
-                            >
-                              <CalendarIcon className="mr-2 h-4 w-4" />
-                              {cycleEndDate ? format(cycleEndDate, "PPP") : <span>Vyber dátum</span>}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                              mode="single"
-                              selected={cycleEndDate}
-                              onSelect={setCycleEndDate}
-                              disabled={(date) => cycleStartDate ? date <= cycleStartDate : false}
-                              initialFocus
-                              className="p-3 pointer-events-auto"
-                            />
-                          </PopoverContent>
-                        </Popover>
-                      </div>
-
-                      {/* Calculated cycle length */}
-                      {cycleStartDate && cycleEndDate && (
-                        <div className="mt-4 p-3 bg-gradient-to-r from-rose-50 to-pink-50 border border-rose-200/30 rounded-xl">
-                          <p className="text-sm font-medium" style={{ color: '#955F6A' }}>
-                            Dĺžka cyklu: {Math.ceil((cycleEndDate.getTime() - cycleStartDate.getTime()) / (1000 * 60 * 60 * 24))} dni
-                          </p>
-                        </div>
-                      )}
+                    {/* Single Calendar with Range Selection */}
+                    <div className="bg-gradient-to-r from-rose-50 to-pink-50 border border-rose-200/30 rounded-xl p-4 symptom-glass">
+                      <Calendar
+                        mode="range"
+                        selected={{ from: cycleStartDate, to: cycleEndDate }}
+                        onSelect={(range) => {
+                          setCycleStartDate(range?.from);
+                          setCycleEndDate(range?.to);
+                        }}
+                        numberOfMonths={1}
+                        className="p-3 pointer-events-auto w-full"
+                        classNames={{
+                          day_selected: "bg-rose-400 text-white hover:bg-rose-500",
+                          day_range_start: "bg-rose-500 text-white hover:bg-rose-600",
+                          day_range_end: "bg-rose-500 text-white hover:bg-rose-600",
+                          day_range_middle: "bg-rose-200 text-rose-800 hover:bg-rose-300"
+                        }}
+                      />
                     </div>
+
+                    {/* Selected dates display */}
+                    {cycleStartDate && (
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-sm" style={{ color: '#955F6A' }}>
+                          <span className="font-medium">Začiatok:</span>
+                          <span>{format(cycleStartDate, "PPP")}</span>
+                        </div>
+                        {cycleEndDate && (
+                          <>
+                            <div className="flex items-center gap-2 text-sm" style={{ color: '#955F6A' }}>
+                              <span className="font-medium">Koniec:</span>
+                              <span>{format(cycleEndDate, "PPP")}</span>
+                            </div>
+                            <div className="mt-4 p-3 bg-gradient-to-r from-rose-50 to-pink-50 border border-rose-200/30 rounded-xl">
+                              <p className="text-sm font-medium" style={{ color: '#955F6A' }}>
+                                Dĺžka cyklu: {Math.ceil((cycleEndDate.getTime() - cycleStartDate.getTime()) / (1000 * 60 * 60 * 24))} dni
+                              </p>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
