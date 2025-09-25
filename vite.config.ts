@@ -33,14 +33,8 @@ export default defineConfig(({ mode }) => ({
         }
       }
     },
-    // Enable compression
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true,
-        drop_debugger: true,
-      }
-    }
+    // Use default minifier (esbuild) which is faster and doesn't require terser
+    minify: true
   },
   // Enable gzip compression for better network performance
   preview: {
