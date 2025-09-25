@@ -116,9 +116,9 @@ export default function MenstrualCycleTracker({
                        currentStep === 2 ? "Dĺžka cyklu" :
                        currentStep === 3 ? "Dĺžka menštruácie" :
                        currentStep === 4 ? "PMS symptómy" :
-                       currentStep === 5 ? "Symptómy menštruácie" :
-                       currentStep === 6 ? "Súhrn" :
-                       "Posledná menštruácia"}
+                       currentStep === 5 ? "Súhrn" :
+                       currentStep === 6 ? "Posledná menštruácia" :
+                       "Dokončenie"}
                     </p>
                     <div className="w-2 h-2 rounded-full bg-rose-400"></div>
                   </div>
@@ -267,7 +267,7 @@ export default function MenstrualCycleTracker({
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                     {[
                       "Kŕče",
-                      "Bolesť dolnej časti chrbta", 
+                      "Bolesť chrbta", 
                       "Nevoľnosť",
                       "Hnačka",
                       "Bolesti hlavy",
