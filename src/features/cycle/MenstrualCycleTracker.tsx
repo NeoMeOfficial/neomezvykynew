@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Calendar as CalendarIcon, TrendingUp, Lightbulb, Settings } from 'lucide-react';
 import { format } from 'date-fns';
+import { sk } from 'date-fns/locale';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
@@ -212,13 +213,13 @@ export default function MenstrualCycleTracker({
                       <div className="space-y-2">
                         <div className="flex items-center gap-2 text-sm" style={{ color: '#955F6A' }}>
                           <span className="font-medium">Začiatok:</span>
-                          <span>{format(cycleStartDate, "PPP")}</span>
+                          <span>{format(cycleStartDate, "PPP", { locale: sk })}</span>
                         </div>
                         {cycleEndDate && (
                           <>
                             <div className="flex items-center gap-2 text-sm" style={{ color: '#955F6A' }}>
                               <span className="font-medium">Koniec:</span>
-                              <span>{format(cycleEndDate, "PPP")}</span>
+                              <span>{format(cycleEndDate, "PPP", { locale: sk })}</span>
                             </div>
                             <div className="mt-4 p-3 bg-gradient-to-r from-rose-50 to-pink-50 border border-rose-200/30 rounded-xl">
                               <p className="text-sm font-medium" style={{ color: '#955F6A' }}>
