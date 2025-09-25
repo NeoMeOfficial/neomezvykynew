@@ -37,7 +37,8 @@ export default function MenstrualCycleTracker({
     loading,
     setLastPeriodStart,
     setCycleLength,
-    setPeriodLength
+    setPeriodLength,
+    updateCycleData
   } = useCycleData(accessCode);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -85,8 +86,20 @@ export default function MenstrualCycleTracker({
 
   // Function to reset and go back to questionnaire
   const resetToQuestionnaire = () => {
-    // Clear the last period start to trigger questionnaire view
-    setLastPeriodStart(new Date('1900-01-01')); // Set invalid date to trigger questionnaire
+    // Clear all cycle data by updating with null/default values
+    updateCycleData({
+      lastPeriodStart: null,
+      cycleLength: 28,
+      periodLength: 5,
+      customSettings: {
+        notifications: true,
+        symptomTracking: true,
+        moodTracking: true,
+        notes: ""
+      },
+      history: []
+    });
+    
     // Reset questionnaire state
     setCurrentStep(1);
     setCompletedSteps([]);
