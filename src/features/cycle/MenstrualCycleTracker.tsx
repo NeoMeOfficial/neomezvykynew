@@ -113,11 +113,11 @@ export default function MenstrualCycleTracker({
                     <div className="w-2 h-2 rounded-full bg-rose-400"></div>
                     <p className="text-base font-medium" style={{ color: '#955F6A' }}>
                       {currentStep === 1 ? UI_TEXT.welcome : 
-                       currentStep === 2 ? "Dĺžka cyklu" :
-                       currentStep === 3 ? "Dĺžka menštruácie" :
-                       currentStep === 4 ? "PMS symptómy" :
-                       currentStep === 5 ? "Súhrn" :
-                       currentStep === 6 ? "Posledná menštruácia" :
+                       currentStep === 2 ? "Posledná menštruácia" :
+                       currentStep === 3 ? "Dĺžka cyklu" :
+                       currentStep === 4 ? "Dĺžka menštruácie" :
+                       currentStep === 5 ? "PMS symptómy" :
+                       currentStep === 6 ? "Súhrn" :
                        "Dokončenie"}
                     </p>
                     <div className="w-2 h-2 rounded-full bg-rose-400"></div>
@@ -147,96 +147,24 @@ export default function MenstrualCycleTracker({
                 </div>
               )}
 
-              {/* Step 2: Cycle Length */}
+              {/* Step 2: Last Period Date */}
               {currentStep === 2 && (
-                <div className="space-y-6">
-                  <div className="space-y-4">
-                    <Label className="text-sm font-medium block" style={{ color: '#955F6A' }}>
-                      Vyber začiatok a koniec svojho posledného cyklu
-                    </Label>
-
-                    {/* Legend for period selection */}
-                    <div className="bg-white/80 rounded-lg p-3 border border-rose-200/50">
-                      <div className="flex flex-col gap-2 text-xs" style={{ color: '#955F6A' }}>
-                        <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 rounded-full bg-gradient-to-r from-rose-400 to-pink-400"></div>
-                          <span>Klikni na dátum pre začiatok cyklu</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 rounded-full bg-gradient-to-r from-rose-300 to-pink-300"></div>
-                          <span>Klikni na druhý dátum pre koniec cyklu</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Single Calendar with Range Selection - matching DatePickerModal style */}
-                    <div className="calendar-inner-container rounded-2xl p-2" style={{ backgroundColor: '#FBF8F9' }}>
-                      <Calendar
-                        mode="range"
-                        selected={{ from: cycleStartDate, to: cycleEndDate }}
-                        onSelect={(range) => {
-                          setCycleStartDate(range?.from);
-                          setCycleEndDate(range?.to);
-                        }}
-                        numberOfMonths={1}
-                        weekStartsOn={1}
-                        classNames={{
-                          months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
-                          month: "space-y-4 w-full",
-                          caption: "flex justify-center pt-1 relative items-center",
-                          caption_label: "text-sm font-medium cycle-calendar-label",
-                          nav: "space-x-1 flex items-center",
-                          nav_button: "cycle-calendar-nav-button h-8 w-8 bg-transparent p-0 opacity-50 hover:opacity-100",
-                          nav_button_previous: "absolute left-1",
-                          nav_button_next: "absolute right-1",
-                          table: "w-full border-collapse space-y-1",
-                          head_row: "flex w-full",
-                          head_cell: "text-muted-foreground rounded-md flex-1 font-normal text-[0.8rem] flex items-center justify-center",
-                          row: "flex w-full mt-2",
-                          cell: "flex-1 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-                          day: "cycle-calendar-day h-12 w-full p-0 font-normal aria-selected:opacity-100 flex items-center justify-center",
-                          day_range_end: "bg-gradient-primary text-white hover:opacity-90",
-                          day_range_start: "bg-gradient-primary text-white hover:opacity-90",
-                          day_selected: "bg-rose-400 text-white hover:bg-rose-500",
-                          day_today: "border-2 border-rose-400 text-rose-600",
-                          day_outside: "day-outside text-muted-foreground opacity-50 aria-selected:bg-accent/50 aria-selected:text-muted-foreground aria-selected:opacity-30",
-                          day_disabled: "cycle-calendar-disabled",
-                          day_range_middle: "bg-gradient-to-r from-rose-50 to-pink-50 text-rose-600 hover:from-rose-100 hover:to-pink-100",
-                          day_hidden: "invisible",
-                        }}
-                        className="w-full pointer-events-auto slovak-calendar"
-                        fixedWeeks
-                      />
-                    </div>
-
-                    {/* Selected dates display */}
-                    {cycleStartDate && (
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2 text-sm" style={{ color: '#955F6A' }}>
-                          <span className="font-medium">Začiatok:</span>
-                          <span>{format(cycleStartDate, "PPP", { locale: sk })}</span>
-                        </div>
-                        {cycleEndDate && (
-                          <>
-                            <div className="flex items-center gap-2 text-sm" style={{ color: '#955F6A' }}>
-                              <span className="font-medium">Koniec:</span>
-                              <span>{format(cycleEndDate, "PPP", { locale: sk })}</span>
-                            </div>
-                            <div className="mt-4 p-3 bg-gradient-to-r from-rose-50 to-pink-50 border border-rose-200/30 rounded-xl">
-                              <p className="text-sm font-medium" style={{ color: '#955F6A' }}>
-                                Dĺžka cyklu: {Math.ceil((cycleEndDate.getTime() - cycleStartDate.getTime()) / (1000 * 60 * 60 * 24))} dni
-                              </p>
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    )}
+                <div className="space-y-4">
+                  <div className="pt-2">
+                    <Button 
+                      onClick={() => setShowDatePicker(true)} 
+                      className="w-full flex items-center justify-center gap-2 py-3 text-base bg-gradient-to-r from-rose-50 to-pink-50 border border-rose-200/30 rounded-3xl symptom-glass hover:from-rose-50 hover:to-pink-50 transition-all"
+                      style={{ color: '#F4415F' }}
+                    >
+                      <CalendarIcon className="w-5 h-5" />
+                      {UI_TEXT.lastPeriod}
+                    </Button>
                   </div>
                 </div>
               )}
 
-              {/* Step 3: Period Length */}
-              {currentStep === 3 && (
+              {/* Step 4: Period Length */}
+              {currentStep === 4 && (
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="setupPeriodLength" className="text-sm font-medium block" style={{ color: '#955F6A' }}>
@@ -257,8 +185,8 @@ export default function MenstrualCycleTracker({
                 </div>
               )}
 
-              {/* Step 4: PMS Symptoms */}
-              {currentStep === 4 && (
+              {/* Step 5: PMS Symptoms */}
+              {currentStep === 5 && (
                 <div className="space-y-6">
                   <p className="text-sm text-center" style={{ color: '#955F6A' }}>
                     Pomôžeme ti pripraviť sa na tieto symptómy vopred.
@@ -299,18 +227,6 @@ export default function MenstrualCycleTracker({
                 </div>
               )}
 
-              {/* Step 5: Period Symptoms */}
-              {currentStep === 5 && (
-                <div className="space-y-4 text-center">
-                  <p className="text-sm" style={{ color: '#955F6A' }}>
-                    Vyber symptómy, ktoré zvyčajne zažívaš počas menštruácie:
-                  </p>
-                  <div className="text-center text-xs" style={{ color: '#955F6A' }}>
-                    (Táto sekcia bude implementovaná v ďalšom kroku)
-                  </div>
-                </div>
-              )}
-
               {/* Step 6: Summary */}
               {currentStep === 6 && (
                 <div className="space-y-4 text-center">
@@ -325,19 +241,12 @@ export default function MenstrualCycleTracker({
                 </div>
               )}
 
-              {/* Step 7: Last Period Date */}
+              {/* Step 7: Completion */}
               {currentStep === 7 && (
-                <div className="space-y-4">
-                  <div className="pt-2">
-                    <Button 
-                      onClick={() => setShowDatePicker(true)} 
-                      className="w-full flex items-center justify-center gap-2 py-3 text-base bg-gradient-to-r from-rose-50 to-pink-50 border border-rose-200/30 rounded-3xl symptom-glass hover:from-rose-50 hover:to-pink-50 transition-all"
-                      style={{ color: '#F4415F' }}
-                    >
-                      <CalendarIcon className="w-5 h-5" />
-                      {UI_TEXT.lastPeriod}
-                    </Button>
-                  </div>
+                <div className="space-y-4 text-center">
+                  <p className="text-sm" style={{ color: '#955F6A' }}>
+                    Dokončenie nastavenia cyklu.
+                  </p>
                 </div>
               )}
 
