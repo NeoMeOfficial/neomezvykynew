@@ -193,13 +193,13 @@ export default function MenstrualCycleTracker({
                           row: "flex w-full mt-2",
                           cell: "h-12 w-12 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
                           day: "cycle-calendar-day h-12 w-12 p-0 font-normal aria-selected:opacity-100 flex items-center justify-center",
-                          day_range_end: "bg-gradient-to-r from-rose-300 to-pink-300 text-rose-800 hover:from-rose-400 hover:to-pink-400",
-                          day_range_start: "bg-gradient-to-r from-rose-400 to-pink-400 text-white hover:from-rose-500 hover:to-pink-500",
+                          day_range_end: "bg-gradient-primary text-white hover:opacity-90",
+                          day_range_start: "bg-gradient-primary text-white hover:opacity-90",
                           day_selected: "bg-rose-400 text-white hover:bg-rose-500",
                           day_today: "border-2 border-rose-400 text-rose-600",
                           day_outside: "day-outside text-muted-foreground opacity-50 aria-selected:bg-accent/50 aria-selected:text-muted-foreground aria-selected:opacity-30",
                           day_disabled: "cycle-calendar-disabled",
-                          day_range_middle: "bg-rose-200 text-rose-800 hover:bg-rose-300",
+                          day_range_middle: "bg-gradient-to-r from-rose-50 to-pink-50 text-rose-600 hover:from-rose-100 hover:to-pink-100",
                           day_hidden: "invisible",
                         }}
                         className="p-3 pointer-events-auto slovak-calendar"
