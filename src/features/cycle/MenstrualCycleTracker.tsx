@@ -82,6 +82,19 @@ export default function MenstrualCycleTracker({
     setLastPeriodStart(date);
     handleFirstInteraction();
   };
+
+  // Function to reset and go back to questionnaire
+  const resetToQuestionnaire = () => {
+    // Clear the last period start to trigger questionnaire view
+    setLastPeriodStart(new Date('1900-01-01')); // Set invalid date to trigger questionnaire
+    // Reset questionnaire state
+    setCurrentStep(1);
+    setCompletedSteps([]);
+    setSelectedPMSSymptoms([]);
+    setSetupAge(25);
+    setSetupCycleLength(28);
+    setSetupPeriodLength(5);
+  };
   if (loading) {
     return <div className="bg-widget-bg p-3 w-full overflow-hidden">
         <div className="w-full max-w-[600px] mx-auto space-y-2">
@@ -423,6 +436,27 @@ export default function MenstrualCycleTracker({
   return <div className="w-full space-y-4">
       {/* Cycle Information Card */}
       <div className="symptom-glass rounded-2xl p-4" style={{ backgroundColor: '#FBF8F9' }}>
+        {/* Header with reset button */}
+        <div className="flex items-center justify-between mb-4">
+          <Button
+            onClick={resetToQuestionnaire}
+            variant="outline"
+            size="sm"
+            className="text-xs px-3 py-1 rounded-full border-rose-200 text-rose-600 hover:bg-rose-50"
+          >
+            ← Naspäť na dotazník
+          </Button>
+          <Button
+            onClick={() => setShowSettings(true)}
+            variant="outline"
+            size="sm"
+            className="text-xs px-3 py-1 rounded-full border-rose-200 text-rose-600 hover:bg-rose-50"
+          >
+            <Settings className="w-3 h-3 mr-1" />
+            Nastavenia
+          </Button>
+        </div>
+        
         <div className="flex items-center justify-center">
           <div className="text-center space-y-3">
             <div className="flex items-center justify-center gap-3">
@@ -532,6 +566,7 @@ export default function MenstrualCycleTracker({
         onUpdateCycleLength={setCycleLength} 
         onUpdatePeriodLength={setPeriodLength}
         onEditPeriodStart={() => setShowDatePicker(true)}
+        onReset={resetToQuestionnaire}
       />
     </div>;
 }

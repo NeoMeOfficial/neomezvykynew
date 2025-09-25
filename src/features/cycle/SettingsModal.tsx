@@ -20,6 +20,7 @@ interface SettingsModalProps {
   onUpdateCycleLength: (length: number) => void;
   onUpdatePeriodLength: (length: number) => void;
   onEditPeriodStart?: () => void;
+  onReset?: () => void; // Added reset function
 }
 
 export function SettingsModal({
@@ -28,7 +29,8 @@ export function SettingsModal({
   cycleData,
   onUpdateCycleLength,
   onUpdatePeriodLength,
-  onEditPeriodStart
+  onEditPeriodStart,
+  onReset
 }: SettingsModalProps) {
   const isMobile = useIsMobile();
   const [cycleLength, setCycleLength] = useState(cycleData.cycleLength);
@@ -122,18 +124,42 @@ export function SettingsModal({
                 Kliknite pre zmenu dátumu poslednej menštruácie
               </p>
             </div>
-          )}
-          
-          <div className="flex gap-2 justify-end pt-4">
-            <Button variant="outline" onClick={handleCancel}>
-              <X className="w-4 h-4 mr-2" />
-              {UI_TEXT.cancel}
-            </Button>
-            <Button onClick={handleSave} variant="hero">
-              <Check className="w-4 h-4 mr-2" />
-              {UI_TEXT.save}
-            </Button>
-          </div>
+           )}
+           
+           {/* Reset to questionnaire section */}
+           {onReset && (
+             <div className="border-t pt-4 space-y-3">
+               <div className="text-center">
+                 <h3 className="text-sm font-medium text-gray-600 mb-2">
+                   Chcete začať odznova?
+                 </h3>
+                 <Button 
+                   onClick={() => {
+                     onReset();
+                     onClose();
+                   }}
+                   variant="outline"
+                   className="w-full border-rose-200 text-rose-600 hover:bg-rose-50"
+                 >
+                   Resetovať a vrátiť sa k dotazníku
+                 </Button>
+                 <p className="text-xs text-muted-foreground mt-1">
+                   Toto vymaže všetky údaje a vráti vás na začiatok
+                 </p>
+               </div>
+             </div>
+           )}
+           
+           <div className="flex gap-2 justify-end pt-4">
+             <Button variant="outline" onClick={handleCancel}>
+               <X className="w-4 h-4 mr-2" />
+               {UI_TEXT.cancel}
+             </Button>
+             <Button onClick={handleSave} variant="hero">
+               <Check className="w-4 h-4 mr-2" />
+               {UI_TEXT.save}
+             </Button>
+           </div>
         </div>
       </DialogContent>
     </Dialog>
