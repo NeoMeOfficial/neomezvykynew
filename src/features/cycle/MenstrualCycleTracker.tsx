@@ -51,6 +51,7 @@ export default function MenstrualCycleTracker({
   // Questionnaire progress state
   const [currentStep, setCurrentStep] = useState(1);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const [selectedPMSSymptoms, setSelectedPMSSymptoms] = useState<string[]>([]);
   const totalSteps = 7;
   const handleFirstInteraction = () => {
     onFirstInteraction?.();
@@ -258,23 +259,42 @@ export default function MenstrualCycleTracker({
 
               {/* Step 4: PMS Symptoms */}
               {currentStep === 4 && (
-                <div className="space-y-4 text-center">
-                  <p className="text-sm" style={{ color: '#955F6A' }}>
-                    Zažívaš PMS symptómy?
+                <div className="space-y-6">
+                  <p className="text-sm text-center" style={{ color: '#955F6A' }}>
+                    Pomôžeme ti pripraviť sa na tieto symptómy vopred.
                   </p>
-                  <div className="flex gap-3">
-                    <Button 
-                      className="flex-1 py-3 text-base bg-gradient-to-r from-rose-50 to-pink-50 border border-rose-200/30 rounded-3xl symptom-glass hover:from-rose-50 hover:to-pink-50 transition-all"
-                      style={{ color: '#F4415F' }}
-                    >
-                      Áno
-                    </Button>
-                    <Button 
-                      className="flex-1 py-3 text-base bg-gradient-to-r from-rose-50 to-pink-50 border border-rose-200/30 rounded-3xl symptom-glass hover:from-rose-50 hover:to-pink-50 transition-all"
-                      style={{ color: '#F4415F' }}
-                    >
-                      Nie
-                    </Button>
+                  
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {[
+                      "Kŕče",
+                      "Bolesť dolnej časti chrbta", 
+                      "Nevoľnosť",
+                      "Hnačka",
+                      "Bolesti hlavy",
+                      "Únava",
+                      "Závraty",
+                      "Citlivosť prsníkov",
+                      "Zmeny nálady"
+                    ].map((symptom) => (
+                      <Button
+                        key={symptom}
+                        onClick={() => {
+                          if (selectedPMSSymptoms.includes(symptom)) {
+                            setSelectedPMSSymptoms(selectedPMSSymptoms.filter(s => s !== symptom));
+                          } else {
+                            setSelectedPMSSymptoms([...selectedPMSSymptoms, symptom]);
+                          }
+                        }}
+                        className={`py-3 px-3 text-sm bg-gradient-to-r border rounded-3xl symptom-glass transition-all text-center ${
+                          selectedPMSSymptoms.includes(symptom)
+                            ? 'from-rose-100 to-pink-100 border-rose-300/50 shadow-sm'
+                            : 'from-rose-50 to-pink-50 border-rose-200/30 hover:from-rose-50 hover:to-pink-50'
+                        }`}
+                        style={{ color: '#F4415F' }}
+                      >
+                        {symptom}
+                      </Button>
+                    ))}
                   </div>
                 </div>
               )}
