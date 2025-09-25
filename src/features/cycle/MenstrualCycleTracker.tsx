@@ -10,6 +10,7 @@ import { WellnessDonutChart } from './WellnessDonutChart';
 import { PhaseOverview } from './PhaseOverview';
 import { DatePickerModal } from './DatePickerModal';
 import { SettingsModal } from './SettingsModal';
+import { QuestionnaireProgress } from './QuestionnaireProgress';
 import { UI_TEXT } from './insights';
 import { formatDateSk, getNextPeriodDate } from './utils';
 import { PhaseKey } from './types';
@@ -40,6 +41,11 @@ export default function MenstrualCycleTracker({
   const [setupCycleLength, setSetupCycleLength] = useState(28);
   const [setupPeriodLength, setSetupPeriodLength] = useState(5);
   const [selectedOutcome, setSelectedOutcome] = useState<OutcomeType | null>(null);
+  
+  // Questionnaire progress state
+  const [currentStep, setCurrentStep] = useState(1);
+  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const totalSteps = 7;
   const handleFirstInteraction = () => {
     onFirstInteraction?.();
   };
@@ -47,7 +53,23 @@ export default function MenstrualCycleTracker({
     setLastPeriodStart(date);
     setCycleLength(setupCycleLength);
     setPeriodLength(setupPeriodLength);
+    setCompletedSteps([...completedSteps, currentStep]);
     handleFirstInteraction();
+  };
+
+  const handleStepComplete = (step: number) => {
+    if (!completedSteps.includes(step)) {
+      setCompletedSteps([...completedSteps, step]);
+    }
+    if (step < totalSteps) {
+      setCurrentStep(step + 1);
+    }
+  };
+
+  const handleStepNavigation = (step: number) => {
+    if (completedSteps.includes(step) || step === currentStep) {
+      setCurrentStep(step);
+    }
   };
   const handleDateSelect = (date: Date) => {
     setLastPeriodStart(date);
@@ -68,6 +90,14 @@ export default function MenstrualCycleTracker({
     return <div className="w-full space-y-4">
           {/* Welcome questionnaire in glass container */}
           <div className="symptom-glass rounded-2xl p-4" style={{ backgroundColor: '#FBF8F9' }}>
+            {/* Progress bar */}
+            <QuestionnaireProgress 
+              currentStep={currentStep}
+              totalSteps={totalSteps}
+              completedSteps={completedSteps}
+              onStepClick={handleStepNavigation}
+            />
+            
             <div className="space-y-6">
               {/* Welcome title with decorative dots like the period date */}
               <div className="flex items-center justify-center">
