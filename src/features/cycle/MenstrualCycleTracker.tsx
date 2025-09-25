@@ -324,10 +324,11 @@ export default function MenstrualCycleTracker({
               {/* Navigation buttons */}
               <div className="flex gap-3 pt-4">
                 <Button 
+                  variant="outline"
                   onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
                   disabled={currentStep === 1}
-                  className="flex-1 py-3 text-base bg-gradient-to-r from-rose-50/80 to-pink-50/80 border border-rose-200/30 rounded-3xl symptom-glass hover:from-rose-50 hover:to-pink-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                  style={{ color: '#F4415F' }}
+                  className="flex-1 py-3 text-base rounded-3xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{ color: '#F4415F', borderColor: '#F4415F' }}
                 >
                   Späť
                 </Button>
