@@ -168,7 +168,7 @@ export default function MenstrualCycleTracker({
                     </div>
                     
                     {/* Single Calendar with Range Selection - matching DatePickerModal style */}
-                    <div className="calendar-inner-container rounded-2xl p-4" style={{ backgroundColor: '#FBF8F9' }}>
+                    <div className="calendar-inner-container rounded-2xl p-2" style={{ backgroundColor: '#FBF8F9' }}>
                       <Calendar
                         mode="range"
                         selected={{ from: cycleStartDate, to: cycleEndDate }}
@@ -180,7 +180,7 @@ export default function MenstrualCycleTracker({
                         weekStartsOn={1}
                         classNames={{
                           months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
-                          month: "space-y-4",
+                          month: "space-y-4 w-full",
                           caption: "flex justify-center pt-1 relative items-center",
                           caption_label: "text-sm font-medium cycle-calendar-label",
                           nav: "space-x-1 flex items-center",
@@ -188,11 +188,11 @@ export default function MenstrualCycleTracker({
                           nav_button_previous: "absolute left-1",
                           nav_button_next: "absolute right-1",
                           table: "w-full border-collapse space-y-1",
-                          head_row: "flex",
-                          head_cell: "text-muted-foreground rounded-md w-12 font-normal text-[0.8rem] flex items-center justify-center",
+                          head_row: "flex w-full",
+                          head_cell: "text-muted-foreground rounded-md flex-1 font-normal text-[0.8rem] flex items-center justify-center",
                           row: "flex w-full mt-2",
-                          cell: "h-12 w-12 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-                          day: "cycle-calendar-day h-12 w-12 p-0 font-normal aria-selected:opacity-100 flex items-center justify-center",
+                          cell: "flex-1 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
+                          day: "cycle-calendar-day h-12 w-full p-0 font-normal aria-selected:opacity-100 flex items-center justify-center",
                           day_range_end: "bg-gradient-primary text-white hover:opacity-90",
                           day_range_start: "bg-gradient-primary text-white hover:opacity-90",
                           day_selected: "bg-rose-400 text-white hover:bg-rose-500",
@@ -202,7 +202,7 @@ export default function MenstrualCycleTracker({
                           day_range_middle: "bg-gradient-to-r from-rose-50 to-pink-50 text-rose-600 hover:from-rose-100 hover:to-pink-100",
                           day_hidden: "invisible",
                         }}
-                        className="p-3 pointer-events-auto slovak-calendar"
+                        className="w-full pointer-events-auto slovak-calendar"
                         fixedWeeks
                       />
                     </div>
