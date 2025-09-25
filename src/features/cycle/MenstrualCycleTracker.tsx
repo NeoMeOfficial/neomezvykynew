@@ -99,41 +99,50 @@ export default function MenstrualCycleTracker({
             />
             
             <div className="space-y-6">
-              {/* Welcome title with decorative dots like the period date */}
+              {/* Welcome title with decorative dots */}
               <div className="flex items-center justify-center">
                 <div className="text-center space-y-3">
                   <div className="flex items-center justify-center gap-3">
                     <div className="w-2 h-2 rounded-full bg-rose-400"></div>
                     <p className="text-base font-medium" style={{ color: '#955F6A' }}>
-                      {UI_TEXT.welcome}
+                      {currentStep === 1 ? UI_TEXT.welcome : 
+                       currentStep === 2 ? "Dĺžka cyklu" :
+                       currentStep === 3 ? "Dĺžka menštruácie" :
+                       currentStep === 4 ? "PMS symptómy" :
+                       currentStep === 5 ? "Symptómy menštruácie" :
+                       currentStep === 6 ? "Súhrn" :
+                       "Posledná menštruácia"}
                     </p>
                     <div className="w-2 h-2 rounded-full bg-rose-400"></div>
                   </div>
                 </div>
               </div>
 
-              {/* Input fields section */}
-              <div className="space-y-4">
-                {/* Age field - first */}
-                <div className="space-y-2">
-                  <Label htmlFor="setupAge" className="text-sm font-medium block" style={{ color: '#955F6A' }}>
-                    Vek
-                  </Label>
-                  <Input 
-                    id="setupAge" 
-                    type="number" 
-                    min="13" 
-                    max="60" 
-                    value={setupAge} 
-                    onChange={e => setSetupAge(Number(e.target.value))} 
-                    placeholder="25 rokov" 
-                    className="w-full text-base bg-gradient-to-r from-rose-50 to-pink-50 border border-rose-200/30 rounded-xl symptom-glass hover:from-rose-50 hover:to-pink-50 transition-all"
-                    style={{ color: '#F4415F' }}
-                  />
+              {/* Step 1: Age */}
+              {currentStep === 1 && (
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="setupAge" className="text-sm font-medium block" style={{ color: '#955F6A' }}>
+                      Vek
+                    </Label>
+                    <Input 
+                      id="setupAge" 
+                      type="number" 
+                      min="13" 
+                      max="60" 
+                      value={setupAge} 
+                      onChange={e => setSetupAge(Number(e.target.value))} 
+                      placeholder="25 rokov" 
+                      className="w-full text-base bg-gradient-to-r from-rose-50 to-pink-50 border border-rose-200/30 rounded-xl symptom-glass hover:from-rose-50 hover:to-pink-50 transition-all"
+                      style={{ color: '#F4415F' }}
+                    />
+                  </div>
                 </div>
+              )}
 
-                {/* Cycle and period length - second row */}
-                <div className="grid grid-cols-2 gap-4">
+              {/* Step 2: Cycle Length */}
+              {currentStep === 2 && (
+                <div className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="setupCycleLength" className="text-sm font-medium block" style={{ color: '#955F6A' }}>
                       {UI_TEXT.cycleLength}
@@ -150,7 +159,12 @@ export default function MenstrualCycleTracker({
                       style={{ color: '#F4415F' }}
                     />
                   </div>
+                </div>
+              )}
 
+              {/* Step 3: Period Length */}
+              {currentStep === 3 && (
+                <div className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="setupPeriodLength" className="text-sm font-medium block" style={{ color: '#955F6A' }}>
                       {UI_TEXT.periodLength}
@@ -168,37 +182,95 @@ export default function MenstrualCycleTracker({
                     />
                   </div>
                 </div>
+              )}
 
-                <div className="pt-2">
-                  <Button 
-                    onClick={() => setShowDatePicker(true)} 
-                    className="w-full flex items-center justify-center gap-2 py-3 text-base bg-gradient-to-r from-rose-50 to-pink-50 border border-rose-200/30 rounded-3xl symptom-glass hover:from-rose-50 hover:to-pink-50 transition-all"
-                    style={{ color: '#F4415F' }}
-                  >
-                    <CalendarIcon className="w-5 h-5" />
-                    {UI_TEXT.lastPeriod}
-                  </Button>
+              {/* Step 4: PMS Symptoms */}
+              {currentStep === 4 && (
+                <div className="space-y-4 text-center">
+                  <p className="text-sm" style={{ color: '#955F6A' }}>
+                    Zažívaš PMS symptómy?
+                  </p>
+                  <div className="flex gap-3">
+                    <Button 
+                      className="flex-1 py-3 text-base bg-gradient-to-r from-rose-50 to-pink-50 border border-rose-200/30 rounded-3xl symptom-glass hover:from-rose-50 hover:to-pink-50 transition-all"
+                      style={{ color: '#F4415F' }}
+                    >
+                      Áno
+                    </Button>
+                    <Button 
+                      className="flex-1 py-3 text-base bg-gradient-to-r from-rose-50 to-pink-50 border border-rose-200/30 rounded-3xl symptom-glass hover:from-rose-50 hover:to-pink-50 transition-all"
+                      style={{ color: '#F4415F' }}
+                    >
+                      Nie
+                    </Button>
+                  </div>
                 </div>
+              )}
 
-                {/* Navigation buttons */}
-                <div className="flex gap-3 pt-4">
-                  <Button 
-                    onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
-                    disabled={currentStep === 1}
-                    className="flex-1 py-3 text-base bg-gradient-to-r from-rose-50/80 to-pink-50/80 border border-rose-200/30 rounded-3xl symptom-glass hover:from-rose-50 hover:to-pink-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                    style={{ color: '#F4415F' }}
-                  >
-                    Späť
-                  </Button>
-                  <Button 
-                    onClick={() => handleStepComplete(currentStep)}
-                    disabled={currentStep === totalSteps}
-                    className="flex-1 py-3 text-base bg-gradient-primary font-semibold rounded-3xl symptom-glass hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
-                    style={{ color: '#F4415F' }}
-                  >
-                    Dopredu
-                  </Button>
+              {/* Step 5: Period Symptoms */}
+              {currentStep === 5 && (
+                <div className="space-y-4 text-center">
+                  <p className="text-sm" style={{ color: '#955F6A' }}>
+                    Vyber symptómy, ktoré zvyčajne zažívaš počas menštruácie:
+                  </p>
+                  <div className="text-center text-xs" style={{ color: '#955F6A' }}>
+                    (Táto sekcia bude implementovaná v ďalšom kroku)
+                  </div>
                 </div>
+              )}
+
+              {/* Step 6: Summary */}
+              {currentStep === 6 && (
+                <div className="space-y-4 text-center">
+                  <p className="text-sm" style={{ color: '#955F6A' }}>
+                    Súhrn tvojich údajov:
+                  </p>
+                  <div className="space-y-2 text-sm" style={{ color: '#955F6A' }}>
+                    <p>Vek: {setupAge} rokov</p>
+                    <p>Dĺžka cyklu: {setupCycleLength} dni</p>
+                    <p>Dĺžka menštruácie: {setupPeriodLength} dni</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 7: Last Period Date */}
+              {currentStep === 7 && (
+                <div className="space-y-4">
+                  <div className="pt-2">
+                    <Button 
+                      onClick={() => setShowDatePicker(true)} 
+                      className="w-full flex items-center justify-center gap-2 py-3 text-base bg-gradient-to-r from-rose-50 to-pink-50 border border-rose-200/30 rounded-3xl symptom-glass hover:from-rose-50 hover:to-pink-50 transition-all"
+                      style={{ color: '#F4415F' }}
+                    >
+                      <CalendarIcon className="w-5 h-5" />
+                      {UI_TEXT.lastPeriod}
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {/* Navigation buttons */}
+              <div className="flex gap-3 pt-4">
+                <Button 
+                  onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
+                  disabled={currentStep === 1}
+                  className="flex-1 py-3 text-base bg-gradient-to-r from-rose-50/80 to-pink-50/80 border border-rose-200/30 rounded-3xl symptom-glass hover:from-rose-50 hover:to-pink-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{ color: '#F4415F' }}
+                >
+                  Späť
+                </Button>
+                <Button 
+                  onClick={() => {
+                    if (currentStep < totalSteps) {
+                      handleStepComplete(currentStep);
+                    }
+                  }}
+                  disabled={currentStep === totalSteps}
+                  className="flex-1 py-3 text-base bg-gradient-primary font-semibold rounded-3xl symptom-glass hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{ color: '#F4415F' }}
+                >
+                  Dopredu
+                </Button>
               </div>
             </div>
           </div>
