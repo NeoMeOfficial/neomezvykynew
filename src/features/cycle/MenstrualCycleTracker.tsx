@@ -1,23 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, lazy, Suspense } from 'react';
 import { Calendar as CalendarIcon, TrendingUp, Lightbulb, Settings } from 'lucide-react';
 import { format } from 'date-fns';
 import { sk } from 'date-fns/locale';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useCycleData } from './useCycleData';
-import { SuggestedToday } from './SuggestedToday';
-import { WellnessDonutChart } from './WellnessDonutChart';
-import { PhaseOverview } from './PhaseOverview';
-import { DatePickerModal } from './DatePickerModal';
-import { SettingsModal } from './SettingsModal';
-import { QuestionnaireProgress } from './QuestionnaireProgress';
 import { UI_TEXT } from './insights';
 import { formatDateSk, getNextPeriodDate } from './utils';
 import { PhaseKey } from './types';
+
+// Lazy load heavy components for instant initial render
+const DatePickerModal = lazy(() => import('./DatePickerModal').then(m => ({ default: m.DatePickerModal })));
+const SettingsModal = lazy(() => import('./SettingsModal').then(m => ({ default: m.SettingsModal })));
+const SuggestedToday = lazy(() => import('./SuggestedToday').then(m => ({ default: m.SuggestedToday })));
+const WellnessDonutChart = lazy(() => import('./WellnessDonutChart').then(m => ({ default: m.WellnessDonutChart })));
+const PhaseOverview = lazy(() => import('./PhaseOverview').then(m => ({ default: m.PhaseOverview })));
+const QuestionnaireProgress = lazy(() => import('./QuestionnaireProgress').then(m => ({ default: m.QuestionnaireProgress })));
+
+// Lazy load UI components only when needed
+const Tabs = lazy(() => import('@/components/ui/tabs').then(m => ({ default: m.Tabs })));
+const TabsContent = lazy(() => import('@/components/ui/tabs').then(m => ({ default: m.TabsContent })));
+const TabsList = lazy(() => import('@/components/ui/tabs').then(m => ({ default: m.TabsList })));
+const TabsTrigger = lazy(() => import('@/components/ui/tabs').then(m => ({ default: m.TabsTrigger })));
+
+// Lightweight loading indicator
+const LoadingIndicator = () => (
+  <div className="flex items-center justify-center p-2">
+    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-rose-400" />
+  </div>
+);
 
 type OutcomeType = 'next-period' | 'fertile-days';
 
