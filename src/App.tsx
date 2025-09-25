@@ -5,9 +5,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { lazy, Suspense } from "react";
 
-// Ultra-fast version - no lazy loading, no heavy operations
+// Lazy load components for better performance
 const Index = lazy(() => import("./pages/Index"));
-const MenstrualCalendarUltraFast = lazy(() => import("./pages/MenstrualCalendarUltraFast"));
+const MenstrualCalendar = lazy(() => import("./pages/MenstrualCalendar"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Optimized loading component
@@ -31,7 +31,7 @@ const App = () => (
         <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/menstrual-calendar" element={<MenstrualCalendarUltraFast />} />
+            <Route path="/menstrual-calendar" element={<MenstrualCalendar />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
