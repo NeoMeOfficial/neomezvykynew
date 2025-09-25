@@ -116,7 +116,7 @@ export default function MenstrualCycleTracker({
                        currentStep === 2 ? "Dĺžka cyklu" :
                        currentStep === 3 ? "Dĺžka menštruácie" :
                        currentStep === 4 ? "PMS symptómy" :
-                       "Posledná menštruácia"}
+                       "Súhrn"}
                     </p>
                     <div className="w-2 h-2 rounded-full bg-rose-400"></div>
                   </div>
@@ -297,6 +297,84 @@ export default function MenstrualCycleTracker({
                 </div>
               )}
 
+              {/* Step 5: Summary */}
+              {currentStep === 5 && (
+                <div className="space-y-6">
+                  <div className="text-center">
+                    <p className="text-lg font-medium mb-6" style={{ color: '#955F6A' }}>
+                      Súhrn tvojich údajov
+                    </p>
+                  </div>
+                  
+                  <div className="bg-white/80 rounded-xl border border-rose-200/50 overflow-hidden">
+                    <div className="divide-y divide-rose-100">
+                      {/* Age */}
+                      <div className="flex justify-between items-center p-4">
+                        <span className="font-medium" style={{ color: '#955F6A' }}>Vek</span>
+                        <span className="font-semibold" style={{ color: '#F4415F' }}>{setupAge} rokov</span>
+                      </div>
+                      
+                      {/* Cycle Length */}
+                      <div className="flex justify-between items-center p-4">
+                        <span className="font-medium" style={{ color: '#955F6A' }}>Dĺžka cyklu</span>
+                        <span className="font-semibold" style={{ color: '#F4415F' }}>
+                          {cycleStartDate && cycleEndDate 
+                            ? `${Math.ceil((cycleEndDate.getTime() - cycleStartDate.getTime()) / (1000 * 60 * 60 * 24))} dni`
+                            : `${setupCycleLength} dni`
+                          }
+                        </span>
+                      </div>
+                      
+                      {/* Period Length */}
+                      <div className="flex justify-between items-center p-4">
+                        <span className="font-medium" style={{ color: '#955F6A' }}>Dĺžka menštruácie</span>
+                        <span className="font-semibold" style={{ color: '#F4415F' }}>{setupPeriodLength} dni</span>
+                      </div>
+                      
+                      {/* PMS Symptoms */}
+                      <div className="p-4">
+                        <div className="flex justify-between items-start mb-3">
+                          <span className="font-medium" style={{ color: '#955F6A' }}>PMS symptómy</span>
+                          <span className="text-sm font-medium" style={{ color: '#F4415F' }}>
+                            {selectedPMSSymptoms.length} vybraných
+                          </span>
+                        </div>
+                        {selectedPMSSymptoms.length > 0 ? (
+                          <div className="flex flex-wrap gap-2">
+                            {selectedPMSSymptoms.map((symptom) => (
+                              <span
+                                key={symptom}
+                                className="px-3 py-1 bg-gradient-to-r from-rose-50 to-pink-50 border border-rose-200/30 rounded-full text-xs font-medium"
+                                style={{ color: '#F4415F' }}
+                              >
+                                {symptom}
+                              </span>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="text-sm text-muted-foreground">Žiadne symptómy nevybrané</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="text-center">
+                    <Button 
+                      onClick={() => {
+                        if (cycleStartDate) {
+                          handleSetupComplete(cycleStartDate);
+                        }
+                      }}
+                      disabled={!cycleStartDate}
+                      className="w-full py-3 text-base bg-gradient-primary font-semibold rounded-3xl symptom-glass hover:opacity-90 transition-opacity"
+                      style={{ color: '#F4415F' }}
+                    >
+                      Dokončiť nastavenie
+                    </Button>
+                  </div>
+                </div>
+              )}
+
               {/* Step 5: Last Period Date */}
               {currentStep === 5 && (
                 <div className="space-y-4">
@@ -334,7 +412,7 @@ export default function MenstrualCycleTracker({
                   className="flex-1 py-3 text-base bg-gradient-primary font-semibold rounded-3xl symptom-glass hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{ color: '#F4415F' }}
                 >
-                  Dopredu
+                  {currentStep === totalSteps ? 'Dokončené' : 'Dopredu'}
                 </Button>
               </div>
             </div>
