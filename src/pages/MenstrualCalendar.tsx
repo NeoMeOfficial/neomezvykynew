@@ -1,8 +1,8 @@
 import { useAccessCode } from "@/hooks/useAccessCode";
 import { lazy, Suspense } from "react";
 
-// Lazy load the cycle tracker component but keep functionality
-const MenstrualCycleTracker = lazy(() => import("@/features/cycle/MenstrualCycleTracker"));
+// Fast-loading progressive cycle tracker
+const MenstrualCycleTrackerFast = lazy(() => import("@/features/cycle/MenstrualCycleTrackerFast"));
 
 const MenstrualCalendar = () => {
   const { accessCode, loading } = useAccessCode();
@@ -30,7 +30,7 @@ const MenstrualCalendar = () => {
               </div>
             </div>
           }>
-            <MenstrualCycleTracker accessCode={accessCode} />
+            <MenstrualCycleTrackerFast accessCode={accessCode} />
           </Suspense>
         </div>
       </div>

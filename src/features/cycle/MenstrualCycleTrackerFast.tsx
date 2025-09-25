@@ -1,88 +1,158 @@
-import React, { useState } from 'react';
-import { Calendar as CalendarIcon, TrendingUp, Lightbulb, Settings } from 'lucide-react';
+import React, { useState, lazy, Suspense } from 'react';
+import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { QuestionnaireView } from './QuestionnaireView';
+import { useCycleData } from './useCycleData';
 
-// Extremely lightweight initial version for instant loading
-export default function MenstrualCycleTrackerFast() {
-  const [currentStep, setCurrentStep] = useState(1);
+// Lazy load heavy components
+const SuggestedToday = lazy(() => import('./SuggestedToday').then(module => ({ default: module.SuggestedToday })));
+const WellnessDonutChart = lazy(() => import('./WellnessDonutChart').then(module => ({ default: module.WellnessDonutChart })));
+const PhaseOverview = lazy(() => import('./PhaseOverview').then(module => ({ default: module.PhaseOverview })));
+const DatePickerModal = lazy(() => import('./DatePickerModal').then(module => ({ default: module.DatePickerModal })));
+const SettingsModal = lazy(() => import('./SettingsModal').then(module => ({ default: module.SettingsModal })));
 
+interface MenstrualCycleTrackerProps {
+  accessCode?: string;
+  compact?: boolean;
+  onFirstInteraction?: () => void;
+}
+
+const ComponentLoader = () => (
+  <div className="flex items-center justify-center p-4">
+    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-rose-400" />
+  </div>
+);
+
+export default function MenstrualCycleTrackerFast({
+  accessCode,
+  compact = false,
+  onFirstInteraction
+}: MenstrualCycleTrackerProps) {
+  const {
+    cycleData,
+    derivedState,
+    loading,
+    setLastPeriodStart,
+    setCycleLength,
+    setPeriodLength,
+    updateCycleData
+  } = useCycleData(accessCode);
+  
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+
+  // Check if questionnaire is needed
+  const needsQuestionnaire = !cycleData.lastPeriodStart || new Date(cycleData.lastPeriodStart).getTime() < new Date('2000-01-01').getTime();
+
+  const handleQuestionnaireComplete = (data: {
+    lastPeriodStart: Date;
+    cycleLength: number;
+    periodLength: number;
+  }) => {
+    setLastPeriodStart(data.lastPeriodStart);
+    setCycleLength(data.cycleLength);
+    setPeriodLength(data.periodLength);
+    onFirstInteraction?.();
+  };
+
+  const resetToQuestionnaire = () => {
+    updateCycleData({
+      lastPeriodStart: null,
+      cycleLength: 28,
+      periodLength: 5,
+      customSettings: {
+        notifications: true,
+        symptomTracking: true,
+        moodTracking: true,
+        notes: ""
+      },
+      history: []
+    });
+  };
+
+  // Show questionnaire if needed
+  if (needsQuestionnaire) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50 p-4">
+        <div className="w-full max-w-[600px] mx-auto">
+          <QuestionnaireView onComplete={handleQuestionnaireComplete} />
+        </div>
+      </div>
+    );
+  }
+
+  // Main tracker view with progressive loading
   return (
-    <div className="w-full max-w-[600px] mx-auto">
-      <div className="space-y-6">
-        {/* Minimal loading UI - renders instantly */}
-        <div className="flex items-center justify-center">
-          <div className="text-center space-y-3">
-            <p className="text-base font-medium" style={{ color: '#955F6A' }}>
-              Vitajte v menštruačnom kalendári
-            </p>
-          </div>
-        </div>
-
-        {/* Progress indicator */}
-        <div className="flex justify-center space-x-2">
-          {[1, 2, 3, 4].map((step) => (
-            <div
-              key={step}
-              className={`w-3 h-3 rounded-full transition-colors ${
-                step === currentStep
-                  ? 'bg-rose-400'
-                  : step < currentStep
-                  ? 'bg-rose-300'
-                  : 'bg-gray-200'
-              }`}
-            />
-          ))}
-        </div>
-
-        {/* Quick setup form */}
-        <div className="space-y-4 p-6 rounded-2xl" style={{ backgroundColor: '#FBF8F9' }}>
-          <h3 className="text-lg font-medium text-center" style={{ color: '#955F6A' }}>
-            Rýchle nastavenie
-          </h3>
-          
-          <div className="space-y-3">
-            <Button 
-              onClick={() => setCurrentStep(2)}
-              className="w-full py-3 rounded-xl"
-              style={{ backgroundColor: '#F4415F', color: 'white' }}
+    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50 overflow-hidden">
+      <div className="w-full max-w-none px-2 sm:px-4 py-4 sm:py-8 mx-auto">
+        <div className="w-full max-w-[600px] mx-auto">
+          {/* Back to questionnaire button */}
+          <div className="mb-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={resetToQuestionnaire}
+              className="text-rose-600 hover:text-rose-700 hover:bg-rose-100"
             >
-              Začať sledovanie cyklu
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Naspäť na dotazník
             </Button>
-            
-            <div className="text-center">
-              <p className="text-sm" style={{ color: '#955F6A' }}>
-                Kompletný kalendár sa načíta na pozadí...
-              </p>
-            </div>
           </div>
-        </div>
 
-        {/* Simple navigation */}
-        <div className="flex justify-center space-x-4">
-          <Button 
-            variant="outline" 
-            size="sm"
-            style={{ borderColor: '#F4415F', color: '#F4415F' }}
-          >
-            <CalendarIcon className="h-4 w-4 mr-2" />
-            Kalendár
-          </Button>
-          <Button 
-            variant="outline" 
-            size="sm"
-            style={{ borderColor: '#F4415F', color: '#F4415F' }}
-          >
-            <TrendingUp className="h-4 w-4 mr-2" />
-            Štatistiky
-          </Button>
-          <Button 
-            variant="outline" 
-            size="sm"
-            style={{ borderColor: '#F4415F', color: '#F4415F' }}
-          >
-            <Settings className="h-4 w-4 mr-2" />
-            Nastavenia
-          </Button>
+          {/* Progressive loading of main content */}
+          <div className="space-y-6">
+            <Suspense fallback={<ComponentLoader />}>
+              <SuggestedToday 
+                derivedState={derivedState!} 
+                accessCode={accessCode}
+              />
+            </Suspense>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Suspense fallback={<ComponentLoader />}>
+              <WellnessDonutChart 
+                derivedState={derivedState!}
+                cycleData={cycleData}
+              />
+              </Suspense>
+
+              <Suspense fallback={<ComponentLoader />}>
+              <PhaseOverview 
+                phaseRanges={derivedState!.phaseRanges}
+                currentPhase={derivedState!.currentPhase}
+              />
+              </Suspense>
+            </div>
+
+            {/* Lazy load modals only when needed */}
+            {showDatePicker && (
+              <Suspense fallback={null}>
+                <DatePickerModal
+                  isOpen={showDatePicker}
+                  onClose={() => setShowDatePicker(false)}
+                  onDateSelect={setLastPeriodStart}
+                  derivedState={derivedState}
+                  cycleLength={cycleData.cycleLength}
+                  periodLength={cycleData.periodLength}
+                  lastPeriodStart={cycleData.lastPeriodStart}
+                  accessCode={accessCode}
+                />
+              </Suspense>
+            )}
+
+            {showSettings && (
+              <Suspense fallback={null}>
+                <SettingsModal
+                  isOpen={showSettings}
+                  onClose={() => setShowSettings(false)}
+                  cycleData={cycleData}
+                  onUpdateCycleLength={setCycleLength}
+                  onUpdatePeriodLength={setPeriodLength}
+                  onReset={resetToQuestionnaire}
+                />
+              </Suspense>
+            )}
+          </div>
         </div>
       </div>
     </div>
