@@ -15,9 +15,7 @@ export function TrackEssentialsSection({
   accessCode
 }: TrackEssentialsSectionProps) {
   return (
-    <div className="w-full space-y-6 rounded-2xl p-6"
-         style={{ backgroundColor: '#FBF8F9' }}>
-
+    <>
       {/* Section Header: Zaznač si to podstatné */}
       <div className="glass-container bg-gradient-to-r from-rose-50/80 to-pink-50/80 backdrop-blur-md border border-rose-200/30 shadow-xl rounded-xl p-4 mb-4"
            style={{ 
@@ -37,13 +35,17 @@ export function TrackEssentialsSection({
           </h3>
         </div>
       </div>
-      
-      {/* Symptom Tracker */}
-      <SymptomTracker
-        currentPhase={currentPhase}
-        currentDay={currentDay}
-        accessCode={accessCode}
-      />
-    </div>
+
+      <div className="w-full space-y-6 rounded-2xl p-6"
+           style={{ backgroundColor: '#FBF8F9' }}>
+
+        {/* Symptom Tracker */}
+        <SymptomTracker
+          currentPhase={currentPhase}
+          currentDay={currentDay}
+          accessCode={accessCode}
+        />
+      </div>
+    </>
   );
 }

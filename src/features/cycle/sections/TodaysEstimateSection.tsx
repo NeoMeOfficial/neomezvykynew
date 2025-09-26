@@ -19,9 +19,7 @@ export function TodaysEstimateSection({
   currentPhase
 }: TodaysEstimateSectionProps) {
   return (
-    <div className="w-full space-y-6 rounded-2xl p-6"
-         style={{ backgroundColor: '#FBF8F9' }}>
-      
+    <>
       {/* Section Header: Odhad na dnes */}
       <div className="glass-container bg-gradient-to-r from-rose-50/80 to-pink-50/80 backdrop-blur-md border border-rose-200/30 shadow-xl rounded-xl p-4 mb-4"
            style={{ 
@@ -41,38 +39,42 @@ export function TodaysEstimateSection({
           </h3>
         </div>
       </div>
-      
-      {/* Cycle Chart */}
-      <WellnessDonutChart
-        derivedState={derivedState}
-        selectedOutcome={selectedOutcome}
-        cycleData={cycleData}
-        className="mb-6"
-      />
-      
-      {/* Current Phase Information */}
-      <div className="space-y-3">
-        <div>
-          <h4 className="text-lg font-medium mb-2" style={{ color: '#955F6A' }}>
-            {currentPhase.name} - Deň {currentDay}
-          </h4>
-          <p className="text-sm leading-relaxed" style={{ color: '#955F6A' }}>
-            Energia postupne klesá, telo sa pripravuje na menštruáciu.
-          </p>
-        </div>
+
+      <div className="w-full space-y-6 rounded-2xl p-6"
+           style={{ backgroundColor: '#FBF8F9' }}>
         
-        <div>
-          <h5 className="text-base font-medium mb-2" style={{ color: '#955F6A' }}>
-            Čo môžete očakávať dnes:
-          </h5>
-          <p className="text-sm leading-relaxed" style={{ color: '#955F6A' }}>
-            Môžeš sa cítiť menej energicky (65%) a potrebovať viac času na odpočinok. 
-            Energia postupne klesá, preto potrebuješ pravidelné jedlá a menej náročné aktivity. 
-            Nálada môže kolísať - môžeš sa cítiť podráždenejšia alebo úzkostlivejšia. 
-            Je to normálne, buď k sebe trpezlivá.
-          </p>
+        {/* Cycle Chart */}
+        <WellnessDonutChart
+          derivedState={derivedState}
+          selectedOutcome={selectedOutcome}
+          cycleData={cycleData}
+          className="mb-6"
+        />
+        
+        {/* Current Phase Information */}
+        <div className="space-y-3">
+          <div>
+            <h4 className="text-lg font-medium mb-2" style={{ color: '#955F6A' }}>
+              {currentPhase.name} - Deň {currentDay}
+            </h4>
+            <p className="text-sm leading-relaxed" style={{ color: '#955F6A' }}>
+              Energia postupne klesá, telo sa pripravuje na menštruáciu.
+            </p>
+          </div>
+          
+          <div>
+            <h5 className="text-base font-medium mb-2" style={{ color: '#955F6A' }}>
+              Čo môžete očakávať dnes:
+            </h5>
+            <p className="text-sm leading-relaxed" style={{ color: '#955F6A' }}>
+              Môžeš sa cítiť menej energicky (65%) a potrebovať viac času na odpočinok. 
+              Energia postupne klesá, preto potrebuješ pravidelné jedlá a menej náročné aktivity. 
+              Nálada môže kolísať - môžeš sa cítiť podráždenejšia alebo úzkostlivejšia. 
+              Je to normálne, buď k sebe trpezlivá.
+            </p>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
