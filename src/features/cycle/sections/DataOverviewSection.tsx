@@ -10,9 +10,9 @@ export function DataOverviewSection({
   accessCode
 }: DataOverviewSectionProps) {
   return (
-    <div className="w-full space-y-4">
+    <>
       {/* Section Header: Prehľad údajov */}
-      <div className="glass-container bg-gradient-to-r from-rose-50/80 to-pink-50/80 backdrop-blur-md border border-rose-200/30 shadow-xl rounded-xl p-4"
+      <div className="glass-container bg-gradient-to-r from-rose-50/80 to-pink-50/80 backdrop-blur-md border border-rose-200/30 shadow-xl rounded-xl p-4 mb-4"
            style={{ 
              background: 'linear-gradient(135deg, rgba(251, 248, 249, 0.85) 0%, rgba(253, 242, 248, 0.90) 100%)',
              backdropFilter: 'blur(16px)',
@@ -46,6 +46,6 @@ export function DataOverviewSection({
         {/* Historical Data Overview */}
         <HistoricalDataOverview accessCode={accessCode} />
       </div>
-    </div>
+    </>
   );
 }
