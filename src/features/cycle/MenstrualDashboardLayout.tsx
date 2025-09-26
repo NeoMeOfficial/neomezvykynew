@@ -182,7 +182,7 @@ export function MenstrualDashboardLayout({
           onSectionChange={setActiveSection} 
         />
         
-        <main className="flex-1 p-6">
+        <main className="flex-1 p-8 max-w-none">
           {/* Header */}
           <div className="flex justify-between items-center mb-6">
             <div>
@@ -214,7 +214,7 @@ export function MenstrualDashboardLayout({
           </div>
 
           {/* Content Area */}
-          <div className="max-w-4xl">
+          <div className="w-full">
             {activeSection === 'estimate' && (
               <TodaysEstimateSection
                 derivedState={derivedState}

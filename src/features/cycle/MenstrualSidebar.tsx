@@ -37,7 +37,7 @@ const menuItems = [
 
 export function MenstrualSidebar({ activeSection, onSectionChange }: MenstrualSidebarProps) {
   return (
-    <div className="w-64 border-r border-border/50 bg-background/95 backdrop-blur-sm">
+    <div className="w-80 border-r border-border/50 bg-background/95 backdrop-blur-sm">
       <div className="p-6">
         <h2 className="text-lg font-semibold mb-6 text-foreground">
           Navigácia
