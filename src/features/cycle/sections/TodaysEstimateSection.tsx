@@ -20,60 +20,82 @@ export function TodaysEstimateSection({
 }: TodaysEstimateSectionProps) {
   return (
     <>
-      {/* Option 3: Card-style Layout - Single unified container */}
-      <div className="w-full glass-container bg-gradient-to-r from-rose-50/80 to-pink-50/80 backdrop-blur-md border border-rose-200/30 shadow-xl rounded-2xl overflow-hidden"
-           style={{ 
-             background: 'linear-gradient(135deg, rgba(251, 248, 249, 0.85) 0%, rgba(253, 242, 248, 0.90) 100%)',
-             backdropFilter: 'blur(16px)',
-             WebkitBackdropFilter: 'blur(16px)',
-             boxShadow: '0 8px 32px rgba(149, 95, 106, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
-             transform: 'translateY(0)',
-             transition: 'transform 0.3s ease'
-           }}
-           onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
-           onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
+      {/* Layered Glass - Multiple glass layers creating depth between header/content */}
+      <div className="relative">
+        {/* Background layer */}
+        <div className="absolute inset-0 rounded-2xl"
+             style={{ 
+               background: 'linear-gradient(135deg, rgba(251, 248, 249, 0.3) 0%, rgba(253, 242, 248, 0.4) 100%)',
+               backdropFilter: 'blur(8px)',
+               WebkitBackdropFilter: 'blur(8px)',
+               transform: 'translate(2px, 2px)'
+             }}></div>
         
-        {/* Card Header */}
-        <div className="border-b border-rose-200/30 p-4 bg-gradient-to-r from-rose-100/50 to-pink-100/50">
-          <div className="flex items-center gap-3">
-            <Clock className="w-5 h-5" style={{ color: '#FF7782' }} />
-            <h3 className="text-lg font-medium" style={{ color: '#FF7782' }}>
-              Odhad na dnes
-            </h3>
-          </div>
-        </div>
-
-        {/* Card Body */}
-        <div className="p-6 space-y-6">
-          {/* Cycle Chart */}
-          <WellnessDonutChart
-            derivedState={derivedState}
-            selectedOutcome={selectedOutcome}
-            cycleData={cycleData}
-            className="mb-6"
-          />
+        {/* Main container */}
+        <div className="relative w-full glass-container backdrop-blur-md border border-rose-200/30 shadow-xl rounded-2xl overflow-hidden"
+             style={{ 
+               background: 'linear-gradient(135deg, rgba(251, 248, 249, 0.85) 0%, rgba(253, 242, 248, 0.90) 100%)',
+               backdropFilter: 'blur(16px)',
+               WebkitBackdropFilter: 'blur(16px)',
+               boxShadow: '0 12px 40px rgba(149, 95, 106, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.9)',
+               transform: 'translateY(0)',
+               transition: 'transform 0.3s ease'
+             }}
+             onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+             onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
           
-          {/* Current Phase Information */}
-          <div className="space-y-3">
-            <div>
-              <h4 className="text-lg font-medium mb-2" style={{ color: '#955F6A' }}>
-                {currentPhase.name} - Deň {currentDay}
-              </h4>
-              <p className="text-sm leading-relaxed" style={{ color: '#955F6A' }}>
-                Energia postupne klesá, telo sa pripravuje na menštruáciu.
-              </p>
+          {/* Header with elevated glass layer */}
+          <div className="relative p-4"
+               style={{ 
+                 background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(253, 242, 248, 0.95) 100%)',
+                 boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 2px 8px rgba(149, 95, 106, 0.1)'
+               }}>
+            {/* Header glass accent */}
+            <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-rose-200/50 to-transparent"></div>
+            <div className="flex items-center gap-3">
+              <Clock className="w-5 h-5" style={{ color: '#FF7782' }} />
+              <h3 className="text-lg font-medium" style={{ color: '#FF7782' }}>
+                Odhad na dnes
+              </h3>
             </div>
+          </div>
+
+          {/* Content with recessed glass layer */}
+          <div className="p-6 space-y-6"
+               style={{ 
+                 background: 'linear-gradient(135deg, rgba(251, 248, 249, 0.75) 0%, rgba(253, 242, 248, 0.80) 100%)',
+                 boxShadow: 'inset 0 2px 8px rgba(149, 95, 106, 0.05)'
+               }}>
+            {/* Cycle Chart */}
+            <WellnessDonutChart
+              derivedState={derivedState}
+              selectedOutcome={selectedOutcome}
+              cycleData={cycleData}
+              className="mb-6"
+            />
             
-            <div>
-              <h5 className="text-base font-medium mb-2" style={{ color: '#955F6A' }}>
-                Čo môžete očakávať dnes:
-              </h5>
-              <p className="text-sm leading-relaxed" style={{ color: '#955F6A' }}>
-                Môžeš sa cítiť menej energicky (65%) a potrebovať viac času na odpočinok. 
-                Energia postupne klesá, preto potrebuješ pravidelné jedlá a menej náročné aktivity. 
-                Nálada môže kolísať - môžeš sa cítiť podráždenejšia alebo úzkostlivejšia. 
-                Je to normálne, buď k sebe trpezlivá.
-              </p>
+            {/* Current Phase Information */}
+            <div className="space-y-3">
+              <div>
+                <h4 className="text-lg font-medium mb-2" style={{ color: '#955F6A' }}>
+                  {currentPhase.name} - Deň {currentDay}
+                </h4>
+                <p className="text-sm leading-relaxed" style={{ color: '#955F6A' }}>
+                  Energia postupne klesá, telo sa pripravuje na menštruáciu.
+                </p>
+              </div>
+              
+              <div>
+                <h5 className="text-base font-medium mb-2" style={{ color: '#955F6A' }}>
+                  Čo môžete očakávať dnes:
+                </h5>
+                <p className="text-sm leading-relaxed" style={{ color: '#955F6A' }}>
+                  Môžeš sa cítiť menej energicky (65%) a potrebovať viac času na odpočinok. 
+                  Energia postupne klesá, preto potrebuješ pravidelné jedlá a menej náročné aktivity. 
+                  Nálada môže kolísať - môžeš sa cítiť podráždenejšia alebo úzkostlivejšia. 
+                  Je to normálne, buď k sebe trpezlivá.
+                </p>
+              </div>
             </div>
           </div>
         </div>
