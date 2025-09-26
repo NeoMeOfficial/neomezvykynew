@@ -7,7 +7,7 @@ import { lazy, Suspense } from "react";
 
 // Lazy load components for better performance
 const Index = lazy(() => import("./pages/Index"));
-const MenstrualCalendar = lazy(() => import("./pages/MenstrualCalendar"));
+import MenstrualCalendar from "./pages/MenstrualCalendar"; // Remove lazy loading for core component
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Optimized loading component
