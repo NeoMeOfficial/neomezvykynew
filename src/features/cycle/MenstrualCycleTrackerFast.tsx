@@ -2,6 +2,7 @@ import React, { useState, lazy, Suspense } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { QuestionnaireView } from './QuestionnaireView';
+import { FadingWordsLoader } from '@/components/FadingWordsLoader';
 import { useCycleData } from './useCycleData';
 
 // Lazy load heavy components
@@ -19,7 +20,7 @@ interface MenstrualCycleTrackerProps {
 
 const ComponentLoader = () => (
   <div className="flex items-center justify-center p-4">
-    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-rose-400" />
+    <FadingWordsLoader />
   </div>
 );
 
