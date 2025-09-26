@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { Calendar as CalendarIcon, TrendingUp, FileText, CalendarDays, Clock } from 'lucide-react';
+import { Calendar as CalendarIcon, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCycleData } from './useCycleData';
-import { WellnessDonutChart } from './WellnessDonutChart';
-import { PhaseOverview } from './PhaseOverview';
-import { SymptomTracker } from './SymptomTracker';
-import { HistoricalDataOverview } from './HistoricalDataOverview';
-import { CalendarView } from './CalendarView';
 import { DatePickerModal } from './DatePickerModal';
 import { SettingsModal } from './SettingsModal';
+import { TodaysEstimateSection } from './sections/TodaysEstimateSection';
+import { TrackEssentialsSection } from './sections/TrackEssentialsSection';
+import { FeelBetterSection } from './sections/FeelBetterSection';
+import { DataOverviewSection } from './sections/DataOverviewSection';
+import { CalendarViewSection } from './sections/CalendarViewSection';
 
 type OutcomeType = 'next-period' | 'fertile-days';
 
@@ -100,147 +100,40 @@ export default function MenstrualCycleTrackerAccordion({
         </div>
       </div>
 
-      {/* Box 1: Cycle Overview and Symptom Tracking */}
-      <div className="w-full space-y-6 glass-container bg-gradient-to-r from-rose-50/80 to-pink-50/80 backdrop-blur-md border border-rose-200/30 shadow-xl rounded-2xl p-6"
-           style={{ 
-             background: 'linear-gradient(135deg, rgba(251, 248, 249, 0.85) 0%, rgba(253, 242, 248, 0.90) 100%)',
-             backdropFilter: 'blur(16px)',
-             WebkitBackdropFilter: 'blur(16px)',
-             boxShadow: '0 8px 32px rgba(149, 95, 106, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
-             transform: 'translateY(0)',
-             transition: 'transform 0.3s ease'
-           }}
-           onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
-           onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
-        
-        {/* Section Header: Odhad na dnes */}
-        <div className="symptom-glass rounded-xl p-4 mb-4" style={{ backgroundColor: '#FBF8F9' }}>
-          <div className="flex items-center gap-3">
-            <Clock className="w-5 h-5" style={{ color: '#FF7782' }} />
-            <h3 className="text-lg font-medium" style={{ color: '#FF7782' }}>
-              Odhad na dnes
-            </h3>
-          </div>
-        </div>
-        
-        {/* Cycle Chart */}
-        <WellnessDonutChart
-          derivedState={derivedState}
-          selectedOutcome={selectedOutcome}
-          cycleData={cycleData}
-          className="mb-6"
-        />
-        
-        {/* Current Phase Information */}
-        <div className="symptom-glass rounded-xl p-4 mb-6"
-             style={{ backgroundColor: '#FBF8F9' }}>
-          <div className="space-y-3">
-            <div>
-              <h4 className="text-lg font-medium mb-2" style={{ color: '#955F6A' }}>
-                {currentPhase.name} - Deň {currentDay}
-              </h4>
-              <p className="text-sm leading-relaxed" style={{ color: '#955F6A' }}>
-                Energia postupne klesá, telo sa pripravuje na menštruáciu.
-              </p>
-            </div>
-            
-            <div>
-              <h5 className="text-base font-medium mb-2" style={{ color: '#955F6A' }}>
-                Čo môžete očakávať dnes:
-              </h5>
-              <p className="text-sm leading-relaxed" style={{ color: '#955F6A' }}>
-                Môžeš sa cítiť menej energicky (65%) a potrebovať viac času na odpočinok. 
-                Energia postupne klesá, preto potrebuješ pravidelné jedlá a menej náročné aktivity. 
-                Nálada môže kolísať - môžeš sa cítiť podráždenejšia alebo úzkostlivejšia. 
-                Je to normálne, buď k sebe trpezlivá.
-              </p>
-            </div>
-          </div>
-        </div>
+      {/* Section 1: Today's Estimate */}
+      <TodaysEstimateSection
+        derivedState={derivedState}
+        selectedOutcome={selectedOutcome}
+        cycleData={cycleData}
+        currentDay={currentDay}
+        currentPhase={currentPhase}
+      />
 
-        {/* Section Header: Zaznač si to podstatné */}
-        <div className="symptom-glass rounded-xl p-4 mb-4" style={{ backgroundColor: '#FBF8F9' }}>
-          <div className="flex items-center gap-3">
-            <FileText className="w-5 h-5" style={{ color: '#FF7782' }} />
-            <h3 className="text-lg font-medium" style={{ color: '#FF7782' }}>
-              Zaznač si to podstatné
-            </h3>
-          </div>
-        </div>
-        
-        {/* Symptom Tracker */}
-        <div className="symptom-glass rounded-xl p-4"
-             style={{ backgroundColor: '#FBF8F9' }}>
-          <SymptomTracker
-            currentPhase={currentPhase.key}
-            currentDay={currentDay}
-            accessCode={accessCode}
-          />
-        </div>
-      </div>
+      {/* Section 2: Track Essentials */}
+      <TrackEssentialsSection
+        currentPhase={currentPhase.key}
+        currentDay={currentDay}
+        accessCode={accessCode}
+      />
 
-      {/* Box 2: Recommendations, Data and Calendar */}
-      <div className="w-full space-y-6 glass-container bg-gradient-to-r from-rose-50/80 to-pink-50/80 backdrop-blur-md border border-rose-200/30 shadow-xl rounded-2xl p-6"
-           style={{ 
-             background: 'linear-gradient(135deg, rgba(251, 248, 249, 0.85) 0%, rgba(253, 242, 248, 0.90) 100%)',
-             backdropFilter: 'blur(16px)',
-             WebkitBackdropFilter: 'blur(16px)',
-             boxShadow: '0 8px 32px rgba(149, 95, 106, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
-             transform: 'translateY(0)',
-             transition: 'transform 0.3s ease'
-           }}
-           onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
-           onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
-        
-        {/* Section Header: Ako sa cítiť lepšie */}
-        <div className="flex items-center gap-3 mb-4">
-          <TrendingUp className="w-5 h-5" style={{ color: '#FF7782' }} />
-          <h3 className="text-lg font-medium" style={{ color: '#FF7782' }}>
-            Ako sa cítiť lepšie
-          </h3>
-        </div>
-        
-        {/* Phase Overview */}
-        <div className="mb-6">
-          <PhaseOverview
-            phaseRanges={phaseRanges}
-            currentPhase={currentPhase}
-          />
-        </div>
+      {/* Section 3: Feel Better */}
+      <FeelBetterSection
+        phaseRanges={phaseRanges}
+        currentPhase={currentPhase}
+      />
 
-        {/* Section Header: Prehľad údajov */}
-        <div className="symptom-glass rounded-xl p-4 mb-4" style={{ backgroundColor: '#FBF8F9' }}>
-          <div className="flex items-center gap-3">
-            <FileText className="w-5 h-5" style={{ color: '#FF7782' }} />
-            <h3 className="text-lg font-medium" style={{ color: '#FF7782' }}>
-              Prehľad údajov
-            </h3>
-          </div>
-        </div>
-        
-        {/* Historical Data Overview */}
-        <div className="mb-6">
-          <HistoricalDataOverview accessCode={accessCode} />
-        </div>
+      {/* Section 4: Data Overview */}
+      <DataOverviewSection
+        accessCode={accessCode}
+      />
 
-        {/* Section Header: Kalendárny pohľad */}
-        <div className="symptom-glass rounded-xl p-4 mb-4" style={{ backgroundColor: '#FBF8F9' }}>
-          <div className="flex items-center gap-3">
-            <CalendarDays className="w-5 h-5" style={{ color: '#FF7782' }} />
-            <h3 className="text-lg font-medium" style={{ color: '#FF7782' }}>
-              Kalendárny pohľad
-            </h3>
-          </div>
-        </div>
-        
-        {/* Calendar View */}
-        <CalendarView
-          cycleData={cycleData}
-          derivedState={derivedState}
-          onOutcomeSelect={setSelectedOutcome}
-          selectedOutcome={selectedOutcome}
-        />
-      </div>
+      {/* Section 5: Calendar View */}
+      <CalendarViewSection
+        cycleData={cycleData}
+        derivedState={derivedState}
+        onOutcomeSelect={setSelectedOutcome}
+        selectedOutcome={selectedOutcome}
+      />
 
       {/* Modals */}
       <DatePickerModal
