@@ -193,13 +193,11 @@ export default function MenstrualCycleTrackerAccordion({
            onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
         
         {/* Section Header: Ako sa cítiť lepšie */}
-        <div className="symptom-glass rounded-xl p-4 mb-4" style={{ backgroundColor: '#FBF8F9' }}>
-          <div className="flex items-center gap-3">
-            <TrendingUp className="w-5 h-5" style={{ color: '#FF7782' }} />
-            <h3 className="text-lg font-medium" style={{ color: '#FF7782' }}>
-              Ako sa cítiť lepšie
-            </h3>
-          </div>
+        <div className="flex items-center gap-3 mb-4">
+          <TrendingUp className="w-5 h-5" style={{ color: '#FF7782' }} />
+          <h3 className="text-lg font-medium" style={{ color: '#FF7782' }}>
+            Ako sa cítiť lepšie
+          </h3>
         </div>
         
         {/* Phase Overview */}
