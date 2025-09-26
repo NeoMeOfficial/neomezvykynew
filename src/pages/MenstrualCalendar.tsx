@@ -1,5 +1,5 @@
 import { useAccessCode } from "@/hooks/useAccessCode";
-import MenstrualCycleTrackerFast from "@/features/cycle/MenstrualCycleTrackerFast";
+import MenstrualCycleTracker from "@/features/cycle/MenstrualCycleTracker";
 
 const MenstrualCalendar = () => {
   const { accessCode, loading } = useAccessCode();
@@ -9,7 +9,7 @@ const MenstrualCalendar = () => {
     <div className="min-h-screen overflow-x-hidden bg-white">
       <div className="w-full max-w-none px-2 sm:px-4 py-4 sm:py-8 mx-auto">
         <div className="w-full max-w-[600px] mx-auto">
-          <MenstrualCycleTrackerFast accessCode={accessCode} />
+          <MenstrualCycleTracker accessCode={accessCode} />
         </div>
       </div>
     </div>
