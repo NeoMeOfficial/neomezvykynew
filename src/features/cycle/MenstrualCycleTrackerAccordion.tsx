@@ -1,12 +1,6 @@
 import React, { useState } from 'react';
 import { Calendar as CalendarIcon, TrendingUp, FileText, CalendarDays, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { 
-  Accordion, 
-  AccordionContent, 
-  AccordionItem, 
-  AccordionTrigger 
-} from '@/components/ui/accordion';
 import { useCycleData } from './useCycleData';
 import { WellnessDonutChart } from './WellnessDonutChart';
 import { PhaseOverview } from './PhaseOverview';
@@ -106,148 +100,139 @@ export default function MenstrualCycleTrackerAccordion({
         </div>
       </div>
 
-      {/* Accordion Sections */}
-      <Accordion
-        type="multiple"
-        value={openSections}
-        onValueChange={setOpenSections}
-        className="w-full space-y-3"
-      >
-        {/* Section 1: Odhad na dnes */}
-        <AccordionItem value="section-1" className="border rounded-lg bg-white/50">
-          <AccordionTrigger className="px-4 py-3 hover:no-underline">
-            <div className="flex items-center gap-3">
-              <Clock className="w-5 h-5" style={{ color: '#955F6A' }} />
-              <span className="font-medium" style={{ color: '#955F6A' }}>
-                Odhad na dnes
-              </span>
+      {/* Box 1: Cycle Overview and Symptom Tracking */}
+      <div className="w-full space-y-6 glass-container bg-gradient-to-r from-rose-50/80 to-pink-50/80 backdrop-blur-md border border-rose-200/30 shadow-xl rounded-2xl p-6"
+           style={{ 
+             background: 'linear-gradient(135deg, rgba(251, 248, 249, 0.85) 0%, rgba(253, 242, 248, 0.90) 100%)',
+             backdropFilter: 'blur(16px)',
+             WebkitBackdropFilter: 'blur(16px)',
+             boxShadow: '0 8px 32px rgba(149, 95, 106, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
+             transform: 'translateY(0)',
+             transition: 'transform 0.3s ease'
+           }}
+           onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
+           onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
+        
+        {/* Section Header: Odhad na dnes */}
+        <div className="flex items-center gap-3 mb-4">
+          <Clock className="w-5 h-5" style={{ color: '#955F6A' }} />
+          <h3 className="text-lg font-medium" style={{ color: '#955F6A' }}>
+            Odhad na dnes
+          </h3>
+        </div>
+        
+        {/* Cycle Chart */}
+        <WellnessDonutChart
+          derivedState={derivedState}
+          selectedOutcome={selectedOutcome}
+          cycleData={cycleData}
+          className="mb-6"
+        />
+        
+        {/* Current Phase Information */}
+        <div className="symptom-glass rounded-xl p-4 mb-6"
+             style={{ backgroundColor: '#FBF8F9' }}>
+          <div className="space-y-3">
+            <div>
+              <h4 className="text-lg font-medium mb-2" style={{ color: '#955F6A' }}>
+                {currentPhase.name} - Deň {currentDay}
+              </h4>
+              <p className="text-sm leading-relaxed" style={{ color: '#955F6A' }}>
+                Energia postupne klesá, telo sa pripravuje na menštruáciu.
+              </p>
             </div>
-          </AccordionTrigger>
-          <AccordionContent className="px-4 pb-4">
-            <div className="space-y-4 glass-container bg-gradient-to-r from-rose-50/80 to-pink-50/80 backdrop-blur-md border border-rose-200/30 shadow-xl"
-                 style={{ 
-                   background: 'linear-gradient(135deg, rgba(251, 248, 249, 0.85) 0%, rgba(253, 242, 248, 0.90) 100%)',
-                   backdropFilter: 'blur(16px)',
-                   WebkitBackdropFilter: 'blur(16px)',
-                   boxShadow: '0 8px 32px rgba(149, 95, 106, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
-                 }}>
-              {/* Cycle Chart */}
-              <WellnessDonutChart
-                derivedState={derivedState}
-                selectedOutcome={selectedOutcome}
-                cycleData={cycleData}
-                className="mb-4"
-              />
-              
-              {/* Current Phase Information */}
-              <div
-                className="symptom-glass rounded-xl p-4"
-                style={{ backgroundColor: '#FBF8F9' }}
-              >
-                <div className="space-y-3">
-                  <div>
-                    <h3 className="text-lg font-medium mb-2" style={{ color: '#955F6A' }}>
-                      {currentPhase.name} - Deň {currentDay}
-                    </h3>
-                    <p className="text-sm leading-relaxed" style={{ color: '#955F6A' }}>
-                      Energia postupne klesá, telo sa pripravuje na menštruáciu.
-                    </p>
-                  </div>
-                  
-                  <div>
-                    <h4 className="text-base font-medium mb-2" style={{ color: '#955F6A' }}>
-                      Čo môžete očakávať dnes:
-                    </h4>
-                    <p className="text-sm leading-relaxed" style={{ color: '#955F6A' }}>
-                      Môžeš sa cítiť menej energicky (65%) a potrebovať viac času na odpočinok. 
-                      Energia postupne klesá, preto potrebuješ pravidelné jedlá a menej náročné aktivity. 
-                      Nálada môže kolísať - môžeš sa cítiť podráždenejšia alebo úzkostlivejšia. 
-                      Je to normálne, buď k sebe trpezlivá.
-                    </p>
-                  </div>
-                </div>
-              </div>
+            
+            <div>
+              <h5 className="text-base font-medium mb-2" style={{ color: '#955F6A' }}>
+                Čo môžete očakávať dnes:
+              </h5>
+              <p className="text-sm leading-relaxed" style={{ color: '#955F6A' }}>
+                Môžeš sa cítiť menej energicky (65%) a potrebovať viac času na odpočinok. 
+                Energia postupne klesá, preto potrebuješ pravidelné jedlá a menej náročné aktivity. 
+                Nálada môže kolísať - môžeš sa cítiť podráždenejšia alebo úzkostlivejšia. 
+                Je to normálne, buď k sebe trpezlivá.
+              </p>
             </div>
-          </AccordionContent>
-        </AccordionItem>
+          </div>
+        </div>
 
-        {/* Section 2: Zaznač si to podstatné */}
-        <AccordionItem value="section-2" className="border rounded-lg bg-white/50">
-          <AccordionTrigger className="px-4 py-3 hover:no-underline">
-            <div className="flex items-center gap-3">
-              <FileText className="w-5 h-5" style={{ color: '#955F6A' }} />
-              <span className="font-medium" style={{ color: '#955F6A' }}>
-                Zaznač si to podstatné
-              </span>
-            </div>
-          </AccordionTrigger>
-          <AccordionContent className="px-4 pb-4">
-            <div
-              className="symptom-glass rounded-xl p-4"
-              style={{ backgroundColor: '#FBF8F9' }}
-            >
-              <SymptomTracker
-                currentPhase={currentPhase.key}
-                currentDay={currentDay}
-                accessCode={accessCode}
-              />
-            </div>
-          </AccordionContent>
-        </AccordionItem>
+        {/* Section Header: Zaznač si to podstatné */}
+        <div className="flex items-center gap-3 mb-4">
+          <FileText className="w-5 h-5" style={{ color: '#955F6A' }} />
+          <h3 className="text-lg font-medium" style={{ color: '#955F6A' }}>
+            Zaznač si to podstatné
+          </h3>
+        </div>
+        
+        {/* Symptom Tracker */}
+        <div className="symptom-glass rounded-xl p-4"
+             style={{ backgroundColor: '#FBF8F9' }}>
+          <SymptomTracker
+            currentPhase={currentPhase.key}
+            currentDay={currentDay}
+            accessCode={accessCode}
+          />
+        </div>
+      </div>
 
-        {/* Section 3: Ako sa cítiť lepšie */}
-        <AccordionItem value="section-3" className="border rounded-lg bg-white/50">
-          <AccordionTrigger className="px-4 py-3 hover:no-underline">
-            <div className="flex items-center gap-3">
-              <TrendingUp className="w-5 h-5" style={{ color: '#955F6A' }} />
-              <span className="font-medium" style={{ color: '#955F6A' }}>
-                Ako sa cítiť lepšie
-              </span>
-            </div>
-          </AccordionTrigger>
-          <AccordionContent className="px-4 pb-4">
-            <PhaseOverview
-              phaseRanges={phaseRanges}
-              currentPhase={currentPhase}
-            />
-          </AccordionContent>
-        </AccordionItem>
+      {/* Box 2: Recommendations, Data and Calendar */}
+      <div className="w-full space-y-6 glass-container bg-gradient-to-r from-rose-50/80 to-pink-50/80 backdrop-blur-md border border-rose-200/30 shadow-xl rounded-2xl p-6"
+           style={{ 
+             background: 'linear-gradient(135deg, rgba(251, 248, 249, 0.85) 0%, rgba(253, 242, 248, 0.90) 100%)',
+             backdropFilter: 'blur(16px)',
+             WebkitBackdropFilter: 'blur(16px)',
+             boxShadow: '0 8px 32px rgba(149, 95, 106, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
+             transform: 'translateY(0)',
+             transition: 'transform 0.3s ease'
+           }}
+           onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
+           onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
+        
+        {/* Section Header: Ako sa cítiť lepšie */}
+        <div className="flex items-center gap-3 mb-4">
+          <TrendingUp className="w-5 h-5" style={{ color: '#955F6A' }} />
+          <h3 className="text-lg font-medium" style={{ color: '#955F6A' }}>
+            Ako sa cítiť lepšie
+          </h3>
+        </div>
+        
+        {/* Phase Overview */}
+        <div className="mb-6">
+          <PhaseOverview
+            phaseRanges={phaseRanges}
+            currentPhase={currentPhase}
+          />
+        </div>
 
-        {/* Section 4: Prehľad údajov */}
-        <AccordionItem value="section-4" className="border rounded-lg bg-white/50">
-          <AccordionTrigger className="px-4 py-3 hover:no-underline">
-            <div className="flex items-center gap-3">
-              <FileText className="w-5 h-5" style={{ color: '#955F6A' }} />
-              <span className="font-medium" style={{ color: '#955F6A' }}>
-                Prehľad údajov
-              </span>
-            </div>
-          </AccordionTrigger>
-          <AccordionContent className="px-4 pb-4">
-            <HistoricalDataOverview accessCode={accessCode} />
-          </AccordionContent>
-        </AccordionItem>
+        {/* Section Header: Prehľad údajov */}
+        <div className="flex items-center gap-3 mb-4">
+          <FileText className="w-5 h-5" style={{ color: '#955F6A' }} />
+          <h3 className="text-lg font-medium" style={{ color: '#955F6A' }}>
+            Prehľad údajov
+          </h3>
+        </div>
+        
+        {/* Historical Data Overview */}
+        <div className="mb-6">
+          <HistoricalDataOverview accessCode={accessCode} />
+        </div>
 
-        {/* Section 5: Kalendárny pohľad */}
-        <AccordionItem value="section-5" className="border rounded-lg bg-white/50">
-          <AccordionTrigger className="px-4 py-3 hover:no-underline">
-            <div className="flex items-center gap-3">
-              <CalendarDays className="w-5 h-5" style={{ color: '#955F6A' }} />
-              <span className="font-medium" style={{ color: '#955F6A' }}>
-                Kalendárny pohľad
-              </span>
-            </div>
-          </AccordionTrigger>
-          <AccordionContent className="px-4 pb-4">
-            <CalendarView
-              cycleData={cycleData}
-              derivedState={derivedState}
-              onOutcomeSelect={setSelectedOutcome}
-              selectedOutcome={selectedOutcome}
-            />
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
+        {/* Section Header: Kalendárny pohľad */}
+        <div className="flex items-center gap-3 mb-4">
+          <CalendarDays className="w-5 h-5" style={{ color: '#955F6A' }} />
+          <h3 className="text-lg font-medium" style={{ color: '#955F6A' }}>
+            Kalendárny pohľad
+          </h3>
+        </div>
+        
+        {/* Calendar View */}
+        <CalendarView
+          cycleData={cycleData}
+          derivedState={derivedState}
+          onOutcomeSelect={setSelectedOutcome}
+          selectedOutcome={selectedOutcome}
+        />
+      </div>
 
       {/* Modals */}
       <DatePickerModal
