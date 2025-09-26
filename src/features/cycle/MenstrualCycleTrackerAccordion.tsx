@@ -114,11 +114,13 @@ export default function MenstrualCycleTrackerAccordion({
            onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
         
         {/* Section Header: Odhad na dnes */}
-        <div className="flex items-center gap-3 mb-4">
-          <Clock className="w-5 h-5" style={{ color: '#955F6A' }} />
-          <h3 className="text-lg font-medium" style={{ color: '#955F6A' }}>
-            Odhad na dnes
-          </h3>
+        <div className="symptom-glass rounded-xl p-4 mb-4" style={{ backgroundColor: '#FBF8F9' }}>
+          <div className="flex items-center gap-3">
+            <Clock className="w-5 h-5" style={{ color: '#FF7782' }} />
+            <h3 className="text-lg font-medium" style={{ color: '#FF7782' }}>
+              Odhad na dnes
+            </h3>
+          </div>
         </div>
         
         {/* Cycle Chart */}
@@ -157,11 +159,13 @@ export default function MenstrualCycleTrackerAccordion({
         </div>
 
         {/* Section Header: Zaznač si to podstatné */}
-        <div className="flex items-center gap-3 mb-4">
-          <FileText className="w-5 h-5" style={{ color: '#955F6A' }} />
-          <h3 className="text-lg font-medium" style={{ color: '#955F6A' }}>
-            Zaznač si to podstatné
-          </h3>
+        <div className="symptom-glass rounded-xl p-4 mb-4" style={{ backgroundColor: '#FBF8F9' }}>
+          <div className="flex items-center gap-3">
+            <FileText className="w-5 h-5" style={{ color: '#FF7782' }} />
+            <h3 className="text-lg font-medium" style={{ color: '#FF7782' }}>
+              Zaznač si to podstatné
+            </h3>
+          </div>
         </div>
         
         {/* Symptom Tracker */}
@@ -189,11 +193,13 @@ export default function MenstrualCycleTrackerAccordion({
            onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
         
         {/* Section Header: Ako sa cítiť lepšie */}
-        <div className="flex items-center gap-3 mb-4">
-          <TrendingUp className="w-5 h-5" style={{ color: '#955F6A' }} />
-          <h3 className="text-lg font-medium" style={{ color: '#955F6A' }}>
-            Ako sa cítiť lepšie
-          </h3>
+        <div className="symptom-glass rounded-xl p-4 mb-4" style={{ backgroundColor: '#FBF8F9' }}>
+          <div className="flex items-center gap-3">
+            <TrendingUp className="w-5 h-5" style={{ color: '#FF7782' }} />
+            <h3 className="text-lg font-medium" style={{ color: '#FF7782' }}>
+              Ako sa cítiť lepšie
+            </h3>
+          </div>
         </div>
         
         {/* Phase Overview */}
@@ -205,11 +211,13 @@ export default function MenstrualCycleTrackerAccordion({
         </div>
 
         {/* Section Header: Prehľad údajov */}
-        <div className="flex items-center gap-3 mb-4">
-          <FileText className="w-5 h-5" style={{ color: '#955F6A' }} />
-          <h3 className="text-lg font-medium" style={{ color: '#955F6A' }}>
-            Prehľad údajov
-          </h3>
+        <div className="symptom-glass rounded-xl p-4 mb-4" style={{ backgroundColor: '#FBF8F9' }}>
+          <div className="flex items-center gap-3">
+            <FileText className="w-5 h-5" style={{ color: '#FF7782' }} />
+            <h3 className="text-lg font-medium" style={{ color: '#FF7782' }}>
+              Prehľad údajov
+            </h3>
+          </div>
         </div>
         
         {/* Historical Data Overview */}
@@ -218,11 +226,13 @@ export default function MenstrualCycleTrackerAccordion({
         </div>
 
         {/* Section Header: Kalendárny pohľad */}
-        <div className="flex items-center gap-3 mb-4">
-          <CalendarDays className="w-5 h-5" style={{ color: '#955F6A' }} />
-          <h3 className="text-lg font-medium" style={{ color: '#955F6A' }}>
-            Kalendárny pohľad
-          </h3>
+        <div className="symptom-glass rounded-xl p-4 mb-4" style={{ backgroundColor: '#FBF8F9' }}>
+          <div className="flex items-center gap-3">
+            <CalendarDays className="w-5 h-5" style={{ color: '#FF7782' }} />
+            <h3 className="text-lg font-medium" style={{ color: '#FF7782' }}>
+              Kalendárny pohľad
+            </h3>
+          </div>
         </div>
         
         {/* Calendar View */}
