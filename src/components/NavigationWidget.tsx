@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Calendar, NotebookPen } from "lucide-react";
 import { MonthlyCalendar } from "@/components/MonthlyCalendar";
 import DiaryView from "@/components/DiaryView";
+import { DashboardLayout } from "@/components/DashboardLayout";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 // Import the uploaded icons
 import menstrualCalendarIcon from "@/assets/menstrual-calendar-icon.png";
@@ -64,6 +66,28 @@ export const NavigationWidget = ({
   };
 
   const getIconSize = (isOpen: boolean) => isOpen ? 'w-16 h-16' : 'w-28 h-28';
+  const isMobile = useIsMobile();
+
+  // Use dashboard layout for desktop, mobile collapsible layout for mobile
+  if (!isMobile) {
+    return (
+      <DashboardLayout
+        accessCode={accessCode}
+        selectedDate={selectedDate}
+        onFirstInteraction={onFirstInteraction}
+        habitData={habitData}
+        habits={habits}
+        formatDate={formatDate}
+        reflections={reflections}
+        monthlyCalendarDate={monthlyCalendarDate}
+        setMonthlyCalendarDate={setMonthlyCalendarDate}
+        showMonthlyCalendar={showMonthlyCalendar}
+        setShowMonthlyCalendar={setShowMonthlyCalendar}
+        showDiaryView={showDiaryView}
+        setShowDiaryView={setShowDiaryView}
+      />
+    );
+  }
 
   return (
     <div className="w-full max-w-[600px] mx-auto space-y-2">

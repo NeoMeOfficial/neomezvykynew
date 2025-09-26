@@ -182,7 +182,7 @@ const Index = () => {
         )}
 
 
-        {/* Navigation Widget with Collapsible Sections */}
+        {/* Navigation Widget with Dashboard/Mobile Layout */}
         <NavigationWidget
           accessCode={accessCode}
           selectedDate={selectedDate}
