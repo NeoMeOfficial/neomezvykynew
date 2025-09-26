@@ -41,7 +41,26 @@ export default function MenstrualCycleTrackerFast({
   
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
 
+  // Ensure minimum loading time to show the fading words animation
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setInitialLoading(false);
+    }, 2000); // Show animation for at least 2 seconds
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Show loading animation if still in initial loading phase
+  if (initialLoading || loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50 flex items-center justify-center">
+        <FadingWordsLoader />
+      </div>
+    );
+  }
+  
   // Check if questionnaire is needed
   const needsQuestionnaire = !cycleData.lastPeriodStart || new Date(cycleData.lastPeriodStart).getTime() < new Date('2000-01-01').getTime();
 
