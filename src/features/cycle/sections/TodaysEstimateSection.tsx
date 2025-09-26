@@ -22,17 +22,17 @@ export function TodaysEstimateSection({
     <>
       {/* Layered Glass - Multiple glass layers creating depth between header/content */}
       <div className="relative">
-        {/* Background layer - reduced blur */}
-        <div className="absolute inset-0 rounded-2xl"
+        {/* Background layer */}
+        <div className="absolute inset-0 rounded-2xl z-0"
              style={{ 
                background: 'linear-gradient(135deg, rgba(251, 248, 249, 0.3) 0%, rgba(253, 242, 248, 0.4) 100%)',
-               backdropFilter: 'blur(2px)',
-               WebkitBackdropFilter: 'blur(2px)',
+               backdropFilter: 'blur(8px)',
+               WebkitBackdropFilter: 'blur(8px)',
                transform: 'translate(2px, 2px)'
              }}></div>
         
         {/* Header with elevated glass layer */}
-        <div className="relative p-4 rounded-t-2xl"
+        <div className="relative p-4 rounded-t-2xl z-10"
              style={{ 
                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(253, 242, 248, 0.95) 100%)',
                boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 2px 8px rgba(149, 95, 106, 0.1)'
@@ -48,7 +48,7 @@ export function TodaysEstimateSection({
         </div>
 
         {/* Content with recessed glass layer */}
-        <div className="p-6 space-y-6 rounded-b-2xl"
+        <div className="p-6 space-y-6 rounded-b-2xl z-10 relative"
              style={{ 
                background: 'linear-gradient(135deg, rgba(251, 248, 249, 0.75) 0%, rgba(253, 242, 248, 0.80) 100%)',
                boxShadow: 'inset 0 2px 8px rgba(149, 95, 106, 0.05)'
