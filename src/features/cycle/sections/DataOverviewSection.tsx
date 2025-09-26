@@ -36,7 +36,7 @@ export function DataOverviewSection({
              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
           
           {/* Header with elevated glass layer */}
-          <div className="relative p-4"
+          <div className="relative p-4 rounded-t-2xl"
                style={{ 
                  background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(253, 242, 248, 0.95) 100%)',
                  boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 2px 8px rgba(149, 95, 106, 0.1)'
