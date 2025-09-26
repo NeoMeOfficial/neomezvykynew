@@ -1,5 +1,5 @@
 import { useAccessCode } from "@/hooks/useAccessCode";
-import MenstrualCycleTrackerAccordion from "@/features/cycle/MenstrualCycleTrackerAccordion";
+import { MenstrualDashboardLayout } from "@/features/cycle/MenstrualDashboardLayout";
 import { AlertCircle, Lock } from 'lucide-react';
 
 const MenstrualCalendar = () => {
@@ -32,7 +32,7 @@ const MenstrualCalendar = () => {
             </div>
           </div>
           
-          <MenstrualCycleTrackerAccordion accessCode={accessCode} />
+          <MenstrualDashboardLayout accessCode={accessCode} />
         </div>
       </div>
     </div>
