@@ -17,9 +17,9 @@ export const FadingWordsLoader: React.FC<FadingWordsLoaderProps> = ({ className 
       setTimeout(() => {
         setCurrentWordIndex((prev) => (prev + 1) % words.length);
         setIsVisible(true);
-      }, 800); // Longer fade out duration
+      }, 700); // Keep the smooth fade out duration
       
-    }, 2500); // Slower word change - every 2.5 seconds
+    }, 1200); // Much faster word changes - every 1.2 seconds
 
     return () => clearInterval(interval);
   }, []);
