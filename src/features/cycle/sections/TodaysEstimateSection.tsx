@@ -22,12 +22,12 @@ export function TodaysEstimateSection({
     <>
       {/* Layered Glass - Multiple glass layers creating depth between header/content */}
       <div className="relative">
-        {/* Background layer */}
+        {/* Background layer - reduced blur */}
         <div className="absolute inset-0 rounded-2xl"
              style={{ 
                background: 'linear-gradient(135deg, rgba(251, 248, 249, 0.3) 0%, rgba(253, 242, 248, 0.4) 100%)',
-               backdropFilter: 'blur(8px)',
-               WebkitBackdropFilter: 'blur(8px)',
+               backdropFilter: 'blur(2px)',
+               WebkitBackdropFilter: 'blur(2px)',
                transform: 'translate(2px, 2px)'
              }}></div>
         
