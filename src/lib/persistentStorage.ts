@@ -263,36 +263,49 @@ class PersistentStorage {
    * Retrieve access code with automatic fallback and parent request
    */
   async retrieve(): Promise<string | null> {
-    const methods = [
-      () => this.getFromIndexedDB(),
-      () => Promise.resolve(this.getFromLocalStorage()),
-      () => Promise.resolve(this.getFromCookie())
-    ];
-
-    for (const method of methods) {
-      try {
-        const result = await method();
-        if (result.success && result.value) {
-          const normalized = this.sanitizeCode(result.value);
-          if (!normalized) continue;
-          console.log('Access code retrieved successfully');
-          // Update recent codes when successfully retrieved
-          this.updateRecentCodes(normalized);
-          
-          return normalized;
-        }
-      } catch (error) {
-        console.warn('Storage method failed:', error);
+    // Fast path: Check localStorage first for immediate response
+    const localResult = this.getFromLocalStorage();
+    if (localResult.success && localResult.value) {
+      const normalized = this.sanitizeCode(localResult.value);
+      if (normalized) {
+        console.log('Access code retrieved successfully (fast path)');
+        this.updateRecentCodes(normalized);
+        return normalized;
       }
     }
 
-    // If no local code found and we're embedded, try requesting from parent
-    if (this.isEmbedded()) {
-      const parentCode = await this.requestAccessCodeFromParent();
-      if (parentCode) {
-        console.log('Access code received from parent');
-        return parentCode;
+    // Parallel approach: Check remaining storage and parent simultaneously
+    const storagePromises = [
+      this.getFromIndexedDB(),
+      Promise.resolve(this.getFromCookie())
+    ];
+    
+    const parentPromise = this.isEmbedded() ? 
+      this.requestAccessCodeFromParent() : 
+      Promise.resolve(null);
+
+    // Race storage methods against parent request
+    const [storageResults, parentCode] = await Promise.all([
+      Promise.allSettled(storagePromises),
+      parentPromise
+    ]);
+
+    // Check storage results first
+    for (const result of storageResults) {
+      if (result.status === 'fulfilled' && result.value?.success && result.value?.value) {
+        const normalized = this.sanitizeCode(result.value.value);
+        if (normalized) {
+          console.log('Access code retrieved successfully');
+          this.updateRecentCodes(normalized);
+          return normalized;
+        }
       }
+    }
+
+    // Fall back to parent code if available
+    if (parentCode) {
+      console.log('Access code received from parent');
+      return parentCode;
     }
 
     console.warn('No access code found in any storage method');
@@ -463,7 +476,7 @@ class PersistentStorage {
       const timeout = setTimeout(() => {
         console.log('Parent code request timed out');
         resolve(null);
-      }, 3000); // 3 second timeout
+      }, 500); // Reduced to 500ms for faster loading
       
       // Listen for response
       const handleResponse = (event: MessageEvent) => {
