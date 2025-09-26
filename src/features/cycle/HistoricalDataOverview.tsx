@@ -141,10 +141,7 @@ export function HistoricalDataOverview({ accessCode }: HistoricalDataOverviewPro
   }
 
   return (
-    <div
-      className="symptom-glass rounded-xl p-4 space-y-4"
-      style={{ backgroundColor: '#FBF8F9' }}
-    >
+    <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
