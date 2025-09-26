@@ -16,13 +16,7 @@ export function PhaseOverview({ phaseRanges, currentPhase, className = "" }: Pha
   const dayInPhase = Math.floor(Math.random() * insights.strava.length); // This should be calculated based on actual day
   
   return (
-    <div
-      className={`symptom-glass rounded-xl p-4 transition-all duration-300 space-y-4 ${className}`}
-      style={{
-        backgroundColor: '#FBF8F9',
-        borderLeft: `4px solid ${getPhaseColor(currentPhase.key)}`
-      }}
-    >
+    <>
       {/* Strava */}
       <div className="space-y-3">
         <div className="flex items-center gap-3">
@@ -82,6 +76,6 @@ export function PhaseOverview({ phaseRanges, currentPhase, className = "" }: Pha
           ))}
         </div>
       </div>
-    </div>
+    </>
   );
 }
