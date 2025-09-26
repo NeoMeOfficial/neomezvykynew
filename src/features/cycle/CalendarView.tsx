@@ -6,6 +6,7 @@ import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterv
 import { sk } from 'date-fns/locale';
 import { DerivedState, CycleData } from './types';
 import { isPeriodDate, isFertilityDate } from './utils';
+import { useIsMobile } from '@/hooks/use-mobile';
 type OutcomeType = 'next-period' | 'fertile-days';
 interface CalendarViewProps {
   cycleData: CycleData;
@@ -20,6 +21,7 @@ export function CalendarView({
   selectedOutcome
 }: CalendarViewProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const isMobile = useIsMobile();
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
   const monthDays = eachDayOfInterval({
@@ -66,10 +68,10 @@ export function CalendarView({
     setCurrentMonth(prev => direction === 'prev' ? subMonths(prev, 1) : addMonths(prev, 1));
   };
   return <div className="space-y-4">
-      {/* Header with Filter Buttons */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          
+      {/* Header with Filter Buttons and Legend */}
+      <div className={isMobile ? "space-y-3" : ""}>
+        <div className={`flex items-center ${isMobile ? 'flex-col gap-3' : 'justify-between'}`}>
+          {/* Filter Buttons */}
           <div className="flex gap-2">
             <Button size="sm" variant={selectedOutcome === 'next-period' ? 'default' : 'outline'} onClick={() => onOutcomeSelect(selectedOutcome === 'next-period' ? null : 'next-period')} className="flex items-center gap-1.5 text-xs">
               <Droplets className="w-3 h-3" />
@@ -80,27 +82,27 @@ export function CalendarView({
               Plodné dni
             </Button>
           </div>
-        </div>
 
-        {/* Legend */}
-        <div className="flex flex-wrap gap-3 text-xs">
-          <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-full bg-rose-400"></div>
-            <span style={{
-            color: '#955F6A'
-          }}>Menštruácia</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-full bg-pink-300"></div>
-            <span style={{
-            color: '#955F6A'
-          }}>Plodné dni</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-full border-2 border-rose-400"></div>
-            <span style={{
-            color: '#955F6A'
-          }}>Dnes</span>
+          {/* Legend */}
+          <div className="flex flex-wrap gap-3 text-xs">
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded-full bg-rose-400"></div>
+              <span style={{
+              color: '#955F6A'
+            }}>Menštruácia</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded-full bg-pink-300"></div>
+              <span style={{
+              color: '#955F6A'
+            }}>Plodné dni</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded-full border-2 border-rose-400"></div>
+              <span style={{
+              color: '#955F6A'
+            }}>Dnes</span>
+            </div>
           </div>
         </div>
       </div>
