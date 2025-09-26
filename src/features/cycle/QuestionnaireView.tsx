@@ -38,6 +38,14 @@ export function QuestionnaireView({ onComplete }: QuestionnaireViewProps) {
     });
   };
 
+  const getIncompleteQuestions = () => {
+    const incomplete = [];
+    if (!setupAge || setupAge < 13 || setupAge > 60) incomplete.push({ step: 1, question: 'Vek' });
+    if (!cycleStartDate || !cycleEndDate) incomplete.push({ step: 2, question: 'Dátum cyklu' });
+    if (!setupPeriodLength || setupPeriodLength < 2 || setupPeriodLength > 10) incomplete.push({ step: 3, question: 'Dĺžka menštruácie' });
+    return incomplete;
+  };
+
   const handleStepComplete = (step: number) => {
     if (!completedSteps.includes(step)) {
       setCompletedSteps([...completedSteps, step]);
@@ -262,6 +270,29 @@ export function QuestionnaireView({ onComplete }: QuestionnaireViewProps) {
                   Súhrn tvojich údajov
                 </p>
               </div>
+
+              {/* Missing questions warning */}
+              {getIncompleteQuestions().length > 0 && (
+                <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-4">
+                  <div className="text-center mb-4">
+                    <p className="font-medium text-amber-700 mb-2">
+                      Ešte potrebujeme dokončiť tieto otázky:
+                    </p>
+                    <div className="space-y-2">
+                      {getIncompleteQuestions().map((item) => (
+                        <Button
+                          key={item.step}
+                          onClick={() => setCurrentStep(item.step)}
+                          variant="outline"
+                          className="mr-2 text-xs py-1 px-3 bg-white border-amber-300 text-amber-700 hover:bg-amber-50"
+                        >
+                          {item.question}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
               
               <div className="bg-white/80 rounded-xl border border-rose-200/50 overflow-hidden">
                 <div className="divide-y divide-rose-100">
@@ -322,11 +353,11 @@ export function QuestionnaireView({ onComplete }: QuestionnaireViewProps) {
                       handleSetupComplete(cycleStartDate);
                     }
                   }}
-                  disabled={!cycleStartDate}
-                  className="w-full py-3 text-base bg-gradient-primary font-semibold rounded-3xl symptom-glass hover:opacity-90 transition-opacity"
+                  disabled={!cycleStartDate || getIncompleteQuestions().length > 0}
+                  className="w-full py-3 text-base bg-gradient-primary font-semibold rounded-3xl symptom-glass hover:opacity-90 transition-opacity disabled:opacity-50"
                   style={{ color: '#F4415F' }}
                 >
-                  Dokončiť nastavenie
+                  {getIncompleteQuestions().length > 0 ? 'Dokončite všetky otázky' : 'Dokončiť nastavenie'}
                 </Button>
               </div>
             </div>
