@@ -23,9 +23,8 @@ export function PhaseOverview({ phaseRanges, currentPhase, className = "" }: Pha
         borderLeft: `4px solid ${getPhaseColor(currentPhase.key)}`
       }}
     >
+      {/* Three Category Recommendations */}
       <div className="space-y-4">
-        {/* Three Category Recommendations */}
-        <div className="space-y-4">
           {/* Strava */}
           <div className="space-y-3">
             <div className="flex items-center gap-3">
@@ -86,7 +85,6 @@ export function PhaseOverview({ phaseRanges, currentPhase, className = "" }: Pha
             </div>
           </div>
         </div>
-      </div>
     </div>
   );
 }
