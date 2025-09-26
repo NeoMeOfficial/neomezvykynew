@@ -57,7 +57,7 @@ export function TrackEssentialsSection({
           </div>
 
           {/* Content with recessed glass layer */}
-          <div className="p-6 space-y-6"
+          <div className="p-6 space-y-6 rounded-b-2xl"
                style={{ 
                  background: 'linear-gradient(135deg, rgba(251, 248, 249, 0.75) 0%, rgba(253, 242, 248, 0.80) 100%)',
                  boxShadow: 'inset 0 2px 8px rgba(149, 95, 106, 0.05)'
