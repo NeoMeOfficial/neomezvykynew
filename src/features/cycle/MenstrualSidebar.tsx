@@ -39,9 +39,11 @@ export function MenstrualSidebar({ activeSection, onSectionChange }: MenstrualSi
   return (
     <div className="w-80 border-r border-border/50 bg-background/95 backdrop-blur-sm">
       <div className="p-6">
-        <h2 className="text-lg font-semibold mb-6 text-foreground">
-          Navigácia
-        </h2>
+        <div className="flex items-center gap-3 mb-6">
+          <h2 className="text-lg font-medium" style={{ color: '#FF7782' }}>
+            Navigácia
+          </h2>
+        </div>
         <nav className="space-y-2">
           {menuItems.map((item) => {
             const Icon = item.icon;
