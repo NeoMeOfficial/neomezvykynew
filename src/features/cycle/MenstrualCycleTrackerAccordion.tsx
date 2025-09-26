@@ -101,12 +101,9 @@ export default function MenstrualCycleTrackerAccordion({
       </div>
 
       {/* Box 1: Cycle Overview and Symptom Tracking */}
-      <div className="w-full space-y-6 glass-container bg-gradient-to-r from-rose-50/80 to-pink-50/80 backdrop-blur-md border border-rose-200/30 shadow-xl rounded-2xl p-6"
+      <div className="w-full space-y-6 rounded-2xl p-6"
            style={{ 
-             background: 'linear-gradient(135deg, rgba(251, 248, 249, 0.85) 0%, rgba(253, 242, 248, 0.90) 100%)',
-             backdropFilter: 'blur(16px)',
-             WebkitBackdropFilter: 'blur(16px)',
-             boxShadow: '0 8px 32px rgba(149, 95, 106, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
+             backgroundColor: '#FBF8F9',
              transform: 'translateY(0)',
              transition: 'transform 0.3s ease'
            }}
@@ -114,7 +111,13 @@ export default function MenstrualCycleTrackerAccordion({
            onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
         
         {/* Section Header: Odhad na dnes */}
-        <div className="symptom-glass rounded-xl p-4 mb-4" style={{ backgroundColor: '#FBF8F9' }}>
+        <div className="glass-container bg-gradient-to-r from-rose-50/80 to-pink-50/80 backdrop-blur-md border border-rose-200/30 shadow-xl rounded-xl p-4 mb-4"
+             style={{ 
+               background: 'linear-gradient(135deg, rgba(251, 248, 249, 0.85) 0%, rgba(253, 242, 248, 0.90) 100%)',
+               backdropFilter: 'blur(16px)',
+               WebkitBackdropFilter: 'blur(16px)',
+               boxShadow: '0 8px 32px rgba(149, 95, 106, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
+             }}>
           <div className="flex items-center gap-3">
             <Clock className="w-5 h-5" style={{ color: '#FF7782' }} />
             <h3 className="text-lg font-medium" style={{ color: '#FF7782' }}>
@@ -124,16 +127,28 @@ export default function MenstrualCycleTrackerAccordion({
         </div>
         
         {/* Cycle Chart */}
-        <WellnessDonutChart
-          derivedState={derivedState}
-          selectedOutcome={selectedOutcome}
-          cycleData={cycleData}
-          className="mb-6"
-        />
+        <div className="glass-container bg-gradient-to-r from-rose-50/80 to-pink-50/80 backdrop-blur-md border border-rose-200/30 shadow-xl rounded-xl p-4 mb-6"
+             style={{ 
+               background: 'linear-gradient(135deg, rgba(251, 248, 249, 0.85) 0%, rgba(253, 242, 248, 0.90) 100%)',
+               backdropFilter: 'blur(16px)',
+               WebkitBackdropFilter: 'blur(16px)',
+               boxShadow: '0 8px 32px rgba(149, 95, 106, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
+             }}>
+          <WellnessDonutChart
+            derivedState={derivedState}
+            selectedOutcome={selectedOutcome}
+            cycleData={cycleData}
+          />
+        </div>
         
         {/* Current Phase Information */}
-        <div className="symptom-glass rounded-xl p-4 mb-6"
-             style={{ backgroundColor: '#FBF8F9' }}>
+        <div className="glass-container bg-gradient-to-r from-rose-50/80 to-pink-50/80 backdrop-blur-md border border-rose-200/30 shadow-xl rounded-xl p-4 mb-6"
+             style={{ 
+               background: 'linear-gradient(135deg, rgba(251, 248, 249, 0.85) 0%, rgba(253, 242, 248, 0.90) 100%)',
+               backdropFilter: 'blur(16px)',
+               WebkitBackdropFilter: 'blur(16px)',
+               boxShadow: '0 8px 32px rgba(149, 95, 106, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
+             }}>
           <div className="space-y-3">
             <div>
               <h4 className="text-lg font-medium mb-2" style={{ color: '#955F6A' }}>
@@ -159,7 +174,13 @@ export default function MenstrualCycleTrackerAccordion({
         </div>
 
         {/* Section Header: Zaznač si to podstatné */}
-        <div className="symptom-glass rounded-xl p-4 mb-4" style={{ backgroundColor: '#FBF8F9' }}>
+        <div className="glass-container bg-gradient-to-r from-rose-50/80 to-pink-50/80 backdrop-blur-md border border-rose-200/30 shadow-xl rounded-xl p-4 mb-4"
+             style={{ 
+               background: 'linear-gradient(135deg, rgba(251, 248, 249, 0.85) 0%, rgba(253, 242, 248, 0.90) 100%)',
+               backdropFilter: 'blur(16px)',
+               WebkitBackdropFilter: 'blur(16px)',
+               boxShadow: '0 8px 32px rgba(149, 95, 106, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
+             }}>
           <div className="flex items-center gap-3">
             <FileText className="w-5 h-5" style={{ color: '#FF7782' }} />
             <h3 className="text-lg font-medium" style={{ color: '#FF7782' }}>
@@ -169,8 +190,13 @@ export default function MenstrualCycleTrackerAccordion({
         </div>
         
         {/* Symptom Tracker */}
-        <div className="symptom-glass rounded-xl p-4"
-             style={{ backgroundColor: '#FBF8F9' }}>
+        <div className="glass-container bg-gradient-to-r from-rose-50/80 to-pink-50/80 backdrop-blur-md border border-rose-200/30 shadow-xl rounded-xl p-4"
+             style={{ 
+               background: 'linear-gradient(135deg, rgba(251, 248, 249, 0.85) 0%, rgba(253, 242, 248, 0.90) 100%)',
+               backdropFilter: 'blur(16px)',
+               WebkitBackdropFilter: 'blur(16px)',
+               boxShadow: '0 8px 32px rgba(149, 95, 106, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
+             }}>
           <SymptomTracker
             currentPhase={currentPhase.key}
             currentDay={currentDay}
@@ -180,12 +206,9 @@ export default function MenstrualCycleTrackerAccordion({
       </div>
 
       {/* Box 2: Recommendations, Data and Calendar */}
-      <div className="w-full space-y-6 glass-container bg-gradient-to-r from-rose-50/80 to-pink-50/80 backdrop-blur-md border border-rose-200/30 shadow-xl rounded-2xl p-6"
+      <div className="w-full space-y-6 rounded-2xl p-6"
            style={{ 
-             background: 'linear-gradient(135deg, rgba(251, 248, 249, 0.85) 0%, rgba(253, 242, 248, 0.90) 100%)',
-             backdropFilter: 'blur(16px)',
-             WebkitBackdropFilter: 'blur(16px)',
-             boxShadow: '0 8px 32px rgba(149, 95, 106, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
+             backgroundColor: '#FBF8F9',
              transform: 'translateY(0)',
              transition: 'transform 0.3s ease'
            }}
@@ -193,7 +216,13 @@ export default function MenstrualCycleTrackerAccordion({
            onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
         
         {/* Section Header: Ako sa cítiť lepšie */}
-        <div className="symptom-glass rounded-xl p-4 mb-4" style={{ backgroundColor: '#FBF8F9' }}>
+        <div className="glass-container bg-gradient-to-r from-rose-50/80 to-pink-50/80 backdrop-blur-md border border-rose-200/30 shadow-xl rounded-xl p-4 mb-4"
+             style={{ 
+               background: 'linear-gradient(135deg, rgba(251, 248, 249, 0.85) 0%, rgba(253, 242, 248, 0.90) 100%)',
+               backdropFilter: 'blur(16px)',
+               WebkitBackdropFilter: 'blur(16px)',
+               boxShadow: '0 8px 32px rgba(149, 95, 106, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
+             }}>
           <div className="flex items-center gap-3">
             <TrendingUp className="w-5 h-5" style={{ color: '#FF7782' }} />
             <h3 className="text-lg font-medium" style={{ color: '#FF7782' }}>
@@ -203,7 +232,13 @@ export default function MenstrualCycleTrackerAccordion({
         </div>
         
         {/* Phase Overview */}
-        <div className="mb-6">
+        <div className="glass-container bg-gradient-to-r from-rose-50/80 to-pink-50/80 backdrop-blur-md border border-rose-200/30 shadow-xl rounded-xl p-4 mb-6"
+             style={{ 
+               background: 'linear-gradient(135deg, rgba(251, 248, 249, 0.85) 0%, rgba(253, 242, 248, 0.90) 100%)',
+               backdropFilter: 'blur(16px)',
+               WebkitBackdropFilter: 'blur(16px)',
+               boxShadow: '0 8px 32px rgba(149, 95, 106, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
+             }}>
           <PhaseOverview
             phaseRanges={phaseRanges}
             currentPhase={currentPhase}
@@ -211,7 +246,13 @@ export default function MenstrualCycleTrackerAccordion({
         </div>
 
         {/* Section Header: Prehľad údajov */}
-        <div className="symptom-glass rounded-xl p-4 mb-4" style={{ backgroundColor: '#FBF8F9' }}>
+        <div className="glass-container bg-gradient-to-r from-rose-50/80 to-pink-50/80 backdrop-blur-md border border-rose-200/30 shadow-xl rounded-xl p-4 mb-4"
+             style={{ 
+               background: 'linear-gradient(135deg, rgba(251, 248, 249, 0.85) 0%, rgba(253, 242, 248, 0.90) 100%)',
+               backdropFilter: 'blur(16px)',
+               WebkitBackdropFilter: 'blur(16px)',
+               boxShadow: '0 8px 32px rgba(149, 95, 106, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
+             }}>
           <div className="flex items-center gap-3">
             <FileText className="w-5 h-5" style={{ color: '#FF7782' }} />
             <h3 className="text-lg font-medium" style={{ color: '#FF7782' }}>
@@ -221,12 +262,24 @@ export default function MenstrualCycleTrackerAccordion({
         </div>
         
         {/* Historical Data Overview */}
-        <div className="mb-6">
+        <div className="glass-container bg-gradient-to-r from-rose-50/80 to-pink-50/80 backdrop-blur-md border border-rose-200/30 shadow-xl rounded-xl p-4 mb-6"
+             style={{ 
+               background: 'linear-gradient(135deg, rgba(251, 248, 249, 0.85) 0%, rgba(253, 242, 248, 0.90) 100%)',
+               backdropFilter: 'blur(16px)',
+               WebkitBackdropFilter: 'blur(16px)',
+               boxShadow: '0 8px 32px rgba(149, 95, 106, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
+             }}>
           <HistoricalDataOverview accessCode={accessCode} />
         </div>
 
         {/* Section Header: Kalendárny pohľad */}
-        <div className="symptom-glass rounded-xl p-4 mb-4" style={{ backgroundColor: '#FBF8F9' }}>
+        <div className="glass-container bg-gradient-to-r from-rose-50/80 to-pink-50/80 backdrop-blur-md border border-rose-200/30 shadow-xl rounded-xl p-4 mb-4"
+             style={{ 
+               background: 'linear-gradient(135deg, rgba(251, 248, 249, 0.85) 0%, rgba(253, 242, 248, 0.90) 100%)',
+               backdropFilter: 'blur(16px)',
+               WebkitBackdropFilter: 'blur(16px)',
+               boxShadow: '0 8px 32px rgba(149, 95, 106, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
+             }}>
           <div className="flex items-center gap-3">
             <CalendarDays className="w-5 h-5" style={{ color: '#FF7782' }} />
             <h3 className="text-lg font-medium" style={{ color: '#FF7782' }}>
@@ -236,12 +289,20 @@ export default function MenstrualCycleTrackerAccordion({
         </div>
         
         {/* Calendar View */}
-        <CalendarView
-          cycleData={cycleData}
-          derivedState={derivedState}
-          onOutcomeSelect={setSelectedOutcome}
-          selectedOutcome={selectedOutcome}
-        />
+        <div className="glass-container bg-gradient-to-r from-rose-50/80 to-pink-50/80 backdrop-blur-md border border-rose-200/30 shadow-xl rounded-xl p-4"
+             style={{ 
+               background: 'linear-gradient(135deg, rgba(251, 248, 249, 0.85) 0%, rgba(253, 242, 248, 0.90) 100%)',
+               backdropFilter: 'blur(16px)',
+               WebkitBackdropFilter: 'blur(16px)',
+               boxShadow: '0 8px 32px rgba(149, 95, 106, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
+             }}>
+          <CalendarView
+            cycleData={cycleData}
+            derivedState={derivedState}
+            onOutcomeSelect={setSelectedOutcome}
+            selectedOutcome={selectedOutcome}
+          />
+        </div>
       </div>
 
       {/* Modals */}
