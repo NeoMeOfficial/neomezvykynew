@@ -124,7 +124,13 @@ export default function MenstrualCycleTrackerAccordion({
             </div>
           </AccordionTrigger>
           <AccordionContent className="px-4 pb-4">
-            <div className="space-y-4">
+            <div className="space-y-4 glass-container bg-gradient-to-r from-rose-50/80 to-pink-50/80 backdrop-blur-md border border-rose-200/30 shadow-xl"
+                 style={{ 
+                   background: 'linear-gradient(135deg, rgba(251, 248, 249, 0.85) 0%, rgba(253, 242, 248, 0.90) 100%)',
+                   backdropFilter: 'blur(16px)',
+                   WebkitBackdropFilter: 'blur(16px)',
+                   boxShadow: '0 8px 32px rgba(149, 95, 106, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
+                 }}>
               {/* Cycle Chart */}
               <WellnessDonutChart
                 derivedState={derivedState}
