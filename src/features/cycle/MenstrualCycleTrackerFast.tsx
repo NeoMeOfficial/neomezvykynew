@@ -55,7 +55,7 @@ export default function MenstrualCycleTrackerFast({
   // Show loading animation if still in initial loading phase
   if (initialLoading || loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-rose-25 via-pink-25 to-purple-25 flex items-center justify-center">
         <FadingWordsLoader />
       </div>
     );
@@ -93,7 +93,7 @@ export default function MenstrualCycleTrackerFast({
   // Show questionnaire if needed
   if (needsQuestionnaire) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50 p-4">
+      <div className="min-h-screen bg-gradient-to-br from-rose-25 via-pink-25 to-purple-25 p-4">
         <div className="w-full max-w-[600px] mx-auto">
           <QuestionnaireView onComplete={handleQuestionnaireComplete} />
         </div>
@@ -103,7 +103,7 @@ export default function MenstrualCycleTrackerFast({
 
   // Main tracker view with progressive loading
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50 overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-rose-25 via-pink-25 to-purple-25 overflow-hidden">
       <div className="w-full max-w-none px-2 sm:px-4 py-4 sm:py-8 mx-auto">
         <div className="w-full max-w-[600px] mx-auto">
           {/* Back to questionnaire button */}

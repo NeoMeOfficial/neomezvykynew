@@ -17,9 +17,9 @@ export const FadingWordsLoader: React.FC<FadingWordsLoaderProps> = ({ className 
       setTimeout(() => {
         setCurrentWordIndex((prev) => (prev + 1) % words.length);
         setIsVisible(true);
-      }, 300); // Half second for fade out
+      }, 800); // Longer fade out duration
       
-    }, 1500); // Change word every 1.5 seconds
+    }, 2500); // Slower word change - every 2.5 seconds
 
     return () => clearInterval(interval);
   }, []);
@@ -28,7 +28,7 @@ export const FadingWordsLoader: React.FC<FadingWordsLoaderProps> = ({ className 
     <div className={`flex items-center justify-center ${className}`}>
       <div className="text-center">
         <div 
-          className={`text-2xl font-semibold transition-opacity duration-300 ${
+          className={`text-2xl font-semibold transition-opacity duration-700 ${
             isVisible ? 'opacity-100' : 'opacity-0'
           }`}
           style={{ color: '#F4415F' }}
