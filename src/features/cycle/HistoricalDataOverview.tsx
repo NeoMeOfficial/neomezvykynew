@@ -214,10 +214,10 @@ export function HistoricalDataOverview({ accessCode }: HistoricalDataOverviewPro
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-base font-medium" style={{ color: '#955F6A' }}>
+          <h3 className="text-base font-medium" style={{ color: '#FF7782' }}>
             História záznamov
           </h3>
-          <p className="text-sm" style={{ color: '#955F6A' }}>
+          <p className="text-sm" style={{ color: '#FF7782' }}>
             Pre lekársku konzultáciu
           </p>
         </div>
