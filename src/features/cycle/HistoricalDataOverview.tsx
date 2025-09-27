@@ -143,7 +143,7 @@ export function HistoricalDataOverview({ accessCode }: HistoricalDataOverviewPro
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-4">
         <div>
           <h3 className="text-base font-medium" style={{ color: '#955F6A' }}>
             História záznamov
