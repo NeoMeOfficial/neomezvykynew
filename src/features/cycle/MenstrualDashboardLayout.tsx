@@ -221,28 +221,6 @@ export function MenstrualDashboardLayout({
             </div>
           </div>
 
-          {/* Next Period and Fertile Days Info */}
-          <div className="mb-6 p-4 rounded-xl" 
-               style={{ 
-                 background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(253, 242, 248, 0.75) 100%)',
-                 boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 1px 4px rgba(149, 95, 106, 0.08)'
-               }}>
-            <div className="flex justify-between items-center">
-              <div>
-                <p className="text-sm font-medium" style={{ color: '#955F6A' }}>
-                  Ďalšia menštruácia: <span style={{ color: '#FF7782' }}>
-                    {new Date(Date.now() + (28 - currentDay) * 24 * 60 * 60 * 1000).toLocaleDateString('sk-SK')}
-                  </span>
-                </p>
-                <p className="text-sm font-medium" style={{ color: '#955F6A' }}>
-                  Ďalšie plodné dni: <span style={{ color: '#FF7782' }}>
-                    {new Date(Date.now() + (14 - currentDay) * 24 * 60 * 60 * 1000).toLocaleDateString('sk-SK')} - {new Date(Date.now() + (16 - currentDay) * 24 * 60 * 60 * 1000).toLocaleDateString('sk-SK')}
-                  </span>
-                </p>
-              </div>
-            </div>
-          </div>
-
           {/* Content Area */}
           <div className="w-full">
             {activeSection === 'estimate' && (

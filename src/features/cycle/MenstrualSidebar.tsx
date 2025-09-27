@@ -58,38 +58,61 @@ export function MenstrualSidebar({ activeSection, onSectionChange }: MenstrualSi
             const isActive = activeSection === item.id;
             
             return (
-              <div
-                key={item.id}
-                onClick={() => onSectionChange(item.id)}
-                className={`
-                  w-full cursor-pointer transition-all duration-200 mb-2 p-4 rounded-xl relative
-                  ${isActive 
-                    ? 'shadow-lg' 
-                    : 'hover:shadow-md'
-                  }
-                `}
-                style={{ 
-                  background: isActive 
-                    ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(253, 242, 248, 0.95) 100%)'
-                    : 'linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(253, 242, 248, 0.75) 100%)',
-                  boxShadow: isActive 
-                    ? 'inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 2px 8px rgba(149, 95, 106, 0.15)'
-                    : 'inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 1px 4px rgba(149, 95, 106, 0.08)'
-                }}
-              >
-                {isActive && <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-rose-200/50 to-transparent"></div>}
-                <div className="flex items-center">
-                  <Icon 
-                    className="mr-3 h-4 w-4 flex-shrink-0" 
-                    style={{ color: isActive ? '#FF7782' : '#955F6A' }}
-                  />
-                  <span 
-                    className="text-sm font-medium"
-                    style={{ color: isActive ? '#FF7782' : '#955F6A' }}
-                  >
-                    {item.title}
-                  </span>
+              <div key={item.id}>
+                <div
+                  onClick={() => onSectionChange(item.id)}
+                  className={`
+                    w-full cursor-pointer transition-all duration-200 mb-2 p-4 rounded-xl relative
+                    ${isActive 
+                      ? 'shadow-lg' 
+                      : 'hover:shadow-md'
+                    }
+                  `}
+                  style={{ 
+                    background: isActive 
+                      ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(253, 242, 248, 0.95) 100%)'
+                      : 'linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(253, 242, 248, 0.75) 100%)',
+                    boxShadow: isActive 
+                      ? 'inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 2px 8px rgba(149, 95, 106, 0.15)'
+                      : 'inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 1px 4px rgba(149, 95, 106, 0.08)'
+                  }}
+                >
+                  {isActive && <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-rose-200/50 to-transparent"></div>}
+                  <div className="flex items-center">
+                    <Icon 
+                      className="mr-3 h-4 w-4 flex-shrink-0" 
+                      style={{ color: isActive ? '#FF7782' : '#955F6A' }}
+                    />
+                    <span 
+                      className="text-sm font-medium"
+                      style={{ color: isActive ? '#FF7782' : '#955F6A' }}
+                    >
+                      {item.title}
+                    </span>
+                  </div>
                 </div>
+                
+                {/* Show next period info under Kalendárny prehľad */}
+                {item.id === 'calendar' && (
+                  <div className="ml-4 mb-4 p-3 rounded-lg" 
+                       style={{ 
+                         background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(253, 242, 248, 0.65) 100%)',
+                         boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 1px 3px rgba(149, 95, 106, 0.06)'
+                       }}>
+                    <div className="space-y-2">
+                      <p className="text-xs font-medium" style={{ color: '#955F6A' }}>
+                        Ďalšia menštruácia: <span style={{ color: '#FF7782' }}>
+                          7. 10. 2025
+                        </span>
+                      </p>
+                      <p className="text-xs font-medium" style={{ color: '#955F6A' }}>
+                        Ďalšie plodné dni: <span style={{ color: '#FF7782' }}>
+                          23. 9. 2025 - 25. 9. 2025
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })}
