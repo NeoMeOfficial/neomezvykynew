@@ -26,14 +26,14 @@ const menuItems = [
     icon: FileText,
   },
   {
-    id: 'calendar',
-    title: 'Kalendárny prehľad',
-    icon: CalendarDays,
-  },
-  {
     id: 'data',
     title: 'Tvoje záznamy',
     icon: BarChart3,
+  },
+  {
+    id: 'calendar',
+    title: 'Kalendárny prehľad',
+    icon: CalendarDays,
   },
 ];
 
