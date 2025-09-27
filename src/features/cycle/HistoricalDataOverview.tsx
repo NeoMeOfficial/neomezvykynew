@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { format, parseISO, isAfter, isBefore, startOfDay } from 'date-fns';
 import { sk } from 'date-fns/locale';
+import jsPDF from 'jspdf';
 
 interface HistoricalEntry {
   date: string;
@@ -179,25 +180,83 @@ export function HistoricalDataOverview({ accessCode }: HistoricalDataOverviewPro
     return true;
   });
 
-  // Export data for medical consultation
+  // Export data for medical consultation as PDF
   const exportData = () => {
-    const exportText = filteredData.map(entry => {
-      const date = format(parseISO(entry.date), 'dd.MM.yyyy', { locale: sk });
-      const symptoms = entry.symptoms.length > 0 ? entry.symptoms.join(', ') : 'Žiadne príznaky';
-      const notes = entry.notes || 'Žiadne poznámky';
-      
-      return `Dátum: ${date}\nPríznaky: ${symptoms}\nPoznámky: ${notes}\n${'='.repeat(50)}`;
-    }).join('\n\n');
+    const doc = new jsPDF();
     
-    const blob = new Blob([exportText], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `menstrual-data-${format(new Date(), 'yyyy-MM-dd')}.txt`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    // Set font for Slovak characters
+    doc.setFont('helvetica');
+    
+    // Title
+    doc.setFontSize(18);
+    doc.text('História menštrpačného cyklu', 20, 25);
+    
+    // Subtitle
+    doc.setFontSize(12);
+    doc.text('Pre lekársku konzultáciu', 20, 35);
+    
+    // Export date
+    doc.setFontSize(10);
+    doc.text(`Exportované: ${format(new Date(), 'dd.MM.yyyy HH:mm', { locale: sk })}`, 20, 45);
+    
+    let yPosition = 60;
+    
+    // Summary
+    doc.setFontSize(12);
+    doc.text(`Celkový počet záznamov: ${filteredData.length}`, 20, yPosition);
+    yPosition += 15;
+    
+    // Data entries
+    filteredData.forEach((entry, index) => {
+      // Check if we need a new page
+      if (yPosition > 260) {
+        doc.addPage();
+        yPosition = 25;
+      }
+      
+      const date = format(parseISO(entry.date), 'EEEE, dd.MM.yyyy', { locale: sk });
+      const capitalizedDate = date.charAt(0).toUpperCase() + date.slice(1);
+      
+      // Date header
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'bold');
+      doc.text(capitalizedDate, 20, yPosition);
+      yPosition += 8;
+      
+      // Symptoms
+      if (entry.symptoms.length > 0) {
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(10);
+        doc.text('Príznaky:', 25, yPosition);
+        yPosition += 6;
+        
+        entry.symptoms.forEach(symptom => {
+          doc.text(`• ${symptom}`, 30, yPosition);
+          yPosition += 5;
+        });
+        yPosition += 3;
+      }
+      
+      // Notes
+      if (entry.notes) {
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(10);
+        doc.text('Poznámky:', 25, yPosition);
+        yPosition += 6;
+        
+        // Split long notes into multiple lines
+        const noteLines = doc.splitTextToSize(entry.notes, 160);
+        noteLines.forEach((line: string) => {
+          doc.text(line, 30, yPosition);
+          yPosition += 5;
+        });
+      }
+      
+      yPosition += 8; // Space between entries
+    });
+    
+    // Save the PDF
+    doc.save(`menstrual-data-${format(new Date(), 'yyyy-MM-dd')}.pdf`);
   };
 
   if (loading) {
@@ -441,23 +500,81 @@ export function ExportButton({ accessCode }: { accessCode?: string }) {
   }, [accessCode]);
 
   const exportData = () => {
-    const exportText = historicalData.map(entry => {
-      const date = format(parseISO(entry.date), 'dd.MM.yyyy', { locale: sk });
-      const symptoms = entry.symptoms.length > 0 ? entry.symptoms.join(', ') : 'Žiadne príznaky';
-      const notes = entry.notes || 'Žiadne poznámky';
-      
-      return `Dátum: ${date}\nPríznaky: ${symptoms}\nPoznámky: ${notes}\n${'='.repeat(50)}`;
-    }).join('\n\n');
+    const doc = new jsPDF();
     
-    const blob = new Blob([exportText], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `menstrual-data-${format(new Date(), 'yyyy-MM-dd')}.txt`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    // Set font for Slovak characters
+    doc.setFont('helvetica');
+    
+    // Title
+    doc.setFontSize(18);
+    doc.text('História menštrpačného cyklu', 20, 25);
+    
+    // Subtitle
+    doc.setFontSize(12);
+    doc.text('Pre lekársku konzultáciu', 20, 35);
+    
+    // Export date
+    doc.setFontSize(10);
+    doc.text(`Exportované: ${format(new Date(), 'dd.MM.yyyy HH:mm', { locale: sk })}`, 20, 45);
+    
+    let yPosition = 60;
+    
+    // Summary
+    doc.setFontSize(12);
+    doc.text(`Celkový počet záznamov: ${historicalData.length}`, 20, yPosition);
+    yPosition += 15;
+    
+    // Data entries
+    historicalData.forEach((entry, index) => {
+      // Check if we need a new page
+      if (yPosition > 260) {
+        doc.addPage();
+        yPosition = 25;
+      }
+      
+      const date = format(parseISO(entry.date), 'EEEE, dd.MM.yyyy', { locale: sk });
+      const capitalizedDate = date.charAt(0).toUpperCase() + date.slice(1);
+      
+      // Date header
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'bold');
+      doc.text(capitalizedDate, 20, yPosition);
+      yPosition += 8;
+      
+      // Symptoms
+      if (entry.symptoms.length > 0) {
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(10);
+        doc.text('Príznaky:', 25, yPosition);
+        yPosition += 6;
+        
+        entry.symptoms.forEach(symptom => {
+          doc.text(`• ${symptom}`, 30, yPosition);
+          yPosition += 5;
+        });
+        yPosition += 3;
+      }
+      
+      // Notes
+      if (entry.notes) {
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(10);
+        doc.text('Poznámky:', 25, yPosition);
+        yPosition += 6;
+        
+        // Split long notes into multiple lines
+        const noteLines = doc.splitTextToSize(entry.notes, 160);
+        noteLines.forEach((line: string) => {
+          doc.text(line, 30, yPosition);
+          yPosition += 5;
+        });
+      }
+      
+      yPosition += 8; // Space between entries
+    });
+    
+    // Save the PDF
+    doc.save(`menstrual-data-${format(new Date(), 'yyyy-MM-dd')}.pdf`);
   };
 
   return (
