@@ -87,6 +87,67 @@ export function HistoricalDataOverview({ accessCode }: HistoricalDataOverviewPro
       setLoading(false);
     };
 
+    // Generate mock data if no data exists
+    const generateMockData = () => {
+      const prefix = accessCode ? `symptoms_${accessCode}_` : 'temp_symptoms_';
+      const notesPrefix = accessCode ? `notes_${accessCode}_` : 'temp_notes_';
+      
+      // Check if we already have data
+      const hasExistingData = Object.keys(localStorage).some(key => key.startsWith(prefix));
+      
+      if (!hasExistingData) {
+        const symptoms = ['cramps', 'heavy_flow', 'back_pain', 'headache', 'fatigue', 'nausea', 'energy_boost', 'good_mood', 'clear_skin', 'motivation', 'increased_libido', 'cervical_mucus', 'ovulation_pain', 'breast_tenderness', 'bloating', 'mood_swings', 'food_cravings', 'irritability', 'acne', 'sleep_issues', 'anxiety', 'depression'];
+        
+        const sampleNotes = [
+          'Dnes som sa cítila veľmi unavene, ale nálada bola stabilná.',
+          'Silné kŕče ráno, popoludní sa zlepšilo po horúcej kúpeli.',
+          'Veľmi dobrý deň, plná energie a motivácie.',
+          'Menšie bolesti hlavy, možno kvôli počasiu.',
+          'Cítim sa veľmi dobre, pokožka vyzerá čisto.',
+          'Trochu náladová, ale celkovo v poriadku.',
+          'Silné krvácanie, potrebujem si dať pozor na železo.',
+          'Úžasná nálada, cítim sa sebavedomá.',
+          'Trochu nadúvanie po jedle, musím byť opatrnejšia.',
+          'Spala som veľmi zle, ráno som bola unavená.',
+          'Perfektný deň bez žiadnych problémov!',
+          'Citlivé prsia, pravdepodobne pred menštruáciou.',
+          ''
+        ];
+        
+        // Generate data for random days in the last 60 days
+        for (let i = 0; i < 60; i++) {
+          // Skip some days randomly (don't generate data for every day)
+          if (Math.random() > 0.6) continue;
+          
+          const date = new Date();
+          date.setDate(date.getDate() - i);
+          const dateStr = date.toISOString().split('T')[0];
+          
+          // Generate random symptoms (1-4 symptoms per day)
+          const numSymptoms = Math.floor(Math.random() * 4) + 1;
+          const selectedSymptoms = [];
+          for (let j = 0; j < numSymptoms; j++) {
+            const randomSymptom = symptoms[Math.floor(Math.random() * symptoms.length)];
+            if (!selectedSymptoms.includes(randomSymptom)) {
+              selectedSymptoms.push(randomSymptom);
+            }
+          }
+          
+          // Store symptoms
+          localStorage.setItem(`${prefix}${dateStr}`, JSON.stringify(selectedSymptoms));
+          
+          // Add notes randomly (not every day has notes)
+          if (Math.random() > 0.4) {
+            const randomNote = sampleNotes[Math.floor(Math.random() * sampleNotes.length)];
+            if (randomNote) {
+              localStorage.setItem(`${notesPrefix}${dateStr}`, randomNote);
+            }
+          }
+        }
+      }
+    };
+
+    generateMockData();
     loadHistoricalData();
   }, [accessCode]);
 
