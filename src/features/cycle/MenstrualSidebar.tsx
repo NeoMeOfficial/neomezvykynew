@@ -40,13 +40,13 @@ export function MenstrualSidebar({ activeSection, onSectionChange }: MenstrualSi
   return (
     <div className="w-80 border-r border-border/50 bg-background/95 backdrop-blur-sm">
       <div className="p-6">
-        <div className="flex items-center gap-3 mb-6">
+        <div className="flex items-start gap-3 mb-6">
           <img 
             src={periodkaLogo} 
             alt="Periodka Logo" 
-            className="w-8 h-8 flex-shrink-0"
+            className="w-10 h-10 flex-shrink-0"
           />
-          <h2 className="text-2xl font-caveat font-semibold" style={{ color: '#FF7782' }}>
+          <h2 className="text-3xl font-caveat font-semibold" style={{ color: '#FF7782' }}>
             Periodka
           </h2>
         </div>
