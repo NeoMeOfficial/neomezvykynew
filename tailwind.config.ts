@@ -105,6 +105,7 @@ export default {
 			fontFamily: {
 				'heading': ['Raleway', 'sans-serif'],
 				'body': ['Raleway', 'sans-serif'],
+				'caveat': ['Caveat', 'cursive'],
 			},
 			fontSize: {
 				// Optimized for readability - minimum 16px for body text on mobile

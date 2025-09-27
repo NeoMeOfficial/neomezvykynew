@@ -1,6 +1,7 @@
 import React from 'react';
 import { Clock, FileText, TrendingUp, BarChart3, CalendarDays } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import periodkaLogo from '@/assets/periodka-logo.png';
 
 interface MenstrualSidebarProps {
   activeSection: string;
@@ -47,7 +48,12 @@ export function MenstrualSidebar({ activeSection, onSectionChange }: MenstrualSi
           {/* Header glass accent */}
           <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-rose-200/50 to-transparent"></div>
           <div className="flex items-center gap-3">
-            <h2 className="text-lg font-medium" style={{ color: '#FF7782' }}>
+            <img 
+              src={periodkaLogo} 
+              alt="Periodka Logo" 
+              className="w-6 h-6 flex-shrink-0"
+            />
+            <h2 className="text-xl font-caveat font-semibold" style={{ color: '#FF7782' }}>
               Periodka
             </h2>
           </div>
