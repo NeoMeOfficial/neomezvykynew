@@ -58,21 +58,39 @@ export function MenstrualSidebar({ activeSection, onSectionChange }: MenstrualSi
             const isActive = activeSection === item.id;
             
             return (
-              <Button
+              <div
                 key={item.id}
-                variant="ghost"
                 onClick={() => onSectionChange(item.id)}
                 className={`
-                  w-full justify-start px-3 py-2 h-auto text-left transition-all duration-200
+                  w-full cursor-pointer transition-all duration-200 mb-2 p-4 rounded-xl relative
                   ${isActive 
-                    ? 'bg-primary/10 text-primary border border-primary/20 shadow-sm' 
-                    : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
+                    ? 'shadow-lg' 
+                    : 'hover:shadow-md'
                   }
                 `}
+                style={{ 
+                  background: isActive 
+                    ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(253, 242, 248, 0.95) 100%)'
+                    : 'linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(253, 242, 248, 0.75) 100%)',
+                  boxShadow: isActive 
+                    ? 'inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 2px 8px rgba(149, 95, 106, 0.15)'
+                    : 'inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 1px 4px rgba(149, 95, 106, 0.08)'
+                }}
               >
-                <Icon className="mr-3 h-4 w-4 flex-shrink-0" />
-                <span className="text-sm font-medium">{item.title}</span>
-              </Button>
+                {isActive && <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-rose-200/50 to-transparent"></div>}
+                <div className="flex items-center">
+                  <Icon 
+                    className="mr-3 h-4 w-4 flex-shrink-0" 
+                    style={{ color: isActive ? '#FF7782' : '#9ca3af' }}
+                  />
+                  <span 
+                    className="text-sm font-medium"
+                    style={{ color: isActive ? '#FF7782' : '#6b7280' }}
+                  >
+                    {item.title}
+                  </span>
+                </div>
+              </div>
             );
           })}
         </nav>
