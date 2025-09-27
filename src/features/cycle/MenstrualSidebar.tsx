@@ -63,7 +63,7 @@ export function MenstrualSidebar({ activeSection, onSectionChange, onEditClick, 
                   className={`
                     w-full cursor-pointer transition-all duration-200 mb-2 p-4 rounded-xl relative
                     ${isActive 
-                      ? 'shadow-lg' 
+                      ? 'shadow-lg border border-rose-200/50' 
                       : 'hover:shadow-md'
                     }
                   `}
@@ -77,14 +77,16 @@ export function MenstrualSidebar({ activeSection, onSectionChange, onEditClick, 
                   }}
                 >
                   {isActive && <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-rose-200/50 to-transparent"></div>}
+                  {/* Active dot indicator */}
+                  {isActive && <div className="absolute right-4 top-1/2 transform -translate-y-1/2 w-2 h-2 rounded-full bg-[#FF7782]"></div>}
                   <div className="flex items-center">
                     <Icon 
                       className="mr-3 h-4 w-4 flex-shrink-0" 
-                      style={{ color: isActive ? '#FF7782' : '#955F6A' }}
+                      style={{ color: '#FF7782' }}
                     />
                     <span 
                       className="text-sm font-medium"
-                      style={{ color: isActive ? '#FF7782' : '#955F6A' }}
+                      style={{ color: '#FF7782' }}
                     >
                       {item.title}
                     </span>
