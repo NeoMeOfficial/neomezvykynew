@@ -189,21 +189,6 @@ export function MenstrualDashboardLayout({
         />
         
         <main className="flex-1 p-8 max-w-none">
-          {/* Header - Full Width Box */}
-          <div className="w-full mb-6 p-6 rounded-2xl relative"
-               style={{ 
-                 background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(253, 242, 248, 0.95) 100%)',
-                 boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 2px 8px rgba(149, 95, 106, 0.1)'
-               }}>
-            {/* Header glass accent */}
-            <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-rose-200/50 to-transparent"></div>
-            <div>
-              <h1 className="text-2xl font-bold" style={{ color: '#FF7782' }}>
-                Menštruačný kalendár
-              </h1>
-            </div>
-          </div>
-
           {/* Content Area */}
           <div className="w-full">
             {activeSection === 'estimate' && (
