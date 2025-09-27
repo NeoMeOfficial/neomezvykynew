@@ -1,20 +1,24 @@
 import React from 'react';
 import { CalendarDays } from 'lucide-react';
 import { CalendarView } from '../CalendarView';
-import { CycleData, DerivedState } from '../types';
+import { CycleData, DerivedState, PeriodIntensity } from '../types';
 
 interface CalendarViewSectionProps {
   cycleData: CycleData;
   derivedState: DerivedState;
   onOutcomeSelect: (outcome: 'next-period' | 'fertile-days' | null) => void;
   selectedOutcome: 'next-period' | 'fertile-days' | null;
+  onPeriodIntensityChange: (date: string, intensity: PeriodIntensity | null) => void;
+  getPeriodIntensity: (date: string) => PeriodIntensity | undefined;
 }
 
 export function CalendarViewSection({
   cycleData,
   derivedState,
   onOutcomeSelect,
-  selectedOutcome
+  selectedOutcome,
+  onPeriodIntensityChange,
+  getPeriodIntensity
 }: CalendarViewSectionProps) {
   return (
     <>
@@ -56,6 +60,8 @@ export function CalendarViewSection({
             derivedState={derivedState}
             onOutcomeSelect={onOutcomeSelect}
             selectedOutcome={selectedOutcome}
+            onPeriodIntensityChange={onPeriodIntensityChange}
+            getPeriodIntensity={getPeriodIntensity}
           />
         </div>
       </div>

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { format } from 'date-fns';
-import { CycleData, DerivedState, CustomSettings } from './types';
+import { CycleData, DerivedState, CustomSettings, PeriodIntensity, DailyPeriodData } from './types';
 import { getDerivedState } from './utils';
 
 const STORAGE_KEY = 'cycle_data';
@@ -17,7 +17,8 @@ const defaultCycleData: CycleData = {
   cycleLength: 28,
   periodLength: 5,
   customSettings: defaultCustomSettings,
-  history: []
+  history: [],
+  dailyPeriodData: []
 };
 
 export function useCycleData(accessCode?: string) {
@@ -127,6 +128,50 @@ export function useCycleData(accessCode?: string) {
     });
   }, [updateCycleData, cycleData.customSettings]);
 
+  // Set period intensity for a specific date
+  const setPeriodIntensity = useCallback((date: string, intensity: PeriodIntensity | null) => {
+    setCycleData(current => {
+      const dailyPeriodData = current.dailyPeriodData || [];
+      
+      if (intensity === null) {
+        // Remove the entry
+        const updated = {
+          ...current,
+          dailyPeriodData: dailyPeriodData.filter(entry => entry.date !== date)
+        };
+        saveCycleData(updated);
+        return updated;
+      } else {
+        // Add or update the entry
+        const existingIndex = dailyPeriodData.findIndex(entry => entry.date === date);
+        const newEntry: DailyPeriodData = { date, intensity };
+        
+        let updatedData;
+        if (existingIndex >= 0) {
+          updatedData = [...dailyPeriodData];
+          updatedData[existingIndex] = newEntry;
+        } else {
+          updatedData = [...dailyPeriodData, newEntry];
+        }
+        
+        const updated = {
+          ...current,
+          dailyPeriodData: updatedData.sort((a, b) => 
+            new Date(b.date).getTime() - new Date(a.date).getTime()
+          )
+        };
+        saveCycleData(updated);
+        return updated;
+      }
+    });
+  }, [saveCycleData]);
+
+  // Get period intensity for a specific date
+  const getPeriodIntensity = useCallback((date: string): PeriodIntensity | undefined => {
+    const dailyPeriodData = cycleData.dailyPeriodData || [];
+    return dailyPeriodData.find(entry => entry.date === date)?.intensity;
+  }, [cycleData.dailyPeriodData]);
+
   // Calculate derived state immediately when cycle data changes
   useEffect(() => {
     setDerivedState(getDerivedState(cycleData));
@@ -177,6 +222,8 @@ export function useCycleData(accessCode?: string) {
     setPeriodLength,
     addPeriodToHistory,
     updateCustomSettings,
-    updateCycleData
+    updateCycleData,
+    setPeriodIntensity,
+    getPeriodIntensity
   };
 }

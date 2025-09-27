@@ -30,7 +30,9 @@ export default function MenstrualCycleTrackerAccordion({
     setLastPeriodStart,
     setCycleLength,
     setPeriodLength,
-    updateCycleData
+    updateCycleData,
+    setPeriodIntensity,
+    getPeriodIntensity
   } = useCycleData(accessCode);
 
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -133,6 +135,8 @@ export default function MenstrualCycleTrackerAccordion({
         derivedState={derivedState}
         onOutcomeSelect={setSelectedOutcome}
         selectedOutcome={selectedOutcome}
+        onPeriodIntensityChange={setPeriodIntensity}
+        getPeriodIntensity={getPeriodIntensity}
       />
 
       {/* Modals */}

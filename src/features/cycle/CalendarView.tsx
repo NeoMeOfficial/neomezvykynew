@@ -4,8 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isToday } from 'date-fns';
 import { sk } from 'date-fns/locale';
-import { DerivedState, CycleData } from './types';
+import { DerivedState, CycleData, PeriodIntensity } from './types';
 import { isPeriodDate, isFertilityDate } from './utils';
+import { PeriodIntensitySelector } from './components/PeriodIntensitySelector';
 import { useIsMobile } from '@/hooks/use-mobile';
 type OutcomeType = 'next-period' | 'fertile-days';
 interface CalendarViewProps {
@@ -13,14 +14,19 @@ interface CalendarViewProps {
   derivedState: DerivedState;
   onOutcomeSelect: (outcome: OutcomeType | null) => void;
   selectedOutcome: OutcomeType | null;
+  onPeriodIntensityChange: (date: string, intensity: PeriodIntensity | null) => void;
+  getPeriodIntensity: (date: string) => PeriodIntensity | undefined;
 }
 export function CalendarView({
   cycleData,
   derivedState,
   onOutcomeSelect,
-  selectedOutcome
+  selectedOutcome,
+  onPeriodIntensityChange,
+  getPeriodIntensity
 }: CalendarViewProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const isMobile = useIsMobile();
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
@@ -66,6 +72,38 @@ export function CalendarView({
   };
   const navigateMonth = (direction: 'prev' | 'next') => {
     setCurrentMonth(prev => direction === 'prev' ? subMonths(prev, 1) : addMonths(prev, 1));
+  };
+
+  const handleDayClick = (date: Date) => {
+    const dateString = format(date, 'yyyy-MM-dd');
+    setSelectedDate(dateString);
+  };
+
+  const handlePeriodIntensitySelect = (intensity: PeriodIntensity | null) => {
+    if (selectedDate) {
+      onPeriodIntensityChange(selectedDate, intensity);
+      setSelectedDate(null);
+    }
+  };
+
+  const renderPeriodIntensity = (date: Date) => {
+    const dateString = format(date, 'yyyy-MM-dd');
+    const intensity = getPeriodIntensity(dateString);
+    
+    if (!intensity) return null;
+
+    return (
+      <div className="absolute top-0.5 right-0.5 flex">
+        {[...Array(intensity)].map((_, i) => (
+          <Droplets 
+            key={i} 
+            className="w-2 h-2" 
+            style={{ color: '#FF7782' }}
+            fill="currentColor"
+          />
+        ))}
+      </div>
+    );
   };
   return <div className="space-y-4">
       {/* Header with Filter Buttons and Legend */}
@@ -179,10 +217,18 @@ export function CalendarView({
           if (isCurrentDay) {
             dayClasses += " ring-2 ring-rose-400 ring-offset-2";
           }
-          return <div key={date.getTime()} className={dayClasses} style={dayStyle}>
+          return <div 
+                key={date.getTime()} 
+                className={dayClasses} 
+                style={dayStyle}
+                onClick={() => handleDayClick(date)}
+              >
                 <span className="relative z-10">
                   {format(date, 'd')}
                 </span>
+                
+                {/* Period intensity indicator */}
+                {renderPeriodIntensity(date)}
                 
                 {/* Today indicator */}
                 {isCurrentDay && !selectedOutcome && <div className="absolute inset-0 rounded-lg bg-rose-400/20"></div>}
@@ -207,5 +253,15 @@ export function CalendarView({
             {selectedOutcome === 'next-period' ? 'Červené dni označujú očakávanú menštruáciu na základe vášho cyklu.' : 'Ružové dni označujú plodné dni, kedy je najväčšia pravdepodobnosť otehotnenia.'}
           </p>
         </div>}
+
+      {/* Period Intensity Selector Modal */}
+      {selectedDate && (
+        <PeriodIntensitySelector
+          date={selectedDate}
+          currentIntensity={getPeriodIntensity(selectedDate)}
+          onSelect={handlePeriodIntensitySelect}
+          onClose={() => setSelectedDate(null)}
+        />
+      )}
     </div>;
 }

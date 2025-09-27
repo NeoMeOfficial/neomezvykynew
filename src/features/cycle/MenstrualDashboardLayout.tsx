@@ -38,7 +38,9 @@ export function MenstrualDashboardLayout({
     setLastPeriodStart,
     setCycleLength,
     setPeriodLength,
-    updateCycleData
+    updateCycleData,
+    setPeriodIntensity,
+    getPeriodIntensity
   } = useCycleData(accessCode);
 
   const handleFirstInteraction = () => {
@@ -133,6 +135,8 @@ export function MenstrualDashboardLayout({
           derivedState={derivedState}
           onOutcomeSelect={setSelectedOutcome}
           selectedOutcome={selectedOutcome}
+          onPeriodIntensityChange={setPeriodIntensity}
+          getPeriodIntensity={getPeriodIntensity}
         />
 
         {/* Modals */}
@@ -257,6 +261,8 @@ export function MenstrualDashboardLayout({
                 derivedState={derivedState}
                 onOutcomeSelect={setSelectedOutcome}
                 selectedOutcome={selectedOutcome}
+                onPeriodIntensityChange={setPeriodIntensity}
+                getPeriodIntensity={getPeriodIntensity}
               />
             )}
           </div>

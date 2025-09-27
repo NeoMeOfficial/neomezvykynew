@@ -13,6 +13,13 @@ export interface PeriodLog {
   notes?: string;
 }
 
+export type PeriodIntensity = 1 | 2 | 3; // 1 = weak, 2 = mild, 3 = strong
+
+export interface DailyPeriodData {
+  date: string; // ISO YYYY-MM-DD
+  intensity: PeriodIntensity;
+}
+
 export interface CustomSettings {
   notifications: boolean;
   symptomTracking: boolean;
@@ -26,6 +33,7 @@ export interface CycleData {
   periodLength: number; // default 5
   customSettings: CustomSettings;
   history?: PeriodLog[];
+  dailyPeriodData?: DailyPeriodData[]; // Track daily period intensity
 }
 
 export interface DerivedState {
