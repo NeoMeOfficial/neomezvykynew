@@ -22,7 +22,7 @@ export function HistoricalDataOverview({ accessCode }: HistoricalDataOverviewPro
   const [historicalData, setHistoricalData] = useState<HistoricalEntry[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [dateFilter, setDateFilter] = useState<{ start?: Date; end?: Date }>({});
-  const [selectedSymptom, setSelectedSymptom] = useState<string>('');
+  const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Load historical data from localStorage
@@ -165,8 +165,8 @@ export function HistoricalDataOverview({ accessCode }: HistoricalDataOverviewPro
     if (dateFilter.start && isBefore(entryDate, startOfDay(dateFilter.start))) return false;
     if (dateFilter.end && isAfter(entryDate, startOfDay(dateFilter.end))) return false;
     
-    // Selected symptom filter
-    if (selectedSymptom && !entry.symptoms.includes(selectedSymptom)) return false;
+    // Selected symptoms filter
+    if (selectedSymptoms.length > 0 && !selectedSymptoms.some(symptom => entry.symptoms.includes(symptom))) return false;
     
     // Search term filter
     if (searchTerm) {
@@ -441,25 +441,31 @@ export function HistoricalDataOverview({ accessCode }: HistoricalDataOverviewPro
             <span className="text-xs font-medium" style={{ color: '#955F6A' }}>
               Filtrovať podľa príznakov:
             </span>
-            {selectedSymptom && (
+            {selectedSymptoms.length > 0 && (
               <button
-                onClick={() => setSelectedSymptom('')}
+                onClick={() => setSelectedSymptoms([])}
                 className="text-xs underline hover:no-underline"
                 style={{ color: '#955F6A' }}
               >
-                Zrušiť filter
+                Zrušiť filtre ({selectedSymptoms.length})
               </button>
             )}
           </div>
           <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto">
             {uniqueSymptoms.map((symptom) => {
-              const isSelected = selectedSymptom === symptom;
+              const isSelected = selectedSymptoms.includes(symptom);
               const symptomCount = historicalData.filter(entry => entry.symptoms.includes(symptom)).length;
               
               return (
                 <button
                   key={symptom}
-                  onClick={() => setSelectedSymptom(isSelected ? '' : symptom)}
+                  onClick={() => {
+                    if (isSelected) {
+                      setSelectedSymptoms(prev => prev.filter(s => s !== symptom));
+                    } else {
+                      setSelectedSymptoms(prev => [...prev, symptom]);
+                    }
+                  }}
                   className={`text-xs py-1 px-2.5 rounded-full border transition-all hover:scale-105 ${
                     isSelected 
                       ? 'bg-gradient-to-r from-rose-100 to-pink-100 border-rose-300' 
@@ -485,10 +491,10 @@ export function HistoricalDataOverview({ accessCode }: HistoricalDataOverviewPro
           <span>Zobrazených záznamov: {filteredData.length}</span>
           <span>•</span>
           <span>Celkom: {historicalData.length}</span>
-          {selectedSymptom && (
+          {selectedSymptoms.length > 0 && (
             <>
               <span>•</span>
-              <span>Filter: {selectedSymptom}</span>
+              <span>Filtre: {selectedSymptoms.join(', ')}</span>
             </>
           )}
         </div>
