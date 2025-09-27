@@ -115,8 +115,12 @@ export function CalendarView({
               size="sm" 
               variant={selectedOutcome === 'next-period' ? 'default' : 'outline'} 
               onClick={() => onOutcomeSelect(selectedOutcome === 'next-period' ? null : 'next-period')} 
-              className="flex items-center gap-1.5 text-xs"
-              style={{ color: '#FF7782' }}
+              className={`flex items-center gap-1.5 text-xs ${
+                selectedOutcome === 'next-period' 
+                  ? 'bg-gradient-to-r from-[#FF7782] to-[#FF9AA1] text-white border-[#FF7782] hover:from-[#FF6B77] hover:to-[#FF8A92]' 
+                  : ''
+              }`}
+              style={selectedOutcome !== 'next-period' ? { color: '#FF7782' } : {}}
             >
               <Droplets className="w-3 h-3" />
               Ďalšia perioda
@@ -125,8 +129,12 @@ export function CalendarView({
               size="sm" 
               variant={selectedOutcome === 'fertile-days' ? 'default' : 'outline'} 
               onClick={() => onOutcomeSelect(selectedOutcome === 'fertile-days' ? null : 'fertile-days')} 
-              className="flex items-center gap-1.5 text-xs"
-              style={{ color: '#FF7782' }}
+              className={`flex items-center gap-1.5 text-xs ${
+                selectedOutcome === 'fertile-days' 
+                  ? 'bg-gradient-to-r from-[#FF7782] to-[#FF9AA1] text-white border-[#FF7782] hover:from-[#FF6B77] hover:to-[#FF8A92]' 
+                  : ''
+              }`}
+              style={selectedOutcome !== 'fertile-days' ? { color: '#FF7782' } : {}}
             >
               <Heart className="w-3 h-3" />
               Plodné dni
