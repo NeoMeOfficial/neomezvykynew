@@ -212,7 +212,7 @@ export function HistoricalDataOverview({ accessCode }: HistoricalDataOverviewPro
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="space-y-3">
         <div>
           <h3 className="text-base font-medium" style={{ color: '#FF7782' }}>
             História záznamov
@@ -220,6 +220,22 @@ export function HistoricalDataOverview({ accessCode }: HistoricalDataOverviewPro
           <p className="text-sm" style={{ color: '#FF7782' }}>
             Pre lekársku konzultáciu
           </p>
+        </div>
+        
+        {/* Search Input */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            placeholder="Hľadať v príznakoch a poznámkach..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10 placeholder:text-[#B0868D]"
+            style={{
+              backgroundColor: 'white',
+              borderColor: '#E5D4D7',
+              color: '#955F6A'
+            }}
+          />
         </div>
       </div>
 
@@ -267,22 +283,8 @@ export function HistoricalDataOverview({ accessCode }: HistoricalDataOverviewPro
         </div>
       )}
 
-      {/* Search and Filter */}
+      {/* Search and Filter Stats */}
       <div className="space-y-3">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Hľadať v príznakoch a poznámkach..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 placeholder:text-[#B0868D]"
-            style={{
-              backgroundColor: 'white',
-              borderColor: '#E5D4D7',
-              color: '#955F6A'
-            }}
-          />
-        </div>
         
         <div className="flex gap-2 text-xs" style={{ color: '#955F6A' }}>
           <span>Zobrazených záznamov: {filteredData.length}</span>
