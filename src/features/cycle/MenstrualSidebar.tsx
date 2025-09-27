@@ -121,7 +121,7 @@ export function MenstrualSidebar({ activeSection, onSectionChange, onEditClick, 
                         style={{ color: '#F4415F' }}
                       >
                         <Lightbulb className="w-3 h-3" />
-                        Upraviť
+                        Zmeniť dátum menštruácie
                       </button>
                       <button
                         onClick={onSettingsClick}
