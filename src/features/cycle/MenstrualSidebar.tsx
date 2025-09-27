@@ -16,24 +16,24 @@ const menuItems = [
     icon: Clock,
   },
   {
-    id: 'track',
-    title: 'Zaznač si to podstatné',
-    icon: FileText,
-  },
-  {
     id: 'feel-better',
     title: 'Ako sa cítiť lepšie',
     icon: TrendingUp,
   },
   {
-    id: 'data',
-    title: 'Prehľad údajov',
-    icon: BarChart3,
+    id: 'track',
+    title: 'Zaznač si to podstatné',
+    icon: FileText,
   },
   {
     id: 'calendar',
     title: 'Kalendárny prehľad',
     icon: CalendarDays,
+  },
+  {
+    id: 'data',
+    title: 'Tvoje záznamy',
+    icon: BarChart3,
   },
 ];
 
