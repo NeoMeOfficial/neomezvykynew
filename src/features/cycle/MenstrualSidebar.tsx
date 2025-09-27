@@ -93,7 +93,7 @@ export function MenstrualSidebar({ activeSection, onSectionChange, onEditClick, 
                 
                 {/* Show buttons and next period info under Kalendárny prehľad */}
                 {item.id === 'calendar' && (
-                  <div className="ml-4 mb-4 space-y-3">
+                  <div className="mb-4 space-y-3">
                     {/* Action buttons */}
                     <div className="flex flex-col gap-2">
                       <button
