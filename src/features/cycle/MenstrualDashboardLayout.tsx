@@ -183,7 +183,9 @@ export function MenstrualDashboardLayout({
     <div className="min-h-screen flex w-full bg-background">
         <MenstrualSidebar 
           activeSection={activeSection} 
-          onSectionChange={setActiveSection} 
+          onSectionChange={setActiveSection}
+          onEditClick={() => setShowDatePicker(true)}
+          onSettingsClick={() => setShowSettings(true)}
         />
         
         <main className="flex-1 p-8 max-w-none">
@@ -195,30 +197,10 @@ export function MenstrualDashboardLayout({
                }}>
             {/* Header glass accent */}
             <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-rose-200/50 to-transparent"></div>
-            <div className="flex justify-between items-center">
-              <div>
-                <h1 className="text-2xl font-bold" style={{ color: '#FF7782' }}>
-                  Menštruačný kalendár
-                </h1>
-              </div>
-              <div className="flex gap-3">
-                <Button
-                  variant="outline"
-                  onClick={() => setShowDatePicker(true)}
-                  className="flex items-center gap-2"
-                >
-                  <CalendarIcon className="w-4 h-4" />
-                  Upraviť
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => setShowSettings(true)}
-                  className="flex items-center gap-2"
-                >
-                  <TrendingUp className="w-4 h-4" />
-                  Nastavenia
-                </Button>
-              </div>
+            <div>
+              <h1 className="text-2xl font-bold" style={{ color: '#FF7782' }}>
+                Menštruačný kalendár
+              </h1>
             </div>
           </div>
 

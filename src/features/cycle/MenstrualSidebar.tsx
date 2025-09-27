@@ -1,11 +1,13 @@
 import React from 'react';
-import { Clock, FileText, TrendingUp, BarChart3, CalendarDays } from 'lucide-react';
+import { Clock, FileText, TrendingUp, BarChart3, CalendarDays, Calendar as CalendarIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import periodkaLogo from '@/assets/periodka-logo.png';
 
 interface MenstrualSidebarProps {
   activeSection: string;
   onSectionChange: (section: string) => void;
+  onEditClick: () => void;
+  onSettingsClick: () => void;
 }
 
 const menuItems = [
@@ -36,7 +38,7 @@ const menuItems = [
   },
 ];
 
-export function MenstrualSidebar({ activeSection, onSectionChange }: MenstrualSidebarProps) {
+export function MenstrualSidebar({ activeSection, onSectionChange, onEditClick, onSettingsClick }: MenstrualSidebarProps) {
   return (
     <div className="w-80 border-r border-border/50 bg-background/95 backdrop-blur-sm">
       <div className="p-6">
@@ -90,24 +92,48 @@ export function MenstrualSidebar({ activeSection, onSectionChange }: MenstrualSi
                   </div>
                 </div>
                 
-                {/* Show next period info under Kalendárny prehľad */}
+                {/* Show next period info and buttons under Kalendárny prehľad */}
                 {item.id === 'calendar' && (
-                  <div className="ml-4 mb-4 p-3 rounded-lg" 
-                       style={{ 
-                         background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(253, 242, 248, 0.65) 100%)',
-                         boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 1px 3px rgba(149, 95, 106, 0.06)'
-                       }}>
-                    <div className="space-y-2">
-                      <p className="text-xs font-medium" style={{ color: '#955F6A' }}>
-                        Ďalšia menštruácia: <span style={{ color: '#FF7782' }}>
-                          7. 10. 2025
-                        </span>
-                      </p>
-                      <p className="text-xs font-medium" style={{ color: '#955F6A' }}>
-                        Ďalšie plodné dni: <span style={{ color: '#FF7782' }}>
-                          23. 9. 2025 - 25. 9. 2025
-                        </span>
-                      </p>
+                  <div className="ml-4 mb-4 space-y-3">
+                    <div className="p-3 rounded-lg" 
+                         style={{ 
+                           background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(253, 242, 248, 0.65) 100%)',
+                           boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 1px 3px rgba(149, 95, 106, 0.06)'
+                         }}>
+                      <div className="space-y-2">
+                        <p className="text-xs font-medium" style={{ color: '#955F6A' }}>
+                          Ďalšia menštruácia: <span style={{ color: '#FF7782' }}>
+                            7. 10. 2025
+                          </span>
+                        </p>
+                        <p className="text-xs font-medium" style={{ color: '#955F6A' }}>
+                          Ďalšie plodné dni: <span style={{ color: '#FF7782' }}>
+                            23. 9. 2025 - 25. 9. 2025
+                          </span>
+                        </p>
+                      </div>
+                    </div>
+                    
+                    {/* Action buttons */}
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={onEditClick}
+                        className="flex items-center gap-1.5 text-xs"
+                      >
+                        <CalendarIcon className="w-3 h-3" />
+                        Upraviť
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={onSettingsClick}
+                        className="flex items-center gap-1.5 text-xs"
+                      >
+                        <TrendingUp className="w-3 h-3" />
+                        Nastavenia
+                      </Button>
                     </div>
                   </div>
                 )}
