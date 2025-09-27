@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { format, parseISO, isAfter, isBefore, startOfDay } from 'date-fns';
 import { sk } from 'date-fns/locale';
 import jsPDF from 'jspdf';
+import periodkaLogo from '@/assets/periodka-logo.png';
 
 interface HistoricalEntry {
   date: string;
@@ -180,83 +181,218 @@ export function HistoricalDataOverview({ accessCode }: HistoricalDataOverviewPro
     return true;
   });
 
+  // Convert image to base64 for PDF embedding
+  const getImageBase64 = (imageSrc: string): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx?.drawImage(img, 0, 0);
+        const dataURL = canvas.toDataURL('image/png');
+        resolve(dataURL);
+      };
+      img.onerror = reject;
+      img.src = imageSrc;
+    });
+  };
+
   // Export data for medical consultation as PDF
-  const exportData = () => {
+  const exportData = async () => {
     const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
     
-    // Set font for Slovak characters
-    doc.setFont('helvetica');
-    
-    // Title
-    doc.setFontSize(18);
-    doc.text('História menštrpačného cyklu', 20, 25);
-    
-    // Subtitle
-    doc.setFontSize(12);
-    doc.text('Pre lekársku konzultáciu', 20, 35);
-    
-    // Export date
-    doc.setFontSize(10);
-    doc.text(`Exportované: ${format(new Date(), 'dd.MM.yyyy HH:mm', { locale: sk })}`, 20, 45);
-    
-    let yPosition = 60;
-    
-    // Summary
-    doc.setFontSize(12);
-    doc.text(`Celkový počet záznamov: ${filteredData.length}`, 20, yPosition);
-    yPosition += 15;
-    
-    // Data entries
-    filteredData.forEach((entry, index) => {
-      // Check if we need a new page
-      if (yPosition > 260) {
-        doc.addPage();
-        yPosition = 25;
-      }
+    try {
+      // Get logo as base64
+      const logoBase64 = await getImageBase64(periodkaLogo);
       
-      const date = format(parseISO(entry.date), 'EEEE, dd.MM.yyyy', { locale: sk });
-      const capitalizedDate = date.charAt(0).toUpperCase() + date.slice(1);
+      // Create branded header
+      const createHeader = (doc: jsPDF, pageNum = 1) => {
+        // Header background gradient effect
+        doc.setFillColor(255, 119, 130); // #FF7782
+        doc.rect(0, 0, pageWidth, 35, 'F');
+        
+        // Add logo
+        doc.addImage(logoBase64, 'PNG', 15, 8, 20, 20);
+        
+        // Brand name
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(24);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Periodka', 45, 22);
+        
+        // Page number (top right)
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Strana ${pageNum}`, pageWidth - 30, 15);
+        
+        // Subtitle
+        doc.setFontSize(12);
+        doc.text('Menštrpačný kalendár', 45, 30);
+      };
       
-      // Date header
+      // Create footer
+      const createFooter = (doc: jsPDF) => {
+        doc.setFillColor(248, 250, 252); // Light gray
+        doc.rect(0, pageHeight - 20, pageWidth, 20, 'F');
+        
+        doc.setTextColor(100, 100, 100);
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'italic');
+        doc.text('Tento dokument bol vytvorený aplikáciou Periodka pre lekárske účely', 15, pageHeight - 8);
+        doc.text(`Exportované: ${format(new Date(), 'dd.MM.yyyy HH:mm', { locale: sk })}`, pageWidth - 80, pageHeight - 8);
+      };
+      
+      let pageNum = 1;
+      createHeader(doc, pageNum);
+      createFooter(doc);
+      
+      // Document title
+      doc.setTextColor(60, 60, 60);
+      doc.setFontSize(20);
+      doc.setFont('helvetica', 'bold');
+      doc.text('História menštrpačného cyklu', 20, 55);
+      
+      // Document purpose
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'normal');
+      doc.text('Pre lekársku konzultáciu', 20, 65);
+      
+      // Summary section with background
+      doc.setFillColor(253, 242, 248); // Light pink background
+      doc.rect(15, 75, pageWidth - 30, 25, 'F');
+      
+      doc.setTextColor(149, 95, 106);
       doc.setFontSize(12);
       doc.setFont('helvetica', 'bold');
-      doc.text(capitalizedDate, 20, yPosition);
-      yPosition += 8;
+      doc.text('Súhrn údajov', 20, 85);
       
-      // Symptoms
-      if (entry.symptoms.length > 0) {
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.text(`• Celkový počet záznamov: ${filteredData.length}`, 25, 92);
+      
+      // Get unique symptoms from filtered data
+      const uniqueFilteredSymptoms = [...new Set(filteredData.flatMap(entry => entry.symptoms))];
+      doc.text(`• Počet rôznych príznakov: ${uniqueFilteredSymptoms.length}`, 25, 97);
+      
+      let yPosition = 115;
+      
+      // Data entries section
+      doc.setTextColor(60, 60, 60);
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Detailné záznamy', 20, yPosition);
+      yPosition += 15;
+      
+      filteredData.forEach((entry, index) => {
+        // Check if we need a new page
+        if (yPosition > pageHeight - 60) {
+          doc.addPage();
+          pageNum++;
+          createHeader(doc, pageNum);
+          createFooter(doc);
+          yPosition = 55;
+        }
+        
+        const date = format(parseISO(entry.date), 'EEEE, dd.MM.yyyy', { locale: sk });
+        const capitalizedDate = date.charAt(0).toUpperCase() + date.slice(1);
+        
+        // Entry background (alternating colors)
+        const bgColor = index % 2 === 0 ? [253, 242, 248] : [255, 255, 255];
+        doc.setFillColor(bgColor[0], bgColor[1], bgColor[2]);
+        
+        const entryHeight = 15 + (entry.symptoms.length * 5) + (entry.notes ? 15 : 0);
+        doc.rect(15, yPosition - 5, pageWidth - 30, entryHeight, 'F');
+        
+        // Date header with accent
+        doc.setFillColor(255, 119, 130);
+        doc.rect(15, yPosition - 5, 5, entryHeight, 'F');
+        
+        doc.setTextColor(255, 119, 130);
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'bold');
+        doc.text(capitalizedDate, 25, yPosition + 5);
+        yPosition += 12;
+        
+        // Symptoms section
+        if (entry.symptoms.length > 0) {
+          doc.setTextColor(80, 80, 80);
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(10);
+          doc.text('Príznaky:', 25, yPosition);
+          yPosition += 6;
+          
+          doc.setFont('helvetica', 'normal');
+          entry.symptoms.forEach(symptom => {
+            doc.setTextColor(100, 100, 100);
+            doc.text('•', 30, yPosition);
+            doc.setTextColor(60, 60, 60);
+            doc.text(symptom, 35, yPosition);
+            yPosition += 5;
+          });
+          yPosition += 3;
+        }
+        
+        // Notes section
+        if (entry.notes) {
+          doc.setTextColor(80, 80, 80);
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(10);
+          doc.text('Poznámky:', 25, yPosition);
+          yPosition += 6;
+          
+          doc.setFont('helvetica', 'normal');
+          doc.setTextColor(60, 60, 60);
+          const noteLines = doc.splitTextToSize(entry.notes, 150);
+          noteLines.forEach((line: string) => {
+            doc.text(line, 30, yPosition);
+            yPosition += 5;
+          });
+        }
+        
+        yPosition += 8;
+      });
+      
+      // Final page summary if multiple pages
+      if (pageNum > 1) {
+        if (yPosition > pageHeight - 80) {
+          doc.addPage();
+          pageNum++;
+          createHeader(doc, pageNum);
+          createFooter(doc);
+          yPosition = 55;
+        }
+        
+        // Summary box
+        doc.setFillColor(253, 242, 248);
+        doc.rect(15, yPosition, pageWidth - 30, 35, 'F');
+        
+        doc.setTextColor(149, 95, 106);
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Záverečný súhrn', 20, yPosition + 10);
+        
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(10);
-        doc.text('Príznaky:', 25, yPosition);
-        yPosition += 6;
-        
-        entry.symptoms.forEach(symptom => {
-          doc.text(`• ${symptom}`, 30, yPosition);
-          yPosition += 5;
-        });
-        yPosition += 3;
+        doc.text(`Dokument obsahuje ${filteredData.length} záznamov na ${pageNum} stranách`, 20, yPosition + 18);
+        doc.text('Určené pre medicínske konzultácie a diagnostiku', 20, yPosition + 25);
       }
       
-      // Notes
-      if (entry.notes) {
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(10);
-        doc.text('Poznámky:', 25, yPosition);
-        yPosition += 6;
-        
-        // Split long notes into multiple lines
-        const noteLines = doc.splitTextToSize(entry.notes, 160);
-        noteLines.forEach((line: string) => {
-          doc.text(line, 30, yPosition);
-          yPosition += 5;
-        });
-      }
-      
-      yPosition += 8; // Space between entries
-    });
+    } catch (error) {
+      console.error('Error loading logo:', error);
+      // Fallback without logo
+      doc.setTextColor(255, 119, 130);
+      doc.setFontSize(24);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Periodka', 20, 25);
+    }
     
     // Save the PDF
-    doc.save(`menstrual-data-${format(new Date(), 'yyyy-MM-dd')}.pdf`);
+    doc.save(`periodka-menstrual-data-${format(new Date(), 'yyyy-MM-dd')}.pdf`);
   };
 
   if (loading) {
@@ -435,6 +571,25 @@ export function HistoricalDataOverview({ accessCode }: HistoricalDataOverviewPro
 export function ExportButton({ accessCode }: { accessCode?: string }) {
   const [historicalData, setHistoricalData] = useState<HistoricalEntry[]>([]);
   
+  // Convert image to base64 for PDF embedding
+  const getImageBase64 = (imageSrc: string): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx?.drawImage(img, 0, 0);
+        const dataURL = canvas.toDataURL('image/png');
+        resolve(dataURL);
+      };
+      img.onerror = reject;
+      img.src = imageSrc;
+    });
+  };
+  
   // Load historical data from localStorage
   useEffect(() => {
     const loadHistoricalData = () => {
@@ -499,82 +654,198 @@ export function ExportButton({ accessCode }: { accessCode?: string }) {
     loadHistoricalData();
   }, [accessCode]);
 
-  const exportData = () => {
+  const exportData = async () => {
     const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
     
-    // Set font for Slovak characters
-    doc.setFont('helvetica');
-    
-    // Title
-    doc.setFontSize(18);
-    doc.text('História menštrpačného cyklu', 20, 25);
-    
-    // Subtitle
-    doc.setFontSize(12);
-    doc.text('Pre lekársku konzultáciu', 20, 35);
-    
-    // Export date
-    doc.setFontSize(10);
-    doc.text(`Exportované: ${format(new Date(), 'dd.MM.yyyy HH:mm', { locale: sk })}`, 20, 45);
-    
-    let yPosition = 60;
-    
-    // Summary
-    doc.setFontSize(12);
-    doc.text(`Celkový počet záznamov: ${historicalData.length}`, 20, yPosition);
-    yPosition += 15;
-    
-    // Data entries
-    historicalData.forEach((entry, index) => {
-      // Check if we need a new page
-      if (yPosition > 260) {
-        doc.addPage();
-        yPosition = 25;
-      }
+    try {
+      // Get logo as base64
+      const logoBase64 = await getImageBase64(periodkaLogo);
       
-      const date = format(parseISO(entry.date), 'EEEE, dd.MM.yyyy', { locale: sk });
-      const capitalizedDate = date.charAt(0).toUpperCase() + date.slice(1);
+      // Create branded header
+      const createHeader = (doc: jsPDF, pageNum = 1) => {
+        // Header background gradient effect
+        doc.setFillColor(255, 119, 130); // #FF7782
+        doc.rect(0, 0, pageWidth, 35, 'F');
+        
+        // Add logo
+        doc.addImage(logoBase64, 'PNG', 15, 8, 20, 20);
+        
+        // Brand name
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(24);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Periodka', 45, 22);
+        
+        // Page number (top right)
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Strana ${pageNum}`, pageWidth - 30, 15);
+        
+        // Subtitle
+        doc.setFontSize(12);
+        doc.text('Menštrpačný kalendár', 45, 30);
+      };
       
-      // Date header
+      // Create footer
+      const createFooter = (doc: jsPDF) => {
+        doc.setFillColor(248, 250, 252); // Light gray
+        doc.rect(0, pageHeight - 20, pageWidth, 20, 'F');
+        
+        doc.setTextColor(100, 100, 100);
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'italic');
+        doc.text('Tento dokument bol vytvorený aplikáciou Periodka pre lekárske účely', 15, pageHeight - 8);
+        doc.text(`Exportované: ${format(new Date(), 'dd.MM.yyyy HH:mm', { locale: sk })}`, pageWidth - 80, pageHeight - 8);
+      };
+      
+      let pageNum = 1;
+      createHeader(doc, pageNum);
+      createFooter(doc);
+      
+      // Document title
+      doc.setTextColor(60, 60, 60);
+      doc.setFontSize(20);
+      doc.setFont('helvetica', 'bold');
+      doc.text('História menštrpačného cyklu', 20, 55);
+      
+      // Document purpose
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'normal');
+      doc.text('Pre lekársku konzultáciu', 20, 65);
+      
+      // Summary section with background
+      doc.setFillColor(253, 242, 248); // Light pink background
+      doc.rect(15, 75, pageWidth - 30, 25, 'F');
+      
+      doc.setTextColor(149, 95, 106);
       doc.setFontSize(12);
       doc.setFont('helvetica', 'bold');
-      doc.text(capitalizedDate, 20, yPosition);
-      yPosition += 8;
+      doc.text('Súhrn údajov', 20, 85);
       
-      // Symptoms
-      if (entry.symptoms.length > 0) {
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.text(`• Celkový počet záznamov: ${historicalData.length}`, 25, 92);
+      
+      // Get unique symptoms from filtered data
+      const uniqueFilteredSymptoms = [...new Set(historicalData.flatMap(entry => entry.symptoms))];
+      doc.text(`• Počet rôznych príznakov: ${uniqueFilteredSymptoms.length}`, 25, 97);
+      
+      let yPosition = 115;
+      
+      // Data entries section
+      doc.setTextColor(60, 60, 60);
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Detailné záznamy', 20, yPosition);
+      yPosition += 15;
+      
+      historicalData.forEach((entry, index) => {
+        // Check if we need a new page
+        if (yPosition > pageHeight - 60) {
+          doc.addPage();
+          pageNum++;
+          createHeader(doc, pageNum);
+          createFooter(doc);
+          yPosition = 55;
+        }
+        
+        const date = format(parseISO(entry.date), 'EEEE, dd.MM.yyyy', { locale: sk });
+        const capitalizedDate = date.charAt(0).toUpperCase() + date.slice(1);
+        
+        // Entry background (alternating colors)
+        const bgColor = index % 2 === 0 ? [253, 242, 248] : [255, 255, 255];
+        doc.setFillColor(bgColor[0], bgColor[1], bgColor[2]);
+        
+        const entryHeight = 15 + (entry.symptoms.length * 5) + (entry.notes ? 15 : 0);
+        doc.rect(15, yPosition - 5, pageWidth - 30, entryHeight, 'F');
+        
+        // Date header with accent
+        doc.setFillColor(255, 119, 130);
+        doc.rect(15, yPosition - 5, 5, entryHeight, 'F');
+        
+        doc.setTextColor(255, 119, 130);
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'bold');
+        doc.text(capitalizedDate, 25, yPosition + 5);
+        yPosition += 12;
+        
+        // Symptoms section
+        if (entry.symptoms.length > 0) {
+          doc.setTextColor(80, 80, 80);
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(10);
+          doc.text('Príznaky:', 25, yPosition);
+          yPosition += 6;
+          
+          doc.setFont('helvetica', 'normal');
+          entry.symptoms.forEach(symptom => {
+            doc.setTextColor(100, 100, 100);
+            doc.text('•', 30, yPosition);
+            doc.setTextColor(60, 60, 60);
+            doc.text(symptom, 35, yPosition);
+            yPosition += 5;
+          });
+          yPosition += 3;
+        }
+        
+        // Notes section
+        if (entry.notes) {
+          doc.setTextColor(80, 80, 80);
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(10);
+          doc.text('Poznámky:', 25, yPosition);
+          yPosition += 6;
+          
+          doc.setFont('helvetica', 'normal');
+          doc.setTextColor(60, 60, 60);
+          const noteLines = doc.splitTextToSize(entry.notes, 150);
+          noteLines.forEach((line: string) => {
+            doc.text(line, 30, yPosition);
+            yPosition += 5;
+          });
+        }
+        
+        yPosition += 8;
+      });
+      
+      // Final page summary if multiple pages
+      if (pageNum > 1) {
+        if (yPosition > pageHeight - 80) {
+          doc.addPage();
+          pageNum++;
+          createHeader(doc, pageNum);
+          createFooter(doc);
+          yPosition = 55;
+        }
+        
+        // Summary box
+        doc.setFillColor(253, 242, 248);
+        doc.rect(15, yPosition, pageWidth - 30, 35, 'F');
+        
+        doc.setTextColor(149, 95, 106);
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Záverečný súhrn', 20, yPosition + 10);
+        
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(10);
-        doc.text('Príznaky:', 25, yPosition);
-        yPosition += 6;
-        
-        entry.symptoms.forEach(symptom => {
-          doc.text(`• ${symptom}`, 30, yPosition);
-          yPosition += 5;
-        });
-        yPosition += 3;
+        doc.text(`Dokument obsahuje ${historicalData.length} záznamov na ${pageNum} stranách`, 20, yPosition + 18);
+        doc.text('Určené pre medicínske konzultácie a diagnostiku', 20, yPosition + 25);
       }
       
-      // Notes
-      if (entry.notes) {
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(10);
-        doc.text('Poznámky:', 25, yPosition);
-        yPosition += 6;
-        
-        // Split long notes into multiple lines
-        const noteLines = doc.splitTextToSize(entry.notes, 160);
-        noteLines.forEach((line: string) => {
-          doc.text(line, 30, yPosition);
-          yPosition += 5;
-        });
-      }
-      
-      yPosition += 8; // Space between entries
-    });
+    } catch (error) {
+      console.error('Error loading logo:', error);
+      // Fallback without logo
+      doc.setTextColor(255, 119, 130);
+      doc.setFontSize(24);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Periodka', 20, 25);
+    }
     
     // Save the PDF
-    doc.save(`menstrual-data-${format(new Date(), 'yyyy-MM-dd')}.pdf`);
+    doc.save(`periodka-menstrual-data-${format(new Date(), 'yyyy-MM-dd')}.pdf`);
   };
 
   return (
