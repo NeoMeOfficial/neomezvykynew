@@ -317,9 +317,12 @@ export function HistoricalDataOverview({ accessCode }: HistoricalDataOverviewPro
             >
               {/* Date */}
               <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4" style={{ color: '#955F6A' }} />
-                <span className="font-medium text-sm" style={{ color: '#955F6A' }}>
-                  {format(parseISO(entry.date), 'EEEE, dd.MM.yyyy', { locale: sk })}
+                <Calendar className="w-4 h-4" style={{ color: '#FF7782' }} />
+                <span className="font-medium text-sm" style={{ color: '#FF7782' }}>
+                  {(() => {
+                    const formatted = format(parseISO(entry.date), 'EEEE, dd.MM.yyyy', { locale: sk });
+                    return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+                  })()}
                 </span>
               </div>
 
