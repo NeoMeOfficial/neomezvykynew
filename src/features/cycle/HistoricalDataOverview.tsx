@@ -20,6 +20,7 @@ export function HistoricalDataOverview({ accessCode }: HistoricalDataOverviewPro
   const [historicalData, setHistoricalData] = useState<HistoricalEntry[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [dateFilter, setDateFilter] = useState<{ start?: Date; end?: Date }>({});
+  const [selectedSymptom, setSelectedSymptom] = useState<string>('');
   const [loading, setLoading] = useState(true);
 
   // Load historical data from localStorage
@@ -151,13 +152,19 @@ export function HistoricalDataOverview({ accessCode }: HistoricalDataOverviewPro
     loadHistoricalData();
   }, [accessCode]);
 
-  // Filter data based on search term and date range
+  // Get unique symptoms for filtering
+  const uniqueSymptoms = [...new Set(historicalData.flatMap(entry => entry.symptoms))].sort();
+
+  // Filter data based on search term, date range, and selected symptom
   const filteredData = historicalData.filter(entry => {
     const entryDate = parseISO(entry.date);
     
     // Date filter
     if (dateFilter.start && isBefore(entryDate, startOfDay(dateFilter.start))) return false;
     if (dateFilter.end && isAfter(entryDate, startOfDay(dateFilter.end))) return false;
+    
+    // Selected symptom filter
+    if (selectedSymptom && !entry.symptoms.includes(selectedSymptom)) return false;
     
     // Search term filter
     if (searchTerm) {
@@ -198,6 +205,7 @@ export function HistoricalDataOverview({ accessCode }: HistoricalDataOverviewPro
       <div className="flex items-center justify-center py-8">
         <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
       </div>
+
     );
   }
 
@@ -214,6 +222,50 @@ export function HistoricalDataOverview({ accessCode }: HistoricalDataOverviewPro
           </p>
         </div>
       </div>
+
+      {/* Symptom Tags for Filtering */}
+      {uniqueSymptoms.length > 0 && (
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium" style={{ color: '#955F6A' }}>
+              Filtrovať podľa príznakov:
+            </span>
+            {selectedSymptom && (
+              <button
+                onClick={() => setSelectedSymptom('')}
+                className="text-xs underline hover:no-underline"
+                style={{ color: '#955F6A' }}
+              >
+                Zrušiť filter
+              </button>
+            )}
+          </div>
+          <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto">
+            {uniqueSymptoms.map((symptom) => {
+              const isSelected = selectedSymptom === symptom;
+              const symptomCount = historicalData.filter(entry => entry.symptoms.includes(symptom)).length;
+              
+              return (
+                <button
+                  key={symptom}
+                  onClick={() => setSelectedSymptom(isSelected ? '' : symptom)}
+                  className={`text-xs py-1 px-2.5 rounded-full border transition-all hover:scale-105 ${
+                    isSelected 
+                      ? 'bg-gradient-to-r from-rose-100 to-pink-100 border-rose-300' 
+                      : 'bg-white/80 border-rose-200/50 hover:bg-rose-50/50'
+                  }`}
+                  style={{ 
+                    color: isSelected ? '#FF7782' : '#955F6A',
+                    fontWeight: isSelected ? '600' : '500'
+                  }}
+                >
+                  {symptom} ({symptomCount})
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Search and Filter */}
       <div className="space-y-3">
@@ -236,6 +288,12 @@ export function HistoricalDataOverview({ accessCode }: HistoricalDataOverviewPro
           <span>Zobrazených záznamov: {filteredData.length}</span>
           <span>•</span>
           <span>Celkom: {historicalData.length}</span>
+          {selectedSymptom && (
+            <>
+              <span>•</span>
+              <span>Filter: {selectedSymptom}</span>
+            </>
+          )}
         </div>
       </div>
 
