@@ -196,9 +196,6 @@ export function MenstrualDashboardLayout({
                 <h1 className="text-2xl font-bold" style={{ color: '#FF7782' }}>
                   Menštruačný kalendár
                 </h1>
-                <p className="text-lg" style={{ color: '#955F6A' }}>
-                  Deň {currentDay} • {currentPhase.name}
-                </p>
               </div>
               <div className="flex gap-3">
                 <Button
