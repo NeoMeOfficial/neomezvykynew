@@ -30,7 +30,7 @@ const menuItems = [
   },
   {
     id: 'calendar',
-    title: 'Kalendárny pohľad',
+    title: 'Kalendárny prehľad',
     icon: CalendarDays,
   },
 ];
@@ -48,7 +48,7 @@ export function MenstrualSidebar({ activeSection, onSectionChange }: MenstrualSi
           <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-rose-200/50 to-transparent"></div>
           <div className="flex items-center gap-3">
             <h2 className="text-lg font-medium" style={{ color: '#FF7782' }}>
-              Navigácia
+              Periodka
             </h2>
           </div>
         </div>

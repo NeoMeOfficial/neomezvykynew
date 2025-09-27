@@ -40,7 +40,7 @@ export function CalendarViewSection({
           <div className="flex items-center gap-3">
             <CalendarDays className="w-5 h-5" style={{ color: '#FF7782' }} />
             <h3 className="text-lg font-medium" style={{ color: '#FF7782' }}>
-              Kalendárny pohľad
+              Kalendárny prehľad
             </h3>
           </div>
         </div>

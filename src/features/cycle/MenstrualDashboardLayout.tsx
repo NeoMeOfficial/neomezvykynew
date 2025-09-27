@@ -183,33 +183,63 @@ export function MenstrualDashboardLayout({
         />
         
         <main className="flex-1 p-8 max-w-none">
-          {/* Header */}
-          <div className="flex justify-between items-center mb-6">
-            <div>
-              <h1 className="text-2xl font-bold text-foreground">
-                Menštruačný kalendár
-              </h1>
-              <p className="text-muted-foreground">
-                Deň {currentDay} • {currentPhase.name}
-              </p>
+          {/* Header - Full Width Box */}
+          <div className="w-full mb-6 p-6 rounded-2xl relative"
+               style={{ 
+                 background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(253, 242, 248, 0.95) 100%)',
+                 boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 2px 8px rgba(149, 95, 106, 0.1)'
+               }}>
+            {/* Header glass accent */}
+            <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-rose-200/50 to-transparent"></div>
+            <div className="flex justify-between items-center">
+              <div>
+                <h1 className="text-2xl font-bold" style={{ color: '#FF7782' }}>
+                  Menštruačný kalendár
+                </h1>
+                <p className="text-lg" style={{ color: '#955F6A' }}>
+                  Deň {currentDay} • {currentPhase.name}
+                </p>
+              </div>
+              <div className="flex gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowDatePicker(true)}
+                  className="flex items-center gap-2"
+                >
+                  <CalendarIcon className="w-4 h-4" />
+                  Upraviť
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowSettings(true)}
+                  className="flex items-center gap-2"
+                >
+                  <TrendingUp className="w-4 h-4" />
+                  Nastavenia
+                </Button>
+              </div>
             </div>
-            <div className="flex gap-3">
-              <Button
-                variant="outline"
-                onClick={() => setShowDatePicker(true)}
-                className="flex items-center gap-2"
-              >
-                <CalendarIcon className="w-4 h-4" />
-                Upraviť
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => setShowSettings(true)}
-                className="flex items-center gap-2"
-              >
-                <TrendingUp className="w-4 h-4" />
-                Nastavenia
-              </Button>
+          </div>
+
+          {/* Next Period and Fertile Days Info */}
+          <div className="mb-6 p-4 rounded-xl" 
+               style={{ 
+                 background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(253, 242, 248, 0.75) 100%)',
+                 boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 1px 4px rgba(149, 95, 106, 0.08)'
+               }}>
+            <div className="flex justify-between items-center">
+              <div>
+                <p className="text-sm font-medium" style={{ color: '#955F6A' }}>
+                  Ďalšia menštruácia: <span style={{ color: '#FF7782' }}>
+                    {new Date(Date.now() + (28 - currentDay) * 24 * 60 * 60 * 1000).toLocaleDateString('sk-SK')}
+                  </span>
+                </p>
+                <p className="text-sm font-medium" style={{ color: '#955F6A' }}>
+                  Ďalšie plodné dni: <span style={{ color: '#FF7782' }}>
+                    {new Date(Date.now() + (14 - currentDay) * 24 * 60 * 60 * 1000).toLocaleDateString('sk-SK')} - {new Date(Date.now() + (16 - currentDay) * 24 * 60 * 60 * 1000).toLocaleDateString('sk-SK')}
+                  </span>
+                </p>
+              </div>
             </div>
           </div>
 
