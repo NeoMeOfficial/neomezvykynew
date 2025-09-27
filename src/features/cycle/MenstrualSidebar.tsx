@@ -1,6 +1,5 @@
 import React from 'react';
-import { Clock, FileText, TrendingUp, BarChart3, CalendarDays, Calendar as CalendarIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Clock, FileText, TrendingUp, BarChart3, CalendarDays, Lightbulb } from 'lucide-react';
 import periodkaLogo from '@/assets/periodka-logo.png';
 
 interface MenstrualSidebarProps {
@@ -116,24 +115,22 @@ export function MenstrualSidebar({ activeSection, onSectionChange, onEditClick, 
                     
                     {/* Action buttons */}
                     <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
+                      <button
                         onClick={onEditClick}
-                        className="flex items-center gap-1.5 text-xs"
+                        className="flex items-center gap-2 px-6 py-3 text-base font-medium rounded-3xl bg-gradient-to-r from-rose-50/80 to-pink-50/80 border border-rose-200/30 symptom-glass hover:from-rose-50 hover:to-pink-50 transition-all"
+                        style={{ color: '#F4415F' }}
                       >
-                        <CalendarIcon className="w-3 h-3" />
+                        <Lightbulb className="w-4 h-4" />
                         Upraviť
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
+                      </button>
+                      <button
                         onClick={onSettingsClick}
-                        className="flex items-center gap-1.5 text-xs"
+                        className="flex items-center gap-2 px-6 py-3 text-base font-medium rounded-3xl bg-gradient-to-r from-rose-50/80 to-pink-50/80 border border-rose-200/30 symptom-glass hover:from-rose-50 hover:to-pink-50 transition-all"
+                        style={{ color: '#F4415F' }}
                       >
-                        <TrendingUp className="w-3 h-3" />
+                        <Lightbulb className="w-4 h-4" />
                         Nastavenia
-                      </Button>
+                      </button>
                     </div>
                   </div>
                 )}
