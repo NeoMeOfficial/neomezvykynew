@@ -65,7 +65,7 @@ export function TodaysEstimateSection({
           <div className="space-y-3">
             <div>
               <h4 className="text-lg font-medium mb-2" style={{ color: '#955F6A' }}>
-                {currentPhase.name} - Deň {currentDay}
+                {currentPhase.name} fáza - Deň {currentDay} cyklu
               </h4>
               <p className="text-sm leading-relaxed" style={{ color: '#955F6A' }}>
                 Energia postupne klesá, telo sa pripravuje na menštruáciu.
