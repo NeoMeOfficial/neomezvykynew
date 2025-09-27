@@ -111,11 +111,23 @@ export function CalendarView({
         <div className={`flex items-center ${isMobile ? 'flex-col gap-3' : 'justify-between'}`}>
           {/* Filter Buttons */}
           <div className="flex gap-2">
-            <Button size="sm" variant={selectedOutcome === 'next-period' ? 'default' : 'outline'} onClick={() => onOutcomeSelect(selectedOutcome === 'next-period' ? null : 'next-period')} className="flex items-center gap-1.5 text-xs">
+            <Button 
+              size="sm" 
+              variant={selectedOutcome === 'next-period' ? 'default' : 'outline'} 
+              onClick={() => onOutcomeSelect(selectedOutcome === 'next-period' ? null : 'next-period')} 
+              className="flex items-center gap-1.5 text-xs"
+              style={{ color: '#FF7782' }}
+            >
               <Droplets className="w-3 h-3" />
               Ďalšia perioda
             </Button>
-            <Button size="sm" variant={selectedOutcome === 'fertile-days' ? 'default' : 'outline'} onClick={() => onOutcomeSelect(selectedOutcome === 'fertile-days' ? null : 'fertile-days')} className="flex items-center gap-1.5 text-xs">
+            <Button 
+              size="sm" 
+              variant={selectedOutcome === 'fertile-days' ? 'default' : 'outline'} 
+              onClick={() => onOutcomeSelect(selectedOutcome === 'fertile-days' ? null : 'fertile-days')} 
+              className="flex items-center gap-1.5 text-xs"
+              style={{ color: '#FF7782' }}
+            >
               <Heart className="w-3 h-3" />
               Plodné dni
             </Button>
