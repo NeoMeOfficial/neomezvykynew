@@ -280,34 +280,59 @@ export function HistoricalDataOverview({ accessCode }: HistoricalDataOverviewPro
         const monthEnd = endOfMonth(date);
         const monthDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
         
-        // Month header
-        doc.setTextColor(255, 119, 130);
+        // Month header with background
+        doc.setFillColor(255, 119, 130);
+        doc.rect(startX, startY - 5, calendarWidth, 20, 'F');
+        
+        doc.setTextColor(255, 255, 255);
         doc.setFontSize(14);
         doc.setFont('helvetica', 'bold');
         const monthName = format(date, 'LLLL yyyy', { locale: sk });
         const capitalizedMonth = monthName.charAt(0).toUpperCase() + monthName.slice(1);
-        doc.text(capitalizedMonth, startX, startY);
+        doc.text(capitalizedMonth, startX + 10, startY + 8);
         
         const headerHeight = 20;
         const dayHeaderHeight = 15;
         const cellWidth = calendarWidth / 7;
         const cellHeight = (calendarHeight - headerHeight - dayHeaderHeight) / 6;
         
+        // Day headers background
+        doc.setFillColor(253, 242, 248);
+        doc.rect(startX, startY + headerHeight - 5, calendarWidth, dayHeaderHeight, 'F');
+        
         // Day headers
-        const dayHeaders = ['Po', 'Ut', 'St', 'Št', 'Pi', 'So', 'Ne'];
-        doc.setTextColor(100, 100, 100);
-        doc.setFontSize(10);
+        const dayHeaders = ['Pondelok', 'Utorok', 'Streda', 'Štvrtok', 'Piatok', 'Sobota', 'Nedeľa'];
+        const dayHeadersShort = ['Po', 'Ut', 'St', 'Št', 'Pi', 'So', 'Ne'];
+        
+        doc.setTextColor(149, 95, 106);
+        doc.setFontSize(9);
         doc.setFont('helvetica', 'bold');
         
-        dayHeaders.forEach((day, index) => {
+        dayHeadersShort.forEach((day, index) => {
           const x = startX + (index * cellWidth) + (cellWidth / 2);
-          doc.text(day, x, startY + headerHeight, { align: 'center' });
+          doc.text(day, x, startY + headerHeight + 8, { align: 'center' });
         });
         
         // Calculate starting position for days
         const firstDayOfWeek = monthStart.getDay() === 0 ? 6 : monthStart.getDay() - 1; // Convert Sunday = 0 to Monday = 0
         
-        // Draw calendar grid and days
+        // Draw calendar grid
+        doc.setDrawColor(200, 200, 200);
+        doc.setLineWidth(0.5);
+        
+        // Draw vertical lines
+        for (let i = 0; i <= 7; i++) {
+          const x = startX + (i * cellWidth);
+          doc.line(x, startY + headerHeight + dayHeaderHeight - 5, x, startY + calendarHeight);
+        }
+        
+        // Draw horizontal lines
+        for (let i = 0; i <= 6; i++) {
+          const y = startY + headerHeight + dayHeaderHeight - 5 + (i * cellHeight);
+          doc.line(startX, y, startX + calendarWidth, y);
+        }
+        
+        // Draw days
         doc.setTextColor(60, 60, 60);
         doc.setFontSize(10);
         doc.setFont('helvetica', 'normal');
@@ -317,41 +342,41 @@ export function HistoricalDataOverview({ accessCode }: HistoricalDataOverviewPro
         
         monthDays.forEach((day) => {
           const x = startX + (currentCol * cellWidth);
-          const y = startY + headerHeight + dayHeaderHeight + (currentRow * cellHeight);
+          const y = startY + headerHeight + dayHeaderHeight - 5 + (currentRow * cellHeight);
           
-          // Draw cell border
-          doc.setDrawColor(200, 200, 200);
-          doc.rect(x, y, cellWidth, cellHeight);
+          // Highlight weekends
+          if (currentCol === 5 || currentCol === 6) { // Saturday or Sunday
+            doc.setFillColor(248, 250, 252);
+            doc.rect(x, y, cellWidth, cellHeight, 'F');
+          }
           
           // Draw day number
-          doc.text(format(day, 'd'), x + 5, y + 12);
+          doc.setTextColor(60, 60, 60);
+          doc.text(format(day, 'd'), x + 5, y + 15);
           
           // Find symptoms for this day
           const dayString = format(day, 'yyyy-MM-dd');
           const dayEntry = filteredData.find(entry => entry.date === dayString);
           
           if (dayEntry && dayEntry.symptoms.length > 0) {
-            // Draw colored dots for symptoms
-            const maxDotsPerRow = Math.floor((cellWidth - 10) / 8);
-            let dotX = x + 5;
-            let dotY = y + cellHeight - 12;
-            let dotCount = 0;
+            // Draw colored dots for symptoms in a grid pattern
+            const maxDotsPerRow = 4;
+            const dotSize = 2;
+            const dotSpacing = 6;
+            const startDotX = x + 5;
+            const startDotY = y + cellHeight - 15;
             
-            dayEntry.symptoms.forEach((symptom) => {
+            dayEntry.symptoms.forEach((symptom, index) => {
               if (symptomColors[symptom]) {
                 const color = symptomColors[symptom];
+                const row = Math.floor(index / maxDotsPerRow);
+                const col = index % maxDotsPerRow;
+                
+                const dotX = startDotX + (col * dotSpacing) + dotSize;
+                const dotY = startDotY - (row * dotSpacing);
+                
                 doc.setFillColor(color[0], color[1], color[2]);
-                doc.circle(dotX + 3, dotY, 2, 'F');
-                
-                dotX += 8;
-                dotCount++;
-                
-                // Move to next row if needed
-                if (dotCount >= maxDotsPerRow) {
-                  dotX = x + 5;
-                  dotY -= 6;
-                  dotCount = 0;
-                }
+                doc.circle(dotX, dotY, dotSize, 'F');
               }
             });
           }
@@ -363,24 +388,31 @@ export function HistoricalDataOverview({ accessCode }: HistoricalDataOverviewPro
           }
         });
         
-        return startY + calendarHeight;
+        return startY + calendarHeight + 10;
       };
 
       // Draw symptom legend
       const drawLegend = (doc: jsPDF, startY: number, symptoms: string[], colors: { [key: string]: number[] }) => {
+        if (symptoms.length === 0) return startY;
+        
+        // Legend background
+        doc.setFillColor(253, 242, 248);
+        const legendHeight = Math.max(40, Math.ceil(symptoms.length / 3) * 10 + 20);
+        doc.rect(15, startY - 5, pageWidth - 30, legendHeight, 'F');
+        
         doc.setTextColor(149, 95, 106);
         doc.setFontSize(12);
         doc.setFont('helvetica', 'bold');
-        doc.text('Legenda príznakov', 15, startY);
+        doc.text('Legenda príznakov', 20, startY + 8);
         
-        let yPos = startY + 10;
-        const itemsPerColumn = Math.ceil(symptoms.length / 2);
-        const columnWidth = (pageWidth - 30) / 2;
+        let yPos = startY + 18;
+        const itemsPerColumn = Math.ceil(symptoms.length / 3);
+        const columnWidth = (pageWidth - 50) / 3;
         
         symptoms.forEach((symptom, index) => {
           const column = Math.floor(index / itemsPerColumn);
           const row = index % itemsPerColumn;
-          const x = 15 + (column * columnWidth);
+          const x = 20 + (column * columnWidth);
           const y = yPos + (row * 8);
           
           if (colors[symptom]) {
@@ -390,18 +422,27 @@ export function HistoricalDataOverview({ accessCode }: HistoricalDataOverviewPro
           }
           
           doc.setTextColor(80, 80, 80);
-          doc.setFontSize(9);
+          doc.setFontSize(8);
           doc.setFont('helvetica', 'normal');
-          doc.text(symptom, x + 10, y);
+          const truncatedSymptom = symptom.length > 15 ? symptom.substring(0, 12) + '...' : symptom;
+          doc.text(truncatedSymptom, x + 10, y);
         });
         
-        return yPos + (itemsPerColumn * 8) + 10;
+        return startY + legendHeight + 10;
       };
 
       // Get date range from filtered data
       const sortedDates = filteredData.map(entry => new Date(entry.date)).sort((a, b) => a.getTime() - b.getTime());
-      const startDate = sortedDates.length > 0 ? sortedDates[0] : new Date();
-      const endDate = sortedDates.length > 0 ? sortedDates[sortedDates.length - 1] : new Date();
+      let startDate, endDate;
+      
+      if (sortedDates.length > 0) {
+        startDate = sortedDates[0];
+        endDate = sortedDates[sortedDates.length - 1];
+      } else {
+        // If no data, show current month and previous month
+        endDate = new Date();
+        startDate = addMonths(endDate, -1);
+      }
       
       // Generate all months between start and end date
       const months: Date[] = [];
@@ -411,6 +452,14 @@ export function HistoricalDataOverview({ accessCode }: HistoricalDataOverviewPro
       while (currentDate <= finalMonth) {
         months.push(new Date(currentDate));
         currentDate = addMonths(currentDate, 1);
+      }
+      
+      // Ensure we have at least 2 months to show
+      if (months.length < 2) {
+        const today = new Date();
+        months.length = 0;
+        months.push(addMonths(today, -1));
+        months.push(today);
       }
       
       let pageNum = 1;
@@ -427,24 +476,22 @@ export function HistoricalDataOverview({ accessCode }: HistoricalDataOverviewPro
         // Draw legend on first page
         if (pageNum === 1) {
           yPosition = drawLegend(doc, yPosition, uniqueFilteredSymptoms, symptomColors);
-          yPosition += 10;
         }
         
         // Calculate available space for calendars
         const availableHeight = pageHeight - yPosition - 30;
-        const calendarHeight = Math.min(availableHeight / 2 - 10, 85);
+        const calendarHeight = Math.min(availableHeight / 2 - 15, 90);
         const calendarWidth = pageWidth - 30;
         
         // Draw first month
         if (monthIndex < months.length) {
           yPosition = drawCalendar(doc, months[monthIndex], yPosition, calendarWidth, calendarHeight);
           monthIndex++;
-          yPosition += 15;
         }
         
         // Draw second month if there's space and more months
         if (monthIndex < months.length && yPosition + calendarHeight < pageHeight - 30) {
-          drawCalendar(doc, months[monthIndex], yPosition, calendarWidth, calendarHeight);
+          yPosition = drawCalendar(doc, months[monthIndex], yPosition, calendarWidth, calendarHeight);
           monthIndex++;
         }
         
