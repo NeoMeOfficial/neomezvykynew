@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Download, Search, Filter } from 'lucide-react';
+import { Calendar, Download, Search, Filter, ChevronDown, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -22,7 +22,8 @@ export function HistoricalDataOverview({ accessCode }: HistoricalDataOverviewPro
   const [historicalData, setHistoricalData] = useState<HistoricalEntry[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [dateFilter, setDateFilter] = useState<{ start?: Date; end?: Date }>({});
-  const [selectedSymptom, setSelectedSymptom] = useState<string>('');
+  const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
   // Load historical data from localStorage
@@ -157,7 +158,20 @@ export function HistoricalDataOverview({ accessCode }: HistoricalDataOverviewPro
   // Get unique symptoms for filtering
   const uniqueSymptoms = [...new Set(historicalData.flatMap(entry => entry.symptoms))].sort();
 
-  // Filter data based on search term, date range, and selected symptom
+  // Handle symptom selection
+  const toggleSymptom = (symptom: string) => {
+    setSelectedSymptoms(prev => 
+      prev.includes(symptom) 
+        ? prev.filter(s => s !== symptom)
+        : [...prev, symptom]
+    );
+  };
+
+  const clearAllSymptoms = () => {
+    setSelectedSymptoms([]);
+  };
+
+  // Filter data based on search term, date range, and selected symptoms
   const filteredData = historicalData.filter(entry => {
     const entryDate = parseISO(entry.date);
     
@@ -165,8 +179,8 @@ export function HistoricalDataOverview({ accessCode }: HistoricalDataOverviewPro
     if (dateFilter.start && isBefore(entryDate, startOfDay(dateFilter.start))) return false;
     if (dateFilter.end && isAfter(entryDate, startOfDay(dateFilter.end))) return false;
     
-    // Selected symptom filter
-    if (selectedSymptom && !entry.symptoms.includes(selectedSymptom)) return false;
+    // Selected symptoms filter
+    if (selectedSymptoms.length > 0 && !selectedSymptoms.some(symptom => entry.symptoms.includes(symptom))) return false;
     
     // Search term filter
     if (searchTerm) {
@@ -434,47 +448,107 @@ export function HistoricalDataOverview({ accessCode }: HistoricalDataOverviewPro
         </div>
       </div>
 
-      {/* Symptom Tags for Filtering */}
+      {/* Multiselect Dropdown for Symptoms */}
       {uniqueSymptoms.length > 0 && (
         <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium" style={{ color: '#955F6A' }}>
-              Filtrovať podľa príznakov:
-            </span>
-            {selectedSymptom && (
-              <button
-                onClick={() => setSelectedSymptom('')}
-                className="text-xs underline hover:no-underline"
-                style={{ color: '#955F6A' }}
-              >
-                Zrušiť filter
-              </button>
+          <label className="text-xs font-medium" style={{ color: '#FF7782' }}>
+            Filtrovať podľa príznakov:
+          </label>
+          
+          {/* Dropdown Button */}
+          <div className="relative">
+            <button
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="w-full flex items-center justify-between px-3 py-2 text-sm border rounded-lg bg-white hover:bg-gray-50 transition-colors"
+              style={{ 
+                borderColor: '#E5D4D7',
+                color: selectedSymptoms.length > 0 ? '#FF7782' : '#955F6A'
+              }}
+            >
+              <span>
+                {selectedSymptoms.length === 0 
+                  ? 'Vyberte príznaky...' 
+                  : `${selectedSymptoms.length} ${selectedSymptoms.length === 1 ? 'príznak' : selectedSymptoms.length < 5 ? 'príznaky' : 'príznakov'}`
+                }
+              </span>
+              <ChevronDown className={`w-4 h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+            </button>
+            
+            {/* Dropdown Menu */}
+            {isDropdownOpen && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-white border rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto"
+                   style={{ borderColor: '#E5D4D7' }}>
+                
+                {/* Clear All Button */}
+                {selectedSymptoms.length > 0 && (
+                  <div className="p-2 border-b" style={{ borderColor: '#E5D4D7' }}>
+                    <button
+                      onClick={clearAllSymptoms}
+                      className="text-xs text-gray-500 hover:text-red-500 flex items-center gap-1"
+                    >
+                      <X className="w-3 h-3" />
+                      Zrušiť všetky
+                    </button>
+                  </div>
+                )}
+                
+                {/* Symptom Options */}
+                <div className="p-1">
+                  {uniqueSymptoms.map((symptom) => {
+                    const isSelected = selectedSymptoms.includes(symptom);
+                    const symptomCount = historicalData.filter(entry => entry.symptoms.includes(symptom)).length;
+                    
+                    return (
+                      <button
+                        key={symptom}
+                        onClick={() => toggleSymptom(symptom)}
+                        className={`w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-50 flex items-center justify-between ${
+                          isSelected ? 'bg-rose-50' : ''
+                        }`}
+                        style={{ color: isSelected ? '#FF7782' : '#955F6A' }}
+                      >
+                        <span className="flex items-center gap-2">
+                          <div className={`w-3 h-3 border rounded-sm flex items-center justify-center ${
+                            isSelected ? 'bg-gradient-to-r from-rose-100 to-pink-100 border-rose-300' : 'border-gray-300'
+                          }`}>
+                            {isSelected && <span className="text-xs">✓</span>}
+                          </div>
+                          {symptom}
+                        </span>
+                        <span className="text-xs text-gray-400">({symptomCount})</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             )}
           </div>
-          <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto">
-            {uniqueSymptoms.map((symptom) => {
-              const isSelected = selectedSymptom === symptom;
-              const symptomCount = historicalData.filter(entry => entry.symptoms.includes(symptom)).length;
-              
-              return (
-                <button
+          
+          {/* Selected Symptoms Display */}
+          {selectedSymptoms.length > 0 && (
+            <div className="flex flex-wrap gap-1">
+              {selectedSymptoms.map((symptom) => (
+                <Badge
                   key={symptom}
-                  onClick={() => setSelectedSymptom(isSelected ? '' : symptom)}
-                  className={`text-xs py-1 px-2.5 rounded-full border transition-all hover:scale-105 ${
-                    isSelected 
-                      ? 'bg-gradient-to-r from-rose-100 to-pink-100 border-rose-300' 
-                      : 'bg-white/80 border-rose-200/50 hover:bg-rose-50/50'
-                  }`}
-                  style={{ 
-                    color: isSelected ? '#FF7782' : '#955F6A',
-                    fontWeight: isSelected ? '600' : '500'
+                  variant="outline"
+                  className="text-xs py-1 px-2 flex items-center gap-1"
+                  style={{
+                    backgroundColor: '#FFF',
+                    borderColor: '#FF7782',
+                    color: '#FF7782'
                   }}
                 >
-                  {symptom} ({symptomCount})
-                </button>
-              );
-            })}
-          </div>
+                  {symptom}
+                  <button
+                    onClick={() => toggleSymptom(symptom)}
+                    className="ml-1 hover:bg-red-100 rounded-full p-0.5"
+                  >
+                    <X className="w-2 h-2" />
+                  </button>
+                </Badge>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -485,10 +559,10 @@ export function HistoricalDataOverview({ accessCode }: HistoricalDataOverviewPro
           <span>Zobrazených záznamov: {filteredData.length}</span>
           <span>•</span>
           <span>Celkom: {historicalData.length}</span>
-          {selectedSymptom && (
+          {selectedSymptoms.length > 0 && (
             <>
               <span>•</span>
-              <span>Filter: {selectedSymptom}</span>
+              <span>Filtrované príznaky: {selectedSymptoms.length}</span>
             </>
           )}
         </div>
