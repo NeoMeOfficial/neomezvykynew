@@ -113,12 +113,12 @@ export function CalendarView({
           <div className="flex gap-2">
             <Button 
               size="sm" 
-              variant={selectedOutcome === 'next-period' ? 'default' : 'outline'} 
+              variant="outline"
               onClick={() => onOutcomeSelect(selectedOutcome === 'next-period' ? null : 'next-period')} 
-              className={`flex items-center gap-1.5 text-xs ${
+              className={`flex items-center gap-1.5 text-xs border transition-all duration-200 ${
                 selectedOutcome === 'next-period' 
                   ? 'bg-gradient-to-r from-[#FF7782] to-[#FF9AA1] text-white border-[#FF7782] hover:from-[#FF6B77] hover:to-[#FF8A92]' 
-                  : ''
+                  : 'border-[#FF7782] bg-transparent hover:bg-[#FF7782]/10'
               }`}
               style={selectedOutcome !== 'next-period' ? { color: '#FF7782' } : {}}
             >
@@ -127,12 +127,12 @@ export function CalendarView({
             </Button>
             <Button 
               size="sm" 
-              variant={selectedOutcome === 'fertile-days' ? 'default' : 'outline'} 
+              variant="outline"
               onClick={() => onOutcomeSelect(selectedOutcome === 'fertile-days' ? null : 'fertile-days')} 
-              className={`flex items-center gap-1.5 text-xs ${
+              className={`flex items-center gap-1.5 text-xs border transition-all duration-200 ${
                 selectedOutcome === 'fertile-days' 
                   ? 'bg-gradient-to-r from-[#FF7782] to-[#FF9AA1] text-white border-[#FF7782] hover:from-[#FF6B77] hover:to-[#FF8A92]' 
-                  : ''
+                  : 'border-[#FF7782] bg-transparent hover:bg-[#FF7782]/10'
               }`}
               style={selectedOutcome !== 'fertile-days' ? { color: '#FF7782' } : {}}
             >
