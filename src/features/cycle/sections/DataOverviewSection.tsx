@@ -1,6 +1,6 @@
 import React from 'react';
-import { FileText } from 'lucide-react';
-import { HistoricalDataOverview } from '../HistoricalDataOverview';
+import { FileText, Download } from 'lucide-react';
+import { HistoricalDataOverview, ExportButton } from '../HistoricalDataOverview';
 
 interface DataOverviewSectionProps {
   accessCode?: string;
@@ -30,11 +30,14 @@ export function DataOverviewSection({
              }}>
           {/* Header glass accent */}
           <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-rose-200/50 to-transparent"></div>
-          <div className="flex items-center gap-3">
-            <FileText className="w-5 h-5" style={{ color: '#FF7782' }} />
-            <h3 className="text-lg font-medium" style={{ color: '#FF7782' }}>
-              Prehľad údajov
-            </h3>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <FileText className="w-5 h-5" style={{ color: '#FF7782' }} />
+              <h3 className="text-lg font-medium" style={{ color: '#FF7782' }}>
+                Prehľad údajov
+              </h3>
+            </div>
+            <ExportButton accessCode={accessCode} />
           </div>
         </div>
 
