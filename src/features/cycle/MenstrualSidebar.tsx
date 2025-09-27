@@ -91,28 +91,9 @@ export function MenstrualSidebar({ activeSection, onSectionChange, onEditClick, 
                   </div>
                 </div>
                 
-                {/* Show next period info and buttons under Kalendárny prehľad */}
+                {/* Show buttons and next period info under Kalendárny prehľad */}
                 {item.id === 'calendar' && (
                   <div className="ml-4 mb-4 space-y-3">
-                    <div className="p-3 rounded-lg" 
-                         style={{ 
-                           background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(253, 242, 248, 0.65) 100%)',
-                           boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 1px 3px rgba(149, 95, 106, 0.06)'
-                         }}>
-                      <div className="space-y-2">
-                        <p className="text-xs font-medium" style={{ color: '#955F6A' }}>
-                          Ďalšia menštruácia: <span style={{ color: '#FF7782' }}>
-                            7. 10. 2025
-                          </span>
-                        </p>
-                        <p className="text-xs font-medium" style={{ color: '#955F6A' }}>
-                          Ďalšie plodné dni: <span style={{ color: '#FF7782' }}>
-                            23. 9. 2025 - 25. 9. 2025
-                          </span>
-                        </p>
-                      </div>
-                    </div>
-                    
                     {/* Action buttons */}
                     <div className="flex flex-col gap-2">
                       <button
@@ -131,6 +112,25 @@ export function MenstrualSidebar({ activeSection, onSectionChange, onEditClick, 
                         <Lightbulb className="w-3 h-3" />
                         Nastavenia
                       </button>
+                    </div>
+                    
+                    <div className="p-3 rounded-lg" 
+                         style={{ 
+                           background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(253, 242, 248, 0.65) 100%)',
+                           boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 1px 3px rgba(149, 95, 106, 0.06)'
+                         }}>
+                      <div className="space-y-2">
+                        <p className="text-xs font-medium" style={{ color: '#955F6A' }}>
+                          Ďalšia menštruácia: <span style={{ color: '#FF7782' }}>
+                            7. 10. 2025
+                          </span>
+                        </p>
+                        <p className="text-xs font-medium" style={{ color: '#955F6A' }}>
+                          Ďalšie plodné dni: <span style={{ color: '#FF7782' }}>
+                            23. 9. 2025 - 25. 9. 2025
+                          </span>
+                        </p>
+                      </div>
                     </div>
                   </div>
                 )}
