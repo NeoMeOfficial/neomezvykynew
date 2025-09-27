@@ -81,11 +81,11 @@ export function MenstrualSidebar({ activeSection, onSectionChange }: MenstrualSi
                 <div className="flex items-center">
                   <Icon 
                     className="mr-3 h-4 w-4 flex-shrink-0" 
-                    style={{ color: isActive ? '#FF7782' : '#9ca3af' }}
+                    style={{ color: isActive ? '#FF7782' : '#955F6A' }}
                   />
                   <span 
                     className="text-sm font-medium"
-                    style={{ color: isActive ? '#FF7782' : '#6b7280' }}
+                    style={{ color: isActive ? '#FF7782' : '#955F6A' }}
                   >
                     {item.title}
                   </span>
