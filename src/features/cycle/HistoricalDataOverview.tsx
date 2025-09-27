@@ -3,7 +3,7 @@ import { Calendar, Download, Search, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { format, parseISO, isAfter, isBefore, startOfDay, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, getDaysInMonth } from 'date-fns';
+import { format, parseISO, isAfter, isBefore, startOfDay, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, getDaysInMonth, subMonths, startOfWeek, endOfWeek, isSameMonth, isSameDay, addDays } from 'date-fns';
 import { sk } from 'date-fns/locale';
 import jsPDF from 'jspdf';
 import periodkaLogo from '@/assets/periodka-logo.png';
@@ -777,42 +777,63 @@ export function ExportButton({ accessCode }: { accessCode?: string }) {
   }, [accessCode]);
 
   const exportData = async () => {
+    // Use the same calendar export logic as the main component
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
     
+    // Define symptom colors for calendar view
+    const symptomColors = {
+      'Kŕče': '#ef4444',
+      'Silné krvácanie': '#dc2626',
+      'Bolesti chrbta': '#f97316',
+      'Bolesti hlavy': '#eab308',
+      'Únava': '#84cc16',
+      'Nevoľnosť': '#22c55e',
+      'Energia': '#10b981',
+      'Dobrá nálada': '#06b6d4',
+      'Čistá pokožka': '#0ea5e9',
+      'Motivácia': '#3b82f6',
+      'Zvýšené libido': '#6366f1',
+      'Cervikálny hlien': '#8b5cf6',
+      'Ovulačná bolesť': '#a855f7',
+      'Citlivé prsia': '#d946ef',
+      'Nadúvanie': '#ec4899',
+      'Zmeny nálady': '#f43f5e',
+      'Chute na jedlo': '#fb7185',
+      'Podráždenie': '#fda4af',
+      'Akné': '#fbbf24',
+      'Problémy so spánkom': '#94a3b8',
+      'Úzkosť': '#64748b',
+      'Smútok': '#475569'
+    };
+
     try {
       // Get logo as base64
       const logoBase64 = await getImageBase64(periodkaLogo);
       
       // Create branded header
       const createHeader = (doc: jsPDF, pageNum = 1) => {
-        // Header background gradient effect
-        doc.setFillColor(255, 119, 130); // #FF7782
+        doc.setFillColor(255, 119, 130);
         doc.rect(0, 0, pageWidth, 35, 'F');
         
-        // Add logo
         doc.addImage(logoBase64, 'PNG', 15, 8, 20, 20);
         
-        // Brand name
         doc.setTextColor(255, 255, 255);
         doc.setFontSize(24);
         doc.setFont('helvetica', 'bold');
         doc.text('Periodka', 45, 22);
         
-        // Page number (top right)
         doc.setFontSize(10);
         doc.setFont('helvetica', 'normal');
         doc.text(`Strana ${pageNum}`, pageWidth - 30, 15);
         
-        // Subtitle
         doc.setFontSize(12);
-        doc.text('Menštrpačný kalendár', 45, 30);
+        doc.text('Menštrpačný kalendár - Kalendárny prehľad', 45, 30);
       };
       
-      // Create footer
       const createFooter = (doc: jsPDF) => {
-        doc.setFillColor(248, 250, 252); // Light gray
+        doc.setFillColor(248, 250, 252);
         doc.rect(0, pageHeight - 20, pageWidth, 20, 'F');
         
         doc.setTextColor(100, 100, 100);
@@ -821,153 +842,198 @@ export function ExportButton({ accessCode }: { accessCode?: string }) {
         doc.text('Tento dokument bol vytvorený aplikáciou Periodka pre lekárske účely', 15, pageHeight - 8);
         doc.text(`Exportované: ${format(new Date(), 'dd.MM.yyyy HH:mm', { locale: sk })}`, pageWidth - 80, pageHeight - 8);
       };
-      
+
       let pageNum = 1;
       createHeader(doc, pageNum);
       createFooter(doc);
+
+      // Get unique symptoms and create legend
+      const uniqueSymptoms = [...new Set(historicalData.flatMap(entry => entry.symptoms))];
       
-      // Document title
-      doc.setTextColor(60, 60, 60);
-      doc.setFontSize(20);
-      doc.setFont('helvetica', 'bold');
-      doc.text('História menštrpačného cyklu', 20, 55);
-      
-      // Document purpose
-      doc.setFontSize(14);
-      doc.setFont('helvetica', 'normal');
-      doc.text('Pre lekársku konzultáciu', 20, 65);
-      
-      // Summary section with background
-      doc.setFillColor(253, 242, 248); // Light pink background
-      doc.rect(15, 75, pageWidth - 30, 25, 'F');
-      
-      doc.setTextColor(149, 95, 106);
-      doc.setFontSize(12);
-      doc.setFont('helvetica', 'bold');
-      doc.text('Súhrn údajov', 20, 85);
-      
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(10);
-      doc.text(`• Celkový počet záznamov: ${historicalData.length}`, 25, 92);
-      
-      // Get unique symptoms from filtered data
-      const uniqueFilteredSymptoms = [...new Set(historicalData.flatMap(entry => entry.symptoms))];
-      doc.text(`• Počet rôznych príznakov: ${uniqueFilteredSymptoms.length}`, 25, 97);
-      
-      let yPosition = 115;
-      
-      // Data entries section
+      // Legend section
+      let yPosition = 45;
       doc.setTextColor(60, 60, 60);
       doc.setFontSize(14);
       doc.setFont('helvetica', 'bold');
-      doc.text('Detailné záznamy', 20, yPosition);
-      yPosition += 15;
-      
-      historicalData.forEach((entry, index) => {
-        // Check if we need a new page
-        if (yPosition > pageHeight - 60) {
-          doc.addPage();
-          pageNum++;
-          createHeader(doc, pageNum);
-          createFooter(doc);
-          yPosition = 55;
-        }
+      doc.text('Legenda príznakov:', 20, yPosition);
+      yPosition += 8;
+
+      const legendCols = 3;
+      const colWidth = (pageWidth - 40) / legendCols;
+      let col = 0;
+
+      uniqueSymptoms.forEach((symptom, index) => {
+        const color = symptomColors[symptom] || '#6b7280';
+        const rgb = hexToRgb(color);
         
-        const date = format(parseISO(entry.date), 'EEEE, dd.MM.yyyy', { locale: sk });
-        const capitalizedDate = date.charAt(0).toUpperCase() + date.slice(1);
+        const xPos = 20 + (col * colWidth);
         
-        // Entry background (alternating colors)
-        const bgColor = index % 2 === 0 ? [253, 242, 248] : [255, 255, 255];
-        doc.setFillColor(bgColor[0], bgColor[1], bgColor[2]);
+        doc.setFillColor(rgb.r, rgb.g, rgb.b);
+        doc.circle(xPos + 3, yPosition - 1, 2, 'F');
         
-        const entryHeight = 15 + (entry.symptoms.length * 5) + (entry.notes ? 15 : 0);
-        doc.rect(15, yPosition - 5, pageWidth - 30, entryHeight, 'F');
-        
-        // Date header with accent
-        doc.setFillColor(255, 119, 130);
-        doc.rect(15, yPosition - 5, 5, entryHeight, 'F');
-        
-        doc.setTextColor(255, 119, 130);
-        doc.setFontSize(12);
-        doc.setFont('helvetica', 'bold');
-        doc.text(capitalizedDate, 25, yPosition + 5);
-        yPosition += 12;
-        
-        // Symptoms section
-        if (entry.symptoms.length > 0) {
-          doc.setTextColor(80, 80, 80);
-          doc.setFont('helvetica', 'bold');
-          doc.setFontSize(10);
-          doc.text('Príznaky:', 25, yPosition);
-          yPosition += 6;
-          
-          doc.setFont('helvetica', 'normal');
-          entry.symptoms.forEach(symptom => {
-            doc.setTextColor(100, 100, 100);
-            doc.text('•', 30, yPosition);
-            doc.setTextColor(60, 60, 60);
-            doc.text(symptom, 35, yPosition);
-            yPosition += 5;
-          });
-          yPosition += 3;
-        }
-        
-        // Notes section
-        if (entry.notes) {
-          doc.setTextColor(80, 80, 80);
-          doc.setFont('helvetica', 'bold');
-          doc.setFontSize(10);
-          doc.text('Poznámky:', 25, yPosition);
-          yPosition += 6;
-          
-          doc.setFont('helvetica', 'normal');
-          doc.setTextColor(60, 60, 60);
-          const noteLines = doc.splitTextToSize(entry.notes, 150);
-          noteLines.forEach((line: string) => {
-            doc.text(line, 30, yPosition);
-            yPosition += 5;
-          });
-        }
-        
-        yPosition += 8;
-      });
-      
-      // Final page summary if multiple pages
-      if (pageNum > 1) {
-        if (yPosition > pageHeight - 80) {
-          doc.addPage();
-          pageNum++;
-          createHeader(doc, pageNum);
-          createFooter(doc);
-          yPosition = 55;
-        }
-        
-        // Summary box
-        doc.setFillColor(253, 242, 248);
-        doc.rect(15, yPosition, pageWidth - 30, 35, 'F');
-        
-        doc.setTextColor(149, 95, 106);
-        doc.setFontSize(12);
-        doc.setFont('helvetica', 'bold');
-        doc.text('Záverečný súhrn', 20, yPosition + 10);
-        
+        doc.setTextColor(60, 60, 60);
+        doc.setFontSize(9);
         doc.setFont('helvetica', 'normal');
-        doc.setFontSize(10);
-        doc.text(`Dokument obsahuje ${historicalData.length} záznamov na ${pageNum} stranách`, 20, yPosition + 18);
-        doc.text('Určené pre medicínske konzultácie a diagnostiku', 20, yPosition + 25);
+        doc.text(symptom, xPos + 8, yPosition);
+        
+        col++;
+        if (col >= legendCols) {
+          col = 0;
+          yPosition += 6;
+        }
+      });
+
+      if (col !== 0) yPosition += 6;
+      yPosition += 15;
+
+      // Calendar generation
+      const today = new Date();
+      const startDate = historicalData.length > 0 ? 
+        startOfMonth(parseISO(historicalData[0].date)) : 
+        startOfMonth(subMonths(today, 5));
+      const endDate = addMonths(startDate, 12);
+
+      // Helper function for color conversion
+      const hexToRgb = (hex: string) => {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+          r: parseInt(result[1], 16),
+          g: parseInt(result[2], 16),
+          b: parseInt(result[3], 16)
+        } : { r: 107, g: 116, b: 128 };
+      };
+
+      let currentDate = startDate;
+      let monthsOnPage = 0;
+
+      while (currentDate < endDate) {
+        if (monthsOnPage >= 2 || yPosition > pageHeight - 120) {
+          doc.addPage();
+          pageNum++;
+          createHeader(doc, pageNum);
+          createFooter(doc);
+          yPosition = 45;
+          monthsOnPage = 0;
+        }
+
+        const monthYear = format(currentDate, 'LLLL yyyy', { locale: sk });
+        const capitalizedMonth = monthYear.charAt(0).toUpperCase() + monthYear.slice(1);
+
+        doc.setTextColor(255, 119, 130);
+        doc.setFontSize(16);
+        doc.setFont('helvetica', 'bold');
+        doc.text(capitalizedMonth, 20, yPosition);
+        yPosition += 10;
+
+        // Calendar grid
+        const cellWidth = 25;
+        const cellHeight = 15;
+        const startX = 20;
+        
+        // Day headers
+        const dayHeaders = ['Po', 'Ut', 'St', 'Št', 'Pi', 'So', 'Ne'];
+        doc.setTextColor(100, 100, 100);
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'bold');
+        
+        dayHeaders.forEach((day, index) => {
+          doc.text(day, startX + (index * cellWidth) + 10, yPosition);
+        });
+        yPosition += 8;
+
+        // Calendar days
+        const monthStart = startOfMonth(currentDate);
+        const monthEnd = endOfMonth(currentDate);
+        const startWeek = startOfWeek(monthStart, { weekStartsOn: 1 });
+        const endWeek = endOfWeek(monthEnd, { weekStartsOn: 1 });
+
+        let day = startWeek;
+        let row = 0;
+
+        while (day <= endWeek && row < 6) {
+          for (let col = 0; col < 7; col++) {
+            const cellX = startX + (col * cellWidth);
+            const cellY = yPosition + (row * cellHeight);
+            
+            // Cell background
+            if (isSameMonth(day, currentDate)) {
+              doc.setFillColor(255, 255, 255);
+            } else {
+              doc.setFillColor(249, 250, 251);
+            }
+            doc.rect(cellX, cellY, cellWidth, cellHeight, 'F');
+            
+            // Cell border
+            doc.setDrawColor(229, 231, 235);
+            doc.rect(cellX, cellY, cellWidth, cellHeight);
+            
+            // Weekend highlighting
+            if (col === 5 || col === 6) {
+              doc.setFillColor(254, 242, 242);
+              doc.rect(cellX, cellY, cellWidth, cellHeight, 'F');
+            }
+            
+            if (isSameMonth(day, currentDate)) {
+              // Day number
+              doc.setTextColor(60, 60, 60);
+              doc.setFontSize(10);
+              doc.setFont('helvetica', 'normal');
+              doc.text(format(day, 'd'), cellX + 3, cellY + 10);
+              
+              // Check for symptoms on this day
+              const dayData = historicalData.find(entry => 
+                isSameDay(parseISO(entry.date), day)
+              );
+              
+              if (dayData && dayData.symptoms.length > 0) {
+                // Display symptom dots
+                const maxDots = 4;
+                const visibleSymptoms = dayData.symptoms.slice(0, maxDots);
+                
+                visibleSymptoms.forEach((symptom, index) => {
+                  const color = symptomColors[symptom] || '#6b7280';
+                  const rgb = hexToRgb(color);
+                  
+                  const dotX = cellX + 12 + (index % 2) * 6;
+                  const dotY = cellY + 4 + Math.floor(index / 2) * 4;
+                  
+                  doc.setFillColor(rgb.r, rgb.g, rgb.b);
+                  doc.circle(dotX, dotY, 1.5, 'F');
+                });
+                
+                // More indicator if there are additional symptoms
+                if (dayData.symptoms.length > maxDots) {
+                  doc.setTextColor(100, 100, 100);
+                  doc.setFontSize(7);
+                  doc.text(`+${dayData.symptoms.length - maxDots}`, cellX + 18, cellY + 13);
+                }
+              }
+            }
+            
+            day = addDays(day, 1);
+          }
+          row++;
+        }
+        
+        yPosition += (row * cellHeight) + 20;
+        currentDate = addMonths(currentDate, 1);
+        monthsOnPage++;
       }
-      
+
     } catch (error) {
-      console.error('Error loading logo:', error);
-      // Fallback without logo
+      console.error('Error generating calendar PDF:', error);
+      // Fallback simple export
       doc.setTextColor(255, 119, 130);
       doc.setFontSize(24);
       doc.setFont('helvetica', 'bold');
       doc.text('Periodka', 20, 25);
+      
+      doc.setTextColor(60, 60, 60);
+      doc.setFontSize(12);
+      doc.text('Kalendárny export sa nepodarilo vygenerovať', 20, 50);
     }
     
-    // Save the PDF
-    doc.save(`periodka-menstrual-data-${format(new Date(), 'yyyy-MM-dd')}.pdf`);
+    doc.save(`periodka-calendar-${format(new Date(), 'yyyy-MM-dd')}.pdf`);
   };
 
   return (
