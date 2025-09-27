@@ -155,7 +155,7 @@ export function HistoricalDataOverview({ accessCode }: HistoricalDataOverviewPro
         <button
           onClick={exportData}
           disabled={filteredData.length === 0}
-          className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-3xl bg-gradient-to-r from-rose-100 to-pink-100 border border-rose-300 hover:from-rose-200 hover:to-pink-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="relative z-10 flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-3xl bg-gradient-to-r from-rose-100 to-pink-100 border border-rose-300 hover:from-rose-200 hover:to-pink-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
           style={{ color: '#FF7782' }}
         >
           <Download className="w-3 h-3" />
