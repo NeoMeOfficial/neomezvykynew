@@ -162,7 +162,7 @@ export function HistoricalDataOverview({ accessCode }: HistoricalDataOverviewPro
             placeholder="Hľadať v príznakoch a poznámkach..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
+            className="pl-10 placeholder:text-[#B0868D]"
             style={{
               backgroundColor: 'white',
               borderColor: '#E5D4D7',
