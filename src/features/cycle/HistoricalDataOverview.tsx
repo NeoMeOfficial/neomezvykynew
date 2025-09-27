@@ -16,9 +16,10 @@ interface HistoricalEntry {
 
 interface HistoricalDataOverviewProps {
   accessCode?: string;
+  onFiltersChange?: (data: HistoricalEntry[], searchTerm: string, selectedSymptoms: string[]) => void;
 }
 
-export function HistoricalDataOverview({ accessCode }: HistoricalDataOverviewProps) {
+export function HistoricalDataOverview({ accessCode, onFiltersChange }: HistoricalDataOverviewProps) {
   const [historicalData, setHistoricalData] = useState<HistoricalEntry[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [dateFilter, setDateFilter] = useState<{ start?: Date; end?: Date }>({});
@@ -181,6 +182,13 @@ export function HistoricalDataOverview({ accessCode }: HistoricalDataOverviewPro
     return true;
   });
 
+  // Notify parent component of filter changes
+  useEffect(() => {
+    if (onFiltersChange) {
+      onFiltersChange(filteredData, searchTerm, selectedSymptoms);
+    }
+  }, [filteredData, searchTerm, selectedSymptoms, onFiltersChange]);
+
   // Convert image to base64 for PDF embedding
   const getImageBase64 = (imageSrc: string): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -301,7 +309,6 @@ export function HistoricalDataOverview({ accessCode }: HistoricalDataOverviewPro
         doc.rect(startX, startY + headerHeight - 5, calendarWidth, dayHeaderHeight, 'F');
         
         // Day headers
-        const dayHeaders = ['Pondelok', 'Utorok', 'Streda', 'Štvrtok', 'Piatok', 'Sobota', 'Nedeľa'];
         const dayHeadersShort = ['Po', 'Ut', 'St', 'Št', 'Pi', 'So', 'Ne'];
         
         doc.setTextColor(149, 95, 106);
@@ -689,8 +696,24 @@ export function HistoricalDataOverview({ accessCode }: HistoricalDataOverviewPro
   );
 }
 
+// Helper function for color conversion
+const hexToRgb = (hex: string) => {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : { r: 107, g: 116, b: 128 };
+};
+
 // Export button component for use in header
-export function ExportButton({ accessCode }: { accessCode?: string }) {
+interface ExportButtonProps {
+  accessCode?: string;
+  filteredData?: HistoricalEntry[];
+  selectedSymptoms?: string[];
+}
+
+export function ExportButton({ accessCode, filteredData, selectedSymptoms = [] }: ExportButtonProps) {
   const [historicalData, setHistoricalData] = useState<HistoricalEntry[]>([]);
   
   // Convert image to base64 for PDF embedding
@@ -712,8 +735,13 @@ export function ExportButton({ accessCode }: { accessCode?: string }) {
     });
   };
   
-  // Load historical data from localStorage
+  // Load historical data from localStorage only if not provided via props
   useEffect(() => {
+    if (filteredData) {
+      setHistoricalData(filteredData);
+      return;
+    }
+
     const loadHistoricalData = () => {
       const data: HistoricalEntry[] = [];
       
@@ -774,39 +802,40 @@ export function ExportButton({ accessCode }: { accessCode?: string }) {
     };
 
     loadHistoricalData();
-  }, [accessCode]);
+  }, [accessCode, filteredData]);
+
+  // Generate symptom colors for calendar view
+  const generateSymptomColors = (symptoms: string[]) => {
+    const colors = [
+      [255, 119, 130], // #FF7782 - rose
+      [244, 114, 182], // #F472B6 - pink
+      [168, 85, 247],  // #A855F7 - purple
+      [59, 130, 246],  // #3B82F6 - blue
+      [16, 185, 129],  // #10B981 - emerald
+      [245, 158, 11],  // #F59E0B - amber
+      [239, 68, 68],   // #EF4444 - red
+      [99, 102, 241],  // #6366F1 - indigo
+      [139, 69, 19],   // #8B4513 - brown
+      [75, 85, 99],    // #4B5563 - gray
+    ];
+    
+    const colorMap: { [key: string]: number[] } = {};
+    symptoms.forEach((symptom, index) => {
+      colorMap[symptom] = colors[index % colors.length];
+    });
+    
+    return colorMap;
+  };
 
   const exportData = async () => {
-    // Use the same calendar export logic as the main component
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
     
-    // Define symptom colors for calendar view
-    const symptomColors = {
-      'Kŕče': '#ef4444',
-      'Silné krvácanie': '#dc2626',
-      'Bolesti chrbta': '#f97316',
-      'Bolesti hlavy': '#eab308',
-      'Únava': '#84cc16',
-      'Nevoľnosť': '#22c55e',
-      'Energia': '#10b981',
-      'Dobrá nálada': '#06b6d4',
-      'Čistá pokožka': '#0ea5e9',
-      'Motivácia': '#3b82f6',
-      'Zvýšené libido': '#6366f1',
-      'Cervikálny hlien': '#8b5cf6',
-      'Ovulačná bolesť': '#a855f7',
-      'Citlivé prsia': '#d946ef',
-      'Nadúvanie': '#ec4899',
-      'Zmeny nálady': '#f43f5e',
-      'Chute na jedlo': '#fb7185',
-      'Podráždenie': '#fda4af',
-      'Akné': '#fbbf24',
-      'Problémy so spánkom': '#94a3b8',
-      'Úzkosť': '#64748b',
-      'Smútok': '#475569'
-    };
+    // Get unique symptoms from the data we're exporting
+    const dataToExport = filteredData || historicalData;
+    const uniqueFilteredSymptoms = [...new Set(dataToExport.flatMap(entry => entry.symptoms))].sort();
+    const symptomColors = generateSymptomColors(uniqueFilteredSymptoms);
 
     try {
       // Get logo as base64
@@ -814,24 +843,30 @@ export function ExportButton({ accessCode }: { accessCode?: string }) {
       
       // Create branded header
       const createHeader = (doc: jsPDF, pageNum = 1) => {
+        // Header background
         doc.setFillColor(255, 119, 130);
         doc.rect(0, 0, pageWidth, 35, 'F');
         
+        // Add logo
         doc.addImage(logoBase64, 'PNG', 15, 8, 20, 20);
         
+        // Brand name
         doc.setTextColor(255, 255, 255);
         doc.setFontSize(24);
         doc.setFont('helvetica', 'bold');
         doc.text('Periodka', 45, 22);
         
+        // Page number
         doc.setFontSize(10);
         doc.setFont('helvetica', 'normal');
         doc.text(`Strana ${pageNum}`, pageWidth - 30, 15);
         
+        // Subtitle
         doc.setFontSize(12);
-        doc.text('Menštrpačný kalendár - Kalendárny prehľad', 45, 30);
+        doc.text('Kalendárny prehľad', 45, 30);
       };
       
+      // Create footer
       const createFooter = (doc: jsPDF) => {
         doc.setFillColor(248, 250, 252);
         doc.rect(0, pageHeight - 20, pageWidth, 20, 'F');
@@ -839,211 +874,260 @@ export function ExportButton({ accessCode }: { accessCode?: string }) {
         doc.setTextColor(100, 100, 100);
         doc.setFontSize(8);
         doc.setFont('helvetica', 'italic');
-        doc.text('Tento dokument bol vytvorený aplikáciou Periodka pre lekárske účely', 15, pageHeight - 8);
+        doc.text('Kalendárny prehľad pre lekárske účely', 15, pageHeight - 8);
         doc.text(`Exportované: ${format(new Date(), 'dd.MM.yyyy HH:mm', { locale: sk })}`, pageWidth - 80, pageHeight - 8);
       };
 
-      let pageNum = 1;
-      createHeader(doc, pageNum);
-      createFooter(doc);
-
-      // Get unique symptoms and create legend
-      const uniqueSymptoms = [...new Set(historicalData.flatMap(entry => entry.symptoms))];
-      
-      // Legend section
-      let yPosition = 45;
-      doc.setTextColor(60, 60, 60);
-      doc.setFontSize(14);
-      doc.setFont('helvetica', 'bold');
-      doc.text('Legenda príznakov:', 20, yPosition);
-      yPosition += 8;
-
-      const legendCols = 3;
-      const colWidth = (pageWidth - 40) / legendCols;
-      let col = 0;
-
-      uniqueSymptoms.forEach((symptom, index) => {
-        const color = symptomColors[symptom] || '#6b7280';
-        const rgb = hexToRgb(color);
+      // Draw calendar for a month
+      const drawCalendar = (doc: jsPDF, date: Date, startY: number, calendarWidth: number, calendarHeight: number, startX: number = 15) => {
+        const monthStart = startOfMonth(date);
+        const monthEnd = endOfMonth(date);
+        const monthDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
         
-        const xPos = 20 + (col * colWidth);
+        // Month header with background
+        doc.setFillColor(255, 119, 130);
+        doc.rect(startX, startY - 5, calendarWidth, 20, 'F');
         
-        doc.setFillColor(rgb.r, rgb.g, rgb.b);
-        doc.circle(xPos + 3, yPosition - 1, 2, 'F');
-        
-        doc.setTextColor(60, 60, 60);
-        doc.setFontSize(9);
-        doc.setFont('helvetica', 'normal');
-        doc.text(symptom, xPos + 8, yPosition);
-        
-        col++;
-        if (col >= legendCols) {
-          col = 0;
-          yPosition += 6;
-        }
-      });
-
-      if (col !== 0) yPosition += 6;
-      yPosition += 15;
-
-      // Calendar generation
-      const today = new Date();
-      const startDate = historicalData.length > 0 ? 
-        startOfMonth(parseISO(historicalData[0].date)) : 
-        startOfMonth(subMonths(today, 5));
-      const endDate = addMonths(startDate, 12);
-
-      // Helper function for color conversion
-      const hexToRgb = (hex: string) => {
-        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        return result ? {
-          r: parseInt(result[1], 16),
-          g: parseInt(result[2], 16),
-          b: parseInt(result[3], 16)
-        } : { r: 107, g: 116, b: 128 };
-      };
-
-      let currentDate = startDate;
-      let monthsOnPage = 0;
-
-      while (currentDate < endDate) {
-        if (monthsOnPage >= 2 || yPosition > pageHeight - 120) {
-          doc.addPage();
-          pageNum++;
-          createHeader(doc, pageNum);
-          createFooter(doc);
-          yPosition = 45;
-          monthsOnPage = 0;
-        }
-
-        const monthYear = format(currentDate, 'LLLL yyyy', { locale: sk });
-        const capitalizedMonth = monthYear.charAt(0).toUpperCase() + monthYear.slice(1);
-
-        doc.setTextColor(255, 119, 130);
-        doc.setFontSize(16);
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(14);
         doc.setFont('helvetica', 'bold');
-        doc.text(capitalizedMonth, 20, yPosition);
-        yPosition += 10;
-
-        // Calendar grid
-        const cellWidth = 25;
-        const cellHeight = 15;
-        const startX = 20;
+        const monthName = format(date, 'LLLL yyyy', { locale: sk });
+        const capitalizedMonth = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+        doc.text(capitalizedMonth, startX + 10, startY + 8);
+        
+        const headerHeight = 20;
+        const dayHeaderHeight = 15;
+        const cellWidth = calendarWidth / 7;
+        const cellHeight = (calendarHeight - headerHeight - dayHeaderHeight) / 6;
+        
+        // Day headers background
+        doc.setFillColor(253, 242, 248);
+        doc.rect(startX, startY + headerHeight - 5, calendarWidth, dayHeaderHeight, 'F');
         
         // Day headers
-        const dayHeaders = ['Po', 'Ut', 'St', 'Št', 'Pi', 'So', 'Ne'];
-        doc.setTextColor(100, 100, 100);
+        const dayHeadersShort = ['Po', 'Ut', 'St', 'Št', 'Pi', 'So', 'Ne'];
+        
+        doc.setTextColor(149, 95, 106);
         doc.setFontSize(9);
         doc.setFont('helvetica', 'bold');
         
-        dayHeaders.forEach((day, index) => {
-          doc.text(day, startX + (index * cellWidth) + 10, yPosition);
+        dayHeadersShort.forEach((day, index) => {
+          const x = startX + (index * cellWidth) + (cellWidth / 2);
+          doc.text(day, x, startY + headerHeight + 8, { align: 'center' });
         });
-        yPosition += 8;
-
-        // Calendar days
-        const monthStart = startOfMonth(currentDate);
-        const monthEnd = endOfMonth(currentDate);
-        const startWeek = startOfWeek(monthStart, { weekStartsOn: 1 });
-        const endWeek = endOfWeek(monthEnd, { weekStartsOn: 1 });
-
-        let day = startWeek;
-        let row = 0;
-
-        while (day <= endWeek && row < 6) {
-          for (let col = 0; col < 7; col++) {
-            const cellX = startX + (col * cellWidth);
-            const cellY = yPosition + (row * cellHeight);
-            
-            // Cell background
-            if (isSameMonth(day, currentDate)) {
-              doc.setFillColor(255, 255, 255);
-            } else {
-              doc.setFillColor(249, 250, 251);
-            }
-            doc.rect(cellX, cellY, cellWidth, cellHeight, 'F');
-            
-            // Cell border
-            doc.setDrawColor(229, 231, 235);
-            doc.rect(cellX, cellY, cellWidth, cellHeight);
-            
-            // Weekend highlighting
-            if (col === 5 || col === 6) {
-              doc.setFillColor(254, 242, 242);
-              doc.rect(cellX, cellY, cellWidth, cellHeight, 'F');
-            }
-            
-            if (isSameMonth(day, currentDate)) {
-              // Day number
-              doc.setTextColor(60, 60, 60);
-              doc.setFontSize(10);
-              doc.setFont('helvetica', 'normal');
-              doc.text(format(day, 'd'), cellX + 3, cellY + 10);
-              
-              // Check for symptoms on this day
-              const dayData = historicalData.find(entry => 
-                isSameDay(parseISO(entry.date), day)
-              );
-              
-              if (dayData && dayData.symptoms.length > 0) {
-                // Display symptom dots
-                const maxDots = 4;
-                const visibleSymptoms = dayData.symptoms.slice(0, maxDots);
-                
-                visibleSymptoms.forEach((symptom, index) => {
-                  const color = symptomColors[symptom] || '#6b7280';
-                  const rgb = hexToRgb(color);
-                  
-                  const dotX = cellX + 12 + (index % 2) * 6;
-                  const dotY = cellY + 4 + Math.floor(index / 2) * 4;
-                  
-                  doc.setFillColor(rgb.r, rgb.g, rgb.b);
-                  doc.circle(dotX, dotY, 1.5, 'F');
-                });
-                
-                // More indicator if there are additional symptoms
-                if (dayData.symptoms.length > maxDots) {
-                  doc.setTextColor(100, 100, 100);
-                  doc.setFontSize(7);
-                  doc.text(`+${dayData.symptoms.length - maxDots}`, cellX + 18, cellY + 13);
-                }
-              }
-            }
-            
-            day = addDays(day, 1);
-          }
-          row++;
+        
+        // Calculate starting position for days
+        const firstDayOfWeek = monthStart.getDay() === 0 ? 6 : monthStart.getDay() - 1;
+        
+        // Draw calendar grid
+        doc.setDrawColor(200, 200, 200);
+        doc.setLineWidth(0.5);
+        
+        // Draw vertical lines
+        for (let i = 0; i <= 7; i++) {
+          const x = startX + (i * cellWidth);
+          doc.line(x, startY + headerHeight + dayHeaderHeight - 5, x, startY + calendarHeight);
         }
         
-        yPosition += (row * cellHeight) + 20;
-        currentDate = addMonths(currentDate, 1);
-        monthsOnPage++;
-      }
+        // Draw horizontal lines
+        for (let i = 0; i <= 6; i++) {
+          const y = startY + headerHeight + dayHeaderHeight - 5 + (i * cellHeight);
+          doc.line(startX, y, startX + calendarWidth, y);
+        }
+        
+        // Draw days
+        doc.setTextColor(60, 60, 60);
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        
+        let currentRow = 0;
+        let currentCol = firstDayOfWeek;
+        
+        monthDays.forEach((day) => {
+          const x = startX + (currentCol * cellWidth);
+          const y = startY + headerHeight + dayHeaderHeight - 5 + (currentRow * cellHeight);
+          
+          // Highlight weekends
+          if (currentCol === 5 || currentCol === 6) {
+            doc.setFillColor(248, 250, 252);
+            doc.rect(x, y, cellWidth, cellHeight, 'F');
+          }
+          
+          // Draw day number
+          doc.setTextColor(60, 60, 60);
+          doc.text(format(day, 'd'), x + 5, y + 15);
+          
+          // Find symptoms for this day
+          const dayString = format(day, 'yyyy-MM-dd');
+          const dayEntry = dataToExport.find(entry => entry.date === dayString);
+          
+          if (dayEntry && dayEntry.symptoms.length > 0) {
+            // Draw colored dots for symptoms in a grid pattern
+            const maxDotsPerRow = 4;
+            const dotSize = 2;
+            const dotSpacing = 6;
+            const startDotX = x + 5;
+            const startDotY = y + cellHeight - 15;
+            
+            dayEntry.symptoms.forEach((symptom, index) => {
+              if (symptomColors[symptom]) {
+                const color = symptomColors[symptom];
+                const row = Math.floor(index / maxDotsPerRow);
+                const col = index % maxDotsPerRow;
+                
+                const dotX = startDotX + (col * dotSpacing) + dotSize;
+                const dotY = startDotY - (row * dotSpacing);
+                
+                doc.setFillColor(color[0], color[1], color[2]);
+                doc.circle(dotX, dotY, dotSize, 'F');
+              }
+            });
+          }
+          
+          currentCol++;
+          if (currentCol >= 7) {
+            currentCol = 0;
+            currentRow++;
+          }
+        });
+        
+        return startY + calendarHeight + 10;
+      };
 
+      // Draw symptom legend
+      const drawLegend = (doc: jsPDF, startY: number, symptoms: string[], colors: { [key: string]: number[] }) => {
+        if (symptoms.length === 0) return startY;
+        
+        // Legend background
+        doc.setFillColor(253, 242, 248);
+        const legendHeight = Math.max(40, Math.ceil(symptoms.length / 3) * 10 + 20);
+        doc.rect(15, startY - 5, pageWidth - 30, legendHeight, 'F');
+        
+        doc.setTextColor(149, 95, 106);
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Legenda príznakov', 20, startY + 8);
+        
+        let yPos = startY + 18;
+        const itemsPerColumn = Math.ceil(symptoms.length / 3);
+        const columnWidth = (pageWidth - 50) / 3;
+        
+        symptoms.forEach((symptom, index) => {
+          const column = Math.floor(index / itemsPerColumn);
+          const row = index % itemsPerColumn;
+          const x = 20 + (column * columnWidth);
+          const y = yPos + (row * 8);
+          
+          if (colors[symptom]) {
+            const color = colors[symptom];
+            doc.setFillColor(color[0], color[1], color[2]);
+            doc.circle(x + 3, y - 2, 2, 'F');
+          }
+          
+          doc.setTextColor(80, 80, 80);
+          doc.setFontSize(8);
+          doc.setFont('helvetica', 'normal');
+          const truncatedSymptom = symptom.length > 15 ? symptom.substring(0, 12) + '...' : symptom;
+          doc.text(truncatedSymptom, x + 10, y);
+        });
+        
+        return startY + legendHeight + 10;
+      };
+
+      // Get date range from data to export
+      const sortedDates = dataToExport.map(entry => new Date(entry.date)).sort((a, b) => a.getTime() - b.getTime());
+      let startDate, endDate;
+      
+      if (sortedDates.length > 0) {
+        startDate = sortedDates[0];
+        endDate = sortedDates[sortedDates.length - 1];
+      } else {
+        // If no data, show current month and previous month
+        endDate = new Date();
+        startDate = addMonths(endDate, -1);
+      }
+      
+      // Generate all months between start and end date
+      const months: Date[] = [];
+      let currentDate = startOfMonth(startDate);
+      const finalMonth = startOfMonth(endDate);
+      
+      while (currentDate <= finalMonth) {
+        months.push(new Date(currentDate));
+        currentDate = addMonths(currentDate, 1);
+      }
+      
+      // Ensure we have at least 2 months to show
+      if (months.length < 2) {
+        const today = new Date();
+        months.length = 0;
+        months.push(addMonths(today, -1));
+        months.push(today);
+      }
+      
+      let pageNum = 1;
+      let monthIndex = 0;
+      
+      while (monthIndex < months.length) {
+        if (pageNum > 1) doc.addPage();
+        
+        createHeader(doc, pageNum);
+        createFooter(doc);
+        
+        let yPosition = 55;
+        
+        // Draw legend on first page
+        if (pageNum === 1) {
+          yPosition = drawLegend(doc, yPosition, uniqueFilteredSymptoms, symptomColors);
+        }
+        
+        // Calculate available space for calendars
+        const availableHeight = pageHeight - yPosition - 30;
+        const calendarHeight = Math.min(availableHeight / 2 - 15, 90);
+        const calendarWidth = pageWidth - 30;
+        
+        // Draw first month
+        if (monthIndex < months.length) {
+          yPosition = drawCalendar(doc, months[monthIndex], yPosition, calendarWidth, calendarHeight);
+          monthIndex++;
+        }
+        
+        // Draw second month if there's space and more months
+        if (monthIndex < months.length && yPosition + calendarHeight < pageHeight - 30) {
+          yPosition = drawCalendar(doc, months[monthIndex], yPosition, calendarWidth, calendarHeight);
+          monthIndex++;
+        }
+        
+        pageNum++;
+      }
+      
     } catch (error) {
-      console.error('Error generating calendar PDF:', error);
-      // Fallback simple export
+      console.error('Error creating calendar PDF:', error);
+      // Fallback to simple header without logo
       doc.setTextColor(255, 119, 130);
       doc.setFontSize(24);
       doc.setFont('helvetica', 'bold');
-      doc.text('Periodka', 20, 25);
-      
-      doc.setTextColor(60, 60, 60);
-      doc.setFontSize(12);
-      doc.text('Kalendárny export sa nepodarilo vygenerovať', 20, 50);
+      doc.text('Periodka - Kalendárny prehľad', 20, 25);
     }
     
+    // Save the PDF
     doc.save(`periodka-calendar-${format(new Date(), 'yyyy-MM-dd')}.pdf`);
   };
 
   return (
-    <button
+    <Button
       onClick={exportData}
-      className="relative z-10 flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-3xl bg-gradient-to-r from-rose-100 to-pink-100 border border-rose-300 hover:from-rose-200 hover:to-pink-200 transition-all shadow-sm"
-      style={{ color: '#FF7782' }}
+      variant="outline"
+      size="sm"
+      className="shrink-0"
+      style={{
+        backgroundColor: 'white',
+        borderColor: '#FF7782',
+        color: '#FF7782'
+      }}
     >
-      <Download className="w-3 h-3" />
+      <Download className="w-4 h-4 mr-2" />
       Exportovať
-    </button>
+    </Button>
   );
 }
