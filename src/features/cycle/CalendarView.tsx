@@ -111,6 +111,32 @@ export function CalendarView({
   // Get available symptoms for filtering
   const availableSymptoms = [...new Set(historicalData.flatMap(entry => entry.symptoms))];
 
+  // Pastel earthy color palette for selected symptoms
+  const pastelEarthyColors = [
+    '#D4B5A0', // Soft beige
+    '#C8B8A8', // Warm taupe
+    '#B8C5A0', // Sage green
+    '#A8B5C8', // Dusty blue
+    '#C8A8B5', // Muted rose
+    '#B5C8A8', // Soft mint
+    '#A8C8B5', // Light teal
+    '#C8B5A8', // Pale brown
+    '#B5A8C8', // Lavender gray
+    '#A8C5B8', // Seafoam
+    '#C5A8B8', // Dusty pink
+    '#A8B8C5', // Powder blue
+    '#B8A8C5', // Soft purple
+    '#C5B8A8', // Warm gray
+    '#A8C5A8', // Soft green
+  ];
+
+  // Assign colors to selected symptoms
+  const getSymptomColor = (symptom: string) => {
+    if (!selectedSymptoms.includes(symptom)) return undefined;
+    const index = selectedSymptoms.indexOf(symptom);
+    return pastelEarthyColors[index % pastelEarthyColors.length];
+  };
+
   // Get calendar period based on view type
   const getCalendarPeriod = () => {
     if (viewType === 'weekly') {
@@ -331,26 +357,33 @@ export function CalendarView({
               <span className="text-sm font-medium text-[#955F6A]">Filtrovať príznaky:</span>
             </div>
             <div className="flex flex-wrap gap-2">
-              {availableSymptoms.map(symptom => (
-                <Badge
-                  key={symptom}
-                  variant={selectedSymptoms.includes(symptom) ? "default" : "outline"}
-                  className={`cursor-pointer text-xs transition-all ${
-                    selectedSymptoms.includes(symptom)
-                      ? 'bg-[#FF7782] text-white border-[#FF7782]'
-                      : 'border-[#FF7782] text-[#FF7782] hover:bg-[#FF7782]/10'
-                  }`}
-                  onClick={() => {
-                    setSelectedSymptoms(prev => 
-                      prev.includes(symptom)
-                        ? prev.filter(s => s !== symptom)
-                        : [...prev, symptom]
-                    );
-                  }}
-                >
-                  {symptom}
-                </Badge>
-              ))}
+              {availableSymptoms.map(symptom => {
+                const symptomColor = getSymptomColor(symptom);
+                return (
+                  <Badge
+                    key={symptom}
+                    variant={selectedSymptoms.includes(symptom) ? "default" : "outline"}
+                    className={`cursor-pointer text-xs transition-all ${
+                      selectedSymptoms.includes(symptom)
+                        ? 'text-white border-transparent'
+                        : 'border-[#FF7782] text-[#FF7782] hover:bg-[#FF7782]/10'
+                    }`}
+                    style={symptomColor ? {
+                      backgroundColor: symptomColor,
+                      borderColor: symptomColor
+                    } : {}}
+                    onClick={() => {
+                      setSelectedSymptoms(prev => 
+                        prev.includes(symptom)
+                          ? prev.filter(s => s !== symptom)
+                          : [...prev, symptom]
+                      );
+                    }}
+                  >
+                    {symptom}
+                  </Badge>
+                );
+              })}
             </div>
           </div>
         )}
@@ -452,17 +485,24 @@ export function CalendarView({
                   {/* Period intensity indicator */}
                   {renderPeriodIntensity(date)}
                   
-                  {/* Symptom indicators */}
-                  {(selectedSymptoms.length === 0 ? dayData.symptoms : dayData.symptoms.filter(s => selectedSymptoms.includes(s))).slice(0, 3).map((_, i) => (
-                    <div 
-                      key={i} 
-                      className="w-1.5 h-1.5 rounded-full bg-blue-400"
-                    />
-                  ))}
+                  {/* Symptom indicators - only show selected symptoms with their colors */}
+                  {dayData.symptoms
+                    .filter(symptom => selectedSymptoms.includes(symptom))
+                    .slice(0, 4)
+                    .map((symptom, i) => {
+                      const color = getSymptomColor(symptom);
+                      return (
+                        <div 
+                          key={i} 
+                          className="w-1.5 h-1.5 rounded-full"
+                          style={{ backgroundColor: color || '#9CA3AF' }}
+                        />
+                      );
+                    })}
                   
                   {/* Additional symptoms indicator */}
-                  {(selectedSymptoms.length === 0 ? dayData.symptoms : dayData.symptoms.filter(s => selectedSymptoms.includes(s))).length > 3 && (
-                    <div className="text-[10px] text-blue-600 font-bold">+</div>
+                  {dayData.symptoms.filter(symptom => selectedSymptoms.includes(symptom)).length > 4 && (
+                    <div className="text-[10px] text-gray-600 font-bold">+</div>
                   )}
                   
                   {/* Notes indicator */}
@@ -493,11 +533,26 @@ export function CalendarView({
               <div>
                 <h5 className="text-xs font-medium mb-2" style={{ color: '#955F6A' }}>Príznaky:</h5>
                 <div className="flex flex-wrap gap-1">
-                  {selectedDayData.symptoms.map(symptom => (
-                    <Badge key={symptom} variant="outline" className="text-xs border-blue-300 text-blue-700">
-                      {symptom}
-                    </Badge>
-                  ))}
+                  {selectedDayData.symptoms.map(symptom => {
+                    const color = getSymptomColor(symptom);
+                    return (
+                      <Badge 
+                        key={symptom} 
+                        variant="outline" 
+                        className={`text-xs ${
+                          color 
+                            ? 'text-white border-transparent' 
+                            : 'border-gray-300 text-gray-700'
+                        }`}
+                        style={color ? {
+                          backgroundColor: color,
+                          borderColor: color
+                        } : {}}
+                      >
+                        {symptom}
+                      </Badge>
+                    );
+                  })}
                 </div>
               </div>
             )}
