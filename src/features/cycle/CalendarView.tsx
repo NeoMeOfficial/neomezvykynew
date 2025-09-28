@@ -111,36 +111,6 @@ export function CalendarView({
   // Get available symptoms for filtering
   const availableSymptoms = [...new Set(historicalData.flatMap(entry => entry.symptoms))];
 
-  // Color palette for symptoms
-  const symptomColors = [
-    '#3B82F6', // blue
-    '#10B981', // emerald
-    '#F59E0B', // amber
-    '#EF4444', // red
-    '#8B5CF6', // violet
-    '#F97316', // orange
-    '#06B6D4', // cyan
-    '#84CC16', // lime
-    '#EC4899', // pink
-    '#6366F1', // indigo
-    '#14B8A6', // teal
-    '#F43F5E', // rose
-    '#A855F7', // purple
-    '#22C55E', // green
-    '#FB923C', // orange-400
-    '#38BDF8', // sky
-    '#FACC15', // yellow
-    '#F472B6', // pink-400
-    '#818CF8', // indigo-400
-    '#34D399', // emerald-400
-  ];
-
-  // Create color mapping for symptoms
-  const getSymptomColor = (symptom: string) => {
-    const index = availableSymptoms.indexOf(symptom);
-    return symptomColors[index % symptomColors.length];
-  };
-
   // Get calendar period based on view type
   const getCalendarPeriod = () => {
     if (viewType === 'weekly') {
@@ -343,7 +313,7 @@ export function CalendarView({
               <span style={{ color: '#955F6A' }}>Dnes</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 rounded-full bg-gradient-to-r from-blue-400 to-purple-400"></div>
+              <div className="w-2 h-2 rounded-full bg-blue-400"></div>
               <span style={{ color: '#955F6A' }}>Príznaky</span>
             </div>
             <div className="flex items-center gap-1.5">
@@ -367,14 +337,9 @@ export function CalendarView({
                   variant={selectedSymptoms.includes(symptom) ? "default" : "outline"}
                   className={`cursor-pointer text-xs transition-all ${
                     selectedSymptoms.includes(symptom)
-                      ? 'text-white border-gray-300'
-                      : 'border-gray-400 text-gray-700 hover:border-gray-500'
+                      ? 'bg-[#FF7782] text-white border-[#FF7782]'
+                      : 'border-[#FF7782] text-[#FF7782] hover:bg-[#FF7782]/10'
                   }`}
-                  style={{
-                    backgroundColor: selectedSymptoms.includes(symptom) ? getSymptomColor(symptom) : 'transparent',
-                    borderColor: getSymptomColor(symptom),
-                    color: selectedSymptoms.includes(symptom) ? 'white' : getSymptomColor(symptom)
-                  }}
                   onClick={() => {
                     setSelectedSymptoms(prev => 
                       prev.includes(symptom)
@@ -383,10 +348,6 @@ export function CalendarView({
                     );
                   }}
                 >
-                  <div 
-                    className="w-2 h-2 rounded-full mr-1.5" 
-                    style={{ backgroundColor: getSymptomColor(symptom) }}
-                  />
                   {symptom}
                 </Badge>
               ))}
@@ -487,31 +448,21 @@ export function CalendarView({
                 )}
                 
                 {/* Indicators container */}
-                <div className="absolute bottom-1 left-1 right-1 flex justify-center gap-0.5 flex-wrap">
+                <div className="absolute bottom-1 left-1 right-1 flex justify-center gap-1 flex-wrap">
                   {/* Period intensity indicator */}
                   {renderPeriodIntensity(date)}
                   
                   {/* Symptom indicators */}
-                  {(selectedSymptoms.length === 0 ? dayData.symptoms : dayData.symptoms.filter(s => selectedSymptoms.includes(s))).slice(0, 4).map((symptom, i) => (
+                  {(selectedSymptoms.length === 0 ? dayData.symptoms : dayData.symptoms.filter(s => selectedSymptoms.includes(s))).slice(0, 3).map((_, i) => (
                     <div 
                       key={i} 
-                      className="w-1.5 h-1.5 rounded-full"
-                      style={{ backgroundColor: getSymptomColor(symptom) }}
-                      title={symptom}
+                      className="w-1.5 h-1.5 rounded-full bg-blue-400"
                     />
                   ))}
                   
                   {/* Additional symptoms indicator */}
-                  {(selectedSymptoms.length === 0 ? dayData.symptoms : dayData.symptoms.filter(s => selectedSymptoms.includes(s))).length > 4 && (
-                    <div 
-                      className="text-[10px] font-bold px-1 rounded" 
-                      style={{ 
-                        backgroundColor: 'rgba(0,0,0,0.1)', 
-                        color: '#666' 
-                      }}
-                    >
-                      +{(selectedSymptoms.length === 0 ? dayData.symptoms : dayData.symptoms.filter(s => selectedSymptoms.includes(s))).length - 4}
-                    </div>
+                  {(selectedSymptoms.length === 0 ? dayData.symptoms : dayData.symptoms.filter(s => selectedSymptoms.includes(s))).length > 3 && (
+                    <div className="text-[10px] text-blue-600 font-bold">+</div>
                   )}
                   
                   {/* Notes indicator */}
@@ -543,20 +494,7 @@ export function CalendarView({
                 <h5 className="text-xs font-medium mb-2" style={{ color: '#955F6A' }}>Príznaky:</h5>
                 <div className="flex flex-wrap gap-1">
                   {selectedDayData.symptoms.map(symptom => (
-                    <Badge 
-                      key={symptom} 
-                      variant="outline" 
-                      className="text-xs border-gray-300"
-                      style={{
-                        borderColor: getSymptomColor(symptom),
-                        backgroundColor: `${getSymptomColor(symptom)}20`,
-                        color: getSymptomColor(symptom)
-                      }}
-                    >
-                      <div 
-                        className="w-2 h-2 rounded-full mr-1.5" 
-                        style={{ backgroundColor: getSymptomColor(symptom) }}
-                      />
+                    <Badge key={symptom} variant="outline" className="text-xs border-blue-300 text-blue-700">
                       {symptom}
                     </Badge>
                   ))}
