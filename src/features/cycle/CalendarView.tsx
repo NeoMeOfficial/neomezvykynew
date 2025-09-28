@@ -202,10 +202,28 @@ export function CalendarView({
     let currentY = 20;
     let pageNumber = 1;
 
-    // Add title
-    doc.setFontSize(16);
-    doc.text('Kalendárny prehľad - Periodka', 20, currentY);
-    currentY += 15;
+    // Brand colors from design system - converted from HSL to RGB for PDF
+    const brandPrimary: [number, number, number] = [244, 65, 95]; // hsl(351 89% 61%) - cycle-secondary-text
+    const brandLight: [number, number, number] = [244, 167, 175]; // hsl(355 75% 80%) - blush
+    const brandText: [number, number, number] = [149, 95, 106]; // hsl(348 22% 48%) - cycle-body-text  
+    const grayText: [number, number, number] = [128, 128, 128];
+    const brandBg: [number, number, number] = [251, 248, 249]; // hsl(355 78% 90%) - from gradient-primary
+
+    // Add branded header with logo area
+    doc.setFillColor(244, 65, 95);
+    doc.rect(0, 0, 210, 30, 'F');
+    
+    // Add title with brand styling
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(18);
+    doc.text('Periodka', 20, 18);
+    
+    doc.setFontSize(14);
+    doc.text('Kalendárny prehľad', 20, 25);
+    
+    // Reset colors and position
+    doc.setTextColor(0, 0, 0);
+    currentY = 45;
 
     // Generate months between start and end date
     let currentMonth = new Date(startDate);
@@ -218,23 +236,27 @@ export function CalendarView({
         pageNumber++;
       }
 
-      // Month header
+      // Month header with brand color
+      doc.setTextColor(...brandPrimary);
       doc.setFontSize(14);
       doc.text(format(currentMonth, 'LLLL yyyy', { locale: sk }), 20, currentY);
-      currentY += 10;
+      doc.setTextColor(0, 0, 0);
+      currentY += 15;
 
       // Calendar grid for this month
       const monthStart = startOfMonth(currentMonth);
       const monthEnd = endOfMonth(currentMonth);
       const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
       
-      // Day headers
-      doc.setFontSize(8);
-      const dayHeaders = ['Po', 'Ut', 'St', 'Št', 'Pi', 'So', 'Ne'];
+      // Day headers with brand styling
+      doc.setFontSize(10);
+      doc.setTextColor(...brandText);
+      const dayHeaders = ['Pon', 'Uto', 'Str', 'Štv', 'Pia', 'Sob', 'Ned'];
       dayHeaders.forEach((day, index) => {
         doc.text(day, 20 + (index * 25), currentY);
       });
-      currentY += 8;
+      doc.setTextColor(0, 0, 0);
+      currentY += 12;
 
       // Calendar days
       const startDayOfWeek = monthStart.getDay() === 0 ? 6 : monthStart.getDay() - 1;
@@ -251,37 +273,48 @@ export function CalendarView({
         doc.text(dateText, dayX, currentWeekY);
         
         // Add indicators for period, fertility, symptoms
-        let indicatorY = currentWeekY + 3;
+        let indicatorY = currentWeekY + 4;
         
         if (dayInfo.isPeriod) {
-          doc.setTextColor(255, 100, 100);
-          doc.text('●', dayX + 8, indicatorY);
+          doc.setTextColor(...brandPrimary);
+          doc.text('●', dayX + 10, indicatorY);
           doc.setTextColor(0, 0, 0);
-          indicatorY += 3;
+          indicatorY += 4;
         }
         
         if (dayInfo.isFertile) {
-          doc.setTextColor(255, 182, 193);
-          doc.text('♥', dayX + 8, indicatorY);
+          doc.setTextColor(...brandLight);
+          doc.text('♥', dayX + 10, indicatorY);
           doc.setTextColor(0, 0, 0);
-          indicatorY += 3;
+          indicatorY += 4;
         }
         
-        // Add symptom indicators
+        // Add symptom indicators with selected colors
         const filteredSymptoms = selectedSymptoms.length > 0 
           ? dayData.symptoms.filter(s => selectedSymptoms.includes(s))
           : dayData.symptoms;
           
         if (filteredSymptoms.length > 0) {
-          doc.setTextColor(100, 149, 237);
-          doc.text('•', dayX + 8, indicatorY);
+          // Use first symptom's color if available, otherwise brand color
+          const firstSymptom = filteredSymptoms[0];
+          const symptomColor = getSymptomColor(firstSymptom);
+          if (symptomColor) {
+            // Convert hex to RGB
+            const r = parseInt(symptomColor.slice(1, 3), 16);
+            const g = parseInt(symptomColor.slice(3, 5), 16);
+            const b = parseInt(symptomColor.slice(5, 7), 16);
+            doc.setTextColor(r, g, b);
+          } else {
+            doc.setTextColor(...brandText);
+          }
+          doc.text('●', dayX + 10, indicatorY);
           doc.setTextColor(0, 0, 0);
-          indicatorY += 3;
+          indicatorY += 4;
         }
         
         if (dayData.notes) {
-          doc.setTextColor(128, 128, 128);
-          doc.text('📝', dayX + 8, indicatorY);
+          doc.setTextColor(...grayText);
+          doc.text('N', dayX + 10, indicatorY);
           doc.setTextColor(0, 0, 0);
         }
 
@@ -301,38 +334,76 @@ export function CalendarView({
       currentMonth = addMonths(currentMonth, 1);
     }
 
-    // Add legend at the end
-    if (currentY > 220) {
+    // Add comprehensive legend at the end
+    if (currentY > 200) {
       doc.addPage();
       currentY = 20;
     }
     
-    doc.setFontSize(12);
-    doc.text('Legenda:', 20, currentY);
-    currentY += 10;
-    
-    doc.setFontSize(9);
-    doc.setTextColor(255, 100, 100);
-    doc.text('● Menštruácia', 20, currentY);
+    // Legend header with brand styling
+    doc.setTextColor(...brandPrimary);
+    doc.setFontSize(14);
+    doc.text('Legenda symbolov', 20, currentY);
     doc.setTextColor(0, 0, 0);
+    currentY += 15;
+    
+    // Period legend
+    doc.setFontSize(10);
+    doc.setTextColor(...brandPrimary);
+    doc.text('●', 20, currentY);
+    doc.setTextColor(0, 0, 0);
+    doc.text('Menštruácia', 30, currentY);
     currentY += 8;
     
-    doc.setTextColor(255, 182, 193);
-    doc.text('♥ Plodné dni', 20, currentY);
+    // Fertility legend
+    doc.setTextColor(...brandLight);
+    doc.text('♥', 20, currentY);
     doc.setTextColor(0, 0, 0);
+    doc.text('Plodné dni', 30, currentY);
     currentY += 8;
     
-    doc.setTextColor(100, 149, 237);
-    doc.text('• Príznaky', 20, currentY);
+    // Notes legend
+    doc.setTextColor(...grayText);
+    doc.text('N', 20, currentY);
     doc.setTextColor(0, 0, 0);
-    currentY += 8;
+    doc.text('Poznámky', 30, currentY);
+    currentY += 12;
     
-    doc.setTextColor(128, 128, 128);
-    doc.text('📝 Poznámky', 20, currentY);
+    // Selected symptoms legend
+    if (selectedSymptoms.length > 0) {
+      doc.setTextColor(...brandPrimary);
+      doc.setFontSize(12);
+      doc.text('Vybrané príznaky:', 20, currentY);
+      doc.setTextColor(0, 0, 0);
+      currentY += 10;
+      
+      selectedSymptoms.forEach((symptom) => {
+        const color = getSymptomColor(symptom);
+        if (color) {
+          // Convert hex to RGB
+          const r = parseInt(color.slice(1, 3), 16);
+          const g = parseInt(color.slice(3, 5), 16);
+          const b = parseInt(color.slice(5, 7), 16);
+          doc.setTextColor(r, g, b);
+          doc.setFontSize(10);
+          doc.text('●', 20, currentY);
+          doc.setTextColor(0, 0, 0);
+          doc.text(symptom, 30, currentY);
+          currentY += 8;
+        }
+      });
+    }
+    
+    // Footer with brand info
+    const pageHeight = doc.internal.pageSize.height;
+    doc.setTextColor(...grayText);
+    doc.setFontSize(8);
+    doc.text('Vygenerované pomocou Periodka', 20, pageHeight - 20);
+    doc.text(`Dátum exportu: ${format(new Date(), 'dd.MM.yyyy', { locale: sk })}`, 20, pageHeight - 15);
     doc.setTextColor(0, 0, 0);
 
-    // Save the PDF
-    const fileName = `kalendar_${format(startDate, 'yyyy-MM')}_${format(endDate, 'yyyy-MM')}.pdf`;
+    // Save the PDF with Slovak filename
+    const fileName = `Periodka_kalendar_${format(startDate, 'yyyy-MM')}_${format(endDate, 'yyyy-MM')}.pdf`;
     doc.save(fileName);
     setExportDialogOpen(false);
   };
@@ -599,25 +670,33 @@ export function CalendarView({
           {/* Legend */}
           <div className="flex flex-wrap gap-3 text-xs">
             <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-full bg-rose-400"></div>
-              <span style={{ color: '#955F6A' }}>Menštruácia</span>
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: 'hsl(355 60% 90%)' }}></div>
+              <span className="text-cycle-body-text">Menštruácia</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-full bg-pink-300"></div>
-              <span style={{ color: '#955F6A' }}>Plodné dni</span>
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: 'hsl(25 50% 88%)' }}></div>
+              <span className="text-cycle-body-text">Plodné dni</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-full border-2 border-rose-400"></div>
-              <span style={{ color: '#955F6A' }}>Dnes</span>
+              <div className="w-3 h-3 rounded-full border-2" style={{ borderColor: 'hsl(45 85% 70%)' }}></div>
+              <span className="text-cycle-body-text">Dnes</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 rounded-full bg-blue-400"></div>
-              <span style={{ color: '#955F6A' }}>Príznaky</span>
+              <FileText className="w-3 h-3 text-cycle-body-text" />
+              <span className="text-cycle-body-text">Poznámky</span>
             </div>
-            <div className="flex items-center gap-1.5">
-              <FileText className="w-3 h-3 text-gray-500" />
-              <span style={{ color: '#955F6A' }}>Poznámky</span>
-            </div>
+            {selectedSymptoms.length > 0 && selectedSymptoms.map(symptom => {
+              const color = getSymptomColor(symptom);
+              return (
+                <div key={symptom} className="flex items-center gap-1.5">
+                  <div 
+                    className="w-3 h-3 rounded-full" 
+                    style={{ backgroundColor: color || '#9CA3AF' }}
+                  ></div>
+                  <span className="text-cycle-body-text">{symptom}</span>
+                </div>
+              );
+            })}
           </div>
         </div>
 
