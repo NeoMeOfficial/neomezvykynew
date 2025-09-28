@@ -51,6 +51,7 @@ export function CalendarView({
   const [exportStartMonth, setExportStartMonth] = useState<string>('');
   const [exportEndMonth, setExportEndMonth] = useState<string>('');
   const isMobile = useIsMobile();
+  
   // Load historical data from localStorage
   useEffect(() => {
     const loadHistoricalData = () => {
@@ -114,6 +115,18 @@ export function CalendarView({
 
     loadHistoricalData();
   }, [accessCode]);
+
+  // Listen for export dialog trigger from header
+  useEffect(() => {
+    const handleExportDialogOpen = () => {
+      setExportDialogOpen(true);
+    };
+
+    window.addEventListener('openExportDialog', handleExportDialogOpen);
+    return () => {
+      window.removeEventListener('openExportDialog', handleExportDialogOpen);
+    };
+  }, []);
 
   // Get available symptoms for filtering
   const availableSymptoms = [...new Set(historicalData.flatMap(entry => entry.symptoms))];
@@ -463,77 +476,67 @@ export function CalendarView({
     );
   };
   return <div className="space-y-4">
+      {/* Export PDF Dialog */}
+      <Dialog open={exportDialogOpen} onOpenChange={setExportDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Export kalendára do PDF</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Od mesiaca:</label>
+              <Select value={exportStartMonth} onValueChange={setExportStartMonth}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Vyberte začiatočný mesiac" />
+                </SelectTrigger>
+                <SelectContent>
+                  {generateMonthOptions().map(option => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Do mesiaca:</label>
+              <Select value={exportEndMonth} onValueChange={setExportEndMonth}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Vyberte koncový mesiac" />
+                </SelectTrigger>
+                <SelectContent>
+                  {generateMonthOptions().map(option => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setExportDialogOpen(false)}>
+                Zrušiť
+              </Button>
+              <Button 
+                onClick={generatePDF}
+                disabled={!exportStartMonth || !exportEndMonth}
+                className="bg-gradient-to-r from-[#FF7782] to-[#FF9AA1] text-white"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Exportovať
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Header with View Toggle and Filters */}
       <div className={isMobile ? "space-y-3" : ""}>
         <div className={`flex items-center ${isMobile ? 'flex-col gap-3' : 'justify-between'}`}>
           {/* View Toggle and Period Filters */}
           <div className="flex gap-2 flex-wrap">
-            {/* Export PDF Button */}
-            <Dialog open={exportDialogOpen} onOpenChange={setExportDialogOpen}>
-              <DialogTrigger asChild>
-                <Button 
-                  size="sm" 
-                  variant="outline"
-                  className="flex items-center gap-1.5 text-xs border-[#FF7782] bg-transparent hover:bg-[#FF7782]/10 text-[#FF7782]"
-                >
-                  <Download className="w-3 h-3" />
-                  Export PDF
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                  <DialogTitle>Export kalendára do PDF</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Od mesiaca:</label>
-                    <Select value={exportStartMonth} onValueChange={setExportStartMonth}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Vyberte začiatočný mesiac" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {generateMonthOptions().map(option => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Do mesiaca:</label>
-                    <Select value={exportEndMonth} onValueChange={setExportEndMonth}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Vyberte koncový mesiac" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {generateMonthOptions().map(option => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div className="flex justify-end gap-2">
-                    <Button variant="outline" onClick={() => setExportDialogOpen(false)}>
-                      Zrušiť
-                    </Button>
-                    <Button 
-                      onClick={generatePDF}
-                      disabled={!exportStartMonth || !exportEndMonth}
-                      className="bg-gradient-to-r from-[#FF7782] to-[#FF9AA1] text-white"
-                    >
-                      <Download className="w-4 h-4 mr-2" />
-                      Exportovať
-                    </Button>
-                  </div>
-                </div>
-              </DialogContent>
-            </Dialog>
-
             {/* View Toggle */}
             <div className="flex bg-white/50 rounded-lg p-1 border border-rose-200/50">
               <Button

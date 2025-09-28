@@ -1,5 +1,8 @@
 import React from 'react';
-import { CalendarDays } from 'lucide-react';
+import { CalendarDays, Download } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CalendarView } from '../CalendarView';
 import { CycleData, DerivedState, PeriodIntensity } from '../types';
 
@@ -43,11 +46,28 @@ export function CalendarViewSection({
              }}>
           {/* Header glass accent */}
           <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-rose-200/50 to-transparent"></div>
-          <div className="flex items-center gap-3">
-            <CalendarDays className="w-5 h-5" style={{ color: '#FF7782' }} />
-            <h3 className="text-lg font-medium" style={{ color: '#FF7782' }}>
-              Kalendárny prehľad
-            </h3>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <CalendarDays className="w-5 h-5" style={{ color: '#FF7782' }} />
+              <h3 className="text-lg font-medium" style={{ color: '#FF7782' }}>
+                Kalendárny prehľad
+              </h3>
+            </div>
+            
+            {/* Export PDF Button */}
+            <Button 
+              size="sm" 
+              variant="outline"
+              className="flex items-center gap-1.5 text-xs border-[#FF7782] bg-transparent hover:bg-[#FF7782]/10 text-[#FF7782]"
+              onClick={() => {
+                // Trigger export from CalendarView component
+                const event = new CustomEvent('openExportDialog');
+                window.dispatchEvent(event);
+              }}
+            >
+              <Download className="w-3 h-3" />
+              Export PDF
+            </Button>
           </div>
         </div>
 
