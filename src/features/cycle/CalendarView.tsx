@@ -312,12 +312,12 @@ export function CalendarView({
             const r = parseInt(symptomColor.slice(1, 3), 16);
             const g = parseInt(symptomColor.slice(3, 5), 16);
             const b = parseInt(symptomColor.slice(5, 7), 16);
-            doc.setTextColor(r, g, b);
+            doc.setFillColor(r, g, b);
           } else {
-            doc.setTextColor(...brandText);
+            doc.setFillColor(...brandText);
           }
-          doc.text('|', dayX + 10, indicatorY);
-          doc.setTextColor(0, 0, 0);
+          // Draw a larger filled circle for symptoms using ellipse
+          doc.ellipse(dayX + 10, indicatorY, 1.5, 1.5, 'F');
           indicatorY += 4;
         }
         
@@ -379,7 +379,7 @@ export function CalendarView({
     
     // Symptoms legend with larger dot
     doc.setFillColor(...brandText);
-    doc.circle(26, currentY - 2, 1.5, 'F');
+    doc.ellipse(26, currentY - 2, 1.5, 1.5, 'F');
     doc.setTextColor(0, 0, 0);
     doc.text('Priznaky', 40, currentY);
     currentY += 10;
@@ -410,7 +410,7 @@ export function CalendarView({
           doc.setFillColor(r, g, b);
           doc.setFontSize(10);
           // Draw colored dot for each symptom
-          doc.circle(26, currentY - 2, 1.5, 'F');
+          doc.ellipse(26, currentY - 2, 1.5, 1.5, 'F');
           doc.setTextColor(0, 0, 0);
           doc.text(symptom, 40, currentY);
           currentY += 8;
