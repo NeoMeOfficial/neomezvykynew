@@ -268,28 +268,29 @@ export function CalendarView({
         const dayData = getDayData(day);
         const dateText = format(day, 'd');
         
+        // Draw colored background for period and fertility days
+        if (dayInfo.isPeriod) {
+          doc.setFillColor(...brandPrimary);
+          doc.rect(dayX - 2, currentWeekY - 8, 20, 12, 'F');
+          doc.setTextColor(255, 255, 255); // White text on colored background
+        } else if (dayInfo.isFertile) {
+          doc.setFillColor(...brandLight);
+          doc.rect(dayX - 2, currentWeekY - 8, 20, 12, 'F');
+          doc.setTextColor(255, 255, 255); // White text on colored background
+        } else {
+          doc.setTextColor(0, 0, 0); // Black text on white background
+        }
+        
         // Draw day number
         doc.setFontSize(8);
         doc.text(dateText, dayX, currentWeekY);
         
-        // Add indicators for period, fertility, symptoms
+        
+        // Reset text color and add indicators below day number
+        doc.setTextColor(0, 0, 0);
         let indicatorY = currentWeekY + 4;
         
-        if (dayInfo.isPeriod) {
-          doc.setTextColor(...brandPrimary);
-          doc.text('*', dayX + 10, indicatorY);
-          doc.setTextColor(0, 0, 0);
-          indicatorY += 4;
-        }
-        
-        if (dayInfo.isFertile) {
-          doc.setTextColor(...brandLight);
-          doc.text('<3', dayX + 10, indicatorY);
-          doc.setTextColor(0, 0, 0);
-          indicatorY += 4;
-        }
-        
-        // Add symptom indicators with selected colors
+        // Add symptom indicators with thick vertical lines
         const filteredSymptoms = selectedSymptoms.length > 0 
           ? dayData.symptoms.filter(s => selectedSymptoms.includes(s))
           : dayData.symptoms;
@@ -307,14 +308,14 @@ export function CalendarView({
           } else {
             doc.setTextColor(...brandText);
           }
-          doc.text('o', dayX + 10, indicatorY);
+          doc.text('|', dayX + 10, indicatorY);
           doc.setTextColor(0, 0, 0);
           indicatorY += 4;
         }
         
         if (dayData.notes) {
           doc.setTextColor(...grayText);
-          doc.text('N', dayX + 10, indicatorY);
+          doc.text('P', dayX + 10, indicatorY); // P for Pen
           doc.setTextColor(0, 0, 0);
         }
 
@@ -347,26 +348,33 @@ export function CalendarView({
     doc.setTextColor(0, 0, 0);
     currentY += 15;
     
-    // Period legend
+    // Period legend with colored background
     doc.setFontSize(10);
-    doc.setTextColor(...brandPrimary);
-    doc.text('*', 20, currentY);
+    doc.setFillColor(...brandPrimary);
+    doc.rect(20, currentY - 5, 8, 8, 'F');
     doc.setTextColor(0, 0, 0);
-    doc.text('Menstruacia', 30, currentY);
-    currentY += 8;
+    doc.text('Menstruacia', 35, currentY);
+    currentY += 10;
     
-    // Fertility legend
-    doc.setTextColor(...brandLight);
-    doc.text('<3', 20, currentY);
+    // Fertility legend with colored background
+    doc.setFillColor(...brandLight);
+    doc.rect(20, currentY - 5, 8, 8, 'F');
     doc.setTextColor(0, 0, 0);
-    doc.text('Plodne dni', 30, currentY);
-    currentY += 8;
+    doc.text('Plodne dni', 35, currentY);
+    currentY += 10;
     
-    // Notes legend
+    // Symptoms legend with vertical line
+    doc.setTextColor(...brandText);
+    doc.text('|', 22, currentY);
+    doc.setTextColor(0, 0, 0);
+    doc.text('Priznaky', 35, currentY);
+    currentY += 10;
+    
+    // Notes legend with pen symbol
     doc.setTextColor(...grayText);
-    doc.text('N', 20, currentY);
+    doc.text('P', 22, currentY);
     doc.setTextColor(0, 0, 0);
-    doc.text('Poznamky', 30, currentY);
+    doc.text('Poznamky', 35, currentY);
     currentY += 12;
     
     // Selected symptoms legend
@@ -386,9 +394,9 @@ export function CalendarView({
           const b = parseInt(color.slice(5, 7), 16);
           doc.setTextColor(r, g, b);
           doc.setFontSize(10);
-          doc.text('o', 20, currentY);
+          doc.text('|', 22, currentY);
           doc.setTextColor(0, 0, 0);
-          doc.text(symptom, 30, currentY);
+          doc.text(symptom, 35, currentY);
           currentY += 8;
         }
       });
