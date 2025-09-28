@@ -43,6 +43,7 @@ export function CalendarView({
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
   const [historicalData, setHistoricalData] = useState<HistoricalEntry[]>([]);
   const [selectedDayData, setSelectedDayData] = useState<{ symptoms: string[]; notes: string } | null>(null);
+  const [symptomColorMap, setSymptomColorMap] = useState<{ [key: string]: string }>({});
   const isMobile = useIsMobile();
   // Load historical data from localStorage
   useEffect(() => {
@@ -133,8 +134,37 @@ export function CalendarView({
   // Assign colors to selected symptoms
   const getSymptomColor = (symptom: string) => {
     if (!selectedSymptoms.includes(symptom)) return undefined;
-    const index = selectedSymptoms.indexOf(symptom);
-    return pastelEarthyColors[index % pastelEarthyColors.length];
+    return symptomColorMap[symptom];
+  };
+
+  // Handle symptom selection with color assignment
+  const handleSymptomToggle = (symptom: string) => {
+    setSelectedSymptoms(prev => {
+      const isCurrentlySelected = prev.includes(symptom);
+      
+      if (isCurrentlySelected) {
+        // Remove symptom and its color
+        setSymptomColorMap(colorMap => {
+          const newMap = { ...colorMap };
+          delete newMap[symptom];
+          return newMap;
+        });
+        return prev.filter(s => s !== symptom);
+      } else {
+        // Add symptom and assign it a new color
+        setSymptomColorMap(colorMap => {
+          const usedColors = Object.values(colorMap);
+          const availableColor = pastelEarthyColors.find(color => !usedColors.includes(color)) || 
+                                 pastelEarthyColors[Object.keys(colorMap).length % pastelEarthyColors.length];
+          
+          return {
+            ...colorMap,
+            [symptom]: availableColor
+          };
+        });
+        return [...prev, symptom];
+      }
+    });
   };
 
   // Get calendar period based on view type
@@ -372,13 +402,7 @@ export function CalendarView({
                       backgroundColor: symptomColor,
                       borderColor: symptomColor
                     } : {}}
-                    onClick={() => {
-                      setSelectedSymptoms(prev => 
-                        prev.includes(symptom)
-                          ? prev.filter(s => s !== symptom)
-                          : [...prev, symptom]
-                      );
-                    }}
+                    onClick={() => handleSymptomToggle(symptom)}
                   >
                     {symptom}
                   </Badge>
