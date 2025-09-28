@@ -202,19 +202,20 @@ export function CalendarView({
     let currentY = 20;
     let pageNumber = 1;
 
-    // Brand colors from design system - converted from HSL to RGB for PDF
-    const brandPrimary: [number, number, number] = [244, 65, 95]; // hsl(351 89% 61%) - cycle-secondary-text
-    const brandLight: [number, number, number] = [244, 167, 175]; // hsl(355 75% 80%) - blush
-    const brandText: [number, number, number] = [149, 95, 106]; // hsl(348 22% 48%) - cycle-body-text  
+    // Exact colors from calendar widget - converted from HSL to RGB for PDF
+    const periodBg: [number, number, number] = [247, 225, 229]; // hsl(355 60% 90%) - period day background
+    const periodText: [number, number, number] = [157, 68, 89]; // hsl(355 60% 35%) - period day text
+    const fertilityBg: [number, number, number] = [240, 220, 207]; // hsl(25 50% 88%) - fertility day background  
+    const fertilityText: [number, number, number] = [130, 82, 39]; // hsl(25 70% 30%) - fertility day text
+    const brandText: [number, number, number] = [149, 95, 106]; // hsl(348 22% 48%) - cycle-body-text
     const grayText: [number, number, number] = [128, 128, 128];
-    const brandBg: [number, number, number] = [251, 248, 249]; // hsl(355 78% 90%) - from gradient-primary
 
-    // Add branded header with logo area
-    doc.setFillColor(244, 65, 95);
+    // Add branded header with updated colors
+    doc.setFillColor(...periodBg);
     doc.rect(0, 0, 210, 30, 'F');
     
     // Add title with brand styling
-    doc.setTextColor(255, 255, 255);
+    doc.setTextColor(...periodText);
     doc.setFontSize(18);
     doc.text('Periodka', 20, 18);
     
@@ -237,7 +238,7 @@ export function CalendarView({
       }
 
       // Month header with brand color
-      doc.setTextColor(...brandPrimary);
+      doc.setTextColor(...periodText);
       doc.setFontSize(14);
       doc.text(format(currentMonth, 'LLLL yyyy', { locale: sk }), 20, currentY);
       doc.setTextColor(0, 0, 0);
@@ -268,21 +269,28 @@ export function CalendarView({
         const dayData = getDayData(day);
         const dateText = format(day, 'd');
         
-        // Draw colored background for period and fertility days
+        // Draw rounded rectangle backgrounds for period and fertility days (like calendar widget)
         if (dayInfo.isPeriod) {
-          doc.setFillColor(...brandPrimary);
-          doc.rect(dayX - 2, currentWeekY - 8, 20, 12, 'F');
-          doc.setTextColor(255, 255, 255); // White text on colored background
+          doc.setFillColor(...periodBg);
+          // Draw rounded rectangle (approximation with small radius)
+          doc.roundedRect(dayX - 2, currentWeekY - 8, 20, 12, 2, 2, 'F');
+          doc.setTextColor(...periodText);
         } else if (dayInfo.isFertile) {
-          doc.setFillColor(...brandLight);
-          doc.rect(dayX - 2, currentWeekY - 8, 20, 12, 'F');
-          doc.setTextColor(255, 255, 255); // White text on colored background
+          doc.setFillColor(...fertilityBg);
+          // Draw rounded rectangle (approximation with small radius)
+          doc.roundedRect(dayX - 2, currentWeekY - 8, 20, 12, 2, 2, 'F');
+          doc.setTextColor(...fertilityText);
         } else {
           doc.setTextColor(0, 0, 0); // Black text on white background
         }
         
-        // Draw day number
+        // Draw day number with bold font for period days (like calendar widget)
         doc.setFontSize(8);
+        if (dayInfo.isPeriod) {
+          doc.setFont(undefined, 'bold');
+        } else {
+          doc.setFont(undefined, 'normal');
+        }
         doc.text(dateText, dayX, currentWeekY);
         
         
@@ -342,44 +350,50 @@ export function CalendarView({
     }
     
     // Legend header with brand styling
-    doc.setTextColor(...brandPrimary);
+    doc.setTextColor(...periodText);
     doc.setFontSize(14);
     doc.text('Legenda symbolov', 20, currentY);
     doc.setTextColor(0, 0, 0);
     currentY += 15;
     
-    // Period legend with colored background
+    // Period legend with colored background (matching calendar widget)
     doc.setFontSize(10);
-    doc.setFillColor(...brandPrimary);
-    doc.rect(20, currentY - 5, 8, 8, 'F');
+    doc.setFillColor(...periodBg);
+    doc.roundedRect(20, currentY - 5, 12, 8, 1, 1, 'F');
+    doc.setTextColor(...periodText);
+    doc.setFont(undefined, 'bold');
+    doc.text('31', 21, currentY);
     doc.setTextColor(0, 0, 0);
-    doc.text('Menstruacia', 35, currentY);
+    doc.setFont(undefined, 'normal');
+    doc.text('Menstruacia', 40, currentY);
     currentY += 10;
     
-    // Fertility legend with colored background
-    doc.setFillColor(...brandLight);
-    doc.rect(20, currentY - 5, 8, 8, 'F');
+    // Fertility legend with colored background (matching calendar widget)
+    doc.setFillColor(...fertilityBg);
+    doc.roundedRect(20, currentY - 5, 12, 8, 1, 1, 'F');
+    doc.setTextColor(...fertilityText);
+    doc.text('14', 21, currentY);
     doc.setTextColor(0, 0, 0);
-    doc.text('Plodne dni', 35, currentY);
+    doc.text('Plodne dni', 40, currentY);
     currentY += 10;
     
     // Symptoms legend with vertical line
     doc.setTextColor(...brandText);
-    doc.text('|', 22, currentY);
+    doc.text('|', 24, currentY);
     doc.setTextColor(0, 0, 0);
-    doc.text('Priznaky', 35, currentY);
+    doc.text('Priznaky', 40, currentY);
     currentY += 10;
     
     // Notes legend with pen symbol
     doc.setTextColor(...grayText);
-    doc.text('P', 22, currentY);
+    doc.text('P', 24, currentY);
     doc.setTextColor(0, 0, 0);
-    doc.text('Poznamky', 35, currentY);
+    doc.text('Poznamky', 40, currentY);
     currentY += 12;
     
     // Selected symptoms legend
     if (selectedSymptoms.length > 0) {
-      doc.setTextColor(...brandPrimary);
+      doc.setTextColor(...periodText);
       doc.setFontSize(12);
       doc.text('Vybrane priznaky:', 20, currentY);
       doc.setTextColor(0, 0, 0);
@@ -394,9 +408,9 @@ export function CalendarView({
           const b = parseInt(color.slice(5, 7), 16);
           doc.setTextColor(r, g, b);
           doc.setFontSize(10);
-          doc.text('|', 22, currentY);
+          doc.text('|', 24, currentY);
           doc.setTextColor(0, 0, 0);
-          doc.text(symptom, 35, currentY);
+          doc.text(symptom, 40, currentY);
           currentY += 8;
         }
       });
@@ -430,7 +444,7 @@ export function CalendarView({
         currentY = 20;
       }
       
-      doc.setTextColor(...brandPrimary);
+      doc.setTextColor(...periodText);
       doc.setFontSize(12);
       doc.text('Poznamky:', 20, currentY);
       doc.setTextColor(0, 0, 0);
