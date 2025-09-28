@@ -10,6 +10,7 @@ interface CalendarViewSectionProps {
   selectedOutcome: 'next-period' | 'fertile-days' | null;
   onPeriodIntensityChange: (date: string, intensity: PeriodIntensity | null) => void;
   getPeriodIntensity: (date: string) => PeriodIntensity | undefined;
+  accessCode?: string;
 }
 
 export function CalendarViewSection({
@@ -18,7 +19,8 @@ export function CalendarViewSection({
   onOutcomeSelect,
   selectedOutcome,
   onPeriodIntensityChange,
-  getPeriodIntensity
+  getPeriodIntensity,
+  accessCode
 }: CalendarViewSectionProps) {
   return (
     <>
@@ -62,6 +64,7 @@ export function CalendarViewSection({
             selectedOutcome={selectedOutcome}
             onPeriodIntensityChange={onPeriodIntensityChange}
             getPeriodIntensity={getPeriodIntensity}
+            accessCode={accessCode}
           />
         </div>
       </div>

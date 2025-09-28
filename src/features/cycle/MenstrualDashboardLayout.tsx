@@ -137,6 +137,7 @@ export function MenstrualDashboardLayout({
           selectedOutcome={selectedOutcome}
           onPeriodIntensityChange={setPeriodIntensity}
           getPeriodIntensity={getPeriodIntensity}
+          accessCode={accessCode}
         />
 
         {/* Modals */}
@@ -230,6 +231,7 @@ export function MenstrualDashboardLayout({
                 selectedOutcome={selectedOutcome}
                 onPeriodIntensityChange={setPeriodIntensity}
                 getPeriodIntensity={getPeriodIntensity}
+                accessCode={accessCode}
               />
             )}
           </div>
