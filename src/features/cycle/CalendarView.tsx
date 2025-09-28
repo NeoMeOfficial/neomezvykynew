@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Heart, Droplets, ChevronLeft, ChevronRight, FileText, Filter, Grid3X3, Calendar as CalendarGrid } from 'lucide-react';
+import { Calendar, Heart, Droplets, ChevronLeft, ChevronRight, FileText, Filter, Grid3X3, Calendar as CalendarGrid, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isToday, addWeeks, subWeeks, startOfWeek, endOfWeek, addDays } from 'date-fns';
 import { sk } from 'date-fns/locale';
+import jsPDF from 'jspdf';
 import { DerivedState, CycleData, PeriodIntensity } from './types';
 import { isPeriodDate, isFertilityDate } from './utils';
 import { PeriodIntensitySelector } from './components/PeriodIntensitySelector';
@@ -44,6 +47,9 @@ export function CalendarView({
   const [historicalData, setHistoricalData] = useState<HistoricalEntry[]>([]);
   const [selectedDayData, setSelectedDayData] = useState<{ symptoms: string[]; notes: string } | null>(null);
   const [symptomColorMap, setSymptomColorMap] = useState<{ [key: string]: string }>({});
+  const [exportDialogOpen, setExportDialogOpen] = useState(false);
+  const [exportStartMonth, setExportStartMonth] = useState<string>('');
+  const [exportEndMonth, setExportEndMonth] = useState<string>('');
   const isMobile = useIsMobile();
   // Load historical data from localStorage
   useEffect(() => {
@@ -165,6 +171,173 @@ export function CalendarView({
         return [...prev, symptom];
       }
     });
+  };
+
+  // Export PDF functionality
+  const generatePDF = async () => {
+    if (!exportStartMonth || !exportEndMonth) return;
+
+    const startDate = new Date(exportStartMonth);
+    const endDate = new Date(exportEndMonth);
+    
+    if (startDate > endDate) {
+      alert('Začiatočný mesiac musí byť pred koncovým mesiacom');
+      return;
+    }
+
+    const doc = new jsPDF();
+    let currentY = 20;
+    let pageNumber = 1;
+
+    // Add title
+    doc.setFontSize(16);
+    doc.text('Kalendárny prehľad - Periodka', 20, currentY);
+    currentY += 15;
+
+    // Generate months between start and end date
+    let currentMonth = new Date(startDate);
+    
+    while (currentMonth <= endDate) {
+      // Check if we need a new page
+      if (currentY > 250) {
+        doc.addPage();
+        currentY = 20;
+        pageNumber++;
+      }
+
+      // Month header
+      doc.setFontSize(14);
+      doc.text(format(currentMonth, 'LLLL yyyy', { locale: sk }), 20, currentY);
+      currentY += 10;
+
+      // Calendar grid for this month
+      const monthStart = startOfMonth(currentMonth);
+      const monthEnd = endOfMonth(currentMonth);
+      const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
+      
+      // Day headers
+      doc.setFontSize(8);
+      const dayHeaders = ['Po', 'Ut', 'St', 'Št', 'Pi', 'So', 'Ne'];
+      dayHeaders.forEach((day, index) => {
+        doc.text(day, 20 + (index * 25), currentY);
+      });
+      currentY += 8;
+
+      // Calendar days
+      const startDayOfWeek = monthStart.getDay() === 0 ? 6 : monthStart.getDay() - 1;
+      let currentWeekY = currentY;
+      let dayX = 20 + (startDayOfWeek * 25);
+
+      daysInMonth.forEach((day, index) => {
+        const dayInfo = getDayInfo(day);
+        const dayData = getDayData(day);
+        const dateText = format(day, 'd');
+        
+        // Draw day number
+        doc.setFontSize(8);
+        doc.text(dateText, dayX, currentWeekY);
+        
+        // Add indicators for period, fertility, symptoms
+        let indicatorY = currentWeekY + 3;
+        
+        if (dayInfo.isPeriod) {
+          doc.setTextColor(255, 100, 100);
+          doc.text('●', dayX + 8, indicatorY);
+          doc.setTextColor(0, 0, 0);
+          indicatorY += 3;
+        }
+        
+        if (dayInfo.isFertile) {
+          doc.setTextColor(255, 182, 193);
+          doc.text('♥', dayX + 8, indicatorY);
+          doc.setTextColor(0, 0, 0);
+          indicatorY += 3;
+        }
+        
+        // Add symptom indicators
+        const filteredSymptoms = selectedSymptoms.length > 0 
+          ? dayData.symptoms.filter(s => selectedSymptoms.includes(s))
+          : dayData.symptoms;
+          
+        if (filteredSymptoms.length > 0) {
+          doc.setTextColor(100, 149, 237);
+          doc.text('•', dayX + 8, indicatorY);
+          doc.setTextColor(0, 0, 0);
+          indicatorY += 3;
+        }
+        
+        if (dayData.notes) {
+          doc.setTextColor(128, 128, 128);
+          doc.text('📝', dayX + 8, indicatorY);
+          doc.setTextColor(0, 0, 0);
+        }
+
+        // Move to next day position
+        dayX += 25;
+        
+        // New week
+        if ((index + startDayOfWeek + 1) % 7 === 0) {
+          dayX = 20;
+          currentWeekY += 15;
+        }
+      });
+      
+      currentY = currentWeekY + 20;
+      
+      // Move to next month
+      currentMonth = addMonths(currentMonth, 1);
+    }
+
+    // Add legend at the end
+    if (currentY > 220) {
+      doc.addPage();
+      currentY = 20;
+    }
+    
+    doc.setFontSize(12);
+    doc.text('Legenda:', 20, currentY);
+    currentY += 10;
+    
+    doc.setFontSize(9);
+    doc.setTextColor(255, 100, 100);
+    doc.text('● Menštruácia', 20, currentY);
+    doc.setTextColor(0, 0, 0);
+    currentY += 8;
+    
+    doc.setTextColor(255, 182, 193);
+    doc.text('♥ Plodné dni', 20, currentY);
+    doc.setTextColor(0, 0, 0);
+    currentY += 8;
+    
+    doc.setTextColor(100, 149, 237);
+    doc.text('• Príznaky', 20, currentY);
+    doc.setTextColor(0, 0, 0);
+    currentY += 8;
+    
+    doc.setTextColor(128, 128, 128);
+    doc.text('📝 Poznámky', 20, currentY);
+    doc.setTextColor(0, 0, 0);
+
+    // Save the PDF
+    const fileName = `kalendar_${format(startDate, 'yyyy-MM')}_${format(endDate, 'yyyy-MM')}.pdf`;
+    doc.save(fileName);
+    setExportDialogOpen(false);
+  };
+
+  // Generate month options for select
+  const generateMonthOptions = () => {
+    const options = [];
+    const currentDate = new Date();
+    
+    // Generate 12 months back and 12 months forward
+    for (let i = -12; i <= 12; i++) {
+      const month = addMonths(currentDate, i);
+      const value = format(month, 'yyyy-MM');
+      const label = format(month, 'LLLL yyyy', { locale: sk });
+      options.push({ value, label });
+    }
+    
+    return options;
   };
 
   // Get calendar period based on view type
@@ -295,6 +468,72 @@ export function CalendarView({
         <div className={`flex items-center ${isMobile ? 'flex-col gap-3' : 'justify-between'}`}>
           {/* View Toggle and Period Filters */}
           <div className="flex gap-2 flex-wrap">
+            {/* Export PDF Button */}
+            <Dialog open={exportDialogOpen} onOpenChange={setExportDialogOpen}>
+              <DialogTrigger asChild>
+                <Button 
+                  size="sm" 
+                  variant="outline"
+                  className="flex items-center gap-1.5 text-xs border-[#FF7782] bg-transparent hover:bg-[#FF7782]/10 text-[#FF7782]"
+                >
+                  <Download className="w-3 h-3" />
+                  Export PDF
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Export kalendára do PDF</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Od mesiaca:</label>
+                    <Select value={exportStartMonth} onValueChange={setExportStartMonth}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Vyberte začiatočný mesiac" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {generateMonthOptions().map(option => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Do mesiaca:</label>
+                    <Select value={exportEndMonth} onValueChange={setExportEndMonth}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Vyberte koncový mesiac" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {generateMonthOptions().map(option => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="flex justify-end gap-2">
+                    <Button variant="outline" onClick={() => setExportDialogOpen(false)}>
+                      Zrušiť
+                    </Button>
+                    <Button 
+                      onClick={generatePDF}
+                      disabled={!exportStartMonth || !exportEndMonth}
+                      className="bg-gradient-to-r from-[#FF7782] to-[#FF9AA1] text-white"
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Exportovať
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+
             {/* View Toggle */}
             <div className="flex bg-white/50 rounded-lg p-1 border border-rose-200/50">
               <Button
