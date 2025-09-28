@@ -186,7 +186,7 @@ export function CalendarView({
     });
   };
 
-  // Export PDF functionality
+  // Export PDF functionality - Medical Report Format
   const generatePDF = async () => {
     if (!exportStartMonth || !exportEndMonth) return;
 
@@ -198,117 +198,231 @@ export function CalendarView({
       return;
     }
 
-    const doc = new jsPDF();
-    let currentY = 20;
-    let pageNumber = 1;
-
-    // Exact colors from calendar widget - converted from HSL to RGB for PDF
-    const periodBg: [number, number, number] = [247, 225, 229]; // hsl(355 60% 90%) - period day background
-    const periodText: [number, number, number] = [157, 68, 89]; // hsl(355 60% 35%) - period day text
-    const fertilityBg: [number, number, number] = [240, 220, 207]; // hsl(25 50% 88%) - fertility day background  
-    const fertilityText: [number, number, number] = [130, 82, 39]; // hsl(25 70% 30%) - fertility day text
-    const brandText: [number, number, number] = [149, 95, 106]; // hsl(348 22% 48%) - cycle-body-text
+    const doc = new jsPDF('p', 'mm', 'a4');
+    
+    // Colors from calendar widget - converted from HSL to RGB for PDF
+    const periodBg: [number, number, number] = [247, 225, 229];
+    const periodText: [number, number, number] = [157, 68, 89];
+    const fertilityBg: [number, number, number] = [240, 220, 207];
+    const fertilityText: [number, number, number] = [130, 82, 39];
+    const brandText: [number, number, number] = [149, 95, 106];
     const grayText: [number, number, number] = [128, 128, 128];
+    const lightGray: [number, number, number] = [240, 240, 240];
 
-    // Add branded header with updated colors
+    // Helper function to calculate cycle statistics
+    const calculateCycleStats = () => {
+      const cycleLengths: number[] = [];
+      const periodLengths: number[] = [];
+      const symptomCounts: { [key: string]: number } = {};
+      
+      // Analyze historical data for patterns
+      historicalData.forEach(entry => {
+        entry.symptoms.forEach(symptom => {
+          symptomCounts[symptom] = (symptomCounts[symptom] || 0) + 1;
+        });
+      });
+
+      return {
+        avgCycleLength: cycleData.cycleLength,
+        avgPeriodLength: cycleData.periodLength,
+        mostCommonSymptoms: Object.entries(symptomCounts)
+          .sort(([,a], [,b]) => b - a)
+          .slice(0, 5)
+          .map(([symptom, count]) => ({ symptom, count })),
+        totalDataDays: historicalData.length
+      };
+    };
+
+    const stats = calculateCycleStats();
+
+    // PAGE 1: CLINICAL SUMMARY
     doc.setFillColor(...periodBg);
-    doc.rect(0, 0, 210, 30, 'F');
+    doc.rect(0, 0, 210, 40, 'F');
     
-    // Add title with brand styling
     doc.setTextColor(...periodText);
-    doc.setFontSize(18);
-    doc.text('Periodka', 20, 18);
+    doc.setFontSize(20);
+    doc.text('MENSTRUAČNÝ CYKLUS - KLINICKÁ SPRÁVA', 20, 20);
     
-    doc.setFontSize(14);
-    doc.text('Kalendárny prehľad', 20, 25);
-    
-    // Reset colors and position
-    doc.setTextColor(0, 0, 0);
-    currentY = 45;
+    doc.setFontSize(12);
+    doc.text(`Obdobie: ${format(startDate, 'MMMM yyyy', { locale: sk })} - ${format(endDate, 'MMMM yyyy', { locale: sk })}`, 20, 30);
+    doc.text(`Dátum vytvorenia: ${format(new Date(), 'dd.MM.yyyy', { locale: sk })}`, 20, 36);
 
-    // Generate months between start and end date
+    let currentY = 60;
+    
+    // Clinical Overview Section
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(16);
+    doc.text('KLINICKÝ PREHĽAD', 20, currentY);
+    currentY += 15;
+
+    // Stats boxes
+    doc.setFillColor(...lightGray);
+    doc.rect(20, currentY, 80, 40, 'F');
+    doc.rect(110, currentY, 80, 40, 'F');
+    
+    doc.setTextColor(...brandText);
+    doc.setFontSize(12);
+    doc.text('PARAMETRE CYKLU', 25, currentY + 10);
+    doc.text('SLEDOVANIE SYMPTÓMOV', 115, currentY + 10);
+    
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(10);
+    doc.text(`Priemerná dĺžka cyklu: ${stats.avgCycleLength} dní`, 25, currentY + 18);
+    doc.text(`Priemerná dĺžka menštruácie: ${stats.avgPeriodLength} dní`, 25, currentY + 25);
+    doc.text(`Posledná menštruácia: ${cycleData.lastPeriodStart ? format(new Date(cycleData.lastPeriodStart), 'dd.MM.yyyy', { locale: sk }) : 'Neurčené'}`, 25, currentY + 32);
+
+    doc.text(`Celkový počet dní so záznamami: ${stats.totalDataDays}`, 115, currentY + 18);
+    doc.text(`Najčastejšie symptómy:`, 115, currentY + 25);
+    
+    let symptomY = currentY + 32;
+    stats.mostCommonSymptoms.slice(0, 3).forEach(({ symptom, count }) => {
+      if (symptomY < currentY + 38) {
+        doc.text(`• ${symptom} (${count}x)`, 115, symptomY);
+        symptomY += 6;
+      }
+    });
+
+    currentY += 55;
+
+    // KEY FINDINGS Section
+    doc.setFontSize(16);
+    doc.setTextColor(...periodText);
+    doc.text('KĽÚČOVÉ ZISTENIA', 20, currentY);
+    currentY += 12;
+
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(10);
+    
+    // Pattern analysis
+    const cyclePatterns = [
+      `Sledované obdobie zahŕňa ${Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24 * 30))} mesiacov`,
+      `Zaznamenané symptómy v ${historicalData.filter(d => d.symptoms.length > 0).length} dňoch`,
+      `Poznámky zaznamenané v ${historicalData.filter(d => d.notes).length} dňoch`
+    ];
+
+    cyclePatterns.forEach(pattern => {
+      doc.text(`• ${pattern}`, 25, currentY);
+      currentY += 8;
+    });
+
+    currentY += 10;
+
+    // RECOMMENDATIONS Section
+    doc.setFontSize(16);
+    doc.setTextColor(...periodText);
+    doc.text('ODPORÚČANIA PRE LEKÁRSKU KONZULTÁCIU', 20, currentY);
+    currentY += 12;
+
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(10);
+    
+    const recommendations = [
+      'Diskutujte o vzorcoch symptómov s vaším gynekológom',
+      'Zvážte sledovanie bazálnej telesnej teploty pre presnejšie určenie ovulácie',
+      'Poznamenajte si intenzitu menštruácie a bolesti pre lepšiu diagnostiku'
+    ];
+
+    recommendations.forEach(rec => {
+      doc.text(`• ${rec}`, 25, currentY);
+      currentY += 8;
+    });
+
+    // PAGE 2: ENHANCED CALENDAR VIEW
+    doc.addPage();
+    currentY = 20;
+    
+    doc.setFillColor(...periodBg);
+    doc.rect(0, 0, 210, 25, 'F');
+    doc.setTextColor(...periodText);
+    doc.setFontSize(16);
+    doc.text('KALENDÁRNY PREHĽAD - MEDICÍNSKY FORMÁT', 20, 15);
+    
+    doc.setTextColor(0, 0, 0);
+    currentY = 40;
+
+    // Generate enhanced monthly calendars
     let currentMonth = new Date(startDate);
     
     while (currentMonth <= endDate) {
-      // Check if we need a new page
-      if (currentY > 250) {
+      if (currentY > 200) {
         doc.addPage();
         currentY = 20;
-        pageNumber++;
       }
 
-      // Month header with brand color
+      // Month header
       doc.setTextColor(...periodText);
       doc.setFontSize(14);
-      doc.text(format(currentMonth, 'LLLL yyyy', { locale: sk }), 20, currentY);
+      doc.text(format(currentMonth, 'LLLL yyyy', { locale: sk }).toUpperCase(), 20, currentY);
       doc.setTextColor(0, 0, 0);
       currentY += 15;
 
-      // Calendar grid for this month
+      // Calendar grid
       const monthStart = startOfMonth(currentMonth);
       const monthEnd = endOfMonth(currentMonth);
       const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
       
-      // Day headers with brand styling
-      doc.setFontSize(10);
+      // Day headers
+      doc.setFontSize(9);
       doc.setTextColor(...brandText);
       const dayHeaders = ['Pon', 'Uto', 'Str', 'Štv', 'Pia', 'Sob', 'Ned'];
       dayHeaders.forEach((day, index) => {
-        doc.text(day, 20 + (index * 25), currentY);
+        doc.text(day, 25 + (index * 24), currentY);
       });
       doc.setTextColor(0, 0, 0);
-      currentY += 12;
+      currentY += 10;
 
-      // Calendar days
+      // Calendar days with enhanced medical formatting
       const startDayOfWeek = monthStart.getDay() === 0 ? 6 : monthStart.getDay() - 1;
       let currentWeekY = currentY;
-      let dayX = 20 + (startDayOfWeek * 25);
+      let dayX = 25 + (startDayOfWeek * 24);
 
       daysInMonth.forEach((day, index) => {
         const dayInfo = getDayInfo(day);
         const dayData = getDayData(day);
         const dateText = format(day, 'd');
         
-        // Draw rounded rectangle backgrounds for period and fertility days (like calendar widget)
+        // Enhanced day cell background
+        doc.setFillColor(255, 255, 255);
+        doc.rect(dayX - 3, currentWeekY - 12, 22, 18, 'F');
+        doc.setDrawColor(...grayText);
+        doc.rect(dayX - 3, currentWeekY - 12, 22, 18);
+        
+        // Period and fertility backgrounds
         if (dayInfo.isPeriod) {
-          doc.setFillColor(...periodBg);
-          // Draw rounded rectangle (approximation with small radius)
-          doc.roundedRect(dayX - 2, currentWeekY - 8, 20, 12, 2, 2, 'F');
+          const intensity = getPeriodIntensity(format(day, 'yyyy-MM-dd'));
+          const intensityColors: { [key: number]: [number, number, number] } = {
+            1: [252, 240, 242], // Light pink
+            2: [249, 232, 237], // Medium pink  
+            3: [247, 225, 229]  // Dark pink
+          };
+          const color = intensityColors[intensity || 1];
+          doc.setFillColor(color[0], color[1], color[2]);
+          doc.rect(dayX - 3, currentWeekY - 12, 22, 18, 'F');
           doc.setTextColor(...periodText);
         } else if (dayInfo.isFertile) {
           doc.setFillColor(...fertilityBg);
-          // Draw rounded rectangle (approximation with small radius)
-          doc.roundedRect(dayX - 2, currentWeekY - 8, 20, 12, 2, 2, 'F');
+          doc.rect(dayX - 3, currentWeekY - 12, 22, 18, 'F');
           doc.setTextColor(...fertilityText);
         } else {
-          doc.setTextColor(0, 0, 0); // Black text on white background
+          doc.setTextColor(0, 0, 0);
         }
         
-        // Draw day number with bold font for period days (like calendar widget)
-        doc.setFontSize(8);
-        if (dayInfo.isPeriod) {
-          doc.setFont(undefined, 'bold');
-        } else {
-          doc.setFont(undefined, 'normal');
-        }
-        doc.text(dateText, dayX, currentWeekY);
+        // Day number
+        doc.setFontSize(10);
+        doc.setFont(undefined, dayInfo.isPeriod ? 'bold' : 'normal');
+        doc.text(dateText, dayX, currentWeekY - 4);
         
-        
-        // Reset text color and add indicators below day number
+        // Medical symbols for symptoms (numbered severity)
         doc.setTextColor(0, 0, 0);
-        let indicatorY = currentWeekY + 4;
-        
-        // Add symptom indicators with thick vertical lines
         const filteredSymptoms = selectedSymptoms.length > 0 
           ? dayData.symptoms.filter(s => selectedSymptoms.includes(s))
           : dayData.symptoms;
           
         if (filteredSymptoms.length > 0) {
-          // Use first symptom's color if available, otherwise brand color
           const firstSymptom = filteredSymptoms[0];
           const symptomColor = getSymptomColor(firstSymptom);
+          
           if (symptomColor) {
-            // Convert hex to RGB
             const r = parseInt(symptomColor.slice(1, 3), 16);
             const g = parseInt(symptomColor.slice(3, 5), 16);
             const b = parseInt(symptomColor.slice(5, 7), 16);
@@ -316,111 +430,130 @@ export function CalendarView({
           } else {
             doc.setFillColor(...brandText);
           }
-          // Draw a larger filled circle for symptoms using ellipse
-          doc.ellipse(dayX + 10, indicatorY, 1.5, 1.5, 'F');
-          indicatorY += 4;
+          
+          // Draw severity indicator (1-3 based on number of symptoms)
+          const severity = Math.min(filteredSymptoms.length, 3);
+          doc.circle(dayX + 8, currentWeekY + 2, 2 + severity, 'F');
+          
+          // Add severity number
+          doc.setTextColor(255, 255, 255);
+          doc.setFontSize(6);
+          doc.text(severity.toString(), dayX + 7, currentWeekY + 3);
         }
         
+        // Notes indicator
         if (dayData.notes) {
-          doc.setTextColor(...grayText);
-          doc.text('P', dayX + 10, indicatorY); // P for Pen
-          doc.setTextColor(0, 0, 0);
+          doc.setFillColor(...grayText);
+          doc.rect(dayX - 2, currentWeekY + 3, 3, 2, 'F');
         }
 
-        // Move to next day position
-        dayX += 25;
+        dayX += 24;
         
-        // New week
         if ((index + startDayOfWeek + 1) % 7 === 0) {
-          dayX = 20;
-          currentWeekY += 15;
+          dayX = 25;
+          currentWeekY += 20;
         }
       });
       
-      currentY = currentWeekY + 20;
-      
-      // Move to next month
+      currentY = currentWeekY + 25;
       currentMonth = addMonths(currentMonth, 1);
     }
 
-    // Add comprehensive legend at the end
-    if (currentY > 200) {
-      doc.addPage();
-      currentY = 20;
-    }
+    // PAGE 3: SYMPTOM TIMELINE AND PATTERN ANALYSIS
+    doc.addPage();
+    currentY = 20;
     
-    // Legend header with brand styling
+    doc.setFillColor(...periodBg);
+    doc.rect(0, 0, 210, 25, 'F');
     doc.setTextColor(...periodText);
-    doc.setFontSize(14);
-    doc.text('Legenda symbolov', 20, currentY);
+    doc.setFontSize(16);
+    doc.text('ANALÝZA SYMPTÓMOV A VZORCOV', 20, 15);
+    
     doc.setTextColor(0, 0, 0);
+    currentY = 45;
+
+    // Symptom frequency chart
+    doc.setFontSize(14);
+    doc.text('FREKVENCIA SYMPTÓMOV', 20, currentY);
+    currentY += 15;
+
+    stats.mostCommonSymptoms.forEach(({ symptom, count }, index) => {
+      const barWidth = (count / Math.max(...stats.mostCommonSymptoms.map(s => s.count))) * 120;
+      
+      doc.setFillColor(...lightGray);
+      doc.rect(20, currentY - 3, 120, 8, 'F');
+      doc.setFillColor(...brandText);
+      doc.rect(20, currentY - 3, barWidth, 8, 'F');
+      
+      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(9);
+      doc.text(`${symptom}: ${count} dní`, 145, currentY + 2);
+      currentY += 12;
+    });
+
+    currentY += 15;
+
+    // Medical legend
+    doc.setFontSize(14);
+    doc.setTextColor(...periodText);
+    doc.text('MEDICÍNSKA LEGENDA', 20, currentY);
     currentY += 15;
     
-    // Period legend with colored background (matching calendar widget)
+    // Period intensity legend
+    doc.setTextColor(0, 0, 0);
     doc.setFontSize(10);
-    doc.setFillColor(...periodBg);
-    doc.roundedRect(20, currentY - 5, 12, 8, 1, 1, 'F');
-    doc.setTextColor(...periodText);
-    doc.setFont(undefined, 'bold');
-    doc.text('31', 21, currentY);
-    doc.setTextColor(0, 0, 0);
-    doc.setFont(undefined, 'normal');
-    doc.text('Menstruacia', 40, currentY);
+    doc.text('INTENZITA MENŠTRUÁCIE:', 20, currentY);
     currentY += 10;
     
-    // Fertility legend with colored background (matching calendar widget)
-    doc.setFillColor(...fertilityBg);
-    doc.roundedRect(20, currentY - 5, 12, 8, 1, 1, 'F');
-    doc.setTextColor(...fertilityText);
-    doc.text('14', 21, currentY);
-    doc.setTextColor(0, 0, 0);
-    doc.text('Plodne dni', 40, currentY);
-    currentY += 10;
-    
-    // Symptoms legend with larger dot
-    doc.setFillColor(...brandText);
-    doc.ellipse(26, currentY - 2, 1.5, 1.5, 'F');
-    doc.setTextColor(0, 0, 0);
-    doc.text('Priznaky', 40, currentY);
-    currentY += 10;
-    
-    // Notes legend 
-    doc.setTextColor(...grayText);
-    doc.setFontSize(8);
-    doc.text('Poznamky v dni', 40, currentY);
-    doc.setFontSize(10);
-    doc.setTextColor(0, 0, 0);
-    currentY += 12;
-    
-    // Selected symptoms legend
-    if (selectedSymptoms.length > 0) {
-      doc.setTextColor(...periodText);
-      doc.setFontSize(12);
-      doc.text('Vybrane priznaky:', 20, currentY);
+    [1, 2, 3].forEach((intensity, index) => {
+      const colors: { [key: number]: [number, number, number] } = {
+        1: [252, 240, 242],
+        2: [249, 232, 237], 
+        3: [247, 225, 229]
+      };
+      const color = colors[intensity];
+      doc.setFillColor(color[0], color[1], color[2]);
+      doc.rect(25, currentY - 3, 15, 8, 'F');
       doc.setTextColor(0, 0, 0);
+      doc.text(`${intensity} - ${intensity === 1 ? 'Slabá' : intensity === 2 ? 'Stredná' : 'Silná'}`, 45, currentY + 2);
       currentY += 10;
-      
-      selectedSymptoms.forEach((symptom) => {
-        const color = getSymptomColor(symptom);
-        if (color) {
-          // Convert hex to RGB
-          const r = parseInt(color.slice(1, 3), 16);
-          const g = parseInt(color.slice(3, 5), 16);
-          const b = parseInt(color.slice(5, 7), 16);
-          doc.setFillColor(r, g, b);
-          doc.setFontSize(10);
-          // Draw colored dot for each symptom
-          doc.ellipse(26, currentY - 2, 1.5, 1.5, 'F');
-          doc.setTextColor(0, 0, 0);
-          doc.text(symptom, 40, currentY);
-          currentY += 8;
-        }
-      });
-    }
+    });
+
+    currentY += 10;
     
-    // Add notes section if there are any notes in the selected period
-    const notesInPeriod = [];
+    // Symptom severity legend
+    doc.text('ZÁVAŽNOSŤ SYMPTÓMOV:', 20, currentY);
+    currentY += 10;
+    
+    [1, 2, 3].forEach(severity => {
+      doc.setFillColor(...brandText);
+      doc.circle(30, currentY - 1, 2 + severity, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(6);
+      doc.text(severity.toString(), 29, currentY);
+      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(10);
+      doc.text(`${severity} - ${severity === 1 ? 'Mierne' : severity === 2 ? 'Stredné' : 'Výrazné'}`, 45, currentY + 2);
+      currentY += 12;
+    });
+
+    // PAGE 4: DETAILED NOTES FOR MEDICAL REVIEW
+    doc.addPage();
+    currentY = 20;
+    
+    doc.setFillColor(...periodBg);
+    doc.rect(0, 0, 210, 25, 'F');
+    doc.setTextColor(...periodText);
+    doc.setFontSize(16);
+    doc.text('DENNÉ POZNÁMKY A POZOROVANIA', 20, 15);
+    
+    doc.setTextColor(0, 0, 0);
+    currentY = 45;
+
+    // Collect and organize notes
+    const notesInPeriod: Array<{ date: string; notes: string; symptoms: string[] }> = [];
     let notesMonth = new Date(startDate);
+    
     while (notesMonth <= endDate) {
       const monthStart = startOfMonth(notesMonth);
       const monthEnd = endOfMonth(notesMonth);
@@ -428,66 +561,87 @@ export function CalendarView({
       
       daysInMonth.forEach(day => {
         const dayData = getDayData(day);
-        if (dayData.notes) {
+        if (dayData.notes || dayData.symptoms.length > 0) {
           notesInPeriod.push({
             date: format(day, 'dd.MM.yyyy', { locale: sk }),
-            notes: dayData.notes
+            notes: dayData.notes,
+            symptoms: dayData.symptoms
           });
         }
       });
       
       notesMonth = addMonths(notesMonth, 1);
     }
-    
-    if (notesInPeriod.length > 0) {
-      // Check if we need a new page for notes
-      if (currentY > 200) {
-        doc.addPage();
-        currentY = 20;
-      }
-      
-      doc.setTextColor(...periodText);
+
+    if (notesInPeriod.length === 0) {
       doc.setFontSize(12);
-      doc.text('Poznamky:', 20, currentY);
-      doc.setTextColor(0, 0, 0);
+      doc.text('Žiadne denné poznámky neboli zaznamenané v tomto období.', 20, currentY);
+    } else {
+      doc.setFontSize(12);
+      doc.text(`Celkovo ${notesInPeriod.length} dní so záznamami`, 20, currentY);
       currentY += 15;
-      
-      notesInPeriod.forEach(({ date, notes }) => {
-        // Check if we need a new page
-        if (currentY > 250) {
+
+      notesInPeriod.forEach(({ date, notes, symptoms }) => {
+        if (currentY > 260) {
           doc.addPage();
           currentY = 20;
         }
         
-        doc.setFontSize(10);
+        // Date header
+        doc.setFillColor(...lightGray);
+        doc.rect(20, currentY - 5, 170, 10, 'F');
         doc.setTextColor(...brandText);
-        doc.text(`${date}:`, 20, currentY);
+        doc.setFontSize(11);
+        doc.text(date, 25, currentY);
         doc.setTextColor(0, 0, 0);
-        currentY += 5;
+        currentY += 12;
         
-        // Split long notes into multiple lines
-        const lines = doc.splitTextToSize(notes, 170);
-        lines.forEach((line: string) => {
-          if (currentY > 250) {
-            doc.addPage();
-            currentY = 20;
-          }
-          doc.text(line, 25, currentY);
+        // Symptoms
+        if (symptoms.length > 0) {
+          doc.setFontSize(9);
+          doc.setTextColor(...brandText);
+          doc.text('Symptómy:', 25, currentY);
+          doc.setTextColor(0, 0, 0);
+          doc.text(symptoms.join(', '), 55, currentY);
+          currentY += 8;
+        }
+        
+        // Notes
+        if (notes) {
+          doc.setFontSize(9);
+          doc.setTextColor(...brandText);
+          doc.text('Poznámky:', 25, currentY);
+          doc.setTextColor(0, 0, 0);
           currentY += 5;
-        });
-        currentY += 5; // Extra spacing between notes
+          
+          const lines = doc.splitTextToSize(notes, 160);
+          lines.forEach((line: string) => {
+            if (currentY > 260) {
+              doc.addPage();
+              currentY = 20;
+            }
+            doc.text(line, 30, currentY);
+            currentY += 5;
+          });
+        }
+        
+        currentY += 8; // Spacing between entries
       });
     }
-    
-    // Footer with brand info
-    const pageHeight = doc.internal.pageSize.height;
-    doc.setTextColor(...grayText);
-    doc.setFontSize(8);
-    doc.text('Vygenerovane pomocou Periodka', 20, pageHeight - 20);
-    doc.text(`Datum exportu: ${format(new Date(), 'dd.MM.yyyy', { locale: sk })}`, 20, pageHeight - 15);
-    doc.setTextColor(0, 0, 0);
 
-    // Save the PDF with Slovak filename
+    // Professional footer on all pages
+    const totalPages = doc.internal.pages.length - 1;
+    for (let i = 1; i <= totalPages; i++) {
+      doc.setPage(i);
+      const pageHeight = doc.internal.pageSize.height;
+      doc.setTextColor(...grayText);
+      doc.setFontSize(8);
+      doc.text('Vygenerované aplikáciou Periodka pre medicínske účely', 20, pageHeight - 15);
+      doc.text(`Strana ${i} z ${totalPages}`, 180, pageHeight - 15);
+      doc.text(`Dátum exportu: ${format(new Date(), 'dd.MM.yyyy HH:mm', { locale: sk })}`, 20, pageHeight - 10);
+    }
+
+    // Save with medical filename
     const fileName = `Periodka_kalendar_${format(startDate, 'yyyy-MM')}_${format(endDate, 'yyyy-MM')}.pdf`;
     doc.save(fileName);
     setExportDialogOpen(false);
