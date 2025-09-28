@@ -277,14 +277,14 @@ export function CalendarView({
         
         if (dayInfo.isPeriod) {
           doc.setTextColor(...brandPrimary);
-          doc.text('●', dayX + 10, indicatorY);
+          doc.text('*', dayX + 10, indicatorY);
           doc.setTextColor(0, 0, 0);
           indicatorY += 4;
         }
         
         if (dayInfo.isFertile) {
           doc.setTextColor(...brandLight);
-          doc.text('♥', dayX + 10, indicatorY);
+          doc.text('<3', dayX + 10, indicatorY);
           doc.setTextColor(0, 0, 0);
           indicatorY += 4;
         }
@@ -307,7 +307,7 @@ export function CalendarView({
           } else {
             doc.setTextColor(...brandText);
           }
-          doc.text('●', dayX + 10, indicatorY);
+          doc.text('o', dayX + 10, indicatorY);
           doc.setTextColor(0, 0, 0);
           indicatorY += 4;
         }
@@ -350,30 +350,30 @@ export function CalendarView({
     // Period legend
     doc.setFontSize(10);
     doc.setTextColor(...brandPrimary);
-    doc.text('●', 20, currentY);
+    doc.text('*', 20, currentY);
     doc.setTextColor(0, 0, 0);
-    doc.text('Menštruácia', 30, currentY);
+    doc.text('Menstruacia', 30, currentY);
     currentY += 8;
     
     // Fertility legend
     doc.setTextColor(...brandLight);
-    doc.text('♥', 20, currentY);
+    doc.text('<3', 20, currentY);
     doc.setTextColor(0, 0, 0);
-    doc.text('Plodné dni', 30, currentY);
+    doc.text('Plodne dni', 30, currentY);
     currentY += 8;
     
     // Notes legend
     doc.setTextColor(...grayText);
     doc.text('N', 20, currentY);
     doc.setTextColor(0, 0, 0);
-    doc.text('Poznámky', 30, currentY);
+    doc.text('Poznamky', 30, currentY);
     currentY += 12;
     
     // Selected symptoms legend
     if (selectedSymptoms.length > 0) {
       doc.setTextColor(...brandPrimary);
       doc.setFontSize(12);
-      doc.text('Vybrané príznaky:', 20, currentY);
+      doc.text('Vybrane priznaky:', 20, currentY);
       doc.setTextColor(0, 0, 0);
       currentY += 10;
       
@@ -386,7 +386,7 @@ export function CalendarView({
           const b = parseInt(color.slice(5, 7), 16);
           doc.setTextColor(r, g, b);
           doc.setFontSize(10);
-          doc.text('●', 20, currentY);
+          doc.text('o', 20, currentY);
           doc.setTextColor(0, 0, 0);
           doc.text(symptom, 30, currentY);
           currentY += 8;
@@ -394,12 +394,73 @@ export function CalendarView({
       });
     }
     
+    // Add notes section if there are any notes in the selected period
+    const notesInPeriod = [];
+    let notesMonth = new Date(startDate);
+    while (notesMonth <= endDate) {
+      const monthStart = startOfMonth(notesMonth);
+      const monthEnd = endOfMonth(notesMonth);
+      const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
+      
+      daysInMonth.forEach(day => {
+        const dayData = getDayData(day);
+        if (dayData.notes) {
+          notesInPeriod.push({
+            date: format(day, 'dd.MM.yyyy', { locale: sk }),
+            notes: dayData.notes
+          });
+        }
+      });
+      
+      notesMonth = addMonths(notesMonth, 1);
+    }
+    
+    if (notesInPeriod.length > 0) {
+      // Check if we need a new page for notes
+      if (currentY > 200) {
+        doc.addPage();
+        currentY = 20;
+      }
+      
+      doc.setTextColor(...brandPrimary);
+      doc.setFontSize(12);
+      doc.text('Poznamky:', 20, currentY);
+      doc.setTextColor(0, 0, 0);
+      currentY += 15;
+      
+      notesInPeriod.forEach(({ date, notes }) => {
+        // Check if we need a new page
+        if (currentY > 250) {
+          doc.addPage();
+          currentY = 20;
+        }
+        
+        doc.setFontSize(10);
+        doc.setTextColor(...brandText);
+        doc.text(`${date}:`, 20, currentY);
+        doc.setTextColor(0, 0, 0);
+        currentY += 5;
+        
+        // Split long notes into multiple lines
+        const lines = doc.splitTextToSize(notes, 170);
+        lines.forEach((line: string) => {
+          if (currentY > 250) {
+            doc.addPage();
+            currentY = 20;
+          }
+          doc.text(line, 25, currentY);
+          currentY += 5;
+        });
+        currentY += 5; // Extra spacing between notes
+      });
+    }
+    
     // Footer with brand info
     const pageHeight = doc.internal.pageSize.height;
     doc.setTextColor(...grayText);
     doc.setFontSize(8);
-    doc.text('Vygenerované pomocou Periodka', 20, pageHeight - 20);
-    doc.text(`Dátum exportu: ${format(new Date(), 'dd.MM.yyyy', { locale: sk })}`, 20, pageHeight - 15);
+    doc.text('Vygenerovane pomocou Periodka', 20, pageHeight - 20);
+    doc.text(`Datum exportu: ${format(new Date(), 'dd.MM.yyyy', { locale: sk })}`, 20, pageHeight - 15);
     doc.setTextColor(0, 0, 0);
 
     // Save the PDF with Slovak filename
