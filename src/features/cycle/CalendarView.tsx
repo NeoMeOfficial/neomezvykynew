@@ -377,18 +377,19 @@ export function CalendarView({
     doc.text('Plodne dni', 40, currentY);
     currentY += 10;
     
-    // Symptoms legend with vertical line
-    doc.setTextColor(...brandText);
-    doc.text('|', 24, currentY);
+    // Symptoms legend with larger dot
+    doc.setFillColor(...brandText);
+    doc.circle(26, currentY - 2, 1.5, 'F');
     doc.setTextColor(0, 0, 0);
     doc.text('Priznaky', 40, currentY);
     currentY += 10;
     
-    // Notes legend with pen symbol
+    // Notes legend 
     doc.setTextColor(...grayText);
-    doc.text('P', 24, currentY);
+    doc.setFontSize(8);
+    doc.text('Poznamky v dni', 40, currentY);
+    doc.setFontSize(10);
     doc.setTextColor(0, 0, 0);
-    doc.text('Poznamky', 40, currentY);
     currentY += 12;
     
     // Selected symptoms legend
@@ -406,9 +407,10 @@ export function CalendarView({
           const r = parseInt(color.slice(1, 3), 16);
           const g = parseInt(color.slice(3, 5), 16);
           const b = parseInt(color.slice(5, 7), 16);
-          doc.setTextColor(r, g, b);
+          doc.setFillColor(r, g, b);
           doc.setFontSize(10);
-          doc.text('|', 24, currentY);
+          // Draw colored dot for each symptom
+          doc.circle(26, currentY - 2, 1.5, 'F');
           doc.setTextColor(0, 0, 0);
           doc.text(symptom, 40, currentY);
           currentY += 8;
