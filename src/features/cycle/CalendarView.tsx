@@ -42,8 +42,8 @@ export function CalendarView({
 }: CalendarViewProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const [viewType, setViewType] = useState<ViewType>('monthly');
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
+  const [showSymptomFilters, setShowSymptomFilters] = useState(false);
   const [historicalData, setHistoricalData] = useState<HistoricalEntry[]>([]);
   const [selectedDayData, setSelectedDayData] = useState<{ symptoms: string[]; notes: string } | null>(null);
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
@@ -663,37 +663,27 @@ export function CalendarView({
     return options;
   };
 
-  // Get calendar period based on view type
+  // Get calendar period for monthly view
   const getCalendarPeriod = () => {
-    if (viewType === 'weekly') {
-      const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
-      const weekEnd = endOfWeek(currentDate, { weekStartsOn: 1 });
-      return {
-        start: weekStart,
-        end: weekEnd,
-        days: eachDayOfInterval({ start: weekStart, end: weekEnd })
-      };
-    } else {
-      const monthStart = startOfMonth(currentDate);
-      const monthEnd = endOfMonth(currentDate);
-      const days = eachDayOfInterval({ start: monthStart, end: monthEnd });
+    const monthStart = startOfMonth(currentDate);
+    const monthEnd = endOfMonth(currentDate);
+    const days = eachDayOfInterval({ start: monthStart, end: monthEnd });
       
-      // Add padding for monthly view
-      const startDay = monthStart.getDay() === 0 ? 6 : monthStart.getDay() - 1;
-      const paddedDays = [];
-      
-      for (let i = 0; i < startDay; i++) {
-        paddedDays.push(null);
-      }
-      
-      days.forEach(day => paddedDays.push(day));
-      
-      return {
-        start: monthStart,
-        end: monthEnd,
-        days: paddedDays
-      };
+    // Add padding for monthly view
+    const startDay = monthStart.getDay() === 0 ? 6 : monthStart.getDay() - 1;
+    const paddedDays = [];
+    
+    for (let i = 0; i < startDay; i++) {
+      paddedDays.push(null);
     }
+    
+    days.forEach(day => paddedDays.push(day));
+    
+    return {
+      start: monthStart,
+      end: monthEnd,
+      days: paddedDays
+    };
   };
 
   const calendarPeriod = getCalendarPeriod();
@@ -740,11 +730,7 @@ export function CalendarView({
     return dayData.notes.length > 0;
   };
   const navigatePeriod = (direction: 'prev' | 'next') => {
-    if (viewType === 'weekly') {
-      setCurrentDate(prev => direction === 'prev' ? subWeeks(prev, 1) : addWeeks(prev, 1));
-    } else {
-      setCurrentDate(prev => direction === 'prev' ? subMonths(prev, 1) : addMonths(prev, 1));
-    }
+    setCurrentDate(prev => direction === 'prev' ? subMonths(prev, 1) : addMonths(prev, 1));
   };
 
   const handleDayClick = (date: Date) => {
@@ -842,41 +828,11 @@ export function CalendarView({
         </DialogContent>
       </Dialog>
 
-      {/* Header with View Toggle and Filters */}
+      {/* Header with Filters */}
       <div className={isMobile ? "space-y-3" : ""}>
         <div className={`flex items-center ${isMobile ? 'flex-col gap-3' : 'justify-between'}`}>
-          {/* View Toggle and Period Filters */}
+          {/* Period Filters and Filter Toggle */}
           <div className="flex gap-2 flex-wrap">
-            {/* View Toggle */}
-            <div className="flex bg-white/50 rounded-lg p-1 border border-rose-200/50">
-              <Button
-                size="sm"
-                variant={viewType === 'monthly' ? 'default' : 'ghost'}
-                onClick={() => setViewType('monthly')}
-                className={`flex items-center gap-1.5 text-xs h-7 ${
-                  viewType === 'monthly' 
-                    ? 'bg-gradient-to-r from-[#FF7782] to-[#FF9AA1] text-white' 
-                    : 'text-[#955F6A]'
-                }`}
-              >
-                <CalendarGrid className="w-3 h-3" />
-                Mesačne
-              </Button>
-              <Button
-                size="sm"
-                variant={viewType === 'weekly' ? 'default' : 'ghost'}
-                onClick={() => setViewType('weekly')}
-                className={`flex items-center gap-1.5 text-xs h-7 ${
-                  viewType === 'weekly' 
-                    ? 'bg-gradient-to-r from-[#FF7782] to-[#FF9AA1] text-white' 
-                    : 'text-[#955F6A]'
-                }`}
-              >
-                <Grid3X3 className="w-3 h-3" />
-                Týždenne
-              </Button>
-            </div>
-            
             {/* Period and Fertility Filters */}
             <Button 
               size="sm" 
@@ -904,6 +860,23 @@ export function CalendarView({
               <Heart className="w-3 h-3" />
               Plodné dni
             </Button>
+            
+            {/* Filter Toggle Button */}
+            {availableSymptoms.length > 0 && (
+              <Button 
+                size="sm" 
+                variant="outline"
+                onClick={() => setShowSymptomFilters(!showSymptomFilters)}
+                className={`flex items-center gap-1.5 text-xs border transition-all duration-200 ${
+                  showSymptomFilters 
+                    ? 'bg-gradient-to-r from-[#FF7782] to-[#FF9AA1] text-white border-[#FF7782]' 
+                    : 'border-[#FF7782] bg-transparent hover:bg-[#FF7782]/10 text-[#FF7782]'
+                }`}
+              >
+                <Filter className="w-3 h-3" />
+                Filtrovať
+              </Button>
+            )}
           </div>
 
           {/* Legend */}
@@ -927,8 +900,8 @@ export function CalendarView({
           </div>
         </div>
 
-        {/* Symptom Filters */}
-        {availableSymptoms.length > 0 && (
+        {/* Symptom Filters - Hidden by default */}
+        {availableSymptoms.length > 0 && showSymptomFilters && (
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <Filter className="w-4 h-4 text-[#955F6A]" />
@@ -968,10 +941,7 @@ export function CalendarView({
         </Button>
         
         <h4 className="text-lg font-medium" style={{ color: '#955F6A' }}>
-          {viewType === 'weekly' 
-            ? `${format(calendarPeriod.start, 'd. MMM', { locale: sk })} - ${format(calendarPeriod.end, 'd. MMM yyyy', { locale: sk })}`
-            : format(currentDate, 'LLLL yyyy', { locale: sk })
-          }
+          {format(currentDate, 'LLLL yyyy', { locale: sk })}
         </h4>
         
         <Button variant="ghost" size="sm" onClick={() => navigatePeriod('next')} className="flex items-center gap-1">
@@ -981,19 +951,17 @@ export function CalendarView({
 
       {/* Calendar Grid */}
       <div className="space-y-2">
-        {/* Day Headers - only show for monthly view */}
-        {viewType === 'monthly' && (
-          <div className="grid grid-cols-7 gap-1">
-            {['Po', 'Ut', 'St', 'Št', 'Pi', 'So', 'Ne'].map(day => (
-              <div key={day} className="text-center text-xs font-medium py-2" style={{ color: '#955F6A' }}>
-                {day}
-              </div>
-            ))}
-          </div>
-        )}
+        {/* Day Headers */}
+        <div className="grid grid-cols-7 gap-1">
+          {['Po', 'Ut', 'St', 'Št', 'Pi', 'So', 'Ne'].map(day => (
+            <div key={day} className="text-center text-xs font-medium py-2" style={{ color: '#955F6A' }}>
+              {day}
+            </div>
+          ))}
+        </div>
 
         {/* Calendar Days */}
-        <div className={`grid gap-1 ${viewType === 'weekly' ? 'grid-cols-7' : 'grid-cols-7'}`}>
+        <div className="grid gap-1 grid-cols-7">
           {calendarPeriod.days.map((date, index) => {
             if (!date) {
               return <div key={index} className="aspect-square"></div>;
@@ -1009,7 +977,7 @@ export function CalendarView({
             const daySymptoms = dayData.symptoms.filter(symptom => selectedSymptoms.includes(symptom));
             const hasSymptoms = daySymptoms.length > 0;
             
-            let dayClasses = `${viewType === 'weekly' ? 'min-h-[80px]' : 'aspect-square'} flex flex-col items-center justify-center text-sm rounded-lg cursor-pointer relative border border-transparent`;
+            let dayClasses = `aspect-square flex flex-col items-center justify-center text-sm rounded-lg cursor-pointer relative border border-transparent`;
             let dayStyle: React.CSSProperties = { color: '#955F6A' };
 
             // 3D Effect: Days with symptoms are elevated, others are pushed back
@@ -1079,13 +1047,6 @@ export function CalendarView({
                 <span className="relative z-10 font-medium">
                   {format(date, 'd')}
                 </span>
-                
-                {/* Day label for weekly view */}
-                {viewType === 'weekly' && (
-                  <span className="text-xs opacity-70 mb-1">
-                    {format(date, 'EEE', { locale: sk })}
-                  </span>
-                )}
                 
                 {/* Indicators container */}
                 <div className="absolute bottom-1 left-1 right-1 flex justify-center gap-1 flex-wrap">
@@ -1213,5 +1174,5 @@ export function CalendarView({
           onClose={() => setSelectedDate(null)}
         />
       )}
-    </div>;
+    </div>
 }
