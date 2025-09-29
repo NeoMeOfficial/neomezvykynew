@@ -21,11 +21,6 @@ const menuItems = [
     icon: TrendingUp,
   },
   {
-    id: 'track',
-    title: 'Zaznač si to podstatné',
-    icon: FileText,
-  },
-  {
     id: 'calendar',
     title: 'Kalendárny prehľad',
     icon: CalendarDays,

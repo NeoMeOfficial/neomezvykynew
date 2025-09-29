@@ -1,7 +1,8 @@
 import React from 'react';
 import { Clock } from 'lucide-react';
 import { WellnessDonutChart } from '../WellnessDonutChart';
-import { CycleData, DerivedState } from '../types';
+import { SymptomTracker } from '../SymptomTracker';
+import { CycleData, DerivedState, PhaseKey } from '../types';
 
 interface TodaysEstimateSectionProps {
   derivedState: DerivedState;
@@ -9,6 +10,8 @@ interface TodaysEstimateSectionProps {
   cycleData: CycleData;
   currentDay: number;
   currentPhase: { name: string; key: string };
+  accessCode?: string;
+  lastPeriodStart?: string | null;
 }
 
 export function TodaysEstimateSection({
@@ -16,7 +19,9 @@ export function TodaysEstimateSection({
   selectedOutcome,
   cycleData,
   currentDay,
-  currentPhase
+  currentPhase,
+  accessCode,
+  lastPeriodStart
 }: TodaysEstimateSectionProps) {
   return (
     <>
@@ -76,7 +81,7 @@ export function TodaysEstimateSection({
             
             <div className="space-y-3">
               <h5 className="text-base font-medium mb-3" style={{ color: '#955F6A' }}>
-                Čo môžete očakávať dnes:
+                Čo môžeš dnes očakávať:
               </h5>
               <p className="text-sm leading-relaxed opacity-90" style={{ color: '#955F6A' }}>
                 Môžeš sa cítiť menej energicky (65%) a potrebovať viac času na odpočinok. 
@@ -84,6 +89,19 @@ export function TodaysEstimateSection({
                 Nálada môže kolísať - môžeš sa cítiť podráždenejšia alebo úzkostlivejšia. 
                 Je to normálne, buď k sebe trpezlivá.
               </p>
+            </div>
+            
+            {/* How do you feel today section */}
+            <div className="space-y-3">
+              <h5 className="text-base font-medium mb-3" style={{ color: '#955F6A' }}>
+                Ako sa dnes cítiš:
+              </h5>
+              <SymptomTracker
+                currentPhase={currentPhase.key as PhaseKey}
+                currentDay={currentDay}
+                accessCode={accessCode}
+                lastPeriodStart={lastPeriodStart}
+              />
             </div>
           </div>
         </div>

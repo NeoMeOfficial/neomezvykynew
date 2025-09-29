@@ -5,7 +5,6 @@ import { useCycleData } from './useCycleData';
 import { DatePickerModal } from './DatePickerModal';
 import { SettingsModal } from './SettingsModal';
 import { TodaysEstimateSection } from './sections/TodaysEstimateSection';
-import { TrackEssentialsSection } from './sections/TrackEssentialsSection';
 import { FeelBetterSection } from './sections/FeelBetterSection';
 import { CalendarViewSection } from './sections/CalendarViewSection';
 
@@ -109,11 +108,6 @@ export default function MenstrualCycleTrackerAccordion({
           cycleData={cycleData}
           currentDay={currentDay}
           currentPhase={currentPhase}
-        />
-
-        <TrackEssentialsSection
-          currentPhase={currentPhase.key}
-          currentDay={currentDay}
           accessCode={accessCode}
           lastPeriodStart={cycleData.lastPeriodStart}
         />

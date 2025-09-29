@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { MenstrualSidebar } from './MenstrualSidebar';
 import { TodaysEstimateSection } from './sections/TodaysEstimateSection';
-import { TrackEssentialsSection } from './sections/TrackEssentialsSection';
 import { FeelBetterSection } from './sections/FeelBetterSection';
 import { CalendarViewSection } from './sections/CalendarViewSection';
 import { DatePickerModal } from './DatePickerModal';
@@ -113,11 +112,6 @@ export function MenstrualDashboardLayout({
             cycleData={cycleData}
             currentDay={currentDay}
             currentPhase={currentPhase}
-          />
-
-          <TrackEssentialsSection
-            currentPhase={currentPhase.key}
-            currentDay={currentDay}
             accessCode={accessCode}
             lastPeriodStart={cycleData.lastPeriodStart}
           />
@@ -197,13 +191,6 @@ export function MenstrualDashboardLayout({
                 cycleData={cycleData}
                 currentDay={currentDay}
                 currentPhase={currentPhase}
-              />
-            )}
-
-            {activeSection === 'track' && (
-              <TrackEssentialsSection
-                currentPhase={currentPhase.key}
-                currentDay={currentDay}
                 accessCode={accessCode}
                 lastPeriodStart={cycleData.lastPeriodStart}
               />
