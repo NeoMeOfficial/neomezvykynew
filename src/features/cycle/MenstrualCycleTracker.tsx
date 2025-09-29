@@ -543,7 +543,7 @@ export default function MenstrualCycleTracker({
         </TabsList>
 
         <TabsContent value="today" className="mt-5">
-          <SuggestedToday derivedState={derivedState} accessCode={accessCode} />
+          <SuggestedToday derivedState={derivedState} accessCode={accessCode} lastPeriodStart={cycleData.lastPeriodStart} />
         </TabsContent>
 
         <TabsContent value="overview" className="mt-5">

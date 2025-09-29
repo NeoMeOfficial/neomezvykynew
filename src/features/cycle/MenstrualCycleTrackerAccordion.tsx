@@ -116,6 +116,7 @@ export default function MenstrualCycleTrackerAccordion({
         currentPhase={currentPhase.key}
         currentDay={currentDay}
         accessCode={accessCode}
+        lastPeriodStart={cycleData.lastPeriodStart}
       />
 
       {/* Section 3: Feel Better */}

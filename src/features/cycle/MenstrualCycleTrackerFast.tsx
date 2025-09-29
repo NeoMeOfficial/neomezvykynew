@@ -125,6 +125,7 @@ export default function MenstrualCycleTrackerFast({
               <SuggestedToday 
                 derivedState={derivedState!} 
                 accessCode={accessCode}
+                lastPeriodStart={cycleData.lastPeriodStart}
               />
             </Suspense>
 

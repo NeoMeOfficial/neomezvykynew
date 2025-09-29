@@ -7,12 +7,14 @@ interface TrackEssentialsSectionProps {
   currentPhase: PhaseKey;
   currentDay: number;
   accessCode?: string;
+  lastPeriodStart?: string | null;
 }
 
 export function TrackEssentialsSection({
   currentPhase,
   currentDay,
-  accessCode
+  accessCode,
+  lastPeriodStart
 }: TrackEssentialsSectionProps) {
   return (
     <>
@@ -53,6 +55,7 @@ export function TrackEssentialsSection({
             currentPhase={currentPhase}
             currentDay={currentDay}
             accessCode={accessCode}
+            lastPeriodStart={lastPeriodStart}
           />
         </div>
       </div>

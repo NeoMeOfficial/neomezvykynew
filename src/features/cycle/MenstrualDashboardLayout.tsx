@@ -119,6 +119,7 @@ export function MenstrualDashboardLayout({
           currentPhase={currentPhase.key}
           currentDay={currentDay}
           accessCode={accessCode}
+          lastPeriodStart={cycleData.lastPeriodStart}
         />
 
         <FeelBetterSection
@@ -207,6 +208,7 @@ export function MenstrualDashboardLayout({
                 currentPhase={currentPhase.key}
                 currentDay={currentDay}
                 accessCode={accessCode}
+                lastPeriodStart={cycleData.lastPeriodStart}
               />
             )}
 

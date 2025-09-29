@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Save, RotateCcw } from 'lucide-react';
 import { PhaseKey } from './types';
+import { format, addDays } from 'date-fns';
+import { sk } from 'date-fns/locale';
 interface Symptom {
   id: string;
   name: string;
@@ -133,33 +135,48 @@ interface SymptomTrackerProps {
   currentPhase: PhaseKey;
   currentDay: number;
   accessCode?: string;
+  lastPeriodStart?: string | null; // ISO date string
 }
 export function SymptomTracker({
   currentPhase,
   currentDay,
-  accessCode
+  accessCode,
+  lastPeriodStart
 }: SymptomTrackerProps) {
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
   const [notes, setNotes] = useState<string>('');
   const [hasChanges, setHasChanges] = useState(false);
 
+  // Calculate the actual date for the currentDay
+  const getDateForCurrentDay = (): string => {
+    if (!lastPeriodStart) {
+      return new Date().toISOString().split('T')[0]; // Fallback to today
+    }
+    
+    const periodStartDate = new Date(lastPeriodStart);
+    const targetDate = addDays(periodStartDate, currentDay - 1); // currentDay is 1-indexed
+    return targetDate.toISOString().split('T')[0];
+  };
+
+  const currentDate = getDateForCurrentDay();
+  const currentDateObject = new Date(currentDate);
+  const today = new Date();
+  const isToday = format(currentDateObject, 'yyyy-MM-dd') === format(today, 'yyyy-MM-dd');
+
   // Filter symptoms relevant to current phase
   const relevantSymptoms = SYMPTOMS.filter(symptom => symptom.phases.includes(currentPhase));
 
-  // Load saved symptoms and notes for today
+  // Load saved symptoms and notes for the current day being tracked
   useEffect(() => {
-    const today = new Date().toISOString().split('T')[0];
-    const symptomsKey = accessCode ? `symptoms_${accessCode}_${today}` : `temp_symptoms_${today}`;
-    const notesKey = accessCode ? `notes_${accessCode}_${today}` : `temp_notes_${today}`;
+    const symptomsKey = accessCode ? `symptoms_${accessCode}_${currentDate}` : `temp_symptoms_${currentDate}`;
+    const notesKey = accessCode ? `notes_${accessCode}_${currentDate}` : `temp_notes_${currentDate}`;
     const savedSymptoms = localStorage.getItem(symptomsKey);
     const savedNotes = localStorage.getItem(notesKey);
-    if (savedSymptoms) {
-      setSelectedSymptoms(JSON.parse(savedSymptoms));
-    }
-    if (savedNotes) {
-      setNotes(savedNotes);
-    }
-  }, [accessCode]);
+    
+    setSelectedSymptoms(savedSymptoms ? JSON.parse(savedSymptoms) : []);
+    setNotes(savedNotes || '');
+    setHasChanges(false);
+  }, [accessCode, currentDate]);
   const toggleSymptom = (symptomId: string) => {
     setSelectedSymptoms(prev => {
       const newSelected = prev.includes(symptomId) ? prev.filter(id => id !== symptomId) : [...prev, symptomId];
@@ -168,9 +185,8 @@ export function SymptomTracker({
     });
   };
   const saveSymptoms = () => {
-    const today = new Date().toISOString().split('T')[0];
-    const symptomsKey = accessCode ? `symptoms_${accessCode}_${today}` : `temp_symptoms_${today}`;
-    const notesKey = accessCode ? `notes_${accessCode}_${today}` : `temp_notes_${today}`;
+    const symptomsKey = accessCode ? `symptoms_${accessCode}_${currentDate}` : `temp_symptoms_${currentDate}`;
+    const notesKey = accessCode ? `notes_${accessCode}_${currentDate}` : `temp_notes_${currentDate}`;
     localStorage.setItem(symptomsKey, JSON.stringify(selectedSymptoms));
     localStorage.setItem(notesKey, notes);
     setHasChanges(false);
@@ -190,6 +206,25 @@ export function SymptomTracker({
     return names[phase];
   };
   return <div className="space-y-4">
+      {/* Date Header */}
+      <div className={`p-3 rounded-lg border ${isToday ? 'bg-gradient-to-r from-rose-50 to-pink-50 border-rose-200' : 'bg-gray-50/50 border-gray-200'}`}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium" style={{ color: isToday ? '#FF7782' : '#955F6A' }}>
+              {format(currentDateObject, 'EEEE, d. MMMM yyyy', { locale: sk })}
+            </span>
+            {isToday && (
+              <span className="text-xs font-medium px-2 py-1 rounded-full bg-rose-100 text-rose-700">
+                Dnes
+              </span>
+            )}
+          </div>
+          <span className="text-xs" style={{ color: '#955F6A' }}>
+            Deň {currentDay} cyklu
+          </span>
+        </div>
+      </div>
+
       {/* Header */}
       <div>
         <div className="flex items-center justify-between mb-2">

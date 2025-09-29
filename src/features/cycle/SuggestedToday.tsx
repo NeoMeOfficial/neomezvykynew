@@ -7,11 +7,13 @@ interface SuggestedTodayProps {
   derivedState: DerivedState;
   className?: string;
   accessCode?: string;
+  lastPeriodStart?: string | null;
 }
 export function SuggestedToday({
   derivedState,
   className = "",
-  accessCode
+  accessCode,
+  lastPeriodStart
 }: SuggestedTodayProps) {
   const suggestion = suggestForDay(derivedState.currentDay, derivedState.phaseRanges);
   const phaseInsights = PHASE_INSIGHTS[suggestion.phaseKey];
@@ -113,7 +115,7 @@ export function SuggestedToday({
           }}>
             Zaznač si to podstatné
           </h3>
-          <SymptomTracker currentPhase={derivedState.currentPhase.key} currentDay={derivedState.currentDay} accessCode={accessCode} />
+          <SymptomTracker currentPhase={derivedState.currentPhase.key} currentDay={derivedState.currentDay} accessCode={accessCode} lastPeriodStart={lastPeriodStart} />
         </div>
       </div>
     </div>;
