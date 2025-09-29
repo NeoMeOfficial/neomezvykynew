@@ -924,18 +924,6 @@ export function CalendarView({
               <FileText className="w-3 h-3 text-cycle-body-text" />
               <span className="text-cycle-body-text">Poznámky</span>
             </div>
-            {selectedSymptoms.length > 0 && selectedSymptoms.map(symptom => {
-              const color = getSymptomColor(symptom);
-              return (
-                <div key={symptom} className="flex items-center gap-1.5">
-                  <div 
-                    className="w-3 h-3 rounded-full" 
-                    style={{ backgroundColor: color || '#9CA3AF' }}
-                  ></div>
-                  <span className="text-cycle-body-text">{symptom}</span>
-                </div>
-              );
-            })}
           </div>
         </div>
 
