@@ -68,71 +68,71 @@ export default function MenstrualCycleTrackerAccordion({
   const { currentDay, phaseRanges, currentPhase } = derivedState;
 
   return (
-    <div className="w-full space-y-4">
+    <div className="w-full px-4 py-6 space-y-8">
       {/* Main Header with Action Buttons */}
-      <div className="flex justify-between items-center mb-4">
-        <div>
-          <h2 className="text-lg font-semibold" style={{ color: '#955F6A' }}>
+      <div className="flex justify-between items-start gap-4 pb-2">
+        <div className="flex-1 min-w-0">
+          <h2 className="text-xl font-semibold mb-1 leading-tight" style={{ color: '#955F6A' }}>
             Menštruačný kalendár
           </h2>
-          <p className="text-sm" style={{ color: '#955F6A' }}>
+          <p className="text-sm opacity-80" style={{ color: '#955F6A' }}>
             Deň {currentDay} • {currentPhase.name}
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-col gap-2 sm:flex-row">
           <Button
             variant="outline"
             size="sm"
             onClick={() => setShowDatePicker(true)}
-            className="flex items-center gap-1.5"
+            className="flex items-center gap-1.5 text-xs px-3 py-2"
           >
-            <CalendarIcon className="w-4 h-4" />
+            <CalendarIcon className="w-3 h-3" />
             Upraviť
           </Button>
           <Button
             variant="outline"
             size="sm"
             onClick={() => setShowSettings(true)}
-            className="flex items-center gap-1.5"
+            className="flex items-center gap-1.5 text-xs px-3 py-2"
           >
-            <TrendingUp className="w-4 h-4" />
+            <TrendingUp className="w-3 h-3" />
             Nastavenia
           </Button>
         </div>
       </div>
 
-      {/* Section 1: Today's Estimate */}
-      <TodaysEstimateSection
-        derivedState={derivedState}
-        selectedOutcome={selectedOutcome}
-        cycleData={cycleData}
-        currentDay={currentDay}
-        currentPhase={currentPhase}
-      />
+      {/* All sections for mobile */}
+      <div className="space-y-8">
+        <TodaysEstimateSection
+          derivedState={derivedState}
+          selectedOutcome={selectedOutcome}
+          cycleData={cycleData}
+          currentDay={currentDay}
+          currentPhase={currentPhase}
+        />
 
-      {/* Section 2: Track Essentials */}
-      <TrackEssentialsSection
-        currentPhase={currentPhase.key}
-        currentDay={currentDay}
-        accessCode={accessCode}
-        lastPeriodStart={cycleData.lastPeriodStart}
-      />
+        <TrackEssentialsSection
+          currentPhase={currentPhase.key}
+          currentDay={currentDay}
+          accessCode={accessCode}
+          lastPeriodStart={cycleData.lastPeriodStart}
+        />
 
-      {/* Section 3: Feel Better */}
-      <FeelBetterSection
-        phaseRanges={phaseRanges}
-        currentPhase={currentPhase}
-      />
+        <FeelBetterSection
+          phaseRanges={phaseRanges}
+          currentPhase={currentPhase}
+        />
 
-      {/* Section 4: Calendar View */}
-      <CalendarViewSection
-        cycleData={cycleData}
-        derivedState={derivedState}
-        onOutcomeSelect={setSelectedOutcome}
-        selectedOutcome={selectedOutcome}
-        onPeriodIntensityChange={setPeriodIntensity}
-        getPeriodIntensity={getPeriodIntensity}
-      />
+        <CalendarViewSection
+          cycleData={cycleData}
+          derivedState={derivedState}
+          onOutcomeSelect={setSelectedOutcome}
+          selectedOutcome={selectedOutcome}
+          onPeriodIntensityChange={setPeriodIntensity}
+          getPeriodIntensity={getPeriodIntensity}
+          accessCode={accessCode}
+        />
+      </div>
 
       {/* Modals */}
       <DatePickerModal

@@ -32,7 +32,7 @@ export function TodaysEstimateSection({
              }}></div>
         
         {/* Header with elevated glass layer */}
-        <div className="relative p-4 rounded-t-2xl z-10"
+        <div className="relative px-4 py-5 sm:px-6 rounded-t-2xl z-10"
              style={{ 
                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(253, 242, 248, 0.95) 100%)',
                boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 2px 8px rgba(149, 95, 106, 0.1)'
@@ -48,35 +48,37 @@ export function TodaysEstimateSection({
         </div>
 
         {/* Content with recessed glass layer */}
-        <div className="p-6 space-y-6 rounded-b-2xl z-10 relative"
+        <div className="px-4 py-6 sm:px-6 sm:py-8 space-y-8 rounded-b-2xl z-10 relative"
              style={{ 
                background: 'linear-gradient(135deg, rgba(251, 248, 249, 0.75) 0%, rgba(253, 242, 248, 0.80) 100%)',
                boxShadow: 'inset 0 2px 8px rgba(149, 95, 106, 0.05)'
              }}>
           {/* Cycle Chart */}
-          <WellnessDonutChart
-            derivedState={derivedState}
-            selectedOutcome={selectedOutcome}
-            cycleData={cycleData}
-            className="mb-6"
-          />
+          <div className="mb-8">
+            <WellnessDonutChart
+              derivedState={derivedState}
+              selectedOutcome={selectedOutcome}
+              cycleData={cycleData}
+              className="mb-6"
+            />
+          </div>
           
           {/* Current Phase Information */}
-          <div className="space-y-3">
-            <div>
-              <h4 className="text-lg font-medium mb-2" style={{ color: '#955F6A' }}>
+          <div className="space-y-6">
+            <div className="space-y-3">
+              <h4 className="text-lg font-medium mb-3 leading-tight" style={{ color: '#955F6A' }}>
                 {currentPhase.name} fáza - Deň {currentDay} cyklu
               </h4>
-              <p className="text-sm leading-relaxed" style={{ color: '#955F6A' }}>
+              <p className="text-sm leading-relaxed opacity-90" style={{ color: '#955F6A' }}>
                 Energia postupne klesá, telo sa pripravuje na menštruáciu.
               </p>
             </div>
             
-            <div>
-              <h5 className="text-base font-medium mb-2" style={{ color: '#955F6A' }}>
+            <div className="space-y-3">
+              <h5 className="text-base font-medium mb-3" style={{ color: '#955F6A' }}>
                 Čo môžete očakávať dnes:
               </h5>
-              <p className="text-sm leading-relaxed" style={{ color: '#955F6A' }}>
+              <p className="text-sm leading-relaxed opacity-90" style={{ color: '#955F6A' }}>
                 Môžeš sa cítiť menej energicky (65%) a potrebovať viac času na odpočinok. 
                 Energia postupne klesá, preto potrebuješ pravidelné jedlá a menej náročné aktivity. 
                 Nálada môže kolísať - môžeš sa cítiť podráždenejšia alebo úzkostlivejšia. 

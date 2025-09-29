@@ -30,7 +30,7 @@ export function TrackEssentialsSection({
              }}></div>
         
         {/* Header with elevated glass layer */}
-        <div className="relative p-4 rounded-t-2xl z-10"
+        <div className="relative px-4 py-5 sm:px-6 rounded-t-2xl z-10"
              style={{ 
                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(253, 242, 248, 0.95) 100%)',
                boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 2px 8px rgba(149, 95, 106, 0.1)'
@@ -46,7 +46,7 @@ export function TrackEssentialsSection({
         </div>
 
         {/* Content with recessed glass layer */}
-        <div className="p-6 space-y-6 rounded-b-2xl z-10 relative"
+        <div className="px-4 py-6 sm:px-6 sm:py-8 rounded-b-2xl z-10 relative"
              style={{ 
                background: 'linear-gradient(135deg, rgba(251, 248, 249, 0.75) 0%, rgba(253, 242, 248, 0.80) 100%)',
                boxShadow: 'inset 0 2px 8px rgba(149, 95, 106, 0.05)'
