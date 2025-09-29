@@ -207,21 +207,23 @@ export function SymptomTracker({
   };
   return <div className="space-y-4">
       {/* Date Header */}
-      <div className={`p-3 rounded-lg border ${isToday ? 'bg-gradient-to-r from-rose-50 to-pink-50 border-rose-200' : 'bg-gray-50/50 border-gray-200'}`}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium" style={{ color: isToday ? '#FF7782' : '#955F6A' }}>
+      <div className={`px-4 py-5 rounded-xl border ${isToday ? 'bg-gradient-to-r from-rose-50 to-pink-50 border-rose-200' : 'bg-gray-50/50 border-gray-200'}`}>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="flex flex-col gap-2">
+            <span className="text-base font-medium leading-relaxed" style={{ color: isToday ? '#FF7782' : '#955F6A' }}>
               {format(currentDateObject, 'EEEE, d. MMMM yyyy', { locale: sk })}
             </span>
-            {isToday && (
-              <span className="text-xs font-medium px-2 py-1 rounded-full bg-rose-100 text-rose-700">
-                Dnes
+            <div className="flex items-center gap-2">
+              {isToday && (
+                <span className="text-xs font-medium px-2.5 py-1.5 rounded-full bg-rose-100 text-rose-700">
+                  Dnes
+                </span>
+              )}
+              <span className="text-sm font-medium px-2.5 py-1.5 rounded-full bg-gray-100" style={{ color: '#955F6A' }}>
+                Deň {currentDay} cyklu
               </span>
-            )}
+            </div>
           </div>
-          <span className="text-xs" style={{ color: '#955F6A' }}>
-            Deň {currentDay} cyklu
-          </span>
         </div>
       </div>
 
