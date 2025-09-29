@@ -218,7 +218,7 @@ export function SymptomTracker({
 
       {/* Symptom Tags */}
       <div className="flex flex-wrap gap-2">
-        {relevantSymptoms.map(symptom => <Badge key={symptom.id} variant={selectedSymptoms.includes(symptom.id) ? "default" : "outline"} className={`cursor-pointer select-none text-sm py-1.5 px-3 transition-all duration-200 symptom-glass ${selectedSymptoms.includes(symptom.id) ? 'bg-primary text-primary-foreground shadow-sm' : 'hover:bg-muted'}`} onClick={() => toggleSymptom(symptom.id)} style={{
+        {relevantSymptoms.map(symptom => <Badge key={symptom.id} variant={selectedSymptoms.includes(symptom.id) ? "default" : "outline"} className={`cursor-pointer select-none text-xs py-1 px-2.5 transition-all duration-200 symptom-glass ${selectedSymptoms.includes(symptom.id) ? 'bg-primary text-primary-foreground shadow-sm' : 'hover:bg-muted'}`} onClick={() => toggleSymptom(symptom.id)} style={{
         backgroundColor: selectedSymptoms.includes(symptom.id) ? undefined : '#FBF8F9',
         color: selectedSymptoms.includes(symptom.id) ? undefined : '#955F6A'
       }}>
