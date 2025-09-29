@@ -777,7 +777,7 @@ export function CalendarView({
         {[...Array(intensity)].map((_, i) => (
           <Droplets 
             key={i} 
-            className="w-2 h-2" 
+            className="w-2.5 h-2.5" 
             style={{ color: '#FF7782' }}
             fill="currentColor"
           />
@@ -1091,7 +1091,7 @@ export function CalendarView({
                   
                   {/* Notes indicator */}
                   {hasNotes && (
-                    <FileText className="w-3 h-3 text-gray-500" />
+                    <FileText className="w-4 h-4 text-gray-500" />
                   )}
                 </div>
                 
