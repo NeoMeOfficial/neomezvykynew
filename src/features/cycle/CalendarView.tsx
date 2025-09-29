@@ -127,8 +127,8 @@ export function CalendarView({
     };
   }, []);
 
-  // Get available symptoms for filtering
-  const availableSymptoms = [...new Set(historicalData.flatMap(entry => entry.symptoms))];
+  // Get available symptoms for filtering - limit to 7 for test view
+  const availableSymptoms = [...new Set(historicalData.flatMap(entry => entry.symptoms))].slice(0, 7);
 
   // Pastel earthy color palette for selected symptoms
   // Define 5 distinctive pastel colors for symptom selection order
