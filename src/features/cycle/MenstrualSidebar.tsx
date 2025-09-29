@@ -98,7 +98,7 @@ export function MenstrualSidebar({ activeSection, onSectionChange, onEditClick, 
                       </button>
                       <button
                         onClick={onSettingsClick}
-                        className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-3xl bg-gradient-to-r from-rose-50/40 to-pink-50/40 border border-rose-200/20 hover:from-rose-50/60 hover:to-pink-50/60 transition-all"
+                        className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-3xl bg-white border border-rose-200/20 hover:bg-gray-50 transition-all"
                         style={{ color: '#FF7782' }}
                       >
                         <Lightbulb className="w-3 h-3" />
