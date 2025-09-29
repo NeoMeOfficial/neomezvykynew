@@ -46,7 +46,6 @@ export function CalendarView({
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
   const [historicalData, setHistoricalData] = useState<HistoricalEntry[]>([]);
   const [selectedDayData, setSelectedDayData] = useState<{ symptoms: string[]; notes: string } | null>(null);
-  const [symptomColorMap, setSymptomColorMap] = useState<{ [key: string]: string }>({});
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
   const [exportStartMonth, setExportStartMonth] = useState<string>('');
   const [exportEndMonth, setExportEndMonth] = useState<string>('');
@@ -132,55 +131,56 @@ export function CalendarView({
   const availableSymptoms = [...new Set(historicalData.flatMap(entry => entry.symptoms))];
 
   // Pastel earthy color palette for selected symptoms
-  const pastelEarthyColors = [
-    '#D4B5A0', // Soft beige
-    '#C8B8A8', // Warm taupe
-    '#B8C5A0', // Sage green
-    '#A8B5C8', // Dusty blue
-    '#C8A8B5', // Muted rose
-    '#B5C8A8', // Soft mint
-    '#A8C8B5', // Light teal
-    '#C8B5A8', // Pale brown
-    '#B5A8C8', // Lavender gray
-    '#A8C5B8', // Seafoam
-    '#C5A8B8', // Dusty pink
-    '#A8B8C5', // Powder blue
-    '#B8A8C5', // Soft purple
-    '#C5B8A8', // Warm gray
-    '#A8C5A8', // Soft green
+  // Define 5 distinctive pastel colors for symptom selection order
+  const symptomOrderColors = [
+    '#E8B4C8', // Soft pink - 1st selected symptom
+    '#B4D4E8', // Light blue - 2nd selected symptom  
+    '#D4E8B4', // Soft green - 3rd selected symptom
+    '#E8D4B4', // Warm peach - 4th selected symptom
+    '#C4B4E8', // Lavender - 5th selected symptom
   ];
 
-  // Assign colors to selected symptoms
-  const getSymptomColor = (symptom: string) => {
-    if (!selectedSymptoms.includes(symptom)) return undefined;
-    return symptomColorMap[symptom];
+  // Generate color variations for symptoms beyond the 5th
+  const getColorVariation = (baseColor: string, variation: number): string => {
+    // Convert hex to RGB
+    const r = parseInt(baseColor.slice(1, 3), 16);
+    const g = parseInt(baseColor.slice(3, 5), 16);
+    const b = parseInt(baseColor.slice(5, 7), 16);
+    
+    // Create variations by adjusting brightness
+    const factor = 1 - (variation * 0.15); // Each variation gets 15% darker
+    const newR = Math.round(r * factor);
+    const newG = Math.round(g * factor);
+    const newB = Math.round(b * factor);
+    
+    return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`;
   };
 
-  // Handle symptom selection with color assignment
+  // Get color based on symptom selection order
+  const getSymptomColor = (symptom: string) => {
+    if (!selectedSymptoms.includes(symptom)) return undefined;
+    
+    const orderIndex = selectedSymptoms.indexOf(symptom);
+    
+    if (orderIndex < symptomOrderColors.length) {
+      // Use base colors for first 5 symptoms
+      return symptomOrderColors[orderIndex];
+    } else {
+      // Use color variations for symptoms beyond the 5th
+      const baseColorIndex = orderIndex % symptomOrderColors.length;
+      const variationLevel = Math.floor(orderIndex / symptomOrderColors.length);
+      return getColorVariation(symptomOrderColors[baseColorIndex], variationLevel);
+    }
+  };
+
+  // Handle symptom selection - simplified without color mapping state
   const handleSymptomToggle = (symptom: string) => {
     setSelectedSymptoms(prev => {
       const isCurrentlySelected = prev.includes(symptom);
       
       if (isCurrentlySelected) {
-        // Remove symptom and its color
-        setSymptomColorMap(colorMap => {
-          const newMap = { ...colorMap };
-          delete newMap[symptom];
-          return newMap;
-        });
         return prev.filter(s => s !== symptom);
       } else {
-        // Add symptom and assign it a new color
-        setSymptomColorMap(colorMap => {
-          const usedColors = Object.values(colorMap);
-          const availableColor = pastelEarthyColors.find(color => !usedColors.includes(color)) || 
-                                 pastelEarthyColors[Object.keys(colorMap).length % pastelEarthyColors.length];
-          
-          return {
-            ...colorMap,
-            [symptom]: availableColor
-          };
-        });
         return [...prev, symptom];
       }
     });
