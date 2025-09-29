@@ -1,5 +1,5 @@
 import React from 'react';
-import { Clock, FileText, TrendingUp, BarChart3, CalendarDays, Lightbulb } from 'lucide-react';
+import { Clock, FileText, TrendingUp, CalendarDays, Lightbulb } from 'lucide-react';
 import periodkaLogo from '@/assets/periodka-logo.png';
 
 interface MenstrualSidebarProps {
@@ -24,11 +24,6 @@ const menuItems = [
     id: 'track',
     title: 'Zaznač si to podstatné',
     icon: FileText,
-  },
-  {
-    id: 'data',
-    title: 'Tvoje záznamy',
-    icon: BarChart3,
   },
   {
     id: 'calendar',
