@@ -83,7 +83,7 @@ export default function MenstrualCycleTrackerAccordion({
             variant="outline"
             size="sm"
             onClick={() => setShowDatePicker(true)}
-            className="flex items-center gap-1.5 text-xs px-3 py-2"
+            className="flex items-center gap-1.5 text-xs px-3 py-2 bg-white border border-[#955F6A] text-[#955F6A] hover:bg-[#955F6A] hover:text-white"
           >
             <CalendarIcon className="w-3 h-3" />
             Upraviť
@@ -92,7 +92,7 @@ export default function MenstrualCycleTrackerAccordion({
             variant="outline"
             size="sm"
             onClick={() => setShowSettings(true)}
-            className="flex items-center gap-1.5 text-xs px-3 py-2"
+            className="flex items-center gap-1.5 text-xs px-3 py-2 bg-white border border-[#955F6A] text-[#955F6A] hover:bg-[#955F6A] hover:text-white"
           >
             <TrendingUp className="w-3 h-3" />
             Nastavenia
