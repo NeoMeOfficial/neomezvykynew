@@ -1017,16 +1017,48 @@ export function CalendarView({
             const hasNotes = dayHasNotes(date);
             const dayData = getDayData(date);
             
-            let dayClasses = `${viewType === 'weekly' ? 'min-h-[80px]' : 'aspect-square'} flex flex-col items-center justify-center text-sm rounded-lg transition-all cursor-pointer relative border border-transparent`;
+            // Get filtered symptoms for this day to create stroke effects
+            const daySymptoms = dayData.symptoms.filter(symptom => selectedSymptoms.includes(symptom));
+            const hasSymptoms = daySymptoms.length > 0;
+            
+            let dayClasses = `${viewType === 'weekly' ? 'min-h-[80px]' : 'aspect-square'} flex flex-col items-center justify-center text-sm rounded-lg cursor-pointer relative border border-transparent`;
             let dayStyle: React.CSSProperties = { color: '#955F6A' };
+
+            // 3D Effect: Days with symptoms are elevated, others are pushed back
+            if (hasSymptoms) {
+              dayClasses += " transform translate-z-0 shadow-lg transition-all duration-300 hover:shadow-xl";
+              dayStyle.transform = 'translateZ(8px) scale(1.02)';
+              dayStyle.zIndex = 10;
+              dayStyle.boxShadow = '0 8px 25px -8px rgba(0,0,0,0.2), 0 4px 15px -4px rgba(0,0,0,0.1)';
+            } else {
+              dayClasses += " transform translate-z-0 transition-all duration-300 opacity-85";
+              dayStyle.transform = 'translateZ(-2px) scale(0.98)';
+              dayStyle.zIndex = 1;
+              dayStyle.boxShadow = '0 2px 8px -2px rgba(0,0,0,0.1)';
+            }
+
+            // Create multiple stroke effects for multiple symptoms
+            if (hasSymptoms) {
+              const strokeCount = Math.min(daySymptoms.length, 3); // Max 3 strokes for visual clarity
+              let strokeStyles = '';
+              
+              for (let i = 0; i < strokeCount; i++) {
+                const symptom = daySymptoms[i];
+                const color = getSymptomColor(symptom) || '#9CA3AF';
+                const offset = i * 2 + 2; // 2px, 4px, 6px offsets
+                strokeStyles += `0 0 0 ${offset}px ${color}${i === strokeCount - 1 ? '' : ', '}`;
+              }
+              
+              dayStyle.boxShadow = `${dayStyle.boxShadow}, ${strokeStyles}`;
+            }
 
             // Highlight based on selected outcome
             if (selectedOutcome === 'next-period' && dayInfo.isPeriod) {
               dayClasses += " bg-rose-400 text-white hover:bg-rose-500 border-rose-500";
-              dayStyle = { color: 'white' };
+              dayStyle = { ...dayStyle, color: 'white' };
             } else if (selectedOutcome === 'fertile-days' && dayInfo.isFertile) {
               dayClasses += " bg-pink-300 text-white hover:bg-pink-400 border-pink-400";
-              dayStyle = { color: 'white' };
+              dayStyle = { ...dayStyle, color: 'white' };
             } else if (!selectedOutcome) {
               // Show normal phase colors when no filter is active
               if (dayInfo.isPeriod) {
@@ -1034,15 +1066,18 @@ export function CalendarView({
               } else if (dayInfo.isFertile) {
                 dayClasses += " bg-pink-50 border-pink-200";
               } else {
-                dayClasses += " hover:bg-white/80 border-gray-100";
+                dayClasses += " hover:bg-white/80 border-gray-100 bg-white/60";
               }
             } else {
-              dayClasses += " hover:bg-white/80 border-gray-100";
+              dayClasses += " hover:bg-white/80 border-gray-100 bg-white/60";
             }
 
-            // Today's border
+            // Today's border - enhanced for 3D effect
             if (isCurrentDay) {
               dayClasses += " ring-2 ring-rose-400 ring-offset-1";
+              if (hasSymptoms) {
+                dayStyle.boxShadow += ', 0 0 0 3px rgba(244, 63, 94, 0.3)';
+              }
             }
 
             return (
