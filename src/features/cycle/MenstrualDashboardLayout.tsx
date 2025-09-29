@@ -6,7 +6,6 @@ import { MenstrualSidebar } from './MenstrualSidebar';
 import { TodaysEstimateSection } from './sections/TodaysEstimateSection';
 import { TrackEssentialsSection } from './sections/TrackEssentialsSection';
 import { FeelBetterSection } from './sections/FeelBetterSection';
-import { DataOverviewSection } from './sections/DataOverviewSection';
 import { CalendarViewSection } from './sections/CalendarViewSection';
 import { DatePickerModal } from './DatePickerModal';
 import { SettingsModal } from './SettingsModal';
@@ -127,10 +126,6 @@ export function MenstrualDashboardLayout({
           currentPhase={currentPhase}
         />
 
-        <DataOverviewSection
-          accessCode={accessCode}
-        />
-
         <CalendarViewSection
           cycleData={cycleData}
           derivedState={derivedState}
@@ -216,12 +211,6 @@ export function MenstrualDashboardLayout({
               <FeelBetterSection
                 phaseRanges={phaseRanges}
                 currentPhase={currentPhase}
-              />
-            )}
-
-            {activeSection === 'data' && (
-              <DataOverviewSection
-                accessCode={accessCode}
               />
             )}
 

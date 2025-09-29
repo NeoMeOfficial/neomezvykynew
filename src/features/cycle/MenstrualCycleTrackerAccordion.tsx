@@ -7,7 +7,6 @@ import { SettingsModal } from './SettingsModal';
 import { TodaysEstimateSection } from './sections/TodaysEstimateSection';
 import { TrackEssentialsSection } from './sections/TrackEssentialsSection';
 import { FeelBetterSection } from './sections/FeelBetterSection';
-import { DataOverviewSection } from './sections/DataOverviewSection';
 import { CalendarViewSection } from './sections/CalendarViewSection';
 
 type OutcomeType = 'next-period' | 'fertile-days';
@@ -125,12 +124,7 @@ export default function MenstrualCycleTrackerAccordion({
         currentPhase={currentPhase}
       />
 
-      {/* Section 4: Data Overview */}
-      <DataOverviewSection
-        accessCode={accessCode}
-      />
-
-      {/* Section 5: Calendar View */}
+      {/* Section 4: Calendar View */}
       <CalendarViewSection
         cycleData={cycleData}
         derivedState={derivedState}
