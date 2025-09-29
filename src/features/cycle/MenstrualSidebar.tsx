@@ -119,7 +119,7 @@ export function MenstrualSidebar({ activeSection, onSectionChange, onEditClick, 
                         </p>
                         <p className="text-xs font-medium" style={{ color: '#955F6A' }}>
                           Ďalšie plodné dni: <span style={{ color: '#FF7782' }}>
-                            23. 9. 2025 - 25. 9. 2025
+                            23. - 25. 9. 2025
                           </span>
                         </p>
                       </div>
