@@ -72,17 +72,8 @@ export function TodaysEstimateSection({
           <div className="space-y-6">
             <div className="space-y-3">
               <h4 className="text-lg font-medium mb-3 leading-tight" style={{ color: '#955F6A' }}>
-                {currentPhase.name} fáza - Deň {currentDay} cyklu
-              </h4>
-              <p className="text-sm leading-relaxed opacity-90" style={{ color: '#955F6A' }}>
-                Energia postupne klesá, telo sa pripravuje na menštruáciu.
-              </p>
-            </div>
-            
-            <div className="space-y-3">
-              <h5 className="text-base font-medium mb-3" style={{ color: '#955F6A' }}>
                 Čo môžeš dnes očakávať:
-              </h5>
+              </h4>
               <p className="text-sm leading-relaxed opacity-90" style={{ color: '#955F6A' }}>
                 Môžeš sa cítiť menej energicky (65%) a potrebovať viac času na odpočinok. 
                 Energia postupne klesá, preto potrebuješ pravidelné jedlá a menej náročné aktivity. 

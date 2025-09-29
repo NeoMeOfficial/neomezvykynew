@@ -238,14 +238,13 @@ export function WellnessDonutChart({ derivedState, onEditClick, className = "", 
             </>
           ) : (
             <>
-              <div className="text-sm text-center mb-1 font-medium" style={{ color: 'hsl(var(--foreground))' }}>
-                {currentPhase.name}
-              </div>
-              <div className="text-4xl font-bold" style={{ color: 'hsl(var(--foreground))' }}>
-                {currentDay}
-              </div>
-              <div className="text-sm text-center font-medium" style={{ color: 'hsl(var(--muted-foreground))' }}>
-                {UI_TEXT.day}
+              <div className="text-center px-4">
+                <div className="text-base font-semibold leading-tight" style={{ color: 'hsl(var(--foreground))' }}>
+                  {currentPhase.name} fáza
+                </div>
+                <div className="text-sm font-medium mt-1" style={{ color: 'hsl(var(--muted-foreground))' }}>
+                  Deň {currentDay} cyklu
+                </div>
               </div>
             </>
           )}
