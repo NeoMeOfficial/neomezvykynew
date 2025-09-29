@@ -152,12 +152,10 @@ export function SymptomTracker({
     if (!lastPeriodStart) {
       return new Date().toISOString().split('T')[0]; // Fallback to today
     }
-    
     const periodStartDate = new Date(lastPeriodStart);
     const targetDate = addDays(periodStartDate, currentDay - 1); // currentDay is 1-indexed
     return targetDate.toISOString().split('T')[0];
   };
-
   const currentDate = getDateForCurrentDay();
   const currentDateObject = new Date(currentDate);
   const today = new Date();
@@ -172,7 +170,6 @@ export function SymptomTracker({
     const notesKey = accessCode ? `notes_${accessCode}_${currentDate}` : `temp_notes_${currentDate}`;
     const savedSymptoms = localStorage.getItem(symptomsKey);
     const savedNotes = localStorage.getItem(notesKey);
-    
     setSelectedSymptoms(savedSymptoms ? JSON.parse(savedSymptoms) : []);
     setNotes(savedNotes || '');
     setHasChanges(false);
@@ -207,33 +204,11 @@ export function SymptomTracker({
   };
   return <div className="space-y-4">
       {/* Date Header */}
-      <div className={`px-4 py-5 rounded-xl border ${isToday ? 'bg-gradient-to-r from-rose-50 to-pink-50 border-rose-200' : 'bg-gray-50/50 border-gray-200'}`}>
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div className="flex flex-col gap-2">
-            <span className="text-base font-medium leading-relaxed" style={{ color: isToday ? '#FF7782' : '#955F6A' }}>
-              {format(currentDateObject, 'EEEE, d. MMMM yyyy', { locale: sk })}
-            </span>
-            <div className="flex items-center gap-2">
-              {isToday && (
-                <span className="text-xs font-medium px-2.5 py-1.5 rounded-full bg-rose-100 text-rose-700">
-                  Dnes
-                </span>
-              )}
-              <span className="text-sm font-medium px-2.5 py-1.5 rounded-full bg-gray-100" style={{ color: '#955F6A' }}>
-                Deň {currentDay} cyklu
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
+      
 
       {/* Header */}
       <div>
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-base font-medium" style={{
-          color: '#955F6A'
-        }}>Príznaky</span>
-        </div>
+        
         <p className="text-sm mb-3" style={{
         color: '#955F6A'
       }}>
