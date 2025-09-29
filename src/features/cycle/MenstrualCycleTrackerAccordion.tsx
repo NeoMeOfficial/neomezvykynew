@@ -80,7 +80,6 @@ export default function MenstrualCycleTrackerAccordion({
         </div>
         <div className="flex flex-col gap-2 sm:flex-row">
           <Button
-            variant="outline"
             size="sm"
             onClick={() => setShowDatePicker(true)}
             className="flex items-center gap-1.5 text-xs px-3 py-2 bg-white border border-[#955F6A] text-[#955F6A] hover:bg-[#955F6A] hover:text-white"
@@ -89,7 +88,6 @@ export default function MenstrualCycleTrackerAccordion({
             Upraviť
           </Button>
           <Button
-            variant="outline"
             size="sm"
             onClick={() => setShowSettings(true)}
             className="flex items-center gap-1.5 text-xs px-3 py-2 bg-white border border-[#955F6A] text-[#955F6A] hover:bg-[#955F6A] hover:text-white"
