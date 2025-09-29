@@ -45,7 +45,8 @@ export function CalendarView({
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
   const [showSymptomFilters, setShowSymptomFilters] = useState(false);
   const [historicalData, setHistoricalData] = useState<HistoricalEntry[]>([]);
-  const [selectedDayData, setSelectedDayData] = useState<{ symptoms: string[]; notes: string } | null>(null);
+  const [selectedDayData, setSelectedDayData] = useState<{ symptoms: string[]; notes: string; date: Date } | null>(null);
+  const [expandedRow, setExpandedRow] = useState<number | null>(null);
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
   const [exportStartMonth, setExportStartMonth] = useState<string>('');
   const [exportEndMonth, setExportEndMonth] = useState<string>('');
@@ -735,7 +736,17 @@ export function CalendarView({
 
   const handleDayClick = (date: Date) => {
     const dayData = getDayData(date);
-    setSelectedDayData(dayData);
+    const dayIndex = calendarPeriod.days.findIndex(d => d && isSameDay(d, date));
+    const rowIndex = Math.floor(dayIndex / 7);
+    
+    // Toggle expansion - if same day clicked, collapse; otherwise expand new day
+    if (selectedDayData && isSameDay(selectedDayData.date, date)) {
+      setSelectedDayData(null);
+      setExpandedRow(null);
+    } else {
+      setSelectedDayData({ ...dayData, date });
+      setExpandedRow(rowIndex);
+    }
     
     // Still show period intensity selector if it's a period day
     const dayInfo = getDayInfo(date);
@@ -960,128 +971,249 @@ export function CalendarView({
           ))}
         </div>
 
-        {/* Calendar Days */}
-        <div className="grid gap-1 grid-cols-7">
-          {calendarPeriod.days.map((date, index) => {
-            if (!date) {
-              return <div key={index} className="aspect-square"></div>;
-            }
+        {/* Calendar Days with Inline Expansion */}
+        <div className="space-y-0">
+          {Array.from({ length: Math.ceil(calendarPeriod.days.length / 7) }, (_, rowIndex) => {
+            const startIndex = rowIndex * 7;
+            const endIndex = Math.min(startIndex + 7, calendarPeriod.days.length);
+            const rowDays = calendarPeriod.days.slice(startIndex, endIndex);
             
-            const dayInfo = getDayInfo(date);
-            const isCurrentDay = isToday(date);
-            const hasFilteredSymptoms = dayHasFilteredSymptoms(date);
-            const hasNotes = dayHasNotes(date);
-            const dayData = getDayData(date);
-            
-            // Get filtered symptoms for this day to create stroke effects
-            const daySymptoms = dayData.symptoms.filter(symptom => selectedSymptoms.includes(symptom));
-            const hasSymptoms = daySymptoms.length > 0;
-            
-            let dayClasses = `aspect-square flex flex-col items-center justify-center text-sm rounded-lg cursor-pointer relative border border-transparent`;
-            let dayStyle: React.CSSProperties = { color: '#955F6A' };
-
-            // 3D Effect: Days with symptoms are elevated, others are pushed back
-            if (hasSymptoms) {
-              dayClasses += " transform translate-z-0 shadow-lg transition-all duration-300 hover:shadow-xl";
-              dayStyle.transform = 'translateZ(8px) scale(1.02)';
-              dayStyle.zIndex = 10;
-              dayStyle.boxShadow = '0 8px 25px -8px rgba(0,0,0,0.2), 0 4px 15px -4px rgba(0,0,0,0.1)';
-            } else {
-              dayClasses += " transform translate-z-0 transition-all duration-300 opacity-85";
-              dayStyle.transform = 'translateZ(-2px) scale(0.98)';
-              dayStyle.zIndex = 1;
-              dayStyle.boxShadow = '0 2px 8px -2px rgba(0,0,0,0.1)';
-            }
-
-            // Create multiple stroke effects for multiple symptoms
-            if (hasSymptoms) {
-              const strokeCount = Math.min(daySymptoms.length, 3); // Max 3 strokes for visual clarity
-              let strokeStyles = '';
-              
-              for (let i = 0; i < strokeCount; i++) {
-                const symptom = daySymptoms[i];
-                const color = getSymptomColor(symptom) || '#9CA3AF';
-                const offset = i * 2 + 2; // 2px, 4px, 6px offsets
-                strokeStyles += `0 0 0 ${offset}px ${color}${i === strokeCount - 1 ? '' : ', '}`;
-              }
-              
-              dayStyle.boxShadow = `${dayStyle.boxShadow}, ${strokeStyles}`;
-            }
-
-            // Highlight based on selected outcome
-            if (selectedOutcome === 'next-period' && dayInfo.isPeriod) {
-              dayClasses += " bg-rose-400 text-white hover:bg-rose-500 border-rose-500";
-              dayStyle = { ...dayStyle, color: 'white' };
-            } else if (selectedOutcome === 'fertile-days' && dayInfo.isFertile) {
-              dayClasses += " bg-pink-300 text-white hover:bg-pink-400 border-pink-400";
-              dayStyle = { ...dayStyle, color: 'white' };
-            } else if (!selectedOutcome) {
-              // Show normal phase colors when no filter is active
-              if (dayInfo.isPeriod) {
-                dayClasses += " bg-rose-100 border-rose-300";
-              } else if (dayInfo.isFertile) {
-                dayClasses += " bg-pink-50 border-pink-200";
-              } else {
-                dayClasses += " hover:bg-white/80 border-gray-100 bg-white/60";
-              }
-            } else {
-              dayClasses += " hover:bg-white/80 border-gray-100 bg-white/60";
-            }
-
-            // Today's border - enhanced for 3D effect
-            if (isCurrentDay) {
-              dayClasses += " ring-2 ring-rose-400 ring-offset-1";
-              if (hasSymptoms) {
-                dayStyle.boxShadow += ', 0 0 0 3px rgba(244, 63, 94, 0.3)';
-              }
-            }
-
             return (
-              <div 
-                key={date.getTime()} 
-                className={dayClasses} 
-                style={dayStyle}
-                onClick={() => handleDayClick(date)}
-              >
-                {/* Day number */}
-                <span className="relative z-10 font-medium">
-                  {format(date, 'd')}
-                </span>
-                
-                {/* Indicators container */}
-                <div className="absolute bottom-1 left-1 right-1 flex justify-center gap-1 flex-wrap">
-                  {/* Period intensity indicator */}
-                  {renderPeriodIntensity(date)}
-                  
-                  {/* Symptom indicators - only show selected symptoms with their colors */}
-                  {dayData.symptoms
-                    .filter(symptom => selectedSymptoms.includes(symptom))
-                    .slice(0, 4)
-                    .map((symptom, i) => {
-                      const color = getSymptomColor(symptom);
-                      return (
-                        <div 
-                          key={i} 
-                          className="w-1.5 h-1.5 rounded-full"
-                          style={{ backgroundColor: color || '#9CA3AF' }}
-                        />
-                      );
-                    })}
-                  
-                  {/* Additional symptoms indicator */}
-                  {dayData.symptoms.filter(symptom => selectedSymptoms.includes(symptom)).length > 4 && (
-                    <div className="text-[10px] text-gray-600 font-bold">+</div>
-                  )}
-                  
-                  {/* Notes indicator */}
-                  {hasNotes && (
-                    <FileText className="w-4 h-4 text-gray-500" />
-                  )}
+              <div key={rowIndex}>
+                {/* Calendar Row */}
+                <div className="grid gap-1 grid-cols-7">
+                  {rowDays.map((date, dayIndex) => {
+                    const globalIndex = startIndex + dayIndex;
+                    
+                    if (!date) {
+                      return <div key={globalIndex} className="aspect-square"></div>;
+                    }
+                    
+                    const dayInfo = getDayInfo(date);
+                    const isCurrentDay = isToday(date);
+                    const hasFilteredSymptoms = dayHasFilteredSymptoms(date);
+                    const hasNotes = dayHasNotes(date);
+                    const dayData = getDayData(date);
+                    const isSelected = selectedDayData && isSameDay(selectedDayData.date, date);
+                    
+                    // Get filtered symptoms for this day to create stroke effects
+                    const daySymptoms = dayData.symptoms.filter(symptom => selectedSymptoms.includes(symptom));
+                    const hasSymptoms = daySymptoms.length > 0;
+                    
+                    let dayClasses = `aspect-square flex flex-col items-center justify-center text-sm rounded-lg cursor-pointer relative border border-transparent transition-all duration-300`;
+                    let dayStyle: React.CSSProperties = { color: '#955F6A' };
+
+                    // Selected day styling
+                    if (isSelected) {
+                      dayClasses += " ring-2 ring-blue-400 ring-offset-2 shadow-lg scale-105";
+                      dayStyle.zIndex = 20;
+                    }
+
+                    // 3D Effect: Days with symptoms are elevated, others are pushed back
+                    if (hasSymptoms && !isSelected) {
+                      dayClasses += " transform translate-z-0 shadow-lg hover:shadow-xl";
+                      dayStyle.transform = 'translateZ(8px) scale(1.02)';
+                      dayStyle.zIndex = 10;
+                      dayStyle.boxShadow = '0 8px 25px -8px rgba(0,0,0,0.2), 0 4px 15px -4px rgba(0,0,0,0.1)';
+                    } else if (!isSelected) {
+                      dayClasses += " transform translate-z-0 opacity-85";
+                      dayStyle.transform = 'translateZ(-2px) scale(0.98)';
+                      dayStyle.zIndex = 1;
+                      dayStyle.boxShadow = '0 2px 8px -2px rgba(0,0,0,0.1)';
+                    }
+
+                    // Create multiple stroke effects for multiple symptoms
+                    if (hasSymptoms && !isSelected) {
+                      const strokeCount = Math.min(daySymptoms.length, 3);
+                      let strokeStyles = '';
+                      
+                      for (let i = 0; i < strokeCount; i++) {
+                        const symptom = daySymptoms[i];
+                        const color = getSymptomColor(symptom) || '#9CA3AF';
+                        const offset = i * 2 + 2;
+                        strokeStyles += `0 0 0 ${offset}px ${color}${i === strokeCount - 1 ? '' : ', '}`;
+                      }
+                      
+                      dayStyle.boxShadow = `${dayStyle.boxShadow}, ${strokeStyles}`;
+                    }
+
+                    // Highlight based on selected outcome
+                    if (selectedOutcome === 'next-period' && dayInfo.isPeriod) {
+                      dayClasses += " bg-rose-400 text-white hover:bg-rose-500 border-rose-500";
+                      dayStyle = { ...dayStyle, color: 'white' };
+                    } else if (selectedOutcome === 'fertile-days' && dayInfo.isFertile) {
+                      dayClasses += " bg-pink-300 text-white hover:bg-pink-400 border-pink-400";
+                      dayStyle = { ...dayStyle, color: 'white' };
+                    } else if (!selectedOutcome) {
+                      // Show normal phase colors when no filter is active
+                      if (dayInfo.isPeriod) {
+                        dayClasses += " bg-rose-100 border-rose-300";
+                      } else if (dayInfo.isFertile) {
+                        dayClasses += " bg-pink-50 border-pink-200";
+                      } else {
+                        dayClasses += " hover:bg-white/80 border-gray-100 bg-white/60";
+                      }
+                    } else {
+                      dayClasses += " hover:bg-white/80 border-gray-100 bg-white/60";
+                    }
+
+                    // Today's border - enhanced for 3D effect
+                    if (isCurrentDay && !isSelected) {
+                      dayClasses += " ring-2 ring-rose-400 ring-offset-1";
+                      if (hasSymptoms) {
+                        dayStyle.boxShadow += ', 0 0 0 3px rgba(244, 63, 94, 0.3)';
+                      }
+                    }
+
+                    return (
+                      <div 
+                        key={date.getTime()} 
+                        className={dayClasses} 
+                        style={dayStyle}
+                        onClick={() => handleDayClick(date)}
+                      >
+                        {/* Day number */}
+                        <span className="relative z-10 font-medium">
+                          {format(date, 'd')}
+                        </span>
+                        
+                        {/* Indicators container */}
+                        <div className="absolute bottom-1 left-1 right-1 flex justify-center gap-1 flex-wrap">
+                          {/* Period intensity indicator */}
+                          {renderPeriodIntensity(date)}
+                          
+                          {/* Symptom indicators - only show selected symptoms with their colors */}
+                          {dayData.symptoms
+                            .filter(symptom => selectedSymptoms.includes(symptom))
+                            .slice(0, 4)
+                            .map((symptom, i) => {
+                              const color = getSymptomColor(symptom);
+                              return (
+                                <div 
+                                  key={i} 
+                                  className="w-1.5 h-1.5 rounded-full"
+                                  style={{ backgroundColor: color || '#9CA3AF' }}
+                                />
+                              );
+                            })}
+                          
+                          {/* Additional symptoms indicator */}
+                          {dayData.symptoms.filter(symptom => selectedSymptoms.includes(symptom)).length > 4 && (
+                            <div className="text-[10px] text-gray-600 font-bold">+</div>
+                          )}
+                          
+                          {/* Notes indicator */}
+                          {hasNotes && (
+                            <FileText className="w-4 h-4 text-gray-500" />
+                          )}
+                        </div>
+                        
+                        {/* Today indicator overlay */}
+                        {isCurrentDay && !selectedOutcome && !isSelected && (
+                          <div className="absolute inset-0 rounded-lg bg-rose-400/10"></div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
                 
-                {/* Today indicator overlay */}
-                {isCurrentDay && !selectedOutcome && (
-                  <div className="absolute inset-0 rounded-lg bg-rose-400/10"></div>
+                {/* Inline Expansion Panel */}
+                {expandedRow === rowIndex && selectedDayData && (
+                  <div 
+                    className="grid grid-cols-1 overflow-hidden animate-accordion-down"
+                    style={{
+                      animation: 'accordion-down 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
+                    }}
+                  >
+                    <div className="mx-1 mt-2 mb-4">
+                      <div className="bg-white/95 backdrop-blur-sm rounded-2xl border border-rose-200/50 shadow-xl overflow-hidden">
+                        {/* Elegant header with glassmorphism */}
+                        <div className="bg-gradient-to-r from-rose-50/90 to-pink-50/90 px-6 py-4 border-b border-rose-100/50">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-full bg-rose-100 flex items-center justify-center">
+                                <span className="text-sm font-medium text-rose-600">
+                                  {format(selectedDayData.date, 'd')}
+                                </span>
+                              </div>
+                              <h4 className="font-medium text-rose-800">
+                                Detaily pre {format(selectedDayData.date, 'd. MMMM', { locale: sk })}
+                              </h4>
+                            </div>
+                            <Button 
+                              size="sm" 
+                              variant="ghost"
+                              onClick={() => {
+                                setSelectedDayData(null);
+                                setExpandedRow(null);
+                              }}
+                              className="text-rose-600 hover:text-rose-700 hover:bg-rose-100/50 rounded-full w-8 h-8 p-0"
+                            >
+                              ×
+                            </Button>
+                          </div>
+                        </div>
+                        
+                        {/* Content with elegant spacing */}
+                        <div className="p-6 space-y-5">
+                          {selectedDayData.symptoms.length > 0 && (
+                            <div className="animate-fade-in" style={{ animationDelay: '0.1s' }}>
+                              <h5 className="text-sm font-medium mb-3 text-rose-700 flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-rose-400"></div>
+                                Príznaky
+                              </h5>
+                              <div className="flex flex-wrap gap-2">
+                                {selectedDayData.symptoms.map((symptom, index) => {
+                                  const color = getSymptomColor(symptom);
+                                  return (
+                                    <Badge 
+                                      key={symptom} 
+                                      variant="outline" 
+                                      className={`text-xs transition-all duration-200 hover:scale-105 ${
+                                        color 
+                                          ? 'text-white border-transparent shadow-sm' 
+                                          : 'border-rose-200 text-rose-700 bg-rose-50/50'
+                                      }`}
+                                      style={{
+                                        backgroundColor: color || undefined,
+                                        borderColor: color || undefined,
+                                        animationDelay: `${index * 0.05}s`
+                                      }}
+                                    >
+                                      {symptom}
+                                    </Badge>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {selectedDayData.notes && (
+                            <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
+                              <h5 className="text-sm font-medium mb-3 text-rose-700 flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-rose-400"></div>
+                                Poznámky
+                              </h5>
+                              <div className="bg-rose-50/50 rounded-xl p-4 border border-rose-100/50">
+                                <p className="text-sm text-rose-800 leading-relaxed">
+                                  {selectedDayData.notes}
+                                </p>
+                              </div>
+                            </div>
+                          )}
+                          
+                          {selectedDayData.symptoms.length === 0 && !selectedDayData.notes && (
+                            <div className="text-center py-8 animate-fade-in">
+                              <div className="w-12 h-12 rounded-full bg-rose-100 flex items-center justify-center mx-auto mb-3">
+                                <FileText className="w-6 h-6 text-rose-400" />
+                              </div>
+                              <p className="text-sm text-rose-600">Žiadne záznamy pre tento deň.</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 )}
               </div>
             );
@@ -1089,66 +1221,6 @@ export function CalendarView({
         </div>
       </div>
 
-      {/* Selected Day Details */}
-      {selectedDayData && (
-        <Card className="mt-4 p-4 bg-white/90 border border-rose-200/50">
-          <div className="space-y-3">
-            <h4 className="font-medium text-sm" style={{ color: '#955F6A' }}>
-              Detaily dňa
-            </h4>
-            
-            {selectedDayData.symptoms.length > 0 && (
-              <div>
-                <h5 className="text-xs font-medium mb-2" style={{ color: '#955F6A' }}>Príznaky:</h5>
-                <div className="flex flex-wrap gap-1">
-                  {selectedDayData.symptoms.map(symptom => {
-                    const color = getSymptomColor(symptom);
-                    return (
-                      <Badge 
-                        key={symptom} 
-                        variant="outline" 
-                        className={`text-xs ${
-                          color 
-                            ? 'text-white border-transparent' 
-                            : 'border-gray-300 text-gray-700'
-                        }`}
-                        style={color ? {
-                          backgroundColor: color,
-                          borderColor: color
-                        } : {}}
-                      >
-                        {symptom}
-                      </Badge>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-            
-            {selectedDayData.notes && (
-              <div>
-                <h5 className="text-xs font-medium mb-2" style={{ color: '#955F6A' }}>Poznámky:</h5>
-                <p className="text-xs bg-gray-50 p-2 rounded" style={{ color: '#955F6A' }}>
-                  {selectedDayData.notes}
-                </p>
-              </div>
-            )}
-            
-            {selectedDayData.symptoms.length === 0 && !selectedDayData.notes && (
-              <p className="text-xs text-gray-500">Žiadne záznamy pre tento deň.</p>
-            )}
-            
-            <Button 
-              size="sm" 
-              variant="outline" 
-              onClick={() => setSelectedDayData(null)}
-              className="w-full text-xs"
-            >
-              Zavrieť
-            </Button>
-          </div>
-        </Card>
-      )}
 
       {/* Current Selection Info */}
       {selectedOutcome && (
