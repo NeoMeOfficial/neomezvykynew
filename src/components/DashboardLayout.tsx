@@ -59,7 +59,7 @@ export const DashboardLayout = ({
                 className="w-12 h-12 flex-shrink-0"
               />
               <h2 className="text-2xl font-semibold text-foreground">
-                Menštruačný kalendár
+                Periodka
               </h2>
             </div>
             <MenstrualDashboardLayout

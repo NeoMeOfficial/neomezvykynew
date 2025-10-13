@@ -105,7 +105,7 @@ export const NavigationWidget = ({
                 className={`${getIconSize(openSections.cycle)} transition-all duration-300 flex-shrink-0`}
               />
               <h2 className="text-mobile-lg md:text-lg font-semibold text-foreground">
-                Menštruačný kalendár
+                Periodka
               </h2>
             </button>
           </CollapsibleTrigger>
