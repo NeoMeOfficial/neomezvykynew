@@ -17,12 +17,14 @@ interface MenstrualDashboardLayoutProps {
   accessCode?: string;
   compact?: boolean;
   onFirstInteraction?: () => void;
+  onAccessCodeGenerated?: (code: string) => void;
 }
 
 export function MenstrualDashboardLayout({
   accessCode,
   compact = false,
-  onFirstInteraction
+  onFirstInteraction,
+  onAccessCodeGenerated
 }: MenstrualDashboardLayoutProps) {
   const isMobile = useIsMobile();
   const [activeSection, setActiveSection] = useState('estimate');
@@ -131,6 +133,7 @@ export function MenstrualDashboardLayout({
             onPeriodIntensityChange={setPeriodIntensity}
             getPeriodIntensity={getPeriodIntensity}
             accessCode={accessCode}
+            onAccessCodeGenerated={onAccessCodeGenerated}
           />
         </div>
 
@@ -216,6 +219,7 @@ export function MenstrualDashboardLayout({
                 onPeriodIntensityChange={setPeriodIntensity}
                 getPeriodIntensity={getPeriodIntensity}
                 accessCode={accessCode}
+                onAccessCodeGenerated={onAccessCodeGenerated}
               />
             )}
           </div>
@@ -261,6 +265,7 @@ export function MenstrualDashboardLayout({
               open={showShareDialog}
               onOpenChange={setShowShareDialog}
               accessCode={accessCode}
+              onAccessCodeGenerated={onAccessCodeGenerated}
             />
           )}
         </main>

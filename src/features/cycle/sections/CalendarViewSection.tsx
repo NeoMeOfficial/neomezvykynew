@@ -13,6 +13,7 @@ interface CalendarViewSectionProps {
   onPeriodIntensityChange: (date: string, intensity: PeriodIntensity | null) => void;
   getPeriodIntensity: (date: string) => PeriodIntensity | undefined;
   accessCode?: string;
+  onAccessCodeGenerated?: (code: string) => void;
 }
 
 export function CalendarViewSection({
@@ -22,7 +23,8 @@ export function CalendarViewSection({
   selectedOutcome,
   onPeriodIntensityChange,
   getPeriodIntensity,
-  accessCode
+  accessCode,
+  onAccessCodeGenerated
 }: CalendarViewSectionProps) {
   const [showShareDialog, setShowShareDialog] = useState(false);
   
@@ -92,6 +94,7 @@ export function CalendarViewSection({
         open={showShareDialog}
         onOpenChange={setShowShareDialog}
         accessCode={accessCode}
+        onAccessCodeGenerated={onAccessCodeGenerated}
       />
     </>
   );

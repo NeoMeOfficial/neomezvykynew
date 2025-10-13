@@ -11,22 +11,68 @@ interface ShareCalendarDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   accessCode: string | null;
+  onAccessCodeGenerated?: (code: string) => void;
 }
 
-export const ShareCalendarDialog = ({ open, onOpenChange, accessCode }: ShareCalendarDialogProps) => {
+export const ShareCalendarDialog = ({ open, onOpenChange, accessCode, onAccessCodeGenerated }: ShareCalendarDialogProps) => {
   const [shareCode, setShareCode] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
+  const [generatingAccessCode, setGeneratingAccessCode] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [localAccessCode, setLocalAccessCode] = useState<string | null>(accessCode);
   const { toast } = useToast();
 
-  // Auto-generate share code when dialog opens and accessCode is available
+  // Update local access code when prop changes
   useEffect(() => {
-    if (open && accessCode && !shareCode) {
-      generateShareCode();
+    setLocalAccessCode(accessCode);
+  }, [accessCode]);
+
+  // Auto-generate access code if needed, then share code
+  useEffect(() => {
+    if (open && !shareCode) {
+      if (!localAccessCode) {
+        handleGenerateAccessCode();
+      } else {
+        generateShareCode();
+      }
     }
-  }, [open, accessCode]);
+  }, [open, localAccessCode]);
+
+  const handleGenerateAccessCode = async () => {
+    setGeneratingAccessCode(true);
+    try {
+      // Call the database function to generate a unique access code
+      const { data, error } = await supabase.rpc('generate_access_code');
+      
+      if (error) throw error;
+      
+      const newAccessCode = data as string;
+      setLocalAccessCode(newAccessCode);
+      
+      // Notify parent component
+      if (onAccessCodeGenerated) {
+        onAccessCodeGenerated(newAccessCode);
+      }
+      
+      toast({
+        title: "Kód vytvorený",
+        description: "Váš prístupový kód bol úspešne vytvorený",
+      });
+    } catch (error) {
+      console.error('Error generating access code:', error);
+      toast({
+        title: "Chyba",
+        description: "Nepodarilo sa vygenerovať prístupový kód",
+        variant: "destructive",
+      });
+    } finally {
+      setGeneratingAccessCode(false);
+    }
+  };
 
   const generateShareCode = async () => {
+    if (!localAccessCode) return;
+    
     setGenerating(true);
     try {
       // Generate a random 6-character code
@@ -41,7 +87,7 @@ export const ShareCalendarDialog = ({ open, onOpenChange, accessCode }: ShareCal
         .from('shared_access_codes')
         .insert({
           code,
-          owner_access_code: accessCode,
+          owner_access_code: localAccessCode,
         })
         .select()
         .single();
@@ -109,20 +155,13 @@ export const ShareCalendarDialog = ({ open, onOpenChange, accessCode }: ShareCal
         </DialogHeader>
 
         <div className="space-y-4 py-4">
-          {!accessCode ? (
-            <Alert>
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>
-                Najprv si musíte nastaviť prístupový kód pre váš kalendár
-              </AlertDescription>
-            </Alert>
-          ) : !shareCode ? (
+          {generatingAccessCode || generating || !shareCode ? (
             <div className="space-y-4">
               <div className="flex items-center justify-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
               </div>
               <p className="text-center text-sm text-muted-foreground">
-                Generuje sa zdieľací odkaz...
+                {generatingAccessCode ? "Vytvára sa váš prístupový kód..." : "Generuje sa zdieľací odkaz..."}
               </p>
             </div>
           ) : (
