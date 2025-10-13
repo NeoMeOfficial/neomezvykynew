@@ -12,7 +12,7 @@ const MenstrualCalendar = () => {
     <div className="min-h-screen overflow-x-hidden bg-white">
       {/* Mobile layout with constraints */}
       {isMobile ? (
-        <div className="w-full max-w-none py-4 sm:py-8 mx-auto">
+        <div className="w-full max-w-none px-2 py-4 sm:py-8 mx-auto">
           <div className="w-full mx-auto">
             {/* Subscription Warning Message */}
             <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-lg p-4 mb-4">

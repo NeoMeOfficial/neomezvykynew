@@ -75,7 +75,7 @@ export function MenstrualDashboardLayout({
   // Mobile view - return original accordion layout
   if (isMobile) {
     return (
-      <div className="w-full py-6 space-y-6">
+      <div className="w-full px-2 py-6 space-y-6">
         {/* Main Header with Action Buttons */}
         <div className="flex justify-between items-start gap-4 pb-2">
           <div className="flex-1 min-w-0">
