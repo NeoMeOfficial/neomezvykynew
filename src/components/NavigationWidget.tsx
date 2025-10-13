@@ -96,9 +96,9 @@ export const NavigationWidget = ({
         open={openSections.cycle} 
         onOpenChange={() => toggleSection('cycle')}
       >
-        <div className={`backdrop-blur-md bg-white border border-white/40 rounded-2xl p-4 shadow-lg transition-all duration-300`}>
+        <div className={`backdrop-blur-md bg-white border border-white/40 rounded-2xl shadow-lg transition-all duration-300 ${openSections.cycle ? 'p-0' : 'p-4'}`}>
           <CollapsibleTrigger asChild>
-            <button className="w-full flex flex-col items-center gap-1 p-0 mb-1 text-center focus:outline-none rounded-lg">
+            <button className={`w-full flex flex-col items-center gap-1 p-0 mb-1 text-center focus:outline-none rounded-lg ${openSections.cycle ? 'pt-4' : ''}`}>
               <img 
                 src={menstrualCalendarIcon} 
                 alt="Menstrual Calendar"
@@ -109,7 +109,7 @@ export const NavigationWidget = ({
               </h2>
             </button>
           </CollapsibleTrigger>
-          <CollapsibleContent className="animate-accordion-down pb-1">
+          <CollapsibleContent className="animate-accordion-down">
             <MenstrualDashboardLayout
               accessCode={accessCode}
               onFirstInteraction={onFirstInteraction}
