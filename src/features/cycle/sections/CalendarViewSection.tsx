@@ -1,8 +1,7 @@
-import React from 'react';
-import { CalendarDays, Download } from 'lucide-react';
+import React, { useState } from 'react';
+import { CalendarDays, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ShareCalendarDialog } from '@/components/ShareCalendarDialog';
 import { CalendarView } from '../CalendarView';
 import { CycleData, DerivedState, PeriodIntensity } from '../types';
 
@@ -25,6 +24,8 @@ export function CalendarViewSection({
   getPeriodIntensity,
   accessCode
 }: CalendarViewSectionProps) {
+  const [showShareDialog, setShowShareDialog] = useState(false);
+  
   return (
     <>
       {/* Layered Glass - Multiple glass layers creating depth between header/content */}
@@ -54,21 +55,19 @@ export function CalendarViewSection({
               </h3>
             </div>
             
-            {/* Export PDF Button */}
-            <Button 
-              size="sm" 
-              variant="outline"
-              className="flex items-center gap-1.5 text-xs border-[#FF7782] bg-transparent hover:bg-[#FF7782]/10 text-[#FF7782] px-3 py-2 flex-shrink-0"
-              onClick={() => {
-                // Trigger export from CalendarView component
-                const event = new CustomEvent('openExportDialog');
-                window.dispatchEvent(event);
-              }}
-            >
-              <Download className="w-3 h-3" />
-              <span className="hidden xs:inline">Export PDF</span>
-              <span className="xs:hidden">PDF</span>
-            </Button>
+            {/* Share Calendar Button */}
+            {accessCode && (
+              <Button 
+                size="sm" 
+                variant="outline"
+                className="flex items-center gap-1.5 text-xs border-[#FF7782] bg-transparent hover:bg-[#FF7782]/10 text-[#FF7782] px-3 py-2 flex-shrink-0"
+                onClick={() => setShowShareDialog(true)}
+              >
+                <Share2 className="w-3 h-3" />
+                <span className="hidden xs:inline">Zdieľať kalendár</span>
+                <span className="xs:hidden">Zdieľať</span>
+              </Button>
+            )}
           </div>
         </div>
 
@@ -89,6 +88,15 @@ export function CalendarViewSection({
           />
         </div>
       </div>
+      
+      {/* Share Calendar Dialog */}
+      {accessCode && (
+        <ShareCalendarDialog
+          open={showShareDialog}
+          onOpenChange={setShowShareDialog}
+          accessCode={accessCode}
+        />
+      )}
     </>
   );
 }
