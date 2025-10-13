@@ -111,9 +111,11 @@ export function MenstrualDashboardLayout({
 
         {/* All sections for mobile as accordion */}
         <Accordion type="multiple" defaultValue={["estimate", "feel-better", "calendar"]} className="space-y-4">
-          <AccordionItem value="estimate" className="border rounded-lg">
-            <AccordionTrigger className="px-4">Odhad na dnes</AccordionTrigger>
-            <AccordionContent className="px-4">
+          <AccordionItem value="estimate" className="border rounded-lg px-4">
+            <AccordionTrigger className="text-base font-semibold">
+              Dnešný odhad
+            </AccordionTrigger>
+            <AccordionContent>
               <TodaysEstimateSection
                 derivedState={derivedState}
                 selectedOutcome={selectedOutcome}
@@ -126,9 +128,11 @@ export function MenstrualDashboardLayout({
             </AccordionContent>
           </AccordionItem>
 
-          <AccordionItem value="feel-better" className="border rounded-lg">
-            <AccordionTrigger className="px-4">Ako sa cítiť lepšie</AccordionTrigger>
-            <AccordionContent className="px-4">
+          <AccordionItem value="feel-better" className="border rounded-lg px-4">
+            <AccordionTrigger className="text-base font-semibold">
+              Cíť sa lepšie
+            </AccordionTrigger>
+            <AccordionContent>
               <FeelBetterSection
                 phaseRanges={phaseRanges}
                 currentPhase={currentPhase}
@@ -136,9 +140,11 @@ export function MenstrualDashboardLayout({
             </AccordionContent>
           </AccordionItem>
 
-          <AccordionItem value="calendar" className="border rounded-lg">
-            <AccordionTrigger className="px-4">Kalendárny prehľad</AccordionTrigger>
-            <AccordionContent className="px-4">
+          <AccordionItem value="calendar" className="border rounded-lg px-4">
+            <AccordionTrigger className="text-base font-semibold">
+              Kalendár
+            </AccordionTrigger>
+            <AccordionContent>
               <CalendarViewSection
                 cycleData={cycleData}
                 derivedState={derivedState}
