@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import MenstrualCycleTracker from "@/features/cycle/MenstrualCycleTracker";
 import HabitTracker from "@/components/HabitTracker";
 import ReflectionWidget from "@/components/ReflectionWidget";
 import HabitCompletionCount from "@/components/HabitCompletionCount";
@@ -44,8 +44,6 @@ export const DashboardLayout = ({
   showDiaryView,
   setShowDiaryView,
 }: DashboardLayoutProps) => {
-  const navigate = useNavigate();
-
   return (
     <div className="w-full max-w-none mx-auto">
       {/* Dashboard Grid for Large Screens */}
@@ -53,10 +51,7 @@ export const DashboardLayout = ({
         
         {/* Menstrual Cycle Panel */}
         <div className="lg:col-span-2 xl:col-span-2">
-          <div 
-            className="backdrop-blur-md bg-white border border-white/40 rounded-2xl p-6 shadow-lg h-full cursor-pointer hover:shadow-xl transition-shadow"
-            onClick={() => navigate('/menstrual-calendar')}
-          >
+          <div className="backdrop-blur-md bg-white border border-white/40 rounded-2xl p-6 shadow-lg h-full">
             <div className="flex items-center gap-4 mb-6">
               <img 
                 src={menstrualCalendarIcon} 
@@ -67,9 +62,11 @@ export const DashboardLayout = ({
                 Menštruačný kalendár
               </h2>
             </div>
-            <p className="text-muted-foreground">
-              Kliknite pre otvorenie menštruačného kalendára
-            </p>
+            <MenstrualCycleTracker
+              accessCode={accessCode}
+              onFirstInteraction={onFirstInteraction}
+              compact={false}
+            />
           </div>
         </div>
 

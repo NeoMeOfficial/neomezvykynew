@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
+import MenstrualCycleTracker from "@/features/cycle/MenstrualCycleTracker";
 import HabitTracker from "@/components/HabitTracker";
 import ReflectionWidget from "@/components/ReflectionWidget";
 import HabitCompletionCount from "@/components/HabitCompletionCount";
@@ -67,7 +67,6 @@ export const NavigationWidget = ({
 
   const getIconSize = (isOpen: boolean) => isOpen ? 'w-16 h-16' : 'w-28 h-28';
   const isMobile = useIsMobile();
-  const navigate = useNavigate();
 
   // Use dashboard layout for desktop, mobile collapsible layout for mobile
   if (!isMobile) {
@@ -93,21 +92,31 @@ export const NavigationWidget = ({
   return (
     <div className="w-full max-w-[600px] mx-auto space-y-2">
       {/* Menstrual Cycle Section */}
-      <div 
-        className="backdrop-blur-md bg-white border border-white/40 rounded-2xl p-4 shadow-lg transition-all duration-300 cursor-pointer hover:shadow-xl"
-        onClick={() => navigate('/menstrual-calendar')}
+      <Collapsible 
+        open={openSections.cycle} 
+        onOpenChange={() => toggleSection('cycle')}
       >
-        <button className="w-full flex flex-col items-center gap-1 p-0 mb-1 text-center focus:outline-none rounded-lg">
-          <img 
-            src={menstrualCalendarIcon} 
-            alt="Menstrual Calendar"
-            className="w-28 h-28 transition-all duration-300 flex-shrink-0"
-          />
-          <h2 className="text-mobile-lg md:text-lg font-semibold text-foreground">
-            Menštruačný kalendár
-          </h2>
-        </button>
-      </div>
+        <div className={`backdrop-blur-md bg-white border border-white/40 rounded-2xl p-4 shadow-lg transition-all duration-300`}>
+          <CollapsibleTrigger asChild>
+            <button className="w-full flex flex-col items-center gap-1 p-0 mb-1 text-center focus:outline-none rounded-lg">
+              <img 
+                src={menstrualCalendarIcon} 
+                alt="Menstrual Calendar"
+                className={`${getIconSize(openSections.cycle)} transition-all duration-300 flex-shrink-0`}
+              />
+              <h2 className="text-mobile-lg md:text-lg font-semibold text-foreground">
+                Menštruačný kalendár
+              </h2>
+            </button>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="animate-accordion-down pb-1">
+            <MenstrualCycleTracker
+              accessCode={accessCode}
+              onFirstInteraction={onFirstInteraction}
+            />
+          </CollapsibleContent>
+        </div>
+      </Collapsible>
 
       {/* Habits Section */}
       <Collapsible 
