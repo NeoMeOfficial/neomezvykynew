@@ -1,4 +1,4 @@
-import MenstrualCycleTracker from "@/features/cycle/MenstrualCycleTracker";
+import { MenstrualDashboardLayout } from "@/features/cycle/MenstrualDashboardLayout";
 import HabitTracker from "@/components/HabitTracker";
 import ReflectionWidget from "@/components/ReflectionWidget";
 import HabitCompletionCount from "@/components/HabitCompletionCount";
@@ -62,7 +62,7 @@ export const DashboardLayout = ({
                 Menštruačný kalendár
               </h2>
             </div>
-            <MenstrualCycleTracker
+            <MenstrualDashboardLayout
               accessCode={accessCode}
               onFirstInteraction={onFirstInteraction}
               compact={false}

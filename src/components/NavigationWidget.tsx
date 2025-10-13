@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
-import MenstrualCycleTracker from "@/features/cycle/MenstrualCycleTracker";
+import { MenstrualDashboardLayout } from "@/features/cycle/MenstrualDashboardLayout";
 import HabitTracker from "@/components/HabitTracker";
 import ReflectionWidget from "@/components/ReflectionWidget";
 import HabitCompletionCount from "@/components/HabitCompletionCount";
@@ -110,7 +110,7 @@ export const NavigationWidget = ({
             </button>
           </CollapsibleTrigger>
           <CollapsibleContent className="animate-accordion-down pb-1">
-            <MenstrualCycleTracker
+            <MenstrualDashboardLayout
               accessCode={accessCode}
               onFirstInteraction={onFirstInteraction}
             />
