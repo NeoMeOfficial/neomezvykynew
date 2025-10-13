@@ -10,6 +10,7 @@ import { DatePickerModal } from './DatePickerModal';
 import { SettingsModal } from './SettingsModal';
 import { ShareCalendarDialog } from '@/components/ShareCalendarDialog';
 import { useCycleData } from './useCycleData';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 type OutcomeType = 'next-period' | 'fertile-days';
 
@@ -108,34 +109,55 @@ export function MenstrualDashboardLayout({
           </div>
         </div>
 
-        {/* All sections for mobile */}
-        <div className="space-y-8">
-          <TodaysEstimateSection
-            derivedState={derivedState}
-            selectedOutcome={selectedOutcome}
-            cycleData={cycleData}
-            currentDay={currentDay}
-            currentPhase={currentPhase}
-            accessCode={accessCode}
-            lastPeriodStart={cycleData.lastPeriodStart}
-          />
+        {/* All sections for mobile as accordion */}
+        <Accordion type="multiple" defaultValue={["estimate", "feel-better", "calendar"]} className="space-y-4">
+          <AccordionItem value="estimate" className="border rounded-lg px-4">
+            <AccordionTrigger className="text-base font-semibold">
+              Dnešný odhad
+            </AccordionTrigger>
+            <AccordionContent>
+              <TodaysEstimateSection
+                derivedState={derivedState}
+                selectedOutcome={selectedOutcome}
+                cycleData={cycleData}
+                currentDay={currentDay}
+                currentPhase={currentPhase}
+                accessCode={accessCode}
+                lastPeriodStart={cycleData.lastPeriodStart}
+              />
+            </AccordionContent>
+          </AccordionItem>
 
-          <FeelBetterSection
-            phaseRanges={phaseRanges}
-            currentPhase={currentPhase}
-          />
+          <AccordionItem value="feel-better" className="border rounded-lg px-4">
+            <AccordionTrigger className="text-base font-semibold">
+              Cíť sa lepšie
+            </AccordionTrigger>
+            <AccordionContent>
+              <FeelBetterSection
+                phaseRanges={phaseRanges}
+                currentPhase={currentPhase}
+              />
+            </AccordionContent>
+          </AccordionItem>
 
-          <CalendarViewSection
-            cycleData={cycleData}
-            derivedState={derivedState}
-            onOutcomeSelect={setSelectedOutcome}
-            selectedOutcome={selectedOutcome}
-            onPeriodIntensityChange={setPeriodIntensity}
-            getPeriodIntensity={getPeriodIntensity}
-            accessCode={accessCode}
-            onAccessCodeGenerated={onAccessCodeGenerated}
-          />
-        </div>
+          <AccordionItem value="calendar" className="border rounded-lg px-4">
+            <AccordionTrigger className="text-base font-semibold">
+              Kalendár
+            </AccordionTrigger>
+            <AccordionContent>
+              <CalendarViewSection
+                cycleData={cycleData}
+                derivedState={derivedState}
+                onOutcomeSelect={setSelectedOutcome}
+                selectedOutcome={selectedOutcome}
+                onPeriodIntensityChange={setPeriodIntensity}
+                getPeriodIntensity={getPeriodIntensity}
+                accessCode={accessCode}
+                onAccessCodeGenerated={onAccessCodeGenerated}
+              />
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
 
         {/* Modals */}
         <DatePickerModal
