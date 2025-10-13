@@ -9,6 +9,7 @@ import { lazy, Suspense } from "react";
 const Index = lazy(() => import("./pages/Index"));
 import MenstrualCalendar from "./pages/MenstrualCalendar"; // Remove lazy loading for core component
 const Checkout = lazy(() => import("./pages/Checkout"));
+const SharedCalendar = lazy(() => import("./pages/SharedCalendar"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Optimized loading component
@@ -34,6 +35,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/menstrual-calendar" element={<MenstrualCalendar />} />
             <Route path="/checkout" element={<Checkout />} />
+            <Route path="/shared/:shareCode" element={<SharedCalendar />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

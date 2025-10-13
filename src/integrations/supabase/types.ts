@@ -41,6 +41,69 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_codes: {
+        Row: {
+          code: string
+          created_at: string
+          expires_at: string
+          id: string
+          is_used: boolean
+          used_at: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          is_used?: boolean
+          used_at?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          is_used?: boolean
+          used_at?: string | null
+        }
+        Relationships: []
+      }
+      blog_posts: {
+        Row: {
+          author: string
+          content: string
+          created_at: string
+          excerpt: string
+          id: string
+          published: boolean
+          read_time: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author: string
+          content: string
+          created_at?: string
+          excerpt: string
+          id?: string
+          published?: boolean
+          read_time?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author?: string
+          content?: string
+          created_at?: string
+          excerpt?: string
+          id?: string
+          published?: boolean
+          read_time?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       cycle_data: {
         Row: {
           access_code: string
@@ -247,6 +310,39 @@ export type Database = {
         }
         Relationships: []
       }
+      shared_access_codes: {
+        Row: {
+          code: string
+          created_at: string
+          expires_at: string
+          id: string
+          is_active: boolean
+          last_viewed_at: string | null
+          owner_access_code: string
+          view_count: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          is_active?: boolean
+          last_viewed_at?: string | null
+          owner_access_code: string
+          view_count?: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          is_active?: boolean
+          last_viewed_at?: string | null
+          owner_access_code?: string
+          view_count?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -257,6 +353,10 @@ export type Database = {
         Returns: string
       }
       generate_random_code: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      generate_share_code: {
         Args: Record<PropertyKey, never>
         Returns: string
       }

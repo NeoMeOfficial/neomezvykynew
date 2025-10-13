@@ -1,5 +1,5 @@
 import React from 'react';
-import { Clock, FileText, TrendingUp, CalendarDays, Lightbulb } from 'lucide-react';
+import { Clock, FileText, TrendingUp, CalendarDays, Lightbulb, Share2 } from 'lucide-react';
 import periodkaLogo from '@/assets/periodka-logo.png';
 
 interface MenstrualSidebarProps {
@@ -7,6 +7,8 @@ interface MenstrualSidebarProps {
   onSectionChange: (section: string) => void;
   onEditClick: () => void;
   onSettingsClick: () => void;
+  onShareClick?: () => void;
+  accessCode?: string;
 }
 
 const menuItems = [
@@ -27,7 +29,7 @@ const menuItems = [
   },
 ];
 
-export function MenstrualSidebar({ activeSection, onSectionChange, onEditClick, onSettingsClick }: MenstrualSidebarProps) {
+export function MenstrualSidebar({ activeSection, onSectionChange, onEditClick, onSettingsClick, onShareClick, accessCode }: MenstrualSidebarProps) {
   return (
     <div className="w-80 border-r border-border/50 bg-background/95 backdrop-blur-sm">
       <div className="p-6">
@@ -104,6 +106,16 @@ export function MenstrualSidebar({ activeSection, onSectionChange, onEditClick, 
                         <Lightbulb className="w-3 h-3" />
                         Nastavenia
                       </button>
+                      {accessCode && onShareClick && (
+                        <button
+                          onClick={onShareClick}
+                          className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-3xl bg-white border border-rose-200/20 hover:bg-gray-50 transition-all"
+                          style={{ color: '#FF7782' }}
+                        >
+                          <Share2 className="w-3 h-3" />
+                          Zdieľať kalendár
+                        </button>
+                      )}
                     </div>
                     
                     <div className="p-3 rounded-lg" 

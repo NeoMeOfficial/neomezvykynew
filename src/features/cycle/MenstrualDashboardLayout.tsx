@@ -8,6 +8,7 @@ import { FeelBetterSection } from './sections/FeelBetterSection';
 import { CalendarViewSection } from './sections/CalendarViewSection';
 import { DatePickerModal } from './DatePickerModal';
 import { SettingsModal } from './SettingsModal';
+import { ShareCalendarDialog } from '@/components/ShareCalendarDialog';
 import { useCycleData } from './useCycleData';
 
 type OutcomeType = 'next-period' | 'fertile-days';
@@ -27,6 +28,7 @@ export function MenstrualDashboardLayout({
   const [activeSection, setActiveSection] = useState('estimate');
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showShareDialog, setShowShareDialog] = useState(false);
   const [selectedOutcome, setSelectedOutcome] = useState<OutcomeType | null>(null);
 
   const {
@@ -174,11 +176,13 @@ export function MenstrualDashboardLayout({
   // Desktop view - sidebar layout
   return (
     <div className="min-h-screen flex w-full bg-background">
-        <MenstrualSidebar 
-          activeSection={activeSection} 
+        <MenstrualSidebar
+          activeSection={activeSection}
           onSectionChange={setActiveSection}
           onEditClick={() => setShowDatePicker(true)}
           onSettingsClick={() => setShowSettings(true)}
+          onShareClick={() => setShowShareDialog(true)}
+          accessCode={accessCode}
         />
         
         <main className="flex-1 p-8 max-w-none">
@@ -251,6 +255,14 @@ export function MenstrualDashboardLayout({
               });
             }}
           />
+
+          {accessCode && (
+            <ShareCalendarDialog
+              open={showShareDialog}
+              onOpenChange={setShowShareDialog}
+              accessCode={accessCode}
+            />
+          )}
         </main>
       </div>
   );

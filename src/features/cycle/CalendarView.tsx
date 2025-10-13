@@ -25,11 +25,12 @@ interface HistoricalEntry {
 interface CalendarViewProps {
   cycleData: CycleData;
   derivedState: DerivedState;
-  onOutcomeSelect: (outcome: OutcomeType | null) => void;
-  selectedOutcome: OutcomeType | null;
-  onPeriodIntensityChange: (date: string, intensity: PeriodIntensity | null) => void;
-  getPeriodIntensity: (date: string) => PeriodIntensity | undefined;
+  onOutcomeSelect?: (outcome: OutcomeType | null) => void;
+  selectedOutcome?: OutcomeType | null;
+  onPeriodIntensityChange?: (date: string, intensity: PeriodIntensity | null) => void;
+  getPeriodIntensity?: (date: string) => PeriodIntensity | undefined;
   accessCode?: string;
+  readOnly?: boolean;
 }
 export function CalendarView({
   cycleData,
@@ -38,7 +39,8 @@ export function CalendarView({
   selectedOutcome,
   onPeriodIntensityChange,
   getPeriodIntensity,
-  accessCode
+  accessCode,
+  readOnly = false
 }: CalendarViewProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
@@ -735,6 +737,22 @@ export function CalendarView({
   };
 
   const handleDayClick = (date: Date) => {
+    if (readOnly) {
+      // In read-only mode, only show the expansion
+      const dayData = getDayData(date);
+      const dayIndex = calendarPeriod.days.findIndex(d => d && isSameDay(d, date));
+      const rowIndex = Math.floor(dayIndex / 7);
+      
+      if (selectedDayData && isSameDay(selectedDayData.date, date)) {
+        setSelectedDayData(null);
+        setExpandedRow(null);
+      } else {
+        setSelectedDayData({ ...dayData, date });
+        setExpandedRow(rowIndex);
+      }
+      return;
+    }
+    
     const dayData = getDayData(date);
     const dayIndex = calendarPeriod.days.findIndex(d => d && isSameDay(d, date));
     const rowIndex = Math.floor(dayIndex / 7);
