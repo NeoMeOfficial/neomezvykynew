@@ -25,13 +25,19 @@ export default function SharedCalendar() {
       }
 
       try {
+        // Ensure we have an anonymous session for accessing public data
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          await supabase.auth.signInAnonymously();
+        }
+
         // Validate the share code
         const { data, error: fetchError } = await supabase
           .from('shared_access_codes')
           .select('*')
           .eq('code', shareCode.toUpperCase())
           .eq('is_active', true)
-          .single();
+          .maybeSingle();
 
         if (fetchError || !data) {
           setError("Zdieľací kód nebol najdený alebo vypršal");
