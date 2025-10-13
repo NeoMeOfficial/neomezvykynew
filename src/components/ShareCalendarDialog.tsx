@@ -1,15 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Copy, Share2, Check, Calendar } from "lucide-react";
+import { Copy, Share2, Check, Calendar, AlertCircle } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface ShareCalendarDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  accessCode: string;
+  accessCode: string | null;
 }
 
 export const ShareCalendarDialog = ({ open, onOpenChange, accessCode }: ShareCalendarDialogProps) => {
@@ -17,6 +18,13 @@ export const ShareCalendarDialog = ({ open, onOpenChange, accessCode }: ShareCal
   const [generating, setGenerating] = useState(false);
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
+
+  // Auto-generate share code when dialog opens and accessCode is available
+  useEffect(() => {
+    if (open && accessCode && !shareCode) {
+      generateShareCode();
+    }
+  }, [open, accessCode]);
 
   const generateShareCode = async () => {
     setGenerating(true);
@@ -101,23 +109,21 @@ export const ShareCalendarDialog = ({ open, onOpenChange, accessCode }: ShareCal
         </DialogHeader>
 
         <div className="space-y-4 py-4">
-          {!shareCode ? (
+          {!accessCode ? (
+            <Alert>
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                Najprv si musíte nastaviť prístupový kód pre váš kalendár
+              </AlertDescription>
+            </Alert>
+          ) : !shareCode ? (
             <div className="space-y-4">
-              <div className="flex items-start gap-3 p-4 bg-muted/50 rounded-lg">
-                <Calendar className="h-5 w-5 mt-0.5 text-muted-foreground" />
-                <div className="text-sm text-muted-foreground">
-                  <p className="font-medium text-foreground mb-1">Bezpečné zdieľanie</p>
-                  <p>Odkaz bude aktívny 30 dní a umožní prístup k vášmu kalendárnemu prehľadu v režime iba na čítanie.</p>
-                </div>
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
               </div>
-              
-              <Button 
-                onClick={generateShareCode} 
-                disabled={generating}
-                className="w-full"
-              >
-                {generating ? "Generuje sa..." : "Vygenerovať zdieľací odkaz"}
-              </Button>
+              <p className="text-center text-sm text-muted-foreground">
+                Generuje sa zdieľací odkaz...
+              </p>
             </div>
           ) : (
             <div className="space-y-4">

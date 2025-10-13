@@ -56,18 +56,16 @@ export function CalendarViewSection({
             </div>
             
             {/* Share Calendar Button */}
-            {accessCode && (
-              <Button 
-                size="sm" 
-                variant="outline"
-                className="flex items-center gap-1.5 text-xs border-[#FF7782] bg-transparent hover:bg-[#FF7782]/10 text-[#FF7782] px-3 py-2 flex-shrink-0"
-                onClick={() => setShowShareDialog(true)}
-              >
-                <Share2 className="w-3 h-3" />
-                <span className="hidden xs:inline">Zdieľať kalendár</span>
-                <span className="xs:hidden">Zdieľať</span>
-              </Button>
-            )}
+            <Button 
+              size="sm" 
+              variant="outline"
+              className="flex items-center gap-1.5 text-xs border-[#FF7782] bg-transparent hover:bg-[#FF7782]/10 text-[#FF7782] px-3 py-2 flex-shrink-0"
+              onClick={() => setShowShareDialog(true)}
+            >
+              <Share2 className="w-3 h-3" />
+              <span className="hidden xs:inline">Zdieľať kalendár</span>
+              <span className="xs:hidden">Zdieľať</span>
+            </Button>
           </div>
         </div>
 
@@ -90,13 +88,11 @@ export function CalendarViewSection({
       </div>
       
       {/* Share Calendar Dialog */}
-      {accessCode && (
-        <ShareCalendarDialog
-          open={showShareDialog}
-          onOpenChange={setShowShareDialog}
-          accessCode={accessCode}
-        />
-      )}
+      <ShareCalendarDialog
+        open={showShareDialog}
+        onOpenChange={setShowShareDialog}
+        accessCode={accessCode}
+      />
     </>
   );
 }
