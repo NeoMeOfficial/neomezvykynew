@@ -59,7 +59,7 @@ export function TodaysEstimateSection({
                boxShadow: 'inset 0 2px 8px rgba(149, 95, 106, 0.05)'
              }}>
           {/* Cycle Chart */}
-          <div className="mb-8">
+          <div className="mb-8" data-tour="wellness-chart">
             <WellnessDonutChart
               derivedState={derivedState}
               selectedOutcome={selectedOutcome}
@@ -83,7 +83,7 @@ export function TodaysEstimateSection({
             </div>
             
             {/* How do you feel today section */}
-            <div className="space-y-3">
+            <div className="space-y-3" data-tour="symptom-tracker">
               <h5 className="text-base font-medium mb-3" style={{ color: '#955F6A' }}>
                 Ako sa dnes cítiš:
               </h5>

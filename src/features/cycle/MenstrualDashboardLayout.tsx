@@ -10,6 +10,7 @@ import { DatePickerModal } from './DatePickerModal';
 import { SettingsModal } from './SettingsModal';
 import { ShareCalendarDialog } from '@/components/ShareCalendarDialog';
 import { useCycleData } from './useCycleData';
+import { PeriodkaTour } from './PeriodkaTour';
 
 type OutcomeType = 'next-period' | 'fertile-days';
 
@@ -82,11 +83,12 @@ export function MenstrualDashboardLayout({
             <h2 className="text-xl font-semibold mb-1 leading-tight" style={{ color: '#955F6A' }}>
               Menštruačný kalendár
             </h2>
-            <p className="text-sm opacity-80" style={{ color: '#955F6A' }}>
+            <p className="text-sm opacity-80" style={{ color: '#955F6A' }} data-tour="current-phase">
               Deň {currentDay} • {currentPhase.name}
             </p>
           </div>
           <div className="flex flex-col gap-2 sm:flex-row">
+            <PeriodkaTour accessCode={accessCode} autoStart={true} />
             <Button
               variant="outline"
               size="sm"
@@ -101,6 +103,7 @@ export function MenstrualDashboardLayout({
               size="sm"
               onClick={() => setShowSettings(true)}
               className="flex items-center gap-1.5 text-xs px-3 py-2"
+              data-tour="settings"
             >
               <TrendingUp className="w-3 h-3" />
               Nastavenia
@@ -189,6 +192,14 @@ export function MenstrualDashboardLayout({
         />
         
         <main className="flex-1 p-8 max-w-none">
+          {/* Tour and Header */}
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-semibold" style={{ color: '#955F6A' }}>
+              <span data-tour="current-phase">Deň {currentDay} • {currentPhase.name}</span>
+            </h2>
+            <PeriodkaTour accessCode={accessCode} autoStart={true} />
+          </div>
+          
           {/* Content Area */}
           <div className="w-full">
             {activeSection === 'estimate' && (

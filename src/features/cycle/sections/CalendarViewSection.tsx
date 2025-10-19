@@ -76,7 +76,8 @@ export function CalendarViewSection({
              style={{ 
                background: 'linear-gradient(135deg, rgba(251, 248, 249, 0.75) 0%, rgba(253, 242, 248, 0.80) 100%)',
                boxShadow: 'inset 0 2px 8px rgba(149, 95, 106, 0.05)'
-             }}>
+             }}
+             data-tour="calendar-view">
           <CalendarView
             cycleData={cycleData}
             derivedState={derivedState}

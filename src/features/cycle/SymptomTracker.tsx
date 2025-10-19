@@ -301,6 +301,7 @@ export function SymptomTracker({
               color: '#955F6A',
               borderColor: '#E5D4D7'
             }}
+            data-tour="custom-symptom"
           >
             <span className="mr-1.5">+</span>
             Zadaj vlastný
@@ -309,7 +310,7 @@ export function SymptomTracker({
       </div>
 
       {/* Notes Section */}
-      <div className="space-y-2">
+      <div className="space-y-2" data-tour="notes">
         <div className="flex items-center justify-between">
           <span className="text-base font-medium" style={{
           color: '#955F6A'
