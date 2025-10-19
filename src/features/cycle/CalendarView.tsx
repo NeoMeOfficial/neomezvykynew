@@ -6,13 +6,14 @@ import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isToday, addWeeks, subWeeks, startOfWeek, endOfWeek, addDays } from 'date-fns';
+import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isToday, addWeeks, subWeeks, startOfWeek, endOfWeek, addDays, differenceInDays } from 'date-fns';
 import { sk } from 'date-fns/locale';
 import jsPDF from 'jspdf';
 import { DerivedState, CycleData, PeriodIntensity } from './types';
 import { isPeriodDate, isFertilityDate } from './utils';
 import { PeriodIntensitySelector } from './components/PeriodIntensitySelector';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { SymptomTracker } from './SymptomTracker';
 type OutcomeType = 'next-period' | 'fertile-days';
 type ViewType = 'monthly' | 'weekly';
 
@@ -1220,7 +1221,39 @@ export function CalendarView({
                             </div>
                           )}
                           
-                          {selectedDayData.symptoms.length === 0 && !selectedDayData.notes && (
+                          {/* Symptom Tracker for current day */}
+                          {!readOnly && (() => {
+                            const lastPeriodDate = cycleData.lastPeriodStart 
+                              ? (typeof cycleData.lastPeriodStart === 'string' 
+                                  ? new Date(cycleData.lastPeriodStart) 
+                                  : cycleData.lastPeriodStart)
+                              : null;
+                            
+                            if (!lastPeriodDate) return null;
+                            
+                            const daysSinceStart = differenceInDays(selectedDayData.date, lastPeriodDate);
+                            const currentDay = daysSinceStart + 1;
+                            const currentPhaseInfo = getCurrentDayPhase(selectedDayData.date);
+                            
+                            if (!currentPhaseInfo) return null;
+                            
+                            return (
+                              <div className="animate-fade-in border-t border-rose-100/50 pt-5" style={{ animationDelay: '0.3s' }}>
+                                <h5 className="text-sm font-medium mb-3 text-rose-700 flex items-center gap-2">
+                                  <div className="w-2 h-2 rounded-full bg-rose-400"></div>
+                                  Zaznamenať príznaky
+                                </h5>
+                                <SymptomTracker
+                                  currentPhase={currentPhaseInfo.key}
+                                  currentDay={currentDay}
+                                  accessCode={accessCode}
+                                  lastPeriodStart={cycleData.lastPeriodStart}
+                                />
+                              </div>
+                            );
+                          })()}
+                          
+                          {selectedDayData.symptoms.length === 0 && !selectedDayData.notes && readOnly && (
                             <div className="text-center py-8 animate-fade-in">
                               <div className="w-12 h-12 rounded-full bg-rose-100 flex items-center justify-center mx-auto mb-3">
                                 <FileText className="w-6 h-6 text-rose-400" />
