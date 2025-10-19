@@ -1,6 +1,9 @@
 import React from 'react';
-import { Clock, FileText, TrendingUp, CalendarDays, Lightbulb, Share2 } from 'lucide-react';
+import { Clock, FileText, TrendingUp, CalendarDays, Lightbulb, Share2, AlertCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import periodkaLogo from '@/assets/periodka-logo.png';
+import { temporaryStorage } from '@/lib/temporaryStorage';
+import { Button } from '@/components/ui/button';
 
 interface MenstrualSidebarProps {
   activeSection: string;
@@ -30,6 +33,9 @@ const menuItems = [
 ];
 
 export function MenstrualSidebar({ activeSection, onSectionChange, onEditClick, onSettingsClick, onShareClick, accessCode }: MenstrualSidebarProps) {
+  const navigate = useNavigate();
+  const hasTemporaryData = temporaryStorage.isSessionActive() && temporaryStorage.hasTemporaryData();
+  
   return (
     <div className="w-80 border-r border-border/50 bg-background/95 backdrop-blur-sm" data-tour="sidebar">
       <div className="p-6">
@@ -137,6 +143,32 @@ export function MenstrualSidebar({ activeSection, onSectionChange, onEditClick, 
                         </p>
                       </div>
                     </div>
+
+                    {/* Temporary Data Indicator */}
+                    {hasTemporaryData && !accessCode && (
+                      <div className="mt-3 bg-amber-50 border border-amber-200 rounded-lg p-3">
+                        <div className="flex items-start gap-2">
+                          <AlertCircle className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                          <div className="flex-1 space-y-2">
+                            <div>
+                              <p className="text-xs font-medium text-amber-800">
+                                Dočasné údaje
+                              </p>
+                              <p className="text-xs text-amber-700 mt-1">
+                                Tvoj pokrok sa neuloží bez zadania kódu
+                              </p>
+                            </div>
+                            <Button
+                              onClick={() => navigate('/checkout')}
+                              size="sm"
+                              className="w-full bg-amber-600 hover:bg-amber-700 text-white text-xs py-1.5 h-auto"
+                            >
+                              Vytvoriť účet
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
