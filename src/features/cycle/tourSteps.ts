@@ -100,8 +100,8 @@ export const getCalendarDetailedTour = (): Step[] => [
   },
   {
     target: '[data-tour="calendar-view"]',
-    content: 'V kalendári vidíš históriu celého cyklu. Ružové dni sú menštruácia, zelené plodné dni. Klikni na ktorýkoľvek deň pre detaily! 📅',
-    placement: 'top',
+    content: 'V kalendári vidíš históriu celého cyklu. Ružové dni sú menštruácia, zelené plodné dni. Klikni na ktorýkoľvek deň a otvorí sa denný detail, kde môžeš pridať príznaky, poznámky a upraviť intenzitu menštruácie pre daný deň. 📅',
+    placement: 'bottom',
   },
   {
     target: '[data-tour="calendar-actions"]',
