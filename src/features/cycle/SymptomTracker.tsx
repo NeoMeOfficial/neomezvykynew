@@ -146,6 +146,9 @@ export function SymptomTracker({
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
   const [notes, setNotes] = useState<string>('');
   const [hasChanges, setHasChanges] = useState(false);
+  const [customSymptoms, setCustomSymptoms] = useState<Symptom[]>([]);
+  const [isAddingCustom, setIsAddingCustom] = useState(false);
+  const [customSymptomInput, setCustomSymptomInput] = useState('');
 
   // Calculate the actual date for the currentDay
   const getDateForCurrentDay = (): string => {
@@ -161,8 +164,17 @@ export function SymptomTracker({
   const today = new Date();
   const isToday = format(currentDateObject, 'yyyy-MM-dd') === format(today, 'yyyy-MM-dd');
 
-  // Filter symptoms relevant to current phase
-  const relevantSymptoms = SYMPTOMS.filter(symptom => symptom.phases.includes(currentPhase));
+  // Load custom symptoms from localStorage
+  useEffect(() => {
+    const customSymptomsKey = accessCode ? `custom_symptoms_${accessCode}` : 'temp_custom_symptoms';
+    const savedCustomSymptoms = localStorage.getItem(customSymptomsKey);
+    if (savedCustomSymptoms) {
+      setCustomSymptoms(JSON.parse(savedCustomSymptoms));
+    }
+  }, [accessCode]);
+
+  // Filter symptoms relevant to current phase + custom symptoms
+  const relevantSymptoms = [...SYMPTOMS.filter(symptom => symptom.phases.includes(currentPhase)), ...customSymptoms];
 
   // Load saved symptoms and notes for the current day being tracked
   useEffect(() => {
@@ -181,6 +193,29 @@ export function SymptomTracker({
       return newSelected;
     });
   };
+  
+  const addCustomSymptom = () => {
+    if (!customSymptomInput.trim()) return;
+    
+    const newSymptom: Symptom = {
+      id: `custom_${Date.now()}`,
+      name: customSymptomInput.trim(),
+      icon: '✏️',
+      phases: ['menstrual', 'follicular', 'ovulation', 'luteal']
+    };
+    
+    const updatedCustomSymptoms = [...customSymptoms, newSymptom];
+    setCustomSymptoms(updatedCustomSymptoms);
+    
+    // Save to localStorage
+    const customSymptomsKey = accessCode ? `custom_symptoms_${accessCode}` : 'temp_custom_symptoms';
+    localStorage.setItem(customSymptomsKey, JSON.stringify(updatedCustomSymptoms));
+    
+    // Clear input and close
+    setCustomSymptomInput('');
+    setIsAddingCustom(false);
+  };
+  
   const saveSymptoms = () => {
     const symptomsKey = accessCode ? `symptoms_${accessCode}_${currentDate}` : `temp_symptoms_${currentDate}`;
     const notesKey = accessCode ? `notes_${accessCode}_${currentDate}` : `temp_notes_${currentDate}`;
@@ -225,6 +260,52 @@ export function SymptomTracker({
             <span className="mr-1.5">{symptom.icon}</span>
             {symptom.name}
           </Badge>)}
+        
+        {/* Add Custom Symptom */}
+        {isAddingCustom ? (
+          <div className="flex items-center gap-1">
+            <input
+              type="text"
+              value={customSymptomInput}
+              onChange={(e) => setCustomSymptomInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  addCustomSymptom();
+                } else if (e.key === 'Escape') {
+                  setIsAddingCustom(false);
+                  setCustomSymptomInput('');
+                }
+              }}
+              onBlur={() => {
+                if (!customSymptomInput.trim()) {
+                  setIsAddingCustom(false);
+                }
+              }}
+              placeholder="Zadaj príznak..."
+              className="text-xs py-1 px-2.5 border border-rose-200 rounded-md focus:outline-none focus:ring-2 focus:ring-rose-300"
+              style={{
+                backgroundColor: '#FBF8F9',
+                color: '#955F6A',
+                minWidth: '150px'
+              }}
+              autoFocus
+            />
+          </div>
+        ) : (
+          <Badge
+            variant="outline"
+            className="cursor-pointer select-none text-xs py-1 px-2.5 transition-all duration-200 hover:bg-muted border-dashed"
+            onClick={() => setIsAddingCustom(true)}
+            style={{
+              backgroundColor: '#FBF8F9',
+              color: '#955F6A',
+              borderColor: '#E5D4D7'
+            }}
+          >
+            <span className="mr-1.5">+</span>
+            Zadaj vlastný
+          </Badge>
+        )}
       </div>
 
       {/* Notes Section */}
