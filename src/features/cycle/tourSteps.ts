@@ -1,91 +1,121 @@
 import { Step } from 'react-joyride';
 
-// Overview tour - introduces the main navigation
+// Overview tour - introduces the main sections
 export const getOverviewTourSteps = (): Step[] => [
   {
     target: '[data-tour="welcome"]',
-    content: 'Vitaj v Periodke! Ukážeme ti hlavné časti aplikácie a ako ich používať. 💗',
+    content: 'Vitaj v Periodke! Ukážeme ti hlavné časti aplikácie. 💗',
     placement: 'center',
     disableBeacon: true,
   },
   {
-    target: '[data-tour="sidebar"]',
-    content: 'Tu nájdeš hlavné sekcie aplikácie. Každá sekcia ti ponúka iné funkcie pre sledovanie tvojho cyklu. 📋',
-    placement: 'right',
-  },
-  {
     target: '[data-tour="estimate-section"]',
-    content: 'Odhad na dnes - tu vidíš prehľad aktuálneho dňa cyklu, fázy a môžeš zaznamenávať príznaky. 📅',
+    content: '1️⃣ Odhad na dnes - Tu vidíš aktuálny deň cyklu, fázu a môžeš zaznamenávať príznaky a poznámky. 📅',
     placement: 'right',
   },
   {
     target: '[data-tour="feel-better-section"]',
-    content: 'Ako sa cítiť lepšie - tipy a odporúčania pre každú fázu tvojho cyklu. 💡',
+    content: '2️⃣ Ako sa cítiť lepšie - Personalizované tipy a rady pre každú fázu tvojho cyklu. 💡',
     placement: 'right',
   },
   {
     target: '[data-tour="calendar-section"]',
-    content: 'Kalendárny prehľad - kompletná história tvojho cyklu s možnosťou upravovať príznaky pre jednotlivé dni. 📆',
+    content: '3️⃣ Kalendárny prehľad - Kompletná história tvojho cyklu s možnosťou upravovať jednotlivé dni. 📆',
     placement: 'right',
+  },
+  {
+    target: '[data-tour="calendar-actions"]',
+    content: '4️⃣ Tu môžeš zmeniť dátum menštruácie, upraviť nastavenia alebo zdieľať kalendár. ⚙️',
+    placement: 'right',
+  },
+  {
+    target: 'body',
+    content: 'Chceš pokračovať a dozvedieť sa viac o jednotlivých sekciách? Klikni "Ďalej" pre detailný návod, alebo "Preskočiť" ak chceš začať používať aplikáciu. 🚀',
+    placement: 'center',
   },
 ];
 
-// Section-specific tour for "Odhad na dnes"
-export const getEstimateTourSteps = (): Step[] => [
+// Detailed tour for "Odhad na dnes"
+export const getEstimateDetailedTour = (): Step[] => [
   {
-    target: '[data-tour="current-phase"]',
-    content: 'Tu vidíš, v ktorom dni cyklu sa nachádzaš a v akej fáze. Fáza ovplyvňuje tvoje fyzické i emocionálne pocity. 📅',
-    placement: 'bottom',
+    target: '[data-tour="estimate-section"]',
+    content: 'Pozrime sa bližšie na sekciu "Odhad na dnes". Ukážeme ti všetky funkcie! 📱',
+    placement: 'right',
     disableBeacon: true,
   },
   {
+    target: '[data-tour="current-phase"]',
+    content: 'Tu vidíš, v ktorom dni cyklu sa nachádzaš a v akej fáze. Každá fáza má iné charakteristiky a ovplyvňuje tvoje pocity. 📅',
+    placement: 'bottom',
+  },
+  {
     target: '[data-tour="wellness-chart"]',
-    content: 'Tento graf zobrazuje tvoj celý cyklus. Každý bod predstavuje jeden deň. Graf predpovedá tvoju nasledujúcu periódu a plodné dni. 🔄',
+    content: 'Graf zobrazuje celý tvoj cyklus. Každý bod je jeden deň. Ružová oblasť je menštruácia, zelená sú plodné dni. 🔄',
     placement: 'bottom',
   },
   {
     target: '[data-tour="symptom-tracker"]',
-    content: 'Tu môžeš zaznamenať príznaky, ktoré práve pociťuješ. Klikni na príznaky, ktoré zažívaš - pomôže ti to lepšie porozumieť svojmu telu! 🏷️',
+    content: 'Tu zaznamenávaš príznaky. Klikni na tie, ktoré práve pociťuješ - pomôže ti to spoznať vzorce v tvojom cykle! 🏷️',
     placement: 'top',
   },
   {
     target: '[data-tour="custom-symptom"]',
-    content: 'Môžeš pridať aj vlastné príznaky! Klikni sem, zadaj vlastný príznak a stlač Enter. Bude uložený pre budúce použitie. ➕',
+    content: 'Môžeš pridať vlastné príznaky! Klikni sem, zadaj názov príznaku a stlač Enter. Príznak sa uloží pre budúce použitie. ➕',
     placement: 'top',
   },
   {
     target: '[data-tour="notes"]',
-    content: 'Sem si môžeš zapísať súkromné poznámky o tom, ako sa cítiš, čo ťa trápi, alebo čo ťa teší. Tieto poznámky sú len pre teba. 📝',
+    content: 'Sem si môžeš zapísať súkromné poznámky - ako sa cítiš, čo ťa trápi, alebo naopak teší. Všetko zostáva len medzi tebou a aplikáciou. 📝',
     placement: 'top',
   },
 ];
 
-// Section-specific tour for "Ako sa cítiť lepšie"
-export const getFeelBetterTourSteps = (): Step[] => [
+// Detailed tour for "Ako sa cítiť lepšie"
+export const getFeelBetterDetailedTour = (): Step[] => [
+  {
+    target: '[data-tour="feel-better-section"]',
+    content: 'Teraz sa pozrieme na sekciu "Ako sa cítiť lepšie". 🌸',
+    placement: 'right',
+    disableBeacon: true,
+  },
   {
     target: '[data-tour="feel-better-content"]',
-    content: 'Táto sekcia ti poskytuje personalizované tipy a rady na základe fázy cyklu, v ktorej sa práve nachádzaš. 🌸',
+    content: 'Táto sekcia ti poskytuje personalizované rady na základe fázy cyklu, v ktorej sa práve nachádzaš. 💪',
     placement: 'bottom',
-    disableBeacon: true,
   },
   {
     target: '[data-tour="phase-tips"]',
-    content: 'Každá fáza cyklu má svoje špecifické odporúčania týkajúce sa stravy, cvičenia a starostlivosti o seba. 💪',
+    content: 'Pre každú fázu nájdeš tipy týkajúce sa stravy, cvičenia, odpočinku a celkovej pohody. Využi ich pre lepší pocit počas celého cyklu! ✨',
     placement: 'bottom',
   },
 ];
 
-// Section-specific tour for "Kalendárny prehľad"
-export const getCalendarTourSteps = (): Step[] => [
+// Detailed tour for "Kalendárny prehľad"
+export const getCalendarDetailedTour = (): Step[] => [
   {
-    target: '[data-tour="calendar-view"]',
-    content: 'V kalendárnom prehľade vidíš históriu celého cyklu. Klikni na ktorýkoľvek deň pre zobrazenie detailov a zadanie prízakov pre ten deň. 📆',
-    placement: 'top',
+    target: '[data-tour="calendar-section"]',
+    content: 'Poďme sa pozrieť na "Kalendárny prehľad". 📆',
+    placement: 'right',
     disableBeacon: true,
   },
   {
+    target: '[data-tour="calendar-view"]',
+    content: 'V kalendári vidíš históriu celého cyklu. Ružové dni sú menštruácia, zelené plodné dni. Klikni na ktorýkoľvek deň pre detaily! 📅',
+    placement: 'top',
+  },
+  {
     target: '[data-tour="calendar-actions"]',
-    content: 'Tu môžeš upraviť dátum menštruácie, zmeniť nastavenia alebo zdieľať svoj kalendár. ⚙️',
+    content: 'Tu môžeš zmeniť dátum poslednej menštruácie, upraviť dĺžku cyklu alebo zdieľať kalendár s niekým blízkym. ⚙️',
     placement: 'right',
+  },
+];
+
+// Completion message
+export const getTourCompletionStep = (): Step[] => [
+  {
+    target: 'body',
+    content: 'Výborne! Teraz vieš všetko o Periodke. Môžeš kedykoľvek spustiť návod znova kliknutím na ikonu "?" v záhlaví. Držíme ti palce! 💗',
+    placement: 'center',
+    disableBeacon: true,
   },
 ];

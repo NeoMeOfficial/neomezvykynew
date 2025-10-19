@@ -88,7 +88,7 @@ export function MenstrualDashboardLayout({
             </p>
           </div>
           <div className="flex flex-col gap-2 sm:flex-row">
-            <PeriodkaTour accessCode={accessCode} autoStart={true} activeSection={activeSection} />
+            <PeriodkaTour accessCode={accessCode} autoStart={true} activeSection={activeSection} onSectionChange={setActiveSection} />
             <Button
               variant="outline"
               size="sm"
@@ -197,7 +197,7 @@ export function MenstrualDashboardLayout({
             <h2 className="text-2xl font-semibold" style={{ color: '#955F6A' }}>
               <span data-tour="current-phase">Deň {currentDay} • {currentPhase.name}</span>
             </h2>
-            <PeriodkaTour accessCode={accessCode} autoStart={true} activeSection={activeSection} />
+            <PeriodkaTour accessCode={accessCode} autoStart={true} activeSection={activeSection} onSectionChange={setActiveSection} />
           </div>
           
           {/* Content Area */}
