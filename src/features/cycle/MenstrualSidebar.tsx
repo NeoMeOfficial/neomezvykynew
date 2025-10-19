@@ -31,7 +31,7 @@ const menuItems = [
 
 export function MenstrualSidebar({ activeSection, onSectionChange, onEditClick, onSettingsClick, onShareClick, accessCode }: MenstrualSidebarProps) {
   return (
-    <div className="w-80 border-r border-border/50 bg-background/95 backdrop-blur-sm">
+    <div className="w-80 border-r border-border/50 bg-background/95 backdrop-blur-sm" data-tour="sidebar">
       <div className="p-6">
         <div className="flex items-start gap-3 mb-6">
           <img 
@@ -52,6 +52,7 @@ export function MenstrualSidebar({ activeSection, onSectionChange, onEditClick, 
               <div key={item.id}>
                 <div
                   onClick={() => onSectionChange(item.id)}
+                  data-tour={`${item.id}-section`}
                   className={`
                     w-full cursor-pointer transition-all duration-200 mb-2 p-4 rounded-xl relative
                     ${isActive 
@@ -87,7 +88,7 @@ export function MenstrualSidebar({ activeSection, onSectionChange, onEditClick, 
                 
                 {/* Show buttons and next period info under Kalendárny prehľad */}
                 {item.id === 'calendar' && (
-                  <div className="mb-4 space-y-3">
+                  <div className="mb-4 space-y-3" data-tour="calendar-actions">
                     {/* Action buttons */}
                     <div className="flex flex-col gap-2">
                       <button

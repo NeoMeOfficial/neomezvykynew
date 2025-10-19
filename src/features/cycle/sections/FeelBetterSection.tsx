@@ -14,7 +14,7 @@ export function FeelBetterSection({
   return (
     <>
       {/* Layered Glass - Multiple glass layers creating depth between header/content */}
-      <div className="relative">
+      <div className="relative" data-tour="feel-better-content">
         {/* Background layer */}
         <div className="absolute inset-0 rounded-2xl z-0"
              style={{ 
@@ -45,7 +45,8 @@ export function FeelBetterSection({
              style={{ 
                background: 'linear-gradient(135deg, rgba(251, 248, 249, 0.75) 0%, rgba(253, 242, 248, 0.80) 100%)',
                boxShadow: 'inset 0 2px 8px rgba(149, 95, 106, 0.05)'
-             }}>
+             }}
+             data-tour="phase-tips">
           <PhaseOverview
             phaseRanges={phaseRanges}
             currentPhase={currentPhase}
