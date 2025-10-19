@@ -155,7 +155,7 @@ export function MenstrualSidebar({ activeSection, onSectionChange, onEditClick, 
                                 Dočasné údaje
                               </p>
                               <p className="text-xs text-amber-700 mt-1">
-                                Tvoj pokrok sa neuloží bez zadania kódu
+                                Pre uloženie údajov je potrebné 5 Eur predplatné
                               </p>
                             </div>
                             <Button
