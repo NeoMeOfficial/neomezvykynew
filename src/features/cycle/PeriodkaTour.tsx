@@ -27,7 +27,6 @@ export const PeriodkaTour = ({
 }: PeriodkaTourProps) => {
   const [runTour, setRunTour] = useState(false);
   const [tourPhase, setTourPhase] = useState<TourPhase>('none');
-  const [stepIndex, setStepIndex] = useState(0);
   
   // Get the appropriate tour steps based on current phase
   const getTourSteps = (): Step[] => {
@@ -52,7 +51,6 @@ export const PeriodkaTour = ({
   // Update tour steps when phase changes
   useEffect(() => {
     setTourSteps(getTourSteps());
-    setStepIndex(0);
   }, [tourPhase]);
 
   useEffect(() => {
@@ -148,7 +146,6 @@ export const PeriodkaTour = ({
       <Joyride
         steps={tourSteps}
         run={runTour}
-        stepIndex={stepIndex}
         continuous
         showProgress
         showSkipButton
