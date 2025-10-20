@@ -56,12 +56,12 @@ export function TodaysEstimateSection({
             </div>
             {onSettingsClick && (
               <Button
-                variant="ghost"
+                variant="outline"
                 size="sm"
                 onClick={onSettingsClick}
-                className="h-8 w-8 p-0 hover:bg-[#FF7782]/10"
+                className="border-[#FF7782] text-[#955F6A] hover:bg-[#FF7782]/10 text-xs px-3 py-1"
               >
-                <Settings className="w-5 h-5" style={{ color: '#FF7782' }} />
+                Nastavenia
               </Button>
             )}
           </div>
