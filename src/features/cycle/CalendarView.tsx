@@ -739,6 +739,19 @@ export function CalendarView({
           date
         });
         setExpandedRow(rowIndex);
+        
+        // Scroll to expanded content on mobile after a brief delay
+        if (isMobile) {
+          setTimeout(() => {
+            const expandedElement = document.querySelector('.animate-accordion-down');
+            if (expandedElement) {
+              expandedElement.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'nearest'
+              });
+            }
+          }, 100);
+        }
       }
       return;
     }
@@ -756,6 +769,19 @@ export function CalendarView({
         date
       });
       setExpandedRow(rowIndex);
+      
+      // Scroll to expanded content on mobile after a brief delay
+      if (isMobile) {
+        setTimeout(() => {
+          const expandedElement = document.querySelector('.animate-accordion-down');
+          if (expandedElement) {
+            expandedElement.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'nearest'
+            });
+          }
+        }, 100);
+      }
     }
 
     // Still show period intensity selector if it's a period day
