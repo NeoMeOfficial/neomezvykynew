@@ -81,10 +81,6 @@ export function MenstrualDashboardLayout({
           </div>
           <div className="flex flex-col gap-2 sm:flex-row">
             <PeriodkaTour accessCode={accessCode} autoStart={true} activeSection={activeSection} onSectionChange={setActiveSection} />
-            <Button variant="outline" size="sm" onClick={() => setShowDatePicker(true)} className="flex items-center gap-1.5 text-xs px-3 py-2">
-              <CalendarIcon className="w-3 h-3" />
-              Upraviť
-            </Button>
             <Button variant="outline" size="sm" onClick={() => setShowSettings(true)} className="flex items-center gap-1.5 text-xs px-3 py-2" data-tour="settings">
               <TrendingUp className="w-3 h-3" />
               Nastavenia
