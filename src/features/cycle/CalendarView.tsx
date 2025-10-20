@@ -834,36 +834,65 @@ export function CalendarView({
       {/* Header with Filters */}
       <div className={isMobile ? "space-y-3" : ""}>
         <div className={`flex items-center ${isMobile ? 'flex-col gap-3' : 'justify-between'}`}>
-          {/* Period Filters and Filter Toggle */}
-          <div className="flex gap-2 flex-wrap">
-            {/* Period and Fertility Filters */}
-            <Button size="sm" variant="outline" onClick={() => onOutcomeSelect(selectedOutcome === 'next-period' ? null : 'next-period')} className={`flex items-center gap-1.5 text-xs border transition-all duration-200 ${selectedOutcome === 'next-period' ? 'bg-gradient-to-r from-[#FF7782] to-[#FF9AA1] text-white border-[#FF7782]' : 'border-[#FF7782] bg-transparent hover:bg-[#FF7782]/10 text-[#FF7782]'}`}>
-              <Droplets className="w-3 h-3" />
-              Menštruácia
-            </Button>
-            <Button size="sm" variant="outline" onClick={() => onOutcomeSelect(selectedOutcome === 'fertile-days' ? null : 'fertile-days')} className={`flex items-center gap-1.5 text-xs border transition-all duration-200 ${selectedOutcome === 'fertile-days' ? 'bg-gradient-to-r from-[#FF7782] to-[#FF9AA1] text-white border-[#FF7782]' : 'border-[#FF7782] bg-transparent hover:bg-[#FF7782]/10 text-[#FF7782]'}`}>
-              <Heart className="w-3 h-3" />
-              Plodné dni
-            </Button>
-            
-            {/* Today Button */}
-            <Button size="sm" variant="outline" onClick={() => setCurrentDate(new Date())} className="flex items-center gap-1.5 text-xs border transition-all duration-200 border-[#FF7782] bg-transparent hover:bg-[#FF7782]/10 text-[#FF7782]">
-              <Calendar className="w-3 h-3" />
-              Dnes
-            </Button>
-            
-            {/* Notes Button */}
-            <Button size="sm" variant="outline" onClick={() => {/* TODO: Implement notes filter */}} className="flex items-center gap-1.5 text-xs border transition-all duration-200 border-[#FF7782] bg-transparent hover:bg-[#FF7782]/10 text-[#FF7782]">
-              <FileText className="w-3 h-3" />
-              Poznámky
-            </Button>
-            
-            {/* Filter Toggle Button */}
-            <Button size="sm" variant="outline" onClick={() => setShowSymptomFilters(!showSymptomFilters)} className={`flex items-center gap-1.5 text-xs border transition-all duration-200 ${showSymptomFilters ? 'bg-gradient-to-r from-[#FF7782] to-[#FF9AA1] text-white border-[#FF7782]' : 'border-[#FF7782] bg-transparent hover:bg-[#FF7782]/10 text-[#FF7782]'}`}>
-              <Filter className="w-3 h-3" />
-              Filtrovať
-            </Button>
-          </div>
+        {/* Calendar Actions Dropdown */}
+          <Select
+            value=""
+            onValueChange={(value) => {
+              switch(value) {
+                case 'period':
+                  onOutcomeSelect(selectedOutcome === 'next-period' ? null : 'next-period');
+                  break;
+                case 'fertile':
+                  onOutcomeSelect(selectedOutcome === 'fertile-days' ? null : 'fertile-days');
+                  break;
+                case 'today':
+                  setCurrentDate(new Date());
+                  break;
+                case 'notes':
+                  // TODO: Implement notes filter
+                  break;
+                case 'filter':
+                  setShowSymptomFilters(!showSymptomFilters);
+                  break;
+              }
+            }}
+          >
+            <SelectTrigger className="w-[180px] border-[#FF7782] text-[#955F6A] hover:bg-[#FF7782]/10 focus:ring-[#FF7782]">
+              <SelectValue placeholder="Vyberte možnosť..." />
+            </SelectTrigger>
+            <SelectContent className="bg-white border-[#FF7782] z-50">
+              <SelectItem value="period" className="text-[#955F6A] hover:bg-[#FF7782]/10 focus:bg-[#FF7782]/10">
+                <div className="flex items-center gap-2">
+                  <Droplets className="w-3 h-3" />
+                  <span>Menštruácia</span>
+                </div>
+              </SelectItem>
+              <SelectItem value="fertile" className="text-[#955F6A] hover:bg-[#FF7782]/10 focus:bg-[#FF7782]/10">
+                <div className="flex items-center gap-2">
+                  <Heart className="w-3 h-3" />
+                  <span>Plodné dni</span>
+                </div>
+              </SelectItem>
+              <SelectItem value="today" className="text-[#955F6A] hover:bg-[#FF7782]/10 focus:bg-[#FF7782]/10">
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-3 h-3" />
+                  <span>Dnes</span>
+                </div>
+              </SelectItem>
+              <SelectItem value="notes" className="text-[#955F6A] hover:bg-[#FF7782]/10 focus:bg-[#FF7782]/10">
+                <div className="flex items-center gap-2">
+                  <FileText className="w-3 h-3" />
+                  <span>Poznámky</span>
+                </div>
+              </SelectItem>
+              <SelectItem value="filter" className="text-[#955F6A] hover:bg-[#FF7782]/10 focus:bg-[#FF7782]/10">
+                <div className="flex items-center gap-2">
+                  <Filter className="w-3 h-3" />
+                  <span>Filtrovať</span>
+                </div>
+              </SelectItem>
+            </SelectContent>
+          </Select>
 
           {/* Legend */}
           
