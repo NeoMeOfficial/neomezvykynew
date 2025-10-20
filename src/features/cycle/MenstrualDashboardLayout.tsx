@@ -11,16 +11,13 @@ import { SettingsModal } from './SettingsModal';
 import { ShareCalendarDialog } from '@/components/ShareCalendarDialog';
 import { useCycleData } from './useCycleData';
 import { PeriodkaTour } from './PeriodkaTour';
-
 type OutcomeType = 'next-period' | 'fertile-days';
-
 interface MenstrualDashboardLayoutProps {
   accessCode?: string;
   compact?: boolean;
   onFirstInteraction?: () => void;
   onAccessCodeGenerated?: (code: string) => void;
 }
-
 export function MenstrualDashboardLayout({
   accessCode,
   compact = false,
@@ -33,7 +30,6 @@ export function MenstrualDashboardLayout({
   const [showSettings, setShowSettings] = useState(false);
   const [showShareDialog, setShowShareDialog] = useState(false);
   const [selectedOutcome, setSelectedOutcome] = useState<OutcomeType | null>(null);
-
   const {
     cycleData,
     derivedState,
@@ -45,66 +41,51 @@ export function MenstrualDashboardLayout({
     setPeriodIntensity,
     getPeriodIntensity
   } = useCycleData(accessCode);
-
   const handleFirstInteraction = () => {
     onFirstInteraction?.();
   };
-
   const handleDateSelect = (date: Date) => {
     setLastPeriodStart(date);
     handleFirstInteraction();
   };
-
   if (loading) {
-    return (
-      <div className="bg-widget-bg p-3 w-full overflow-hidden">
+    return <div className="bg-widget-bg p-3 w-full overflow-hidden">
         <div className="w-full max-w-[600px] mx-auto space-y-2">
           <div className="flex items-center justify-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
           </div>
         </div>
-      </div>
-    );
+      </div>;
   }
-
   if (!derivedState) {
     return null;
   }
-
-  const { currentDay, phaseRanges, currentPhase } = derivedState;
+  const {
+    currentDay,
+    phaseRanges,
+    currentPhase
+  } = derivedState;
 
   // Mobile view - return original accordion layout
   if (isMobile) {
-    return (
-      <div className="w-full px-2 py-6 space-y-6">
+    return <div className="w-full px-2 py-6 space-y-6">
         {/* Main Header with Action Buttons */}
         <div className="flex justify-between items-start gap-4 pb-2">
           <div className="flex-1 min-w-0">
-            <h2 className="text-xl font-semibold mb-1 leading-tight" style={{ color: '#955F6A' }}>
+            <h2 className="text-xl font-semibold mb-1 leading-tight" style={{
+            color: '#955F6A'
+          }}>
               Menštruačný kalendár
             </h2>
-            <p className="text-sm opacity-80" style={{ color: '#955F6A' }} data-tour="current-phase">
-              Deň {currentDay} • {currentPhase.name}
-            </p>
+            
           </div>
           <div className="flex flex-col gap-2 sm:flex-row">
             <PeriodkaTour accessCode={accessCode} autoStart={true} activeSection={activeSection} onSectionChange={setActiveSection} />
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowDatePicker(true)}
-              className="flex items-center gap-1.5 text-xs px-3 py-2"
-            >
+            <Button variant="outline" size="sm" onClick={() => setShowDatePicker(true)} className="flex items-center gap-1.5 text-xs px-3 py-2">
               <CalendarIcon className="w-3 h-3" />
               Upraviť
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowSettings(true)}
-              className="flex items-center gap-1.5 text-xs px-3 py-2"
-              data-tour="settings"
-            >
+            <Button variant="outline" size="sm" onClick={() => setShowSettings(true)} className="flex items-center gap-1.5 text-xs px-3 py-2" data-tour="settings">
               <TrendingUp className="w-3 h-3" />
               Nastavenia
             </Button>
@@ -113,88 +94,43 @@ export function MenstrualDashboardLayout({
 
         {/* All sections for mobile */}
         <div className="space-y-8">
-          <TodaysEstimateSection
-            derivedState={derivedState}
-            selectedOutcome={selectedOutcome}
-            cycleData={cycleData}
-            currentDay={currentDay}
-            currentPhase={currentPhase}
-            accessCode={accessCode}
-            lastPeriodStart={cycleData.lastPeriodStart}
-          />
+          <TodaysEstimateSection derivedState={derivedState} selectedOutcome={selectedOutcome} cycleData={cycleData} currentDay={currentDay} currentPhase={currentPhase} accessCode={accessCode} lastPeriodStart={cycleData.lastPeriodStart} />
 
-          <FeelBetterSection
-            phaseRanges={phaseRanges}
-            currentPhase={currentPhase}
-          />
+          <FeelBetterSection phaseRanges={phaseRanges} currentPhase={currentPhase} />
 
-          <CalendarViewSection
-            cycleData={cycleData}
-            derivedState={derivedState}
-            onOutcomeSelect={setSelectedOutcome}
-            selectedOutcome={selectedOutcome}
-            onPeriodIntensityChange={setPeriodIntensity}
-            getPeriodIntensity={getPeriodIntensity}
-            accessCode={accessCode}
-            onAccessCodeGenerated={onAccessCodeGenerated}
-          />
+          <CalendarViewSection cycleData={cycleData} derivedState={derivedState} onOutcomeSelect={setSelectedOutcome} selectedOutcome={selectedOutcome} onPeriodIntensityChange={setPeriodIntensity} getPeriodIntensity={getPeriodIntensity} accessCode={accessCode} onAccessCodeGenerated={onAccessCodeGenerated} />
         </div>
 
         {/* Modals */}
-        <DatePickerModal
-          isOpen={showDatePicker}
-          onClose={() => setShowDatePicker(false)}
-          onDateSelect={handleDateSelect}
-          derivedState={derivedState}
-          cycleLength={cycleData.cycleLength}
-          periodLength={cycleData.periodLength}
-          lastPeriodStart={cycleData.lastPeriodStart}
-          title="Nová perioda"
-          accessCode={accessCode}
-        />
+        <DatePickerModal isOpen={showDatePicker} onClose={() => setShowDatePicker(false)} onDateSelect={handleDateSelect} derivedState={derivedState} cycleLength={cycleData.cycleLength} periodLength={cycleData.periodLength} lastPeriodStart={cycleData.lastPeriodStart} title="Nová perioda" accessCode={accessCode} />
 
-        <SettingsModal
-          isOpen={showSettings}
-          onClose={() => setShowSettings(false)}
-          cycleData={cycleData}
-          onUpdateCycleLength={setCycleLength}
-          onUpdatePeriodLength={setPeriodLength}
-          onEditPeriodStart={() => setShowDatePicker(true)}
-          onReset={() => {
-            updateCycleData({
-              lastPeriodStart: null,
-              cycleLength: 28,
-              periodLength: 5,
-              customSettings: {
-                notifications: true,
-                symptomTracking: true,
-                moodTracking: true,
-                notes: ""
-              },
-              history: []
-            });
-          }}
-        />
-      </div>
-    );
+        <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} cycleData={cycleData} onUpdateCycleLength={setCycleLength} onUpdatePeriodLength={setPeriodLength} onEditPeriodStart={() => setShowDatePicker(true)} onReset={() => {
+        updateCycleData({
+          lastPeriodStart: null,
+          cycleLength: 28,
+          periodLength: 5,
+          customSettings: {
+            notifications: true,
+            symptomTracking: true,
+            moodTracking: true,
+            notes: ""
+          },
+          history: []
+        });
+      }} />
+      </div>;
   }
 
   // Desktop view - sidebar layout
-  return (
-    <div className="min-h-screen flex w-full bg-background">
-        <MenstrualSidebar
-          activeSection={activeSection}
-          onSectionChange={setActiveSection}
-          onEditClick={() => setShowDatePicker(true)}
-          onSettingsClick={() => setShowSettings(true)}
-          onShareClick={() => setShowShareDialog(true)}
-          accessCode={accessCode}
-        />
+  return <div className="min-h-screen flex w-full bg-background">
+        <MenstrualSidebar activeSection={activeSection} onSectionChange={setActiveSection} onEditClick={() => setShowDatePicker(true)} onSettingsClick={() => setShowSettings(true)} onShareClick={() => setShowShareDialog(true)} accessCode={accessCode} />
         
         <main className="flex-1 p-8 max-w-none">
           {/* Tour and Header */}
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-semibold" style={{ color: '#955F6A' }}>
+            <h2 className="text-2xl font-semibold" style={{
+          color: '#955F6A'
+        }}>
               <span data-tour="current-phase">Deň {currentDay} • {currentPhase.name}</span>
             </h2>
             <div className="flex justify-end">
@@ -204,84 +140,32 @@ export function MenstrualDashboardLayout({
           
           {/* Content Area */}
           <div className="w-full">
-            {activeSection === 'estimate' && (
-              <TodaysEstimateSection
-                derivedState={derivedState}
-                selectedOutcome={selectedOutcome}
-                cycleData={cycleData}
-                currentDay={currentDay}
-                currentPhase={currentPhase}
-                accessCode={accessCode}
-                lastPeriodStart={cycleData.lastPeriodStart}
-              />
-            )}
+            {activeSection === 'estimate' && <TodaysEstimateSection derivedState={derivedState} selectedOutcome={selectedOutcome} cycleData={cycleData} currentDay={currentDay} currentPhase={currentPhase} accessCode={accessCode} lastPeriodStart={cycleData.lastPeriodStart} />}
 
-            {activeSection === 'feel-better' && (
-              <FeelBetterSection
-                phaseRanges={phaseRanges}
-                currentPhase={currentPhase}
-              />
-            )}
+            {activeSection === 'feel-better' && <FeelBetterSection phaseRanges={phaseRanges} currentPhase={currentPhase} />}
 
-            {activeSection === 'calendar' && (
-              <CalendarViewSection
-                cycleData={cycleData}
-                derivedState={derivedState}
-                onOutcomeSelect={setSelectedOutcome}
-                selectedOutcome={selectedOutcome}
-                onPeriodIntensityChange={setPeriodIntensity}
-                getPeriodIntensity={getPeriodIntensity}
-                accessCode={accessCode}
-                onAccessCodeGenerated={onAccessCodeGenerated}
-              />
-            )}
+            {activeSection === 'calendar' && <CalendarViewSection cycleData={cycleData} derivedState={derivedState} onOutcomeSelect={setSelectedOutcome} selectedOutcome={selectedOutcome} onPeriodIntensityChange={setPeriodIntensity} getPeriodIntensity={getPeriodIntensity} accessCode={accessCode} onAccessCodeGenerated={onAccessCodeGenerated} />}
           </div>
 
           {/* Modals */}
-          <DatePickerModal
-            isOpen={showDatePicker}
-            onClose={() => setShowDatePicker(false)}
-            onDateSelect={handleDateSelect}
-            derivedState={derivedState}
-            cycleLength={cycleData.cycleLength}
-            periodLength={cycleData.periodLength}
-            lastPeriodStart={cycleData.lastPeriodStart}
-            title="Nová perioda"
-            accessCode={accessCode}
-          />
+          <DatePickerModal isOpen={showDatePicker} onClose={() => setShowDatePicker(false)} onDateSelect={handleDateSelect} derivedState={derivedState} cycleLength={cycleData.cycleLength} periodLength={cycleData.periodLength} lastPeriodStart={cycleData.lastPeriodStart} title="Nová perioda" accessCode={accessCode} />
 
-          <SettingsModal
-            isOpen={showSettings}
-            onClose={() => setShowSettings(false)}
-            cycleData={cycleData}
-            onUpdateCycleLength={setCycleLength}
-            onUpdatePeriodLength={setPeriodLength}
-            onEditPeriodStart={() => setShowDatePicker(true)}
-            onReset={() => {
-              updateCycleData({
-                lastPeriodStart: null,
-                cycleLength: 28,
-                periodLength: 5,
-                customSettings: {
-                  notifications: true,
-                  symptomTracking: true,
-                  moodTracking: true,
-                  notes: ""
-                },
-                history: []
-              });
-            }}
-          />
+          <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} cycleData={cycleData} onUpdateCycleLength={setCycleLength} onUpdatePeriodLength={setPeriodLength} onEditPeriodStart={() => setShowDatePicker(true)} onReset={() => {
+        updateCycleData({
+          lastPeriodStart: null,
+          cycleLength: 28,
+          periodLength: 5,
+          customSettings: {
+            notifications: true,
+            symptomTracking: true,
+            moodTracking: true,
+            notes: ""
+          },
+          history: []
+        });
+      }} />
 
-          {accessCode && (
-            <ShareCalendarDialog
-              open={showShareDialog}
-              onOpenChange={setShowShareDialog}
-              accessCode={accessCode}
-              onAccessCodeGenerated={onAccessCodeGenerated}
-            />
-          )}
+          {accessCode && <ShareCalendarDialog open={showShareDialog} onOpenChange={setShowShareDialog} accessCode={accessCode} onAccessCodeGenerated={onAccessCodeGenerated} />}
         </main>
-      </div>
-  );
+      </div>;
 }
