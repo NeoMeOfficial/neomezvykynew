@@ -71,25 +71,25 @@ export function TodaysEstimateSection({
         </div>
 
         {/* Content with recessed glass layer */}
-        <div className="px-4 py-6 sm:px-6 sm:py-8 space-y-8 rounded-b-2xl z-10 relative"
+        <div className="px-4 py-4 sm:px-6 sm:py-5 space-y-5 rounded-b-2xl z-10 relative"
              style={{ 
                background: 'linear-gradient(135deg, rgba(251, 248, 249, 0.75) 0%, rgba(253, 242, 248, 0.80) 100%)',
                boxShadow: 'inset 0 2px 8px rgba(149, 95, 106, 0.05)'
              }}>
           {/* Cycle Chart */}
-          <div className="mb-8" data-tour="wellness-chart">
+          <div className="mb-4" data-tour="wellness-chart">
             <WellnessDonutChart
               derivedState={derivedState}
               selectedOutcome={selectedOutcome}
               cycleData={cycleData}
-              className="mb-6"
+              className="mb-4"
             />
           </div>
           
           {/* Current Phase Information */}
-          <div className="space-y-6">
-            <div className="space-y-3">
-              <h4 className="text-lg font-medium mb-3 leading-tight" style={{ color: '#955F6A' }}>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <h4 className="text-base font-medium mb-2 leading-tight" style={{ color: '#955F6A' }}>
                 Čo môžeš dnes očakávať:
               </h4>
               {tipsLoading ? (
@@ -97,7 +97,7 @@ export function TodaysEstimateSection({
                   Načítavam odporúčania...
                 </p>
               ) : tips.length > 0 ? (
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {tips.map((tip) => (
                     <div key={tip.id} className="text-sm leading-relaxed opacity-90" style={{ color: '#955F6A' }}>
                       <span className="font-medium">{tip.category === 'energy' ? '⚡ Energia' : 
@@ -116,8 +116,8 @@ export function TodaysEstimateSection({
             </div>
             
             {/* How do you feel today section */}
-            <div className="space-y-3" data-tour="symptom-tracker">
-              <h5 className="text-base font-medium mb-3" style={{ color: '#955F6A' }}>
+            <div className="space-y-2" data-tour="symptom-tracker">
+              <h5 className="text-base font-medium mb-2" style={{ color: '#955F6A' }}>
                 Ako sa dnes cítiš:
               </h5>
               <SymptomTracker
