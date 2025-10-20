@@ -9,6 +9,7 @@ import {
 } from './tourSteps';
 import { Button } from '@/components/ui/button';
 import { HelpCircle } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface PeriodkaTourProps {
   accessCode?: string;
@@ -27,6 +28,7 @@ export const PeriodkaTour = ({
 }: PeriodkaTourProps) => {
   const [runTour, setRunTour] = useState(false);
   const [tourPhase, setTourPhase] = useState<TourPhase>('none');
+  const isMobile = useIsMobile();
   
   // Get the appropriate tour steps based on current phase
   const getTourSteps = (): Step[] => {
@@ -150,6 +152,11 @@ export const PeriodkaTour = ({
         showProgress
         showSkipButton
         callback={handleJoyrideCallback}
+        disableScrolling={false}
+        spotlightPadding={isMobile ? 5 : 10}
+        floaterProps={{
+          disableAnimation: isMobile,
+        }}
         styles={{
           options: {
             primaryColor: '#955F6A',
@@ -158,24 +165,29 @@ export const PeriodkaTour = ({
             arrowColor: '#FFFFFF',
             overlayColor: 'rgba(0, 0, 0, 0.5)',
             zIndex: 10000,
+            width: isMobile ? '85vw' : 400,
           },
           tooltip: {
             borderRadius: 12,
-            padding: 20,
+            padding: isMobile ? 15 : 20,
+            fontSize: isMobile ? 13 : 14,
+            maxWidth: isMobile ? '90vw' : 480,
           },
           buttonNext: {
             backgroundColor: '#955F6A',
             borderRadius: 8,
-            padding: '8px 16px',
-            fontSize: 14,
+            padding: isMobile ? '6px 12px' : '8px 16px',
+            fontSize: isMobile ? 13 : 14,
             fontWeight: 500,
           },
           buttonBack: {
             color: '#955F6A',
             marginRight: 10,
+            fontSize: isMobile ? 13 : 14,
           },
           buttonSkip: {
             color: '#6B7280',
+            fontSize: isMobile ? 13 : 14,
           },
         }}
         locale={{
