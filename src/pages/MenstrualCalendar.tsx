@@ -19,11 +19,8 @@ const MenstrualCalendar = () => {
               <div className="flex items-center gap-3">
                 <Lock className="h-5 w-5 text-amber-600 flex-shrink-0" />
                 <div className="flex-1">
-                  <p className="text-base font-medium text-amber-800 mb-1">
-                    Chceš si svoje údaje uložiť?
-                  </p>
                   <p className="text-sm text-amber-700 mb-3">
-                    Vytvor si vlastný účet
+                    Chceš si svoje údaje uložiť? Vytvor si vlastný účet
                   </p>
                   <a 
                     href="/checkout" 
