@@ -11,6 +11,7 @@ import { SettingsModal } from './SettingsModal';
 import { ShareCalendarDialog } from '@/components/ShareCalendarDialog';
 import { useCycleData } from './useCycleData';
 import { PeriodkaTour } from './PeriodkaTour';
+import { NextDatesInfo } from './components/NextDatesInfo';
 type OutcomeType = 'next-period' | 'fertile-days';
 interface MenstrualDashboardLayoutProps {
   accessCode?: string;
@@ -84,6 +85,9 @@ export function MenstrualDashboardLayout({
           </div>
         </div>
 
+        {/* Next Dates Info for Mobile */}
+        <NextDatesInfo lastPeriodStart={cycleData.lastPeriodStart} cycleLength={cycleData.cycleLength} />
+
         {/* All sections for mobile */}
         <div className="space-y-8">
           <TodaysEstimateSection derivedState={derivedState} selectedOutcome={selectedOutcome} cycleData={cycleData} currentDay={currentDay} currentPhase={currentPhase} accessCode={accessCode} lastPeriodStart={cycleData.lastPeriodStart} onSettingsClick={() => setShowSettings(true)} />
@@ -115,7 +119,7 @@ export function MenstrualDashboardLayout({
 
   // Desktop view - sidebar layout
   return <div className="min-h-screen flex w-full bg-background">
-        <MenstrualSidebar activeSection={activeSection} onSectionChange={setActiveSection} onEditClick={() => setShowDatePicker(true)} onSettingsClick={() => setShowSettings(true)} onShareClick={() => setShowShareDialog(true)} accessCode={accessCode} />
+        <MenstrualSidebar activeSection={activeSection} onSectionChange={setActiveSection} onEditClick={() => setShowDatePicker(true)} onSettingsClick={() => setShowSettings(true)} onShareClick={() => setShowShareDialog(true)} accessCode={accessCode} lastPeriodStart={cycleData.lastPeriodStart} cycleLength={cycleData.cycleLength} />
         
         <main className="flex-1 p-8 max-w-none">
           {/* Tour and Header */}

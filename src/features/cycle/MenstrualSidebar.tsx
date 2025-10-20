@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import periodkaLogo from '@/assets/periodka-logo.png';
 import { temporaryStorage } from '@/lib/temporaryStorage';
 import { Button } from '@/components/ui/button';
+import { NextDatesInfo } from './components/NextDatesInfo';
 
 interface MenstrualSidebarProps {
   activeSection: string;
@@ -12,6 +13,8 @@ interface MenstrualSidebarProps {
   onSettingsClick: () => void;
   onShareClick?: () => void;
   accessCode?: string;
+  lastPeriodStart?: string | null;
+  cycleLength?: number;
 }
 
 const menuItems = [
@@ -32,7 +35,7 @@ const menuItems = [
   },
 ];
 
-export function MenstrualSidebar({ activeSection, onSectionChange, onEditClick, onSettingsClick, onShareClick, accessCode }: MenstrualSidebarProps) {
+export function MenstrualSidebar({ activeSection, onSectionChange, onEditClick, onSettingsClick, onShareClick, accessCode, lastPeriodStart, cycleLength = 28 }: MenstrualSidebarProps) {
   const navigate = useNavigate();
   const hasTemporaryData = temporaryStorage.isSessionActive() && temporaryStorage.hasTemporaryData();
   
@@ -125,24 +128,7 @@ export function MenstrualSidebar({ activeSection, onSectionChange, onEditClick, 
                       )}
                     </div>
                     
-                    <div className="p-3 rounded-lg" 
-                         style={{ 
-                           background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(253, 242, 248, 0.65) 100%)',
-                           boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 1px 3px rgba(149, 95, 106, 0.06)'
-                         }}>
-                      <div className="space-y-2">
-                        <p className="text-xs font-medium" style={{ color: '#955F6A' }}>
-                          Ďalšia menštruácia: <span style={{ color: '#FF7782' }}>
-                            7. 10. 2025
-                          </span>
-                        </p>
-                        <p className="text-xs font-medium" style={{ color: '#955F6A' }}>
-                          Ďalšie plodné dni: <span style={{ color: '#FF7782' }}>
-                            23. - 25. 9. 2025
-                          </span>
-                        </p>
-                      </div>
-                    </div>
+                    <NextDatesInfo lastPeriodStart={lastPeriodStart} cycleLength={cycleLength} />
 
                     {/* Temporary Data Indicator */}
                     {hasTemporaryData && !accessCode && (
