@@ -839,6 +839,10 @@ export function CalendarView({
             value=""
             onValueChange={(value) => {
               switch(value) {
+                case 'clear':
+                  onOutcomeSelect(null);
+                  setShowSymptomFilters(false);
+                  break;
                 case 'period':
                   onOutcomeSelect(selectedOutcome === 'next-period' ? null : 'next-period');
                   break;
@@ -858,9 +862,14 @@ export function CalendarView({
             }}
           >
             <SelectTrigger className="w-[180px] border-[#FF7782] text-[#955F6A] hover:bg-[#FF7782]/10 focus:ring-[#FF7782]">
-              <SelectValue placeholder="Vyberte možnosť..." />
+              <SelectValue placeholder="Vyber si" />
             </SelectTrigger>
             <SelectContent className="bg-white border-[#FF7782] z-50">
+              <SelectItem value="clear" className="text-[#955F6A] hover:bg-[#FF7782]/10 focus:bg-[#FF7782]/10 font-medium">
+                <div className="flex items-center gap-2">
+                  <span>✕ Zrušiť filter</span>
+                </div>
+              </SelectItem>
               <SelectItem value="period" className="text-[#955F6A] hover:bg-[#FF7782]/10 focus:bg-[#FF7782]/10">
                 <div className="flex items-center gap-2">
                   <Droplets className="w-3 h-3" />
