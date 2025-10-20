@@ -133,14 +133,14 @@ export const PeriodkaTour = ({
   return (
     <>
       <Button
-        variant="ghost"
-        size="icon"
+        variant="outline"
+        size="sm"
         onClick={startFullTour}
-        className="relative"
+        className="flex items-center gap-1.5 text-xs px-3 py-2 border-[#FF7782] text-[#955F6A] hover:bg-[#FF7782]/10"
         title="Spustiť návod"
         data-tour="welcome"
       >
-        <HelpCircle className="h-5 w-5" />
+        Návod
       </Button>
 
       <Joyride
