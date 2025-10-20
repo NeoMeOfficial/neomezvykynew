@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Heart, Droplets, ChevronLeft, ChevronRight, FileText, Filter, Grid3X3, Calendar as CalendarGrid, Download } from 'lucide-react';
+import { Calendar, Heart, Droplets, ChevronLeft, ChevronRight, FileText, Filter, Grid3X3, Calendar as CalendarGrid, Download, Pen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
@@ -1072,7 +1072,7 @@ export function CalendarView({
                           {dayData.symptoms.filter(symptom => selectedSymptoms.includes(symptom)).length > 4 && <div className="text-[10px] text-gray-600 font-bold">+</div>}
                           
                           {/* Notes indicator */}
-                          {hasNotes && <FileText className="w-4 h-4 text-gray-500" />}
+                          {hasNotes && <Pen className="w-3 h-3 text-[#955F6A] absolute top-0.5 left-0.5" strokeWidth={2.5} />}
                         </div>
                         
                         {/* Today indicator overlay */}
