@@ -835,7 +835,7 @@ export function CalendarView({
       <div className={isMobile ? "space-y-3" : ""}>
         <div className={`flex items-center ${isMobile ? 'flex-col gap-3' : 'justify-between'}`}>
         {/* Calendar Actions - Filter and Dropdown */}
-          <div className="flex gap-2 items-center">
+          <div className={`flex gap-2 items-center ${isMobile ? '' : 'order-2 ml-auto'}`}>
             {/* Filter Toggle Button */}
             <Button 
               size="sm" 
