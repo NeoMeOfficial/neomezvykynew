@@ -18,13 +18,13 @@ const MenstrualCalendar = () => {
             <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-lg p-4 mb-4">
               <div className="flex items-center gap-3">
                 <Lock className="h-5 w-5 text-amber-600 flex-shrink-0" />
-                <div className="flex-1">
-                  <p className="text-sm text-amber-700 mb-3">
-                    Chceš si svoje údaje uložiť? Vytvor si vlastný účet
+                <div className="flex items-center gap-3 flex-wrap flex-1">
+                  <p className="text-sm text-amber-700">
+                    Chceš si svoje údaje<br />uložiť? Vytvor si vlastný účet
                   </p>
                   <a 
                     href="/checkout" 
-                    className="inline-flex items-center px-4 py-2 bg-amber-600 text-white text-sm font-medium rounded-lg hover:bg-amber-700 transition-colors"
+                    className="inline-flex items-center px-4 py-2 bg-amber-600 text-white text-sm font-medium rounded-lg hover:bg-amber-700 transition-colors whitespace-nowrap"
                   >
                     Vytvoriť účet
                   </a>
