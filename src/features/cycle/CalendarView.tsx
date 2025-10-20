@@ -875,7 +875,7 @@ export function CalendarView({
               }`}
             >
               <Droplets className="w-3 h-3" />
-              Ďalšia perioda
+              Menštruácia
             </Button>
             <Button 
               size="sm" 
@@ -891,22 +891,42 @@ export function CalendarView({
               Plodné dni
             </Button>
             
+            {/* Today Button */}
+            <Button 
+              size="sm" 
+              variant="outline"
+              onClick={() => setCurrentDate(new Date())}
+              className="flex items-center gap-1.5 text-xs border transition-all duration-200 border-[#FF7782] bg-transparent hover:bg-[#FF7782]/10 text-[#FF7782]"
+            >
+              <Calendar className="w-3 h-3" />
+              Dnes
+            </Button>
+            
+            {/* Notes Button */}
+            <Button 
+              size="sm" 
+              variant="outline"
+              onClick={() => {/* TODO: Implement notes filter */}}
+              className="flex items-center gap-1.5 text-xs border transition-all duration-200 border-[#FF7782] bg-transparent hover:bg-[#FF7782]/10 text-[#FF7782]"
+            >
+              <FileText className="w-3 h-3" />
+              Poznámky
+            </Button>
+            
             {/* Filter Toggle Button */}
-            {availableSymptoms.length > 0 && (
-              <Button 
-                size="sm" 
-                variant="outline"
-                onClick={() => setShowSymptomFilters(!showSymptomFilters)}
-                className={`flex items-center gap-1.5 text-xs border transition-all duration-200 ${
-                  showSymptomFilters 
-                    ? 'bg-gradient-to-r from-[#FF7782] to-[#FF9AA1] text-white border-[#FF7782]' 
-                    : 'border-[#FF7782] bg-transparent hover:bg-[#FF7782]/10 text-[#FF7782]'
-                }`}
-              >
-                <Filter className="w-3 h-3" />
-                Filtrovať
-              </Button>
-            )}
+            <Button 
+              size="sm" 
+              variant="outline"
+              onClick={() => setShowSymptomFilters(!showSymptomFilters)}
+              className={`flex items-center gap-1.5 text-xs border transition-all duration-200 ${
+                showSymptomFilters 
+                  ? 'bg-gradient-to-r from-[#FF7782] to-[#FF9AA1] text-white border-[#FF7782]' 
+                  : 'border-[#FF7782] bg-transparent hover:bg-[#FF7782]/10 text-[#FF7782]'
+              }`}
+            >
+              <Filter className="w-3 h-3" />
+              Filtrovať
+            </Button>
           </div>
 
           {/* Legend */}
