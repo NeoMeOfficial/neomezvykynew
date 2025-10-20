@@ -4,33 +4,33 @@ import { Step } from 'react-joyride';
 export const getOverviewTourSteps = (): Step[] => [
   {
     target: '[data-tour="welcome"]',
-    content: 'Vitaj v Periodke! Ukážeme ti hlavné časti aplikácie. 💗',
+    content: 'Vitaj v Periodke! Spoznaj cyklus, predvídaj zmeny a cíť sa lepšie. 💗',
     placement: 'center',
     disableBeacon: true,
   },
   {
     target: '[data-tour="estimate-section"]',
-    content: '1️⃣ Odhad na dnes - Aktuálny deň cyklu, fáza, príznaky a poznámky. 📅',
+    content: '1️⃣ Odhad na dnes - Zisti, v ktorej fáze si a čo môžeš očakávať. 📅',
     placement: 'auto',
   },
   {
     target: '[data-tour="feel-better-section"]',
-    content: '2️⃣ Ako sa cítiť lepšie - AI tipy pre tvoju fázu cyklu. 💡',
+    content: '2️⃣ Ako sa cítiť lepšie - Praktické tipy pre tvoju aktuálnu fázu. 💡',
     placement: 'auto',
   },
   {
     target: '[data-tour="calendar-section"]',
-    content: '3️⃣ Kalendár - História cyklu s možnosťou úprav. 📆',
+    content: '3️⃣ Kalendár - Sleduj históriu a plánuj dopredu. 📆',
     placement: 'auto',
   },
   {
     target: '[data-tour="calendar-actions"]',
-    content: '4️⃣ Tu môžeš zmeniť dátum menštruácie, nastavenia a zdieľať kalendár. ⚙️',
+    content: '4️⃣ Nastav dátum menštruácie a zdieľaj kalendár s blízkymi. ⚙️',
     placement: 'auto',
   },
   {
     target: 'body',
-    content: 'Pokračovať v detailnom návode? Klikni "Ďalej" alebo "Preskočiť" pre okamžité použitie. 🚀',
+    content: 'Chceš sa dozvedieť viac? Klikni "Ďalej" alebo "Preskočiť" a začni hneď. 🚀',
     placement: 'center',
   },
 ];
@@ -39,33 +39,33 @@ export const getOverviewTourSteps = (): Step[] => [
 export const getEstimateDetailedTour = (): Step[] => [
   {
     target: '[data-tour="estimate-section"]',
-    content: 'Pozrime sa bližšie na "Odhad na dnes". 📱',
+    content: 'Pochop, kde sa nachádzaš a čo môžeš čakať. 📱',
     placement: 'auto',
     disableBeacon: true,
   },
   {
     target: '[data-tour="current-phase"]',
-    content: 'Deň cyklu a aktuálna fáza. Každá fáza má iné charakteristiky. 📅',
+    content: 'Každá fáza ovplyvňuje tvoju energiu, náladu a telo. Vedieť, kde si, pomáha. 📅',
     placement: 'bottom',
   },
   {
     target: '[data-tour="wellness-chart"]',
-    content: 'Graf cyklu - každý bod je deň. Ružová = menštruácia, zelená = plodné dni. 🔄',
+    content: 'Vizualizácia cyklu - ľahko vidíš, čo ťa čaká. Ružová = menštruácia, zelená = plodné dni. 🔄',
     placement: 'bottom',
   },
   {
     target: '[data-tour="symptom-tracker"]',
-    content: 'Príznaky v prehľadných boxoch. Klikni na tie, čo pociťuješ - spoznáš vzorce! 🏷️',
+    content: 'Zaznamenávaj príznaky pravidelne - odhalíš vzorce a lepšie pochopíš svoje telo. 🏷️',
     placement: 'bottom',
   },
   {
     target: '[data-tour="custom-symptom"]',
-    content: 'Pridaj vlastný príznak - zadaj názov a stlač Enter. 💫',
+    content: 'Tvoje telo je jedinečné - pridaj vlastné príznaky pre kompletný obraz. ➕',
     placement: 'bottom',
   },
   {
     target: '[data-tour="notes"]',
-    content: 'Súkromné poznámky - ako sa cítiš, čo ťa trápi či teší. Zostáva medzi tebou a aplikáciou. 📝',
+    content: 'Poznámky ti pomôžu spätne vidieť súvislosti medzi náladou, diétou a fázou cyklu. 📝',
     placement: 'bottom',
   },
 ];
@@ -74,18 +74,18 @@ export const getEstimateDetailedTour = (): Step[] => [
 export const getFeelBetterDetailedTour = (): Step[] => [
   {
     target: '[data-tour="feel-better-section"]',
-    content: 'Pozrime sa na "Ako sa cítiť lepšie". 🌸',
+    content: 'Prispôsob životný štýl svojmu cyklu. 🌸',
     placement: 'auto',
     disableBeacon: true,
   },
   {
     target: '[data-tour="feel-better-content"]',
-    content: 'AI-generované tipy prispôsobené presne tvojej fáze a dňu cyklu. 💪',
+    content: 'Tipy sú prispôsobené presne tvojej aktuálnej fáze - vieš, čo telu práve prospieva. 💪',
     placement: 'bottom',
   },
   {
     target: '[data-tour="phase-tips"]',
-    content: 'Tipy pokrývajú energiu, náladu, výživu, aktivitu a starostlivosť. Pre lepší pocit počas celého cyklu! ✨',
+    content: 'Od výživy cez cvičenie po odpočinok - malé zmeny môžu výrazne zlepšiť tvoj pocit. ✨',
     placement: 'bottom',
   },
 ];
@@ -94,18 +94,18 @@ export const getFeelBetterDetailedTour = (): Step[] => [
 export const getCalendarDetailedTour = (): Step[] => [
   {
     target: '[data-tour="calendar-section"]',
-    content: 'Pozrime sa na "Kalendárny prehľad". 📆',
+    content: 'História aj budúcnosť na jednom mieste. 📆',
     placement: 'auto',
     disableBeacon: true,
   },
   {
     target: '[data-tour="calendar-view"]',
-    content: 'História cyklu - ružové dni = menštruácia, zelené = plodné dni. Dni s perom 🖊️ majú poznámky. Klikni na deň pre detail! 📅',
+    content: 'Plánuj dopredu - vedieť, čo ťa čaká, ti dáva kontrolu nad životom. Pero 🖊️ = máš poznámku. 📅',
     placement: 'bottom',
   },
   {
     target: '[data-tour="calendar-actions"]',
-    content: 'Zmeň dátum menštruácie, dĺžku cyklu alebo zdieľaj kalendár. ⚙️',
+    content: 'Uprav nastavenia alebo zdieľaj kalendár s partnerom či lekárom. ⚙️',
     placement: 'auto',
   },
 ];
@@ -114,7 +114,7 @@ export const getCalendarDetailedTour = (): Step[] => [
 export const getTourCompletionStep = (): Step[] => [
   {
     target: 'body',
-    content: 'Výborne! Teraz vieš všetko o Periodke. Môžeš kedykoľvek spustiť návod znova kliknutím na ikonu "?" v záhlaví. Držíme ti palce! 💗',
+    content: 'Hotovo! Teraz vieš, ako Periodka pomôže ti lepšie rozumieť svojmu telu. Návod spustíš znova cez ikonu "?". 💗',
     placement: 'center',
     disableBeacon: true,
   },
