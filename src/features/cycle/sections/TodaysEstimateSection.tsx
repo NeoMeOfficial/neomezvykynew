@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { WellnessDonutChart } from '../WellnessDonutChart';
 import { SymptomTracker } from '../SymptomTracker';
 import { CycleData, DerivedState, PhaseKey } from '../types';
+import { useCycleTips } from '@/hooks/useCycleTips';
 
 interface TodaysEstimateSectionProps {
   derivedState: DerivedState;
@@ -26,6 +27,8 @@ export function TodaysEstimateSection({
   lastPeriodStart,
   onSettingsClick
 }: TodaysEstimateSectionProps) {
+  const { data: tips = [], isLoading: tipsLoading } = useCycleTips(currentPhase.key, currentDay);
+
   return (
     <>
       {/* Layered Glass - Multiple glass layers creating depth between header/content */}
@@ -89,12 +92,27 @@ export function TodaysEstimateSection({
               <h4 className="text-lg font-medium mb-3 leading-tight" style={{ color: '#955F6A' }}>
                 Čo môžeš dnes očakávať:
               </h4>
-              <p className="text-sm leading-relaxed opacity-90" style={{ color: '#955F6A' }}>
-                Môžeš sa cítiť menej energicky (65%) a potrebovať viac času na odpočinok. 
-                Energia postupne klesá, preto potrebuješ pravidelné jedlá a menej náročné aktivity. 
-                Nálada môže kolísať - môžeš sa cítiť podráždenejšia alebo úzkostlivejšia. 
-                Je to normálne, buď k sebe trpezlivá.
-              </p>
+              {tipsLoading ? (
+                <p className="text-sm leading-relaxed opacity-90" style={{ color: '#955F6A' }}>
+                  Načítavam odporúčania...
+                </p>
+              ) : tips.length > 0 ? (
+                <div className="space-y-3">
+                  {tips.map((tip) => (
+                    <div key={tip.id} className="text-sm leading-relaxed opacity-90" style={{ color: '#955F6A' }}>
+                      <span className="font-medium">{tip.category === 'energy' ? '⚡ Energia' : 
+                                                      tip.category === 'mood' ? '💭 Nálada' :
+                                                      tip.category === 'nutrition' ? '🍎 Výživa' :
+                                                      tip.category === 'activity' ? '🏃‍♀️ Aktivita' :
+                                                      '💖 Starostlivosť o seba'}:</span> {tip.tip_text}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm leading-relaxed opacity-90" style={{ color: '#955F6A' }}>
+                  Zatiaľ nie sú k dispozícii žiadne odporúčania pre túto fázu.
+                </p>
+              )}
             </div>
             
             {/* How do you feel today section */}
