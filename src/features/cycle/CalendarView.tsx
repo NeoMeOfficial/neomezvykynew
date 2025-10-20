@@ -1085,10 +1085,10 @@ export function CalendarView({
                 {expandedRow === rowIndex && selectedDayData && <div className="grid grid-cols-1 overflow-hidden animate-accordion-down" style={{
               animation: 'accordion-down 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
             }}>
-                    <div className="mx-1 mt-2 mb-4">
+                    <div className={isMobile ? "mx-1 mt-2 mb-2" : "mx-1 mt-2 mb-4"}>
                       <div className="bg-white/95 backdrop-blur-sm rounded-2xl border border-rose-200/50 shadow-xl overflow-hidden">
                         {/* Elegant header with glassmorphism */}
-                        <div className="bg-gradient-to-r from-rose-50/90 to-pink-50/90 px-6 py-4 border-b border-rose-100/50">
+                        <div className={`bg-gradient-to-r from-rose-50/90 to-pink-50/90 border-b border-rose-100/50 ${isMobile ? 'px-3 py-3' : 'px-6 py-4'}`}>
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
                               <div className="w-8 h-8 rounded-full bg-rose-100 flex items-center justify-center">
@@ -1113,7 +1113,7 @@ export function CalendarView({
                         </div>
                         
                         {/* Content with elegant spacing */}
-                        <div className="p-6 space-y-5">
+                        <div className={isMobile ? "p-3 space-y-4" : "p-6 space-y-5"}>
                           {selectedDayData.symptoms.length > 0 && <div className="animate-fade-in" style={{
                       animationDelay: '0.1s'
                     }}>
@@ -1122,7 +1122,7 @@ export function CalendarView({
                                 Príznaky
                               </h5>
                               <div className="flex flex-wrap gap-2">
-                                {selectedDayData.symptoms.map((symptom, index) => {
+                                {selectedDayData.symptoms.slice(0, isMobile ? 3 : undefined).map((symptom, index) => {
                           const color = getSymptomColor(symptom);
                           return <Badge key={symptom} variant="outline" className={`text-xs transition-all duration-200 hover:scale-105 ${color ? 'text-white border-transparent shadow-sm' : 'border-rose-200 text-rose-700 bg-rose-50/50'}`} style={{
                             backgroundColor: color || undefined,
@@ -1132,6 +1132,11 @@ export function CalendarView({
                                       {symptom}
                                     </Badge>;
                         })}
+                                {isMobile && selectedDayData.symptoms.length > 3 && (
+                                  <Badge variant="outline" className="text-xs border-rose-200 text-rose-700 bg-rose-50/50">
+                                    +{selectedDayData.symptoms.length - 3}
+                                  </Badge>
+                                )}
                               </div>
                             </div>}
                           
@@ -1142,7 +1147,7 @@ export function CalendarView({
                                 <div className="w-2 h-2 rounded-full bg-rose-400"></div>
                                 Poznámky
                               </h5>
-                              <div className="bg-rose-50/50 rounded-xl p-4 border border-rose-100/50">
+                              <div className={`bg-rose-50/50 rounded-xl border border-rose-100/50 ${isMobile ? 'p-3' : 'p-4'}`}>
                                 <p className="text-sm text-rose-800 leading-relaxed">
                                   {selectedDayData.notes}
                                 </p>
