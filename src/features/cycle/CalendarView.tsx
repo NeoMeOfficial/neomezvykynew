@@ -643,9 +643,8 @@ export function CalendarView({
     for (let i = -12; i <= 12; i++) {
       const month = addMonths(currentDate, i);
       const value = format(month, 'yyyy-MM');
-      const label = format(month, 'LLLL yyyy', {
-        locale: sk
-      });
+      const monthName = format(month, 'LLLL yyyy', { locale: sk });
+      const label = monthName.charAt(0).toUpperCase() + monthName.slice(1);
       options.push({
         value,
         label
@@ -932,9 +931,10 @@ export function CalendarView({
         <h4 className="text-lg font-medium" style={{
         color: '#955F6A'
       }}>
-          {format(currentDate, 'LLLL yyyy', {
-          locale: sk
-        })}
+          {(() => {
+            const monthName = format(currentDate, 'LLLL yyyy', { locale: sk });
+            return monthName.charAt(0).toUpperCase() + monthName.slice(1);
+          })()}
         </h4>
         
         <Button variant="ghost" size="sm" onClick={() => navigatePeriod('next')} className="flex items-center gap-1">
@@ -1097,9 +1097,10 @@ export function CalendarView({
                                 </span>
                               </div>
                               <h4 className="font-medium text-rose-800">
-                                Detaily pre {format(selectedDayData.date, 'd. MMMM', {
-                            locale: sk
-                          })}
+                                Detaily pre {(() => {
+                                  const formatted = format(selectedDayData.date, 'd. MMMM', { locale: sk });
+                                  return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+                                })()}
                               </h4>
                             </div>
                             <Button size="sm" variant="ghost" onClick={() => {

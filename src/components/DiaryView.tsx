@@ -25,7 +25,8 @@ export default function DiaryView({ reflections, formatDate }: DiaryViewProps) {
   const formatDisplayDate = (dateString: string) => {
     try {
       const date = new Date(dateString + 'T00:00:00');
-      return format(date, 'EEEE, d. MMMM yyyy', { locale: sk });
+      const formatted = format(date, 'EEEE, d. MMMM yyyy', { locale: sk });
+      return formatted.charAt(0).toUpperCase() + formatted.slice(1);
     } catch {
       return dateString;
     }
