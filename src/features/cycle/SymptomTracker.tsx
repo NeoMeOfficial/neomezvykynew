@@ -242,14 +242,18 @@ export function SymptomTracker({
       
 
       {/* Header */}
-      <div>
-        
+      <div className="rounded-xl p-4" style={{
+        backgroundColor: 'rgba(251, 248, 249, 0.6)',
+        border: '1px solid rgba(229, 212, 215, 0.4)'
+      }}>
+        <h4 className="text-base font-medium mb-2" style={{ color: '#955F6A' }}>
+          Vyber si príznaky
+        </h4>
         <p className="text-sm mb-3" style={{
         color: '#955F6A'
       }}>
           Zaznamenajte príznaky pre lekársku konzultáciu
         </p>
-      </div>
 
       {/* Symptom Tags */}
       <div className="flex flex-wrap gap-2">
@@ -308,23 +312,29 @@ export function SymptomTracker({
           </Badge>
         )}
       </div>
+      </div>
 
       {/* Notes Section */}
-      <div className="space-y-2" data-tour="notes">
-        <div className="flex items-center justify-between">
-          <span className="text-base font-medium" style={{
+      <div className="rounded-xl p-4" style={{
+        backgroundColor: 'rgba(251, 248, 249, 0.6)',
+        border: '1px solid rgba(229, 212, 215, 0.4)'
+      }}>
+        <div className="space-y-2" data-tour="notes">
+          <div className="flex items-center justify-between">
+            <span className="text-base font-medium" style={{
+            color: '#955F6A'
+          }}>Poznámky</span>
+          </div>
+          
+          <Textarea value={notes} onChange={e => {
+          setNotes(e.target.value);
+          setHasChanges(true);
+        }} placeholder="Napíš si poznámky o svojom dni" className="min-h-[80px] resize-none placeholder:text-[#955F6A]" style={{
+          backgroundColor: '#FBF8F9',
+          borderColor: '#E5D4D7',
           color: '#955F6A'
-        }}>Poznámky</span>
+        }} />
         </div>
-        
-        <Textarea value={notes} onChange={e => {
-        setNotes(e.target.value);
-        setHasChanges(true);
-      }} placeholder="Napíš si poznámky o svojom dni" className="min-h-[80px] resize-none placeholder:text-[#955F6A]" style={{
-        backgroundColor: '#FBF8F9',
-        borderColor: '#E5D4D7',
-        color: '#955F6A'
-      }} />
       </div>
 
       {/* Action Buttons */}
