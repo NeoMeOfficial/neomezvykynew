@@ -928,7 +928,6 @@ export function CalendarView({
               Filtrovať
             </Button>
           </div>
-        </div>
 
           {/* Legend */}
           <div className="flex flex-wrap gap-3 text-xs">
@@ -1291,26 +1290,8 @@ export function CalendarView({
             );
           })}
         </div>
-
-      {/* Legend - moved below calendar */}
-      <div className="flex flex-wrap justify-center gap-3 text-xs mt-4 pb-2">
-        <div className="flex items-center gap-1.5">
-          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: 'hsl(355 60% 90%)' }}></div>
-          <span className="text-cycle-body-text">Menštruácia</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: 'hsl(25 50% 88%)' }}></div>
-          <span className="text-cycle-body-text">Plodné dni</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <div className="w-3 h-3 rounded-full border-2" style={{ borderColor: 'hsl(45 85% 70%)' }}></div>
-          <span className="text-cycle-body-text">Dnes</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <FileText className="w-3 h-3 text-cycle-body-text" />
-          <span className="text-cycle-body-text">Poznámky</span>
-        </div>
       </div>
+
 
       {/* Current Selection Info */}
       {selectedOutcome && (
