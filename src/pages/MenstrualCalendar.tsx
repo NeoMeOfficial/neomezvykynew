@@ -15,21 +15,19 @@ const MenstrualCalendar = () => {
         <div className="w-full max-w-none px-2 py-4 sm:py-8 mx-auto">
           <div className="w-full mx-auto">
             {/* Subscription Warning Message */}
-            <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-lg p-4 mb-4">
+            <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-lg px-4 py-2 mb-4">
               <div className="flex items-center gap-3">
-                <Lock className="h-5 w-5 text-amber-600 flex-shrink-0" />
-                <div className="flex items-center gap-3 flex-wrap flex-1">
-                  <p className="text-sm text-amber-700">
-                    Chceš si svoje údaje<br />uložiť? Vytvor si vlastný účet
-                  </p>
+                <Lock className="h-4 w-4 text-amber-600 flex-shrink-0" />
+                <p className="text-xs text-amber-700 flex-1">
+                  Chceš si svoje údaje uložiť? 
                   <a 
                     href="/checkout" 
-                    className="inline-flex items-center px-4 py-2 bg-amber-600 text-white text-sm font-medium rounded-lg hover:bg-amber-700 transition-colors whitespace-nowrap"
+                    className="ml-1 font-medium text-amber-800 underline hover:text-amber-900 transition-colors"
                   >
-                    Vytvoriť účet
+                    Vytvor si vlastný účet
                   </a>
-                </div>
-                <AlertCircle className="h-5 w-5 text-amber-500 flex-shrink-0" />
+                </p>
+                <AlertCircle className="h-4 w-4 text-amber-500 flex-shrink-0" />
               </div>
             </div>
             
