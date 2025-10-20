@@ -2,3 +2,9 @@ project_id = "xqihoxgwxgiwwbybztbp"
 
 [functions.validate-access-code]
 verify_jwt = false
+
+[functions.generate-cycle-tips]
+verify_jwt = false
+
+[functions.bulk-generate-tips]
+verify_jwt = false

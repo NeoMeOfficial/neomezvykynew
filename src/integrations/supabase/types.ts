@@ -140,6 +140,42 @@ export type Database = {
         }
         Relationships: []
       }
+      cycle_tips: {
+        Row: {
+          category: string
+          created_at: string
+          created_by: string
+          day_range: string
+          id: string
+          is_approved: boolean
+          phase: string
+          tip_text: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          created_by?: string
+          day_range: string
+          id?: string
+          is_approved?: boolean
+          phase: string
+          tip_text: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          created_by?: string
+          day_range?: string
+          id?: string
+          is_approved?: boolean
+          phase?: string
+          tip_text?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       habit_entries: {
         Row: {
           access_code: string | null
