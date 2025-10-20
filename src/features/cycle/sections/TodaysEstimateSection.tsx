@@ -1,5 +1,6 @@
 import React from 'react';
-import { Clock } from 'lucide-react';
+import { Clock, Settings } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { WellnessDonutChart } from '../WellnessDonutChart';
 import { SymptomTracker } from '../SymptomTracker';
 import { CycleData, DerivedState, PhaseKey } from '../types';
@@ -12,6 +13,7 @@ interface TodaysEstimateSectionProps {
   currentPhase: { name: string; key: string };
   accessCode?: string;
   lastPeriodStart?: string | null;
+  onSettingsClick?: () => void;
 }
 
 export function TodaysEstimateSection({
@@ -21,7 +23,8 @@ export function TodaysEstimateSection({
   currentDay,
   currentPhase,
   accessCode,
-  lastPeriodStart
+  lastPeriodStart,
+  onSettingsClick
 }: TodaysEstimateSectionProps) {
   return (
     <>
@@ -44,11 +47,23 @@ export function TodaysEstimateSection({
              }}>
           {/* Header glass accent */}
           <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-rose-200/50 to-transparent"></div>
-          <div className="flex items-center gap-3">
-            <Clock className="w-5 h-5" style={{ color: '#FF7782' }} />
-            <h3 className="text-lg font-medium" style={{ color: '#FF7782' }}>
-              Odhad na dnes
-            </h3>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Clock className="w-5 h-5" style={{ color: '#FF7782' }} />
+              <h3 className="text-lg font-medium" style={{ color: '#FF7782' }}>
+                Odhad na dnes
+              </h3>
+            </div>
+            {onSettingsClick && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onSettingsClick}
+                className="h-8 w-8 p-0 hover:bg-[#FF7782]/10"
+              >
+                <Settings className="w-5 h-5" style={{ color: '#FF7782' }} />
+              </Button>
+            )}
           </div>
         </div>
 

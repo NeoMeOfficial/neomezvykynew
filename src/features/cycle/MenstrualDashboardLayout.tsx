@@ -81,16 +81,12 @@ export function MenstrualDashboardLayout({
           </div>
           <div className="flex flex-col gap-2 sm:flex-row">
             <PeriodkaTour accessCode={accessCode} autoStart={true} activeSection={activeSection} onSectionChange={setActiveSection} />
-            <Button variant="outline" size="sm" onClick={() => setShowSettings(true)} className="flex items-center gap-1.5 text-xs px-3 py-2" data-tour="settings">
-              <TrendingUp className="w-3 h-3" />
-              Nastavenia
-            </Button>
           </div>
         </div>
 
         {/* All sections for mobile */}
         <div className="space-y-8">
-          <TodaysEstimateSection derivedState={derivedState} selectedOutcome={selectedOutcome} cycleData={cycleData} currentDay={currentDay} currentPhase={currentPhase} accessCode={accessCode} lastPeriodStart={cycleData.lastPeriodStart} />
+          <TodaysEstimateSection derivedState={derivedState} selectedOutcome={selectedOutcome} cycleData={cycleData} currentDay={currentDay} currentPhase={currentPhase} accessCode={accessCode} lastPeriodStart={cycleData.lastPeriodStart} onSettingsClick={() => setShowSettings(true)} />
 
           <FeelBetterSection phaseRanges={phaseRanges} currentPhase={currentPhase} />
 
@@ -136,7 +132,7 @@ export function MenstrualDashboardLayout({
           
           {/* Content Area */}
           <div className="w-full">
-            {activeSection === 'estimate' && <TodaysEstimateSection derivedState={derivedState} selectedOutcome={selectedOutcome} cycleData={cycleData} currentDay={currentDay} currentPhase={currentPhase} accessCode={accessCode} lastPeriodStart={cycleData.lastPeriodStart} />}
+            {activeSection === 'estimate' && <TodaysEstimateSection derivedState={derivedState} selectedOutcome={selectedOutcome} cycleData={cycleData} currentDay={currentDay} currentPhase={currentPhase} accessCode={accessCode} lastPeriodStart={cycleData.lastPeriodStart} onSettingsClick={() => setShowSettings(true)} />}
 
             {activeSection === 'feel-better' && <FeelBetterSection phaseRanges={phaseRanges} currentPhase={currentPhase} />}
 
