@@ -86,7 +86,7 @@ export const getFeelBetterDetailedTour = (): Step[] => [
   {
     target: '[data-tour="phase-tips"]',
     content: 'Od výživy cez cvičenie po odpočinok - malé zmeny môžu výrazne zlepšiť tvoj pocit. ✨',
-    placement: 'bottom',
+    placement: 'top',
   },
 ];
 
