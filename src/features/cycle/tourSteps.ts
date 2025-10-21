@@ -11,22 +11,22 @@ export const getOverviewTourSteps = (): Step[] => [
   {
     target: '[data-tour="estimate-section"]',
     content: '1️⃣ Odhad na dnes - Zisti, v ktorej fáze si a čo môžeš očakávať. 📅',
-    placement: 'auto',
+    placement: 'bottom',
   },
   {
     target: '[data-tour="feel-better-section"]',
     content: '2️⃣ Ako sa cítiť lepšie - Praktické tipy pre tvoju aktuálnu fázu. 💡',
-    placement: 'auto',
+    placement: 'bottom',
   },
   {
     target: '[data-tour="calendar-section"]',
     content: '3️⃣ Kalendár - Sleduj históriu a plánuj dopredu. 📆',
-    placement: 'auto',
+    placement: 'bottom',
   },
   {
     target: '[data-tour="calendar-actions"]',
     content: '4️⃣ Nastav dátum menštruácie a zdieľaj kalendár s blízkymi. ⚙️',
-    placement: 'auto',
+    placement: 'bottom',
   },
   {
     target: 'body',
@@ -40,7 +40,7 @@ export const getEstimateDetailedTour = (): Step[] => [
   {
     target: '[data-tour="estimate-section"]',
     content: 'Pochop, kde sa nachádzaš a čo môžeš čakať. 📱',
-    placement: 'auto',
+    placement: 'bottom',
     disableBeacon: true,
   },
   {
@@ -75,7 +75,7 @@ export const getFeelBetterDetailedTour = (): Step[] => [
   {
     target: '[data-tour="feel-better-section"]',
     content: 'Prispôsob životný štýl svojmu cyklu. 🌸',
-    placement: 'auto',
+    placement: 'bottom',
     disableBeacon: true,
   },
   {
@@ -86,7 +86,7 @@ export const getFeelBetterDetailedTour = (): Step[] => [
   {
     target: '[data-tour="phase-tips"]',
     content: 'Od výživy cez cvičenie po odpočinok - malé zmeny môžu výrazne zlepšiť tvoj pocit. ✨',
-    placement: 'top',
+    placement: 'bottom',
   },
 ];
 
@@ -95,7 +95,7 @@ export const getCalendarDetailedTour = (): Step[] => [
   {
     target: '[data-tour="calendar-section"]',
     content: 'História aj budúcnosť na jednom mieste. 📆',
-    placement: 'auto',
+    placement: 'bottom',
     disableBeacon: true,
   },
   {
@@ -106,7 +106,7 @@ export const getCalendarDetailedTour = (): Step[] => [
   {
     target: '[data-tour="calendar-actions"]',
     content: 'Uprav nastavenia alebo zdieľaj kalendár s partnerom či lekárom. ⚙️',
-    placement: 'auto',
+    placement: 'bottom',
   },
 ];
 

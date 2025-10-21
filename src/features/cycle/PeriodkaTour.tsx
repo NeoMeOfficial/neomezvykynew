@@ -194,7 +194,7 @@ export const PeriodkaTour = ({
           back: 'Späť',
           close: 'Zavrieť',
           last: 'Dokončiť',
-          next: 'Ďalej',
+          next: 'Ďalší krok',
           skip: 'Preskočiť',
         }}
       />
