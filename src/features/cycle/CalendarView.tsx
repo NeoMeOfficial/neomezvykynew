@@ -1047,13 +1047,15 @@ export function CalendarView({
                   dayClasses += " bg-rose-400 text-white hover:bg-rose-500 border-rose-500";
                   dayStyle = {
                     ...dayStyle,
-                    color: 'white'
+                    color: 'white',
+                    borderWidth: '2px'
                   };
                 } else if (selectedOutcome === 'fertile-days' && dayInfo.isFertile) {
                   dayClasses += " bg-pink-300 text-white hover:bg-pink-400 border-pink-400";
                   dayStyle = {
                     ...dayStyle,
-                    color: 'white'
+                    color: 'white',
+                    borderWidth: '2px'
                   };
                 } else if (!selectedOutcome) {
                   // Show normal phase colors when no filter is active
