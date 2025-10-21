@@ -288,7 +288,7 @@ export function SymptomTracker({
         <div className="flex items-center justify-between">
           <span className="text-base font-medium" style={{
           color: '#955F6A'
-        }}>Poznámky</span>
+        }}>Poznámky o svojom dni</span>
         </div>
         
         <Textarea value={notes} onChange={e => {
