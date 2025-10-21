@@ -242,18 +242,14 @@ export function SymptomTracker({
       
 
       {/* Header */}
-      <div className="rounded-xl p-4" style={{
-        backgroundColor: 'rgba(251, 248, 249, 0.6)',
-        border: '1px solid rgba(229, 212, 215, 0.4)'
-      }}>
-        <h4 className="text-base font-medium mb-2" style={{ color: '#955F6A' }}>
-          Vyber si príznaky
-        </h4>
-        <p className="text-sm mb-3" style={{
+      <h4 className="text-base font-medium mb-2" style={{ color: '#955F6A' }}>
+        Vyber si príznaky
+      </h4>
+      <p className="text-sm mb-3" style={{
         color: '#955F6A'
       }}>
-          Zaznamenajte príznaky pre lekársku konzultáciu
-        </p>
+        Zaznamenajte príznaky pre lekársku konzultáciu
+      </p>
 
       {/* Symptom Tags */}
       <div className="flex flex-wrap gap-2">
@@ -311,7 +307,6 @@ export function SymptomTracker({
             Zadaj vlastný
           </Badge>
         )}
-      </div>
       </div>
 
       {/* Notes Section */}
