@@ -969,13 +969,15 @@ export function CalendarView({
       </div>
 
       {/* Color Legend */}
-      <div className="flex items-center gap-2">
-        <div className="w-6 h-6 rounded-md bg-rose-100" style={{ border: '2px solid #fb7185' }}></div>
-        <span className="text-sm font-medium text-[#955F6A]">Menštruácia</span>
-      </div>
-      <div className="flex items-center gap-2">
-        <div className="w-6 h-6 rounded-md bg-pink-50" style={{ border: '2px solid #f9a8d4' }}></div>
-        <span className="text-sm font-medium text-[#955F6A]">Plodné dni</span>
+      <div className="flex items-center justify-center gap-6 py-3 px-4 bg-white/60 rounded-lg border border-gray-100">
+        <div className="flex items-center gap-2">
+          <div className="w-6 h-6 rounded-md bg-rose-100" style={{ border: '2px solid #fb7185' }}></div>
+          <span className="text-sm font-medium text-[#955F6A]">Menštruácia</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-6 h-6 rounded-md bg-pink-50" style={{ border: '2px solid #f9a8d4' }}></div>
+          <span className="text-sm font-medium text-[#955F6A]">Plodné dni</span>
+        </div>
       </div>
 
       {/* Calendar Grid */}
