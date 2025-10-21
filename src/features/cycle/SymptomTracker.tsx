@@ -243,7 +243,7 @@ export function SymptomTracker({
 
       {/* Header */}
       <h4 className="text-base font-medium mb-2" style={{ color: '#955F6A' }}>
-        Ako sa cítiš
+        Ako sa cítiš:
       </h4>
       <p className="text-sm mb-3" style={{
         color: '#955F6A'
