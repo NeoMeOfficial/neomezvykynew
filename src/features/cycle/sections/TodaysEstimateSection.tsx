@@ -31,7 +31,7 @@ export function TodaysEstimateSection({
   const {
     data: tips = [],
     isLoading: tipsLoading
-  } = useCycleTips(currentPhase.key, currentDay);
+  } = useCycleTips(currentDay);
   return <>
       {/* Layered Glass - Multiple glass layers creating depth between header/content */}
       <div className="relative">

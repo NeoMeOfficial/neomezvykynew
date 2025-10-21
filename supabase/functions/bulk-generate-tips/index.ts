@@ -21,57 +21,38 @@ serve(async (req) => {
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    // Define all phase/day combinations to generate
-    const phaseDayRanges = [
-      { phase: 'menstruation', dayRanges: ['1-2', '3-5'] },
-      { phase: 'follicular', dayRanges: ['6-11', '12-13'] },
-      { phase: 'ovulation', dayRanges: ['14'] },
-      { phase: 'luteal', dayRanges: ['15-23', '24-28'] }
-    ];
+    // Generate tips for all 28 days
+    const days = Array.from({ length: 28 }, (_, i) => i + 1);
 
     const results = [];
     let totalGenerated = 0;
     let totalFailed = 0;
 
-    // Generate for each phase/day combination
-    for (const { phase, dayRanges } of phaseDayRanges) {
-      for (const dayRange of dayRanges) {
-        try {
-          console.log(`Generating tips for ${phase} ${dayRange}...`);
-          
-          // Call the generate-cycle-tips function
-          const { data, error } = await supabase.functions.invoke('generate-cycle-tips', {
-            body: { phase, dayRange, regenerate: false }
-          });
+    // Generate tips for each day
+    for (const day of days) {
+      try {
+        console.log(`Generating tips for day ${day}...`);
+        
+        const { data, error } = await supabase.functions.invoke('generate-cycle-tips', {
+          body: { day, regenerate: true }
+        });
 
-          if (error) throw error;
-          
-          if (data?.success) {
-            totalGenerated += data.tips?.length || 0;
-            results.push({
-              phase,
-              dayRange,
-              success: true,
-              tipsCount: data.tips?.length || 0
-            });
-            console.log(`✓ Generated ${data.tips?.length} tips for ${phase} ${dayRange}`);
-          } else {
-            throw new Error(data?.error || 'Unknown error');
-          }
-
-          // Add delay to avoid rate limiting
-          await new Promise(resolve => setTimeout(resolve, 1000));
-
-        } catch (error) {
+        if (error) {
+          console.error(`Failed for day ${day}:`, error);
           totalFailed++;
-          results.push({
-            phase,
-            dayRange,
-            success: false,
-            error: error.message
-          });
-          console.error(`✗ Failed for ${phase} ${dayRange}:`, error.message);
+          results.push({ day, success: false, error: error.message });
+        } else {
+          console.log(`Success for day ${day}`);
+          totalGenerated += data.tips?.length || 0;
+          results.push({ day, success: true, tipsCount: data.tips?.length });
         }
+
+        // Add a small delay to avoid rate limiting
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      } catch (err) {
+        console.error(`Error for day ${day}:`, err);
+        totalFailed++;
+        results.push({ day, success: false, error: err.message });
       }
     }
 
@@ -81,7 +62,7 @@ serve(async (req) => {
         summary: {
           totalGenerated,
           totalFailed,
-          totalAttempts: phaseDayRanges.reduce((acc, p) => acc + p.dayRanges.length, 0)
+          totalAttempts: 28
         },
         results
       }),

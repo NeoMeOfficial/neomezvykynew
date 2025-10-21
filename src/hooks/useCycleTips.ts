@@ -1,28 +1,19 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
-export function useCycleTips(phase: string, currentDay: number) {
+export function useCycleTips(currentDay: number) {
   return useQuery({
-    queryKey: ['cycle-tips', phase, currentDay],
+    queryKey: ['cycle-tips', currentDay],
     queryFn: async () => {
-      // Determine day range based on current day
-      let dayRange = '';
-      if (currentDay >= 1 && currentDay <= 3) dayRange = '1-3';
-      else if (currentDay >= 4 && currentDay <= 7) dayRange = '4-7';
-      else if (currentDay >= 8 && currentDay <= 14) dayRange = '8-14';
-      else if (currentDay >= 15 && currentDay <= 21) dayRange = '15-21';
-      else dayRange = '22-28';
-
       const { data, error } = await supabase
         .from('cycle_tips')
         .select('*')
-        .eq('phase', phase)
-        .eq('day_range', dayRange)
+        .eq('day', currentDay)
         .eq('is_approved', true);
 
       if (error) throw error;
       return data || [];
     },
-    enabled: !!phase,
+    enabled: currentDay >= 1 && currentDay <= 28,
   });
 }

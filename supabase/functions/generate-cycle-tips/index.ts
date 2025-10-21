@@ -22,52 +22,76 @@ serve(async (req) => {
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    const { phase, dayRange, regenerate } = await req.json();
+    const { day, regenerate } = await req.json();
 
-    // Define categories
-    const categories = ['energy', 'mood', 'nutrition', 'activity', 'self_care'];
+    // Define categories (4 tips per day)
+    const categories = ['energy', 'mood', 'nutrition', 'activity'];
 
     // System prompt for AI
-    const systemPrompt = `Si expertka na ženské zdravie a menštruačný cyklus. Tvoja úloha je vytvárať praktické, krátke a užitočné tipy pre busy maminy.
+    const systemPrompt = `Si expertka na ženské zdravie a menštruačný cyklus s hlbokým pochopením hormonálnych zmien počas 28-dňového cyklu.
 
 PRAVIDLÁ:
-- Každý tip má max 2-3 vety
+- Každý tip je založený na FAKTOCH o hormonálnych zmenách v daný deň cyklu
 - Používaj "ty" formu (nie "vy")
-- Buď konkrétna a praktická
-- Zameraj sa na všedný deň busy maminy
-- Tipy musia byť jednoducho realizovateľné
+- Buď konkrétna, praktická a informatívna - nie len povšechná
+- Vysvetľuj PREČO je tip relevantný (súvislosť s hormónmi/fázou)
+- Tipy majú 2-4 vety - jednoduché, ale nie povrchné
 - Používaj slovenčinu
-- Nepoužívaj odborné medicínske výrazy
+- Nepoužívaj odborné medicínske výrazy, ale uvádzaj hormóny (estrogén, progesterón, testosterón)
 
 ŠTRUKTÚRA ODPOVEDE:
-Vráť PRESNE 5 tipov (jeden pre každú kategóriu) vo formáte JSON:
+Vráť PRESNE 4 tipy (jeden pre každú kategóriu) vo formáte JSON:
 {
-  "energy": "tip o energii",
-  "mood": "tip o nálade", 
-  "nutrition": "tip o výžive",
-  "activity": "tip o aktivite",
-  "self_care": "tip o self-care"
+  "energy": "konkrétny tip o energii s vysvetlením prečo",
+  "mood": "konkrétny tip o nálade/myslení s kontextom", 
+  "nutrition": "konkrétny tip o výžive s vysvetlením benefitu",
+  "activity": "konkrétny tip o pohybe/aktivite s dôvodom"
 }`;
 
-    // Phase-specific context
-    const phaseContext = {
-      menstruation: `Fáza: MENŠTRUÁCIA (${dayRange}. deň)
-Žena je na menštruácii. Energia je nižšia, môže pociťovať únavu, kŕče, bolesti. Potrebuje viac odpočinku a pohody.`,
-      follicular: `Fáza: FOLIKULÁRNA (${dayRange}. deň)
-Energia postupne stúpa, žena sa cíti svieža a motivovaná. Telo sa pripravuje na ovuláciu.`,
-      ovulation: `Fáza: OVULÁCIA (${dayRange}. deň)
-Vrchol energie a nálady. Žena sa cíti sebavedomo, má veľa energie. Ideálny čas na náročné úlohy.`,
-      luteal: `Fáza: LUTEÁLNA (${dayRange}. deň)
-Energia postupne klesá, môžu sa objaviť PMS symptómy. Žena potrebuje viac trpezlivosti so sebou.`
+    // Day-specific context based on 28-day cycle
+    const dayContext: Record<number, string> = {
+      1: `DEŇ 1 – Menštruácia\nHormóny: Estrogén aj progesterón sú na minime – telo je citlivé a unaviteľné.\nZameranie: Nízka intenzita, protizápalová strava, jemnosť k sebe.`,
+      2: `DEŇ 2 – Menštruácia\nHormóny: Únava môže pretrvávať, zápalové procesy sú mierne zvýšené.\nZameranie: Nízka intenzita, omega-3 a antioxidanty, dychové cvičenia.`,
+      3: `DEŇ 3 – Menštruácia\nHormóny: Krvácanie môže byť silnejšie – energia je limitovaná.\nZameranie: Strečing, komplexné sacharidy, self-kindness.`,
+      4: `DEŇ 4 – Menštruácia\nHormóny: Estrogén začína jemne stúpať – energia sa vracia.\nZameranie: Pilates stredná intenzita, regenerácia (železo, horčík, vápnik).`,
+      5: `DEŇ 5 – Koniec menštruácie\nHormóny: Estrogén ďalej stúpa – myseľ sa prejasňuje.\nZameranie: Pilates, tvorba krvi (železo, horčík), sústredenie.`,
+      6: `DEŇ 6 – Folikulárna fáza\nHormóny: Estrogén rastie – motivácia aj energia stúpajú.\nZameranie: Stredná intenzita, bielkoviny a sacharidy, prebúdzanie.`,
+      7: `DEŇ 7 – Folikulárna fáza\nHormóny: Estrogén podporuje rýchlejšie regenerovanie.\nZameranie: Vyššia intenzita, svalová podpora, konanie.`,
+      8: `DEŇ 8 – Folikulárna fáza\nHormóny: Telo je výkonnejšie a odolnejšie voči záťaži.\nZameranie: Vysoká intenzita, dlhšia energia, hranice.`,
+      9: `DEŇ 9 – Folikulárna fáza\nHormóny: Estrogén ďalej rastie – nálada aj mozgová jasnosť sú vysoko.\nZameranie: Vysoká intenzita, regenerácia svalov, rast.`,
+      10: `DEŇ 10 – Folikulárna fáza\nHormóny: Estrogén je na vrchole – peak performance.\nZameranie: Vysoká intenzita, stabilný cukor, využiť energiu.`,
+      11: `DEŇ 11 – Folikulárna fáza\nHormóny: Mozog aj telo sú v najlepšej kondícii.\nZameranie: Vysoká intenzita, metabolizmus estrogénu (vláknina), smerovanie energie.`,
+      12: `DEŇ 12 – Ovulácia (začiatok)\nHormóny: Estrogén a testosterón sú vysoko – sila a charizma stúpajú.\nZameranie: Vysoká intenzita, omega-3 a antioxidanty, flow.`,
+      13: `DEŇ 13 – Ovulácia\nHormóny: Vrchol estrogénu – sebavedomie, komunikácia, energia.\nZameranie: Vysoká intenzita, detox estrogénu (vláknina), žiarenie.`,
+      14: `DEŇ 14 – Ovulácia (peak)\nHormóny: Energia na maxime – telo zvládne najviac.\nZameranie: Vysoká intenzita, metabolizmus estrogénu, múdre využitie energie.`,
+      15: `DEŇ 15 – Koniec ovulácie\nHormóny: Estrogén začína klesať – energia stále vysoká.\nZameranie: Stredná až vysoká intenzita, stabilita hormónov, ochrana energie.`,
+      16: `DEŇ 16 – Luteálna fáza\nHormóny: Progesterón stúpa – telo sa spomaľuje.\nZameranie: Stredná intenzita, stabilný cukor, spomalenie.`,
+      17: `DEŇ 17 – Luteálna fáza\nHormóny: Môže sa objaviť pokles motivácie.\nZameranie: Stredná intenzita, trávenie (vláknina, probiotiká), schopnosť.`,
+      18: `DEŇ 18 – Luteálna fáza\nHormóny: Progesterón tlačí k pomalšiemu tempu.\nZameranie: Stredná intenzita, horčík pre spánok, dôvera v telo.`,
+      19: `DEŇ 19 – Luteálna fáza\nHormóny: Začína sa zvyšovať emočná citlivosť.\nZameranie: Stredná intenzita, nervový systém (horčík, B6), láskavosť k sebe.`,
+      20: `DEŇ 20 – Luteálna fáza\nHormóny: Zadržiavanie vody – pocit "ťažkosti".\nZameranie: Stredná intenzita, lymfa (draslík), zjednodušenie.`,
+      21: `DEŇ 21 – Luteálna fáza\nHormóny: Energia pokračuje v poklese – šetrenie sily.\nZameranie: Stredná intenzita, nálada (B6, horčík, omega-3), pokoj.`,
+      22: `DEŇ 22 – Luteálna fáza\nHormóny: Môže sa objaviť podráždenosť.\nZameranie: Nízka až stredná intenzita, trávenie a hormóny, ochrana energie.`,
+      23: `DEŇ 23 – Luteálna fáza (PMS)\nHormóny: Progesterón klesá – výkyvy nálad.\nZameranie: Nízka intenzita, nervový systém (horčík, B6), emócie nie sú ja.`,
+      24: `DEŜ 24 – Luteálna fáza (PMS)\nHormóny: Citlivosť a únava stúpajú.\nZameranie: Nízka intenzita, stabilný cukor, jemnosť.`,
+      25: `DEŇ 25 – Luteálna fáza (PMS)\nHormóny: Progesterón prudko klesá – kolísanie nálad.\nZameranie: Nízka intenzita, nervový systém, emócie nedefinujú.`,
+      26: `DEŇ 26 – Predmenštruačné dni\nHormóny: Únava a výkyvy sú bežné.\nZameranie: Nízka intenzita, omega-3 pre prípravu, hlboké dýchanie.`,
+      27: `DEŇ 27 – Predmenštruačné dni\nHormóny: Príprava na nový cyklus – spomalenie.\nZameranie: Nízka intenzita, trávenie (vláknina, probiotiká), spolupráca s telom.`,
+      28: `DEŇ 28 – Koniec cyklu\nHormóny: Minimum – začína sa nový cyklus.\nZameranie: Nízka intenzita, pokoj pred menštruáciou (horčík), nový začiatok.`
     };
 
-    const userPrompt = `${phaseContext[phase as keyof typeof phaseContext]}
+    const userPrompt = `${dayContext[day]}
 
-Vytvor 5 praktických tipov (jeden pre každú kategóriu: energy, mood, nutrition, activity, self_care).
-Pamätaj - busy mamina, krátke tipy (2-3 vety), konkrétne a jednoducho realizovateľné.`;
+Vytvor 4 hlboké, faktami podložené tipy (jeden pre každú kategóriu: energy, mood, nutrition, activity).
+DÔLEŽITÉ:
+- Vysvetľuj súvislosť s hormónmi alebo fázou cyklu
+- Uvádzaj konkrétne potraviny/aktivity, nie len všeobecnosti
+- Každý tip má jasný benefit/dôvod
+- 2-4 vety, jednoducho ale nie povrchne
+- Pre busy maminy – jednoducho realizovateľné`;
 
     // Call Lovable AI
-    console.log("Calling AI for phase:", phase, "day:", dayRange);
+    console.log("Calling AI for day:", day);
     
     const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -99,21 +123,19 @@ Pamätaj - busy mamina, krátke tipy (2-3 vety), konkrétne a jednoducho realizo
 
     // Store tips in database
     const tipsToInsert = categories.map(category => ({
-      phase,
-      day_range: dayRange,
+      day: day,
       category,
       tip_text: generatedTips[category],
       is_approved: false,
       created_by: 'ai'
     }));
 
-    // If regenerate, delete existing tips for this phase/day
+    // If regenerate, delete existing tips for this day
     if (regenerate) {
       const { error: deleteError } = await supabase
         .from('cycle_tips')
         .delete()
-        .eq('phase', phase)
-        .eq('day_range', dayRange);
+        .eq('day', day);
       
       if (deleteError) {
         console.error('Error deleting old tips:', deleteError);
@@ -134,7 +156,7 @@ Pamätaj - busy mamina, krátke tipy (2-3 vety), konkrétne a jednoducho realizo
       JSON.stringify({ 
         success: true, 
         tips: insertedTips,
-        message: `Generated ${insertedTips.length} tips for ${phase} ${dayRange}`
+        message: `Generated ${insertedTips.length} tips for day ${day}`
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
