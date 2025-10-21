@@ -9,28 +9,18 @@ import { Check, X, RefreshCw, Sparkles, Loader2 } from 'lucide-react';
 
 interface CycleTip {
   id: string;
-  phase: string;
-  day_range: string;
+  day: number;
   category: string;
   tip_text: string;
   is_approved: boolean;
   created_by: string;
 }
 
-const PHASE_LABELS = {
-  menstruation: 'Menštruácia',
-  follicular: 'Folikulárna',
-  ovulation: 'Ovulácia',
-  luteal: 'Luteálna'
-};
-
 const CATEGORY_LABELS = {
   energy: 'Energia',
   mood: 'Nálada',
   nutrition: 'Výživa',
-  activity: 'Aktivita',
-  self_care: 'Self-care',
-  general: 'Všeobecné'
+  activity: 'Aktivita'
 };
 
 export default function AdminCycleTips() {
@@ -51,8 +41,7 @@ export default function AdminCycleTips() {
       const { data, error } = await supabase
         .from('cycle_tips')
         .select('*')
-        .order('phase')
-        .order('day_range')
+        .order('day')
         .order('category');
 
       if (error) throw error;
@@ -150,11 +139,11 @@ export default function AdminCycleTips() {
     }
   };
 
-  const handleRegenerate = async (phase: string, dayRange: string) => {
-    setRegeneratingPhase(`${phase}-${dayRange}`);
+  const handleRegenerate = async (day: number) => {
+    setRegeneratingPhase(`day-${day}`);
     try {
       const { data, error } = await supabase.functions.invoke('generate-cycle-tips', {
-        body: { phase, dayRange, regenerate: true }
+        body: { day, regenerate: true }
       });
 
       if (error) throw error;
@@ -202,15 +191,15 @@ export default function AdminCycleTips() {
     }
   };
 
-  // Group tips by phase and day range
+  // Group tips by day
   const groupedTips = tips.reduce((acc, tip) => {
-    const key = `${tip.phase}-${tip.day_range}`;
+    const key = tip.day;
     if (!acc[key]) {
       acc[key] = [];
     }
     acc[key].push(tip);
     return acc;
-  }, {} as Record<string, CycleTip[]>);
+  }, {} as Record<number, CycleTip[]>);
 
   if (loading) {
     return (
@@ -281,28 +270,29 @@ export default function AdminCycleTips() {
           </Card>
         </div>
 
-        {/* Tips by Phase and Day */}
+        {/* Tips by Day */}
         <div className="space-y-6">
-          {Object.entries(groupedTips).map(([key, phaseTips]) => {
-            const [phase, dayRange] = key.split('-');
-            const isRegenerating = regeneratingPhase === key;
+          {Object.entries(groupedTips)
+            .sort(([a], [b]) => Number(a) - Number(b))
+            .map(([day, dayTips]) => {
+            const isRegenerating = regeneratingPhase === `day-${day}`;
             
             return (
-              <Card key={key} className="p-6">
+              <Card key={day} className="p-6">
                 <div className="flex justify-between items-center mb-4">
                   <div>
                     <h2 className="text-xl font-semibold" style={{ color: '#955F6A' }}>
-                      {PHASE_LABELS[phase as keyof typeof PHASE_LABELS]} - Deň {dayRange}
+                      Deň {day}
                     </h2>
                     <p className="text-sm" style={{ color: '#955F6A', opacity: 0.7 }}>
-                      {phaseTips.filter(t => t.is_approved).length} / {phaseTips.length} schválené
+                      {dayTips.filter(t => t.is_approved).length} / {dayTips.length} schválené
                     </p>
                   </div>
                   
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => handleRegenerate(phase, dayRange)}
+                    onClick={() => handleRegenerate(Number(day))}
                     disabled={isRegenerating}
                     className="border-[#FF7782] text-[#955F6A] hover:bg-[#FF7782]/10"
                   >
@@ -321,7 +311,7 @@ export default function AdminCycleTips() {
                 </div>
 
                 <div className="space-y-3">
-                  {phaseTips.map((tip) => (
+                  {dayTips.map((tip) => (
                     <div
                       key={tip.id}
                       className={`p-4 rounded-lg border-2 transition-all ${

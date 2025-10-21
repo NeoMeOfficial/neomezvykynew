@@ -145,10 +145,9 @@ export type Database = {
           category: string
           created_at: string
           created_by: string
-          day_range: string
+          day: number
           id: string
           is_approved: boolean
-          phase: string
           tip_text: string
           updated_at: string
         }
@@ -156,10 +155,9 @@ export type Database = {
           category: string
           created_at?: string
           created_by?: string
-          day_range: string
+          day?: number
           id?: string
           is_approved?: boolean
-          phase: string
           tip_text: string
           updated_at?: string
         }
@@ -167,10 +165,9 @@ export type Database = {
           category?: string
           created_at?: string
           created_by?: string
-          day_range?: string
+          day?: number
           id?: string
           is_approved?: boolean
-          phase?: string
           tip_text?: string
           updated_at?: string
         }
