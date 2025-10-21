@@ -193,29 +193,25 @@ export function SymptomTracker({
       return newSelected;
     });
   };
-  
   const addCustomSymptom = () => {
     if (!customSymptomInput.trim()) return;
-    
     const newSymptom: Symptom = {
       id: `custom_${Date.now()}`,
       name: customSymptomInput.trim(),
       icon: '✏️',
       phases: ['menstrual', 'follicular', 'ovulation', 'luteal']
     };
-    
     const updatedCustomSymptoms = [...customSymptoms, newSymptom];
     setCustomSymptoms(updatedCustomSymptoms);
-    
+
     // Save to localStorage
     const customSymptomsKey = accessCode ? `custom_symptoms_${accessCode}` : 'temp_custom_symptoms';
     localStorage.setItem(customSymptomsKey, JSON.stringify(updatedCustomSymptoms));
-    
+
     // Clear input and close
     setCustomSymptomInput('');
     setIsAddingCustom(false);
   };
-  
   const saveSymptoms = () => {
     const symptomsKey = accessCode ? `symptoms_${accessCode}_${currentDate}` : `temp_symptoms_${currentDate}`;
     const notesKey = accessCode ? `notes_${accessCode}_${currentDate}` : `temp_notes_${currentDate}`;
@@ -242,14 +238,12 @@ export function SymptomTracker({
       
 
       {/* Header */}
-      <h4 className="text-base font-medium mb-2" style={{ color: '#955F6A' }}>
+      <h4 className="text-base font-medium mb-2" style={{
+      color: '#955F6A'
+    }}>
         Ako sa cítiš:
       </h4>
-      <p className="text-sm mb-3" style={{
-        color: '#955F6A'
-      }}>
-        Zaznamenajte príznaky pre lekársku konzultáciu
-      </p>
+      
 
       {/* Symptom Tags */}
       <div className="flex flex-wrap gap-2">
@@ -262,51 +256,31 @@ export function SymptomTracker({
           </Badge>)}
         
         {/* Add Custom Symptom */}
-        {isAddingCustom ? (
-          <div className="flex items-center gap-1">
-            <input
-              type="text"
-              value={customSymptomInput}
-              onChange={(e) => setCustomSymptomInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  addCustomSymptom();
-                } else if (e.key === 'Escape') {
-                  setIsAddingCustom(false);
-                  setCustomSymptomInput('');
-                }
-              }}
-              onBlur={() => {
-                if (!customSymptomInput.trim()) {
-                  setIsAddingCustom(false);
-                }
-              }}
-              placeholder="Zadaj príznak..."
-              className="text-xs py-1 px-2.5 border border-rose-200 rounded-md focus:outline-none focus:ring-2 focus:ring-rose-300"
-              style={{
-                backgroundColor: '#FBF8F9',
-                color: '#955F6A',
-                minWidth: '150px'
-              }}
-              autoFocus
-            />
-          </div>
-        ) : (
-          <Badge
-            variant="outline"
-            className="cursor-pointer select-none text-xs py-1 px-2.5 transition-all duration-200 hover:bg-muted border-dashed"
-            onClick={() => setIsAddingCustom(true)}
-            style={{
-              backgroundColor: '#FBF8F9',
-              color: '#955F6A',
-              borderColor: '#E5D4D7'
-            }}
-            data-tour="custom-symptom"
-          >
+        {isAddingCustom ? <div className="flex items-center gap-1">
+            <input type="text" value={customSymptomInput} onChange={e => setCustomSymptomInput(e.target.value)} onKeyDown={e => {
+          if (e.key === 'Enter') {
+            addCustomSymptom();
+          } else if (e.key === 'Escape') {
+            setIsAddingCustom(false);
+            setCustomSymptomInput('');
+          }
+        }} onBlur={() => {
+          if (!customSymptomInput.trim()) {
+            setIsAddingCustom(false);
+          }
+        }} placeholder="Zadaj príznak..." className="text-xs py-1 px-2.5 border border-rose-200 rounded-md focus:outline-none focus:ring-2 focus:ring-rose-300" style={{
+          backgroundColor: '#FBF8F9',
+          color: '#955F6A',
+          minWidth: '150px'
+        }} autoFocus />
+          </div> : <Badge variant="outline" className="cursor-pointer select-none text-xs py-1 px-2.5 transition-all duration-200 hover:bg-muted border-dashed" onClick={() => setIsAddingCustom(true)} style={{
+        backgroundColor: '#FBF8F9',
+        color: '#955F6A',
+        borderColor: '#E5D4D7'
+      }} data-tour="custom-symptom">
             <span className="mr-1.5">+</span>
             Zadaj vlastný
-          </Badge>
-        )}
+          </Badge>}
       </div>
 
       {/* Notes Section */}
