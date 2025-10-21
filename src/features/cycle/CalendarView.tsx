@@ -1058,9 +1058,11 @@ export function CalendarView({
                 } else if (!selectedOutcome) {
                   // Show normal phase colors when no filter is active
                   if (dayInfo.isPeriod) {
-                    dayClasses += " bg-rose-100 border-rose-300";
+                    dayClasses += " bg-rose-100 border-rose-400";
+                    dayStyle.borderWidth = '2px';
                   } else if (dayInfo.isFertile) {
-                    dayClasses += " bg-pink-50 border-pink-200";
+                    dayClasses += " bg-pink-50 border-pink-300";
+                    dayStyle.borderWidth = '2px';
                   } else {
                     dayClasses += " hover:bg-white/80 border-gray-100 bg-white/60";
                   }
