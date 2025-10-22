@@ -107,14 +107,6 @@ export function MenstrualSidebar({ activeSection, onSectionChange, onEditClick, 
                     {/* Action buttons */}
                     <div className="flex flex-col gap-2">
                       <button
-                        onClick={onEditClick}
-                        className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-3xl bg-white border border-rose-200/20 hover:bg-gray-50 transition-all"
-                        style={{ color: '#FF7782' }}
-                      >
-                        <Lightbulb className="w-3 h-3" />
-                        Zmeniť dátum menštruácie
-                      </button>
-                      <button
                         onClick={onSettingsClick}
                         className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-3xl bg-white border border-rose-200/20 hover:bg-gray-50 transition-all"
                         style={{ color: '#FF7782' }}
@@ -137,7 +129,7 @@ export function MenstrualSidebar({ activeSection, onSectionChange, onEditClick, 
                       )}
                     </div>
                     
-                    <NextDatesInfo lastPeriodStart={lastPeriodStart} cycleLength={cycleLength} />
+                    <NextDatesInfo lastPeriodStart={lastPeriodStart} cycleLength={cycleLength} onEditClick={onEditClick} />
 
                     {/* Temporary Data Indicator */}
                     {hasTemporaryData && !accessCode && (

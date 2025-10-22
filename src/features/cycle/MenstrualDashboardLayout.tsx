@@ -86,7 +86,7 @@ export function MenstrualDashboardLayout({
         </div>
 
         {/* Next Dates Info for Mobile */}
-        <NextDatesInfo lastPeriodStart={cycleData.lastPeriodStart} cycleLength={cycleData.cycleLength} />
+        <NextDatesInfo lastPeriodStart={cycleData.lastPeriodStart} cycleLength={cycleData.cycleLength} onEditClick={() => setShowDatePicker(true)} />
 
         {/* All sections for mobile */}
         <div className="space-y-8">
