@@ -143,7 +143,7 @@ const Index = () => {
   return (
     <div className="min-h-screen overflow-x-hidden bg-white">
       <div className="w-full max-w-none px-2 sm:px-4 py-4 sm:py-8 mx-auto">
-        {/* Navigation Buttons and Widgets in One Row */}
+        {/* Navigation Buttons Row */}
         <div className="w-full mb-4 sm:mb-6">
           <div className="flex gap-2 overflow-x-auto pb-2 px-2">
             <Button 
@@ -169,25 +169,25 @@ const Index = () => {
               <Fingerprint className="h-3 w-3" />
               Uložiť si svoje informácie
             </Button>
-            
-            {/* Inline Navigation Widgets */}
-            <NavigationWidget
-              accessCode={accessCode}
-              selectedDate={selectedDate}
-              onFirstInteraction={handleFirstInteraction}
-              habitData={habitData}
-              habits={habits}
-              formatDate={habitFormatDate}
-              reflections={reflections as Record<string, any>}
-              monthlyCalendarDate={monthlyCalendarDate}
-              setMonthlyCalendarDate={setMonthlyCalendarDate}
-              showMonthlyCalendar={showMonthlyCalendar}
-              setShowMonthlyCalendar={setShowMonthlyCalendar}
-              showDiaryView={showDiaryView}
-              setShowDiaryView={setShowDiaryView}
-            />
           </div>
         </div>
+
+        {/* Navigation Widgets */}
+        <NavigationWidget
+          accessCode={accessCode}
+          selectedDate={selectedDate}
+          onFirstInteraction={handleFirstInteraction}
+          habitData={habitData}
+          habits={habits}
+          formatDate={habitFormatDate}
+          reflections={reflections as Record<string, any>}
+          monthlyCalendarDate={monthlyCalendarDate}
+          setMonthlyCalendarDate={setMonthlyCalendarDate}
+          showMonthlyCalendar={showMonthlyCalendar}
+          setShowMonthlyCalendar={setShowMonthlyCalendar}
+          showDiaryView={showDiaryView}
+          setShowDiaryView={setShowDiaryView}
+        />
         
         
         <Suspense fallback={<ComponentLoader />}>
