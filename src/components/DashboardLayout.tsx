@@ -65,12 +65,9 @@ export const DashboardLayout = ({
             onClick={() => setActiveWidget(widget.id)}
             className={`
               flex items-center justify-center gap-2 rounded-3xl py-3 px-4 text-mobile-sm md:text-sm font-medium symptom-glass transition-all hover:opacity-90
-              ${activeWidget === widget.id ? 'shadow-lg scale-105' : ''}
+              ${activeWidget === widget.id ? 'shadow-[0_4px_12px_rgba(149,95,106,0.3)]' : 'shadow-none'}
             `}
-            style={activeWidget === widget.id 
-              ? { backgroundColor: '#F4415F', color: '#FFFFFF' }
-              : { backgroundColor: '#FBF8F9', color: '#955F6A' }
-            }
+            style={{ backgroundColor: '#FBF8F9', color: '#955F6A' }}
           >
             <img 
               src={widget.icon} 
