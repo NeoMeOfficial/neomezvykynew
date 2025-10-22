@@ -61,7 +61,7 @@ export function TodaysEstimateSection({
                 Odhad na dnes
               </h3>
             </div>
-            {onSettingsClick && <Button variant="outline" size="sm" onClick={onSettingsClick} className="border-[#FF7782] text-[#955F6A] hover:bg-[#FF7782]/10 text-xs px-3 py-1">
+            {onSettingsClick && <Button variant="outline" size="sm" onClick={onSettingsClick} className="lg:hidden border-[#FF7782] text-[#955F6A] hover:bg-[#FF7782]/10 text-xs px-3 py-1">
                 Nastavenia
               </Button>}
           </div>
