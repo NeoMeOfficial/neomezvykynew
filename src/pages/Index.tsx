@@ -172,14 +172,6 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Temporary Data Indicator */}
-        {!accessCode && temporaryStorage.isSessionActive() && (
-          <div className="w-full max-w-[600px] mx-auto mb-4">
-            <Suspense fallback={<ComponentLoader />}>
-              <TemporaryDataIndicator onShowAccessCodeValidation={() => setShowAccessCodeValidation(true)} />
-            </Suspense>
-          </div>
-        )}
 
 
         {/* Navigation Widget with Dashboard/Mobile Layout */}
@@ -198,24 +190,6 @@ const Index = () => {
           showDiaryView={showDiaryView}
           setShowDiaryView={setShowDiaryView}
         />
-        
-        {!accessCode && !shouldOfferBiometric() && (
-          <div className="w-full max-w-[600px] mx-auto mt-4">
-            <div className="text-center p-4 bg-muted/50 rounded-lg border border-border/50">
-              <div className="space-y-3">
-                <Button 
-                  onClick={handleEnterCodeClick}
-                  className="w-full"
-                >
-                  Zadať prístupový kód
-                </Button>
-                <p className="text-mobile-sm md:text-sm text-muted-foreground">
-                  Zadajte váš prístupový kód pre prístup k údajom
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
         
         
         <Suspense fallback={<ComponentLoader />}>
