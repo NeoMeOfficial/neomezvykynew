@@ -129,9 +129,6 @@ export function MenstrualDashboardLayout({
         }}>
               <span data-tour="current-phase">Deň {currentDay} • {currentPhase.name}</span>
             </h2>
-            <div className="flex justify-end">
-              <PeriodkaTour accessCode={accessCode} autoStart={true} activeSection={activeSection} onSectionChange={setActiveSection} />
-            </div>
           </div>
           
           {/* Content Area */}
