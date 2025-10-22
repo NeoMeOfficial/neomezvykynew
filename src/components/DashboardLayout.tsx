@@ -64,23 +64,22 @@ export const DashboardLayout = ({
             key={widget.id}
             onClick={() => setActiveWidget(widget.id)}
             className={`
-              flex items-center gap-3 px-6 py-3 rounded-2xl border transition-all duration-300
-              ${activeWidget === widget.id 
-                ? 'bg-primary/10 border-primary shadow-lg scale-105' 
-                : 'bg-white/60 border-white/40 hover:bg-white/80 hover:scale-102'
-              }
+              flex items-center justify-center gap-2 rounded-3xl py-3 px-4 text-mobile-sm md:text-sm font-medium symptom-glass transition-all hover:opacity-90
+              ${activeWidget === widget.id ? 'shadow-lg scale-105' : ''}
             `}
+            style={activeWidget === widget.id 
+              ? { backgroundColor: '#F4415F', color: '#FFFFFF' }
+              : { backgroundColor: '#FBF8F9', color: '#955F6A' }
+            }
           >
             <img 
               src={widget.icon} 
               alt={widget.name}
-              className={`w-8 h-8 transition-transform duration-300 ${
+              className={`w-6 h-6 transition-transform duration-300 ${
                 activeWidget === widget.id ? 'scale-110' : ''
               }`}
             />
-            <span className={`text-sm font-medium transition-colors ${
-              activeWidget === widget.id ? 'text-primary' : 'text-foreground/70'
-            }`}>
+            <span className="transition-colors">
               {widget.name}
             </span>
           </button>
