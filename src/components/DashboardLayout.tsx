@@ -13,9 +13,7 @@ import DiaryView from "@/components/DiaryView";
 import menstrualCalendarIcon from "@/assets/menstrual-calendar-icon.png";
 import habitsIcon from "@/assets/habits-icon.png";
 import reflectionIcon from "@/assets/dennik-icon.png";
-
 type WidgetType = 'periodka' | 'navyky' | 'reflexia';
-
 interface DashboardLayoutProps {
   accessCode?: string;
   selectedDate: Date;
@@ -31,7 +29,6 @@ interface DashboardLayoutProps {
   showDiaryView: boolean;
   setShowDiaryView: (show: boolean) => void;
 }
-
 export const DashboardLayout = ({
   accessCode,
   selectedDate,
@@ -45,42 +42,37 @@ export const DashboardLayout = ({
   showMonthlyCalendar,
   setShowMonthlyCalendar,
   showDiaryView,
-  setShowDiaryView,
+  setShowDiaryView
 }: DashboardLayoutProps) => {
   const [activeWidget, setActiveWidget] = useState<WidgetType>('periodka');
-
-  const widgets = [
-    { id: 'periodka' as WidgetType, name: 'Periodka', icon: menstrualCalendarIcon },
-    { id: 'navyky' as WidgetType, name: 'Moje návyky', icon: habitsIcon },
-    { id: 'reflexia' as WidgetType, name: 'Denná reflexia', icon: reflectionIcon },
-  ];
-
-  return (
-    <div className="w-full max-w-none mx-auto">
+  const widgets = [{
+    id: 'periodka' as WidgetType,
+    name: 'Periodka',
+    icon: menstrualCalendarIcon
+  }, {
+    id: 'navyky' as WidgetType,
+    name: 'Moje návyky',
+    icon: habitsIcon
+  }, {
+    id: 'reflexia' as WidgetType,
+    name: 'Denná reflexia',
+    icon: reflectionIcon
+  }];
+  return <div className="w-full max-w-none mx-auto">
       {/* Widget Selector for Desktop */}
       <div className="hidden lg:flex justify-end mb-6 gap-3">
-        {widgets.map((widget) => (
-          <button
-            key={widget.id}
-            onClick={() => setActiveWidget(widget.id)}
-            className={`
+        {widgets.map(widget => <button key={widget.id} onClick={() => setActiveWidget(widget.id)} className={`
               flex items-center justify-center gap-2 rounded-3xl py-3 px-4 text-mobile-sm md:text-sm font-medium symptom-glass transition-all hover:opacity-90
               ${activeWidget === widget.id ? 'shadow-[0_4px_12px_rgba(149,95,106,0.3)]' : 'shadow-none'}
-            `}
-            style={{ backgroundColor: '#FBF8F9', color: '#955F6A' }}
-          >
-            <img 
-              src={widget.icon} 
-              alt={widget.name}
-              className={`w-6 h-6 transition-transform duration-300 ${
-                activeWidget === widget.id ? 'scale-110' : ''
-              }`}
-            />
+            `} style={{
+        backgroundColor: '#FBF8F9',
+        color: '#955F6A'
+      }}>
+            <img src={widget.icon} alt={widget.name} className={`w-6 h-6 transition-transform duration-300 ${activeWidget === widget.id ? 'scale-110' : ''}`} />
             <span className="transition-colors">
               {widget.name}
             </span>
-          </button>
-        ))}
+          </button>)}
       </div>
 
       {/* Mobile Grid - Show all widgets */}
@@ -90,20 +82,12 @@ export const DashboardLayout = ({
         <div className="lg:col-span-2 xl:col-span-2">
           <div className="backdrop-blur-md bg-white border border-white/40 rounded-2xl p-6 shadow-lg h-full">
             <div className="flex items-center gap-4 mb-6">
-              <img 
-                src={menstrualCalendarIcon} 
-                alt="Menstrual Calendar"
-                className="w-12 h-12 flex-shrink-0"
-              />
+              <img src={menstrualCalendarIcon} alt="Menstrual Calendar" className="w-12 h-12 flex-shrink-0" />
               <h2 className="text-2xl font-semibold text-foreground">
                 Periodka
               </h2>
             </div>
-            <MenstrualDashboardLayout
-              accessCode={accessCode}
-              onFirstInteraction={onFirstInteraction}
-              compact={false}
-            />
+            <MenstrualDashboardLayout accessCode={accessCode} onFirstInteraction={onFirstInteraction} compact={false} />
           </div>
         </div>
 
@@ -112,29 +96,18 @@ export const DashboardLayout = ({
           <div className="backdrop-blur-md bg-white border border-white/40 rounded-2xl p-6 shadow-lg h-full">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-4">
-                <img 
-                  src={habitsIcon} 
-                  alt="Habits"
-                  className="w-12 h-12 flex-shrink-0"
-                />
+                <img src={habitsIcon} alt="Habits" className="w-12 h-12 flex-shrink-0" />
                 <h2 className="text-2xl font-semibold text-foreground">
                   Moje návyky
                 </h2>
               </div>
               <Dialog open={showMonthlyCalendar} onOpenChange={setShowMonthlyCalendar}>
                 <DialogTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="p-2 bg-amber-100 hover:bg-amber-200 border border-amber-200 rounded-xl shadow-sm"
-                  >
+                  <Button variant="ghost" size="sm" className="p-2 bg-amber-100 hover:bg-amber-200 border border-amber-200 rounded-xl shadow-sm">
                     <Calendar size={20} className="text-foreground" />
                   </Button>
                 </DialogTrigger>
-                <DialogContent 
-                  className="glass-container border-0 backdrop-blur-xl shadow-2xl max-w-none top-0 left-1/2 -translate-x-1/2 translate-y-0 w-[calc(100vw-8px)] max-h-[85vh] overflow-y-auto mt-2 sm:max-w-4xl md:max-w-5xl lg:max-w-6xl sm:top-1/2 sm:-translate-y-1/2"
-                  aria-describedby={undefined}
-                >
+                <DialogContent className="glass-container border-0 backdrop-blur-xl shadow-2xl max-w-none top-0 left-1/2 -translate-x-1/2 translate-y-0 w-[calc(100vw-8px)] max-h-[85vh] overflow-y-auto mt-2 sm:max-w-4xl md:max-w-5xl lg:max-w-6xl sm:top-1/2 sm:-translate-y-1/2" aria-describedby={undefined}>
                   <DialogHeader className="pb-1 flex-shrink-0">
                     <div className="flex items-center justify-between">
                       <DialogTitle className="text-base font-semibold text-foreground flex items-center gap-2">
@@ -147,14 +120,7 @@ export const DashboardLayout = ({
                     </div>
                   </DialogHeader>
                   <div className="overflow-y-auto flex-1 min-h-0">
-                    <MonthlyCalendar
-                      habitData={habitData}
-                      selectedMonth={monthlyCalendarDate}
-                      onMonthChange={setMonthlyCalendarDate}
-                      habits={habits}
-                      formatDate={formatDate}
-                      accessCode={accessCode}
-                    />
+                    <MonthlyCalendar habitData={habitData} selectedMonth={monthlyCalendarDate} onMonthChange={setMonthlyCalendarDate} habits={habits} formatDate={formatDate} accessCode={accessCode} />
                   </div>
                 </DialogContent>
               </Dialog>
@@ -164,10 +130,7 @@ export const DashboardLayout = ({
               <HabitCompletionCount selectedDate={selectedDate} />
             </div>
             
-            <HabitTracker 
-              selectedDate={selectedDate} 
-              onFirstInteraction={onFirstInteraction}
-            />
+            <HabitTracker selectedDate={selectedDate} onFirstInteraction={onFirstInteraction} />
           </div>
         </div>
 
@@ -176,22 +139,14 @@ export const DashboardLayout = ({
           <div className="backdrop-blur-md bg-white border border-white/40 rounded-2xl p-6 shadow-lg h-full">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-4">
-                <img 
-                  src={reflectionIcon} 
-                  alt="Daily Reflection"
-                  className="w-12 h-12 flex-shrink-0"
-                />
+                <img src={reflectionIcon} alt="Daily Reflection" className="w-12 h-12 flex-shrink-0" />
                 <h2 className="text-2xl font-semibold text-foreground">
                   Denná reflexia
                 </h2>
               </div>
               <Dialog open={showDiaryView} onOpenChange={setShowDiaryView}>
                 <DialogTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="p-2 bg-amber-100 hover:bg-amber-200 border border-amber-200 rounded-xl shadow-sm"
-                  >
+                  <Button variant="ghost" size="sm" className="p-2 bg-amber-100 hover:bg-amber-200 border border-amber-200 rounded-xl shadow-sm">
                     <NotebookPen size={20} className="text-foreground" />
                   </Button>
                 </DialogTrigger>
@@ -199,18 +154,12 @@ export const DashboardLayout = ({
                   <DialogHeader className="pb-0">
                     <DialogTitle className="text-lg font-heading">Môj denník reflexií</DialogTitle>
                   </DialogHeader>
-                   <DiaryView
-                     reflections={accessCode ? reflections : {}}
-                     formatDate={formatDate}
-                   />
+                   <DiaryView reflections={accessCode ? reflections : {}} formatDate={formatDate} />
                 </DialogContent>
               </Dialog>
             </div>
             
-            <ReflectionWidget 
-              selectedDate={selectedDate}
-              onFirstInteraction={onFirstInteraction}
-            />
+            <ReflectionWidget selectedDate={selectedDate} onFirstInteraction={onFirstInteraction} />
           </div>
         </div>
       </div>
@@ -223,21 +172,8 @@ export const DashboardLayout = ({
           ${activeWidget === 'periodka' ? 'opacity-100 scale-100 block animate-fade-in' : 'opacity-0 scale-95 hidden'}
         `}>
           <div className="backdrop-blur-md bg-white border border-white/40 rounded-2xl p-6 shadow-lg">
-            <div className="flex items-center gap-4 mb-6">
-              <img 
-                src={menstrualCalendarIcon} 
-                alt="Menstrual Calendar"
-                className="w-12 h-12 flex-shrink-0"
-              />
-              <h2 className="text-2xl font-semibold text-foreground">
-                Periodka
-              </h2>
-            </div>
-            <MenstrualDashboardLayout
-              accessCode={accessCode}
-              onFirstInteraction={onFirstInteraction}
-              compact={false}
-            />
+            
+            <MenstrualDashboardLayout accessCode={accessCode} onFirstInteraction={onFirstInteraction} compact={false} />
           </div>
         </div>
 
@@ -249,29 +185,18 @@ export const DashboardLayout = ({
           <div className="backdrop-blur-md bg-white border border-white/40 rounded-2xl p-6 shadow-lg">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-4">
-                <img 
-                  src={habitsIcon} 
-                  alt="Habits"
-                  className="w-12 h-12 flex-shrink-0"
-                />
+                <img src={habitsIcon} alt="Habits" className="w-12 h-12 flex-shrink-0" />
                 <h2 className="text-2xl font-semibold text-foreground">
                   Moje návyky
                 </h2>
               </div>
               <Dialog open={showMonthlyCalendar} onOpenChange={setShowMonthlyCalendar}>
                 <DialogTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="p-2 bg-amber-100 hover:bg-amber-200 border border-amber-200 rounded-xl shadow-sm"
-                  >
+                  <Button variant="ghost" size="sm" className="p-2 bg-amber-100 hover:bg-amber-200 border border-amber-200 rounded-xl shadow-sm">
                     <Calendar size={20} className="text-foreground" />
                   </Button>
                 </DialogTrigger>
-                <DialogContent 
-                  className="glass-container border-0 backdrop-blur-xl shadow-2xl max-w-none top-0 left-1/2 -translate-x-1/2 translate-y-0 w-[calc(100vw-8px)] max-h-[85vh] overflow-y-auto mt-2 sm:max-w-4xl md:max-w-5xl lg:max-w-6xl sm:top-1/2 sm:-translate-y-1/2"
-                  aria-describedby={undefined}
-                >
+                <DialogContent className="glass-container border-0 backdrop-blur-xl shadow-2xl max-w-none top-0 left-1/2 -translate-x-1/2 translate-y-0 w-[calc(100vw-8px)] max-h-[85vh] overflow-y-auto mt-2 sm:max-w-4xl md:max-w-5xl lg:max-w-6xl sm:top-1/2 sm:-translate-y-1/2" aria-describedby={undefined}>
                   <DialogHeader className="pb-1 flex-shrink-0">
                     <div className="flex items-center justify-between">
                       <DialogTitle className="text-base font-semibold text-foreground flex items-center gap-2">
@@ -284,14 +209,7 @@ export const DashboardLayout = ({
                     </div>
                   </DialogHeader>
                   <div className="overflow-y-auto flex-1 min-h-0">
-                    <MonthlyCalendar
-                      habitData={habitData}
-                      selectedMonth={monthlyCalendarDate}
-                      onMonthChange={setMonthlyCalendarDate}
-                      habits={habits}
-                      formatDate={formatDate}
-                      accessCode={accessCode}
-                    />
+                    <MonthlyCalendar habitData={habitData} selectedMonth={monthlyCalendarDate} onMonthChange={setMonthlyCalendarDate} habits={habits} formatDate={formatDate} accessCode={accessCode} />
                   </div>
                 </DialogContent>
               </Dialog>
@@ -301,10 +219,7 @@ export const DashboardLayout = ({
               <HabitCompletionCount selectedDate={selectedDate} />
             </div>
             
-            <HabitTracker 
-              selectedDate={selectedDate} 
-              onFirstInteraction={onFirstInteraction}
-            />
+            <HabitTracker selectedDate={selectedDate} onFirstInteraction={onFirstInteraction} />
           </div>
         </div>
 
@@ -316,22 +231,14 @@ export const DashboardLayout = ({
           <div className="backdrop-blur-md bg-white border border-white/40 rounded-2xl p-6 shadow-lg">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-4">
-                <img 
-                  src={reflectionIcon} 
-                  alt="Daily Reflection"
-                  className="w-12 h-12 flex-shrink-0"
-                />
+                <img src={reflectionIcon} alt="Daily Reflection" className="w-12 h-12 flex-shrink-0" />
                 <h2 className="text-2xl font-semibold text-foreground">
                   Denná reflexia
                 </h2>
               </div>
               <Dialog open={showDiaryView} onOpenChange={setShowDiaryView}>
                 <DialogTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="p-2 bg-amber-100 hover:bg-amber-200 border border-amber-200 rounded-xl shadow-sm"
-                  >
+                  <Button variant="ghost" size="sm" className="p-2 bg-amber-100 hover:bg-amber-200 border border-amber-200 rounded-xl shadow-sm">
                     <NotebookPen size={20} className="text-foreground" />
                   </Button>
                 </DialogTrigger>
@@ -339,21 +246,14 @@ export const DashboardLayout = ({
                   <DialogHeader className="pb-0">
                     <DialogTitle className="text-lg font-heading">Môj denník reflexií</DialogTitle>
                   </DialogHeader>
-                   <DiaryView
-                     reflections={accessCode ? reflections : {}}
-                     formatDate={formatDate}
-                   />
+                   <DiaryView reflections={accessCode ? reflections : {}} formatDate={formatDate} />
                 </DialogContent>
               </Dialog>
             </div>
             
-            <ReflectionWidget 
-              selectedDate={selectedDate}
-              onFirstInteraction={onFirstInteraction}
-            />
+            <ReflectionWidget selectedDate={selectedDate} onFirstInteraction={onFirstInteraction} />
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
