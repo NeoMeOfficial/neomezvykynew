@@ -143,6 +143,35 @@ const Index = () => {
   return (
     <div className="min-h-screen overflow-x-hidden bg-white">
       <div className="w-full max-w-none px-2 sm:px-4 py-4 sm:py-8 mx-auto">
+        {/* Navigation Buttons Row */}
+        <div className="w-full mb-4 sm:mb-6">
+          <div className="flex gap-2 overflow-x-auto pb-2 px-2">
+            <Button 
+              onClick={() => {
+                // Check if user has temporary data and prompt to save
+                if (!accessCode && temporaryStorage.hasTemporaryData()) {
+                  setShowSaveProgressDialog(true);
+                } else {
+                  window.location.href = 'https://neome.mvt.so/mj-de';
+                }
+              }}
+              className="flex items-center justify-center gap-1 rounded-3xl py-3 px-3 text-xs font-medium symptom-glass transition-all hover:opacity-90 whitespace-nowrap flex-shrink-0"
+              style={{ backgroundColor: '#FBF8F9', color: '#955F6A' }}
+            >
+              <ArrowLeft className="h-3 w-3" />
+              Naspäť
+            </Button>
+            <Button 
+              onClick={() => setShowAccessCodeValidation(true)}
+              className="flex items-center justify-center gap-1 rounded-3xl py-3 px-3 text-xs font-medium symptom-glass transition-all hover:opacity-90 whitespace-nowrap flex-shrink-0"
+              style={{ backgroundColor: '#FBF8F9', color: '#955F6A' }}
+            >
+              <Fingerprint className="h-3 w-3" />
+              Uložiť si svoje informácie
+            </Button>
+          </div>
+        </div>
+
         {/* Navigation Widgets */}
         <NavigationWidget
           accessCode={accessCode}
