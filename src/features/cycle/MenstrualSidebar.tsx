@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
-import { Clock, FileText, TrendingUp, CalendarDays, Lightbulb, Share2, AlertCircle, HelpCircle } from 'lucide-react';
+import React from 'react';
+import { Clock, TrendingUp, CalendarDays, Lightbulb, Share2, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import periodkaLogo from '@/assets/periodka-logo.png';
 import { temporaryStorage } from '@/lib/temporaryStorage';
 import { Button } from '@/components/ui/button';
 import { NextDatesInfo } from './components/NextDatesInfo';
@@ -39,25 +38,10 @@ const menuItems = [
 export function MenstrualSidebar({ activeSection, onSectionChange, onEditClick, onSettingsClick, onShareClick, accessCode, lastPeriodStart, cycleLength = 28 }: MenstrualSidebarProps) {
   const navigate = useNavigate();
   const hasTemporaryData = temporaryStorage.isSessionActive() && temporaryStorage.hasTemporaryData();
-  const [runTour, setRunTour] = useState(false);
-  
-  const startTour = () => {
-    setRunTour(true);
-  };
   
   return (
     <div className="w-80 border-r border-border/50 bg-background/95 backdrop-blur-sm" data-tour="sidebar">
       <div className="p-6">
-        <div className="flex items-start gap-3 mb-6">
-          <img 
-            src={periodkaLogo} 
-            alt="Periodka Logo" 
-            className="w-10 h-10 flex-shrink-0"
-          />
-          <h2 className="text-3xl font-caveat font-semibold" style={{ color: '#FF7782' }}>
-            Periodka
-          </h2>
-        </div>
         <nav className="space-y-2">
           {menuItems.map((item) => {
             const Icon = item.icon;
