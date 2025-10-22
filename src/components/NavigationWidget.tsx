@@ -90,54 +90,73 @@ export const NavigationWidget = ({
   }
 
   return (
-    <div className="w-full max-w-[600px] mx-auto space-y-2">
-      {/* Menstrual Cycle Section */}
-      <Collapsible 
-        open={openSections.cycle} 
-        onOpenChange={() => toggleSection('cycle')}
+    <>
+      {/* Inline compact buttons for horizontal layout */}
+      <button 
+        onClick={() => toggleSection('cycle')}
+        className="flex flex-col items-center gap-1 rounded-3xl py-2 px-3 symptom-glass transition-all hover:opacity-90 whitespace-nowrap flex-shrink-0"
+        style={{ backgroundColor: '#FBF8F9' }}
       >
-        <div className={`backdrop-blur-md bg-white border border-white/40 rounded-2xl shadow-lg transition-all duration-300 ${openSections.cycle ? 'p-0' : 'p-4'}`}>
-          <CollapsibleTrigger asChild>
-            <button className={`w-full flex flex-col items-center gap-1 p-0 mb-1 text-center focus:outline-none rounded-lg ${openSections.cycle ? 'pt-4' : ''}`}>
-              <img 
-                src={menstrualCalendarIcon} 
-                alt="Menstrual Calendar"
-                className={`${getIconSize(openSections.cycle)} transition-all duration-300 flex-shrink-0`}
-              />
-              <h2 className="text-mobile-lg md:text-lg font-semibold text-foreground">
-                Periodka
-              </h2>
-            </button>
-          </CollapsibleTrigger>
-          <CollapsibleContent className="animate-accordion-down">
+        <img 
+          src={menstrualCalendarIcon} 
+          alt="Menstrual Calendar"
+          className="w-8 h-8 flex-shrink-0"
+        />
+        <span className="text-xs font-medium" style={{ color: '#955F6A' }}>
+          Periodka
+        </span>
+      </button>
+      
+      <button 
+        onClick={() => toggleSection('habits')}
+        className="flex flex-col items-center gap-1 rounded-3xl py-2 px-3 symptom-glass transition-all hover:opacity-90 whitespace-nowrap flex-shrink-0"
+        style={{ backgroundColor: '#FBF8F9' }}
+      >
+        <img 
+          src={habitsIcon} 
+          alt="Habits"
+          className="w-8 h-8 flex-shrink-0"
+        />
+        <span className="text-xs font-medium" style={{ color: '#955F6A' }}>
+          Moje návyky
+        </span>
+      </button>
+      
+      <button 
+        onClick={() => toggleSection('reflection')}
+        className="flex flex-col items-center gap-1 rounded-3xl py-2 px-3 symptom-glass transition-all hover:opacity-90 whitespace-nowrap flex-shrink-0"
+        style={{ backgroundColor: '#FBF8F9' }}
+      >
+        <img 
+          src={reflectionIcon} 
+          alt="Daily Reflection"
+          className="w-8 h-8 flex-shrink-0"
+        />
+        <span className="text-xs font-medium" style={{ color: '#955F6A' }}>
+          Denná reflexia
+        </span>
+      </button>
+      
+      {/* Expanded sections - shown below the row */}
+      {openSections.cycle && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-start justify-center pt-20 px-2" onClick={() => toggleSection('cycle')}>
+          <div className="backdrop-blur-md bg-white border border-white/40 rounded-2xl shadow-lg w-full max-w-[600px] max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <MenstrualDashboardLayout
               accessCode={accessCode}
               onFirstInteraction={onFirstInteraction}
             />
-          </CollapsibleContent>
+          </div>
         </div>
-      </Collapsible>
-
-      {/* Habits Section */}
-      <Collapsible 
-        open={openSections.habits} 
-        onOpenChange={() => toggleSection('habits')}
-      >
-        <div className={`backdrop-blur-md bg-white border border-white/40 rounded-2xl p-4 shadow-lg transition-all duration-300 relative`}>
-          {/* Top Right Controls for Habits */}
-          {openSections.habits && (
-            <div className="absolute top-3 right-3 flex items-center gap-2">
-              <div className="text-sm font-medium text-foreground">
-                Tvoj kalendár
-              </div>
+      )}
+      
+      {openSections.habits && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-start justify-center pt-20 px-2" onClick={() => toggleSection('habits')}>
+          <div className="backdrop-blur-md bg-white border border-white/40 rounded-2xl p-4 shadow-lg w-full max-w-[600px] max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-foreground">Moje návyky</h2>
               <Dialog open={showMonthlyCalendar} onOpenChange={setShowMonthlyCalendar}>
                 <DialogTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="p-1.5 bg-amber-100 hover:bg-amber-200 border border-amber-200 rounded-xl shadow-sm"
-                    onClick={(e) => e.stopPropagation()}
-                  >
+                  <Button variant="ghost" size="sm" className="p-1.5 bg-amber-100 hover:bg-amber-200 border border-amber-200 rounded-xl shadow-sm">
                     <Calendar size={20} className="text-foreground" />
                   </Button>
                 </DialogTrigger>
@@ -169,56 +188,23 @@ export const NavigationWidget = ({
                 </DialogContent>
               </Dialog>
             </div>
-          )}
-          
-          <CollapsibleTrigger asChild>
-            <button className="w-full flex flex-col items-center p-0 mb-1 text-center focus:outline-none rounded-lg">
-              <img 
-                src={habitsIcon} 
-                alt="Habits"
-                className={`${getIconSize(openSections.habits)} transition-all duration-300 flex-shrink-0`}
-              />
-              <h2 className="text-mobile-lg md:text-lg font-semibold text-foreground mt-1">
-                Moje návyky
-              </h2>
-            </button>
-          </CollapsibleTrigger>
-          
-          {openSections.habits && (
-            <div className="flex items-center justify-center mt-2 mb-1">
-              <HabitCompletionCount selectedDate={selectedDate} />
-            </div>
-          )}
-          
-          <CollapsibleContent className="animate-accordion-down pb-1">
+            <HabitCompletionCount selectedDate={selectedDate} />
             <HabitTracker 
               selectedDate={selectedDate} 
               onFirstInteraction={onFirstInteraction}
             />
-          </CollapsibleContent>
+          </div>
         </div>
-      </Collapsible>
-
-      {/* Reflection Section */}
-      <Collapsible 
-        open={openSections.reflection} 
-        onOpenChange={() => toggleSection('reflection')}
-      >
-        <div className={`backdrop-blur-md bg-white border border-white/40 rounded-2xl p-4 shadow-lg transition-all duration-300 relative`}>
-          {/* Top Right Controls for Reflection */}
-          {openSections.reflection && (
-            <div className="absolute top-3 right-3 flex items-center gap-2">
-              <div className="text-sm font-medium text-foreground">
-                Tvoj diár
-              </div>
+      )}
+      
+      {openSections.reflection && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-start justify-center pt-20 px-2" onClick={() => toggleSection('reflection')}>
+          <div className="backdrop-blur-md bg-white border border-white/40 rounded-2xl p-4 shadow-lg w-full max-w-[600px] max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-foreground">Denná reflexia</h2>
               <Dialog open={showDiaryView} onOpenChange={setShowDiaryView}>
                 <DialogTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="p-1.5 bg-amber-100 hover:bg-amber-200 border border-amber-200 rounded-xl shadow-sm"
-                    onClick={(e) => e.stopPropagation()}
-                  >
+                  <Button variant="ghost" size="sm" className="p-1.5 bg-amber-100 hover:bg-amber-200 border border-amber-200 rounded-xl shadow-sm">
                     <NotebookPen size={20} className="text-foreground" />
                   </Button>
                 </DialogTrigger>
@@ -226,36 +212,20 @@ export const NavigationWidget = ({
                   <DialogHeader className="pb-0">
                     <DialogTitle className="text-lg font-heading">Môj denník reflexií</DialogTitle>
                   </DialogHeader>
-                   <DiaryView
-                     reflections={accessCode ? reflections : {}}
-                     formatDate={formatDate}
-                   />
+                  <DiaryView
+                    reflections={accessCode ? reflections : {}}
+                    formatDate={formatDate}
+                  />
                 </DialogContent>
               </Dialog>
             </div>
-          )}
-          
-          <CollapsibleTrigger asChild>
-            <button className="w-full flex flex-col items-center p-0 mb-1 text-center focus:outline-none rounded-lg">
-              <img 
-                src={reflectionIcon} 
-                alt="Daily Reflection"
-                className={`${getIconSize(openSections.reflection)} transition-all duration-300 flex-shrink-0`}
-              />
-              <h2 className="text-mobile-lg md:text-lg font-semibold text-foreground mt-1">
-                Denná reflexia
-              </h2>
-            </button>
-          </CollapsibleTrigger>
-          
-          <CollapsibleContent className="animate-accordion-down pb-1">
             <ReflectionWidget 
               selectedDate={selectedDate}
               onFirstInteraction={onFirstInteraction}
             />
-          </CollapsibleContent>
+          </div>
         </div>
-      </Collapsible>
-    </div>
+      )}
+    </>
   );
 };
