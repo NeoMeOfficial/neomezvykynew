@@ -144,8 +144,8 @@ const Index = () => {
     <div className="min-h-screen overflow-x-hidden bg-white">
       <div className="w-full max-w-none px-2 sm:px-4 py-4 sm:py-8 mx-auto">
         {/* Navigation Buttons and Widgets in One Row */}
-        <div className="w-full px-2 mb-4 sm:mb-6">
-          <div className="flex gap-2 overflow-x-auto pb-2">
+        <div className="w-full mb-4 sm:mb-6">
+          <div className="flex gap-2 overflow-x-auto pb-2 px-2">
             <Button 
               onClick={() => {
                 // Check if user has temporary data and prompt to save
