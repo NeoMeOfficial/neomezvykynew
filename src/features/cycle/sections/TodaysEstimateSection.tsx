@@ -1,10 +1,9 @@
 import React from 'react';
-import { Clock, Settings } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Clock } from 'lucide-react';
 import { WellnessDonutChart } from '../WellnessDonutChart';
 import { SymptomTracker } from '../SymptomTracker';
+import { DailyPlanView } from '../DailyPlanView';
 import { CycleData, DerivedState, PhaseKey } from '../types';
-import { useCycleTips } from '@/hooks/useCycleTips';
 interface TodaysEstimateSectionProps {
   derivedState: DerivedState;
   selectedOutcome: 'next-period' | 'fertile-days' | null;
@@ -28,10 +27,6 @@ export function TodaysEstimateSection({
   lastPeriodStart,
   onSettingsClick
 }: TodaysEstimateSectionProps) {
-  const {
-    data: tips = [],
-    isLoading: tipsLoading
-  } = useCycleTips(currentDay);
   return <>
       {/* Layered Glass - Multiple glass layers creating depth between header/content */}
       <div className="relative">
@@ -61,9 +56,6 @@ export function TodaysEstimateSection({
                 Odhad na dnes
               </h3>
             </div>
-            {onSettingsClick && <Button variant="outline" size="sm" onClick={onSettingsClick} className="lg:hidden border-[#FF7782] text-[#955F6A] hover:bg-[#FF7782]/10 text-xs px-3 py-1">
-                Nastavenia
-              </Button>}
           </div>
         </div>
 
@@ -77,36 +69,20 @@ export function TodaysEstimateSection({
             <WellnessDonutChart derivedState={derivedState} selectedOutcome={selectedOutcome} cycleData={cycleData} className="mb-4" />
           </div>
           
-          {/* Current Phase Information */}
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <h4 className="text-base font-medium mb-2 leading-tight" style={{
-              color: '#955F6A'
-            }}>
-                Čo môžeš dnes očakávať:
-              </h4>
-              {tipsLoading ? <p className="text-sm leading-relaxed opacity-90" style={{
-              color: '#955F6A'
-            }}>
-                  Načítavam odporúčania...
-                </p> : tips.length > 0 ? <div className="space-y-2">
-                  {tips.map(tip => <div key={tip.id} className="text-sm leading-relaxed opacity-90" style={{
-                color: '#955F6A'
-              }}>
-                      <span className="font-medium">{tip.category === 'energy' ? '⚡ Energia' : tip.category === 'mood' ? '💭 Nálada' : tip.category === 'nutrition' ? '🍎 Výživa' : tip.category === 'activity' ? '🏃‍♀️ Aktivita' : '💖 Starostlivosť o seba'}:</span> {tip.tip_text}
-                    </div>)}
-                </div> : <p className="text-sm leading-relaxed opacity-90" style={{
-              color: '#955F6A'
-            }}>
-                  Zatiaľ nie sú k dispozícii žiadne odporúčania pre túto fázu.
-                </p>}
-            </div>
-            
-            {/* How do you feel today section */}
-            <div className="space-y-2" data-tour="symptom-tracker">
-              
-              <SymptomTracker currentPhase={currentPhase.key as PhaseKey} currentDay={currentDay} accessCode={accessCode} lastPeriodStart={lastPeriodStart} />
-            </div>
+          {/* Daily Plan View - NEW COMPONENT */}
+          <DailyPlanView 
+            currentDay={currentDay} 
+            currentPhase={derivedState.currentPhase} 
+          />
+          
+          {/* How do you feel today section */}
+          <div className="space-y-2 mt-6" data-tour="symptom-tracker">
+            <SymptomTracker 
+              currentPhase={currentPhase.key as PhaseKey} 
+              currentDay={currentDay} 
+              accessCode={accessCode} 
+              lastPeriodStart={lastPeriodStart} 
+            />
           </div>
         </div>
       </div>

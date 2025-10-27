@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -12,57 +12,60 @@ serve(async (req) => {
   }
 
   try {
-    const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
-    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-
-    if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
-      throw new Error("Missing required environment variables");
-    }
+    const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
+    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    const { regenerate = false } = await req.json();
 
-    // Generate tips for all 28 days
-    const days = Array.from({ length: 28 }, (_, i) => i + 1);
-
+    console.log('Starting bulk generation of 28-day cycle tips...');
+    
     const results = [];
-    let totalGenerated = 0;
-    let totalFailed = 0;
+    let successCount = 0;
+    let failureCount = 0;
 
-    // Generate tips for each day
-    for (const day of days) {
+    for (let day = 1; day <= 28; day++) {
       try {
         console.log(`Generating tips for day ${day}...`);
         
         const { data, error } = await supabase.functions.invoke('generate-cycle-tips', {
-          body: { day, regenerate: true }
+          body: { day, regenerate }
         });
 
-        if (error) {
-          console.error(`Failed for day ${day}:`, error);
-          totalFailed++;
-          results.push({ day, success: false, error: error.message });
-        } else {
-          console.log(`Success for day ${day}`);
-          totalGenerated += data.tips?.length || 0;
-          results.push({ day, success: true, tipsCount: data.tips?.length });
-        }
+        if (error) throw error;
 
-        // Add a small delay to avoid rate limiting
+        results.push({
+          day,
+          success: true,
+          data
+        });
+        successCount++;
+        
+        console.log(`✓ Day ${day} completed`);
+        
+        // Small delay to avoid rate limiting
         await new Promise(resolve => setTimeout(resolve, 1000));
-      } catch (err) {
-        console.error(`Error for day ${day}:`, err);
-        totalFailed++;
-        results.push({ day, success: false, error: err.message });
+        
+      } catch (error) {
+        console.error(`✗ Day ${day} failed:`, error);
+        results.push({
+          day,
+          success: false,
+          error: error.message
+        });
+        failureCount++;
       }
     }
 
+    console.log(`Bulk generation complete: ${successCount} success, ${failureCount} failures`);
+
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         success: true,
         summary: {
-          totalGenerated,
-          totalFailed,
-          totalAttempts: 28
+          total: 28,
+          successful: successCount,
+          failed: failureCount
         },
         results
       }),
@@ -73,10 +76,7 @@ serve(async (req) => {
     console.error('Error in bulk-generate-tips:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
-      { 
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      }
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 });

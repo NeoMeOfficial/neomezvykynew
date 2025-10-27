@@ -146,8 +146,14 @@ export type Database = {
           created_at: string
           created_by: string
           day: number
+          expectation_text: string | null
           id: string
           is_approved: boolean
+          mind_text: string | null
+          movement_text: string | null
+          nutrition_text: string | null
+          phase: string | null
+          subphase: string | null
           tip_text: string
           updated_at: string
         }
@@ -156,8 +162,14 @@ export type Database = {
           created_at?: string
           created_by?: string
           day?: number
+          expectation_text?: string | null
           id?: string
           is_approved?: boolean
+          mind_text?: string | null
+          movement_text?: string | null
+          nutrition_text?: string | null
+          phase?: string | null
+          subphase?: string | null
           tip_text: string
           updated_at?: string
         }
@@ -166,8 +178,14 @@ export type Database = {
           created_at?: string
           created_by?: string
           day?: number
+          expectation_text?: string | null
           id?: string
           is_approved?: boolean
+          mind_text?: string | null
+          movement_text?: string | null
+          nutrition_text?: string | null
+          phase?: string | null
+          subphase?: string | null
           tip_text?: string
           updated_at?: string
         }
@@ -381,22 +399,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      generate_access_code: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      generate_random_code: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      generate_share_code: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      populate_access_codes: {
-        Args: Record<PropertyKey, never>
-        Returns: number
-      }
+      generate_access_code: { Args: never; Returns: string }
+      generate_random_code: { Args: never; Returns: string }
+      generate_share_code: { Args: never; Returns: string }
+      populate_access_codes: { Args: never; Returns: number }
     }
     Enums: {
       [_ in never]: never
