@@ -23,6 +23,8 @@ serve(async (req) => {
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
     const { day, regenerate } = await req.json();
 
+    console.log(`📍 Generating day ${day}, regenerate: ${regenerate}`);
+
     if (!day || day < 1 || day > 28) {
       throw new Error('Invalid day. Must be between 1 and 28.');
     }
@@ -379,21 +381,30 @@ Formátuj do 4 sekcií pomocou presného textu z master template. Žiadne nové 
     }
 
     const generatedContent = JSON.parse(toolCall.function.arguments);
-    console.log(`Generated tips for day ${day}:`, generatedContent);
+    console.log(`✨ Generated content for day ${day}:`, {
+      expectation: generatedContent.expectation?.substring(0, 50) + '...',
+      nutrition: generatedContent.nutrition?.substring(0, 50) + '...',
+      mind: generatedContent.mind?.substring(0, 50) + '...',
+      movement: generatedContent.movement?.substring(0, 50) + '...'
+    });
 
     // Delete existing tips if regenerate = true
     if (regenerate) {
+      console.log(`🗑️ Deleting existing plan for day ${day}...`);
       const { error: deleteError } = await supabase
         .from('cycle_tips')
         .delete()
         .eq('day', day);
       
       if (deleteError) {
-        console.error('Error deleting old tips:', deleteError);
+        console.error('❌ Error deleting old plan:', deleteError);
+      } else {
+        console.log(`✅ Old plan deleted for day ${day}`);
       }
     }
 
-    // Insert new tip into database
+    // Insert new plan into database
+    console.log(`💾 Inserting plan for day ${day} into database...`);
     const { data: insertData, error: insertError } = await supabase
       .from('cycle_tips')
       .insert({
@@ -413,9 +424,11 @@ Formátuj do 4 sekcií pomocou presného textu z master template. Žiadne nové 
       .single();
 
     if (insertError) {
-      console.error('Error inserting tips:', insertError);
+      console.error('❌ Error inserting plan:', insertError);
       throw insertError;
     }
+
+    console.log(`✅ Day ${day} plan successfully saved to database`);
 
     return new Response(
       JSON.stringify({ 

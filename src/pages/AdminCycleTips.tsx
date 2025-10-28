@@ -243,33 +243,49 @@ export default function AdminCycleTips() {
     <div className="min-h-screen bg-gradient-to-br from-rose-50 to-pink-50 p-4 sm:p-8">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold" style={{ color: '#955F6A' }}>
-              Admin - Tipy pre cyklus
-            </h1>
-            <p className="text-sm mt-1" style={{ color: '#955F6A', opacity: 0.7 }}>
-              Schvaľuj, upravuj a generuj AI tipy pre jednotlivé fázy cyklu
-            </p>
+        <div className="space-y-4">
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold" style={{ color: '#955F6A' }}>
+                Admin - 28-dňový plán
+              </h1>
+              <p className="text-sm mt-1" style={{ color: '#955F6A', opacity: 0.7 }}>
+                Schvaľuj, upravuj a generuj AI plány pre každý deň cyklu
+              </p>
+            </div>
+            
+            <Button
+              onClick={handleBulkGenerate}
+              disabled={bulkGenerating}
+              className="bg-gradient-to-r from-[#FF7782] to-[#FF9AA1] text-white"
+            >
+              {bulkGenerating ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Generujem (cca 1 min)...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Vygenerovať 28-dňový plán
+                </>
+              )}
+            </Button>
           </div>
-          
-          <Button
-            onClick={handleBulkGenerate}
-            disabled={bulkGenerating}
-            className="bg-gradient-to-r from-[#FF7782] to-[#FF9AA1] text-white"
-          >
-            {bulkGenerating ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Generujem...
-              </>
-            ) : (
-              <>
-                <Sparkles className="w-4 h-4 mr-2" />
-                Vygenerovať všetky AI tipy
-              </>
-            )}
-          </Button>
+
+          {/* Instructions */}
+          <Card className="p-4 bg-blue-50 border-blue-200">
+            <h3 className="font-semibold mb-2" style={{ color: '#955F6A' }}>
+              📋 Návod na použitie
+            </h3>
+            <ol className="text-sm space-y-1" style={{ color: '#955F6A', opacity: 0.9 }}>
+              <li>1️⃣ Klikni na "Vygenerovať 28-dňový plán" pre vytvorenie všetkých denných plánov s AI</li>
+              <li>2️⃣ Skontroluj každý deň - AI používa presný obsah z PDF (žiadne halucinácie)</li>
+              <li>3️⃣ Upravuj texty podľa potreby (gramatika, plynulosť)</li>
+              <li>4️⃣ Schvaľuj denné plány - len schválené sa zobrazia užívateľom</li>
+              <li>5️⃣ Použij "Re-generovať" pre nové verzie konkrétneho dňa</li>
+            </ol>
+          </Card>
         </div>
 
         {/* Stats */}
