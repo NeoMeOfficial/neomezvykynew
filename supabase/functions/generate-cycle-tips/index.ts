@@ -278,11 +278,29 @@ TÓN KOMUNIKÁCIE:
 - Žiadne klišé, žiadne "si bohyňa svetla"
 - Používaj: "môžeš", "skús", "pomôže ti" (NIE "musíš")
 
-PRAVIDLÁ:
+PRAVIDLÁ PRE FORMÁTOVANIE:
 1. Použi PRESNÝ text z master template
 2. Vyber z poskytnutých zoznamov (potraviny, benefity, techniky)
 3. Žiadne vymýšľanie nových faktov alebo informácií
 4. Len gramatické úpravy pre plynulosť
+
+KRITICKÉ: VÝSTUP MUSÍ BYŤ ČISTÝ TEXT
+- NIKDY nepouži markdown formátovanie (###, **, atď.)
+- NIKDY neuvádzaj názvy sekcií ("Insight:", "Čo potrebuješ?", "Kľúčové živiny a potraviny:", atď.)
+- NIKDY nekopíruj štruktúru template do výstupu
+- Píš len plynulé odseky prirodzeného textu
+- Template je len referencia, nie text na kopírovanie
+
+PRÍKLAD ZLÉHO VÝSTUPU (NIKDY NEROB):
+"Insight: Dnes je prirodzená citlivosť.
+
+**Čo potrebuješ?**
+Stabilizovať cukor v krvi..."
+
+PRÍKLAD DOBRÉHO VÝSTUPU (VŽY TAKTO):
+"Dnes je prirodzená citlivosť na stres. Môžeš sa cítiť emočne citlivejšie.
+
+Tvoje telo teraz potrebuje stabilizovať hladinu cukru v krvi..."
 
 ZDROJE (overené):
 - Dr. Mary Claire Haver (menopause & hormonal health)
@@ -292,25 +310,25 @@ ZDROJE (overené):
 
     const userPrompt = `Vytvor obsah pre DEŇ ${day} v ${phase}${subphase ? ` (${subphase})` : ''} fáze.
 
-MASTER TEMPLATE (SOURCE OF TRUTH):
+MASTER TEMPLATE - REFERENCIA (použij obsah, nie štruktúru):
 Hormóny: ${template.hormones}
 Očakávanie: ${template.expectation}
 Telo: ${template.body}
 Emócie: ${template.emotional}
 
-STRAVA:
+STRAVA - REFERENCIA:
 Potreby: ${template.nutrition.needs.join(', ')}
 Kľúčové živiny: ${template.nutrition.keyNutrients.join(', ')}
 Vyber 6 RÔZNYCH potravín z tohto zoznamu: ${template.nutrition.foods.join(', ')}
 Tip: ${template.nutrition.tip}
 
-MYSEĽ:
+MYSEĽ - REFERENCIA:
 Insight: ${template.mind.insight}
 Technika (použi túto): ${template.mind.techniques[techniqueIndex]}
 Benefit: ${template.mind.benefit}
 Myšlienka dňa (použi túto): ${template.mind.thoughts?.[thoughtIndex] || template.mind.thoughts?.[0]}
 
-POHYB:
+POHYB - REFERENCIA:
 Kontext: ${template.movement.context}
 Intenzita: ${template.movement.intensity}
 NeoMe: ${template.movement.neome}
@@ -318,7 +336,13 @@ Kardio: ${template.movement.cardio || "Žiadne"}
 Prechádzka benefit (použi tento): ${template.movement.walkBenefits[walkBenefitIndex]}
 
 ÚLOHA:
-Formátuj do 4 sekcií pomocou presného textu z master template. Žiadne nové fakty!`;
+Napíš 4 sekcie ako plynulé textové odseky. Použi obsah z referencie, ale NIKDY neuvádzaj názvy polí ani markdown.
+
+PRÍKLAD:
+expectation: "Dnes môžeš pociťovať nízku energiu a rýchlejšie vyčerpanie, keďže estrogén aj progesterón sú nízko."
+nutrition: "Tvoje telo teraz potrebuje znížiť zápal, doplniť železo a podporiť trávenie teplými jedlami. Skús kombinovať vajcia, špenát, jahody, losos, quinoa a kurkumu. Tieto potraviny dodajú železo, vitamín C a omega-3 mastné kyseliny. Tip: Kombinuj železo s vitamínom C pre lepšiu vstrebateľnosť."
+
+NIKDY nepíš: "**Čo potrebuješ?**" alebo "Kľúčové živiny:" - len plynulé odseky!`;
 
     // Call Lovable AI with tool calling for structured output
     const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
@@ -343,19 +367,19 @@ Formátuj do 4 sekcií pomocou presného textu z master template. Žiadne nové 
               properties: {
                 expectation: {
                   type: 'string',
-                  description: 'Čo môžem dnes očakávať? (1-2 vety, hormonálny kontext)'
+                  description: 'Čo môžem dnes očakávať? Len plynulý text, 1-2 vety o hormonálnom kontexte bez markdown alebo názvov polí.'
                 },
                 nutrition: {
                   type: 'string',
-                  description: 'Strava: 3 odseky (živiny, potraviny, tip)'
+                  description: 'Strava ako 3 plynulé odseky: potreby tela, konkrétne potraviny, praktický tip. Čistý text bez markdown, hviezdičiek alebo názvov sekcií.'
                 },
                 mind: {
                   type: 'string',
-                  description: 'Myseľ: 4 odseky (insight, návyk, benefit, myšlienka) max 90 slov'
+                  description: 'Myseľ ako 4 plynulé odseky: insight, dychová technika, benefit, afirmácia. Max 90 slov. Čistý text bez markdown alebo "Insight:", "Technika:" atď.'
                 },
                 movement: {
                   type: 'string',
-                  description: 'Pohyb: 5 odsekov (hormonálny kontext, intenzita, NeoMe, kardio, prechádzka)'
+                  description: 'Pohyb ako 5 plynulých odsekov: hormonálny kontext, intenzita cvičenia, NeoMe odporúčanie, kardio rady, benefit prechádzky. Čistý text bez markdown alebo názvov polí.'
                 }
               },
               required: ['expectation', 'nutrition', 'mind', 'movement']
