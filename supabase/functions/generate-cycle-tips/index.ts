@@ -21,29 +21,107 @@ serve(async (req) => {
     }
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-    const { day, regenerate } = await req.json();
+    const { day, regenerate = false, cycleLength = 28 } = await req.json();
 
-    console.log(`📍 Generating day ${day}, regenerate: ${regenerate}`);
+    console.log(`📍 Generating day ${day}, regenerate: ${regenerate}, cycleLength: ${cycleLength}`);
 
-    if (!day || day < 1 || day > 28) {
-      throw new Error('Invalid day. Must be between 1 and 28.');
+    if (!day || day < 1 || day > cycleLength || cycleLength < 25 || cycleLength > 35) {
+      throw new Error(`Invalid input. Day must be 1-${cycleLength}, cycle length must be 25-35.`);
     }
 
-    // Determine phase and subphase based on day
-    const getPhaseInfo = (d: number) => {
-      if (d >= 1 && d <= 5) return { phase: 'menstrual', subphase: null };
-      if (d >= 6 && d <= 12) return { phase: 'follicular', subphase: null };
-      if (d >= 13 && d <= 15) return { phase: 'ovulation', subphase: null };
-      // Luteal: 16-28 (13 days total)
-      const lutealDay = d - 15;
-      if (lutealDay <= 4) return { phase: 'luteal', subphase: 'early' }; // 16-19
-      if (lutealDay <= 9) return { phase: 'luteal', subphase: 'mid' };   // 20-24
-      return { phase: 'luteal', subphase: 'late' }; // 25-28
+    // Dynamic phase calculation for different cycle lengths (25-35 days)
+    const calculatePhaseRanges = (cycleLength: number) => {
+      // Menstrual phase: always days 1-5
+      const menstrualEnd = 5;
+      
+      // Luteal phase: typically 12-14 days before next period
+      const lutealLength = Math.round(cycleLength * 0.43); // ~43% of cycle (12-15 days for 28-35 day cycles)
+      const lutealStart = cycleLength - lutealLength + 1;
+      
+      // Ovulation: typically 3 days in the middle
+      const ovulationLength = 3;
+      const ovulationStart = Math.round((menstrualEnd + lutealStart) / 2) - 1;
+      const ovulationEnd = ovulationStart + ovulationLength - 1;
+      
+      // Follicular: from end of menstrual to start of ovulation
+      const follicularStart = menstrualEnd + 1;
+      const follicularEnd = ovulationStart - 1;
+      
+      // Luteal subphases
+      const lutealEarlyEnd = lutealStart + Math.round(lutealLength * 0.31) - 1; // ~31% of luteal
+      const lutealMidEnd = lutealStart + Math.round(lutealLength * 0.69) - 1;   // ~69% of luteal
+      
+      return {
+        menstrual: { start: 1, end: menstrualEnd },
+        follicular: { start: follicularStart, end: follicularEnd },
+        ovulation: { start: ovulationStart, end: ovulationEnd },
+        lutealEarly: { start: lutealStart, end: lutealEarlyEnd },
+        lutealMid: { start: lutealEarlyEnd + 1, end: lutealMidEnd },
+        lutealLate: { start: lutealMidEnd + 1, end: cycleLength }
+      };
     };
 
-    const { phase, subphase } = getPhaseInfo(day);
+    // Updated getPhaseInfo to accept cycle length
+    const getPhaseInfoDynamic = (d: number, cycleLength: number) => {
+      const ranges = calculatePhaseRanges(cycleLength);
+      
+      if (d >= ranges.menstrual.start && d <= ranges.menstrual.end) 
+        return { phase: 'menstrual', subphase: null };
+      if (d >= ranges.follicular.start && d <= ranges.follicular.end) 
+        return { phase: 'follicular', subphase: null };
+      if (d >= ranges.ovulation.start && d <= ranges.ovulation.end) 
+        return { phase: 'ovulation', subphase: null };
+      if (d >= ranges.lutealEarly.start && d <= ranges.lutealEarly.end) 
+        return { phase: 'luteal', subphase: 'early' };
+      if (d >= ranges.lutealMid.start && d <= ranges.lutealMid.end) 
+        return { phase: 'luteal', subphase: 'mid' };
+      if (d >= ranges.lutealLate.start && d <= ranges.lutealLate.end) 
+        return { phase: 'luteal', subphase: 'late' };
+        
+      return { phase: 'menstrual', subphase: null }; // fallback
+    };
 
-    // MASTER TEMPLATES - Direct from PDF (SOURCE OF TRUTH)
+    // Dynamic cardio recommendation based on cycle length
+    const getCardioRecommendation = (day: number, cycleLength: number): string | null => {
+      const ranges = calculatePhaseRanges(cycleLength);
+      
+      // Helper: get "every 3rd day" within a phase
+      const isCardioDay = (day: number, phaseStart: number, phaseEnd: number, interval: number = 3): boolean => {
+        const dayInPhase = day - phaseStart + 1;
+        return dayInPhase % interval === 1; // 1st, 4th, 7th, etc.
+      };
+      
+      // Follicular phase: every 3rd day (e.g., day 6, 9, 12 for 28-day cycle)
+      if (day >= ranges.follicular.start && day <= ranges.follicular.end) {
+        if (isCardioDay(day, ranges.follicular.start, ranges.follicular.end)) {
+          return "Dnes by mal byť dobrý deň na 20-30 minút intervalového kardia (1 minútu rýchlo, 1 minútu voľne). Vyber si, čo ti vyhovuje - beh, bicykel, švihadlo alebo eliptický trenažér.";
+        }
+      }
+      
+      // Ovulation phase: last day of ovulation only (to maintain 3-day gap from follicular)
+      if (day === ranges.ovulation.end) {
+        return "Dnes by mal byť ideálny deň pre intervalové kardio - skús 20-30 minút v pomere 2:1 alebo 4:3 (2 minúty naplno, 1 minúta vydychové tempo, alebo 4 minúty naplno, 3 minúty vydychové tempo). Vyber si beh, bicykel, švihadlo alebo eliptický trenažér.";
+      }
+      
+      // Early Luteal phase: 3rd day after ovulation end
+      const earlyLutealCardioDay = ranges.ovulation.end + 3;
+      if (day === earlyLutealCardioDay && day <= ranges.lutealEarly.end) {
+        return "Môžeš ešte zaradiť intervalový tréning, ale počúvaj svoje telo - 20-30 minút v pomere 1:1. Skús beh, bicykel, švihadlo alebo eliptický trenažér.";
+      }
+      
+      // Mid Luteal phase: every 3rd day (e.g., day 21, 24 for 28-day cycle)
+      if (day >= ranges.lutealMid.start && day <= ranges.lutealMid.end) {
+        if (isCardioDay(day, ranges.lutealMid.start, ranges.lutealMid.end)) {
+          return "Dnes môžeš skúsiť 20-30 minút steady kardia v rovnakom tempe, bez intervalov. Vyber si beh, bicykel alebo eliptický trenažér.";
+        }
+      }
+      
+      return null; // no cardio for menstrual, late luteal, and non-cardio days
+    };
+
+    const { phase, subphase } = getPhaseInfoDynamic(day, cycleLength);
+
+    // MASTER TEMPLATES - UPDATED with new content and softer language
     const masterTemplates: Record<string, any> = {
       menstrual: {
         hormones: "Estrogén aj progesterón sú nízko",
@@ -56,27 +134,31 @@ serve(async (req) => {
           foods: ["vajcia", "tofu", "cícer", "šošovica", "hovädzie mäso", "jahody", "pomaranč", "kiwi", 
                   "granátové jablko", "špenát", "kel", "brokolica", "červená repa", "losos", "sardinky", 
                   "chia", "ľan", "kurkuma", "zázvor", "vývary", "polievky", "ovsená kaša", "quinoa"],
-          tip: "Kombinuj železo + vitamín C pre lepšiu vstrebateľnosť. Teplé jedlá uľahčujú trávenie."
+          tip: "Dopraj si kombinovať železo s vitamínom C pre lepšiu vstrebateľnosť. Teplé jedlá ti uľahčia trávenie."
         },
         mind: {
-          insight: "Dnes je prirodzená citlivosť a potreba pokoja.",
-          techniques: [
-            "Predĺžený výdych (nádych 4, výdych 6) upokojí nervový systém.",
-            "Journaling: Čo viem dnes zjednodušiť?"
-          ],
-          benefit: "Pomôže ti to upokоjiť nervový systém a znížiť tlak.",
-          thoughts: [
-            "Som v bezpečí. Nemusím dnes veľa dávať.",
-            "Moje telo potrebuje oddych – a to je v poriadku.",
-            "Dnes si dovolím spomalit."
+          practicalThoughts: [
+            "Dnes si dovoľ urobiť menej. Aj ticho a oddych sú súčasť regenerácie.",
+            "Tvoje telo pracuje naplno, aj keď ty odpočívaš – dopraj mu pokoj.",
+            "Ak sa cítiš preťažená, vyber si jednu vec, ktorú dnes neurobíš.",
+            "Skús si večer dať teplý kúpeľ alebo sprchu – pomôže ti uvoľniť napätie v bruchu.",
+            "Namiesto plánovania sa len pýtaj: čo teraz naozaj potrebujem?"
           ]
         },
         movement: {
           context: "Nízka energia, citlivé telo.",
-          intensity: "Strečing / jemný pilates (5-15 min)",
-          neome: "5-min strečing pre panvu a spodný chrbát",
-          cardio: "",
-          walkBenefits: ["uvoľní kŕče", "zníži úzkosť", "zlepší náladu cez endorfíny"]
+          intensity: "Strečing alebo jemný pilates",
+          neome: "Strečing pre panvu a spodný chrbát",
+          walkBenefits: [
+            "Prechádzka ti pomôže uvoľniť napätie, ktoré sa ti hromadilo celý deň.",
+            "Znížiš stres, ktorý možno pociťuješ.",
+            "Vyčistíš si hlavu od nekonečných myšlienok.",
+            "Zlepšíš náladu vďaka prirodzenému dopamínu.",
+            "Krátka chôdza ťa vráti späť „do tela", nie do úloh.",
+            "Pomôže ti mať kvalitnejší spánok — aj keď máš milión vecí v hlave.",
+            "Uvoľníš stuhnuté svaly.",
+            "Vyrovnáš si hormóny a upokojíš nervový systém."
+          ]
         }
       },
       follicular: {
@@ -90,27 +172,33 @@ serve(async (req) => {
           foods: ["vajcia", "losos", "tofu", "tempeh", "grécky jogurt", "fazuľa", "bobuľové ovocie", 
                   "mango", "jablko", "hrozno", "špenát", "kel", "paprika", "brokolica", "cuketa",
                   "quinoa", "ovos", "bataty", "ryža natural", "chia", "ľan", "avokádo", "olivy", "orechy"],
-          tip: "Bielkoviny v každom jedle (25-30g). Pravidelné jedlá každé 3-4 hodiny."
+          tip: "Dopraj si dostatok bielkovin (25-30g) do každého jedla a jedz pravidelne každé 3-4 hodiny, aby si udržala stabilnú hladinu energie."
         },
         mind: {
-          insight: "Dnes cítiš rast energie a kreativitu.",
-          techniques: [
-            "Energizujúci nádych nosom + rýchly výdych ústami (3×).",
-            "Journaling: Čo chcem tento týždeň posunúť?"
-          ],
-          benefit: "Naštartuje tvoj deň a zlepší koncentráciu.",
-          thoughts: [
-            "Mám energiu na nové veci.",
-            "Som pripravená rásť.",
-            "Dnes je dobrý deň na výzvy."
+          practicalThoughts: [
+            "Využi energiu na veci, ktoré si dlhšie odkladala.",
+            "Skús si dnes napísať jeden malý cieľ, ktorý ti spraví radosť – nie povinnosť.",
+            "Počas tejto fázy sa učíš rýchlejšie – využi to, ak sa chceš niečo nové naučiť.",
+            "Urob si priestor na plánovanie – napíš si, čo chceš tento mesiac skúsiť.",
+            "Skús ísť von s kamarátkou alebo na krátku kávu – spoločnosť ti teraz robí dobre.",
+            "Tvoje telo zvláda viac – ale netreba ísť na maximum. Drž rovnováhu.",
+            "Ak cítiš chuť niečo zmeniť, začni drobnosťou – nový recept, nový tréning, nový playlist."
           ]
         },
         movement: {
           context: "Vysoká energia, telo zvláda záťaž.",
-          intensity: "Silový tréning (15-30 min)",
-          neome: "5-15 min silový tréning",
-          cardio: "Voliteľné 2-3× týždenne, intervalové 15 min (1:1 = 1 min rýchlo / 1 min voľne)",
-          walkBenefits: ["podporuje kreativitu", "zvyšuje motiváciu", "zlepšuje metabolizmus"]
+          intensity: "Silový tréning",
+          neome: "Silový tréning",
+          walkBenefits: [
+            "Získaš nápady, ktoré v sede neprichádzajú.",
+            "Zlepšíš náladu vďaka prirodzenému dopamínu.",
+            "Dodáš telu energiu namiesto ďalšej kávy.",
+            "Podporíš spaľovanie tukov aj bez cvičenia.",
+            "Zlepšíš cirkuláciu krvi a kyslík v mozgu.",
+            "Stabilizuješ si hladinu cukru v krvi po jedle.",
+            "Krátka prechádzka mení náladu na celý deň.",
+            "Cítiš sa viac pod kontrolou — aj keď je deň chaos."
+          ]
         }
       },
       ovulation: {
@@ -124,27 +212,30 @@ serve(async (req) => {
           foods: ["vajcia", "losos", "tofu", "cottage", "citrusy", "bobuľové", "kiwi",
                   "brokolica", "paprika", "rukola", "špenát", "ľan", "chia", "avokádo", 
                   "orechy", "olivový olej"],
-          tip: "Ľahšie jedlá pre vyššiu energiu. Pravidelné jedlá s dôrazom na bielkoviny (25-30g)."
+          tip: "Dopraj si ľahšie jedlá pre vyššiu energiu. Pravidelné jedlá s dôrazom na bielkoviny (25-30g)."
         },
         mind: {
-          insight: "Dnes cítiš sebadôveru a sociálnu energiu.",
-          techniques: [
-            "4-6 dých pre emocionálne uvoľnenie (nádych 4, výdych 6).",
-            "Journaling: Kde chcem dať viac hlas môjmu názoru?"
-          ],
-          benefit: "Posilní tvoju sebadôveru a jasnosť.",
-          thoughts: [
-            "Som silná a žiarivá.",
-            "Môj hlas má hodnotu.",
-            "Dnes je deň pre spojenie a blízkosť."
+          practicalThoughts: [
+            "Dnes sa ti bude dariť hovoriť jasne – využi to pri rozhovoroch či v práci.",
+            "Skús niekomu úprimne poďakovať alebo niečo pekné povedať – vráti sa ti to.",
+            "Si v najlepšej fáze na networking, prezentácie či ťažšie rozhovory – ver si.",
+            "Ak máš veľa energie, dopraj si niečo, čo ťa nabíja – tanec, beh, pohyb s radosťou.",
+            "Dnes si ľahšie všimneš, čo ti funguje – napíš si to, využiješ to neskôr.",
+            "Ak cítiš tlak, spomaľ. Energia smeruje von, ale potrebuje aj priestor na doplnenie."
           ]
         },
         movement: {
           context: "Peak výkonnosť, maximálna sila.",
-          intensity: "Silový tréning (15-30 min)",
-          neome: "15 min intenzívne silové + 5-min dopáľovačky",
-          cardio: "Najlepšie dni v mesiaci na intervalové kardio (2:1 alebo 4:3)",
-          walkBenefits: ["zvyšuje kreativitu", "zlepšuje koncentráciu", "podporuje dobrý spánok"]
+          intensity: "Silový tréning",
+          neome: "Intenzívny silový tréning",
+          walkBenefits: [
+            "Získaš nápady, ktoré v sede neprichádzajú.",
+            "Zlepšíš náladu vďaka prirodzenému dopamínu.",
+            "Zlepšíš cirkuláciu krvi a kyslík v mozgu.",
+            "Pomôže ti mať kvalitnejší spánok — aj keď máš milión vecí v hlave.",
+            "Získaš chvíľu len pre seba.",
+            "Nabiješ sa vitamínom D."
+          ]
         }
       },
       lutealEarly: {
@@ -158,27 +249,28 @@ serve(async (req) => {
           foods: ["vajcia", "morčacie mäso", "tofu", "strukoviny", "banán", "bobuľové", "hruška",
                   "brokolica", "kapusta", "špenát", "bataty", "orechy", "avokádo", "semienka",
                   "ovos", "quinoa", "škorica", "zázvor"],
-          tip: "Pravidelné jedlá (hlavne raňajky). Bielkoviny + vláknina (25-30g fiber denne). Obmedziť kávu."
+          tip: "Dopraj si pravidelné jedlá (hlavne raňajky). Bielkoviny + vláknina (25-30g fiber denne). Obmedziť kávu."
         },
         mind: {
-          insight: "Dnes cítiš väčšiu emočnú citlivosť.",
-          techniques: [
-            "4-7-8 breathing (nádych 4, zadrž 7, výdych 8) upokojí nervový systém.",
-            "Journaling: Čo môžem delegovať alebo zjednodušiť?"
-          ],
-          benefit: "Pomôže ti to nastaviť hranice a chrániť energiu.",
-          thoughts: [
-            "Moje emócie sú signály, nie problémy.",
-            "Môžem počkať s veľkými rozhodnutiami.",
-            "Dnes si nastavujem hranice."
+          practicalThoughts: [
+            "Ak cítiš podráždenie, nie si zlá – len tvoje telo potrebuje viac pokoja.",
+            "Dnes si urči jasnú hranicu – napríklad „po ôsmej už neodpovedám na správy".",
+            "Vyčisti si hlavu aj priestor – upratovanie pôsobí ako terapia.",
+            "Ak sa cítiš unavená, vyber si najdôležitejšiu vec dňa a ostatné nechaj tak.",
+            "Tvoje telo reaguje citlivejšie – skús si dopriať pokojnejšie prostredie."
           ]
         },
         movement: {
           context: "Dobrá energia, ale citlivejšie telo.",
           intensity: "Silový tréning",
-          neome: "5-15 min silový tréning",
-          cardio: "Steady kardio 20-30 min (žiadne intervaly)",
-          walkBenefits: ["znižuje podráždenosť", "podporuje spánok", "znižuje stresový kortizol"]
+          neome: "Silový tréning",
+          walkBenefits: [
+            "Prechádzka ti pomôže uvoľniť napätie, ktoré sa ti hromadilo celý deň.",
+            "Znížiš stres, ktorý možno pociťuješ.",
+            "Pomôže ti mať kvalitnejší spánok — aj keď máš milión vecí v hlave.",
+            "Vyrovnáš si hormóny a upokojíš nervový systém.",
+            "Po prechádzke máš viac trpezlivosti — pre seba aj pre deti."
+          ]
         }
       },
       lutealMid: {
@@ -191,27 +283,30 @@ serve(async (req) => {
           keyNutrients: ["Horčík", "Vitamín B6", "Vláknina", "Proteíny"],
           foods: ["vajcia", "morčacie mäso", "tofu", "strukoviny", "banán", "bobuľové",
                   "brokolica", "kapusta", "bataty", "orechy", "avokádo", "ovos", "quinoa"],
-          tip: "Pravidelné jedlá, menej cukru, teplé tekutiny, zázvorový čaj."
+          tip: "Dopraj si pravidelné jedlá, menej cukru, teplé tekutiny, zázvorový čaj."
         },
         mind: {
-          insight: "Dnes je prirodzená citlivosť na stres.",
-          techniques: [
-            "4-7-8 breathing upokojí nervový systém.",
-            "Journaling: Čo viem dnes odložiť?"
-          ],
-          benefit: "Pomôže ti to chrániť energiu a kľud.",
-          thoughts: [
-            "Moje emócie sú signály, nie problémy.",
-            "Nemusím dnes všetko riešiť.",
-            "Dnes si nastavujem hranice."
+          practicalThoughts: [
+            "Ak máš chuť všetko „zachraňovať", zastav sa – nie všetko je tvoja úloha.",
+            "Skús si zapisovať, čo ti robí dobre a čo nie – pomôže ti to pri ďalšom cykle.",
+            "Ak cítiš tlak, urob si 5 minút len pre seba – dýchaj pomaly a hlboko.",
+            "Pripomeň si, že nie všetky dni musia byť produktívne. Niektoré majú byť pokojné.",
+            "Ak cítiš podráždenie, nie si zlá – len tvoje telo potrebuje viac pokoja."
           ]
         },
         movement: {
           context: "Nižšia energia, citlivé telo.",
-          intensity: "Pilates / mierny silový tréning",
-          neome: "5-15 min pilates alebo mierny silový",
-          cardio: "Steady kardio 20-30 min (žiadne intervaly) alebo žiadne",
-          walkBenefits: ["znižuje PMS", "stabilizuje náladu", "uvoľňuje napätie"]
+          intensity: "Pilates alebo mierny silový tréning",
+          neome: "Pilates alebo mierny silový tréning",
+          walkBenefits: [
+            "Prechádzka ti pomôže uvoľniť napätie, ktoré sa ti hromadilo celý deň.",
+            "Znížiš stres, ktorý možno pociťuješ.",
+            "Znížiš chuť na sladké.",
+            "Stabilizuješ si hladinu cukru v krvi po jedle.",
+            "Vyrovnáš si hormóny a upokojíš nervový systém.",
+            "Dostaneš sa do prítomnosti a spomalíš.",
+            "Myseľ sa upokojí, keď sa pohne telo."
+          ]
         }
       },
       lutealLate: {
@@ -224,27 +319,31 @@ serve(async (req) => {
           keyNutrients: ["Horčík", "Vitamín B6", "Omega-3", "Antioxidanty"],
           foods: ["banán", "brokolica", "špenát", "bataty", "orechy", "avokádo", "temná čokoláda",
                   "zázvor", "kurkuma", "teplé polievky"],
-          tip: "Teplé jedlá, pravidelné porcie, menej kofeínu a cukru, viac horčíka."
+          tip: "Dopraj si teplé jedlá, pravidelné porcie, menej kofeínu a cukru, viac horčíka."
         },
         mind: {
-          insight: "Dnes je prirodzená emočná záťaž (PMS).",
-          techniques: [
-            "Predĺžený výdych (4 nádych / 6 výdych) upokojí nervový systém.",
-            "Journaling: Čo môžem pustiť?"
-          ],
-          benefit: "Pomôže ti to uvoľniť tlak a nájsť pokoj.",
-          thoughts: [
-            "Som v bezpečí, nemusím dnes veľa dávať.",
-            "Moje telo potrebuje odpočinok.",
-            "Dnes si dovolím spomalit."
+          practicalThoughts: [
+            "Dnes si dovoľ urobiť menej. Aj ticho a oddych sú súčasť regenerácie.",
+            "Ak sa cítiš unavená, vyber si najdôležitejšiu vec dňa a ostatné nechaj tak.",
+            "Deň na vďačnosť – napíš si tri veci, ktoré sa ti tento mesiac podarili, aj malé.",
+            "Pripomeň si, že nie všetky dni musia byť produktívne. Niektoré majú byť pokojné.",
+            "Ak cítiš tlak, urob si 5 minút len pre seba – dýchaj pomaly a hlboko."
           ]
         },
         movement: {
           context: "Nízka energia, PMS symptómy.",
-          intensity: "Strečing / jemný pilates",
-          neome: "5-15 min strečing alebo meditácia",
-          cardio: "Žiadne, iba prechádzka",
-          walkBenefits: ["zmierni PMS", "zníži kŕče", "zlepší náladu"]
+          intensity: "Strečing alebo jemný pilates",
+          neome: "Strečing alebo meditácia",
+          walkBenefits: [
+            "Prechádzka ti pomôže uvoľniť napätie, ktoré sa ti hromadilo celý deň.",
+            "Znížiš stres, ktorý možno pociťuješ.",
+            "Vyčistíš si hlavu od nekonečných myšlienok.",
+            "Krátka chôdza ťa vráti späť „do tela", nie do úloh.",
+            "Znížiš chuť na sladké.",
+            "Uvoľníš stuhnuté svaly.",
+            "Vyrovnáš si hormóny a upokojíš nervový systém.",
+            "Po prechádzke máš viac trpezlivosti — pre seba aj pre deti."
+          ]
         }
       }
     };
@@ -259,11 +358,10 @@ serve(async (req) => {
 
     // Rotate content for diversity
     const walkBenefitIndex = day % template.movement.walkBenefits.length;
-    const thoughtIndex = day % (template.mind.thoughts?.length || 1);
-    const techniqueIndex = day % template.mind.techniques.length;
+    const thoughtIndex = day % template.mind.practicalThoughts.length;
 
-    // System prompt - AI is FORMATTER, not CREATOR
-    const systemPrompt = `Si expert na ženské zdravie a menštruačný cyklus. Tvorcou personalizovaných denných plánov pre ženy vo veku 25-45 rokov, väčšinou mamy.
+    // System prompt - AI is FORMATTER with softer language and bullet points
+    const systemPrompt = `Si expert na ženské zdravie a menštruačný cyklus. Tvorcom personalizovaných denných plánov pre ženy vo veku 25-45 rokov, väčšinou mamy.
 
 AUDIENCE:
 - Zaneprázdnené ženy a mamy (1-3 deti) s málo času, nízkou energiou
@@ -278,29 +376,37 @@ TÓN KOMUNIKÁCIE:
 - Žiadne klišé, žiadne "si bohyňa svetla"
 - Používaj: "môžeš", "skús", "pomôže ti" (NIE "musíš")
 
-PRAVIDLÁ PRE FORMÁTOVANIE:
+KONDICIONÁLNY A SOFTER TÓN:
+- Používaj: "by si mala", "pravdepodobne budeš", "môžeš pociťovať"
+- NIE direktívne: "máš", "cítiš", "je"
+- Soft odporúčania: "vyskúšaj si dopriať", "skús si", "môžeš skúsiť"
+- NIE príkazy: "Odporúčame ti", "Zaraď", "Urob"
+- Praktické tipy: "dopraj si" namiesto "Zaraď"
+
+PREPOJENIE SEKCIÍ:
+- Všetky 4 sekcie musia byť logicky prepojené
+- Ak v "Expectation" hovoríš o nízkej energii → v "Movement" odkazuj na tento kontext ("Vzhľadom na nízku energiu...")
+- Zabezpeč konzistenciu energie, hormónov a emócií naprieč sekciami
+
+FORMÁTOVANIE - BULLET POINTS:
+- Sekcia STRAVA: 4 odrážky (začni každú "- ")
+  1. Potreby tela (prepojené s expectation)
+  2. Konkrétne potraviny (6 vybraných)
+  3. Živiny, ktoré dodávajú
+  4. Praktický tip (začni: "Dopraj si...")
+  
+- Sekcia POHYB: 4-5 odrážok (začni každú "- ")
+  1. Hormonálny kontext (prepojený s expectation)
+  2. Odporúčanie typu cvičenia (BEZ časových údajov, použij: "vyskúšaj si dopriať")
+  3. Neome tip: "Ak nemáš veľa času alebo chceš čas ušetriť, vyskúšaj 15min cvičenia od Neome."
+  4. Kardio odporúčanie (ak je pre daný deň)
+  5. Prechádzka: "Skús si aj dnes dopriať prechádzku. Dopraj si aspoň 30-60min na čerstvom vzduchu. [benefit]"
+
+PRAVIDLÁ:
 1. Použi PRESNÝ text z master template
-2. Vyber z poskytnutých zoznamov (potraviny, benefity, techniky)
+2. Vyber z poskytnutých zoznamov (potraviny, benefity, myšlienky)
 3. Žiadne vymýšľanie nových faktov alebo informácií
 4. Len gramatické úpravy pre plynulosť
-
-KRITICKÉ: VÝSTUP MUSÍ BYŤ ČISTÝ TEXT
-- NIKDY nepouži markdown formátovanie (###, **, atď.)
-- NIKDY neuvádzaj názvy sekcií ("Insight:", "Čo potrebuješ?", "Kľúčové živiny a potraviny:", atď.)
-- NIKDY nekopíruj štruktúru template do výstupu
-- Píš len plynulé odseky prirodzeného textu
-- Template je len referencia, nie text na kopírovanie
-
-PRÍKLAD ZLÉHO VÝSTUPU (NIKDY NEROB):
-"Insight: Dnes je prirodzená citlivosť.
-
-**Čo potrebuješ?**
-Stabilizovať cukor v krvi..."
-
-PRÍKLAD DOBRÉHO VÝSTUPU (VŽY TAKTO):
-"Dnes je prirodzená citlivosť na stres. Môžeš sa cítiť emočne citlivejšie.
-
-Tvoje telo teraz potrebuje stabilizovať hladinu cukru v krvi..."
 
 ZDROJE (overené):
 - Dr. Mary Claire Haver (menopause & hormonal health)
@@ -308,7 +414,9 @@ ZDROJE (overené):
 - Dr. Natalie Crawford (fertility & cycle health)
 - Dr. Stacy Sims (female physiology & performance)`;
 
-    const userPrompt = `Vytvor obsah pre DEŇ ${day} v ${phase}${subphase ? ` (${subphase})` : ''} fáze.
+    const cardioText = getCardioRecommendation(day, cycleLength);
+
+    const userPrompt = `Vytvor obsah pre DEŇ ${day} v ${phase}${subphase ? ` (${subphase})` : ''} fáze (celková dĺžka cyklu: ${cycleLength} dní).
 
 MASTER TEMPLATE - REFERENCIA (použij obsah, nie štruktúru):
 Hormóny: ${template.hormones}
@@ -323,26 +431,49 @@ Vyber 6 RÔZNYCH potravín z tohto zoznamu: ${template.nutrition.foods.join(', '
 Tip: ${template.nutrition.tip}
 
 MYSEĽ - REFERENCIA:
-Insight: ${template.mind.insight}
-Technika (použi túto): ${template.mind.techniques[techniqueIndex]}
-Benefit: ${template.mind.benefit}
-Myšlienka dňa (použi túto): ${template.mind.thoughts?.[thoughtIndex] || template.mind.thoughts?.[0]}
+Praktická myšlienka (použi presne túto): ${template.mind.practicalThoughts[thoughtIndex]}
+
+FORMÁT VÝSTUPU PRE MYSEĽ:
+Len táto praktická myšlienka ako 1-2 plynulé odseky, bez doplnkov, bez dychových techník, bez afirmácií. Max 60 slov.
 
 POHYB - REFERENCIA:
-Kontext: ${template.movement.context}
-Intenzita: ${template.movement.intensity}
-NeoMe: ${template.movement.neome}
-Kardio: ${template.movement.cardio || "Žiadne"}
-Prechádzka benefit (použi tento): ${template.movement.walkBenefits[walkBenefitIndex]}
+Hormonálny kontext (prepoj s expectation): ${template.movement.context}
+Typ cvičenia: ${template.movement.intensity}
+NeoMe odporúčanie: Ak nemáš veľa času alebo chceš čas ušetriť, vyskúšaj 15min cvičenia od Neome.
+Kardio (ak je): ${cardioText || "Dnes nie je kardio deň"}
+Prechádzka: Skús si aj dnes dopriať prechádzku. Dopraj si aspoň 30-60min na čerstvom vzduchu. ${template.movement.walkBenefits[walkBenefitIndex]}
 
-ÚLOHA:
-Napíš 4 sekcie ako plynulé textové odseky. Použi obsah z referencie, ale NIKDY neuvádzaj názvy polí ani markdown.
+FORMÁT VÝSTUPU PRE POHYB (SOFT jazyk, 4-5 odrážok):
+❌ NIKDY: "S rastúcou hladinou estrogénu máš teraz vysokú energiu..."
+✅ VŽDY: "S rastúcou hladinou estrogénu by si mala pociťovať teraz väčšiu energiu..."
 
-PRÍKLAD:
-expectation: "Dnes môžeš pociťovať nízku energiu a rýchlejšie vyčerpanie, keďže estrogén aj progesterón sú nízko."
-nutrition: "Tvoje telo teraz potrebuje znížiť zápal, doplniť železo a podporiť trávenie teplými jedlami. Skús kombinovať vajcia, špenát, jahody, losos, quinoa a kurkumu. Tieto potraviny dodajú železo, vitamín C a omega-3 mastné kyseliny. Tip: Kombinuj železo s vitamínom C pre lepšiu vstrebateľnosť."
+❌ NIKDY: "Odporúčame ti silový tréning."
+✅ VŽDY: "Vyskúšaj si dnes dopriať silový tréning."
 
-NIKDY nepíš: "**Čo potrebuješ?**" alebo "Kľúčové živiny:" - len plynulé odseky!`;
+Príklad výstupu:
+- S rastúcou hladinou estrogénu by si mala pociťovať teraz väčšiu energiu a tvoje telo by malo lepšie zvládať fyzickú záťaž.
+- Vyskúšaj si dnes dopriať silový tréning.
+- Ak nemáš veľa času alebo chceš čas ušetriť, vyskúšaj 15min cvičenia od Neome.
+- [Kardio odporúčanie - ak je]
+- Skús si aj dnes dopriať prechádzku. Dopraj si aspoň 30-60min na čerstvom vzduchu. [benefit]
+
+PRÍKLAD VÝSTUPU:
+expectation: "V týchto dňoch by si mala cítiť nižšiu energiu a rýchlejšie vyčerpanie, pretože estrogén aj progesterón sú nízko."
+
+nutrition (4 odrážky):
+- Tvoje telo teraz potrebuje znížiť zápal, doplniť železo a podporiť trávenie teplými jedlami.
+- Skús do jedálnička zaradiť vajcia, špenát, jahody, losos, quinoa a kurkumu.
+- Tieto potraviny ti dodajú železo, vitamín C a omega-3 mastné kyseliny.
+- Dopraj si kombinovať železo s vitamínom C pre lepšiu vstrebateľnosť. Teplé jedlá ti uľahčia trávenie.
+
+mind (1-2 odseky):
+"Dnes si dovoľ urobiť menej. Aj ticho a oddych sú súčasť regenerácie."
+
+movement (4-5 odrážok):
+- Vzhľadom na nízku energiu a citlivé telo by si sa mala dnes zamerať na jemný pohyb.
+- Vyskúšaj si dopriať strečing alebo jemný pilates.
+- Ak nemáš veľa času alebo chceš čas ušetriť, vyskúšaj 15min cvičenia od Neome.
+- Skús si aj dnes dopriať prechádzku. Dopraj si aspoň 30-60min na čerstvom vzduchu. Uvoľníš stuhnuté svaly.`;
 
     // Call Lovable AI with tool calling for structured output
     const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
@@ -367,100 +498,103 @@ NIKDY nepíš: "**Čo potrebuješ?**" alebo "Kľúčové živiny:" - len plynul�
               properties: {
                 expectation: {
                   type: 'string',
-                  description: 'Čo môžem dnes očakávať? Len plynulý text, 1-2 vety o hormonálnom kontexte bez markdown alebo názvov polí.'
+                  description: 'Čo môžem dnes očakávať? 1-2 vety v SOFTER tóne: "by si mala cítiť", "pravdepodobne budeš", "môžeš pociťovať". Prepoj s hormónmi ("pretože estrogén..."). Čistý text bez markdown.'
                 },
                 nutrition: {
                   type: 'string',
-                  description: 'Strava ako 3 plynulé odseky: potreby tela, konkrétne potraviny, praktický tip. Čistý text bez markdown, hviezdičiek alebo názvov sekcií.'
+                  description: 'Strava ako 4 odrážky (začni každú "- "). SOFT jazyk: "Dopraj si...". Prepoj prvú odrážku s expectation. Odrážky: (1) potreby tela, (2) 6 potravín, (3) živiny, (4) praktický tip. Čistý text bez markdown.'
                 },
                 mind: {
                   type: 'string',
-                  description: 'Myseľ ako 4 plynulé odseky: insight, dychová technika, benefit, afirmácia. Max 90 slov. Čistý text bez markdown alebo "Insight:", "Technika:" atď.'
+                  description: 'Myseľ ako 1-2 plynulé odseky s praktickou myšlienkou/habitom. Použi PRESNE text z practicalThoughts. Max 60 slov. Čistý text bez markdown.'
                 },
                 movement: {
                   type: 'string',
-                  description: 'Pohyb ako 5 plynulých odsekov: hormonálny kontext, intenzita cvičenia, NeoMe odporúčanie, kardio rady, benefit prechádzky. Čistý text bez markdown alebo názvov polí.'
+                  description: 'Pohyb ako 4-5 odrážok (začni každú "- "). SOFT jazyk: "by si mala pociťovať", "vyskúšaj si dopriať". Prepoj prvú odrážku s expectation. Odrážky: (1) hormonálny kontext, (2) typ cvičenia BEZ časov, (3) Neome tip, (4) kardio ak je, (5) prechádzka s benefitom. Čistý text bez markdown.'
                 }
               },
               required: ['expectation', 'nutrition', 'mind', 'movement']
             }
           }
         }],
-        tool_choice: { type: 'function', function: { name: 'generate_daily_plan' } },
-        temperature: 0.7
-      }),
+        tool_choice: { type: 'function', function: { name: 'generate_daily_plan' } }
+      })
     });
 
     if (!aiResponse.ok) {
       const errorText = await aiResponse.text();
-      console.error('AI Gateway error:', aiResponse.status, errorText);
-      throw new Error(`AI Gateway error: ${aiResponse.status}`);
+      console.error('❌ Lovable AI error:', aiResponse.status, errorText);
+      throw new Error(`Lovable AI error: ${aiResponse.status}`);
     }
 
     const aiData = await aiResponse.json();
-    const toolCall = aiData.choices[0].message.tool_calls?.[0];
+    const toolCall = aiData.choices?.[0]?.message?.tool_calls?.[0];
     
     if (!toolCall) {
-      throw new Error('No tool call received from AI');
+      console.error('❌ No tool call in response:', JSON.stringify(aiData, null, 2));
+      throw new Error('No tool call returned from AI');
     }
 
     const generatedContent = JSON.parse(toolCall.function.arguments);
+
     console.log(`✨ Generated content for day ${day}:`, {
-      expectation: generatedContent.expectation?.substring(0, 50) + '...',
-      nutrition: generatedContent.nutrition?.substring(0, 50) + '...',
-      mind: generatedContent.mind?.substring(0, 50) + '...',
-      movement: generatedContent.movement?.substring(0, 50) + '...'
+      expectation: generatedContent.expectation.substring(0, 50) + '...',
+      nutrition: generatedContent.nutrition.substring(0, 50) + '...',
+      mind: generatedContent.mind.substring(0, 50) + '...',
+      movement: generatedContent.movement.substring(0, 50) + '...'
     });
 
-    // Delete existing tips if regenerate = true
+    // Delete existing plan if regenerating
     if (regenerate) {
       console.log(`🗑️ Deleting existing plan for day ${day}...`);
       const { error: deleteError } = await supabase
         .from('cycle_tips')
         .delete()
-        .eq('day', day);
-      
+        .eq('day', day)
+        .eq('cycle_length', cycleLength)
+        .eq('category', 'daily_plan');
+
       if (deleteError) {
-        console.error('❌ Error deleting old plan:', deleteError);
+        console.error('Delete error:', deleteError);
       } else {
         console.log(`✅ Old plan deleted for day ${day}`);
       }
     }
 
-    // Insert new plan into database
+    // Insert the generated plan
     console.log(`💾 Inserting plan for day ${day} into database...`);
-    const { data: insertData, error: insertError } = await supabase
+    const { error: insertError } = await supabase
       .from('cycle_tips')
       .insert({
         day,
         phase,
         subphase,
+        cycle_length: cycleLength,
         expectation_text: generatedContent.expectation,
         nutrition_text: generatedContent.nutrition,
         mind_text: generatedContent.mind,
         movement_text: generatedContent.movement,
         category: 'daily_plan',
-        tip_text: `Day ${day} plan`,
+        tip_text: '', // legacy field
         is_approved: false,
         created_by: 'ai'
-      })
-      .select()
-      .single();
+      });
 
     if (insertError) {
-      console.error('❌ Error inserting plan:', insertError);
+      console.error('❌ Insert error:', insertError);
       throw insertError;
     }
 
     console.log(`✅ Day ${day} plan successfully saved to database`);
 
     return new Response(
-      JSON.stringify({ 
-        success: true, 
+      JSON.stringify({
+        success: true,
         day,
         phase,
         subphase,
-        tips: insertData 
+        cycleLength,
+        content: generatedContent
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );

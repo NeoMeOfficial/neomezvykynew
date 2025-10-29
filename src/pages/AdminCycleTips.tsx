@@ -45,6 +45,7 @@ export default function AdminCycleTips() {
   const [editMovement, setEditMovement] = useState('');
   const [bulkGenerating, setBulkGenerating] = useState(false);
   const [regeneratingDay, setRegeneratingDay] = useState<number | null>(null);
+  const [cycleLength, setCycleLength] = useState(28);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -198,14 +199,14 @@ export default function AdminCycleTips() {
     setBulkGenerating(true);
     try {
       const { data, error } = await supabase.functions.invoke('bulk-generate-tips', {
-        body: { regenerate: true }
+        body: { regenerate: true, cycleLength }
       });
 
       if (error) throw error;
 
       toast({
         title: 'Úspech',
-        description: `Vygenerovaných ${data.summary?.successful || 0} / 28 dní`,
+        description: `Vygenerovaných ${data.summary?.successful || 0} / ${cycleLength} dní`,
       });
 
       await loadTips();
@@ -247,30 +248,48 @@ export default function AdminCycleTips() {
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-3xl font-bold" style={{ color: '#955F6A' }}>
-                Admin - 28-dňový plán
+                Admin - Dynamický cyklový plán
               </h1>
               <p className="text-sm mt-1" style={{ color: '#955F6A', opacity: 0.7 }}>
-                Schvaľuj, upravuj a generuj AI plány pre každý deň cyklu
+                Schvaľuj, upravuj a generuj AI plány pre rôzne dĺžky cyklu (25-35 dní)
               </p>
             </div>
             
-            <Button
-              onClick={handleBulkGenerate}
-              disabled={bulkGenerating}
-              className="bg-gradient-to-r from-[#FF7782] to-[#FF9AA1] text-white"
-            >
-              {bulkGenerating ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Generujem (cca 1 min)...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  Vygenerovať 28-dňový plán
-                </>
-              )}
-            </Button>
+            <div className="flex gap-3 items-center">
+              <div className="flex flex-col">
+                <label className="text-xs font-medium mb-1" style={{ color: '#955F6A' }}>
+                  Dĺžka cyklu:
+                </label>
+                <select 
+                  value={cycleLength} 
+                  onChange={(e) => setCycleLength(Number(e.target.value))}
+                  className="border rounded px-3 py-2 text-sm"
+                  style={{ borderColor: '#FF7782', color: '#955F6A' }}
+                >
+                  {[25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35].map(len => (
+                    <option key={len} value={len}>{len} dní</option>
+                  ))}
+                </select>
+              </div>
+              
+              <Button
+                onClick={handleBulkGenerate}
+                disabled={bulkGenerating}
+                className="bg-gradient-to-r from-[#FF7782] to-[#FF9AA1] text-white mt-5"
+              >
+                {bulkGenerating ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Generujem (cca 1 min)...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    Vygenerovať {cycleLength}-dňový plán
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
 
           {/* Instructions */}
@@ -279,11 +298,12 @@ export default function AdminCycleTips() {
               📋 Návod na použitie
             </h3>
             <ol className="text-sm space-y-1" style={{ color: '#955F6A', opacity: 0.9 }}>
-              <li>1️⃣ Klikni na "Vygenerovať 28-dňový plán" pre vytvorenie všetkých denných plánov s AI</li>
-              <li>2️⃣ Skontroluj každý deň - AI používa presný obsah z PDF (žiadne halucinácie)</li>
-              <li>3️⃣ Upravuj texty podľa potreby (gramatika, plynulosť)</li>
-              <li>4️⃣ Schvaľuj denné plány - len schválené sa zobrazia užívateľom</li>
-              <li>5️⃣ Použij "Re-generovať" pre nové verzie konkrétneho dňa</li>
+              <li>1️⃣ Vyber dĺžku cyklu (25-35 dní) a klikni na "Vygenerovať" pre vytvorenie všetkých denných plánov</li>
+              <li>2️⃣ AI dynamicky prispôsobí fázy cyklu a kardio dni podľa zvolenej dĺžky</li>
+              <li>3️⃣ Skontroluj každý deň - AI používa softer jazyk a praktické myšlienky</li>
+              <li>4️⃣ Upravuj texty podľa potreby (gramatika, plynulosť)</li>
+              <li>5️⃣ Schvaľuj denné plány - len schválené sa zobrazia užívateľom</li>
+              <li>6️⃣ Použij "Re-generovať" pre nové verzie konkrétneho dňa</li>
             </ol>
           </Card>
         </div>

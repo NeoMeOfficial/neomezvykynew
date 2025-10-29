@@ -145,6 +145,7 @@ export type Database = {
           category: string
           created_at: string
           created_by: string
+          cycle_length: number | null
           day: number
           expectation_text: string | null
           id: string
@@ -161,6 +162,7 @@ export type Database = {
           category: string
           created_at?: string
           created_by?: string
+          cycle_length?: number | null
           day?: number
           expectation_text?: string | null
           id?: string
@@ -177,6 +179,7 @@ export type Database = {
           category?: string
           created_at?: string
           created_by?: string
+          cycle_length?: number | null
           day?: number
           expectation_text?: string | null
           id?: string
