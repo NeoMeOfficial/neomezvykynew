@@ -1150,7 +1150,7 @@ export function CalendarView({
                             <Button size="sm" variant="ghost" onClick={() => {
                         setSelectedDayData(null);
                         setExpandedRow(null);
-                      }} className="text-rose-600 hover:text-rose-700 hover:bg-rose-100/50 rounded-full w-8 h-8 p-0">
+                      }} className="text-rose-600 hover:text-rose-700 hover:bg-rose-100/50 rounded-full w-10 h-10 p-0 text-2xl font-light">
                               ×
                             </Button>
                           </div>
