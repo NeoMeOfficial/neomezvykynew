@@ -18,6 +18,7 @@ interface MenstrualSidebarProps {
   cycleLength?: number;
   onPeriodStart?: (date: Date) => void;
   onPeriodEnd?: (startDate: Date, endDate: Date) => void;
+  onUseCustomDatePicker?: () => void;
 }
 
 const menuItems = [
@@ -48,7 +49,8 @@ export function MenstrualSidebar({
   lastPeriodStart, 
   cycleLength = 28,
   onPeriodStart,
-  onPeriodEnd
+  onPeriodEnd,
+  onUseCustomDatePicker
 }: MenstrualSidebarProps) {
   const navigate = useNavigate();
   const hasTemporaryData = temporaryStorage.isSessionActive() && temporaryStorage.hasTemporaryData();
@@ -148,6 +150,7 @@ export function MenstrualSidebar({
                       onEditClick={onEditClick}
                       onPeriodStart={onPeriodStart}
                       onPeriodEnd={onPeriodEnd}
+                      onUseCustomDatePicker={onUseCustomDatePicker}
                     />
 
                     {/* Temporary Data Indicator */}

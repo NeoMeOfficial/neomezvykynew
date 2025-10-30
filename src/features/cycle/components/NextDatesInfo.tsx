@@ -10,6 +10,7 @@ interface NextDatesInfoProps {
   onEditClick?: () => void;
   onPeriodStart?: (date: Date) => void;
   onPeriodEnd?: (startDate: Date, endDate: Date) => void;
+  onUseCustomDatePicker?: () => void;
 }
 
 export function NextDatesInfo({ 
@@ -17,7 +18,8 @@ export function NextDatesInfo({
   cycleLength, 
   onEditClick,
   onPeriodStart,
-  onPeriodEnd 
+  onPeriodEnd,
+  onUseCustomDatePicker
 }: NextDatesInfoProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
   
@@ -149,6 +151,7 @@ export function NextDatesInfo({
         predictedDate={nextPeriodDate}
         onConfirmStart={handlePeriodStart}
         onConfirmEnd={handlePeriodEnd}
+        onUseCustomDatePicker={onUseCustomDatePicker}
       />
     </div>
   );

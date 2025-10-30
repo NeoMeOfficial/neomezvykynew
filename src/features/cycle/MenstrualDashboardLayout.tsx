@@ -107,6 +107,7 @@ export function MenstrualDashboardLayout({
           onEditClick={() => setShowDatePicker(true)}
           onPeriodStart={handlePeriodStart}
           onPeriodEnd={handlePeriodEnd}
+          onUseCustomDatePicker={() => setShowDatePicker(true)}
         />
 
         {/* All sections for mobile */}
@@ -151,6 +152,7 @@ export function MenstrualDashboardLayout({
           cycleLength={cycleData.cycleLength}
           onPeriodStart={handlePeriodStart}
           onPeriodEnd={handlePeriodEnd}
+          onUseCustomDatePicker={() => setShowDatePicker(true)}
         />
         
         <main className="flex-1 p-8 max-w-none">

@@ -19,6 +19,7 @@ interface PeriodConfirmationDialogProps {
   predictedDate: Date;
   onConfirmStart: (date: Date) => void;
   onConfirmEnd: (startDate: Date, endDate: Date) => void;
+  onUseCustomDatePicker?: () => void;
 }
 
 type DialogStep = 'initial' | 'select-start' | 'select-end';
@@ -29,6 +30,7 @@ export function PeriodConfirmationDialog({
   predictedDate,
   onConfirmStart,
   onConfirmEnd,
+  onUseCustomDatePicker,
 }: PeriodConfirmationDialogProps) {
   const [step, setStep] = useState<DialogStep>('initial');
   const [startDate, setStartDate] = useState<Date>();
@@ -52,6 +54,11 @@ export function PeriodConfirmationDialog({
       description: "Dáme ti vedieť, keď sa priblíži očakávaný termín.",
     });
     handleClose();
+  };
+
+  const handleUseCustomPicker = () => {
+    handleClose();
+    onUseCustomDatePicker?.();
   };
 
   const handleConfirmStart = () => {
@@ -124,6 +131,16 @@ export function PeriodConfirmationDialog({
               >
                 <AlertCircle className="w-4 h-4 mr-2" />
                 Ešte nezačala
+              </Button>
+
+              <Button
+                onClick={handleUseCustomPicker}
+                variant="outline"
+                className="w-full border-rose-200 hover:bg-rose-50"
+                size="lg"
+              >
+                <Calendar className="w-4 h-4 mr-2" />
+                Zadať vlastný dátum
               </Button>
             </div>
           </>
