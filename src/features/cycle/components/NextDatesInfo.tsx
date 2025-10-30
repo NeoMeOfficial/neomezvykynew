@@ -69,7 +69,7 @@ export function NextDatesInfo({
              boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 1px 3px rgba(149, 95, 106, 0.06)'
            }}>
         <p className="text-xs font-medium" style={{ color: '#955F6A' }}>
-          Ďalšie plodné dni: <span style={{ color: '#FF7782' }}>
+          Odhadované plodné dni: <span style={{ color: '#FF7782' }}>
             {formatDate(fertilityStart)} - {formatDate(fertilityEnd)}
           </span>
         </p>
