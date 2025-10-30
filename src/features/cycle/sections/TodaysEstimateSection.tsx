@@ -1,8 +1,11 @@
-import React from 'react';
-import { Clock } from 'lucide-react';
+import React, { useState } from 'react';
+import { Clock, Calendar, AlertCircle } from 'lucide-react';
+import { format, addDays, differenceInDays } from 'date-fns';
+import { sk } from 'date-fns/locale';
 import { WellnessDonutChart } from '../WellnessDonutChart';
 import { SymptomTracker } from '../SymptomTracker';
 import { DailyPlanView } from '../DailyPlanView';
+import { PeriodConfirmationDialog } from '../components/PeriodConfirmationDialog';
 import { CycleData, DerivedState, PhaseKey } from '../types';
 interface TodaysEstimateSectionProps {
   derivedState: DerivedState;
@@ -16,6 +19,9 @@ interface TodaysEstimateSectionProps {
   accessCode?: string;
   lastPeriodStart?: string | null;
   onSettingsClick?: () => void;
+  onPeriodStart?: (date: Date) => void;
+  onPeriodEnd?: (startDate: Date, endDate: Date) => void;
+  onUseCustomDatePicker?: () => void;
 }
 export function TodaysEstimateSection({
   derivedState,
@@ -25,8 +31,42 @@ export function TodaysEstimateSection({
   currentPhase,
   accessCode,
   lastPeriodStart,
-  onSettingsClick
+  onSettingsClick,
+  onPeriodStart,
+  onPeriodEnd,
+  onUseCustomDatePicker
 }: TodaysEstimateSectionProps) {
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  // Calculate period prediction data
+  const startDate = lastPeriodStart ? new Date(lastPeriodStart) : null;
+  const nextPeriodDate = startDate ? addDays(startDate, cycleData.cycleLength) : null;
+  const today = new Date();
+  const daysUntilPeriod = nextPeriodDate ? differenceInDays(nextPeriodDate, today) : null;
+
+  const formatDate = (date: Date) => {
+    return format(date, 'd. M. yyyy', { locale: sk });
+  };
+
+  const handlePeriodStart = (date: Date) => {
+    onPeriodStart?.(date);
+  };
+
+  const handlePeriodEnd = (startDate: Date, endDate: Date) => {
+    onPeriodEnd?.(startDate, endDate);
+  };
+
+  // Determine UI state based on days until period
+  const getUIState = () => {
+    if (daysUntilPeriod === null) return null;
+    if (daysUntilPeriod > 6) return 'info';
+    if (daysUntilPeriod >= 3) return 'approaching';
+    if (daysUntilPeriod >= 0) return 'imminent';
+    if (daysUntilPeriod >= -3) return 'overdue';
+    return 'late';
+  };
+
+  const uiState = getUIState();
   return <>
       {/* Layered Glass - Multiple glass layers creating depth between header/content */}
       <div className="relative">
@@ -84,7 +124,78 @@ export function TodaysEstimateSection({
               lastPeriodStart={lastPeriodStart} 
             />
           </div>
+
+          {/* Smart period prediction button */}
+          {uiState && nextPeriodDate && (
+            <div className="mt-4">
+              {uiState === 'info' && (
+                <button
+                  onClick={() => setDialogOpen(true)}
+                  className="w-full flex items-center justify-between gap-2 px-4 py-2.5 text-sm font-medium rounded-3xl bg-white border border-rose-200/20 hover:bg-rose-50 transition-all"
+                  style={{ color: '#FF7782' }}
+                >
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-3.5 h-3.5" />
+                    <span>Ďalšia menštruácia by ti mala začať: {formatDate(nextPeriodDate)}</span>
+                  </div>
+                </button>
+              )}
+
+              {uiState === 'approaching' && (
+                <button
+                  onClick={() => setDialogOpen(true)}
+                  className="w-full flex items-center justify-between gap-2 px-4 py-3 text-sm font-medium rounded-3xl bg-amber-50 border border-amber-200 hover:bg-amber-100 transition-all"
+                  style={{ color: '#d97706' }}
+                >
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4" />
+                    <span>O {Math.abs(daysUntilPeriod!)} {Math.abs(daysUntilPeriod!) === 1 ? 'deň' : 'dni'} by mala začať menštruácia</span>
+                  </div>
+                  <span className="text-xs opacity-70">Klikni pre potvrdenie</span>
+                </button>
+              )}
+
+              {uiState === 'imminent' && (
+                <button
+                  onClick={() => setDialogOpen(true)}
+                  className="w-full flex items-center justify-between gap-2 px-4 py-3 text-sm font-medium rounded-3xl bg-rose-50 border border-rose-300 hover:bg-rose-100 transition-all animate-pulse"
+                  style={{ color: '#FF7782' }}
+                >
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4" />
+                    <span>Menštruácia by mala začať {daysUntilPeriod === 0 ? 'dnes' : `o ${daysUntilPeriod} ${daysUntilPeriod === 1 ? 'deň' : 'dni'}`}</span>
+                  </div>
+                  <span className="text-xs font-bold">Už začala?</span>
+                </button>
+              )}
+
+              {(uiState === 'overdue' || uiState === 'late') && (
+                <button
+                  onClick={() => setDialogOpen(true)}
+                  className="w-full flex items-center justify-between gap-2 px-4 py-3 text-sm font-medium rounded-3xl bg-red-50 border-2 border-red-400 hover:bg-red-100 transition-all"
+                  style={{ color: '#dc2626' }}
+                >
+                  <div className="flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4" />
+                    <span>Menštruácia mešká {Math.abs(daysUntilPeriod!)} {Math.abs(daysUntilPeriod!) === 1 ? 'deň' : 'dní'}</span>
+                  </div>
+                  <span className="text-xs font-bold">Potvrdiť začiatok</span>
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </div>
+
+      {nextPeriodDate && (
+        <PeriodConfirmationDialog
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          predictedDate={nextPeriodDate}
+          onConfirmStart={handlePeriodStart}
+          onConfirmEnd={handlePeriodEnd}
+          onUseCustomDatePicker={onUseCustomDatePicker}
+        />
+      )}
     </>;
 }

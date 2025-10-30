@@ -112,7 +112,19 @@ export function MenstrualDashboardLayout({
 
         {/* All sections for mobile */}
         <div className="space-y-8">
-          <TodaysEstimateSection derivedState={derivedState} selectedOutcome={selectedOutcome} cycleData={cycleData} currentDay={currentDay} currentPhase={currentPhase} accessCode={accessCode} lastPeriodStart={cycleData.lastPeriodStart} onSettingsClick={() => setShowSettings(true)} />
+          <TodaysEstimateSection 
+            derivedState={derivedState} 
+            selectedOutcome={selectedOutcome} 
+            cycleData={cycleData} 
+            currentDay={currentDay} 
+            currentPhase={currentPhase} 
+            accessCode={accessCode} 
+            lastPeriodStart={cycleData.lastPeriodStart} 
+            onSettingsClick={() => setShowSettings(true)}
+            onPeriodStart={handlePeriodStart}
+            onPeriodEnd={handlePeriodEnd}
+            onUseCustomDatePicker={() => setShowDatePicker(true)}
+          />
 
           <FeelBetterSection phaseRanges={phaseRanges} currentPhase={currentPhase} />
 
@@ -167,7 +179,19 @@ export function MenstrualDashboardLayout({
           
           {/* Content Area */}
           <div className="w-full">
-            {activeSection === 'estimate' && <TodaysEstimateSection derivedState={derivedState} selectedOutcome={selectedOutcome} cycleData={cycleData} currentDay={currentDay} currentPhase={currentPhase} accessCode={accessCode} lastPeriodStart={cycleData.lastPeriodStart} onSettingsClick={() => setShowSettings(true)} />}
+            {activeSection === 'estimate' && <TodaysEstimateSection 
+              derivedState={derivedState} 
+              selectedOutcome={selectedOutcome} 
+              cycleData={cycleData} 
+              currentDay={currentDay} 
+              currentPhase={currentPhase} 
+              accessCode={accessCode} 
+              lastPeriodStart={cycleData.lastPeriodStart} 
+              onSettingsClick={() => setShowSettings(true)}
+              onPeriodStart={handlePeriodStart}
+              onPeriodEnd={handlePeriodEnd}
+              onUseCustomDatePicker={() => setShowDatePicker(true)}
+            />}
 
             {activeSection === 'feel-better' && <FeelBetterSection phaseRanges={phaseRanges} currentPhase={currentPhase} />}
 
