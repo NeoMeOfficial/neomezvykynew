@@ -137,9 +137,9 @@ serve(async (req) => {
         mind: {
           practicalThoughts: [
             "Dnes si dovoľ urobiť menej. Aj ticho a oddych sú súčasť regenerácie.",
-            "Tvoje telo pracuje naplno, aj keď ty odpočívaš – dopraj mu pokoj.",
+            "Tvoje telo pracuje naplno, aj keď ty odpočívaš - dopraj mu pokoj.",
             "Ak sa cítiš preťažená, vyber si jednu vec, ktorú dnes neurobíš.",
-            "Skús si večer dať teplý kúpeľ alebo sprchu – pomôže ti uvoľniť napätie v bruchu.",
+            "Skús si večer dať teplý kúpeľ alebo sprchu - pomôže ti uvoľniť napätie v bruchu.",
             "Namiesto plánovania sa len pýtaj: čo teraz naozaj potrebujem?"
           ]
         },
@@ -152,8 +152,8 @@ serve(async (req) => {
             "Znížiš stres, ktorý možno pociťuješ.",
             "Vyčistíš si hlavu od nekonečných myšlienok.",
             "Zlepšíš náladu vďaka prirodzenému dopamínu.",
-            "Krátka chôdza ťa vráti späť „do tela", nie do úloh.",
-            "Pomôže ti mať kvalitnejší spánok — aj keď máš milión vecí v hlave.",
+            "Krátka chôdza ťa vráti späť \"do tela\", nie do úloh.",
+            "Pomôže ti mať kvalitnejší spánok - aj keď máš milión vecí v hlave.",
             "Uvoľníš stuhnuté svaly.",
             "Vyrovnáš si hormóny a upokojíš nervový systém."
           ]
@@ -175,12 +175,12 @@ serve(async (req) => {
         mind: {
           practicalThoughts: [
             "Využi energiu na veci, ktoré si dlhšie odkladala.",
-            "Skús si dnes napísať jeden malý cieľ, ktorý ti spraví radosť – nie povinnosť.",
-            "Počas tejto fázy sa učíš rýchlejšie – využi to, ak sa chceš niečo nové naučiť.",
-            "Urob si priestor na plánovanie – napíš si, čo chceš tento mesiac skúsiť.",
-            "Skús ísť von s kamarátkou alebo na krátku kávu – spoločnosť ti teraz robí dobre.",
-            "Tvoje telo zvláda viac – ale netreba ísť na maximum. Drž rovnováhu.",
-            "Ak cítiš chuť niečo zmeniť, začni drobnosťou – nový recept, nový tréning, nový playlist."
+            "Skús si dnes napísať jeden malý cieľ, ktorý ti spraví radosť - nie povinnosť.",
+            "Počas tejto fázy sa učíš rýchlejšie - využi to, ak sa chceš niečo nové naučiť.",
+            "Urob si priestor na plánovanie - napíš si, čo chceš tento mesiac skúsiť.",
+            "Skús ísť von s kamarátkou alebo na krátku kávu - spoločnosť ti teraz robí dobre.",
+            "Tvoje telo zvláda viac - ale netreba ísť na maximum. Drž rovnováhu.",
+            "Ak cítiš chuť niečo zmeniť, začni drobnosťou - nový recept, nový tréning, nový playlist."
           ]
         },
         movement: {
@@ -195,7 +195,7 @@ serve(async (req) => {
             "Zlepšíš cirkuláciu krvi a kyslík v mozgu.",
             "Stabilizuješ si hladinu cukru v krvi po jedle.",
             "Krátka prechádzka mení náladu na celý deň.",
-            "Cítiš sa viac pod kontrolou — aj keď je deň chaos."
+            "Cítiš sa viac pod kontrolou - aj keď je deň chaos."
           ]
         }
       },
@@ -214,11 +214,11 @@ serve(async (req) => {
         },
         mind: {
           practicalThoughts: [
-            "Dnes sa ti bude dariť hovoriť jasne – využi to pri rozhovoroch či v práci.",
-            "Skús niekomu úprimne poďakovať alebo niečo pekné povedať – vráti sa ti to.",
-            "Si v najlepšej fáze na networking, prezentácie či ťažšie rozhovory – ver si.",
-            "Ak máš veľa energie, dopraj si niečo, čo ťa nabíja – tanec, beh, pohyb s radosťou.",
-            "Dnes si ľahšie všimneš, čo ti funguje – napíš si to, využiješ to neskôr.",
+            "Dnes sa ti bude dariť hovoriť jasne - využi to pri rozhovoroch či v práci.",
+            "Skús niekomu úprimne poďakovať alebo niečo pekné povedať - vráti sa ti to.",
+            "Si v najlepšej fáze na networking, prezentácie či ťažšie rozhovory - ver si.",
+            "Ak máš veľa energie, dopraj si niečo, čo ťa nabíja - tanec, beh, pohyb s radosťou.",
+            "Dnes si ľahšie všimneš, čo ti funguje - napíš si to, využiješ to neskôr.",
             "Ak cítiš tlak, spomaľ. Energia smeruje von, ale potrebuje aj priestor na doplnenie."
           ]
         },
@@ -230,7 +230,7 @@ serve(async (req) => {
             "Získaš nápady, ktoré v sede neprichádzajú.",
             "Zlepšíš náladu vďaka prirodzenému dopamínu.",
             "Zlepšíš cirkuláciu krvi a kyslík v mozgu.",
-            "Pomôže ti mať kvalitnejší spánok — aj keď máš milión vecí v hlave.",
+            "Pomôže ti mať kvalitnejší spánok - aj keď máš milión vecí v hlave.",
             "Získaš chvíľu len pre seba.",
             "Nabiješ sa vitamínom D."
           ]
@@ -251,11 +251,11 @@ serve(async (req) => {
         },
         mind: {
           practicalThoughts: [
-            "Ak cítiš podráždenie, nie si zlá – len tvoje telo potrebuje viac pokoja.",
-            "Dnes si urči jasnú hranicu – napríklad „po ôsmej už neodpovedám na správy".",
-            "Vyčisti si hlavu aj priestor – upratovanie pôsobí ako terapia.",
+            "Ak cítiš podráždenie, nie si zlá - len tvoje telo potrebuje viac pokoja.",
+            "Dnes si urči jasnú hranicu - napríklad \"po ôsmej už neodpovedám na správy\".",
+            "Vyčisti si hlavu aj priestor - upratovanie pôsobí ako terapia.",
             "Ak sa cítiš unavená, vyber si najdôležitejšiu vec dňa a ostatné nechaj tak.",
-            "Tvoje telo reaguje citlivejšie – skús si dopriať pokojnejšie prostredie."
+            "Tvoje telo reaguje citlivejšie - skús si dopriať pokojnejšie prostredie."
           ]
         },
         movement: {
@@ -265,9 +265,9 @@ serve(async (req) => {
           walkBenefits: [
             "Prechádzka ti pomôže uvoľniť napätie, ktoré sa ti hromadilo celý deň.",
             "Znížiš stres, ktorý možno pociťuješ.",
-            "Pomôže ti mať kvalitnejší spánok — aj keď máš milión vecí v hlave.",
+            "Pomôže ti mať kvalitnejší spánok - aj keď máš milión vecí v hlave.",
             "Vyrovnáš si hormóny a upokojíš nervový systém.",
-            "Po prechádzke máš viac trpezlivosti — pre seba aj pre deti."
+            "Po prechádzke máš viac trpezlivosti - pre seba aj pre deti."
           ]
         }
       },
@@ -285,11 +285,11 @@ serve(async (req) => {
         },
         mind: {
           practicalThoughts: [
-            "Ak máš chuť všetko „zachraňovať", zastav sa – nie všetko je tvoja úloha.",
-            "Skús si zapisovať, čo ti robí dobre a čo nie – pomôže ti to pri ďalšom cykle.",
-            "Ak cítiš tlak, urob si 5 minút len pre seba – dýchaj pomaly a hlboko.",
+            "Ak máš chuť všetko \"zachraňovať\", zastav sa - nie všetko je tvoja úloha.",
+            "Skús si zapisovať, čo ti robí dobre a čo nie - pomôže ti to pri ďalšom cykle.",
+            "Ak cítiš tlak, urob si 5 minút len pre seba - dýchaj pomaly a hlboko.",
             "Pripomeň si, že nie všetky dni musia byť produktívne. Niektoré majú byť pokojné.",
-            "Ak cítiš podráždenie, nie si zlá – len tvoje telo potrebuje viac pokoja."
+            "Ak cítiš podráždenie, nie si zlá - len tvoje telo potrebuje viac pokoja."
           ]
         },
         movement: {
@@ -323,9 +323,9 @@ serve(async (req) => {
           practicalThoughts: [
             "Dnes si dovoľ urobiť menej. Aj ticho a oddych sú súčasť regenerácie.",
             "Ak sa cítiš unavená, vyber si najdôležitejšiu vec dňa a ostatné nechaj tak.",
-            "Deň na vďačnosť – napíš si tri veci, ktoré sa ti tento mesiac podarili, aj malé.",
+            "Deň na vďačnosť - napíš si tri veci, ktoré sa ti tento mesiac podarili, aj malé.",
             "Pripomeň si, že nie všetky dni musia byť produktívne. Niektoré majú byť pokojné.",
-            "Ak cítiš tlak, urob si 5 minút len pre seba – dýchaj pomaly a hlboko."
+            "Ak cítiš tlak, urob si 5 minút len pre seba - dýchaj pomaly a hlboko."
           ]
         },
         movement: {
@@ -336,11 +336,11 @@ serve(async (req) => {
             "Prechádzka ti pomôže uvoľniť napätie, ktoré sa ti hromadilo celý deň.",
             "Znížiš stres, ktorý možno pociťuješ.",
             "Vyčistíš si hlavu od nekonečných myšlienok.",
-            "Krátka chôdza ťa vráti späť „do tela", nie do úloh.",
+            "Krátka chôdza ťa vráti späť \"do tela\", nie do úloh.",
             "Znížiš chuť na sladké.",
             "Uvoľníš stuhnuté svaly.",
             "Vyrovnáš si hormóny a upokojíš nervový systém.",
-            "Po prechádzke máš viac trpezlivosti — pre seba aj pre deti."
+            "Po prechádzke máš viac trpezlivosti - pre seba aj pre deti."
           ]
         }
       }
@@ -387,18 +387,17 @@ PREPOJENIE SEKCIÍ:
 - Zabezpeč konzistenciu energie, hormónov a emócií naprieč sekciami
 
 FORMÁTOVANIE - BULLET POINTS:
-- Sekcia STRAVA: 4 odrážky (začni každú "- ")
-  1. Potreby tela (prepojené s expectation)
-  2. Konkrétne potraviny (6 vybraných)
-  3. Živiny, ktoré dodávajú
-  4. Praktický tip (začni: "Dopraj si...")
+- Sekcia STRAVA: Každá veta komunikujúca novú informáciu = nová odrážka (začni každú "- ")
+  - Rozdeľ na 4-5 odrážok: (1) Potreby tela, (2) Konkrétne potraviny, (3) Živiny, (4) Praktický tip, (5) Doplnková informácia ak je
+  - Každá odrážka musí byť samostatná veta s vlastnou pointou
+  - Príklad: "- Tvoje telo potrebuje X.\n- Skús Y.\n- Dodajú ti Z.\n- Tip: kombinuj A s B."
   
-- Sekcia POHYB: 4-5 odrážok (začni každú "- ")
-  1. Hormonálny kontext (prepojený s expectation)
-  2. Odporúčanie typu cvičenia (BEZ časových údajov, použij: "vyskúšaj si dopriať")
-  3. Neome tip: "Ak nemáš veľa času alebo chceš čas ušetriť, vyskúšaj 15min cvičenia od Neome."
-  4. Kardio odporúčanie (ak je pre daný deň)
-  5. Prechádzka: "Skús si aj dnes dopriať prechádzku. Dopraj si aspoň 30-60min na čerstvom vzduchu. [benefit]"
+- Sekcia POHYB: Každá veta komunikujúca novú informáciu = nová odrážka (začni každú "- ")
+  - Rozdeľ na 4-6 odrážok: (1) Kontext energie/tela, (2) Odporúčanie cvičenia, (3) Neome tip, (4) Kardio ak je, (5) Prechádzka, (6) Benefit prechádzky
+  - Každá odrážka musí byť samostatná veta s vlastnou pointou
+  - Neome tip: "- Ak nemáš veľa času alebo chceš čas ušetriť, vyskúšaj 15min cvičenia od Neome."
+  - Prechádzka: "- Skús si aj dnes dopriať prechádzku. Dopraj si aspoň 30-60min na čerstvom vzduchu."
+  - Benefit: "- [benefit]" ako samostatná odrážka
 
 PRAVIDLÁ:
 1. Použi PRESNÝ text z master template
@@ -458,20 +457,23 @@ Príklad výstupu:
 PRÍKLAD VÝSTUPU:
 expectation: "V týchto dňoch by si mala cítiť nižšiu energiu a rýchlejšie vyčerpanie, pretože estrogén aj progesterón sú nízko."
 
-nutrition (4 odrážky):
+nutrition (4-5 odrážok, každá veta = nová odrážka):
 - Tvoje telo teraz potrebuje znížiť zápal, doplniť železo a podporiť trávenie teplými jedlami.
-- Skús do jedálnička zaradiť vajcia, špenát, jahody, losos, quinoa a kurkumu.
-- Tieto potraviny ti dodajú železo, vitamín C a omega-3 mastné kyseliny.
-- Dopraj si kombinovať železo s vitamínom C pre lepšiu vstrebateľnosť. Teplé jedlá ti uľahčia trávenie.
+- Skús kombinovať vajcia, špenát, jahody, losos, quinoa a kurkumu.
+- Tieto potraviny dodajú železo, vitamín C a omega-3 mastné kyseliny.
+- Tip: Kombinuj železo s vitamínom C pre lepšiu vstrebateľnosť, napríklad špenát s jahodami.
+- Teplé jedlá, ako vývary alebo polievky, uľahčujú trávenie a pomáhajú stabilizovať hladinu cukru v krvi.
 
 mind (1-2 odseky):
 "Dnes si dovoľ urobiť menej. Aj ticho a oddych sú súčasť regenerácie."
 
-movement (4-5 odrážok):
-- Vzhľadom na nízku energiu a citlivé telo by si sa mala dnes zamerať na jemný pohyb.
-- Vyskúšaj si dopriať strečing alebo jemný pilates.
+movement (4-6 odrážok, každá veta = nová odrážka):
+- S nízkou energiou a citlivým telom je dnes ideálny čas na jemnejšie pohyby.
+- Namiesto intenzívneho cvičenia skús strečing alebo jemný pilates, ktorý sa zameriava na panvu a spodný chrbát, aby uvoľnil prípadné napätie.
 - Ak nemáš veľa času alebo chceš čas ušetriť, vyskúšaj 15min cvičenia od Neome.
-- Skús si aj dnes dopriať prechádzku. Dopraj si aspoň 30-60min na čerstvom vzduchu. Uvoľníš stuhnuté svaly.`;
+- Dnes sa vyhni kardiu.
+- Namiesto toho, krátka prechádzka ti pomôže znížiť úzkosť a zlepší náladu.`;
+
 
     // Call Lovable AI with tool calling for structured output
     const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
@@ -500,7 +502,7 @@ movement (4-5 odrážok):
                 },
                 nutrition: {
                   type: 'string',
-                  description: 'Strava ako 4 odrážky (začni každú "- "). SOFT jazyk: "Dopraj si...". Prepoj prvú odrážku s expectation. Odrážky: (1) potreby tela, (2) 6 potravín, (3) živiny, (4) praktický tip. Čistý text bez markdown.'
+                  description: 'Strava ako 4-5 odrážok (začni každú "- "). KAŽDÁ VETA = NOVÁ ODRÁŽKA. SOFT jazyk: "Dopraj si...". Prepoj prvú odrážku s expectation. Rozdeľ informácie: (1) potreby tela, (2) konkrétne potraviny, (3) živiny, (4) praktický tip, (5) doplnková info. Každá odrážka má jednu samostatnú pointu. Čistý text bez markdown.'
                 },
                 mind: {
                   type: 'string',
@@ -508,7 +510,7 @@ movement (4-5 odrážok):
                 },
                 movement: {
                   type: 'string',
-                  description: 'Pohyb ako 4-5 odrážok (začni každú "- "). SOFT jazyk: "by si mala pociťovať", "vyskúšaj si dopriať". Prepoj prvú odrážku s expectation. Odrážky: (1) hormonálny kontext, (2) typ cvičenia BEZ časov, (3) Neome tip, (4) kardio ak je, (5) prechádzka s benefitom. Čistý text bez markdown.'
+                  description: 'Pohyb ako 4-6 odrážok (začni každú "- "). KAŽDÁ VETA = NOVÁ ODRÁŽKA. SOFT jazyk: "by si mala pociťovať", "vyskúšaj si dopriať". Prepoj prvú odrážku s expectation. Rozdeľ na samostatné odrážky: (1) kontext energie/tela, (2) odporúčanie cvičenia, (3) Neome tip, (4) kardio ak je, (5) prechádzka, (6) benefit prechádzky. Každá odrážka má jednu samostatnú pointu. Čistý text bez markdown.'
                 }
               },
               required: ['expectation', 'nutrition', 'mind', 'movement']

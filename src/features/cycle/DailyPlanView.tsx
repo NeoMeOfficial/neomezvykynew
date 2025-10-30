@@ -121,17 +121,11 @@ export function DailyPlanView({ currentDay, currentPhase }: DailyPlanViewProps) 
             </CardHeader>
             <CardContent>
               <div className="text-sm space-y-3 leading-relaxed text-foreground/90">
-                {tips.mind.split('\n\n').map((para, i) => {
-                  const isLastPara = i === tips.mind.split('\n\n').length - 1;
-                  return (
-                    <p 
-                      key={i} 
-                      className={isLastPara ? 'italic font-medium text-primary' : ''}
-                    >
-                      {para}
-                    </p>
-                  );
-                })}
+                {tips.mind.split('\n\n').map((para, i) => (
+                  <p key={i}>
+                    {para}
+                  </p>
+                ))}
               </div>
             </CardContent>
           </Card>
