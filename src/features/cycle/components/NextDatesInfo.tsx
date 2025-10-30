@@ -64,8 +64,21 @@ export function NextDatesInfo({
 
   return (
     <div className="space-y-2">
-      {/* Fertile window info - always show */}
+      {/* Predicted next period - always show */}
       <div className="p-3 rounded-lg" 
+           style={{ 
+             background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(253, 242, 248, 0.65) 100%)',
+             boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 1px 3px rgba(149, 95, 106, 0.06)'
+           }}>
+        <p className="text-xs font-medium" style={{ color: '#955F6A' }}>
+          Odhadovaná ďalšia perióda: <span style={{ color: '#FF7782' }}>
+            {formatDate(nextPeriodDate)}
+          </span>
+        </p>
+      </div>
+
+      {/* Fertile window info - always show */}
+      <div className="p-3 rounded-lg"
            style={{ 
              background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(253, 242, 248, 0.65) 100%)',
              boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 1px 3px rgba(149, 95, 106, 0.06)'
