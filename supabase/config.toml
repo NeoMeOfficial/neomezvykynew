@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.bulk-generate-tips]
 verify_jwt = false
+
+[functions.approve-cycle-tips]
+verify_jwt = false
