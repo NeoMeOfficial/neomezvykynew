@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Save, RotateCcw, ChevronDown } from 'lucide-react';
+import { Save, RotateCcw } from 'lucide-react';
 import { PhaseKey } from './types';
 import { format, addDays } from 'date-fns';
 import { sk } from 'date-fns/locale';
@@ -162,7 +162,6 @@ export function SymptomTracker({
   const [isAddingCustom, setIsAddingCustom] = useState(false);
   const [customSymptomInput, setCustomSymptomInput] = useState('');
   const [symptomUsage, setSymptomUsage] = useState<SymptomUsage>({});
-  const [showAllSymptoms, setShowAllSymptoms] = useState(false);
   const [validationError, setValidationError] = useState<string>('');
 
   // Calculate the actual date for the currentDay
@@ -213,8 +212,8 @@ export function SymptomTracker({
     return bUsage - aUsage;
   });
 
-  // Show max 5 symptoms (or all if expanded)
-  const displayedSymptoms = showAllSymptoms ? prioritizedSymptoms : prioritizedSymptoms.slice(0, 5);
+  // Show max 5 symptoms
+  const displayedSymptoms = prioritizedSymptoms.slice(0, 5);
 
   // Load saved symptoms and notes for the current day being tracked
   useEffect(() => {
@@ -344,23 +343,6 @@ export function SymptomTracker({
           >
             <span className="mr-1.5">+</span>
             Zadaj vlastný
-          </Badge>
-        )}
-
-        {/* Show More Button */}
-        {!showAllSymptoms && prioritizedSymptoms.length > 5 && !isAddingCustom && (
-          <Badge 
-            variant="outline" 
-            className="cursor-pointer select-none text-xs py-1 px-2.5 transition-all duration-200 hover:bg-muted" 
-            onClick={() => setShowAllSymptoms(true)} 
-            style={{
-              backgroundColor: '#FBF8F9',
-              color: '#955F6A',
-              borderColor: '#E5D4D7'
-            }}
-          >
-            <ChevronDown className="w-3 h-3 mr-1" />
-            Viac ({prioritizedSymptoms.length - 5})
           </Badge>
         )}
       </div>
