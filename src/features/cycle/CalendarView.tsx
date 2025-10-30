@@ -974,10 +974,15 @@ export function CalendarView({
           <div className="w-6 h-6 rounded-md bg-rose-100" style={{ border: '2px solid #fb7185' }}></div>
           <span className="text-sm font-medium text-[#955F6A]">Menštruácia</span>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-md bg-pink-50" style={{ border: '2px solid #f9a8d4' }}></div>
-          <span className="text-sm font-medium text-[#955F6A]">Plodné dni</span>
-        </div>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={() => setCurrentDate(new Date())}
+          className="flex items-center gap-2 border-amber-400 text-amber-700 hover:bg-amber-50"
+        >
+          <Calendar className="w-4 h-4" />
+          <span className="font-medium">Dnes</span>
+        </Button>
       </div>
 
       {/* Calendar Grid */}
@@ -1084,11 +1089,11 @@ export function CalendarView({
                   dayClasses += " hover:bg-white/80 border-gray-100 bg-white/60";
                 }
 
-                // Today's border - enhanced for 3D effect
+                // Today's border - enhanced for 3D effect with warm yellow
                 if (isCurrentDay && !isSelected) {
-                  dayClasses += " ring-2 ring-rose-400 ring-offset-1";
+                  dayClasses += " ring-2 ring-amber-400 ring-offset-1";
                   if (hasSymptoms) {
-                    dayStyle.boxShadow += ', 0 0 0 3px rgba(244, 63, 94, 0.3)';
+                    dayStyle.boxShadow += ', 0 0 0 3px rgba(251, 191, 36, 0.3)';
                   }
                 }
                 return <div key={date.getTime()} className={dayClasses} style={dayStyle} onClick={() => handleDayClick(date)}>
@@ -1118,7 +1123,7 @@ export function CalendarView({
                         </div>
                         
                         {/* Today indicator overlay */}
-                        {isCurrentDay && !selectedOutcome && !isSelected && <div className="absolute inset-0 rounded-lg bg-rose-400/10"></div>}
+                        {isCurrentDay && !selectedOutcome && !isSelected && <div className="absolute inset-0 rounded-lg bg-amber-50"></div>}
                       </div>;
               })}
                 </div>
