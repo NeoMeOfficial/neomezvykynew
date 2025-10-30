@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Clock, Calendar, AlertCircle } from 'lucide-react';
+import { Clock } from 'lucide-react';
 import { format, addDays, differenceInDays } from 'date-fns';
 import { sk } from 'date-fns/locale';
 import { WellnessDonutChart } from '../WellnessDonutChart';
@@ -121,55 +121,49 @@ export function TodaysEstimateSection({
               {uiState === 'info' && (
                 <button
                   onClick={() => setDialogOpen(true)}
-                  className="w-full flex items-center justify-between gap-2 px-4 py-2.5 text-sm font-medium rounded-3xl bg-white border border-rose-200/20 hover:bg-rose-50 transition-all"
+                  className="w-full flex items-center justify-center px-4 py-2.5 text-sm font-medium rounded-3xl bg-white border border-rose-200/20 hover:bg-rose-50 transition-all"
                   style={{ color: '#FF7782' }}
                 >
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-3.5 h-3.5" />
-                    <span>Ďalšia menštruácia by ti mala začať: {formatDate(nextPeriodDate)}</span>
-                  </div>
+                  <span>Ďalšia menštruácia by ti mala začať: {formatDate(nextPeriodDate)}</span>
                 </button>
               )}
 
               {uiState === 'approaching' && (
                 <button
                   onClick={() => setDialogOpen(true)}
-                  className="w-full flex items-center justify-between gap-2 px-4 py-3 text-sm font-medium rounded-3xl bg-amber-50 border border-amber-200 hover:bg-amber-100 transition-all"
+                  className="w-full flex flex-col items-center gap-1 px-4 py-3 text-center rounded-3xl bg-amber-50 border border-amber-200 hover:bg-amber-100 transition-all"
                   style={{ color: '#d97706' }}
                 >
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4" />
-                    <span>O {Math.abs(daysUntilPeriod!)} {Math.abs(daysUntilPeriod!) === 1 ? 'deň' : 'dni'} by mala začať menštruácia</span>
-                  </div>
-                  <span className="text-xs opacity-70">Klikni pre potvrdenie</span>
+                  <span className="text-sm font-semibold">
+                    O {Math.abs(daysUntilPeriod!)} {Math.abs(daysUntilPeriod!) === 1 ? 'deň' : 'dni'} by mala začať menštruácia
+                  </span>
+                  <span className="text-xs opacity-60 font-normal">Klikni pre potvrdenie</span>
                 </button>
               )}
 
               {uiState === 'imminent' && (
                 <button
                   onClick={() => setDialogOpen(true)}
-                  className="w-full flex items-center justify-between gap-2 px-4 py-3 text-sm font-medium rounded-3xl bg-rose-50 border border-rose-300 hover:bg-rose-100 transition-all animate-pulse"
+                  className="w-full flex flex-col items-center gap-1 px-4 py-3 text-center rounded-3xl bg-rose-50 border border-rose-300 hover:bg-rose-100 transition-all animate-pulse"
                   style={{ color: '#FF7782' }}
                 >
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4" />
-                    <span>Menštruácia by mala začať {daysUntilPeriod === 0 ? 'dnes' : `o ${daysUntilPeriod} ${daysUntilPeriod === 1 ? 'deň' : 'dni'}`}</span>
-                  </div>
-                  <span className="text-xs font-bold">Už začala?</span>
+                  <span className="text-sm font-semibold">
+                    Menštruácia by mala začať {daysUntilPeriod === 0 ? 'dnes' : `o ${daysUntilPeriod} ${daysUntilPeriod === 1 ? 'deň' : 'dni'}`}
+                  </span>
+                  <span className="text-xs opacity-60 font-semibold">Už začala?</span>
                 </button>
               )}
 
               {(uiState === 'overdue' || uiState === 'late') && (
                 <button
                   onClick={() => setDialogOpen(true)}
-                  className="w-full flex items-center justify-between gap-2 px-4 py-3 text-sm font-medium rounded-3xl bg-red-50 border-2 border-red-400 hover:bg-red-100 transition-all"
+                  className="w-full flex flex-col items-center gap-1 px-4 py-3 text-center rounded-3xl bg-red-50 border-2 border-red-400 hover:bg-red-100 transition-all"
                   style={{ color: '#dc2626' }}
                 >
-                  <div className="flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4" />
-                    <span>Menštruácia mešká {Math.abs(daysUntilPeriod!)} {Math.abs(daysUntilPeriod!) === 1 ? 'deň' : 'dní'}</span>
-                  </div>
-                  <span className="text-xs font-bold">Potvrdiť začiatok</span>
+                  <span className="text-sm font-semibold">
+                    Menštruácia mešká {Math.abs(daysUntilPeriod!)} {Math.abs(daysUntilPeriod!) === 1 ? 'deň' : 'dní'}
+                  </span>
+                  <span className="text-xs opacity-60 font-semibold">Potvrdiť začiatok</span>
                 </button>
               )}
             </div>
