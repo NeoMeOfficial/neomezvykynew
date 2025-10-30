@@ -12,6 +12,12 @@ interface DailyPlanViewProps {
 export function DailyPlanView({ currentDay, currentPhase }: DailyPlanViewProps) {
   const { data: tips, isLoading } = useCycleTips(currentDay, currentPhase.key);
   
+  // Helper function to parse bullet points from text
+  const parseBulletPoints = (text: string) => {
+    const lines = text.split('\n').filter(line => line.trim());
+    return lines.map(line => line.replace(/^-\s*/, '').trim());
+  };
+  
   if (isLoading) {
     return (
       <div className="py-16">
@@ -70,11 +76,36 @@ export function DailyPlanView({ currentDay, currentPhase }: DailyPlanViewProps) 
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-sm space-y-3 leading-relaxed text-foreground/90">
-                {tips.nutrition.split('\n\n').map((para, i) => (
-                  <p key={i}>{para}</p>
+              <ul className="text-sm space-y-2 leading-relaxed text-foreground/90 list-none">
+                {parseBulletPoints(tips.nutrition).map((item, i) => (
+                  <li key={i} className="flex gap-2">
+                    <span className="text-rose-400 mt-1">•</span>
+                    <span>{item}</span>
+                  </li>
                 ))}
-              </div>
+              </ul>
+            </CardContent>
+          </Card>
+        )}
+        
+        {/* Pohyb */}
+        {tips.movement && (
+          <Card className="hover:shadow-md transition-shadow">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-3 text-lg">
+                <span className="text-2xl">🏃‍♀️</span>
+                <span>Pohyb</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ul className="text-sm space-y-2 leading-relaxed text-foreground/90 list-none">
+                {parseBulletPoints(tips.movement).map((item, i) => (
+                  <li key={i} className="flex gap-2">
+                    <span className="text-rose-400 mt-1">•</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
             </CardContent>
           </Card>
         )}
@@ -101,25 +132,6 @@ export function DailyPlanView({ currentDay, currentPhase }: DailyPlanViewProps) 
                     </p>
                   );
                 })}
-              </div>
-            </CardContent>
-          </Card>
-        )}
-        
-        {/* Pohyb */}
-        {tips.movement && (
-          <Card className="hover:shadow-md transition-shadow">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-3 text-lg">
-                <span className="text-2xl">🏃‍♀️</span>
-                <span>Pohyb</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-sm space-y-3 leading-relaxed text-foreground/90">
-                {tips.movement.split('\n\n').map((para, i) => (
-                  <p key={i}>{para}</p>
-                ))}
               </div>
             </CardContent>
           </Card>
