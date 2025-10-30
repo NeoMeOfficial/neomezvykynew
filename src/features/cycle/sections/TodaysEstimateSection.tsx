@@ -115,16 +115,6 @@ export function TodaysEstimateSection({
             currentPhase={derivedState.currentPhase} 
           />
           
-          {/* How do you feel today section */}
-          <div className="space-y-2 mt-6" data-tour="symptom-tracker">
-            <SymptomTracker 
-              currentPhase={currentPhase.key as PhaseKey} 
-              currentDay={currentDay} 
-              accessCode={accessCode} 
-              lastPeriodStart={lastPeriodStart} 
-            />
-          </div>
-
           {/* Smart period prediction button */}
           {uiState && nextPeriodDate && (
             <div className="mt-4">
@@ -184,6 +174,16 @@ export function TodaysEstimateSection({
               )}
             </div>
           )}
+
+          {/* How do you feel today section */}
+          <div className="space-y-2 mt-6" data-tour="symptom-tracker">
+            <SymptomTracker 
+              currentPhase={currentPhase.key as PhaseKey} 
+              currentDay={currentDay} 
+              accessCode={accessCode} 
+              lastPeriodStart={lastPeriodStart} 
+            />
+          </div>
         </div>
       </div>
 
