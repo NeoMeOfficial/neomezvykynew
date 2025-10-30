@@ -13,7 +13,11 @@ export function DailyPlanView({ currentDay, currentPhase }: DailyPlanViewProps) 
   const { data: tips, isLoading } = useCycleTips(currentDay, currentPhase.key);
   
   if (isLoading) {
-    return <FadingWordsLoader />;
+    return (
+      <div className="py-16">
+        <FadingWordsLoader />
+      </div>
+    );
   }
 
   if (!tips || (!tips.expectation && !tips.nutrition && !tips.mind && !tips.movement)) {
