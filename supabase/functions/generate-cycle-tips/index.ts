@@ -154,7 +154,7 @@ serve(async (req) => {
             "Znížiš stres, ktorý možno pociťuješ.",
             "Vyčistíš si hlavu od nekonečných myšlienok.",
             "Zlepšíš náladu vďaka prirodzenému dopamínu.",
-            "Krátka chôdza ťa vráti späť 'do tela', nie do úloh.",
+            "Krátka chôdza ťa vráti späť „do tela", nie do úloh.",
             "Pomôže ti mať kvalitnejší spánok — aj keď máš milión vecí v hlave.",
             "Uvoľníš stuhnuté svaly.",
             "Vyrovnáš si hormóny a upokojíš nervový systém."
@@ -254,7 +254,7 @@ serve(async (req) => {
         mind: {
           practicalThoughts: [
             "Ak cítiš podráždenie, nie si zlá – len tvoje telo potrebuje viac pokoja.",
-            "Dnes si urči jasnú hranicu – napríklad 'po ôsmej už neodpovedám na správy'.",
+            "Dnes si urči jasnú hranicu – napríklad „po ôsmej už neodpovedám na správy".",
             "Vyčisti si hlavu aj priestor – upratovanie pôsobí ako terapia.",
             "Ak sa cítiš unavená, vyber si najdôležitejšiu vec dňa a ostatné nechaj tak.",
             "Tvoje telo reaguje citlivejšie – skús si dopriať pokojnejšie prostredie."
@@ -338,7 +338,7 @@ serve(async (req) => {
             "Prechádzka ti pomôže uvoľniť napätie, ktoré sa ti hromadilo celý deň.",
             "Znížiš stres, ktorý možno pociťuješ.",
             "Vyčistíš si hlavu od nekonečných myšlienok.",
-            "Krátka chôdza ťa vráti späť 'do tela', nie do úloh.",
+            "Krátka chôdza ťa vráti späť „do tela", nie do úloh.",
             "Znížiš chuť na sladké.",
             "Uvoľníš stuhnuté svaly.",
             "Vyrovnáš si hormóny a upokojíš nervový systém.",
