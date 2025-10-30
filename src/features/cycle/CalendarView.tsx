@@ -1246,7 +1246,10 @@ export function CalendarView({
           <p className="text-xs" style={{
         color: '#955F6A'
       }}>
-            {selectedOutcome === 'next-period' ? 'Červené dni označujú očakávanú menštruáciu na základe vášho cyklu.' : 'Ružové dni označujú plodné dni, kedy je najväčšia pravdepodobnosť otehotnenia.'}
+            {selectedOutcome === 'next-period' 
+              ? 'Červené dni označujú očakávanú menštruáciu na základe vášho cyklu.' 
+              : <>Ružové dni označujú <strong>odhadované</strong> plodné dni, kedy je najväčšia pravdepodobnosť otehotnenia.</>
+            }
           </p>
         </div>}
 
