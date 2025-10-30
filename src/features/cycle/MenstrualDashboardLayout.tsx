@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { format } from 'date-fns';
 import { Calendar as CalendarIcon, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -38,10 +39,24 @@ export function MenstrualDashboardLayout({
     setLastPeriodStart,
     setCycleLength,
     setPeriodLength,
+    addPeriodToHistory,
     updateCycleData,
     setPeriodIntensity,
     getPeriodIntensity
   } = useCycleData(accessCode);
+  
+  const handlePeriodStart = (date: Date) => {
+    setLastPeriodStart(date);
+    handleFirstInteraction();
+  };
+
+  const handlePeriodEnd = (startDate: Date, endDate: Date) => {
+    const startStr = format(startDate, 'yyyy-MM-dd');
+    const endStr = format(endDate, 'yyyy-MM-dd');
+    addPeriodToHistory(startStr, endStr);
+    setLastPeriodStart(startDate);
+    handleFirstInteraction();
+  };
   const handleFirstInteraction = () => {
     onFirstInteraction?.();
   };
@@ -86,7 +101,13 @@ export function MenstrualDashboardLayout({
         </div>
 
         {/* Next Dates Info for Mobile */}
-        <NextDatesInfo lastPeriodStart={cycleData.lastPeriodStart} cycleLength={cycleData.cycleLength} onEditClick={() => setShowDatePicker(true)} />
+        <NextDatesInfo 
+          lastPeriodStart={cycleData.lastPeriodStart} 
+          cycleLength={cycleData.cycleLength} 
+          onEditClick={() => setShowDatePicker(true)}
+          onPeriodStart={handlePeriodStart}
+          onPeriodEnd={handlePeriodEnd}
+        />
 
         {/* All sections for mobile */}
         <div className="space-y-8">
@@ -119,7 +140,18 @@ export function MenstrualDashboardLayout({
 
   // Desktop view - sidebar layout
   return <div className="min-h-screen flex w-full bg-background">
-        <MenstrualSidebar activeSection={activeSection} onSectionChange={setActiveSection} onEditClick={() => setShowDatePicker(true)} onSettingsClick={() => setShowSettings(true)} onShareClick={() => setShowShareDialog(true)} accessCode={accessCode} lastPeriodStart={cycleData.lastPeriodStart} cycleLength={cycleData.cycleLength} />
+        <MenstrualSidebar 
+          activeSection={activeSection} 
+          onSectionChange={setActiveSection} 
+          onEditClick={() => setShowDatePicker(true)} 
+          onSettingsClick={() => setShowSettings(true)} 
+          onShareClick={() => setShowShareDialog(true)} 
+          accessCode={accessCode} 
+          lastPeriodStart={cycleData.lastPeriodStart} 
+          cycleLength={cycleData.cycleLength}
+          onPeriodStart={handlePeriodStart}
+          onPeriodEnd={handlePeriodEnd}
+        />
         
         <main className="flex-1 p-8 max-w-none">
           {/* Tour and Header */}

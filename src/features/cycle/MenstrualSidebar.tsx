@@ -16,6 +16,8 @@ interface MenstrualSidebarProps {
   accessCode?: string;
   lastPeriodStart?: string | null;
   cycleLength?: number;
+  onPeriodStart?: (date: Date) => void;
+  onPeriodEnd?: (startDate: Date, endDate: Date) => void;
 }
 
 const menuItems = [
@@ -36,7 +38,18 @@ const menuItems = [
   },
 ];
 
-export function MenstrualSidebar({ activeSection, onSectionChange, onEditClick, onSettingsClick, onShareClick, accessCode, lastPeriodStart, cycleLength = 28 }: MenstrualSidebarProps) {
+export function MenstrualSidebar({ 
+  activeSection, 
+  onSectionChange, 
+  onEditClick, 
+  onSettingsClick, 
+  onShareClick, 
+  accessCode, 
+  lastPeriodStart, 
+  cycleLength = 28,
+  onPeriodStart,
+  onPeriodEnd
+}: MenstrualSidebarProps) {
   const navigate = useNavigate();
   const hasTemporaryData = temporaryStorage.isSessionActive() && temporaryStorage.hasTemporaryData();
   const [runTour, setRunTour] = useState(false);
@@ -129,7 +142,13 @@ export function MenstrualSidebar({ activeSection, onSectionChange, onEditClick, 
                       )}
                     </div>
                     
-                    <NextDatesInfo lastPeriodStart={lastPeriodStart} cycleLength={cycleLength} onEditClick={onEditClick} />
+                    <NextDatesInfo 
+                      lastPeriodStart={lastPeriodStart} 
+                      cycleLength={cycleLength} 
+                      onEditClick={onEditClick}
+                      onPeriodStart={onPeriodStart}
+                      onPeriodEnd={onPeriodEnd}
+                    />
 
                     {/* Temporary Data Indicator */}
                     {hasTemporaryData && !accessCode && (
