@@ -1099,6 +1099,9 @@ export function CalendarView({
                           {format(date, 'd')}
                         </span>
                         
+                        {/* Notes indicator - positioned in top-right corner */}
+                        {hasNotes && <Pen className="w-3 h-3 text-[#955F6A] absolute top-0.5 right-0.5" strokeWidth={2.5} />}
+                        
                         {/* Indicators container */}
                         <div className="absolute bottom-1 left-1 right-1 flex justify-center gap-1 flex-wrap">
                           {/* Period intensity indicator */}
@@ -1114,9 +1117,6 @@ export function CalendarView({
                           
                           {/* Additional symptoms indicator */}
                           {dayData.symptoms.filter(symptom => selectedSymptoms.includes(symptom)).length > 4 && <div className="text-[10px] text-gray-600 font-bold">+</div>}
-                          
-                          {/* Notes indicator */}
-                          {hasNotes && <Pen className="w-3 h-3 text-[#955F6A] absolute top-0.5 left-0.5" strokeWidth={2.5} />}
                         </div>
                         
                         {/* Today indicator overlay */}
