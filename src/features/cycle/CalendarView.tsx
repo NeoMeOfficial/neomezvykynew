@@ -1088,7 +1088,13 @@ export function CalendarView({
       <Dialog open={!!selectedDayData} onOpenChange={(open) => !open && setSelectedDayData(null)}>
         <DialogContent className={isMobile ? 'w-full max-w-[95%] max-h-[85vh] overflow-y-auto p-0' : 'sm:max-w-lg'}>
           {selectedDayData && (
-            <div className="bg-white/95 backdrop-blur-sm overflow-hidden h-full flex flex-col">
+            <div 
+              className="overflow-hidden h-full flex flex-col"
+              style={{
+                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(253, 242, 248, 0.98) 100%)',
+                boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 8px 32px rgba(149, 95, 106, 0.2)'
+              }}
+            >
               {/* Elegant header with glassmorphism */}
               <div className={`bg-gradient-to-r from-rose-50/90 to-pink-50/90 border-b border-rose-100/50 ${isMobile ? 'px-4 py-4' : 'px-6 py-4'}`}>
                 <div className="flex items-center justify-between">
