@@ -51,7 +51,6 @@ export function CalendarView({
     notes: string;
     date: Date;
   } | null>(null);
-  const [expandedRow, setExpandedRow] = useState<number | null>(null);
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
   const [exportStartMonth, setExportStartMonth] = useState<string>('');
   const [exportEndMonth, setExportEndMonth] = useState<string>('');
@@ -725,63 +724,19 @@ export function CalendarView({
     setCurrentDate(prev => direction === 'prev' ? subMonths(prev, 1) : addMonths(prev, 1));
   };
   const handleDayClick = (date: Date) => {
-    if (readOnly) {
-      // In read-only mode, only show the expansion
-      const dayData = getDayData(date);
-      const dayIndex = calendarPeriod.days.findIndex(d => d && isSameDay(d, date));
-      const rowIndex = Math.floor(dayIndex / 7);
-      if (selectedDayData && isSameDay(selectedDayData.date, date)) {
-        setSelectedDayData(null);
-        setExpandedRow(null);
-      } else {
-        setSelectedDayData({
-          ...dayData,
-          date
-        });
-        setExpandedRow(rowIndex);
-        
-        // Scroll to expanded content on mobile after a brief delay
-        if (isMobile) {
-          setTimeout(() => {
-            const expandedElement = document.querySelector('.animate-accordion-down');
-            if (expandedElement) {
-              expandedElement.scrollIntoView({ 
-                behavior: 'smooth', 
-                block: 'nearest'
-              });
-            }
-          }, 100);
-        }
-      }
-      return;
-    }
     const dayData = getDayData(date);
-    const dayIndex = calendarPeriod.days.findIndex(d => d && isSameDay(d, date));
-    const rowIndex = Math.floor(dayIndex / 7);
-
-    // Toggle expansion - if same day clicked, collapse; otherwise expand new day
-    if (selectedDayData && isSameDay(selectedDayData.date, date)) {
+    const isSelected = selectedDayData && isSameDay(selectedDayData.date, date);
+    
+    if (isSelected) {
+      // Close if clicking the same day
       setSelectedDayData(null);
-      setExpandedRow(null);
     } else {
+      // Open with new day data
       setSelectedDayData({
-        ...dayData,
-        date
+        symptoms: dayData.symptoms,
+        notes: dayData.notes,
+        date: date
       });
-      setExpandedRow(rowIndex);
-      
-      // Scroll to expanded content on mobile after a brief delay
-      if (isMobile) {
-        setTimeout(() => {
-          const expandedElement = document.querySelector('.animate-accordion-down');
-          if (expandedElement) {
-            expandedElement.scrollIntoView({ 
-              behavior: 'smooth', 
-              block: 'nearest'
-            });
-          }
-        }, 100);
-      }
     }
 
     // Still show period intensity selector if it's a period day
@@ -1124,114 +1079,120 @@ export function CalendarView({
                       </div>;
               })}
                 </div>
-                
-                {/* Inline Expansion Panel */}
-                {expandedRow === rowIndex && selectedDayData && <div className="grid grid-cols-1 overflow-hidden animate-accordion-down" style={{
-              animation: 'accordion-down 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
-            }}>
-                    <div className={isMobile ? "mx-1 mt-2 mb-2" : "mx-1 mt-2 mb-4"}>
-                      <div className="bg-white/95 backdrop-blur-sm rounded-2xl border border-rose-200/50 shadow-xl overflow-hidden">
-                        {/* Elegant header with glassmorphism */}
-                        <div className={`bg-gradient-to-r from-rose-50/90 to-pink-50/90 border-b border-rose-100/50 ${isMobile ? 'px-3 py-3' : 'px-6 py-4'}`}>
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-full bg-rose-100 flex items-center justify-center">
-                                <span className="text-sm font-medium text-rose-600">
-                                  {format(selectedDayData.date, 'd')}
-                                </span>
-                              </div>
-                              <h4 className="font-medium text-rose-800">
-                                Detaily pre {(() => {
-                                  const formatted = format(selectedDayData.date, 'd. MMMM', { locale: sk });
-                                  return formatted.charAt(0).toUpperCase() + formatted.slice(1);
-                                })()}
-                              </h4>
-                            </div>
-                            <Button size="sm" variant="ghost" onClick={() => {
-                        setSelectedDayData(null);
-                        setExpandedRow(null);
-                      }} className="text-rose-600 hover:text-rose-700 hover:bg-rose-100/50 rounded-full w-10 h-10 p-0 text-2xl font-light">
-                              ×
-                            </Button>
-                          </div>
-                        </div>
-                        
-                        {/* Content with elegant spacing */}
-                        <div className={isMobile ? "p-3 space-y-4" : "p-6 space-y-5"}>
-                          {selectedDayData.symptoms.length > 0 && <div className="animate-fade-in" style={{
-                      animationDelay: '0.1s'
-                    }}>
-                              <h5 className="text-sm font-medium mb-3 text-rose-700 flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full bg-rose-400"></div>
-                                Príznaky
-                              </h5>
-                              <div className="flex flex-wrap gap-2">
-                                {selectedDayData.symptoms.slice(0, isMobile ? 3 : undefined).map((symptom, index) => {
-                          const color = getSymptomColor(symptom);
-                          return <Badge key={symptom} variant="outline" className={`text-xs transition-all duration-200 hover:scale-105 ${color ? 'text-white border-transparent shadow-sm' : 'border-rose-200 text-rose-700 bg-rose-50/50'}`} style={{
-                            backgroundColor: color || undefined,
-                            borderColor: color || undefined,
-                            animationDelay: `${index * 0.05}s`
-                          }}>
-                                      {symptom}
-                                    </Badge>;
-                        })}
-                                {isMobile && selectedDayData.symptoms.length > 3 && (
-                                  <Badge variant="outline" className="text-xs border-rose-200 text-rose-700 bg-rose-50/50">
-                                    +{selectedDayData.symptoms.length - 3}
-                                  </Badge>
-                                )}
-                              </div>
-                            </div>}
-                          
-                          {selectedDayData.notes && <div className="animate-fade-in" style={{
-                      animationDelay: '0.2s'
-                    }}>
-                              <h5 className="text-sm font-medium mb-3 text-rose-700 flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full bg-rose-400"></div>
-                                Poznámky
-                              </h5>
-                              <div className={`bg-rose-50/50 rounded-xl border border-rose-100/50 ${isMobile ? 'p-3' : 'p-4'}`}>
-                                <p className="text-sm text-rose-800 leading-relaxed">
-                                  {selectedDayData.notes}
-                                </p>
-                              </div>
-                            </div>}
-                          
-                          {/* Symptom Tracker for current day */}
-                          {!readOnly && (() => {
-                      const lastPeriodDate = cycleData.lastPeriodStart ? typeof cycleData.lastPeriodStart === 'string' ? new Date(cycleData.lastPeriodStart) : cycleData.lastPeriodStart : null;
-                      if (!lastPeriodDate) return null;
-                      const daysSinceStart = differenceInDays(selectedDayData.date, lastPeriodDate);
-                      const currentDay = daysSinceStart + 1;
-                      const currentPhaseInfo = getCurrentDayPhase(selectedDayData.date);
-                      if (!currentPhaseInfo) return null;
-                      return <div className="animate-fade-in border-t border-rose-100/50 pt-5" style={{
-                        animationDelay: '0.3s'
-                      }}>
-                                <h5 className="text-sm font-medium mb-3 text-rose-700 flex items-center gap-2">
-                                  <div className="w-2 h-2 rounded-full bg-rose-400"></div>
-                                  Zaznamenať príznaky
-                                </h5>
-                                <SymptomTracker currentPhase={currentPhaseInfo.key} currentDay={currentDay} accessCode={accessCode} lastPeriodStart={cycleData.lastPeriodStart} />
-                              </div>;
-                    })()}
-                          
-                          {selectedDayData.symptoms.length === 0 && !selectedDayData.notes && readOnly && <div className="text-center py-8 animate-fade-in">
-                              <div className="w-12 h-12 rounded-full bg-rose-100 flex items-center justify-center mx-auto mb-3">
-                                <FileText className="w-6 h-6 text-rose-400" />
-                              </div>
-                              <p className="text-sm text-rose-600">Žiadne záznamy pre tento deň.</p>
-                            </div>}
-                        </div>
-                      </div>
-                    </div>
-                  </div>}
               </div>;
         })}
-        </div>
+          </div>
       </div>
-
+      
+      {/* Day Detail Dialog */}
+      <Dialog open={!!selectedDayData} onOpenChange={(open) => !open && setSelectedDayData(null)}>
+        <DialogContent className={isMobile ? 'w-full h-full max-w-full rounded-none p-0' : 'sm:max-w-lg'}>
+          {selectedDayData && (
+            <div className="bg-white/95 backdrop-blur-sm overflow-hidden h-full flex flex-col">
+              {/* Elegant header with glassmorphism */}
+              <div className={`bg-gradient-to-r from-rose-50/90 to-pink-50/90 border-b border-rose-100/50 ${isMobile ? 'px-4 py-4' : 'px-6 py-4'}`}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-rose-100 flex items-center justify-center">
+                      <span className="text-base font-medium text-rose-600">
+                        {format(selectedDayData.date, 'd')}
+                      </span>
+                    </div>
+                    <h4 className="font-medium text-rose-800 text-base">
+                      Detaily pre {(() => {
+                        const formatted = format(selectedDayData.date, 'd. MMMM', { locale: sk });
+                        return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+                      })()}
+                    </h4>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Content with elegant spacing */}
+              <div className={`${isMobile ? 'p-4 space-y-5' : 'p-6 space-y-5'} flex-1 overflow-y-auto`}>
+                {selectedDayData.symptoms.length > 0 && (
+                  <div className="animate-fade-in" style={{ animationDelay: '0.1s' }}>
+                    <h5 className="text-sm font-medium mb-3 text-rose-700 flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-rose-400"></div>
+                      Príznaky
+                    </h5>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedDayData.symptoms.map((symptom, index) => {
+                        const color = getSymptomColor(symptom);
+                        return (
+                          <Badge 
+                            key={symptom} 
+                            variant="outline" 
+                            className={`text-xs transition-all duration-200 hover:scale-105 ${color ? 'text-white border-transparent shadow-sm' : 'border-rose-200 text-rose-700 bg-rose-50/50'}`}
+                            style={{
+                              backgroundColor: color || undefined,
+                              borderColor: color || undefined,
+                              animationDelay: `${index * 0.05}s`
+                            }}
+                          >
+                            {symptom}
+                          </Badge>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+                
+                {selectedDayData.notes && (
+                  <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
+                    <h5 className="text-sm font-medium mb-3 text-rose-700 flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-rose-400"></div>
+                      Poznámky
+                    </h5>
+                    <div className={`bg-rose-50/50 rounded-xl border border-rose-100/50 ${isMobile ? 'p-3' : 'p-4'}`}>
+                      <p className="text-sm text-rose-800 leading-relaxed">
+                        {selectedDayData.notes}
+                      </p>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Symptom Tracker for current day */}
+                {!readOnly && (() => {
+                  const lastPeriodDate = cycleData.lastPeriodStart 
+                    ? typeof cycleData.lastPeriodStart === 'string' 
+                      ? new Date(cycleData.lastPeriodStart) 
+                      : cycleData.lastPeriodStart 
+                    : null;
+                  if (!lastPeriodDate) return null;
+                  const daysSinceStart = differenceInDays(selectedDayData.date, lastPeriodDate);
+                  const currentDay = daysSinceStart + 1;
+                  const currentPhaseInfo = getCurrentDayPhase(selectedDayData.date);
+                  if (!currentPhaseInfo) return null;
+                  return (
+                    <div className="animate-fade-in border-t border-rose-100/50 pt-5" style={{ animationDelay: '0.3s' }}>
+                      <h5 className="text-sm font-medium mb-3 text-rose-700 flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-rose-400"></div>
+                        Zaznamenať príznaky
+                      </h5>
+                      <SymptomTracker 
+                        currentPhase={currentPhaseInfo.key} 
+                        currentDay={currentDay} 
+                        accessCode={accessCode} 
+                        lastPeriodStart={cycleData.lastPeriodStart} 
+                      />
+                    </div>
+                  );
+                })()}
+                
+                {selectedDayData.symptoms.length === 0 && !selectedDayData.notes && readOnly && (
+                  <div className="text-center py-8 animate-fade-in">
+                    <div className="w-12 h-12 rounded-full bg-rose-100 flex items-center justify-center mx-auto mb-3">
+                      <FileText className="w-6 h-6 text-rose-400" />
+                    </div>
+                    <p className="text-sm text-rose-600">Žiadne záznamy pre tento deň.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Current Selection Info */}
       {selectedOutcome && <div className="mt-4 p-3 bg-white/80 rounded-lg border border-rose-200/50">
