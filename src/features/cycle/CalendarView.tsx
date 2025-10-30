@@ -1086,7 +1086,7 @@ export function CalendarView({
       
       {/* Day Detail Dialog */}
       <Dialog open={!!selectedDayData} onOpenChange={(open) => !open && setSelectedDayData(null)}>
-        <DialogContent className={isMobile ? 'w-full h-full max-w-full rounded-none p-0' : 'sm:max-w-lg'}>
+        <DialogContent className={isMobile ? 'w-full max-w-[95%] max-h-[85vh] overflow-y-auto p-0' : 'sm:max-w-lg'}>
           {selectedDayData && (
             <div className="bg-white/95 backdrop-blur-sm overflow-hidden h-full flex flex-col">
               {/* Elegant header with glassmorphism */}
