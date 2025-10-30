@@ -1079,9 +1079,6 @@ export function CalendarView({
                   if (dayInfo.isPeriod) {
                     dayClasses += " bg-rose-100";
                     dayStyle.border = '2px solid #fb7185'; // rose-400
-                  } else if (dayInfo.isFertile) {
-                    dayClasses += " bg-pink-50";
-                    dayStyle.border = '2px solid #f9a8d4'; // pink-300
                   } else {
                     dayClasses += " hover:bg-white/80 border-gray-100 bg-white/60";
                   }
