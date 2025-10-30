@@ -413,7 +413,7 @@ export function SymptomTracker({
         <Textarea value={notes} onChange={e => {
         setNotes(e.target.value);
         setHasChanges(true);
-      }} placeholder="..." className="min-h-[80px] resize-none placeholder:text-[#955F6A]" style={{
+      }} placeholder="..." className="min-h-[80px] resize-none placeholder:text-[#955F6A] focus:border-rose-300 focus:ring-2 focus:ring-rose-200" style={{
         backgroundColor: '#FBF8F9',
         borderColor: '#E5D4D7',
         color: '#955F6A'
