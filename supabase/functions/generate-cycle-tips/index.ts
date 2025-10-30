@@ -34,27 +34,25 @@ serve(async (req) => {
       // Menstrual phase: always days 1-5
       const menstrualEnd = 5;
       
-      // Luteal phase: typically 12-14 days before next period
-      const lutealLength = Math.round(cycleLength * 0.43); // ~43% of cycle (12-15 days for 28-35 day cycles)
-      const lutealStart = cycleLength - lutealLength + 1;
+      // Ovulation: always 1 day at cycleLength - 14
+      const ovulationDay = cycleLength - 14;
       
-      // Ovulation: typically 3 days in the middle
-      const ovulationLength = 3;
-      const ovulationStart = Math.round((menstrualEnd + lutealStart) / 2) - 1;
-      const ovulationEnd = ovulationStart + ovulationLength - 1;
+      // Luteal phase: always starts at cycleLength - 13 (14 days total)
+      const lutealStart = cycleLength - 13;
+      const lutealLength = 14;
       
-      // Follicular: from end of menstrual to start of ovulation
+      // Follicular: from end of menstrual to before ovulation
       const follicularStart = menstrualEnd + 1;
-      const follicularEnd = ovulationStart - 1;
+      const follicularEnd = ovulationDay - 1;
       
-      // Luteal subphases
-      const lutealEarlyEnd = lutealStart + Math.round(lutealLength * 0.31) - 1; // ~31% of luteal
-      const lutealMidEnd = lutealStart + Math.round(lutealLength * 0.69) - 1;   // ~69% of luteal
+      // Luteal subphases (14 days total)
+      const lutealEarlyEnd = lutealStart + Math.round(lutealLength * 0.31) - 1; // ~4-5 days
+      const lutealMidEnd = lutealStart + Math.round(lutealLength * 0.69) - 1;   // ~9-10 days
       
       return {
         menstrual: { start: 1, end: menstrualEnd },
         follicular: { start: follicularStart, end: follicularEnd },
-        ovulation: { start: ovulationStart, end: ovulationEnd },
+        ovulation: { start: ovulationDay, end: ovulationDay }, // 1 day only
         lutealEarly: { start: lutealStart, end: lutealEarlyEnd },
         lutealMid: { start: lutealEarlyEnd + 1, end: lutealMidEnd },
         lutealLate: { start: lutealMidEnd + 1, end: cycleLength }
@@ -98,13 +96,13 @@ serve(async (req) => {
         }
       }
       
-      // Ovulation phase: last day of ovulation only (to maintain 3-day gap from follicular)
-      if (day === ranges.ovulation.end) {
+      // Ovulation phase: the single ovulation day (to maintain 3-day gap from follicular)
+      if (day === ranges.ovulation.start) {
         return "Dnes by mal byť ideálny deň pre intervalové kardio - skús 20-30 minút v pomere 2:1 alebo 4:3 (2 minúty naplno, 1 minúta vydychové tempo, alebo 4 minúty naplno, 3 minúty vydychové tempo). Vyber si beh, bicykel, švihadlo alebo eliptický trenažér.";
       }
       
-      // Early Luteal phase: 3rd day after ovulation end
-      const earlyLutealCardioDay = ranges.ovulation.end + 3;
+      // Early Luteal phase: 3rd day after ovulation
+      const earlyLutealCardioDay = ranges.ovulation.start + 3;
       if (day === earlyLutealCardioDay && day <= ranges.lutealEarly.end) {
         return "Môžeš ešte zaradiť intervalový tréning, ale počúvaj svoje telo - 20-30 minút v pomere 1:1. Skús beh, bicykel, švihadlo alebo eliptický trenažér.";
       }

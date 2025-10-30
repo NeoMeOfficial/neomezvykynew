@@ -13,14 +13,17 @@ export function dayFractionInPhase(day: number, phase: PhaseRange): number {
 
 export function getPhaseRanges(cycleLength: number, periodLength: number): PhaseRange[] {
   const follicularStart = periodLength + 1;
-  const ovulationStart = Math.max(follicularStart, cycleLength - 16);
-  const ovulationEnd = Math.min(ovulationStart + 2, cycleLength - 3);
-  const lutealStart = ovulationEnd + 1;
+  
+  // Ovulation: always 1 day at cycleLength - 14
+  const ovulationDay = cycleLength - 14;
+  
+  // Luteal: always starts at cycleLength - 13 (14 days total)
+  const lutealStart = cycleLength - 13;
 
   return [
     { key: "menstrual", name: "Menštruácia", start: 1, end: periodLength },
-    { key: "follicular", name: "Folikulárna", start: follicularStart, end: ovulationStart - 1 },
-    { key: "ovulation", name: "Ovulácia", start: ovulationStart, end: ovulationEnd },
+    { key: "follicular", name: "Folikulárna", start: follicularStart, end: ovulationDay - 1 },
+    { key: "ovulation", name: "Ovulácia", start: ovulationDay, end: ovulationDay },
     { key: "luteal", name: "Luteálna", start: lutealStart, end: cycleLength }
   ];
 }
