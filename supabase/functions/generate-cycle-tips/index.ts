@@ -123,7 +123,7 @@ serve(async (req) => {
     const masterTemplates: Record<string, any> = {
       menstrual: {
         hormones: "Estrogén aj progesterón sú nízko",
-        expectation: "môžeš cítiť nižšiu energiu a rýchlejšie vyčerpanie",
+        expectation: "Tvoje telo práve prechádza obnovou. Estrogén aj progesterón sú na nízkych úrovniach, preto je bežné, že môžeš pociťovať nižšiu energiu a väčšiu potrebu oddychu. Ak sa cítiš unavená alebo citlivejšia, je to prirodzené – tvoje telo reštartuje hormóny na nový cyklus.",
         body: "mierny zápalový proces v maternici, možné kŕče, napätie v bruchu, citlivý chrbát",
         emotional: "nižšia tolerancia stresu, emočná citlivosť",
         nutrition: {
@@ -161,7 +161,7 @@ serve(async (req) => {
       },
       follicular: {
         hormones: "Estrogén postupne stúpa",
-        expectation: "energia, motivácia a výkonnosť sa zlepšujú",
+        expectation: "Estrogén v tvojom tele začína stúpať a s ním prichádza aj viac energie a motivácie. Môžeš si všimnúť, že sa ti ľahšie vstáva, koncentruje sa a máš chuť tvoriť alebo sa učiť. Toto obdobie je vhodné na plánovanie a nové začiatky.",
         body: "regenerácia je rýchlejšia, telo lepšie znáša fyzickú záťaž",
         emotional: "rast energie, motivácia, kreativita, pozitívne naladenie",
         nutrition: {
@@ -201,7 +201,7 @@ serve(async (req) => {
       },
       ovulation: {
         hormones: "Estrogén je na vrchole",
-        expectation: "viac energie, sebavedomia a spoločenskej otvorenosti",
+        expectation: "Estrogén je teraz na svojom vrchole, a tak môžeš pociťovať zvýšenú energiu, sebavedomie a prirodzenú chuť komunikovať a spájať sa s ľuďmi. Je to ideálny čas na dôležité rozhovory, prezentácie alebo aktivity, ktoré vyžadujú odvahu.",
         body: "silové aj kondičné výkony na maxime",
         emotional: "vysoká sebadôvera, empatia, najvyššia sociálna inteligencia",
         nutrition: {
@@ -238,7 +238,7 @@ serve(async (req) => {
       },
       lutealEarly: {
         hormones: "Progesterón stúpa",
-        expectation: "ešte dobrá energia, ale začína spomaľovať",
+        expectation: "Tvoje telo práve ukončilo ovuláciu a progesterón začína stúpať. Môžeš sa cítiť pokojnejšie a vyrovnanejšie – akoby si sa po aktívnejšom období trochu spomalila. Napriek tomu máš ešte dosť energie a sústredenia. Je to ideálny čas dokončovať veci a starať sa o svoje telo.",
         body: "telo začína byť citlivejšie na intenzitu",
         emotional: "emočná citlivosť sa zvyšuje, potreba systému",
         nutrition: {
@@ -273,7 +273,7 @@ serve(async (req) => {
       },
       lutealMid: {
         hormones: "Progesterón vysoký",
-        expectation: "energia klesá, potreba pokoja",
+        expectation: "Progesterón je teraz na vrchole a tvoje telo sa upokojuje. Môžeš pociťovať menšiu energiu a väčšiu potrebu pokoja či priestoru pre seba. Je prirodzené, ak cítiš menší záujem o sociálny kontakt alebo výkonnosť. Telo si teraz žiada pravidelnosť a jemnosť.",
         body: "nižšia tolerancia na intenzitu a teplo, trávenie citlivejšie",
         emotional: "citlivosť na stres, silnejšie chute",
         nutrition: {
@@ -309,7 +309,7 @@ serve(async (req) => {
       },
       lutealLate: {
         hormones: "Progesterón klesá",
-        expectation: "nízka energia, vyčerpanie",
+        expectation: "Progesterón aj estrogén teraz klesajú a tvoje telo sa pripravuje na menštruáciu. Môžeš sa cítiť unavená, citlivejšia alebo potrebovať viac pokoja. To nie je slabosť – je to signál, že je čas spomaliť, dopriať si teplé jedlá, jemný pohyb a kvalitný spánok.",
         body: "PMS, kŕče, nafukovanie, bolesti hlavy",
         emotional: "podráždenosť, úzkosť, citlivosť na maximum",
         nutrition: {
