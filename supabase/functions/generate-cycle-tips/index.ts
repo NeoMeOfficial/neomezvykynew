@@ -119,6 +119,38 @@ serve(async (req) => {
 
     const { phase, subphase } = getPhaseInfoDynamic(day, cycleLength);
 
+    // DAY-SPECIFIC EXPECTATIONS - 28 unique texts for each day
+    const daySpecificExpectations: Record<number, string> = {
+      1: "Prvý deň menštruácie môže byť výzvou. Estrogén aj progesterón sú na najnižších úrovniach, preto je bežné, že môžeš pociťovať kŕče, únavu a potrebu pokoja. Ak sa cítiš vyčerpaná, je to prirodzené – tvoje telo práve začína dôležitú obnovu.",
+      2: "Druhý deň často prináša najväčšiu únavu a citlivosť. Tvoje telo intenzívne pracuje na obnovení a stráca krv aj minerály. Dopraj si teplé jedlá, dostatok odpočinku a netlač sa do výkonu.",
+      3: "Tretí deň je často vrcholom únavy, ale môžeš začať pociťovať mierne zlepšenie. Kŕče sa môžu zmierniť a telo pomaly prechádza z akútnej fázy do obnovy. Je to dobré obdobie na jemný pohyb alebo strečing.",
+      4: "Štvrtý deň často prináša prvé signály zlepšenia. Prietok sa znižuje a môžeš cítiť trochu viac energie. Tvoje telo sa pripravuje na prechod do folikulárnej fázy, kde začne stúpať estrogén.",
+      5: "Posledný deň menštruácie je ako mostek do novej fázy. Prietok sa končí a estrogén začína pomaly stúpať, čo môže priniesť prvé náznaky energie a motivácie. Je to ideálny čas na plánovanie nasledujúcich dní.",
+      6: "Prvý deň po menštruácii môže priniesť pocit úľavy a prvé náznaky energie. Estrogén začína stúpať a s ním aj tvoja chuť hýbať sa a tvoriť. Je to dobrý deň na jemný štart do pohybu.",
+      7: "Energia v tvojom tele začína rásť. Môžeš si všimnúť, že sa ti ľahšie vstáva a myseľ je jasnejšia. Toto je obdobie, keď sa telo začína cítiť silnejšie a odolnejšie voči stresu.",
+      8: "Tvoje telo je v plnom rozbehu. Estrogén podporuje dopamín a serotonín, čo môže zlepšiť tvoju náladu a motiváciu. Máš väčšiu chuť na zdravé jedlá a pohyb.",
+      9: "Toto je jedna z najlepších fáz pre učenie a plánovanie. Tvoje telo rýchlejšie regeneruje a mozog je viac zameraný na nové nápady a projekty. Využi túto energiu.",
+      10: "Energia je na vysokej úrovni a tvoje telo je pripravené na výzvy. Môžeš cítiť väčšiu sebadôveru a chuť skúšať nové veci. Je to ideálne obdobie pre dôležité úlohy.",
+      11: "Tvoje telo sa pripravuje na ovuláciu. Môžeš pociťovať vysokú energiu, kreativitu a chuť spájať sa s ľuďmi. Toto je vrchol tvojej produktivity v cykle.",
+      12: "Deň pred ovuláciou je často pocitom maximálnej energie. Cítiš sa silná, sebavedomá a pripravená na všetko. Tvoje telo je v peak stave.",
+      13: "Posledný deň folikulárnej fázy prináša pocit plnosti energie. Estrogén je na vrchole a tvoje telo sa pripravuje na ovuláciu. Využi tento deň pre dôležité rozhovory alebo aktivity.",
+      14: "Estrogén je teraz na svojom vrchole a dnes sa uvoľňuje vajíčko. Môžeš pociťovať zvýšenú energiu, charizmu a prirodzenú chuť komunikovať. Je to ideálny čas na dôležité rozhovory, prezentácie alebo aktivity, ktoré vyžadujú odvahu a sebavedomie.",
+      15: "Tvoje telo práve ukončilo ovuláciu a progesterón začína stúpať. Môžeš cítiť prvé náznaky upokojenia – akoby sa tempo spomalilo. Napriek tomu máš ešte dosť energie a sústredenia.",
+      16: "Progesterón prináša pocit väčšej stability a pokoja. Môžeš si všimnúť, že máš chuť dokončovať rozpracované veci alebo organizovať svoj priestor. Telo ešte má silu fungovať naplno.",
+      17: "Toto je obdobie harmónie. Energia je stále dobrá, ale telo prechádza do režimu „zázemia". Môžeš mať lepší spánok a chuť na výživnejšie jedlá.",
+      18: "Posledný deň rannej luteálnej fázy môže priniesť prvé náznaky spomalenia. Energia je stále dobrá, ale tvoje telo začína potrebovať viac pokoja a pravidelnosti.",
+      19: "Progesterón naďalej stúpa a tvoje telo sa postupne upokojuje. Môžeš pociťovať menšiu energiu a väčšiu potrebu priestoru pre seba. Je to prirodzené – telo si žiada pokojnejšie tempo.",
+      20: "Progesterón je teraz na vrchole a tvoje telo reaguje citlivejšie na stres, kofeín či chaos. Je prirodzené, ak cítiš menší záujem o sociálny kontakt. Dopraj si pravidelnosť a jemnosť.",
+      21: "Mozog je teraz menej orientovaný na rýchle reakcie a viac na vnútorný svet. Tvoja intuícia sa zlepšuje a potrebuješ viac priestoru pre seba. Telo uprednostňuje pokoj pred výkonom.",
+      22: "Progesterón môže spomaliť trávenie, preto je dôležité jesť pravidelne a vyhýbať sa ťažkým jedlám. Môžeš cítiť nafukovanie alebo pomalšie trávenie. Teplé jedlá a tekutiny ti pomôžu.",
+      23: "Energie ubúda rýchlejšie ako pred pár dňami. Je prirodzené cítiť väčšiu potrebu odpočinku a jasných hraníc. Tvoje telo potrebuje pravidelný rytmus a dostatok spánku.",
+      24: "Progesterón sa pripravuje na pokles a tvoje telo môže reagovať citlivejšie na stres. Môžeš pociťovať prvé náznaky PMS – podráždenie, únavu alebo citlivosť.",
+      25: "Progesterón začína klesať a s ním môže prichádzať väčšia citlivosť či únava. Je to signál, že tvoje telo sa pripravuje na menštruáciu. Dopraj si viac pokoja.",
+      26: "Progesterón aj estrogén teraz klesajú a tvoje telo sa pripravuje na menštruáciu. Môžeš pociťovať príznaky PMS – napätie, únavu, kŕče alebo nafukovanie. Je to čas spomaliť a dopriať si teplé jedlá a jemný pohyb.",
+      27: "V týchto dňoch môžeš pociťovať únavu, citlivosť či podráždenie. Tvoje telo potrebuje viac pokoja a bezpečia. To nie je slabosť – je to signál, že je čas starať sa o seba.",
+      28: "Posledný deň cyklu je ako príprava na nový začiatok. Hormóny sú nízko a telo sa pripravuje na menštruáciu. Dopraj si kvalitný spánok, teplé jedlá a jemnosť – zajtra začína nový cyklus."
+    };
+
     // MASTER TEMPLATES - UPDATED with new content and softer language
     const masterTemplates: Record<string, any> = {
       menstrual: {
@@ -417,7 +449,7 @@ ZDROJE (overené):
 
 MASTER TEMPLATE - REFERENCIA (použij obsah, nie štruktúru):
 Hormóny: ${template.hormones}
-Očakávanie: ${template.expectation}
+Očakávanie (POUŽI PRESNE TENTO TEXT): ${daySpecificExpectations[day] || template.expectation}
 Telo: ${template.body}
 Emócie: ${template.emotional}
 
@@ -498,7 +530,7 @@ movement (4-6 odrážok, každá veta = nová odrážka):
               properties: {
                 expectation: {
                   type: 'string',
-                  description: 'Čo môžem dnes očakávať? 1-2 vety v SOFTER tóne: "by si mala cítiť", "pravdepodobne budeš", "môžeš pociťovať". Prepoj s hormónmi ("pretože estrogén..."). Čistý text bez markdown.'
+                  description: 'Čo môžem dnes očakávať? POUŽI PRESNE text z "Očakávanie (POUŽI PRESNE TENTO TEXT)" sekcie. Nič nemôžeš meniť ani skracovať. Čistý text bez markdown.'
                 },
                 nutrition: {
                   type: 'string',
