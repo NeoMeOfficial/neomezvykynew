@@ -21,18 +21,22 @@ serve(async (req) => {
     }
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-    const { day, regenerate = false, cycleLength = 28 } = await req.json();
+    const { day, regenerate = false, cycleLength = 28, periodLength = 5 } = await req.json();
 
-    console.log(`📍 Generating day ${day}, regenerate: ${regenerate}, cycleLength: ${cycleLength}`);
+    console.log(`📍 Generating day ${day}, regenerate: ${regenerate}, cycleLength: ${cycleLength}, periodLength: ${periodLength}`);
 
     if (!day || day < 1 || day > cycleLength || cycleLength < 25 || cycleLength > 35) {
       throw new Error(`Invalid input. Day must be 1-${cycleLength}, cycle length must be 25-35.`);
     }
 
-    // Dynamic phase calculation for different cycle lengths (25-35 days)
-    const calculatePhaseRanges = (cycleLength: number) => {
-      // Menstrual phase: always days 1-5
-      const menstrualEnd = 5;
+    if (periodLength < 3 || periodLength > 8) {
+      throw new Error('Period length must be 3-8 days.');
+    }
+
+    // Dynamic phase calculation for different cycle lengths (25-35 days) and period lengths (3-8 days)
+    const calculatePhaseRanges = (cycleLength: number, periodLength: number) => {
+      // Menstrual phase: flexible based on periodLength
+      const menstrualEnd = periodLength;
       
       // Ovulation: always 1 day at cycleLength - 14
       const ovulationDay = cycleLength - 14;
@@ -59,9 +63,88 @@ serve(async (req) => {
       };
     };
 
-    // Updated getPhaseInfo to accept cycle length
-    const getPhaseInfoDynamic = (d: number, cycleLength: number) => {
-      const ranges = calculatePhaseRanges(cycleLength);
+    // Get detailed context about a day's position within its phase
+    interface PhaseContext {
+      phase: string;
+      subphase: string | null;
+      dayInPhase: number;
+      totalDaysInPhase: number;
+      relativePosition: string;
+      description: string;
+    }
+
+    const getPhaseContext = (day: number, cycleLength: number, periodLength: number): PhaseContext => {
+      const ranges = calculatePhaseRanges(cycleLength, periodLength);
+      
+      let phase = 'menstrual';
+      let subphase: string | null = null;
+      let phaseStart = ranges.menstrual.start;
+      let phaseEnd = ranges.menstrual.end;
+      let phaseNameSk = 'menštruačnej';
+
+      if (day >= ranges.menstrual.start && day <= ranges.menstrual.end) {
+        phase = 'menstrual';
+        phaseStart = ranges.menstrual.start;
+        phaseEnd = ranges.menstrual.end;
+        phaseNameSk = 'menštruačnej';
+      } else if (day >= ranges.follicular.start && day <= ranges.follicular.end) {
+        phase = 'follicular';
+        phaseStart = ranges.follicular.start;
+        phaseEnd = ranges.follicular.end;
+        phaseNameSk = 'folikulárnej';
+      } else if (day >= ranges.ovulation.start && day <= ranges.ovulation.end) {
+        phase = 'ovulation';
+        phaseStart = ranges.ovulation.start;
+        phaseEnd = ranges.ovulation.end;
+        phaseNameSk = 'ovulačnej';
+      } else if (day >= ranges.lutealEarly.start && day <= ranges.lutealEarly.end) {
+        phase = 'luteal';
+        subphase = 'early';
+        phaseStart = ranges.lutealEarly.start;
+        phaseEnd = ranges.lutealEarly.end;
+        phaseNameSk = 'skorej luteálnej';
+      } else if (day >= ranges.lutealMid.start && day <= ranges.lutealMid.end) {
+        phase = 'luteal';
+        subphase = 'mid';
+        phaseStart = ranges.lutealMid.start;
+        phaseEnd = ranges.lutealMid.end;
+        phaseNameSk = 'strednej luteálnej';
+      } else if (day >= ranges.lutealLate.start && day <= ranges.lutealLate.end) {
+        phase = 'luteal';
+        subphase = 'late';
+        phaseStart = ranges.lutealLate.start;
+        phaseEnd = ranges.lutealLate.end;
+        phaseNameSk = 'neskorej luteálnej';
+      }
+
+      const dayInPhase = day - phaseStart + 1;
+      const totalDaysInPhase = phaseEnd - phaseStart + 1;
+      
+      // Calculate relative position (začiatok, stred, koniec)
+      let relativePosition = 'stred';
+      const positionRatio = dayInPhase / totalDaysInPhase;
+      
+      if (positionRatio <= 0.33) {
+        relativePosition = 'začiatok';
+      } else if (positionRatio >= 0.67) {
+        relativePosition = 'koniec';
+      }
+
+      const description = `Deň ${dayInPhase} z ${totalDaysInPhase} dní ${phaseNameSk} fázy (${relativePosition})`;
+
+      return {
+        phase,
+        subphase,
+        dayInPhase,
+        totalDaysInPhase,
+        relativePosition,
+        description
+      };
+    };
+
+    // Updated getPhaseInfo to accept cycle length and period length
+    const getPhaseInfoDynamic = (d: number, cycleLength: number, periodLength: number) => {
+      const ranges = calculatePhaseRanges(cycleLength, periodLength);
       
       if (d >= ranges.menstrual.start && d <= ranges.menstrual.end) 
         return { phase: 'menstrual', subphase: null };
@@ -80,8 +163,8 @@ serve(async (req) => {
     };
 
     // Dynamic cardio recommendation based on cycle length
-    const getCardioRecommendation = (day: number, cycleLength: number): string | null => {
-      const ranges = calculatePhaseRanges(cycleLength);
+    const getCardioRecommendation = (day: number, cycleLength: number, periodLength: number): string | null => {
+      const ranges = calculatePhaseRanges(cycleLength, periodLength);
       
       // Helper: get "every 3rd day" within a phase
       const isCardioDay = (day: number, phaseStart: number, phaseEnd: number, interval: number = 3): boolean => {
@@ -92,7 +175,7 @@ serve(async (req) => {
       // Follicular phase: every 3rd day (e.g., day 6, 9, 12 for 28-day cycle)
       if (day >= ranges.follicular.start && day <= ranges.follicular.end) {
         if (isCardioDay(day, ranges.follicular.start, ranges.follicular.end)) {
-          return "Dnes by mal byť dobrý deň na 20-30 minút intervalového kardia (1 minútu rýchlo, 1 minútu voľne). Vyber si, čo ti vyhovuje - beh, bicykel, švihadlo alebo eliptický trenažér.";
+          return "Dnes by mal byť dobrý deň na 20-30 minút intervalového kardia (1 minútu rýchlo, 1 minúta voľne). Vyber si, čo ti vyhovuje - beh, bicykel, švihadlo alebo eliptický trenažér.";
         }
       }
       
@@ -117,39 +200,60 @@ serve(async (req) => {
       return null; // no cardio for menstrual, late luteal, and non-cardio days
     };
 
-    const { phase, subphase } = getPhaseInfoDynamic(day, cycleLength);
+    const { phase, subphase } = getPhaseInfoDynamic(day, cycleLength, periodLength);
+    const phaseContext = getPhaseContext(day, cycleLength, periodLength);
 
-    // DAY-SPECIFIC EXPECTATIONS - 28 unique texts for each day
-    const daySpecificExpectations: Record<number, string> = {
-      1: `V týchto dňoch sú tvoje hormóny pravdepodobne na najnižších úrovniach. Je bežné pociťovať kŕče, únavu a potrebu pokoja. Tvoje telo začína dôležitú obnovu a ak sa cítiš vyčerpaná, je to prirodzené.`,
-      2: `Tvoje telo pravdepodobne intenzívne pracuje na obnovení a stráca krv aj minerály. Môžeš pociťovať väčšiu únavu a citlivosť. Dopraj si dostatok odpočinku a netlač sa do výkonu.`,
-      3: `V týchto dňoch môže byť únava stále výrazná, no zároveň je možné začať pociťovať mierne zlepšenie. Kŕče sa často zmierňujú a telo pomaly prechádza z akútnej fázy do obnovy.`,
-      4: `Menštruácia sa ti pravdepodobne blíži ku koncu a estrogén začína pomaly stúpať. Môže to priniesť prvé náznaky energie a motivácie. Je to vhodný čas na plánovanie nasledujúcich dní a pomaly sa vrátiť k bežnému rytmu.`,
-      5: `Prietok sa pravdepodobne znižuje a telo sa pripravuje na prechod do folikulárnej fázy. V najbližších dňoch ti môže začať stúpať estrogén. Môžeš zaznamenať prvé signály zlepšenia – viac energie alebo jasnejšiu myseľ.`,
-      6: `Koniec menštruácie môže priniesť pocit úľavy. Estrogén ti pravdepodobne začína stúpať a s tým často prichádza aj chuť tvoriť a byť aktívna. Telo sa prebúdza do novej fázy.`,
-      7: `Stúpajúci estrogén môže prinášať viac energie. Je možné, že sa ti ľahšie vstáva alebo že máš jasnejšiu myseľ. V týchto dňoch je telo často odolnejšie voči stresu.`,
-      8: `Estrogén v týchto dňoch často podporuje dopamín a serotonín, čo môže zlepšiť náladu a motiváciu. Telo je pravdepodobne v stave, keď má dobrú energiu a chuť do aktivít.`,
-      9: `Toto je často jedna z najlepších fáz pre učenie a plánovanie. Telo v týchto dňoch zvyčajne rýchlejšie regeneruje a mozog môže byť viac zameraný na nové nápady a projekty.`,
-      10: `V týchto dňoch býva energia pravdepodobne na vysokej úrovni a telo je často pripravené na výzvy. Môžeš cítiť väčšiu sebadôveru alebo chuť skúšať nové veci. Je to často ideálne obdobie pre dôležité úlohy.`,
-      11: `Telo sa v týchto dňoch pravdepodobne pripravuje na ovuláciu. Je možné pociťovať vysokú energiu, kreativitu a chuť spájať sa s ľuďmi. Toto je pre mnohé ženy vrchol produktivity v cykle.`,
-      12: `Estrogén sa pravdepodobne blíži k svojmu vrcholu. Môžeš sa cítiť silnejšia, sebavedomejšia alebo pripravená na výzvy. Telo je pravdepodobne v stave, ktorý umožňuje zvládať náročnejšie aktivity.`,
-      13: `Tvoj estrogén je pravdepodobne na vrchole alebo sa k nemu blíži a telo sa pripravuje na ovuláciu. Je možné pociťovať plnosť energie a vnútornej sily. Môže to byť dobrý deň pre dôležité rozhovory alebo aktivity, ktoré vyžadujú odvahu.`,
-      14: `Tvoj estrogén je pravdepodobne na svojom vrchole. Je možné, že budeš pociťovať zvýšenú energiu, charizmu a prirodzenú chuť komunikovať. Pre mnohé ženy je to ideálny čas na dôležité rozhovory, prezentácie alebo aktivity, ktoré vyžadujú sebavedomie.`,
-      15: `V týchto dňoch tvoje telo pravdepodobne ukončuje ovuláciu. Progesterón ti bude v najbližších dňoch stúpať. Je možné cítiť prvé náznaky upokojenia – akoby sa tempo spomalilo. Zároveň v týchto dňoch často zostáva ešte dosť energie a sústredenia.`,
-      16: `Stúpajúci progesterón môže prinášať pocit väčšej stability a pokoja. Je možné, že máš chuť dokončovať rozpracované veci alebo organizovať svoj priestor. Telo v týchto dňoch často ešte zvláda fungovať naplno.`,
-      17: `Toto je často obdobie harmónie. Energia môže byť stále dobrá, ale telo pravdepodobne prechádza do režimu pokoja a stability. Môžeš mať lepší spánok a pocit väčšej vyrovnanosti.`,
-      18: `V týchto dňoch môže byť energia stále na dobrej úrovni, ale telo často začína potrebovať viac pokoja a pravidelnosti. Je možné zaznamenať prvé náznaky spomalenia, čo je úplne prirodzené.`,
-      19: `Progesterón ti pravdepodobne naďalej stúpa a telo sa postupne upokojuje. Je možné pociťovať menšiu energiu a väčšiu potrebu priestoru pre seba. Je to prirodzené – telo v týchto dňoch často si žiada pokojnejšie tempo.`,
-      20: `Progesterón je v týchto dňoch pravdepodobne na vrchole alebo sa k nemu blíži. Telo môže reagovať citlivejšie na stres, chaos či preťaženie. Je prirodzené, ak cítiš menší záujem o sociálny kontakt. Dopraj si pravidelnosť a jemnosť.`,
-      21: `Mozog je v týchto dňoch často menej orientovaný na rýchle reakcie a viac na vnútorný svet. Intuícia sa môže zlepšovať a telo pravdepodobne potrebuje viac priestoru. Pokoj v týchto dňoch má často prednosť pred výkonom.`,
-      22: `Progesterón môže spomaliť trávenie a spôsobiť nafukovanie. Tvoje telo v týchto dňoch pravdepodobne reaguje citlivejšie na chaotické podnety a potrebuje pravidelný rytmus a dostatok pokoja.`,
-      23: `V týchto dňoch môže energia ubúdať rýchlejšie ako pred pár dňami. Je prirodzené cítiť väčšiu potrebu odpočinku a jasných hraníc. Telo v tomto období často potrebuje pravidelný rytmus a dostatok spánku.`,
-      24: `Progesterón sa pravdepodobne pripravuje na pokles a telo môže reagovať citlivejšie na stres. Je možné pociťovať prvé náznaky PMS – podráždenie, únavu alebo citlivosť.`,
-      25: `Progesterón ti pravdepodobne začína klesať a s ním môže prichádzať väčšia citlivosť či únava. Je to signál, že telo sa pripravuje na menštruáciu. Dopraj si viac pokoja a jemnosti.`,
-      26: `Progesterón aj estrogén ti v týchto dňoch pravdepodobne klesajú a telo sa pripravuje na menštruáciu. Je možné pociťovať príznaky PMS – napätie, únavu, kŕče alebo nafukovanie. Je to čas spomaliť a dopriať si viac pokoja.`,
-      27: `V týchto dňoch je možné pociťovať únavu, citlivosť či podráždenie. Telo v tomto období často potrebuje viac pokoja a bezpečia. To nie je slabosť – je to signál, že je čas starať sa o seba.`,
-      28: `Tvoje hormóny sú pravdepodobne nízko a telo sa pripravuje na menštruáciu. Dopraj si kvalitný spánok a jemnosť. Čoskoro začína nový cyklus a telo sa opäť pripraví na ďalšiu obnovu.`
+    // PHASE CONTEXT DESCRIPTIONS - replaces daySpecificExpectations[1-28]
+    // These are base templates for each phase + relative position
+    const phaseContextDescriptions: Record<string, Record<string, string>> = {
+      menstrual: {
+        začiatok: "V týchto dňoch sú tvoje hormóny pravdepodobne na najnižších úrovniach. Je bežné pociťovať kŕče, únavu a potrebu pokoja. Tvoje telo začína dôležitú obnovu a ak sa cítiš vyčerpaná, je to prirodzené.",
+        stred: "Tvoje telo pravdepodobne intenzívne pracuje na obnovení a stráca krv aj minerály. Môžeš pociťovať väčšiu únavu a citlivosť. Dopraj si dostatok odpočinku a netlač sa do výkonu.",
+        koniec: "Menštruácia sa ti pravdepodobne blíži ku koncu a estrogén začína pomaly stúpať. Môže to priniesť prvé náznaky energie a motivácie. Je to vhodný čas na plánovanie nasledujúcich dní a pomaly sa vrátiť k bežnému rytmu."
+      },
+      follicular: {
+        začiatok: "Koniec menštruácie môže priniesť pocit úľavy. Estrogén ti pravdepodobne začína stúpať a s tým často prichádza aj chuť tvoriť a byť aktívna. Telo sa prebúdza do novej fázy.",
+        stred: "Toto je často jedna z najlepších fáz pre učenie a plánovanie. Telo v týchto dňoch zvyčajne rýchlejšie regeneruje a mozog môže byť viac zameraný na nové nápady a projekty.",
+        koniec: "Telo sa v týchto dňoch pravdepodobne pripravuje na ovuláciu. Je možné pociťovať vysokú energiu, kreativitu a chuť spájať sa s ľuďmi. Toto je pre mnohé ženy vrchol produktivity v cykle."
+      },
+      ovulation: {
+        stred: "Tvoj estrogén je pravdepodobne na svojom vrchole. Je možné, že budeš pociťovať zvýšenú energiu, charizmu a prirodzenú chuť komunikovať. Pre mnohé ženy je to ideálny čas na dôležité rozhovory, prezentácie alebo aktivity, ktoré vyžadujú sebavedomie."
+      },
+      lutealEarly: {
+        začiatok: "V týchto dňoch tvoje telo pravdepodobne ukončuje ovuláciu. Progesterón ti bude v najbližších dňoch stúpať. Je možné cítiť prvé náznaky upokojenia – akoby sa tempo spomalilo. Zároveň v týchto dňoch často zostáva ešte dosť energie a sústredenia.",
+        stred: "Stúpajúci progesterón môže prinášať pocit väčšej stability a pokoja. Je možné, že máš chuť dokončovať rozpracované veci alebo organizovať svoj priestor. Telo v týchto dňoch často ešte zvláda fungovať naplno.",
+        koniec: "Toto je často obdobie harmónie. Energia môže byť stále dobrá, ale telo pravdepodobne prechádza do režimu pokoja a stability. Môžeš mať lepší spánok a pocit väčšej vyrovnanosti."
+      },
+      lutealMid: {
+        začiatok: "V týchto dňoch môže byť energia stále na dobrej úrovni, ale telo často začína potrebovať viac pokoja a pravidelnosti. Je možné zaznamenať prvé náznaky spomalenia, čo je úplne prirodzené.",
+        stred: "Progesterón je v týchto dňoch pravdepodobne na vrchole alebo sa k nemu blíži. Telo môže reagovať citlivejšie na stres, chaos či preťaženie. Je prirodzené, ak cítiš menší záujem o sociálny kontakt. Dopraj si pravidelnosť a jemnosť.",
+        koniec: "Mozog je v týchto dňoch často menej orientovaný na rýchle reakcie a viac na vnútorný svet. Intuícia sa môže zlepšovať a telo pravdepodobne potrebuje viac priestoru. Pokoj v týchto dňoch má často prednosť pred výkonom."
+      },
+      lutealLate: {
+        začiatok: "Progesterón môže spomaliť trávenie a spôsobiť nafukovanie. Tvoje telo v týchto dňoch pravdepodobne reaguje citlivejšie na chaotické podnety a potrebuje pravidelný rytmus a dostatok pokoja.",
+        stred: "V týchto dňoch môže energia ubúdať rýchlejšie ako pred pár dňami. Je prirodzené cítiť väčšiu potrebu odpočinku a jasných hraníc. Telo v tomto období často potrebuje pravidelný rytmus a dostatok spánku.",
+        koniec: "Tvoje hormóny sú pravdepodobne nízko a telo sa pripravuje na menštruáciu. Dopraj si kvalitný spánok a jemnosť. Čoskoro začína nový cyklus a telo sa opäť pripraví na ďalšiu obnovu."
+      }
     };
+
+    // Select the appropriate context description
+    const getContextDescription = (phaseContext: PhaseContext): string => {
+      const phaseKey = phaseContext.subphase 
+        ? `${phaseContext.phase}${phaseContext.subphase.charAt(0).toUpperCase() + phaseContext.subphase.slice(1)}`
+        : phaseContext.phase;
+      
+      const phaseDescriptions = phaseContextDescriptions[phaseKey];
+      if (!phaseDescriptions) {
+        // Fallback to menstrual if phase not found
+        return phaseContextDescriptions.menstrual.začiatok;
+      }
+
+      return phaseDescriptions[phaseContext.relativePosition] || 
+             phaseDescriptions.stred || 
+             Object.values(phaseDescriptions)[0];
+    };
+
+    const selectedContextDescription = getContextDescription(phaseContext);
 
     // MASTER TEMPLATES - UPDATED with new content and softer language
     const masterTemplates: Record<string, any> = {
@@ -242,137 +346,149 @@ serve(async (req) => {
           foods: ["vajcia", "losos", "tofu", "cottage", "citrusy", "bobuľové", "kiwi",
                   "brokolica", "paprika", "rukola", "špenát", "ľan", "chia", "avokádo", 
                   "orechy", "olivový olej"],
-          tip: "Dopraj si ľahšie jedlá pre vyššiu energiu. Pravidelné jedlá s dôrazom na bielkoviny (25-30g)."
+          tip: "Dopraj si bielkoviny do každého jedla a kombinuj ich s čerstvou zeleninou na podporu optimálneho výkonu."
         },
         mind: {
           practicalThoughts: [
-            "Dnes sa ti bude dariť hovoriť jasne - využi to pri rozhovoroch či v práci.",
-            "Skús niekomu úprimne poďakovať alebo niečo pekné povedať - vráti sa ti to.",
-            "Si v najlepšej fáze na networking, prezentácie či ťažšie rozhovory - ver si.",
-            "Ak máš veľa energie, dopraj si niečo, čo ťa nabíja - tanec, beh, pohyb s radosťou.",
-            "Dnes si ľahšie všimneš, čo ti funguje - napíš si to, využiješ to neskôr.",
-            "Ak cítiš tlak, spomaľ. Energia smeruje von, ale potrebuje aj priestor na doplnenie."
+            "Dnes je ideálny deň na dôležité rozhovory alebo prezentácie.",
+            "Využi sebavedomie a energiu na úlohy, ktoré si odkladala.",
+            "Tvoja komunikácia je dnes na vrchole - využi to.",
+            "Dnes môžeš skúsiť niečo nové, čo si dlhšie zvažovala.",
+            "Ak cítiš chuť spojiť sa s ľuďmi, urob to - tvoje telo ti signalizuje správny čas.",
+            "Nie vždy budeš mať takúto energiu - využi ju múdro.",
+            "Skús dnes vyriešiť náročnejšie úlohy - mozog aj telo sú pripravené."
           ]
         },
         movement: {
-          context: "Peak výkonnosť, maximálna sila.",
-          intensity: "Silový tréning",
-          neome: "Intenzívny silový tréning",
+          context: "Maximálna energia, telo na vrchole.",
+          intensity: "Vysoká intenzita, silový aj kondičný tréning",
+          neome: "Silový tréning alebo HIIT",
           walkBenefits: [
-            "Získaš nápady, ktoré v sede neprichádzajú.",
-            "Zlepšíš náladu vďaka prirodzenému dopamínu.",
-            "Zlepšíš cirkuláciu krvi a kyslík v mozgu.",
-            "Pomôže ti mať kvalitnejší spánok - aj keď máš milión vecí v hlave.",
-            "Získaš chvíľu len pre seba.",
-            "Nabiješ sa vitamínom D."
+            "Načerpáš ešte viac energie na celý deň.",
+            "Zlepšíš náladu, ktorá už aj tak je dobrá.",
+            "Podporíš spaľovanie tukov.",
+            "Vyčistíš si hlavu pred dôležitými úlohami.",
+            "Stabilizuješ si hladinu cukru v krvi.",
+            "Dodáš si mentálnu jasnosť na celý deň.",
+            "Prechádzka ti pomôže lepšie myslieť a plánovať.",
+            "Cítiš sa silnejšia a pripravená na čokoľvek."
           ]
         }
       },
       lutealEarly: {
-        hormones: "Progesterón stúpa",
-        expectation: "Tvoje telo práve ukončilo ovuláciu a progesterón začína stúpať. Môžeš sa cítiť pokojnejšie a vyrovnanejšie – akoby si sa po aktívnejšom období trochu spomalila. Napriek tomu máš ešte dosť energie a sústredenia. Je to ideálny čas dokončovať veci a starať sa o svoje telo.",
-        body: "telo začína byť citlivejšie na intenzitu",
-        emotional: "emočná citlivosť sa zvyšuje, potreba systému",
+        hormones: "Progesterón začína stúpať",
+        expectation: "Progesterón v tvojom tele začína stúpať a s ním môže prísť pocit väčšej stability a pokoja. Energia môže byť stále dobrá, ale telo sa postupne upokojuje a prechádza do režimu regenerácie. Je to prirodzené – telo si žiada viac pokoja a pravidelnosti.",
+        body: "stále dobrá regenerácia, ale telo sa pomaly upokojuje",
+        emotional: "stabilita, vnútorný pokoj, väčšia potreba pravidelnosti",
         nutrition: {
-          needs: ["stabilizácia cukru v krvi", "upokojenie nervového systému", "prevencia PMS"],
-          keyNutrients: ["Horčík", "Vitamín B6", "Vláknina", "Proteíny"],
-          foods: ["vajcia", "morčacie mäso", "tofu", "strukoviny", "banán", "bobuľové", "hruška",
-                  "brokolica", "kapusta", "špenát", "bataty", "orechy", "avokádo", "semienka",
-                  "ovos", "quinoa", "škorica", "zázvor"],
-          tip: "Dopraj si pravidelné jedlá (hlavne raňajky). Bielkoviny + vláknina (25-30g fiber denne). Obmedziť kávu."
+          needs: ["stabilizovať energiu", "podporiť tvorbu progesterónu", "udržať dobrú náladu"],
+          keyNutrients: ["Magnézium", "B6", "Omega-3", "Komplex sacharidov"],
+          foods: ["bataty", "ryža natural", "quinoa", "ovos", "banány", "tmavá čokoláda", "mandle",
+                  "losos", "avokádo", "špenát", "brokolica", "kel", "vajcia", "cottage", "grécky jogurt"],
+          tip: "Dopraj si pravidelné jedlá každé 3-4 hodiny a kombinuj sacharidy s proteínmi pre stabilnú energiu."
         },
         mind: {
           practicalThoughts: [
-            "Ak cítiš podráždenie, nie si zlá - len tvoje telo potrebuje viac pokoja.",
-            "Dnes si urči jasnú hranicu - napríklad \"po ôsmej už neodpovedám na správy\".",
-            "Vyčisti si hlavu aj priestor - upratovanie pôsobí ako terapia.",
-            "Ak sa cítiš unavená, vyber si najdôležitejšiu vec dňa a ostatné nechaj tak.",
-            "Tvoje telo reaguje citlivejšie - skús si dopriať pokojnejšie prostredie."
+            "Skús si zapisovať, čo ti robí dobre a čo nie - pomôže ti to v budúcnosti.",
+            "Ak cítiš chuť dokončiť rozpracované veci, je to prirodzené - tvoje telo preferuje teraz organizáciu.",
+            "Dopraj si chvíľku pokoja večer - napr. čítanie alebo teplý kúpeľ.",
+            "Ak máš pocit, že chceš menej sociálneho kontaktu, je to normálne - rešpektuj to.",
+            "Urob si zoznam 3 vecí, ktoré musíš urobiť zajtra - uľahčíš si ráno.",
+            "Skús si dopriať pravidelný rytmus - telo ti bude vďačné.",
+            "Ak cítiš menšiu motiváciu ako pred pár dňami, nehovor si, že je to tvoja chyba - sú to len hormóny."
           ]
         },
         movement: {
-          context: "Dobrá energia, ale citlivejšie telo.",
-          intensity: "Silový tréning",
-          neome: "Silový tréning",
+          context: "Ešte dobrá energia, ale telo sa upokojuje.",
+          intensity: "Silový tréning alebo joga",
+          neome: "Silový tréning alebo pilates",
           walkBenefits: [
-            "Prechádzka ti pomôže uvoľniť napätie, ktoré sa ti hromadilo celý deň.",
-            "Znížiš stres, ktorý možno pociťuješ.",
-            "Pomôže ti mať kvalitnejší spánok - aj keď máš milión vecí v hlave.",
-            "Vyrovnáš si hormóny a upokojíš nervový systém.",
-            "Po prechádzke máš viac trpezlivosti - pre seba aj pre deti."
+            "Zachováš si dobrú náladu vďaka endorfínom.",
+            "Pomôžeš telu udržať si dobrú energiu.",
+            "Zlepšíš spánok, ktorý môže byť teraz hlbší.",
+            "Vyčistíš si myseľ od zbytočných myšlienok.",
+            "Stabilizuješ si hormóny pohybom.",
+            "Uvoľníš telo a myseľ.",
+            "Prechádzka ti pomôže cítiť sa pokojnejšie.",
+            "Krátka chôdza pred spaním ti pomôže lepšie zaspať."
           ]
         }
       },
       lutealMid: {
-        hormones: "Progesterón vysoký",
-        expectation: "Progesterón je teraz na vrchole a tvoje telo sa upokojuje. Môžeš pociťovať menšiu energiu a väčšiu potrebu pokoja či priestoru pre seba. Je prirodzené, ak cítiš menší záujem o sociálny kontakt alebo výkonnosť. Telo si teraz žiada pravidelnosť a jemnosť.",
-        body: "nižšia tolerancia na intenzitu a teplo, trávenie citlivejšie",
-        emotional: "citlivosť na stres, silnejšie chute",
+        hormones: "Progesterón je na vrchole",
+        expectation: "Progesterón je teraz pravdepodobne na svojom vrchole. Telo môže reagovať citlivejšie na stres, chaos či preťaženie. Je prirodzené, ak cítiš menší záujem o sociálny kontakt a väčšiu potrebu priestoru pre seba. Dopraj si pravidelnosť, jemnosť a dostatok pokoja.",
+        body: "spomalené trávenie, možné nafukovanie, citlivosť na stres",
+        emotional: "introspekcia, menší záujem o sociálny kontakt, vyššia citlivosť",
         nutrition: {
-          needs: ["stabilizácia cukru", "upokojenie nervov", "podpora trávenia"],
-          keyNutrients: ["Horčík", "Vitamín B6", "Vláknina", "Proteíny"],
-          foods: ["vajcia", "morčacie mäso", "tofu", "strukoviny", "banán", "bobuľové",
-                  "brokolica", "kapusta", "bataty", "orechy", "avokádo", "ovos", "quinoa"],
-          tip: "Dopraj si pravidelné jedlá, menej cukru, teplé tekutiny, zázvorový čaj."
+          needs: ["podporiť trávenie", "znížiť nafukovanie", "stabilizovať náladu"],
+          keyNutrients: ["Magnézium", "Vláknina", "Probiótiká", "Komplex B"],
+          foods: ["kvások", "kefír", "grécky jogurt", "banány", "ovsená kaša", "špenát", "kel",
+                  "bataty", "quinoa", "ľan", "chia", "tmavá čokoláda", "mandle", "vlašské orechy"],
+          tip: "Dopraj si menšie porcie, jedz pomaly a vyvaruj sa ťažkým jedlám večer. Teplé jedlá ti uľahčia trávenie."
         },
         mind: {
           practicalThoughts: [
-            "Ak máš chuť všetko \"zachraňovať\", zastav sa - nie všetko je tvoja úloha.",
-            "Skús si zapisovať, čo ti robí dobre a čo nie - pomôže ti to pri ďalšom cykle.",
-            "Ak cítiš tlak, urob si 5 minút len pre seba - dýchaj pomaly a hlboko.",
-            "Pripomeň si, že nie všetky dni musia byť produktívne. Niektoré majú byť pokojné.",
-            "Ak cítiš podráždenie, nie si zlá - len tvoje telo potrebuje viac pokoja."
+            "Ak cítiš tlak, urob si 5 minút len pre seba - dýchaj a len si sadni.",
+            "Dnes sa vyhni stresu a chaosu - tvoje telo reaguje citlivejšie.",
+            "Ak máš pocit, že potrebuješ menej sociálneho kontaktu, je to normálne - rešpektuj to.",
+            "Skús si večer urobiť ritual - napr. teplý kúpeľ alebo čítanie.",
+            "Dopraj si pravidelný rytmus - telo ti bude vďačné.",
+            "Ak cítiš menšiu motiváciu, nehovor si, že je to tvoja chyba - sú to len hormóny.",
+            "Urob si zoznam 3 vecí, ktoré musíš urobiť zajtra - uľahčíš si ráno."
           ]
         },
         movement: {
-          context: "Nižšia energia, citlivé telo.",
-          intensity: "Pilates alebo mierny silový tréning",
-          neome: "Pilates alebo mierny silový tréning",
+          context: "Nižšia energia, citlivejšie telo.",
+          intensity: "Jemný pilates alebo joga",
+          neome: "Pilates alebo strečing",
           walkBenefits: [
-            "Prechádzka ti pomôže uvoľniť napätie, ktoré sa ti hromadilo celý deň.",
-            "Znížiš stres, ktorý možno pociťuješ.",
-            "Znížiš chuť na sladké.",
-            "Stabilizuješ si hladinu cukru v krvi po jedle.",
-            "Vyrovnáš si hormóny a upokojíš nervový systém.",
-            "Dostaneš sa do prítomnosti a spomalíš.",
-            "Myseľ sa upokojí, keď sa pohne telo."
+            "Pomôžeš telu spracovať stres, ktorý si možno cítiš.",
+            "Zlepšíš trávenie, ktoré môže byť pomalšie.",
+            "Vyčistíš si hlavu od zbytočných myšlienok.",
+            "Uvoľníš napätie v tele.",
+            "Zlepšíš náladu vďaka endorfínom.",
+            "Prechádzka ti pomôže cítiť sa pokojnejšie.",
+            "Krátka chôdza pred spaním ti pomôže lepšie zaspať.",
+            "Vyrovnáš si hormóny pohybom."
           ]
         }
       },
       lutealLate: {
-        hormones: "Progesterón klesá",
-        expectation: "Progesterón aj estrogén teraz klesajú a tvoje telo sa pripravuje na menštruáciu. Môžeš sa cítiť unavená, citlivejšia alebo potrebovať viac pokoja. To nie je slabosť – je to signál, že je čas spomaliť, dopriať si teplé jedlá, jemný pohyb a kvalitný spánok.",
-        body: "PMS, kŕče, nafukovanie, bolesti hlavy",
-        emotional: "podráždenosť, úzkosť, citlivosť na maximum",
+        hormones: "Progesterón klesá, estrogén klesá",
+        expectation: "Progesterón aj estrogén ti v týchto dňoch pravdepodobne klesajú a telo sa pripravuje na menštruáciu. Je možné pociťovať príznaky PMS – napätie, únavu, kŕče alebo nafukovanie. Je to čas spomaliť a dopriať si viac pokoja a jemnosti.",
+        body: "možné príznaky PMS – kŕče, nafukovanie, únava, napätie",
+        emotional: "citlivosť, podráždenie, nižšia tolerancia stresu",
         nutrition: {
-          needs: ["znižiť zápal", "doplniť horčík", "stabilizovať cukry"],
-          keyNutrients: ["Horčík", "Vitamín B6", "Omega-3", "Antioxidanty"],
-          foods: ["banán", "brokolica", "špenát", "bataty", "orechy", "avokádo", "temná čokoláda",
-                  "zázvor", "kurkuma", "teplé polievky"],
-          tip: "Dopraj si teplé jedlá, pravidelné porcie, menej kofeínu a cukru, viac horčíka."
+          needs: ["znížiť PMS príznaky", "podporiť tvorbu serotonínu", "stabilizovať náladu"],
+          keyNutrients: ["Magnézium", "Omega-3", "Vitamín B6", "Komplex sacharidov"],
+          foods: ["tmavá čokoláda", "banány", "ovsená kaša", "mandle", "vlašské orechy", "losos",
+                  "avokádo", "špenát", "kel", "bataty", "quinoa", "vajcia", "cottage", "grécky jogurt"],
+          tip: "Dopraj si menšie porcie, jedz pomaly a vyhýbaj sa nadmernému kofeínu a alkoholu, ktoré môžu zhoršiť PMS príznaky."
         },
         mind: {
           practicalThoughts: [
             "Dnes si dovoľ urobiť menej. Aj ticho a oddych sú súčasť regenerácie.",
-            "Ak sa cítiš unavená, vyber si najdôležitejšiu vec dňa a ostatné nechaj tak.",
-            "Deň na vďačnosť - napíš si tri veci, ktoré sa ti tento mesiac podarili, aj malé.",
-            "Pripomeň si, že nie všetky dni musia byť produktívne. Niektoré majú byť pokojné.",
-            "Ak cítiš tlak, urob si 5 minút len pre seba - dýchaj pomaly a hlboko."
+            "Ak sa cítiš unavená, vyber si jednu vec, ktorú dnes neurobíš.",
+            "Pripomeň si, že nie všetky dni musia byť produktívne - dnes je deň pokoja.",
+            "Skús si večer dát teplý kúpeľ alebo sprchu - pomôže ti uvoľniť napätie.",
+            "Ak cítiš podráždenie, nie si zlá - len tvoje telo reaguje na hormóny.",
+            "Dopraj si pravidelný rytmus a dostatok spánku.",
+            "Ak máš pocit, že potrebuješ menej sociálneho kontaktu, je to normálne - rešpektuj to."
           ]
         },
         movement: {
-          context: "Nízka energia, PMS symptómy.",
+          context: "Nízka energia, citlivé telo, možné PMS príznaky.",
           intensity: "Strečing alebo jemný pilates",
-          neome: "Strečing alebo meditácia",
+          neome: "Strečing alebo jemný pilates",
           walkBenefits: [
             "Prechádzka ti pomôže uvoľniť napätie, ktoré sa ti hromadilo celý deň.",
             "Znížiš stres, ktorý možno pociťuješ.",
             "Vyčistíš si hlavu od nekonečných myšlienok.",
+            "Zlepšíš náladu vďaka prirodzenému dopamínu.",
             "Krátka chôdza ťa vráti späť \"do tela\", nie do úloh.",
-            "Znížiš chuť na sladké.",
+            "Pomôže ti mať kvalitnejší spánok - aj keď máš milión vecí v hlave.",
             "Uvoľníš stuhnuté svaly.",
-            "Vyrovnáš si hormóny a upokojíš nervový systém.",
-            "Po prechádzke máš viac trpezlivosti - pre seba aj pre deti."
+            "Vyrovnáš si hormóny a upokojíš nervový systém."
           ]
         }
       }
@@ -431,11 +547,19 @@ FORMÁTOVANIE - BULLET POINTS:
   - Prechádzka: "- Skús si aj dnes dopriať prechádzku. Dopraj si aspoň 30-60min na čerstvom vzduchu."
   - Benefit: "- [benefit]" ako samostatná odrážka
 
+UNIKÁTNOSŤ OBSAHU:
+- Každý deň v cykle musí mať ODLIŠNÝ obsah
+- NIE kópie, NIE opakujúce sa formulácie
+- Variuj štýl, slová, príklady
+- Pre deň ${day}: použij pozíciu "${phaseContext.relativePosition}" v "${phaseContext.phase}" fáze
+- Kontext: deň ${phaseContext.dayInPhase} z ${phaseContext.totalDaysInPhase}
+- KRITICKÉ: Generuj skutočne unikátny text pre tento konkrétny deň, nie generický šablónu
+
 PRAVIDLÁ:
-1. Použi PRESNÝ text z master template
+1. Použi PRESNÝ text z master template alebo phaseContext ako základ
 2. Vyber z poskytnutých zoznamov (potraviny, benefity, myšlienky)
 3. Žiadne vymýšľanie nových faktov alebo informácií
-4. Len gramatické úpravy pre plynulosť
+4. Len gramatické úpravy pre plynulosť a unikátnosť pre daný deň
 
 ZDROJE (overené):
 - Dr. Mary Claire Haver (menopause & hormonal health)
@@ -443,15 +567,28 @@ ZDROJE (overené):
 - Dr. Natalie Crawford (fertility & cycle health)
 - Dr. Stacy Sims (female physiology & performance)`;
 
-    const cardioText = getCardioRecommendation(day, cycleLength);
+    const cardioText = getCardioRecommendation(day, cycleLength, periodLength);
 
-    const userPrompt = `Vytvor obsah pre DEŇ ${day} v ${phase}${subphase ? ` (${subphase})` : ''} fáze (celková dĺžka cyklu: ${cycleLength} dní).
+    const userPrompt = `Vytvor obsah pre DEŇ ${day} v ${phase}${subphase ? ` (${subphase})` : ''} fáze (celková dĺžka cyklu: ${cycleLength} dní, menštruácia: ${periodLength} dní).
+
+RELATÍVNY KONTEXT:
+${phaseContext.description}
+Fáza: ${phaseContext.phase}${phaseContext.subphase ? ` (${phaseContext.subphase})` : ''}
+Pozícia v rámci fázy: ${phaseContext.relativePosition}
 
 MASTER TEMPLATE - REFERENCIA (použij obsah, nie štruktúru):
 Hormóny: ${template.hormones}
-Očakávanie (POUŽI PRESNE TENTO TEXT): ${daySpecificExpectations[day] || template.expectation}
+Základný text pre očakávanie (prispôsob pre deň ${phaseContext.dayInPhase} z ${phaseContext.totalDaysInPhase}): ${selectedContextDescription}
 Telo: ${template.body}
 Emócie: ${template.emotional}
+
+INŠTRUKCIA PRE OČAKÁVANIE:
+Vytvor unikátny text pre tento konkrétny deň, ktorý:
+- Reflektuje pozíciu ženy v tejto fáze (${phaseContext.relativePosition} z ${phaseContext.totalDaysInPhase} dní)
+- Používa mäkký, kondicionálny jazyk ("pravdepodobne", "môžeš pociťovať")
+- Je konkrétny pre deň ${phaseContext.dayInPhase} z ${phaseContext.totalDaysInPhase}
+- Nie je kópiou iných dní v tomto cykle
+- Prispôsobuje obsah základného textu tak, aby bol jedinečný
 
 STRAVA - REFERENCIA:
 Potreby: ${template.nutrition.needs.join(', ')}
@@ -530,7 +667,7 @@ movement (4-6 odrážok, každá veta = nová odrážka):
               properties: {
                 expectation: {
                   type: 'string',
-                  description: 'Čo môžem dnes očakávať? POUŽI PRESNE text z "Očakávanie (POUŽI PRESNE TENTO TEXT)" sekcie. Nič nemôžeš meniť ani skracovať. Čistý text bez markdown.'
+                  description: 'Čo môžem dnes očakávať? Vytvor unikátny text pre tento konkrétny deň na základe relatívneho kontextu. Čistý text bez markdown.'
                 },
                 nutrition: {
                   type: 'string',
@@ -626,6 +763,8 @@ movement (4-6 odrážok, každá veta = nová odrážka):
         phase,
         subphase,
         cycleLength,
+        periodLength,
+        phaseContext,
         content: generatedContent
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
