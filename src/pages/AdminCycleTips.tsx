@@ -427,21 +427,21 @@ export default function AdminCycleTips() {
                         </div>
                         <div>
                           <label className="text-sm font-medium mb-1 block" style={{ color: '#955F6A' }}>
-                            Myseľ
-                          </label>
-                          <Textarea
-                            value={editMind}
-                            onChange={(e) => setEditMind(e.target.value)}
-                            className="min-h-[120px]"
-                          />
-                        </div>
-                        <div>
-                          <label className="text-sm font-medium mb-1 block" style={{ color: '#955F6A' }}>
                             Pohyb
                           </label>
                           <Textarea
                             value={editMovement}
                             onChange={(e) => setEditMovement(e.target.value)}
+                            className="min-h-[120px]"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium mb-1 block" style={{ color: '#955F6A' }}>
+                            Myseľ
+                          </label>
+                          <Textarea
+                            value={editMind}
+                            onChange={(e) => setEditMind(e.target.value)}
                             className="min-h-[120px]"
                           />
                         </div>
@@ -494,22 +494,6 @@ export default function AdminCycleTips() {
                           </div>
                           <div>
                             <h3 className="text-sm font-semibold mb-1" style={{ color: '#955F6A' }}>
-                              Myseľ
-                            </h3>
-                            {tip.mind_text ? (
-                              <div className="text-sm space-y-3" style={{ color: '#955F6A', opacity: 0.9 }}>
-                                {tip.mind_text.split('\n\n').map((para, i) => (
-                                  <p key={i}>{para}</p>
-                                ))}
-                              </div>
-                            ) : (
-                              <p className="text-sm" style={{ color: '#955F6A', opacity: 0.9 }}>
-                                Nie je definované
-                              </p>
-                            )}
-                          </div>
-                          <div>
-                            <h3 className="text-sm font-semibold mb-1" style={{ color: '#955F6A' }}>
                               Pohyb
                             </h3>
                             {tip.movement_text ? (
@@ -521,6 +505,22 @@ export default function AdminCycleTips() {
                                   </li>
                                 ))}
                               </ul>
+                            ) : (
+                              <p className="text-sm" style={{ color: '#955F6A', opacity: 0.9 }}>
+                                Nie je definované
+                              </p>
+                            )}
+                          </div>
+                          <div>
+                            <h3 className="text-sm font-semibold mb-1" style={{ color: '#955F6A' }}>
+                              Myseľ
+                            </h3>
+                            {tip.mind_text ? (
+                              <div className="text-sm space-y-3" style={{ color: '#955F6A', opacity: 0.9 }}>
+                                {tip.mind_text.split('\n\n').map((para, i) => (
+                                  <p key={i}>{para}</p>
+                                ))}
+                              </div>
                             ) : (
                               <p className="text-sm" style={{ color: '#955F6A', opacity: 0.9 }}>
                                 Nie je definované
