@@ -48,6 +48,12 @@ export default function AdminCycleTips() {
   const [cycleLength, setCycleLength] = useState(28);
   const { toast } = useToast();
 
+  // Helper function to parse bullet points from text
+  const parseBulletPoints = (text: string) => {
+    const lines = text.split('\n').filter(line => line.trim());
+    return lines.map(line => line.replace(/^-\s*/, '').trim());
+  };
+
   useEffect(() => {
     loadTips();
   }, []);
@@ -471,25 +477,55 @@ export default function AdminCycleTips() {
                             <h3 className="text-sm font-semibold mb-1" style={{ color: '#955F6A' }}>
                               Strava
                             </h3>
-                            <p className="text-sm whitespace-pre-wrap" style={{ color: '#955F6A', opacity: 0.9 }}>
-                              {tip.nutrition_text || 'Nie je definované'}
-                            </p>
+                            {tip.nutrition_text ? (
+                              <ul className="text-sm space-y-2 list-none" style={{ color: '#955F6A', opacity: 0.9 }}>
+                                {parseBulletPoints(tip.nutrition_text).map((item, i) => (
+                                  <li key={i} className="flex gap-2">
+                                    <span className="text-rose-400 mt-0.5">•</span>
+                                    <span>{item}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            ) : (
+                              <p className="text-sm" style={{ color: '#955F6A', opacity: 0.9 }}>
+                                Nie je definované
+                              </p>
+                            )}
                           </div>
                           <div>
                             <h3 className="text-sm font-semibold mb-1" style={{ color: '#955F6A' }}>
                               Myseľ
                             </h3>
-                            <p className="text-sm whitespace-pre-wrap" style={{ color: '#955F6A', opacity: 0.9 }}>
-                              {tip.mind_text || 'Nie je definované'}
-                            </p>
+                            {tip.mind_text ? (
+                              <div className="text-sm space-y-3" style={{ color: '#955F6A', opacity: 0.9 }}>
+                                {tip.mind_text.split('\n\n').map((para, i) => (
+                                  <p key={i}>{para}</p>
+                                ))}
+                              </div>
+                            ) : (
+                              <p className="text-sm" style={{ color: '#955F6A', opacity: 0.9 }}>
+                                Nie je definované
+                              </p>
+                            )}
                           </div>
                           <div>
                             <h3 className="text-sm font-semibold mb-1" style={{ color: '#955F6A' }}>
                               Pohyb
                             </h3>
-                            <p className="text-sm whitespace-pre-wrap" style={{ color: '#955F6A', opacity: 0.9 }}>
-                              {tip.movement_text || 'Nie je definované'}
-                            </p>
+                            {tip.movement_text ? (
+                              <ul className="text-sm space-y-2 list-none" style={{ color: '#955F6A', opacity: 0.9 }}>
+                                {parseBulletPoints(tip.movement_text).map((item, i) => (
+                                  <li key={i} className="flex gap-2">
+                                    <span className="text-rose-400 mt-0.5">•</span>
+                                    <span>{item}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            ) : (
+                              <p className="text-sm" style={{ color: '#955F6A', opacity: 0.9 }}>
+                                Nie je definované
+                              </p>
+                            )}
                           </div>
                         </div>
                         <div className="flex gap-2 mt-4 pt-4 border-t">
