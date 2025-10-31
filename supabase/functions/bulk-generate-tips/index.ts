@@ -16,18 +16,21 @@ serve(async (req) => {
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-    const { regenerate = false, cycleLength = 28 } = await req.json().catch(() => ({ 
+    const { regenerate = false, cycleLength = 28, startDay, endDay } = await req.json().catch(() => ({ 
       regenerate: false, 
       cycleLength: 28 
     }));
 
-    console.log(`🚀 Starting bulk generation of ${cycleLength}-day cycle plans (regenerate: ${regenerate})...`);
+    const actualStartDay = startDay || 1;
+    const actualEndDay = endDay || cycleLength;
+
+    console.log(`🚀 Starting bulk generation of days ${actualStartDay}-${actualEndDay} for ${cycleLength}-day cycle (regenerate: ${regenerate})...`);
     
     const results = [];
     let successCount = 0;
     let failureCount = 0;
 
-    for (let day = 1; day <= cycleLength; day++) {
+    for (let day = actualStartDay; day <= actualEndDay; day++) {
       try {
         console.log(`📅 [${day}/${cycleLength}] Generating plan for day ${day}...`);
         

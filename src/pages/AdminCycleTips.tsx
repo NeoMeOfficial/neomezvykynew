@@ -204,15 +204,48 @@ export default function AdminCycleTips() {
   const handleBulkGenerate = async () => {
     setBulkGenerating(true);
     try {
-      const { data, error } = await supabase.functions.invoke('bulk-generate-tips', {
-        body: { regenerate: true, cycleLength }
-      });
-
-      if (error) throw error;
+      const BATCH_SIZE = 10;
+      const batches: { start: number; end: number }[] = [];
+      
+      // Create batches: [1-10], [11-20], [21-30], [31-cycleLength]
+      for (let start = 1; start <= cycleLength; start += BATCH_SIZE) {
+        const end = Math.min(start + BATCH_SIZE - 1, cycleLength);
+        batches.push({ start, end });
+      }
+      
+      let totalSuccessful = 0;
+      let totalFailed = 0;
+      
+      // Process each batch sequentially with progress toasts
+      for (let i = 0; i < batches.length; i++) {
+        const batch = batches[i];
+        
+        toast({
+          title: `🔄 Batch ${i + 1}/${batches.length}`,
+          description: `Generujem dni ${batch.start}-${batch.end}...`,
+        });
+        
+        const { data, error } = await supabase.functions.invoke('bulk-generate-tips', {
+          body: { 
+            regenerate: true, 
+            cycleLength, 
+            startDay: batch.start, 
+            endDay: batch.end 
+          }
+        });
+        
+        if (!error && data?.summary) {
+          totalSuccessful += data.summary.successful || 0;
+          totalFailed += data.summary.failed || 0;
+        } else {
+          console.error(`Batch ${i + 1} error:`, error);
+          totalFailed += (batch.end - batch.start + 1);
+        }
+      }
 
       toast({
-        title: 'Úspech',
-        description: `Vygenerovaných ${data.summary?.successful || 0} / ${cycleLength} dní`,
+        title: '✅ Generovanie hotové!',
+        description: `Úspešne vygenerovaných: ${totalSuccessful} / ${cycleLength} dní${totalFailed > 0 ? ` (${totalFailed} chýb)` : ''}`,
       });
 
       await loadTips();
@@ -286,7 +319,7 @@ export default function AdminCycleTips() {
                 {bulkGenerating ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Generujem (cca 1 min)...
+                    Generujem batch...
                   </>
                 ) : (
                   <>
