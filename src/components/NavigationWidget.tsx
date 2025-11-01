@@ -91,11 +91,11 @@ export const NavigationWidget = ({
 
   return (
     <>
-      {/* Inline compact buttons for horizontal layout */}
-      <div className="flex gap-3 justify-center items-stretch w-full px-2 mb-4">
+      {/* Inline compact buttons for vertical layout */}
+      <div className="flex flex-col gap-3 w-full px-2 mb-4">
         <button 
           onClick={() => toggleSection('cycle')}
-          className="flex flex-col items-center justify-center gap-2 rounded-3xl py-4 px-4 symptom-glass transition-all hover:opacity-90 flex-1 min-w-0"
+          className="flex flex-col items-center justify-center gap-2 rounded-3xl py-4 px-4 symptom-glass transition-all hover:opacity-90 w-full"
           style={{ backgroundColor: '#FBF8F9' }}
         >
           <img 
@@ -110,7 +110,7 @@ export const NavigationWidget = ({
         
         <button 
           onClick={() => toggleSection('habits')}
-          className="flex flex-col items-center justify-center gap-2 rounded-3xl py-4 px-4 symptom-glass transition-all hover:opacity-90 flex-1 min-w-0"
+          className="flex flex-col items-center justify-center gap-2 rounded-3xl py-4 px-4 symptom-glass transition-all hover:opacity-90 w-full"
           style={{ backgroundColor: '#FBF8F9' }}
         >
           <img 
@@ -125,7 +125,7 @@ export const NavigationWidget = ({
         
         <button 
           onClick={() => toggleSection('reflection')}
-          className="flex flex-col items-center justify-center gap-2 rounded-3xl py-4 px-4 symptom-glass transition-all hover:opacity-90 flex-1 min-w-0"
+          className="flex flex-col items-center justify-center gap-2 rounded-3xl py-4 px-4 symptom-glass transition-all hover:opacity-90 w-full"
           style={{ backgroundColor: '#FBF8F9' }}
         >
           <img 
