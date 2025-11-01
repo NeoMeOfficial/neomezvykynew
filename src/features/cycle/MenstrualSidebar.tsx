@@ -16,6 +16,8 @@ interface MenstrualSidebarProps {
   accessCode?: string;
   lastPeriodStart?: string | null;
   cycleLength?: number;
+  periodLength?: number;
+  currentPhase?: string;
   onPeriodStart?: (date: Date) => void;
   onPeriodEnd?: (startDate: Date, endDate: Date) => void;
   onUseCustomDatePicker?: () => void;
@@ -48,6 +50,8 @@ export function MenstrualSidebar({
   accessCode, 
   lastPeriodStart, 
   cycleLength = 28,
+  periodLength = 5,
+  currentPhase,
   onPeriodStart,
   onPeriodEnd,
   onUseCustomDatePicker
@@ -146,11 +150,14 @@ export function MenstrualSidebar({
                     
                     <NextDatesInfo 
                       lastPeriodStart={lastPeriodStart} 
-                      cycleLength={cycleLength} 
+                      cycleLength={cycleLength}
+                      periodLength={periodLength}
+                      currentPhase={currentPhase}
                       onEditClick={onEditClick}
                       onPeriodStart={onPeriodStart}
                       onPeriodEnd={onPeriodEnd}
                       onUseCustomDatePicker={onUseCustomDatePicker}
+                      onPeriodEndClick={onEditClick}
                     />
 
                     {/* Temporary Data Indicator */}

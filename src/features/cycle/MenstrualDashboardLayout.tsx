@@ -98,11 +98,14 @@ export function MenstrualDashboardLayout({
         {/* Next Dates Info for Mobile */}
         <NextDatesInfo 
           lastPeriodStart={cycleData.lastPeriodStart} 
-          cycleLength={cycleData.cycleLength} 
+          cycleLength={cycleData.cycleLength}
+          periodLength={cycleData.periodLength}
+          currentPhase={currentPhase.name}
           onEditClick={() => setShowDatePicker(true)}
           onPeriodStart={handlePeriodStart}
           onPeriodEnd={handlePeriodEnd}
           onUseCustomDatePicker={() => setShowDatePicker(true)}
+          onPeriodEndClick={() => setShowDatePicker(true)}
         />
 
         {/* All sections for mobile */}
@@ -157,6 +160,8 @@ export function MenstrualDashboardLayout({
           accessCode={accessCode} 
           lastPeriodStart={cycleData.lastPeriodStart} 
           cycleLength={cycleData.cycleLength}
+          periodLength={cycleData.periodLength}
+          currentPhase={currentPhase.name}
           onPeriodStart={handlePeriodStart}
           onPeriodEnd={handlePeriodEnd}
           onUseCustomDatePicker={() => setShowDatePicker(true)}

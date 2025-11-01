@@ -5,16 +5,22 @@ import { Lightbulb } from 'lucide-react';
 interface NextDatesInfoProps {
   lastPeriodStart: string | null;
   cycleLength: number;
+  periodLength: number;
+  currentPhase?: string;
   onEditClick?: () => void;
   onPeriodStart?: (date: Date) => void;
   onPeriodEnd?: (startDate: Date, endDate: Date) => void;
   onUseCustomDatePicker?: () => void;
+  onPeriodEndClick?: () => void;
 }
 
 export function NextDatesInfo({ 
   lastPeriodStart, 
-  cycleLength, 
-  onEditClick
+  cycleLength,
+  periodLength,
+  currentPhase,
+  onEditClick,
+  onPeriodEndClick
 }: NextDatesInfoProps) {
   
   const formatDate = (date: Date) => {
@@ -25,6 +31,7 @@ export function NextDatesInfo({
   // Calculate dates if lastPeriodStart exists
   const startDate = lastPeriodStart ? new Date(lastPeriodStart) : null;
   const nextPeriodDate = startDate ? addDays(startDate, cycleLength) : null;
+  const periodEndDate = startDate ? addDays(startDate, periodLength) : null;
   
   // Calculate fertile window (ovulation typically 14 days before next period)
   const ovulationDay = cycleLength - 14;
@@ -33,6 +40,8 @@ export function NextDatesInfo({
   
   const fertilityStart = startDate ? addDays(startDate, fertilityStartDay) : null;
   const fertilityEnd = startDate ? addDays(startDate, fertilityEndDay) : null;
+
+  const isInMenstruationPhase = currentPhase === 'Menštruácia';
 
   return (
     <div className="space-y-2">
@@ -61,6 +70,32 @@ export function NextDatesInfo({
           )}
         </div>
       </div>
+
+      {/* Period end date */}
+      {lastPeriodStart && periodEndDate && (
+        <div className="p-3 rounded-lg" 
+             style={{ 
+               background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(253, 242, 248, 0.65) 100%)',
+               boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 1px 3px rgba(149, 95, 106, 0.06)'
+             }}>
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-xs font-medium" style={{ color: '#955F6A' }}>
+              Koniec menštruácie: <span style={{ color: '#FF7782' }}>
+                {formatDate(periodEndDate)}
+              </span>
+            </p>
+            {onPeriodEndClick && (
+              <button
+                onClick={onPeriodEndClick}
+                className="px-2 py-1 text-xs font-medium rounded-lg bg-white/50 hover:bg-white/80 transition-colors flex-shrink-0"
+                style={{ color: '#FF7782' }}
+              >
+                {isInMenstruationPhase ? 'Potvrdiť' : 'Zmeniť'}
+              </button>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Predicted next period - only show if lastPeriodStart exists */}
       {lastPeriodStart && nextPeriodDate && (
