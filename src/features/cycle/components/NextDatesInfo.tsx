@@ -42,21 +42,24 @@ export function NextDatesInfo({
              background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(253, 242, 248, 0.65) 100%)',
              boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 1px 3px rgba(149, 95, 106, 0.06)'
            }}>
-        <p className="text-xs font-medium" style={{ color: '#955F6A' }}>
-          Posledná menštruácia: {lastPeriodStart ? (
-            <span style={{ color: '#FF7782' }}>
-              {formatDate(startDate!)}
-            </span>
-          ) : (
-            <button 
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-xs font-medium" style={{ color: '#955F6A' }}>
+            Posledná menštruácia: {lastPeriodStart ? (
+              <span style={{ color: '#FF7782' }}>
+                {formatDate(startDate!)}
+              </span>
+            ) : null}
+          </p>
+          {onEditClick && (
+            <button
               onClick={onEditClick}
-              className="underline transition-colors hover:opacity-80"
+              className="px-2 py-1 text-xs font-medium rounded-lg bg-white/50 hover:bg-white/80 transition-colors flex-shrink-0"
               style={{ color: '#FF7782' }}
             >
-              Zadaj tu
+              {lastPeriodStart ? 'Zmeniť' : 'Zadaj'}
             </button>
           )}
-        </p>
+        </div>
       </div>
 
       {/* Predicted next period - only show if lastPeriodStart exists */}
@@ -87,18 +90,6 @@ export function NextDatesInfo({
             </span>
           </p>
         </div>
-      )}
-      
-      {/* Edit period date button */}
-      {onEditClick && (
-        <button
-          onClick={onEditClick}
-          className="w-full flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-3xl bg-white border border-rose-200/20 hover:bg-gray-50 transition-all"
-          style={{ color: '#FF7782' }}
-        >
-          <Lightbulb className="w-3 h-3" />
-          Zmeniť dátum menštruácie
-        </button>
       )}
 
     </div>
