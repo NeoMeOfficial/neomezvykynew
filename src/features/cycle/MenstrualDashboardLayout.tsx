@@ -86,7 +86,7 @@ export function MenstrualDashboardLayout({
   if (isMobile) {
     return <div className="w-full px-2 py-6 space-y-6">
         {/* Main Header with Action Buttons */}
-        <div className="flex items-center justify-between gap-2 pb-2">
+        <div className="flex items-center justify-between gap-2 pb-2 px-3">
           <h2 className="text-xl font-semibold leading-tight" style={{
             color: '#955F6A'
           }}>
