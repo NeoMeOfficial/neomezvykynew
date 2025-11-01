@@ -94,13 +94,13 @@ export const NavigationWidget = ({
       {/* Inline compact buttons for horizontal layout */}
       <button 
         onClick={() => toggleSection('cycle')}
-        className="flex flex-col items-center gap-1 rounded-3xl py-2 px-3 symptom-glass transition-all hover:opacity-90 whitespace-nowrap flex-shrink-0"
+        className="flex flex-col items-center justify-center gap-2 rounded-3xl py-4 px-4 symptom-glass transition-all hover:opacity-90 whitespace-nowrap flex-shrink-0"
         style={{ backgroundColor: '#FBF8F9' }}
       >
         <img 
           src={menstrualCalendarIcon} 
           alt="Menstrual Calendar"
-          className="w-8 h-8 flex-shrink-0"
+          className="w-20 h-20 flex-shrink-0"
         />
         <span className="text-xs font-medium" style={{ color: '#955F6A' }}>
           Periodka
@@ -109,13 +109,13 @@ export const NavigationWidget = ({
       
       <button 
         onClick={() => toggleSection('habits')}
-        className="flex flex-col items-center gap-1 rounded-3xl py-2 px-3 symptom-glass transition-all hover:opacity-90 whitespace-nowrap flex-shrink-0"
+        className="flex flex-col items-center justify-center gap-2 rounded-3xl py-4 px-4 symptom-glass transition-all hover:opacity-90 whitespace-nowrap flex-shrink-0"
         style={{ backgroundColor: '#FBF8F9' }}
       >
         <img 
           src={habitsIcon} 
           alt="Habits"
-          className="w-8 h-8 flex-shrink-0"
+          className="w-20 h-20 flex-shrink-0"
         />
         <span className="text-xs font-medium" style={{ color: '#955F6A' }}>
           Moje návyky
@@ -124,13 +124,13 @@ export const NavigationWidget = ({
       
       <button 
         onClick={() => toggleSection('reflection')}
-        className="flex flex-col items-center gap-1 rounded-3xl py-2 px-3 symptom-glass transition-all hover:opacity-90 whitespace-nowrap flex-shrink-0"
+        className="flex flex-col items-center justify-center gap-2 rounded-3xl py-4 px-4 symptom-glass transition-all hover:opacity-90 whitespace-nowrap flex-shrink-0"
         style={{ backgroundColor: '#FBF8F9' }}
       >
         <img 
           src={reflectionIcon} 
           alt="Daily Reflection"
-          className="w-8 h-8 flex-shrink-0"
+          className="w-20 h-20 flex-shrink-0"
         />
         <span className="text-xs font-medium" style={{ color: '#955F6A' }}>
           Denná reflexia
