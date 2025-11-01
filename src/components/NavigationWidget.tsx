@@ -156,16 +156,13 @@ export const NavigationWidget = ({
           <div className="backdrop-blur-md bg-white border border-white/40 rounded-2xl p-4 shadow-lg w-full max-w-[600px] max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <Calendar size={20} className="text-foreground" />
-                <h2 className="text-lg font-semibold text-foreground">Prehľad úspechov</h2>
-              </div>
-              <Dialog open={showMonthlyCalendar} onOpenChange={setShowMonthlyCalendar}>
-                <DialogTrigger asChild>
-                  <Button variant="ghost" size="sm" className="p-1.5 bg-amber-100 hover:bg-amber-200 border border-amber-200 rounded-xl shadow-sm">
-                    <Calendar size={20} className="text-foreground" />
-                  </Button>
-                </DialogTrigger>
-                <DialogContent 
+                <Dialog open={showMonthlyCalendar} onOpenChange={setShowMonthlyCalendar}>
+                  <DialogTrigger asChild>
+                    <Button variant="ghost" size="sm" className="p-1.5 bg-amber-100 hover:bg-amber-200 border border-amber-200 rounded-xl shadow-sm">
+                      <Calendar size={20} className="text-foreground" />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent
                   className="glass-container border-0 backdrop-blur-xl shadow-2xl max-w-none top-0 left-1/2 -translate-x-1/2 translate-y-0 w-[calc(100vw-8px)] max-h-[85vh] overflow-y-auto mt-2 sm:max-w-4xl md:max-w-5xl lg:max-w-6xl sm:top-1/2 sm:-translate-y-1/2"
                   aria-describedby={undefined}
                 >
@@ -190,8 +187,10 @@ export const NavigationWidget = ({
                       accessCode={accessCode}
                     />
                   </div>
-                </DialogContent>
-              </Dialog>
+                  </DialogContent>
+                </Dialog>
+                <h2 className="text-lg font-semibold text-foreground">Prehľad úspechov</h2>
+              </div>
             </div>
             <HabitCompletionCount selectedDate={selectedDate} />
             <HabitTracker 
