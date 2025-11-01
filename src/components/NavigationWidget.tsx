@@ -92,48 +92,48 @@ export const NavigationWidget = ({
   return (
     <>
       {/* Inline compact buttons for vertical layout */}
-      <div className="flex flex-col gap-4 w-full px-4 mb-4 min-h-[calc(100vh-120px)] justify-center">
+      <div className="flex flex-col gap-3 w-full px-4 mb-4">
         <button 
           onClick={() => toggleSection('cycle')}
-          className="flex flex-col items-center justify-center gap-3 rounded-3xl symptom-glass transition-all hover:opacity-90 w-full aspect-square"
+          className="flex flex-col items-center justify-center gap-2 rounded-3xl symptom-glass transition-all hover:opacity-90 w-full aspect-square max-h-[26vh]"
           style={{ backgroundColor: '#FBF8F9' }}
         >
           <img 
             src={menstrualCalendarIcon} 
             alt="Menstrual Calendar"
-            className="w-24 h-24 flex-shrink-0"
+            className="w-16 h-16 flex-shrink-0"
           />
-          <span className="text-base font-medium" style={{ color: '#955F6A' }}>
+          <span className="text-sm font-medium" style={{ color: '#955F6A' }}>
             Periodka
           </span>
         </button>
         
         <button 
           onClick={() => toggleSection('habits')}
-          className="flex flex-col items-center justify-center gap-3 rounded-3xl symptom-glass transition-all hover:opacity-90 w-full aspect-square"
+          className="flex flex-col items-center justify-center gap-2 rounded-3xl symptom-glass transition-all hover:opacity-90 w-full aspect-square max-h-[26vh]"
           style={{ backgroundColor: '#FBF8F9' }}
         >
           <img 
             src={habitsIcon} 
             alt="Habits"
-            className="w-24 h-24 flex-shrink-0"
+            className="w-16 h-16 flex-shrink-0"
           />
-          <span className="text-base font-medium" style={{ color: '#955F6A' }}>
+          <span className="text-sm font-medium" style={{ color: '#955F6A' }}>
             Moje návyky
           </span>
         </button>
         
         <button 
           onClick={() => toggleSection('reflection')}
-          className="flex flex-col items-center justify-center gap-3 rounded-3xl symptom-glass transition-all hover:opacity-90 w-full aspect-square"
+          className="flex flex-col items-center justify-center gap-2 rounded-3xl symptom-glass transition-all hover:opacity-90 w-full aspect-square max-h-[26vh]"
           style={{ backgroundColor: '#FBF8F9' }}
         >
           <img 
             src={reflectionIcon} 
             alt="Daily Reflection"
-            className="w-24 h-24 flex-shrink-0"
+            className="w-16 h-16 flex-shrink-0"
           />
-          <span className="text-base font-medium" style={{ color: '#955F6A' }}>
+          <span className="text-sm font-medium" style={{ color: '#955F6A' }}>
             Denná reflexia
           </span>
         </button>
