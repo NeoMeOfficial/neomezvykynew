@@ -92,50 +92,52 @@ export const NavigationWidget = ({
   return (
     <>
       {/* Inline compact buttons for horizontal layout */}
-      <button 
-        onClick={() => toggleSection('cycle')}
-        className="flex flex-col items-center justify-center gap-2 rounded-3xl py-4 px-4 symptom-glass transition-all hover:opacity-90 whitespace-nowrap flex-shrink-0"
-        style={{ backgroundColor: '#FBF8F9' }}
-      >
-        <img 
-          src={menstrualCalendarIcon} 
-          alt="Menstrual Calendar"
-          className="w-20 h-20 flex-shrink-0"
-        />
-        <span className="text-xs font-medium" style={{ color: '#955F6A' }}>
-          Periodka
-        </span>
-      </button>
-      
-      <button 
-        onClick={() => toggleSection('habits')}
-        className="flex flex-col items-center justify-center gap-2 rounded-3xl py-4 px-4 symptom-glass transition-all hover:opacity-90 whitespace-nowrap flex-shrink-0"
-        style={{ backgroundColor: '#FBF8F9' }}
-      >
-        <img 
-          src={habitsIcon} 
-          alt="Habits"
-          className="w-20 h-20 flex-shrink-0"
-        />
-        <span className="text-xs font-medium" style={{ color: '#955F6A' }}>
-          Moje návyky
-        </span>
-      </button>
-      
-      <button 
-        onClick={() => toggleSection('reflection')}
-        className="flex flex-col items-center justify-center gap-2 rounded-3xl py-4 px-4 symptom-glass transition-all hover:opacity-90 whitespace-nowrap flex-shrink-0"
-        style={{ backgroundColor: '#FBF8F9' }}
-      >
-        <img 
-          src={reflectionIcon} 
-          alt="Daily Reflection"
-          className="w-20 h-20 flex-shrink-0"
-        />
-        <span className="text-xs font-medium" style={{ color: '#955F6A' }}>
-          Denná reflexia
-        </span>
-      </button>
+      <div className="flex gap-3 justify-center items-stretch w-full px-2 mb-4">
+        <button 
+          onClick={() => toggleSection('cycle')}
+          className="flex flex-col items-center justify-center gap-2 rounded-3xl py-4 px-4 symptom-glass transition-all hover:opacity-90 flex-1 min-w-0"
+          style={{ backgroundColor: '#FBF8F9' }}
+        >
+          <img 
+            src={menstrualCalendarIcon} 
+            alt="Menstrual Calendar"
+            className="w-20 h-20 flex-shrink-0"
+          />
+          <span className="text-xs font-medium" style={{ color: '#955F6A' }}>
+            Periodka
+          </span>
+        </button>
+        
+        <button 
+          onClick={() => toggleSection('habits')}
+          className="flex flex-col items-center justify-center gap-2 rounded-3xl py-4 px-4 symptom-glass transition-all hover:opacity-90 flex-1 min-w-0"
+          style={{ backgroundColor: '#FBF8F9' }}
+        >
+          <img 
+            src={habitsIcon} 
+            alt="Habits"
+            className="w-20 h-20 flex-shrink-0"
+          />
+          <span className="text-xs font-medium" style={{ color: '#955F6A' }}>
+            Moje návyky
+          </span>
+        </button>
+        
+        <button 
+          onClick={() => toggleSection('reflection')}
+          className="flex flex-col items-center justify-center gap-2 rounded-3xl py-4 px-4 symptom-glass transition-all hover:opacity-90 flex-1 min-w-0"
+          style={{ backgroundColor: '#FBF8F9' }}
+        >
+          <img 
+            src={reflectionIcon} 
+            alt="Daily Reflection"
+            className="w-20 h-20 flex-shrink-0"
+          />
+          <span className="text-xs font-medium" style={{ color: '#955F6A' }}>
+            Denná reflexia
+          </span>
+        </button>
+      </div>
       
       {/* Expanded sections - shown below the row */}
       {openSections.cycle && (
