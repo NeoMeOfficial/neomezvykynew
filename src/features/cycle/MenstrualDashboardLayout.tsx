@@ -86,18 +86,13 @@ export function MenstrualDashboardLayout({
   if (isMobile) {
     return <div className="w-full px-2 py-6 space-y-6">
         {/* Main Header with Action Buttons */}
-        <div className="flex justify-between items-start gap-4 pb-2">
-          <div className="flex-1 min-w-0">
-            <h2 className="text-xl font-semibold mb-1 leading-tight" style={{
+        <div className="flex items-center justify-center gap-2 pb-2">
+          <h2 className="text-xl font-semibold leading-tight" style={{
             color: '#955F6A'
           }}>
-              Menštruačný kalendár
-            </h2>
-            
-          </div>
-          <div className="flex flex-col gap-2 sm:flex-row">
-            <PeriodkaTour accessCode={accessCode} autoStart={true} activeSection={activeSection} onSectionChange={setActiveSection} />
-          </div>
+            Menštruačný kalendár
+          </h2>
+          <PeriodkaTour accessCode={accessCode} autoStart={true} activeSection={activeSection} onSectionChange={setActiveSection} />
         </div>
 
         {/* Next Dates Info for Mobile */}
