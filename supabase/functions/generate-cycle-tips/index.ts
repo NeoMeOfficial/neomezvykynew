@@ -130,7 +130,7 @@ serve(async (req) => {
         relativePosition = 'koniec';
       }
 
-      const description = `Deň ${dayInPhase} z ${totalDaysInPhase} dní ${phaseNameSk} fázy (${relativePosition})`;
+      const description = `${relativePosition.charAt(0).toUpperCase() + relativePosition.slice(1)} ${phaseNameSk} fázy`;
 
       return {
         phase,
@@ -552,14 +552,21 @@ UNIKÁTNOSŤ OBSAHU:
 - NIE kópie, NIE opakujúce sa formulácie
 - Variuj štýl, slová, príklady
 - Pre deň ${day}: použij pozíciu "${phaseContext.relativePosition}" v "${phaseContext.phase}" fáze
-- Kontext: deň ${phaseContext.dayInPhase} z ${phaseContext.totalDaysInPhase}
-- KRITICKÉ: Generuj skutočne unikátny text pre tento konkrétny deň, nie generický šablónu
+- KRITICKÉ: Generuj skutočne unikátny text pre túto pozíciu v cykle, nie generický šablónu
+- DÔLEŽITÉ: NIKDY nespomínaj konkrétne čísla dní (napr. "v 6. dni", "deň 7 z 12")
 
 PRAVIDLÁ:
 1. Použi PRESNÝ text z master template alebo phaseContext ako základ
 2. Vyber z poskytnutých zoznamov (potraviny, benefity, myšlienky)
 3. Žiadne vymýšľanie nových faktov alebo informácií
 4. Len gramatické úpravy pre plynulosť a unikátnosť pre daný deň
+5. NIKDY nespomínaj konkrétne čísla dní v generovanom texte
+   ❌ "v 6. dni folikulárnej fázy"
+   ❌ "deň 7 z 12"
+   ❌ "v siedmom dni"
+   ✅ "pravdepodobne vstupuješ do folikulárnej fázy"
+   ✅ "si na konci folikulárnej fázy"
+   ✅ "tvoje telo sa pripravuje na ovuláciu"
 
 ZDROJE (overené):
 - Dr. Mary Claire Haver (menopause & hormonal health)
@@ -578,17 +585,18 @@ Pozícia v rámci fázy: ${phaseContext.relativePosition}
 
 MASTER TEMPLATE - REFERENCIA (použij obsah, nie štruktúru):
 Hormóny: ${template.hormones}
-Základný text pre očakávanie (prispôsob pre deň ${phaseContext.dayInPhase} z ${phaseContext.totalDaysInPhase}): ${selectedContextDescription}
+Základný text pre očakávanie (prispôsob pre ${phaseContext.relativePosition} ${phaseContext.phase} fázy): ${selectedContextDescription}
 Telo: ${template.body}
 Emócie: ${template.emotional}
 
 INŠTRUKCIA PRE OČAKÁVANIE:
-Vytvor unikátny text pre tento konkrétny deň, ktorý:
-- Reflektuje pozíciu ženy v tejto fáze (${phaseContext.relativePosition} z ${phaseContext.totalDaysInPhase} dní)
+Vytvor unikátny text pre túto pozíciu v cykle, ktorý:
+- Reflektuje pozíciu ženy v ${phaseContext.relativePosition} ${phaseContext.phase} fázy
 - Používa mäkký, kondicionálny jazyk ("pravdepodobne", "môžeš pociťovať")
-- Je konkrétny pre deň ${phaseContext.dayInPhase} z ${phaseContext.totalDaysInPhase}
+- Je všeobecný a nevyužíva konkrétne čísla dní (NIKDY nepíš "v X. dni" alebo "deň Y z Z")
 - Nie je kópiou iných dní v tomto cykle
 - Prispôsobuje obsah základného textu tak, aby bol jedinečný
+- Používa formulácie ako "vstupuješ do fázy", "si na konci", "telo sa pripravuje"
 
 STRAVA - REFERENCIA:
 Potreby: ${template.nutrition.needs.join(', ')}
