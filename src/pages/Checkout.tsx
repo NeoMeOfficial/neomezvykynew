@@ -9,10 +9,10 @@ const Checkout = () => {
   const [password, setPassword] = useState('');
 
   const features = [
-    { icon: Lock, text: 'Tvoje údaje sú bezpečne uložené navždy' },
-    { icon: TrendingUp, text: 'Presné predpovede cyklu a úrodných dní' },
-    { icon: Sparkles, text: 'Personalizované rady pre každú fázu cyklu' },
-    { icon: Heart, text: 'Zdieľaj kalendár s partnerom či lekárom' },
+    { icon: Lock, text: 'Tvoje údaje bezpečne uložené a vždy dostupné' },
+    { icon: TrendingUp, text: 'Buď informovaná o svojom cykle a úrodných dňoch' },
+    { icon: Heart, text: 'Rady pre myseľ, pohyb a stravu v každej fáze' },
+    { icon: Sparkles, text: 'Zdieľaj kalendár s partnerom či lekárom' },
   ];
 
   const handleGoogleLogin = () => {
@@ -52,10 +52,10 @@ const Checkout = () => {
             <div className="text-center lg:text-left mb-6">
               <div className="inline-flex items-center gap-2 bg-[#FEF5F7] text-[#F4415F] px-3 py-1.5 rounded-full text-sm font-medium mb-3">
                 <Sparkles className="h-4 w-4" />
-                Staň sa členkou Periodka Premium
+                Začni používať Periodku
               </div>
               <h1 className="text-2xl md:text-3xl font-bold mb-3" style={{ color: '#955F6A' }}>
-                Pochop svoje telo.<br />Ži v súlade s cyklom.
+                Buď informovaná o svojom cykle.<br />Cíť sa lepšie každý deň.
               </h1>
             </div>
 
@@ -117,7 +117,7 @@ const Checkout = () => {
               <div className="mb-5">
                 <h2 className="text-xl font-bold mb-1" style={{ color: '#955F6A' }}>Vytvor si účet</h2>
                 <p className="text-xs text-[hsl(var(--widget-text-soft))]">
-                  Rýchla registrácia. Začni užívať Premium za 2 minúty.
+                  Rýchla registrácia. Začni užívať Periodku za 2 minúty.
                 </p>
               </div>
 
@@ -208,7 +208,7 @@ const Checkout = () => {
                     color: 'white'
                   }}
                 >
-                  Začať s Premium →
+                  Začať s Periodkou →
                 </Button>
 
                 <p className="text-xs text-center text-[hsl(var(--widget-text-soft))] mt-3 leading-relaxed">
