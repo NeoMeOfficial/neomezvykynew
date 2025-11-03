@@ -45,31 +45,7 @@ const Checkout = () => {
         <div className="grid lg:grid-cols-2 gap-6 lg:gap-8">
           {/* Left Column - Value Props */}
           <div className="space-y-4">
-            {/* Social Proof - Moved to top */}
-            <div className="bg-gradient-to-br from-[#FEF5F7] to-white rounded-2xl p-4 border border-[#F4415F]/10">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="flex -space-x-3">
-                  <div className="w-10 h-10 rounded-full border-2 border-white overflow-hidden bg-gradient-to-br from-rose-100 to-pink-100">
-                    <div className="w-full h-full flex items-center justify-center text-[#F4415F] text-xs font-semibold">MK</div>
-                  </div>
-                  <div className="w-10 h-10 rounded-full border-2 border-white overflow-hidden bg-gradient-to-br from-pink-100 to-rose-100">
-                    <div className="w-full h-full flex items-center justify-center text-[#955F6A] text-xs font-semibold">LS</div>
-                  </div>
-                  <div className="w-10 h-10 rounded-full border-2 border-white overflow-hidden bg-gradient-to-br from-rose-100 to-pink-100">
-                    <div className="w-full h-full flex items-center justify-center text-[#F4415F] text-xs font-semibold">PH</div>
-                  </div>
-                  <div className="w-10 h-10 rounded-full border-2 border-white bg-[#F4415F] flex items-center justify-center text-white text-xs font-semibold">
-                    10k+
-                  </div>
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-[#955F6A]">Už viac ako 10 000+ žien</p>
-                  <p className="text-xs text-[hsl(var(--widget-text-soft))]">používa Periodku každý deň</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Security Badge - Moved up */}
+            {/* Security Badge - Top Priority */}
             <div className="bg-gradient-to-br from-[#FEF5F7] to-white rounded-2xl p-4 border border-[#F4415F]/10">
               <div className="flex items-start gap-3">
                 <div className="flex-shrink-0">
@@ -77,7 +53,7 @@ const Checkout = () => {
                 </div>
                 <div>
                   <h3 className="font-semibold text-[#955F6A] text-sm mb-0.5">100% Bezpečné</h3>
-                  
+                  <p className="text-xs text-[hsl(var(--widget-text-soft))]">Tvoje údaje sú šifrované a chránené najmodernejšími bezpečnostnými štandardmi.</p>
                 </div>
               </div>
             </div>
@@ -93,6 +69,30 @@ const Checkout = () => {
             }}>
                 Ži v súlade so svojim cyklom.<br />Cíť sa lepšie každý deň.
               </h1>
+            </div>
+
+            {/* Social Proof */}
+            <div className="bg-gradient-to-br from-[#FEF5F7] to-white rounded-2xl p-4 border border-[#F4415F]/10">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="flex -space-x-3">
+                  <div className="w-10 h-10 rounded-full border-2 border-white overflow-hidden bg-gradient-to-br from-rose-100 to-pink-100">
+                    <div className="w-full h-full flex items-center justify-center text-[#F4415F] text-xs font-semibold">MK</div>
+                  </div>
+                  <div className="w-10 h-10 rounded-full border-2 border-white overflow-hidden bg-gradient-to-br from-pink-100 to-rose-100">
+                    <div className="w-full h-full flex items-center justify-center text-[#955F6A] text-xs font-semibold">LS</div>
+                  </div>
+                  <div className="w-10 h-10 rounded-full border-2 border-white overflow-hidden bg-gradient-to-br from-rose-100 to-pink-100">
+                    <div className="w-full h-full flex items-center justify-center text-[#F4415F] text-xs font-semibold">PH</div>
+                  </div>
+                  <div className="w-10 h-10 rounded-full border-2 border-white bg-[#F4415F] flex items-center justify-center text-white text-xs font-semibold">
+                    1k+
+                  </div>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-[#955F6A]">Už viac ako 1000+ žien</p>
+                  <p className="text-xs text-[hsl(var(--widget-text-soft))]">používa Periodku každý deň</p>
+                </div>
+              </div>
             </div>
 
             {/* Features Card */}
