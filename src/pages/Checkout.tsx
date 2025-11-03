@@ -55,7 +55,7 @@ const Checkout = () => {
                 Začni používať Periodku
               </div>
               <h1 className="text-2xl md:text-3xl font-bold mb-3" style={{ color: '#955F6A' }}>
-                Buď informovaná o svojom cykle.<br />Cíť sa lepšie každý deň.
+                Ži v súlade so svojim cyklom.<br />Cíť sa lepšie každý deň.
               </h1>
             </div>
 
