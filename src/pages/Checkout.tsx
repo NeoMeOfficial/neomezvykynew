@@ -61,14 +61,6 @@ const Checkout = () => {
 
             {/* Price Card */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-[hsl(var(--widget-border))]">
-              <div className="flex items-baseline gap-2 mb-1">
-                <span className="text-3xl md:text-4xl font-bold" style={{ color: '#F4415F' }}>4,90 €</span>
-                <span className="text-base text-[hsl(var(--widget-text-soft))]">/mesiac</span>
-              </div>
-              <p className="text-xs text-[hsl(var(--widget-text-soft))] mb-4">
-                Žiadne skryté poplatky. Zruš kedykoľvek.
-              </p>
-              
               {/* Features */}
               <div className="space-y-3">
                 {features.map((feature, index) => {
