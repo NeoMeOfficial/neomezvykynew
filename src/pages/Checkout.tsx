@@ -8,7 +8,7 @@ const Checkout = () => {
   const [password, setPassword] = useState('');
   const features = [{
     icon: Lock,
-    text: 'Jednoducho si zaznač periodu a spoznaj lepšie svoje telo'
+    text: 'Tvoje údaje bezpečne uložené a vždy dostupné'
   }, {
     icon: TrendingUp,
     text: 'Buď informovaná o svojom cykle a úrodných dňoch'
