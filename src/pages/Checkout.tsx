@@ -10,8 +10,8 @@ const Checkout = () => {
 
   const features = [
     { icon: Lock, text: 'Tvoje údaje sú bezpečne uložené navždy' },
-    { icon: TrendingUp, text: 'Sleduj trendy a predpovedaj svoj cyklus' },
-    { icon: Sparkles, text: 'AI odporúčania šité na mieru tvojmu telu' },
+    { icon: TrendingUp, text: 'Presné predpovede cyklu a úrodných dní' },
+    { icon: Sparkles, text: 'Personalizované rady pre každú fázu cyklu' },
     { icon: Heart, text: 'Zdieľaj kalendár s partnerom či lekárom' },
   ];
 
