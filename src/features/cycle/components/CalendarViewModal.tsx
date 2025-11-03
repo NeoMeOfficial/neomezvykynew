@@ -42,7 +42,7 @@ export function CalendarViewModal({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
-        className={`${isMobile ? 'w-[95vw] max-w-[95vw] h-[90vh]' : 'max-w-6xl w-[90vw] max-h-[90vh]'} overflow-hidden flex flex-col`}
+        className={`${isMobile ? 'w-[95vw] max-w-[95vw] h-[90vh]' : 'max-w-6xl w-[90vw] max-h-[90vh]'} overflow-hidden flex flex-col rounded-3xl bg-background/80 backdrop-blur-xl border-white/20`}
       >
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold" style={{ color: '#955F6A' }}>
