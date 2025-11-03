@@ -30,6 +30,7 @@ interface CalendarViewProps {
   getPeriodIntensity?: (date: string) => PeriodIntensity | undefined;
   accessCode?: string;
   readOnly?: boolean;
+  onDaySelect?: (date: Date) => void;
 }
 export function CalendarView({
   cycleData,
@@ -39,7 +40,8 @@ export function CalendarView({
   onPeriodIntensityChange,
   getPeriodIntensity,
   accessCode,
-  readOnly = false
+  readOnly = false,
+  onDaySelect
 }: CalendarViewProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
@@ -726,6 +728,11 @@ export function CalendarView({
   const handleDayClick = (date: Date) => {
     const dayData = getDayData(date);
     const isSelected = selectedDayData && isSameDay(selectedDayData.date, date);
+    
+    // Call the callback if provided (for modal usage)
+    if (onDaySelect) {
+      onDaySelect(date);
+    }
     
     if (isSelected) {
       // Close if clicking the same day

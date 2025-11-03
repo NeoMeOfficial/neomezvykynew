@@ -13,6 +13,7 @@ import { ShareCalendarDialog } from '@/components/ShareCalendarDialog';
 import { useCycleData } from './useCycleData';
 import { PeriodkaTour } from './PeriodkaTour';
 import { NextDatesInfo } from './components/NextDatesInfo';
+import { CalendarViewModal } from './components/CalendarViewModal';
 type OutcomeType = 'next-period' | 'fertile-days';
 interface MenstrualDashboardLayoutProps {
   accessCode?: string;
@@ -29,6 +30,8 @@ export function MenstrualDashboardLayout({
   const isMobile = useIsMobile();
   const [activeSection, setActiveSection] = useState('estimate');
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showCalendarModal, setShowCalendarModal] = useState(false);
+  const [calendarModalMode, setCalendarModalMode] = useState<'select-start' | 'select-end'>('select-start');
   const [showSettings, setShowSettings] = useState(false);
   const [showShareDialog, setShowShareDialog] = useState(false);
   const [selectedOutcome, setSelectedOutcome] = useState<OutcomeType | null>(null);
@@ -62,6 +65,20 @@ export function MenstrualDashboardLayout({
   };
   const handleDateSelect = (date: Date) => {
     setLastPeriodStart(date);
+    handleFirstInteraction();
+  };
+
+  const handleCalendarDateSelect = (date: Date) => {
+    if (calendarModalMode === 'select-start') {
+      setLastPeriodStart(date);
+    } else {
+      // For select-end - update end of period
+      const startDate = cycleData.lastPeriodStart ? new Date(cycleData.lastPeriodStart) : date;
+      const startStr = format(startDate, 'yyyy-MM-dd');
+      const endStr = format(date, 'yyyy-MM-dd');
+      addPeriodToHistory(startStr, endStr);
+    }
+    setShowCalendarModal(false);
     handleFirstInteraction();
   };
   if (loading) {
@@ -101,11 +118,17 @@ export function MenstrualDashboardLayout({
           cycleLength={cycleData.cycleLength}
           periodLength={cycleData.periodLength}
           currentPhase={currentPhase.name}
-          onEditClick={() => setShowDatePicker(true)}
+          onEditClick={() => {
+            setCalendarModalMode('select-start');
+            setShowCalendarModal(true);
+          }}
           onPeriodStart={handlePeriodStart}
           onPeriodEnd={handlePeriodEnd}
           onUseCustomDatePicker={() => setShowDatePicker(true)}
-          onPeriodEndClick={() => setShowDatePicker(true)}
+          onPeriodEndClick={() => {
+            setCalendarModalMode('select-end');
+            setShowCalendarModal(true);
+          }}
         />
 
         {/* All sections for mobile */}
@@ -131,6 +154,18 @@ export function MenstrualDashboardLayout({
 
         {/* Modals */}
         <DatePickerModal isOpen={showDatePicker} onClose={() => setShowDatePicker(false)} onDateSelect={handleDateSelect} derivedState={derivedState} cycleLength={cycleData.cycleLength} periodLength={cycleData.periodLength} lastPeriodStart={cycleData.lastPeriodStart} title="Nová perioda" accessCode={accessCode} />
+
+        <CalendarViewModal
+          isOpen={showCalendarModal}
+          onClose={() => setShowCalendarModal(false)}
+          onDateSelect={handleCalendarDateSelect}
+          mode={calendarModalMode}
+          cycleData={cycleData}
+          derivedState={derivedState}
+          onPeriodIntensityChange={setPeriodIntensity}
+          getPeriodIntensity={getPeriodIntensity}
+          accessCode={accessCode}
+        />
 
         <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} cycleData={cycleData} onUpdateCycleLength={setCycleLength} onUpdatePeriodLength={setPeriodLength} onEditPeriodStart={() => setShowDatePicker(true)} onReset={() => {
         updateCycleData({
@@ -200,6 +235,18 @@ export function MenstrualDashboardLayout({
 
           {/* Modals */}
           <DatePickerModal isOpen={showDatePicker} onClose={() => setShowDatePicker(false)} onDateSelect={handleDateSelect} derivedState={derivedState} cycleLength={cycleData.cycleLength} periodLength={cycleData.periodLength} lastPeriodStart={cycleData.lastPeriodStart} title="Nová perioda" accessCode={accessCode} />
+
+          <CalendarViewModal
+            isOpen={showCalendarModal}
+            onClose={() => setShowCalendarModal(false)}
+            onDateSelect={handleCalendarDateSelect}
+            mode={calendarModalMode}
+            cycleData={cycleData}
+            derivedState={derivedState}
+            onPeriodIntensityChange={setPeriodIntensity}
+            getPeriodIntensity={getPeriodIntensity}
+            accessCode={accessCode}
+          />
 
           <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} cycleData={cycleData} onUpdateCycleLength={setCycleLength} onUpdatePeriodLength={setPeriodLength} onEditPeriodStart={() => setShowDatePicker(true)} onReset={() => {
         updateCycleData({
