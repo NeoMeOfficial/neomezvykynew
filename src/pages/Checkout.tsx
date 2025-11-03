@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Check, Shield, Heart, Lock, Sparkles, TrendingUp, FileText } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 const Checkout = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const features = [{
@@ -36,7 +38,7 @@ const Checkout = () => {
       {/* Header */}
       <div className="bg-white/80 backdrop-blur-sm border-b border-[hsl(var(--widget-border))] sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 max-w-5xl">
-          <button onClick={() => window.history.back()} className="flex items-center gap-2 text-[#955F6A] hover:text-[#F4415F] transition-colors">
+          <button onClick={() => navigate('/')} className="flex items-center gap-2 text-[#955F6A] hover:text-[#F4415F] transition-colors">
             <ArrowLeft className="h-4 w-4" />
             <span className="text-sm font-medium">Späť</span>
           </button>
