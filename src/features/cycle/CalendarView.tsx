@@ -950,7 +950,7 @@ export function CalendarView({
       {/* Calendar Grid */}
       <div className="space-y-2">
         {/* Day Headers */}
-        <div className={`grid grid-cols-7 ${isMobile ? 'gap-3' : 'gap-2'}`}>
+        <div className={`grid grid-cols-7 ${isMobile ? 'gap-x-4 gap-y-1' : 'gap-x-3 gap-y-1'}`}>
           {['Po', 'Ut', 'St', 'Št', 'Pi', 'So', 'Ne'].map(day => <div key={day} className="text-center text-xs font-medium py-2" style={{
           color: '#955F6A'
         }}>
@@ -968,7 +968,7 @@ export function CalendarView({
           const rowDays = calendarPeriod.days.slice(startIndex, endIndex);
           return <div key={rowIndex}>
                 {/* Calendar Row */}
-                <div className={`grid grid-cols-7 ${isMobile ? 'gap-3' : 'gap-2'}`}>
+                <div className={`grid grid-cols-7 ${isMobile ? 'gap-x-4 gap-y-1' : 'gap-x-3 gap-y-1'}`}>
                   {rowDays.map((date, dayIndex) => {
                 const globalIndex = startIndex + dayIndex;
                 if (!date) {
