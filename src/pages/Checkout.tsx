@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Check, Shield, Heart, Lock, Sparkles, TrendingUp } from 'lucide-react';
+import { ArrowLeft, Check, Shield, Heart, Lock, Sparkles, TrendingUp, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,7 +11,10 @@ const Checkout = () => {
     text: 'Tvoje údaje bezpečne uložené a vždy dostupné'
   }, {
     icon: TrendingUp,
-    text: 'Buď informovaná o svojom cykle a úrodných dňoch'
+    text: 'Zaznač si svoje periody a spoznaj lepšie svoje telo'
+  }, {
+    icon: FileText,
+    text: 'Jednoducho si zaznamenaj si symptómy a maj ich prehľadne uložené'
   }, {
     icon: Heart,
     text: 'Rady pre myseľ, pohyb a stravu v každej fáze'
