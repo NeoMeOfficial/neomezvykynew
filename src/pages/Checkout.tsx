@@ -62,11 +62,11 @@ const Checkout = () => {
                     <div className="w-full h-full flex items-center justify-center text-[#F4415F] text-xs font-semibold">PH</div>
                   </div>
                   <div className="w-10 h-10 rounded-full border-2 border-white bg-[#F4415F] flex items-center justify-center text-white text-xs font-semibold">
-                    10k+
+                    1k+
                   </div>
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-[#955F6A]">Už viac ako 10 000+ žien</p>
+                  <p className="text-sm font-semibold text-[#955F6A]">Už viac ako 1000+ žien</p>
                   <p className="text-xs text-[hsl(var(--widget-text-soft))]">používa Periodku každý deň</p>
                 </div>
               </div>
