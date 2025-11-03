@@ -1082,7 +1082,7 @@ export function CalendarView({
                         </div>
                         
                         {/* Today indicator overlay */}
-                        {isCurrentDay && !selectedOutcome && !isSelected && <div className="absolute inset-0 rounded-lg bg-amber-50"></div>}
+                        {isCurrentDay && !selectedOutcome && !isSelected && <div className="absolute inset-0 rounded-lg bg-amber-50 border border-amber-400"></div>}
                       </div>;
               })}
                 </div>
