@@ -48,8 +48,47 @@ const Checkout = () => {
         <div className="grid lg:grid-cols-2 gap-6 lg:gap-8">
           {/* Left Column - Value Props */}
           <div className="space-y-4">
+            {/* Social Proof - Moved to top */}
+            <div className="bg-gradient-to-br from-[#FEF5F7] to-white rounded-2xl p-4 border border-[#F4415F]/10">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="flex -space-x-3">
+                  <div className="w-10 h-10 rounded-full border-2 border-white overflow-hidden bg-gradient-to-br from-rose-100 to-pink-100">
+                    <div className="w-full h-full flex items-center justify-center text-[#F4415F] text-xs font-semibold">MK</div>
+                  </div>
+                  <div className="w-10 h-10 rounded-full border-2 border-white overflow-hidden bg-gradient-to-br from-pink-100 to-rose-100">
+                    <div className="w-full h-full flex items-center justify-center text-[#955F6A] text-xs font-semibold">LS</div>
+                  </div>
+                  <div className="w-10 h-10 rounded-full border-2 border-white overflow-hidden bg-gradient-to-br from-rose-100 to-pink-100">
+                    <div className="w-full h-full flex items-center justify-center text-[#F4415F] text-xs font-semibold">PH</div>
+                  </div>
+                  <div className="w-10 h-10 rounded-full border-2 border-white bg-[#F4415F] flex items-center justify-center text-white text-xs font-semibold">
+                    10k+
+                  </div>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-[#955F6A]">Už viac ako 10 000+ žien</p>
+                  <p className="text-xs text-[hsl(var(--widget-text-soft))]">používa Periodku každý deň</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Security Badge - Moved up */}
+            <div className="bg-gradient-to-br from-[#FEF5F7] to-white rounded-2xl p-4 border border-[#F4415F]/10">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0">
+                  <Shield className="h-5 w-5 text-[#F4415F]" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-[#955F6A] text-sm mb-0.5">100% Bezpečné</h3>
+                  <p className="text-xs text-[hsl(var(--widget-text-soft))]">
+                    Tvoje údaje sú šifrované a chránené najmodernejšími bezpečnostnými štandardmi.
+                  </p>
+                </div>
+              </div>
+            </div>
+
             {/* Hero Section */}
-            <div className="text-center lg:text-left mb-6">
+            <div className="text-center lg:text-left mb-2">
               <div className="inline-flex items-center gap-2 bg-[#FEF5F7] text-[#F4415F] px-3 py-1.5 rounded-full text-sm font-medium mb-3">
                 <Sparkles className="h-4 w-4" />
                 Začni používať Periodku
@@ -59,7 +98,7 @@ const Checkout = () => {
               </h1>
             </div>
 
-            {/* Price Card */}
+            {/* Features Card */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-[hsl(var(--widget-border))]">
               {/* Features */}
               <div className="space-y-3">
@@ -77,29 +116,68 @@ const Checkout = () => {
               </div>
             </div>
 
-            {/* Trust Badge */}
-            <div className="bg-gradient-to-br from-[#FEF5F7] to-white rounded-2xl p-4 border border-[#F4415F]/10">
-              <div className="flex items-start gap-3">
-                <div className="flex-shrink-0">
-                  <Shield className="h-5 w-5 text-[#F4415F]" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-[#955F6A] text-sm mb-0.5">100% Bezpečné</h3>
-                  <p className="text-xs text-[hsl(var(--widget-text-soft))]">
-                    Tvoje údaje sú šifrované a chránené najmodernejšími bezpečnostnými štandardmi.
-                  </p>
+            {/* Testimonials Section */}
+            <div className="space-y-3">
+              {/* Doctor Testimonial */}
+              <div className="bg-white rounded-xl p-4 border border-[hsl(var(--widget-border))] shadow-sm">
+                <div className="flex items-start gap-3">
+                  <div className="w-11 h-11 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex-shrink-0 flex items-center justify-center">
+                    <span className="text-blue-700 text-sm font-semibold">MUDr</span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs text-[hsl(var(--widget-text-soft))] mb-2 leading-relaxed">
+                      "Odporúčam Periodku svojim pacientkam. Je to skvelý nástroj pre lepšie pochopenie vlastného tela a prípravy na návštevy gynekológa."
+                    </p>
+                    <p className="text-xs font-semibold text-[#955F6A]">MUDr. Jana Horváthová</p>
+                    <p className="text-xs text-[hsl(var(--widget-text-soft))]">Gynekologička</p>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Social Proof */}
-            <div className="flex items-center justify-center lg:justify-start gap-2 text-sm text-[hsl(var(--widget-text-soft))]">
-              <div className="flex -space-x-2">
-                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#F4415F] to-[#955F6A]"></div>
-                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#955F6A] to-[#F4415F]"></div>
-                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#F4415F] to-[#955F6A]"></div>
+              {/* Client Testimonial 1 */}
+              <div className="bg-white rounded-xl p-4 border border-[hsl(var(--widget-border))] shadow-sm">
+                <div className="flex items-start gap-3">
+                  <div className="w-11 h-11 rounded-full bg-gradient-to-br from-rose-100 to-pink-100 flex-shrink-0 flex items-center justify-center">
+                    <span className="text-[#F4415F] text-sm font-semibold">MK</span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs text-[hsl(var(--widget-text-soft))] mb-2 leading-relaxed">
+                      "Konečne rozumiem tomu, prečo sa cítim tak, ako sa cítim. Rady k strave a cvičeniu mi naozaj pomohli cítiť sa každý deň lepšie."
+                    </p>
+                    <p className="text-xs font-semibold text-[#955F6A]">Mária K., 28 rokov</p>
+                  </div>
+                </div>
               </div>
-              <span className="text-xs">Už viac ako <strong className="text-[#F4415F]">10 000+ žien</strong></span>
+
+              {/* Client Testimonial 2 */}
+              <div className="bg-white rounded-xl p-4 border border-[hsl(var(--widget-border))] shadow-sm">
+                <div className="flex items-start gap-3">
+                  <div className="w-11 h-11 rounded-full bg-gradient-to-br from-pink-100 to-rose-100 flex-shrink-0 flex items-center justify-center">
+                    <span className="text-[#955F6A] text-sm font-semibold">LS</span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs text-[hsl(var(--widget-text-soft))] mb-2 leading-relaxed">
+                      "Úžasné, že môžem zdieľať kalendár s partnerom. Teraz lepšie chápe, čo prežívam a vie mi byť väčšou oporou."
+                    </p>
+                    <p className="text-xs font-semibold text-[#955F6A]">Lucia S., 32 rokov</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Client Testimonial 3 */}
+              <div className="bg-white rounded-xl p-4 border border-[hsl(var(--widget-border))] shadow-sm">
+                <div className="flex items-start gap-3">
+                  <div className="w-11 h-11 rounded-full bg-gradient-to-br from-rose-100 to-pink-100 flex-shrink-0 flex items-center justify-center">
+                    <span className="text-[#F4415F] text-sm font-semibold">PH</span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs text-[hsl(var(--widget-text-soft))] mb-2 leading-relaxed">
+                      "Predpovede cyklu sú presné a jednoduché sledovanie symptómov mi pomáha plánovať si mesiace dopredu. Veľmi užitočné!"
+                    </p>
+                    <p className="text-xs font-semibold text-[#955F6A]">Petra H., 25 rokov</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
