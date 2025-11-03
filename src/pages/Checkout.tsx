@@ -14,7 +14,7 @@ const Checkout = () => {
     text: 'Zaznač si svoje periody a spoznaj lepšie svoje telo'
   }, {
     icon: FileText,
-    text: 'Jednoducho si zaznamenaj si symptómy a maj ich prehľadne uložené'
+    text: 'Jednoducho a prehľadne zaznamenaj a pozoruj svoje symptómy'
   }, {
     icon: Heart,
     text: 'Rady pre myseľ, pohyb a stravu v každej fáze'
