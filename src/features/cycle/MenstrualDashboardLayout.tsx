@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { format } from 'date-fns';
+import { format, differenceInDays } from 'date-fns';
 import { Calendar as CalendarIcon, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -76,6 +76,11 @@ export function MenstrualDashboardLayout({
       const startDate = cycleData.lastPeriodStart ? new Date(cycleData.lastPeriodStart) : date;
       const startStr = format(startDate, 'yyyy-MM-dd');
       const endStr = format(date, 'yyyy-MM-dd');
+      
+      // Calculate and update period length based on the selected end date
+      const calculatedLength = differenceInDays(date, startDate) + 1;
+      setPeriodLength(calculatedLength);
+      
       addPeriodToHistory(startStr, endStr);
     }
     setShowCalendarModal(false);
