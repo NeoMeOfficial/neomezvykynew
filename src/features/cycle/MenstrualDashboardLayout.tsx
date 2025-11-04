@@ -200,6 +200,10 @@ export function MenstrualDashboardLayout({
           onPeriodStart={handlePeriodStart}
           onPeriodEnd={handlePeriodEnd}
           onUseCustomDatePicker={() => setShowDatePicker(true)}
+          onPeriodEndClick={() => {
+            setCalendarModalMode('select-end');
+            setShowCalendarModal(true);
+          }}
         />
         
         <main className="flex-1 p-8 max-w-none">
