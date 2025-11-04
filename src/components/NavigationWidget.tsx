@@ -101,7 +101,7 @@ export const NavigationWidget = ({
           <img 
             src={menstrualCalendarIcon} 
             alt="Menstrual Calendar"
-            className="w-18 h-18 flex-shrink-0"
+            className="w-[72px] h-[72px] flex-shrink-0"
           />
           <span className="text-lg font-medium" style={{ color: '#955F6A' }}>
             Periodka
@@ -116,7 +116,7 @@ export const NavigationWidget = ({
           <img 
             src={habitsIcon} 
             alt="Habits"
-            className="w-18 h-18 flex-shrink-0"
+            className="w-[72px] h-[72px] flex-shrink-0"
           />
           <span className="text-lg font-medium" style={{ color: '#955F6A' }}>
             Moje návyky
@@ -131,7 +131,7 @@ export const NavigationWidget = ({
           <img 
             src={reflectionIcon} 
             alt="Daily Reflection"
-            className="w-18 h-18 flex-shrink-0"
+            className="w-[72px] h-[72px] flex-shrink-0"
           />
           <span className="text-lg font-medium" style={{ color: '#955F6A' }}>
             Denná reflexia
