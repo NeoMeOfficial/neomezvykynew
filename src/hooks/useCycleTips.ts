@@ -33,6 +33,6 @@ export function useCycleTips(currentDay: number, phase: PhaseKey, cycleLength: n
         movement: data.movement_text || ''
       };
     },
-    enabled: currentDay >= 1 && currentDay <= 28,
+    enabled: currentDay >= 1 && currentDay <= cycleLength,
   });
 }
