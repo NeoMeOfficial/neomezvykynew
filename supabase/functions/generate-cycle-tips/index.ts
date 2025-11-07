@@ -547,10 +547,21 @@ FORMÁTOVANIE - BULLET POINTS:
   - Prechádzka: "- Skús si aj dnes dopriať prechádzku. Dopraj si aspoň 30-60min na čerstvom vzduchu."
   - Benefit: "- [benefit]" ako samostatná odrážka
 
-UNIKÁTNOSŤ OBSAHU:
-- Každý deň v cykle musí mať ODLIŠNÝ obsah
-- NIE kópie, NIE opakujúce sa formulácie
-- Variuj štýl, slová, príklady
+DIVERZITA A UNIKÁTNOSŤ:
+- Každý deň v cykle musí mať SKUTOČNE ODLIŠNÝ obsah (nie len kozmetické zmeny)
+- Využi progres vo fáze (X%) na jemné variácie v tóne a formuláciách:
+  - 0-20%: "práve vstupuješ", "začína sa", "prvé náznaky"
+  - 21-40%: "postupne", "pomaly", "čoraz viac"
+  - 41-60%: "už si v strede", "telo pracuje naplno"
+  - 61-80%: "blížiš sa ku koncu", "postupne sa mení"
+  - 81-100%: "končí sa", "pripravuje sa na ďalšiu fázu"
+- Každý deň musí mať RÔZNE konkrétne príklady:
+  - Iné kombinácie potravín z poskytnutého zoznamu (NIKDY tie isté 6 ako predošlý deň)
+  - Iný benefit prechádzky z poskytnutého zoznamu (rotuj ho na základe progressPercent)
+  - Iné praktické tipy
+  - Iné formulácie pre expectation text (variuj slová, štruktúru viet)
+- Seed slúži na prirodzenú variáciu - čím vyšší, tým iné príklady vyber
+- NIKDY nekopíruj formulácie z predošlých dní, aj keď sú v tej istej subfáze
 - Pre deň ${day}: použij pozíciu "${phaseContext.relativePosition}" v "${phaseContext.phase}" fáze
 - KRITICKÉ: Generuj skutočne unikátny text pre túto pozíciu v cykle, nie generický šablónu
 - DÔLEŽITÉ: NIKDY nespomínaj konkrétne čísla dní (napr. "v 6. dni", "deň 7 z 12")
@@ -575,6 +586,9 @@ ZDROJE (overené):
 - Dr. Stacy Sims (female physiology & performance)`;
 
     const cardioText = getCardioRecommendation(day, cycleLength, periodLength);
+    
+    const progressPercent = Math.round((phaseContext.dayInPhase / phaseContext.totalDaysInPhase) * 100);
+    const diversitySeed = day + (cycleLength * 100) + (phaseContext.dayInPhase * 10);
 
     const userPrompt = `Vytvor obsah pre DEŇ ${day} v ${phase}${subphase ? ` (${subphase})` : ''} fáze (celková dĺžka cyklu: ${cycleLength} dní, menštruácia: ${periodLength} dní).
 
@@ -582,6 +596,21 @@ RELATÍVNY KONTEXT:
 ${phaseContext.description}
 Fáza: ${phaseContext.phase}${phaseContext.subphase ? ` (${phaseContext.subphase})` : ''}
 Pozícia v rámci fázy: ${phaseContext.relativePosition}
+Progres vo fáze: ${phaseContext.dayInPhase}/${phaseContext.totalDaysInPhase} dní (${progressPercent}%)
+Seed pre diverzitu: ${diversitySeed}
+
+KRITICKÉ PRE UNIKÁTNOSŤ:
+- Tento deň ${day} je ${phaseContext.dayInPhase}. deň z ${phaseContext.totalDaysInPhase} dní tejto fázy
+- Si na ${progressPercent}% progresu tejto fázy
+- Obsah sa MUSÍ líšiť od dňa ${day > 1 ? day - 1 : cycleLength} aj od dňa ${day < cycleLength ? day + 1 : 1}
+- Použi rozdielne príklady potravín z poskytnutého zoznamu (min 6 odlišných než predošlý deň)
+- Použi rozdielny benefit prechádzky z poskytnutého zoznamu
+- Variuj formulácie podľa ${progressPercent}% progresu:
+  - 0-20%: "práve vstupuješ", "začína sa"
+  - 21-40%: "postupne", "pomaly" 
+  - 41-60%: "v strede", "telo pracuje naplno"
+  - 61-80%: "blížiš sa ku koncu"
+  - 81-100%: "končí sa", "pripravuje sa na ďalšiu fázu"
 
 MASTER TEMPLATE - REFERENCIA (použij obsah, nie štruktúru):
 Hormóny: ${template.hormones}
