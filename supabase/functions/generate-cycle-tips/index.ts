@@ -29,8 +29,8 @@ serve(async (req) => {
       throw new Error(`Invalid input. Day must be 1-${cycleLength}, cycle length must be 25-35.`);
     }
 
-    if (periodLength < 3 || periodLength > 8) {
-      throw new Error('Period length must be 3-8 days.');
+    if (periodLength < 2 || periodLength > 8) {
+      throw new Error('Period length must be 2-8 days.');
     }
 
     // Dynamic phase calculation for different cycle lengths (25-35 days) and period lengths (3-8 days)
@@ -49,9 +49,11 @@ serve(async (req) => {
       const follicularStart = menstrualEnd + 1;
       const follicularEnd = ovulationDay - 1;
       
-      // Luteal subphases (14 days total)
-      const lutealEarlyEnd = lutealStart + Math.round(lutealLength * 0.31) - 1; // ~4-5 days
-      const lutealMidEnd = lutealStart + Math.round(lutealLength * 0.69) - 1;   // ~9-10 days
+      // Luteal subphases (14 days total): 35% early, 40% mid, 25% late
+      // Note: Biologically, menstruation is part of the follicular phase, but we display it as a separate phase in the UI
+      const lutealEarlyEnd = lutealStart + Math.round(lutealLength * 0.35) - 1; // 35% = ~5 days
+      const lutealMidEnd = lutealStart + Math.round(lutealLength * 0.75) - 1;   // 75% (35% + 40%) = ~10 days
+      // Late luteal: from lutealMidEnd + 1 to cycleLength (remaining 25% = ~4 days)
       
       return {
         menstrual: { start: 1, end: menstrualEnd },

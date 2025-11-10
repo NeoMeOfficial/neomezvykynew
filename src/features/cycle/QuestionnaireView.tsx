@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Calendar as CalendarIcon } from 'lucide-react';
-import { format } from 'date-fns';
+import { format, differenceInDays } from 'date-fns';
 import { sk } from 'date-fns/locale';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -28,12 +28,62 @@ export function QuestionnaireView({ onComplete }: QuestionnaireViewProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [selectedPMSSymptoms, setSelectedPMSSymptoms] = useState<string[]>([]);
+  const [validationWarnings, setValidationWarnings] = useState<string[]>([]);
   const totalSteps = 5;
 
+  const validateCycleData = (): { valid: boolean; warnings: string[] } => {
+    const warnings: string[] = [];
+    
+    if (!cycleStartDate || !cycleEndDate) {
+      return { valid: false, warnings: ['Vyplň oba dátumy (začiatok a koniec cyklu).'] };
+    }
+    
+    const calculatedCycleLength = differenceInDays(cycleEndDate, cycleStartDate);
+    
+    // Validácia 1: cycle_length 25-35 dní
+    if (calculatedCycleLength < 25 || calculatedCycleLength > 35) {
+      warnings.push(`⚠️ Dĺžka cyklu ${calculatedCycleLength} dní je mimo rozsahu 25-35 dní. Tieto údaje môžu ovplyvniť presnosť výpočtu.`);
+    }
+    
+    // Validácia 2: periodLength 2-8 dní
+    if (setupPeriodLength < 2 || setupPeriodLength > 8) {
+      warnings.push('⚠️ Dĺžka krvácania musí byť 2-8 dní.');
+      return { valid: false, warnings };
+    }
+    
+    // Validácia 3: Folikulárna fáza minimálne 10 dní
+    const ovulationDay = calculatedCycleLength - 14;
+    const follicularLength = ovulationDay - 1;
+    
+    if (follicularLength < 10) {
+      warnings.push('⚠️ Tvoja folikulárna fáza sa zdá byť kratšia ako 10 dní, čo môže naznačovať hormonálnu nerovnováhu. Ak sa to opakuje, zváž konzultáciu s gynekológom.');
+    }
+    
+    // Validácia 4: Kritická kontrola
+    if (setupPeriodLength + 14 >= calculatedCycleLength) {
+      warnings.push(`⚠️ Tvoj cyklus sa zdá byť veľmi krátky (${calculatedCycleLength} dní) alebo s dlhým krvácaním (${setupPeriodLength} dní). Tieto údaje môžu ovplyvniť presnosť výpočtu. Ak sa to opakuje, odporúčame konzultáciu s gynekológom.`);
+    }
+    
+    return { valid: warnings.length === 0 || warnings.every(w => w.startsWith('⚠️')), warnings };
+  };
+
   const handleSetupComplete = (date: Date) => {
+    const validation = validateCycleData();
+    setValidationWarnings(validation.warnings);
+    
+    if (!validation.valid) {
+      return;
+    }
+    
+    let calculatedCycleLength = setupCycleLength;
+    
+    if (cycleStartDate && cycleEndDate) {
+      calculatedCycleLength = differenceInDays(cycleEndDate, cycleStartDate);
+    }
+    
     onComplete({
       lastPeriodStart: date,
-      cycleLength: setupCycleLength,
+      cycleLength: calculatedCycleLength,
       periodLength: setupPeriodLength
     });
   };
@@ -42,7 +92,7 @@ export function QuestionnaireView({ onComplete }: QuestionnaireViewProps) {
     const incomplete = [];
     if (!setupAge || setupAge < 13 || setupAge > 60) incomplete.push({ step: 1, question: 'Vek' });
     if (!cycleStartDate || !cycleEndDate) incomplete.push({ step: 2, question: 'Dátum cyklu' });
-    if (!setupPeriodLength || setupPeriodLength < 2 || setupPeriodLength > 10) incomplete.push({ step: 3, question: 'Dĺžka menštruácie' });
+    if (!setupPeriodLength || setupPeriodLength < 2 || setupPeriodLength > 8) incomplete.push({ step: 3, question: 'Dĺžka menštruácie' });
     return incomplete;
   };
 
@@ -209,7 +259,7 @@ export function QuestionnaireView({ onComplete }: QuestionnaireViewProps) {
                   id="setupPeriodLength" 
                   type="number" 
                   min="2" 
-                  max="10" 
+                  max="8" 
                   value={setupPeriodLength} 
                   onChange={e => setSetupPeriodLength(Number(e.target.value))} 
                   placeholder="5 dni" 
@@ -345,6 +395,16 @@ export function QuestionnaireView({ onComplete }: QuestionnaireViewProps) {
                   </div>
                 </div>
               </div>
+              
+              {/* Validation Warnings */}
+              {validationWarnings.length > 0 && (
+                <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-4 space-y-2">
+                  <p className="font-medium text-amber-700 mb-2">⚠️ Upozornenia:</p>
+                  {validationWarnings.map((warning, idx) => (
+                    <p key={idx} className="text-sm text-amber-700">{warning}</p>
+                  ))}
+                </div>
+              )}
               
               <div className="text-center">
                 <Button 

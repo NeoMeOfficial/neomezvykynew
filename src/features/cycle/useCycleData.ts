@@ -94,12 +94,12 @@ export function useCycleData(accessCode?: string) {
 
   // Set cycle length
   const setCycleLength = useCallback((length: number) => {
-    updateCycleData({ cycleLength: Math.max(21, Math.min(45, length)) });
+    updateCycleData({ cycleLength: Math.max(25, Math.min(35, length)) });
   }, [updateCycleData]);
 
   // Set period length
   const setPeriodLength = useCallback((length: number) => {
-    updateCycleData({ periodLength: Math.max(2, Math.min(10, length)) });
+    updateCycleData({ periodLength: Math.max(2, Math.min(8, length)) });
   }, [updateCycleData]);
 
   // Add period to history

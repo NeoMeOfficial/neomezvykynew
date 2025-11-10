@@ -32,10 +32,10 @@ export function getPhaseByDay(day: number, ranges: PhaseRange[]): PhaseRange {
   return ranges.find(range => day >= range.start && day <= range.end) || ranges[0];
 }
 
-export function getCurrentCycleDay(lastPeriodStart: string, today: Date): number {
+export function getCurrentCycleDay(lastPeriodStart: string, today: Date, cycleLength: number): number {
   const startDate = new Date(lastPeriodStart);
   const daysSince = differenceInDays(today, startDate);
-  return ((daysSince % 28) + 28) % 28 + 1; // Handle negative values
+  return ((daysSince % cycleLength) + cycleLength) % cycleLength + 1; // Handle negative values
 }
 
 export function getDerivedState(cycleData: CycleData): DerivedState {
@@ -44,7 +44,7 @@ export function getDerivedState(cycleData: CycleData): DerivedState {
   const maxDate = today;
   
   const currentDay = cycleData.lastPeriodStart 
-    ? getCurrentCycleDay(cycleData.lastPeriodStart, today)
+    ? getCurrentCycleDay(cycleData.lastPeriodStart, today, cycleData.cycleLength)
     : 1;
     
   const phaseRanges = getPhaseRanges(cycleData.cycleLength, cycleData.periodLength);

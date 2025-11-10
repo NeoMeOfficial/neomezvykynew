@@ -14,6 +14,7 @@ import { useCycleData } from './useCycleData';
 import { PeriodkaTour } from './PeriodkaTour';
 import { NextDatesInfo } from './components/NextDatesInfo';
 import { CalendarViewModal } from './components/CalendarViewModal';
+import { CycleInfoSection } from './CycleInfoSection';
 type OutcomeType = 'next-period' | 'fertile-days';
 interface MenstrualDashboardLayoutProps {
   accessCode?: string;
@@ -138,6 +139,8 @@ export function MenstrualDashboardLayout({
 
         {/* All sections for mobile */}
         <div className="space-y-8">
+          <CycleInfoSection cycleData={cycleData} />
+          
           <TodaysEstimateSection 
             derivedState={derivedState} 
             selectedOutcome={selectedOutcome} 
@@ -222,7 +225,9 @@ export function MenstrualDashboardLayout({
           </div>
           
           {/* Content Area */}
-          <div className="w-full">
+          <div className="w-full space-y-8">
+            <CycleInfoSection cycleData={cycleData} />
+            
             {activeSection === 'estimate' && <TodaysEstimateSection 
               derivedState={derivedState} 
               selectedOutcome={selectedOutcome} 
