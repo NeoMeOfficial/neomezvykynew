@@ -58,11 +58,16 @@ export default function AdminCycleTips() {
     loadTips();
   }, []);
 
+  useEffect(() => {
+    loadTips();
+  }, [cycleLength]);
+
   const loadTips = async () => {
     try {
       const { data, error } = await supabase
         .from('cycle_tips')
         .select('*')
+        .eq('cycle_length', cycleLength)
         .order('day')
         .order('category');
 
