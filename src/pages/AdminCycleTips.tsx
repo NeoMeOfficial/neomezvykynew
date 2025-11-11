@@ -7,9 +7,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Check, X, RefreshCw, Sparkles, Loader2, Calendar, Edit2, Save } from 'lucide-react';
+import { Check, X, RefreshCw, Sparkles, Loader2, Calendar, Edit2, Save, Plus } from 'lucide-react';
 import { useCycleData } from '@/features/cycle/useCycleData';
-import { format, addDays, parseISO } from 'date-fns';
+import { format, addDays, parseISO, subDays } from 'date-fns';
 import { sk } from 'date-fns/locale';
 import { getCurrentCycleDay, getPhaseRanges, getPhaseByDay } from '@/features/cycle/utils';
 
@@ -330,6 +330,16 @@ export default function AdminCycleTips() {
   };
 
   const handleSaveTestData = () => {
+    // Validácia: musí byť zadaný aspoň začiatok menštruácie
+    if (!editLastPeriodStart) {
+      toast({
+        title: '⚠️ Chýbajúce údaje',
+        description: 'Prosím, zadaj aspoň začiatok menštruácie.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
     let finalPeriodLength = editPeriodLength;
     let finalCycleLength = editCycleLength;
     
@@ -392,7 +402,7 @@ export default function AdminCycleTips() {
     <div className="min-h-screen bg-gradient-to-br from-rose-50 to-pink-50 p-4 sm:p-8">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Test Data Card */}
-        {cycleData.lastPeriodStart && (
+        {cycleData.lastPeriodStart ? (
           <Card className="border-2 border-primary/20 shadow-lg">
             <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10">
               <div className="flex justify-between items-center">
@@ -568,6 +578,37 @@ export default function AdminCycleTips() {
                   💡 <strong>Tip:</strong> Tieto údaje sa načítavajú z localStorage. Môžeš ich tu upraviť pre rýchle testovanie rôznych scenárov.
                 </p>
               </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="border-2 border-dashed border-primary/20 shadow-lg">
+            <CardHeader className="bg-gradient-to-r from-rose-50 to-pink-50">
+              <CardTitle className="flex items-center gap-2 text-primary">
+                <Calendar className="w-5 h-5" />
+                Testové údaje
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-6 text-center">
+              <p className="text-muted-foreground mb-4">
+                Nie sú dostupné žiadne testovacie údaje.
+              </p>
+              <p className="text-sm text-muted-foreground mb-6">
+                Vlož testovacie údaje tu alebo vyplň dotazník v hlavnej aplikácii (<code>/menstrual-calendar</code>).
+              </p>
+              <Button
+                onClick={() => {
+                  setIsEditingTestData(true);
+                  // Nastaviť default hodnoty pre pohodlie
+                  setEditLastPeriodStart(format(subDays(new Date(), 10), 'yyyy-MM-dd'));
+                  setEditCycleLength(28);
+                  setEditPeriodLength(0); // 0 = AUTO
+                  setEditNextPeriodEstimate('');
+                }}
+                className="bg-primary hover:bg-primary/90"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Vložiť údaje
+              </Button>
             </CardContent>
           </Card>
         )}
