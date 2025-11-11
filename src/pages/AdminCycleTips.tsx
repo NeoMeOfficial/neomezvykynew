@@ -41,6 +41,21 @@ const SUBPHASE_LABELS: Record<string, string> = {
   late: 'Neskorá'
 };
 
+// Lookup tabuľka pre typické rozsahy krvácania podľa dĺžky cyklu
+const TYPICAL_BLEEDING_RANGES: Record<number, [number, number]> = {
+  21: [2, 4], 22: [2, 4], 23: [2, 5], 24: [3, 5], 25: [3, 5],
+  26: [3, 6], 27: [4, 5], 28: [4, 6], 29: [4, 6], 30: [4, 6],
+  31: [4, 6], 32: [4, 6], 33: [5, 6], 34: [5, 6], 35: [5, 7],
+  36: [5, 7], 37: [5, 7], 38: [5, 7], 39: [5, 7], 40: [5, 8]
+};
+
+// Generuje náhodnú hodnotu v typickom rozsahu
+const generateTypicalBleedingLength = (cycleLength: number): number => {
+  const range = TYPICAL_BLEEDING_RANGES[cycleLength] || [4, 6];
+  const [min, max] = range;
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+};
+
 export default function AdminCycleTips() {
   const [tips, setTips] = useState<CycleTip[]>([]);
   const [loading, setLoading] = useState(true);
@@ -56,6 +71,8 @@ export default function AdminCycleTips() {
   const [editLastPeriodStart, setEditLastPeriodStart] = useState('');
   const [editPeriodLength, setEditPeriodLength] = useState(5);
   const [editCycleLength, setEditCycleLength] = useState(28);
+  const [editNextPeriodEstimate, setEditNextPeriodEstimate] = useState('');
+  const [isPeriodLengthAuto, setIsPeriodLengthAuto] = useState(false);
   const { toast } = useToast();
   
   // Load cycle data from localStorage
@@ -308,18 +325,65 @@ export default function AdminCycleTips() {
     setEditLastPeriodStart(cycleData.lastPeriodStart || format(new Date(), 'yyyy-MM-dd'));
     setEditPeriodLength(cycleData.periodLength);
     setEditCycleLength(cycleData.cycleLength);
+    setEditNextPeriodEstimate('');
     setIsEditingTestData(true);
   };
 
   const handleSaveTestData = () => {
+    let finalPeriodLength = editPeriodLength;
+    let finalCycleLength = editCycleLength;
+    
+    // 1. Vypočítať dĺžku cyklu z "začiatku ďalšej menštruácie" (ak je zadaný)
+    if (editNextPeriodEstimate && editLastPeriodStart) {
+      const daysDiff = Math.abs(
+        Math.floor((parseISO(editNextPeriodEstimate).getTime() - parseISO(editLastPeriodStart).getTime()) / (1000 * 60 * 60 * 24))
+      );
+      finalCycleLength = daysDiff;
+      
+      // Validácia rozsahu cyklu
+      if (finalCycleLength < 25 || finalCycleLength > 35) {
+        toast({
+          title: '⚠️ Nezvyčajná dĺžka cyklu',
+          description: `Vypočítaná dĺžka ${finalCycleLength} dní je mimo typického rozsahu 25-35 dní.`,
+          variant: 'destructive',
+        });
+      }
+    }
+    
+    // 2. Ak nie je zadaná dĺžka krvácania (alebo je 0) → AUTO
+    if (!finalPeriodLength || finalPeriodLength === 0) {
+      finalPeriodLength = generateTypicalBleedingLength(finalCycleLength);
+      setIsPeriodLengthAuto(true);
+      toast({
+        title: '✅ Automaticky doplnená dĺžka menštruácie',
+        description: `Použitá typická hodnota ${finalPeriodLength} dní pre ${finalCycleLength}-dňový cyklus`,
+      });
+    } else {
+      setIsPeriodLengthAuto(false);
+    }
+    
+    // 3. Validácia: krvácanie >8 dní
+    if (finalPeriodLength > 8) {
+      toast({
+        title: '⚠️ Dlhé krvácanie',
+        description: 'Krvácanie dlhšie ako 8 dní môže byť nezvyčajné. Odporúčame konzultáciu s lekárom.',
+        variant: 'destructive',
+      });
+    }
+    
+    // 4. Obmedzenie na fyziologický rozsah 2-8 dní
+    finalPeriodLength = Math.max(2, Math.min(8, finalPeriodLength));
+    
+    // 5. Uloženie do localStorage
     if (editLastPeriodStart) {
       setLastPeriodStart(parseISO(editLastPeriodStart));
     }
-    setPeriodLength(editPeriodLength);
-    updateCycleLength(editCycleLength);
+    setPeriodLength(finalPeriodLength);
+    updateCycleLength(finalCycleLength);
+    
     setIsEditingTestData(false);
     toast({
-      title: 'Údaje uložené',
+      title: '✅ Údaje uložené',
       description: 'Testové údaje boli aktualizované',
     });
   };
@@ -360,7 +424,7 @@ export default function AdminCycleTips() {
               {isEditingTestData ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="lastPeriodStart">Začiatok poslednej menštruácie</Label>
+                    <Label htmlFor="lastPeriodStart">Začiatok menštruácie</Label>
                     <Input
                       id="lastPeriodStart"
                       type="date"
@@ -370,19 +434,60 @@ export default function AdminCycleTips() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="periodLength">Dĺžka krvácania (dni)</Label>
+                    <Label htmlFor="periodLength">
+                      Dĺžka menštruácie (dni krvácania)
+                      {isPeriodLengthAuto && <Badge variant="secondary" className="ml-2">AUTO</Badge>}
+                    </Label>
                     <Input
                       id="periodLength"
                       type="number"
-                      min="2"
-                      max="8"
-                      value={editPeriodLength}
+                      min="0"
+                      max="10"
+                      placeholder="Nechaj prázdne pre AUTO výpočet"
+                      value={editPeriodLength || ''}
                       onChange={(e) => setEditPeriodLength(Number(e.target.value))}
                       className="w-full"
                     />
+                    <p className="text-xs text-muted-foreground">
+                      Ak je prázdne, použije sa typická hodnota podľa dĺžky cyklu (2-8 dní)
+                    </p>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="cycleLength">Dĺžka cyklu (dni)</Label>
+                    <Label htmlFor="nextPeriodEstimate">
+                      Odhadovaný začiatok ďalšej menštruácie (voliteľné)
+                    </Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id="nextPeriodEstimate"
+                        type="date"
+                        value={editNextPeriodEstimate}
+                        onChange={(e) => setEditNextPeriodEstimate(e.target.value)}
+                        min={editLastPeriodStart}
+                        className="w-full"
+                      />
+                      {editNextPeriodEstimate && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setEditNextPeriodEstimate('')}
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Ak je zadaný, dĺžka cyklu sa vypočíta automaticky
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="cycleLength">
+                      Dĺžka menštruačného cyklu (dni)
+                      {editNextPeriodEstimate && editLastPeriodStart && (
+                        <Badge variant="secondary" className="ml-2">
+                          AUTO: {Math.abs(Math.floor((parseISO(editNextPeriodEstimate).getTime() - parseISO(editLastPeriodStart).getTime()) / (1000 * 60 * 60 * 24)))}
+                        </Badge>
+                      )}
+                    </Label>
                     <Input
                       id="cycleLength"
                       type="number"
@@ -390,54 +495,73 @@ export default function AdminCycleTips() {
                       max="35"
                       value={editCycleLength}
                       onChange={(e) => setEditCycleLength(Number(e.target.value))}
+                      disabled={!!editNextPeriodEstimate}
                       className="w-full"
                     />
                   </div>
-                  <div className="flex items-end">
-                    <Button
-                      variant="outline"
-                      onClick={() => setIsEditingTestData(false)}
-                      className="w-full"
-                    >
-                      Zrušiť
-                    </Button>
-                  </div>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Začiatok poslednej menštruácie</p>
-                    <p className="text-lg font-semibold text-foreground">
-                      {format(parseISO(cycleData.lastPeriodStart), 'PPP', { locale: sk })}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Koniec menštruácie</p>
-                    <p className="text-lg font-semibold text-foreground">
-                      {format(addDays(parseISO(cycleData.lastPeriodStart), cycleData.periodLength - 1), 'PPP', { locale: sk })}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Dĺžka krvácania</p>
-                    <p className="text-lg font-semibold text-foreground">{cycleData.periodLength} dní</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Dĺžka cyklu</p>
-                    <p className="text-lg font-semibold text-foreground">{cycleData.cycleLength} dní</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Predpokladaný začiatok ďalšej menštruácie</p>
-                    <p className="text-lg font-semibold text-foreground">
-                      {format(addDays(parseISO(cycleData.lastPeriodStart), cycleData.cycleLength), 'PPP', { locale: sk })}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Aktuálny deň / Fáza</p>
-                    <p className="text-lg font-semibold text-foreground">
-                      Deň {currentDay} / {PHASE_LABELS[currentPhase.key]}
-                    </p>
-                  </div>
-                </div>
+                (() => {
+                  // Vypočítať plodné dni
+                  const ovulationDay = cycleData.cycleLength - 14;
+                  const fertilityStart = ovulationDay - 5;
+                  const fertilityEnd = ovulationDay + 1;
+                  const fertilityStartDate = addDays(parseISO(cycleData.lastPeriodStart), fertilityStart);
+                  const fertilityEndDate = addDays(parseISO(cycleData.lastPeriodStart), fertilityEnd);
+                  
+                  return (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div>
+                        <p className="text-sm text-muted-foreground mb-1">Začiatok menštruácie</p>
+                        <p className="text-lg font-semibold text-foreground">
+                          {format(parseISO(cycleData.lastPeriodStart), 'PPP', { locale: sk })}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground mb-1">Koniec menštruácie</p>
+                        <p className="text-lg font-semibold text-foreground">
+                          {format(addDays(parseISO(cycleData.lastPeriodStart), cycleData.periodLength - 1), 'PPP', { locale: sk })}
+                          <Badge variant="outline" className="ml-2 text-xs">AUTO</Badge>
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground mb-1">Dĺžka menštruácie (krvácania)</p>
+                        <p className="text-lg font-semibold text-foreground">
+                          {cycleData.periodLength} dní
+                          {isPeriodLengthAuto && <Badge variant="secondary" className="ml-2 text-xs">TYPICKÁ</Badge>}
+                          {cycleData.periodLength > 8 && (
+                            <Badge variant="destructive" className="ml-2 text-xs">⚠️ DLHÉ</Badge>
+                          )}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground mb-1">Dĺžka menštruačného cyklu</p>
+                        <p className="text-lg font-semibold text-foreground">
+                          {cycleData.cycleLength} dní
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground mb-1">Odhadovaný začiatok ďalšej menštruácie</p>
+                        <p className="text-lg font-semibold text-foreground">
+                          {format(addDays(parseISO(cycleData.lastPeriodStart), cycleData.cycleLength), 'PPP', { locale: sk })}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground mb-1">Plodné dni (fertility window)</p>
+                        <p className="text-lg font-semibold text-foreground">
+                          {format(fertilityStartDate, 'd.M.', { locale: sk })} - {format(fertilityEndDate, 'd.M.yyyy', { locale: sk })}
+                          <Badge variant="outline" className="ml-2 text-xs">AUTO</Badge>
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground mb-1">Aktuálny deň cyklu / Fáza</p>
+                        <p className="text-lg font-semibold text-foreground">
+                          Deň {currentDay} / {PHASE_LABELS[currentPhase.key]}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })()
               )}
               <div className="mt-6 p-4 bg-primary/5 rounded-lg">
                 <p className="text-sm text-muted-foreground">
