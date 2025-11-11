@@ -1,11 +1,17 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Check, X, RefreshCw, Sparkles, Loader2 } from 'lucide-react';
+import { Check, X, RefreshCw, Sparkles, Loader2, Calendar, Edit2, Save } from 'lucide-react';
+import { useCycleData } from '@/features/cycle/useCycleData';
+import { format, addDays, parseISO } from 'date-fns';
+import { sk } from 'date-fns/locale';
+import { getCurrentCycleDay, getPhaseRanges, getPhaseByDay } from '@/features/cycle/utils';
 
 interface CycleTip {
   id: string;
@@ -46,7 +52,14 @@ export default function AdminCycleTips() {
   const [bulkGenerating, setBulkGenerating] = useState(false);
   const [regeneratingDay, setRegeneratingDay] = useState<number | null>(null);
   const [cycleLength, setCycleLength] = useState(28);
+  const [isEditingTestData, setIsEditingTestData] = useState(false);
+  const [editLastPeriodStart, setEditLastPeriodStart] = useState('');
+  const [editPeriodLength, setEditPeriodLength] = useState(5);
+  const [editCycleLength, setEditCycleLength] = useState(28);
   const { toast } = useToast();
+  
+  // Load cycle data from localStorage
+  const { cycleData, setLastPeriodStart, setPeriodLength, setCycleLength: updateCycleLength } = useCycleData();
 
   // Helper function to parse bullet points from text
   const parseBulletPoints = (text: string) => {
@@ -284,9 +297,157 @@ export default function AdminCycleTips() {
     );
   }
 
+  // Calculate current cycle day and phase
+  const currentDay = cycleData.lastPeriodStart 
+    ? getCurrentCycleDay(cycleData.lastPeriodStart, new Date(), cycleData.cycleLength)
+    : 1;
+  const phaseRanges = getPhaseRanges(cycleData.cycleLength, cycleData.periodLength);
+  const currentPhase = getPhaseByDay(currentDay, phaseRanges);
+
+  const handleEditTestData = () => {
+    setEditLastPeriodStart(cycleData.lastPeriodStart || format(new Date(), 'yyyy-MM-dd'));
+    setEditPeriodLength(cycleData.periodLength);
+    setEditCycleLength(cycleData.cycleLength);
+    setIsEditingTestData(true);
+  };
+
+  const handleSaveTestData = () => {
+    if (editLastPeriodStart) {
+      setLastPeriodStart(parseISO(editLastPeriodStart));
+    }
+    setPeriodLength(editPeriodLength);
+    updateCycleLength(editCycleLength);
+    setIsEditingTestData(false);
+    toast({
+      title: 'Údaje uložené',
+      description: 'Testové údaje boli aktualizované',
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-50 to-pink-50 p-4 sm:p-8">
       <div className="max-w-6xl mx-auto space-y-6">
+        {/* Test Data Card */}
+        {cycleData.lastPeriodStart && (
+          <Card className="border-2 border-primary/20 shadow-lg">
+            <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10">
+              <div className="flex justify-between items-center">
+                <CardTitle className="flex items-center gap-2 text-primary">
+                  <Calendar className="w-5 h-5" />
+                  Testové údaje (localStorage)
+                </CardTitle>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={isEditingTestData ? handleSaveTestData : handleEditTestData}
+                  className="border-primary text-primary hover:bg-primary/10"
+                >
+                  {isEditingTestData ? (
+                    <>
+                      <Save className="w-4 h-4 mr-2" />
+                      Uložiť
+                    </>
+                  ) : (
+                    <>
+                      <Edit2 className="w-4 h-4 mr-2" />
+                      Upraviť
+                    </>
+                  )}
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-6">
+              {isEditingTestData ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="lastPeriodStart">Začiatok poslednej menštruácie</Label>
+                    <Input
+                      id="lastPeriodStart"
+                      type="date"
+                      value={editLastPeriodStart}
+                      onChange={(e) => setEditLastPeriodStart(e.target.value)}
+                      className="w-full"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="periodLength">Dĺžka krvácania (dni)</Label>
+                    <Input
+                      id="periodLength"
+                      type="number"
+                      min="2"
+                      max="8"
+                      value={editPeriodLength}
+                      onChange={(e) => setEditPeriodLength(Number(e.target.value))}
+                      className="w-full"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="cycleLength">Dĺžka cyklu (dni)</Label>
+                    <Input
+                      id="cycleLength"
+                      type="number"
+                      min="25"
+                      max="35"
+                      value={editCycleLength}
+                      onChange={(e) => setEditCycleLength(Number(e.target.value))}
+                      className="w-full"
+                    />
+                  </div>
+                  <div className="flex items-end">
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsEditingTestData(false)}
+                      className="w-full"
+                    >
+                      Zrušiť
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Začiatok poslednej menštruácie</p>
+                    <p className="text-lg font-semibold text-foreground">
+                      {format(parseISO(cycleData.lastPeriodStart), 'PPP', { locale: sk })}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Koniec menštruácie</p>
+                    <p className="text-lg font-semibold text-foreground">
+                      {format(addDays(parseISO(cycleData.lastPeriodStart), cycleData.periodLength - 1), 'PPP', { locale: sk })}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Dĺžka krvácania</p>
+                    <p className="text-lg font-semibold text-foreground">{cycleData.periodLength} dní</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Dĺžka cyklu</p>
+                    <p className="text-lg font-semibold text-foreground">{cycleData.cycleLength} dní</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Predpokladaný začiatok ďalšej menštruácie</p>
+                    <p className="text-lg font-semibold text-foreground">
+                      {format(addDays(parseISO(cycleData.lastPeriodStart), cycleData.cycleLength), 'PPP', { locale: sk })}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Aktuálny deň / Fáza</p>
+                    <p className="text-lg font-semibold text-foreground">
+                      Deň {currentDay} / {PHASE_LABELS[currentPhase.key]}
+                    </p>
+                  </div>
+                </div>
+              )}
+              <div className="mt-6 p-4 bg-primary/5 rounded-lg">
+                <p className="text-sm text-muted-foreground">
+                  💡 <strong>Tip:</strong> Tieto údaje sa načítavajú z localStorage. Môžeš ich tu upraviť pre rýchle testovanie rôznych scenárov.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Header */}
         <div className="space-y-4">
           <div className="flex justify-between items-center">
