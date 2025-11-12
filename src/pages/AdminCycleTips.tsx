@@ -402,7 +402,7 @@ export default function AdminCycleTips() {
     <div className="min-h-screen bg-gradient-to-br from-rose-50 to-pink-50 p-4 sm:p-8">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Test Data Card */}
-        {cycleData.lastPeriodStart ? (
+        {(cycleData.lastPeriodStart || isEditingTestData) ? (
           <Card className="border-2 border-primary/20 shadow-lg">
             <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10">
               <div className="flex justify-between items-center">
