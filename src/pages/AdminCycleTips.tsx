@@ -92,6 +92,13 @@ export default function AdminCycleTips() {
     loadTips();
   }, [cycleLength]);
 
+  // Synchronize cycleLength with Test Data
+  useEffect(() => {
+    if (cycleData.cycleLength) {
+      setCycleLength(cycleData.cycleLength);
+    }
+  }, [cycleData.cycleLength]);
+
   const loadTips = async () => {
     try {
       const { data, error } = await supabase
@@ -630,16 +637,23 @@ export default function AdminCycleTips() {
                 <label className="text-xs font-medium mb-1" style={{ color: '#955F6A' }}>
                   Dĺžka cyklu:
                 </label>
-                <select 
-                  value={cycleLength} 
-                  onChange={(e) => setCycleLength(Number(e.target.value))}
-                  className="border rounded px-3 py-2 text-sm"
-                  style={{ borderColor: '#FF7782', color: '#955F6A' }}
-                >
-                  {[25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35].map(len => (
-                    <option key={len} value={len}>{len} dní</option>
-                  ))}
-                </select>
+                <div className="flex items-center gap-2">
+                  <select 
+                    value={cycleLength} 
+                    onChange={(e) => setCycleLength(Number(e.target.value))}
+                    className="border rounded px-3 py-2 text-sm"
+                    style={{ borderColor: '#FF7782', color: '#955F6A' }}
+                  >
+                    {[25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35].map(len => (
+                      <option key={len} value={len}>{len} dní</option>
+                    ))}
+                  </select>
+                  {cycleData.cycleLength && cycleLength === cycleData.cycleLength && (
+                    <Badge variant="secondary" className="text-xs whitespace-nowrap">
+                      ✅ Synchronizované
+                    </Badge>
+                  )}
+                </div>
               </div>
               
               <Button
