@@ -214,7 +214,7 @@ serve(async (req) => {
         koniec: "Menštruácia sa ti pravdepodobne blíži ku koncu a estrogén začína pomaly stúpať. Môže to priniesť prvé náznaky energie a motivácie. Je to vhodný čas na plánovanie nasledujúcich dní a pomaly sa vrátiť k bežnému rytmu."
       },
       follicular: {
-        začiatok: "Koniec menštruácie môže priniesť pocit úľavy. Estrogén ti pravdepodobne začína stúpať a s tým často prichádza aj chuť tvoriť a byť aktívna. Telo sa prebúdza do novej fázy.",
+        začiatok: "Po ukončení menštruačnej fázy ti pravdepodobne hladina estrogénu naďalej stúpa a s ním často prichádza aj chuť tvoriť a byť aktívna. Telo sa prebúdza do ďalšej časti cyklu.",
         stred: "Toto je často jedna z najlepších fáz pre učenie a plánovanie. Telo v týchto dňoch zvyčajne rýchlejšie regeneruje a mozog môže byť viac zameraný na nové nápady a projekty.",
         koniec: "Telo sa v týchto dňoch pravdepodobne pripravuje na ovuláciu. Je možné pociťovať vysokú energiu, kreativitu a chuť spájať sa s ľuďmi. Toto je pre mnohé ženy vrchol produktivity v cykle."
       },
@@ -298,8 +298,8 @@ serve(async (req) => {
         }
       },
       follicular: {
-        hormones: "Estrogén postupne stúpa",
-        expectation: "Estrogén v tvojom tele začína stúpať a s ním prichádza aj viac energie a motivácie. Môžeš si všimnúť, že sa ti ľahšie vstáva, koncentruje sa a máš chuť tvoriť alebo sa učiť. Toto obdobie je vhodné na plánovanie a nové začiatky.",
+        hormones: "Estrogén naďalej stúpa",
+        expectation: "Hladina estrogénu ti v tomto období naďalej stúpa a s ním prichádza aj viac energie a motivácie. Môžeš si všimnúť, že sa ti ľahšie vstáva, koncentruje sa a máš chuť tvoriť alebo sa učiť. Toto obdobie je vhodné na plánovanie a nové začiatky.",
         body: "regenerácia je rýchlejšia, telo lepšie znáša fyzickú záťaž",
         emotional: "rast energie, motivácia, kreativita, pozitívne naladenie",
         nutrition: {
@@ -530,6 +530,14 @@ KONDICIONÁLNY A SOFTER TÓN:
 - Soft odporúčania: "vyskúšaj si dopriať", "skús si", "môžeš skúsiť"
 - NIE príkazy: "Odporúčame ti", "Zaraď", "Urob"
 - Praktické tipy: "dopraj si" namiesto "Zaraď"
+
+MEDICÍNSKA SPRÁVNOSŤ FÁZY CYKLU:
+- Folikulárna fáza ZAČÍNA prvým dňom menštruácie (deň 1 cyklu)
+- Menštruácia (dni 1-${periodLength}) je MENŠTRUAČNÁ ČASŤ folikulárnej fázy
+- Po ukončení menštruácie (deň ${periodLength + 1}) pokračuje PROLIFERAČNÁ ČASŤ folikulárnej fázy
+- V UI zobrazujeme "menštruáciu" a "folikulárnu fázu" oddelene pre prehľadnosť
+- Pri generovaní obsahu NIKDY nepíš "začiatok folikulárnej fázy" pre deň ${periodLength + 1}
+- Správne formulácie: "Po ukončení menštruačnej fázy", "hladina estrogénu naďalej stúpa"
 
 PREPOJENIE SEKCIÍ:
 - Všetky 4 sekcie musia byť logicky prepojené
