@@ -331,7 +331,7 @@ export default function AdminCycleTips() {
   const handleEditTestData = () => {
     setEditLastPeriodStart(cycleData.lastPeriodStart || format(new Date(), 'yyyy-MM-dd'));
     setEditPeriodLength(cycleData.periodLength);
-    setEditCycleLength(cycleData.cycleLength);
+    setEditCycleLength(cycleData.cycleLength || 0); // 0 ak nie je definované
     setEditNextPeriodEstimate('');
     setIsEditingTestData(true);
   };
@@ -341,7 +341,17 @@ export default function AdminCycleTips() {
     if (!editLastPeriodStart) {
       toast({
         title: '⚠️ Chýbajúce údaje',
-        description: 'Prosím, zadaj aspoň začiatok menštruácie.',
+        description: 'Prosím, zadaj začiatok poslednej menštruácie.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // Validácia: musí byť vyplnený cycleLength ALEBO nextPeriodEstimate
+    if (!editCycleLength && !editNextPeriodEstimate) {
+      toast({
+        title: '⚠️ Chýbajúce údaje',
+        description: 'Prosím, vyplň buď dĺžku menštruačného cyklu alebo predpokladaný začiatok ďalšej menštruácie.',
         variant: 'destructive',
       });
       return;
@@ -441,7 +451,10 @@ export default function AdminCycleTips() {
               {isEditingTestData ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="lastPeriodStart">Začiatok menštruácie</Label>
+                    <Label htmlFor="lastPeriodStart">
+                      Začiatok poslednej menštruácie *
+                      <span className="text-xs text-muted-foreground ml-2">(povinné)</span>
+                    </Label>
                     <Input
                       id="lastPeriodStart"
                       type="date"
@@ -452,7 +465,8 @@ export default function AdminCycleTips() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="periodLength">
-                      Dĺžka menštruácie (dni krvácania)
+                      Dĺžka menštruácie (dni krvácania) *
+                      <span className="text-xs text-muted-foreground ml-2">(povinné, alebo AUTO)</span>
                       {isPeriodLengthAuto && <Badge variant="secondary" className="ml-2">AUTO</Badge>}
                     </Label>
                     <Input
@@ -471,7 +485,8 @@ export default function AdminCycleTips() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="nextPeriodEstimate">
-                      Odhadovaný začiatok ďalšej menštruácie (voliteľné)
+                      Predpokladaný začiatok ďalšej menštruácie *
+                      <span className="text-xs text-muted-foreground ml-2">(vyplň toto ALEBO dĺžku cyklu nižšie)</span>
                     </Label>
                     <div className="flex gap-2">
                       <Input
@@ -480,6 +495,7 @@ export default function AdminCycleTips() {
                         value={editNextPeriodEstimate}
                         onChange={(e) => setEditNextPeriodEstimate(e.target.value)}
                         min={editLastPeriodStart}
+                        disabled={editCycleLength > 0}
                         className="w-full"
                       />
                       {editNextPeriodEstimate && (
@@ -493,28 +509,40 @@ export default function AdminCycleTips() {
                       )}
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      Ak je zadaný, dĺžka cyklu sa vypočíta automaticky
+                      Ak je zadaný, dĺžka cyklu sa vypočíta automaticky. Alternatívne zadaj dĺžku cyklu nižšie.
                     </p>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="cycleLength">
-                      Dĺžka menštruačného cyklu (dni)
+                      ALEBO Dĺžka menštruačného cyklu (dni) *
+                      <span className="text-xs text-muted-foreground ml-2">(vyplň toto ALEBO predpokladaný začiatok vyššie)</span>
                       {editNextPeriodEstimate && editLastPeriodStart && (
                         <Badge variant="secondary" className="ml-2">
-                          AUTO: {Math.abs(Math.floor((parseISO(editNextPeriodEstimate).getTime() - parseISO(editLastPeriodStart).getTime()) / (1000 * 60 * 60 * 24)))}
+                          AUTO: {Math.abs(Math.floor((parseISO(editNextPeriodEstimate).getTime() - parseISO(editLastPeriodStart).getTime()) / (1000 * 60 * 60 * 24)))} dní
                         </Badge>
                       )}
                     </Label>
-                    <Input
-                      id="cycleLength"
-                      type="number"
-                      min="25"
-                      max="35"
-                      value={editCycleLength}
-                      onChange={(e) => setEditCycleLength(Number(e.target.value))}
-                      disabled={!!editNextPeriodEstimate}
-                      className="w-full"
-                    />
+                    <div className="flex gap-2">
+                      <Input
+                        id="cycleLength"
+                        type="number"
+                        min="25"
+                        max="35"
+                        value={editCycleLength || ''}
+                        onChange={(e) => setEditCycleLength(Number(e.target.value))}
+                        disabled={!!editNextPeriodEstimate}
+                        className="w-full"
+                      />
+                      {editCycleLength > 0 && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setEditCycleLength(0)}
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </div>
               ) : (
