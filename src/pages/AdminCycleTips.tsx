@@ -67,6 +67,7 @@ export default function AdminCycleTips() {
   const [bulkGenerating, setBulkGenerating] = useState(false);
   const [regeneratingDay, setRegeneratingDay] = useState<number | null>(null);
   const [cycleLength, setCycleLength] = useState(28);
+  const [adminPeriodLength, setAdminPeriodLength] = useState(5);
   const [isEditingTestData, setIsEditingTestData] = useState(false);
   const [editLastPeriodStart, setEditLastPeriodStart] = useState('');
   const [editPeriodLength, setEditPeriodLength] = useState(5);
@@ -98,6 +99,13 @@ export default function AdminCycleTips() {
       setCycleLength(cycleData.cycleLength);
     }
   }, [cycleData.cycleLength]);
+
+  // Synchronize periodLength with Test Data
+  useEffect(() => {
+    if (cycleData.periodLength) {
+      setAdminPeriodLength(cycleData.periodLength);
+    }
+  }, [cycleData.periodLength]);
 
   const loadTips = async () => {
     try {
@@ -220,7 +228,12 @@ export default function AdminCycleTips() {
     setRegeneratingDay(day);
     try {
       const { data, error } = await supabase.functions.invoke('generate-cycle-tips', {
-        body: { day, regenerate: true }
+        body: { 
+          day, 
+          regenerate: true,
+          cycleLength,
+          periodLength: adminPeriodLength
+        }
       });
 
       if (error) throw error;
@@ -270,7 +283,8 @@ export default function AdminCycleTips() {
         const { data, error } = await supabase.functions.invoke('bulk-generate-tips', {
           body: { 
             regenerate: true, 
-            cycleLength, 
+            cycleLength,
+            periodLength: adminPeriodLength,
             startDay: batch.start, 
             endDay: batch.end 
           }
@@ -678,7 +692,7 @@ export default function AdminCycleTips() {
                   </select>
                   {cycleData.cycleLength && cycleLength === cycleData.cycleLength && (
                     <Badge variant="secondary" className="text-xs whitespace-nowrap">
-                      ✅ Synchronizované
+                      ✅ Synchronizované ({adminPeriodLength}d menštruácia)
                     </Badge>
                   )}
                 </div>

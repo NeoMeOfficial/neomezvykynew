@@ -16,15 +16,16 @@ serve(async (req) => {
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-    const { regenerate = false, cycleLength = 28, startDay, endDay } = await req.json().catch(() => ({ 
+    const { regenerate = false, cycleLength = 28, periodLength = 5, startDay, endDay } = await req.json().catch(() => ({ 
       regenerate: false, 
-      cycleLength: 28 
+      cycleLength: 28,
+      periodLength: 5
     }));
 
     const actualStartDay = startDay || 1;
     const actualEndDay = endDay || cycleLength;
 
-    console.log(`🚀 Starting bulk generation of days ${actualStartDay}-${actualEndDay} for ${cycleLength}-day cycle (regenerate: ${regenerate})...`);
+    console.log(`🚀 Starting bulk generation of days ${actualStartDay}-${actualEndDay} for ${cycleLength}-day cycle with ${periodLength}-day period (regenerate: ${regenerate})...`);
     
     const results = [];
     let successCount = 0;
@@ -35,7 +36,7 @@ serve(async (req) => {
         console.log(`📅 [${day}/${cycleLength}] Generating plan for day ${day}...`);
         
         const { data, error } = await supabase.functions.invoke('generate-cycle-tips', {
-          body: { day, regenerate, cycleLength }
+          body: { day, regenerate, cycleLength, periodLength }
         });
 
         if (error) {
