@@ -122,14 +122,28 @@ serve(async (req) => {
       const dayInPhase = day - phaseStart + 1;
       const totalDaysInPhase = phaseEnd - phaseStart + 1;
       
-      // Calculate relative position (začiatok, stred, koniec)
+      // Calculate relative position (začiatok, stred, koniec) with phase-specific percentages
       let relativePosition = 'stred';
       const positionRatio = dayInPhase / totalDaysInPhase;
       
-      if (positionRatio <= 0.33) {
-        relativePosition = 'začiatok';
-      } else if (positionRatio >= 0.67) {
-        relativePosition = 'koniec';
+      if (phase === 'menstrual') {
+        // M: 40% | 35% | 25%
+        if (positionRatio <= 0.40) relativePosition = 'začiatok';
+        else if (positionRatio <= 0.75) relativePosition = 'stred';
+        else relativePosition = 'koniec';
+      } else if (phase === 'follicular') {
+        // F: 30% | 45% | 25%
+        if (positionRatio <= 0.30) relativePosition = 'začiatok';
+        else if (positionRatio <= 0.75) relativePosition = 'stred';
+        else relativePosition = 'koniec';
+      } else if (phase === 'luteal') {
+        // L: 35% | 40% | 25%
+        if (positionRatio <= 0.35) relativePosition = 'začiatok';
+        else if (positionRatio <= 0.75) relativePosition = 'stred';
+        else relativePosition = 'koniec';
+      } else {
+        // ovulation - single day, no subphases
+        relativePosition = 'stred';
       }
 
       const description = `${relativePosition.charAt(0).toUpperCase() + relativePosition.slice(1)} ${phaseNameSk} fázy`;
@@ -259,11 +273,11 @@ serve(async (req) => {
 
     // MASTER TEMPLATES - UPDATED with new content and softer language
     const masterTemplates: Record<string, any> = {
-      menstrual: {
-        hormones: "Estrogén aj progesterón sú nízko",
-        expectation: "Tvoje telo práve prechádza obnovou. Estrogén aj progesterón sú na nízkych úrovniach, preto je bežné, že môžeš pociťovať nižšiu energiu a väčšiu potrebu oddychu. Ak sa cítiš unavená alebo citlivejšia, je to prirodzené – tvoje telo reštartuje hormóny na nový cyklus.",
-        body: "mierny zápalový proces v maternici, možné kŕče, napätie v bruchu, citlivý chrbát",
-        emotional: "nižšia tolerancia stresu, emočná citlivosť",
+      'menstrual-early': {
+        hormones: "Estrogén a progesterón sú na najnižšej úrovni",
+        expectation: "Prvý deň menštruácie býva zvyčajne najnáročnejší – energia je nízka, môžeš pociťovať silnejšie kŕče a únavu. Telo teraz najviac potrebuje oddych a šetrný prístup. Je to úplne v poriadku nepodávať výkon, toto obdobie je o regenerácii a odpočinku.",
+        body: "začiatok krvácania, možné silné kŕče, únavnosť, citlivé brucho",
+        emotional: "zvýšená citlivosť, introverzia, potreba pokoja",
         nutrition: {
           needs: ["znižiť zápal", "doplniť železo", "podporiť trávenie teplými jedlami", "stabilizovať cukry"],
           keyNutrients: ["Železo", "Vitamín C", "Omega-3", "Antioxidanty"],
@@ -282,8 +296,8 @@ serve(async (req) => {
           ]
         },
         movement: {
-          context: "Nízka energia, citlivé telo.",
-          intensity: "Strečing alebo jemný pilates",
+          context: "Veľmi nízka energia, citlivé telo.",
+          intensity: "Veľmi jemný strečing",
           neome: "Strečing pre panvu a spodný chrbát",
           walkBenefits: [
             "Prechádzka ti pomôže uvoľniť napätie, ktoré sa ti hromadilo celý deň.",
@@ -297,43 +311,195 @@ serve(async (req) => {
           ]
         }
       },
-      follicular: {
-        hormones: "Estrogén naďalej stúpa",
-        expectation: "Hladina estrogénu ti v tomto období naďalej stúpa a s ním prichádza aj viac energie a motivácie. Môžeš si všimnúť, že sa ti ľahšie vstáva, koncentruje sa a máš chuť tvoriť alebo sa učiť. Toto obdobie je vhodné na plánovanie a nové začiatky.",
-        body: "regenerácia je rýchlejšia, telo lepšie znáša fyzickú záťaž",
-        emotional: "rast energie, motivácia, kreativita, pozitívne naladenie",
+      'menstrual-mid': {
+        hormones: "Estrogén a progesterón sú stále nízko",
+        expectation: "Krvácanie pravdepodobne pokračuje, ale telo sa postupne ustáľuje. Kŕče môžu byť miernejšie ako prvý deň a energia sa môže mierne zlepšiť. Stále je dôležité si dopriať dostatok odpočinku a počúvať potreby tela.",
+        body: "pokračujúce krvácanie, miernejšie kŕče, postupné ustálenie",
+        emotional: "menšia citlivosť ako prvý deň, pokojnejšia nálada",
         nutrition: {
-          needs: ["podpora rastúcej energie", "stabilný cukor v krvi", "výživa pre svaly a hormóny"],
-          keyNutrients: ["Proteíny", "Omega-3", "Vláknina", "B-komplex"],
-          foods: ["vajcia", "losos", "tofu", "tempeh", "grécky jogurt", "fazuľa", "bobuľové ovocie", 
-                  "mango", "jablko", "hrozno", "špenát", "kel", "paprika", "brokolica", "cuketa",
-                  "quinoa", "ovos", "bataty", "ryža natural", "chia", "ľan", "avokádo", "olivy", "orechy"],
-          tip: "Dopraj si dostatok bielkovin (25-30g) do každého jedla a jedz pravidelne každé 3-4 hodiny, aby si udržala stabilnú hladinu energie."
+          needs: ["doplniť železo", "podporiť regeneráciu", "stabilizovať energiu"],
+          keyNutrients: ["Železo", "Proteíny", "Omega-3", "Vitamín C"],
+          foods: ["červená šošovica", "fazuľa", "špenát", "rukola", "červená repa", "orechy", "semienka",
+                  "teplé polievky", "vývary", "vajcia", "tofu", "losos", "banány", "jahody", "čučoriedky"],
+          tip: "Pokračuj v teplých jedlách a nápojoch. Telo stále regeneruje a potrebuje šetrný prístup v stravovaní."
         },
         mind: {
           practicalThoughts: [
+            "Môžeš sa cítiť trochu lepšie ako prvý deň, ale stále si dopraj pohodu.",
+            "Denník ti môže pomôcť spracovať pocity a pozorovania z týchto dní.",
+            "Ak máš energiu na krátku prechádzku, skús to - pohyb môže pomôcť s náladou.",
+            "Netlač sa do výkonu, telo ešte potrebuje čas na regeneráciu.",
+            "Dopraj si chvíle ticha a pokoja, nie je nutné byť produktívna."
+          ]
+        },
+        movement: {
+          context: "Nízka až stredná energia, postupné zlepšenie.",
+          intensity: "Jemný strečing alebo krátka prechádzka",
+          neome: "Strečing celého tela",
+          walkBenefits: [
+            "Krátka prechádzka pomôže s cirkuláciou a náladou.",
+            "Čerstvý vzduch zlepší tvoju energiu prirodzeným spôsobom.",
+            "Pohyb môže zmierniť zostávajúce kŕče.",
+            "Vyčistíš si hlavu a zlepšíš koncentráciu.",
+            "Prirodzený dopamín ti pomôže cítiť sa lepšie.",
+            "Uvoľníš napätie v tele.",
+            "Spánok bude kvalitnejší.",
+            "Vyrovnáš si hormóny jemným pohybom."
+          ]
+        }
+      },
+      'menstrual-late': {
+        hormones: "Estrogén začína pomaly stúpať",
+        expectation: "Menštruácia sa ti pravdepodobne blíži ku koncu a estrogén začína pomaly stúpať. Môže to priniesť prvé náznaky energie a motivácie. Je to vhodný čas na plánovanie nasledujúcich dní a pomaly sa vrátiť k bežnému rytmu.",
+        body: "krvácanie ustupuje, energia sa vracia, miernejšie príznaky",
+        emotional: "pocit úľavy, lepšia nálada, viac chuti do aktivity",
+        nutrition: {
+          needs: ["doplniť zásoby železa", "podporiť návrat energie", "pripraviť telo na aktívnejšie dni"],
+          keyNutrients: ["Železo", "Vitamín C", "Proteíny", "Komplex B"],
+          foods: ["listová zelenina", "strukoviny", "ovocie bohaté na vitamín C", "celozrnné produkty",
+                  "zdravé tuky", "avokádo", "orechy", "vajcia", "losos", "tofu", "quinoa", "bataty"],
+          tip: "Telo sa vracia do normálu. Môžeš si začať dopriať pestrejšiu stravu a väčšie porcie, ak cítiš chuť."
+        },
+        mind: {
+          practicalThoughts: [
+            "Môžeš cítiť prvé náznaky energie - využi to na plánovanie týždňa.",
+            "Tento čas je vhodný na pomaly sa vrátiť k bežným aktivitám.",
+            "Ranná rutina s kávou a denníkom ti môže pomôcť naštartovať deň.",
+            "Netráp sa, ak ešte nie si na 100% - energia sa vracia postupne.",
+            "Skús si zapísať, čo chceš tento týždeň dokázať."
+          ]
+        },
+        movement: {
+          context: "Stredná energia, telo sa prebúdza.",
+          intensity: "Strečing, mobilita, prechádzka",
+          neome: "Strečing a mobilita na prípravu",
+          walkBenefits: [
+            "Dlhšia prechádzka ti pomôže naštartovať energiu.",
+            "Čerstvý vzduch zlepší náladu a koncentráciu.",
+            "Pohyb podporí návrat do normálneho rytmu.",
+            "Prirodzené endorfíny ťa naplnia optimizmom.",
+            "Cirkulácia krvi sa zlepší.",
+            "Pripravíš telo na aktívnejšie dni.",
+            "Spánok bude kvalitnejší.",
+            "Cítiš sa pripravená na nový začiatok."
+          ]
+        }
+      },
+      'follicular-early': {
+        hormones: "Estrogén začína postupne stúpať",
+        expectation: "Po ukončení menštruačnej fázy ti pravdepodobne hladina estrogénu naďalej stúpa a s ním prichádza prvý nárast energie a motivácie. Môžeš pociťovať pocit úľavy a prvé náznaky chuti do aktivity. Je to vhodný čas na pomaly sa vrátiť k bežným aktivitám.",
+        body: "regenerácia sa zrýchľuje, telo sa prebúdza",
+        emotional: "pocit úľavy, prvé náznaky motivácie, lepšia nálada",
+        nutrition: {
+          needs: ["podporiť návrat energie", "stabilizovať cukor v krvi", "pripraviť telo na aktívnejšie dni"],
+          keyNutrients: ["Proteíny", "Vitamín C", "Vláknina", "B-komplex"],
+          foods: ["zelenina bohatá na vitamíny", "brokolica", "paprika", "rukola", "celozrnné obilniny",
+                  "chudé bielkoviny", "kurča", "ryby", "vajcia", "ovocie", "jahody", "jablká", "citrusy"],
+          tip: "Telo sa vracia do normálu. Dopraj si pestrejšiu stravu a väčšie porcie, ak cítiš chuť do jedla."
+        },
+        mind: {
+          practicalThoughts: [
+            "Môžeš cítiť prvé náznaky energie - využi to na plánovanie týždňa.",
+            "Ranná rutina s kávou a denníkom ti môže pomôcť naštartovať deň.",
+            "Skús si zapísať, čo chceš tento týždeň dokázať.",
+            "Tento čas je vhodný na pomaly sa vrátiť k bežným aktivitám.",
+            "Netráp sa, ak ešte nie si na 100% - energia sa vracia postupne.",
+            "Dopraj si chvíľu pokoja večer - napr. čítanie alebo teplý kúpeľ.",
+            "Skús si krátku meditáciu s fokusem na novú energiu."
+          ]
+        },
+        movement: {
+          context: "Stredná energia, telo sa pripravuje.",
+          intensity: "Strečing, mobilita, prechádzka",
+          neome: "Strečing a mobilita na prípravu",
+          walkBenefits: [
+            "Prechádzka v prírode ti pomôže naštartovať energiu.",
+            "Čerstvý vzduch zlepší náladu a koncentráciu.",
+            "Pohyb podporí návrat do normálneho rytmu.",
+            "Prirodzené endorfíny ťa naplnia optimizmom.",
+            "Cirkulácia krvi sa zlepší.",
+            "Pripravíš telo na aktívnejšie dni.",
+            "Spánok bude kvalitnejší.",
+            "Cítiš sa pripravená na nový začiatok."
+          ]
+        }
+      },
+      'follicular-mid': {
+        hormones: "Estrogén výrazne stúpa",
+        expectation: "Toto je často jedna z najlepších fáz v cykle. Energia je na vysokej úrovni, koncentrácia je vynikajúca a máš chuť tvoriť, učiť sa a plánovať. Telo v týchto dňoch zvyčajne rýchlejšie regeneruje a mozog môže byť viac zameraný na nové nápady a projekty.",
+        body: "rýchla regenerácia, telo výborne znáša záťaž, energia na vysokej úrovni",
+        emotional: "vysoká motivácia, kreativita, pozitívne naladenie, sebadôvera",
+        nutrition: {
+          needs: ["podpora vysokej energie", "stabilný cukor v krvi", "výživa pre svaly a hormóny"],
+          keyNutrients: ["Proteíny", "Omega-3", "Vláknina", "B-komplex"],
+          foods: ["zelenina všetkých farieb", "brokolica", "mrkva", "paprika", "rajčiny", "celozrnné obilniny",
+                  "ovos", "quinoa", "hnedá ryža", "chudé bielkoviny", "kuracie mäso", "ryby", "tofu", "strukoviny",
+                  "ovocie", "jahody", "čučoriedky", "banány"],
+          tip: "Teraz môžeš experimentovať s novou stravou alebo receptami. Telo je silné a chutí ti to."
+        },
+        mind: {
+          practicalThoughts: [
+            "Plánovanie dôležitých projektov - teraz je na to ten pravý čas.",
+            "Učenie sa nových vecí - mozog je aktívny a rýchlo sa učí.",
+            "Denník - zápis nápadov, plánov a cieľov.",
+            "Toto je tvoj čas na rozlet - využi túto fázu na dôležité úlohy.",
             "Využi energiu na veci, ktoré si dlhšie odkladala.",
-            "Skús si dnes napísať jeden malý cieľ, ktorý ti spraví radosť - nie povinnosť.",
-            "Počas tejto fázy sa učíš rýchlejšie - využi to, ak sa chceš niečo nové naučiť.",
-            "Urob si priestor na plánovanie - napíš si, čo chceš tento mesiac skúsiť.",
-            "Skús ísť von s kamarátkou alebo na krátku kávu - spoločnosť ti teraz robí dobre.",
-            "Tvoje telo zvláda viac - ale netreba ísť na maximum. Drž rovnováhu.",
-            "Ak cítiš chuť niečo zmeniť, začni drobnosťou - nový recept, nový tréning, nový playlist."
+            "Skús si dnes napísať jeden malý cieľ, ktorý ti spraví radosť.",
+            "Tvoje telo zvláda viac - ale netreba ísť na maximum. Drž rovnováhu."
           ]
         },
         movement: {
           context: "Vysoká energia, telo zvláda záťaž.",
-          intensity: "Silový tréning",
+          intensity: "Silový tréning alebo intenzívny cardio",
           neome: "Silový tréning",
           walkBenefits: [
+            "Dlhšia prechádzka, jemný beh - endorfíny, jasná myseľ, kreativita.",
             "Získaš nápady, ktoré v sede neprichádzajú.",
             "Zlepšíš náladu vďaka prirodzenému dopamínu.",
             "Dodáš telu energiu namiesto ďalšej kávy.",
             "Podporíš spaľovanie tukov aj bez cvičenia.",
             "Zlepšíš cirkuláciu krvi a kyslík v mozgu.",
             "Stabilizuješ si hladinu cukru v krvi po jedle.",
-            "Krátka prechádzka mení náladu na celý deň.",
             "Cítiš sa viac pod kontrolou - aj keď je deň chaos."
+          ]
+        }
+      },
+      'follicular-late': {
+        hormones: "Estrogén dosahuje vrchol pred ovuláciou",
+        expectation: "Telo sa v týchto dňoch pravdepodobne pripravuje na ovuláciu. Energia môže byť stále vysoká, kreativita vrcholí a môžeš pociťovať chuť spájať sa s ľuďmi. Pre mnohé ženy je toto vrchol produktivity v cykle. Využi tento čas na dokončenie projektov a sociálne aktivity.",
+        body: "vrchol energie, telo je pripravené na ovuláciu, výborná regenerácia",
+        emotional: "vysoká sebadôvera, kreativita, chuť do sociálnych aktivít, optimizmus",
+        nutrition: {
+          needs: ["podpora vrcholovej energie", "antioxidačná ochrana", "výživa pre výkon"],
+          keyNutrients: ["Antioxidanty", "Omega-3", "Proteíny", "Vitamín C"],
+          foods: ["zelenina bohatá na vlákninu", "brokolica", "kapusta", "špenát", "celozrnné produkty",
+                  "zdravé tuky", "avokádo", "orechy", "olivový olej", "ovocie", "citrusy", "jahody"],
+          tip: "Teraz je skvelý čas na pestré jedlá a nové recepty. Telo je silné a má vysoké nároky na energiu."
+        },
+        mind: {
+          practicalThoughts: [
+            "Dokončenie rozpracovaných projektov - koncentrácia je na vrchole.",
+            "Sociálne aktivity - stretnutia, eventy, networking.",
+            "Kreatívne projekty - písanie, maľovanie, tvorba.",
+            "Využi tento vrchol energie na to, čo je pre teba dôležité.",
+            "Telo aj myseľ sú v top forme.",
+            "Dnes je ideálny deň na dôležité rozhovory alebo prezentácie.",
+            "Skús dnes vyriešiť náročnejšie úlohy - mozog aj telo sú pripravené."
+          ]
+        },
+        movement: {
+          context: "Maximálna energia, telo na vrchole.",
+          intensity: "Vysoká intenzita, silový aj kondičný tréning",
+          neome: "Silový tréning alebo HIIT",
+          walkBenefits: [
+            "Aktívny pohyb - beh, tanec, šport s priateľmi.",
+            "Načerpáš ešte viac energie na celý deň.",
+            "Zlepšíš náladu, ktorá už aj tak je dobrá.",
+            "Podporíš spaľovanie tukov.",
+            "Vyčistíš si hlavu pred dôležitými úlohami.",
+            "Stabilizuješ si hladinu cukru v krvi.",
+            "Dodáš si mentálnu jasnosť na celý deň.",
+            "Cítiš sa silnejšia a pripravená na čokoľvek."
           ]
         }
       },
@@ -496,13 +662,21 @@ serve(async (req) => {
       }
     };
 
-    // Determine which template to use
-    let template = masterTemplates.menstrual;
-    if (phase === 'follicular') template = masterTemplates.follicular;
-    if (phase === 'ovulation') template = masterTemplates.ovulation;
-    if (phase === 'luteal' && subphase === 'early') template = masterTemplates.lutealEarly;
-    if (phase === 'luteal' && subphase === 'mid') template = masterTemplates.lutealMid;
-    if (phase === 'luteal' && subphase === 'late') template = masterTemplates.lutealLate;
+    // Select master template based on phase and subphase
+    let template;
+    if (phaseContext.phase === 'menstrual') {
+      // Use menstrual subphases based on relative position
+      template = masterTemplates[`menstrual-${phaseContext.relativePosition === 'začiatok' ? 'early' : phaseContext.relativePosition === 'stred' ? 'mid' : 'late'}`];
+    } else if (phaseContext.phase === 'follicular') {
+      // Use follicular subphases based on relative position
+      template = masterTemplates[`follicular-${phaseContext.relativePosition === 'začiatok' ? 'early' : phaseContext.relativePosition === 'stred' ? 'mid' : 'late'}`];
+    } else if (phaseContext.phase === 'luteal') {
+      // Use luteal subphases
+      template = masterTemplates[`luteal${subphase?.charAt(0).toUpperCase()}${subphase?.slice(1)}`];
+    } else {
+      // Ovulation - single template
+      template = masterTemplates.ovulation;
+    }
 
     // Rotate content for diversity
     const walkBenefitIndex = day % template.movement.walkBenefits.length;
