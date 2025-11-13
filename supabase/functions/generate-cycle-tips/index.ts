@@ -132,9 +132,13 @@ serve(async (req) => {
         else if (positionRatio <= 0.75) relativePosition = 'stred';
         else relativePosition = 'koniec';
       } else if (phase === 'follicular') {
+        // ŠPECIÁL: folikulárna fáza sa počíta OD DŇA 1 (začiatok menštruácie) až po koniec ovulácie
+        const follicularTotalDays = ranges.ovulation.end; // koniec ovulácie
+        const positionInFullFollicular = day / follicularTotalDays;
+        
         // F: 30% | 45% | 25%
-        if (positionRatio <= 0.30) relativePosition = 'začiatok';
-        else if (positionRatio <= 0.75) relativePosition = 'stred';
+        if (positionInFullFollicular <= 0.30) relativePosition = 'začiatok';
+        else if (positionInFullFollicular <= 0.75) relativePosition = 'stred';
         else relativePosition = 'koniec';
       } else if (phase === 'luteal') {
         // L: 35% | 40% | 25%
@@ -386,8 +390,8 @@ serve(async (req) => {
         }
       },
       'follicular-early': {
-        hormones: "Estrogén začína postupne stúpať",
-        expectation: "Po ukončení menštruačnej fázy ti pravdepodobne hladina estrogénu naďalej stúpa a s ním prichádza prvý nárast energie a motivácie. Môžeš pociťovať pocit úľavy a prvé náznaky chuti do aktivity. Je to vhodný čas na pomaly sa vrátiť k bežným aktivitám.",
+        hormones: "Estrogén naďalej stúpa",
+        expectation: "Menštruácia ti už pravdepodobne skončila a hladina estrogénu ti naďalej stúpa. S tým prichádza prvý nárast energie a motivácie. Môžeš pociťovať pocit úľavy a prvé náznaky chuti do aktivity. Je to vhodný čas na pomaly sa vrátiť k bežným aktivitám.",
         body: "regenerácia sa zrýchľuje, telo sa prebúdza",
         emotional: "pocit úľavy, prvé náznaky motivácie, lepšia nálada",
         nutrition: {
