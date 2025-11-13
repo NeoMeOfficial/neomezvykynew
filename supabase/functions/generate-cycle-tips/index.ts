@@ -152,13 +152,67 @@ serve(async (req) => {
 
       const description = `${relativePosition.charAt(0).toUpperCase() + relativePosition.slice(1)} ${phaseNameSk} fázy`;
 
+      // Calculate day within current subphase (for variant rotation)
+      let dayWithinSubphase = 1;
+      let totalDaysInSubphase = 1;
+
+      if (phase === 'menstrual') {
+        // M: 40% | 35% | 25%
+        const earlyDays = Math.round(totalDaysInPhase * 0.40);
+        const midDays = Math.round(totalDaysInPhase * 0.35);
+        
+        if (relativePosition === 'začiatok') {
+          totalDaysInSubphase = earlyDays;
+          dayWithinSubphase = dayInPhase;
+        } else if (relativePosition === 'stred') {
+          totalDaysInSubphase = midDays;
+          dayWithinSubphase = dayInPhase - earlyDays;
+        } else {
+          totalDaysInSubphase = totalDaysInPhase - earlyDays - midDays;
+          dayWithinSubphase = dayInPhase - earlyDays - midDays;
+        }
+      } else if (phase === 'follicular') {
+        // F: 30% | 45% | 25% (počíta sa od dňa 1)
+        const follicularTotalDays = ranges.ovulation.end;
+        const earlyDays = Math.round(follicularTotalDays * 0.30);
+        const midDays = Math.round(follicularTotalDays * 0.45);
+        
+        if (relativePosition === 'začiatok') {
+          totalDaysInSubphase = earlyDays;
+          dayWithinSubphase = day;
+        } else if (relativePosition === 'stred') {
+          totalDaysInSubphase = midDays;
+          dayWithinSubphase = day - earlyDays;
+        } else {
+          totalDaysInSubphase = follicularTotalDays - earlyDays - midDays;
+          dayWithinSubphase = day - earlyDays - midDays;
+        }
+      } else if (phase === 'luteal') {
+        // L: 35% | 40% | 25%
+        const earlyDays = Math.round(totalDaysInPhase * 0.35);
+        const midDays = Math.round(totalDaysInPhase * 0.40);
+        
+        if (relativePosition === 'začiatok') {
+          totalDaysInSubphase = earlyDays;
+          dayWithinSubphase = dayInPhase;
+        } else if (relativePosition === 'stred') {
+          totalDaysInSubphase = midDays;
+          dayWithinSubphase = dayInPhase - earlyDays;
+        } else {
+          totalDaysInSubphase = totalDaysInPhase - earlyDays - midDays;
+          dayWithinSubphase = dayInPhase - earlyDays - midDays;
+        }
+      }
+
       return {
         phase,
         subphase,
         dayInPhase,
         totalDaysInPhase,
         relativePosition,
-        description
+        description,
+        dayWithinSubphase,
+        totalDaysInSubphase
       };
     };
 
@@ -279,7 +333,13 @@ serve(async (req) => {
     const masterTemplates: Record<string, any> = {
       'menstrual-early': {
         hormones: "Estrogén a progesterón sú na najnižšej úrovni",
-        expectation: "Prvý deň menštruácie býva zvyčajne najnáročnejší – energia je nízka, môžeš pociťovať silnejšie kŕče a únavu. Telo teraz najviac potrebuje oddych a šetrný prístup. Je to úplne v poriadku nepodávať výkon, toto obdobie je o regenerácii a odpočinku.",
+        expectationVariants: [
+          "Prvý deň menštruácie býva zvyčajne najnáročnejší – energia je nízka, môžeš pociťovať silnejšie kŕče a únavu. Telo teraz najviac potrebuje oddych a šetrný prístup. Je to úplne v poriadku nepodávať výkon, toto obdobie je o regenerácii a odpočinku.",
+          
+          "V týchto dňoch je prirodzené, že máš menej energie na sociálne kontakty. Ak ti vyhovuje menej rozhovorov a viac ticha, dopraj si to. Tvoje telo teraz pracuje na obnove a potrebuje šetriť sily.",
+          
+          "Môžeš pociťovať silnejšie kŕče v spodnej časti brucha alebo v drieku. Teplá fľaša, jemný strečing alebo teplý sprcha môžu pomôcť uvoľniť napätie. Počúvaj, čo ti teraz prináša úľavu."
+        ],
         body: "začiatok krvácania, možné silné kŕče, únavnosť, citlivé brucho",
         emotional: "zvýšená citlivosť, introverzia, potreba pokoja",
         nutrition: {
@@ -317,7 +377,13 @@ serve(async (req) => {
       },
       'menstrual-mid': {
         hormones: "Estrogén a progesterón sú stále nízko",
-        expectation: "Krvácanie pravdepodobne pokračuje, ale telo sa postupne ustáľuje. Kŕče môžu byť miernejšie ako prvý deň a energia sa môže mierne zlepšiť. Stále je dôležité si dopriať dostatok odpočinku a počúvať potreby tela.",
+        expectationVariants: [
+          "Krvácanie pravdepodobne pokračuje, ale telo sa postupne ustáľuje. Kŕče môžu byť miernejšie ako prvý deň a energia sa môže mierne zlepšiť. Stále je dôležité si dopriať dostatok odpočinku a počúvať potreby tela.",
+          
+          "Ak sa cítiš trochu lepšie ako na začiatku menštruácie, je to dobrý signál. Niektoré ženy v týchto dňoch už zvládnu krátku prechádzku alebo jednoduchšie úlohy. Netlač sa ale do výkonu – telo ešte regeneruje.",
+          
+          "Môžeš si všimnúť, že si menej citlivá ako prvý deň. Nálada sa môže stabilizovať a hlava byť jasnejšia. To je prirodzený priebeh – hormóny sa postupne začínajú vyvažovať."
+        ],
         body: "pokračujúce krvácanie, miernejšie kŕče, postupné ustálenie",
         emotional: "menšia citlivosť ako prvý deň, pokojnejšia nálada",
         nutrition: {
@@ -354,7 +420,13 @@ serve(async (req) => {
       },
       'menstrual-late': {
         hormones: "Estrogén začína pomaly stúpať",
-        expectation: "Menštruácia sa ti pravdepodobne blíži ku koncu a estrogén začína pomaly stúpať. Môže to priniesť prvé náznaky energie a motivácie. Je to vhodný čas na plánovanie nasledujúcich dní a pomaly sa vrátiť k bežnému rytmu.",
+        expectationVariants: [
+          "Menštruácia sa ti pravdepodobne blíži ku koncu a estrogén začína stúpať. Môže to priniesť prvé náznaky energie a lepšej nálady. Je to ideálny čas na pomaly sa vrátiť k bežným aktivitám a plánovať nasledujúce dni.",
+          
+          "V týchto dňoch sa môžeš cítiť optimistickejšia a motivovanejšia. Ak máš chuť začať niečo nové alebo sa vrátiť k odloženým veciam, je to prirodzený impulz rastúceho estrogénu.",
+          
+          "Telo už pravdepodobne nie je také citlivé a únava ustupuje. Ak ti vyhovuje, môžeš sa vrátiť k bežným aktivitám – stretnutiam, telefónátom alebo jednoduchším povinnostiam."
+        ],
         body: "krvácanie ustupuje, energia sa vracia, miernejšie príznaky",
         emotional: "pocit úľavy, lepšia nálada, viac chuti do aktivity",
         nutrition: {
@@ -391,7 +463,13 @@ serve(async (req) => {
       },
       'follicular-early': {
         hormones: "Estrogén naďalej stúpa",
-        expectation: "Menštruácia ti už pravdepodobne skončila a hladina estrogénu ti naďalej stúpa. S tým prichádza prvý nárast energie a motivácie. Môžeš pociťovať pocit úľavy a prvé náznaky chuti do aktivity. Je to vhodný čas na pomaly sa vrátiť k bežným aktivitám.",
+        expectationVariants: [
+          "Menštruácia ti už pravdepodobne skončila a hladina estrogénu ti naďalej stúpa. S tým prichádza prvý nárast energie a motivácie. Môžeš pociťovať pocit úľavy a prvé náznaky chuti do aktivity. Je to vhodný čas na pomaly sa vrátiť k bežným aktivitám.",
+          
+          "V týchto dňoch môžeš mať väčšiu chuť riešiť odložené veci alebo sa venovať veciam, ktoré ti prinášajú radosť. Telo sa prebúdza do novej fázy a energia postupne pribúda.",
+          
+          "Môžeš si všimnúť, že sa ti lepšie spí a ráno sa cítiš odpočinutejšia. To je prirodzený efekt stúpajúceho estrogénu – telo sa regeneruje rýchlejšie."
+        ],
         body: "regenerácia sa zrýchľuje, telo sa prebúdza",
         emotional: "pocit úľavy, prvé náznaky motivácie, lepšia nálada",
         nutrition: {
@@ -430,7 +508,13 @@ serve(async (req) => {
       },
       'follicular-mid': {
         hormones: "Estrogén výrazne stúpa",
-        expectation: "Toto je často jedna z najlepších fáz v cykle. Energia je na vysokej úrovni, koncentrácia je vynikajúca a máš chuť tvoriť, učiť sa a plánovať. Telo v týchto dňoch zvyčajne rýchlejšie regeneruje a mozog môže byť viac zameraný na nové nápady a projekty.",
+        expectationVariants: [
+          "Toto je často jedna z najlepších fáz v cykle. Energia je na vysokej úrovni, koncentrácia je vynikajúca a máš chuť tvoriť, učiť sa a plánovať. Telo v týchto dňoch zvyčajne rýchlejšie regeneruje a mozog môže byť viac zameraný na nové nápady a projekty.",
+          
+          "V týchto dňoch môžeš mať chuť viac komunikovať a byť v spoločnosti. To je prirodzený signál vysokej hladiny estrogénu – tvoje telo ti hovorí, že máš energiu na sociálne interakcie. Využi to na stretnutia, telefonáty alebo aktivity s deťmi.",
+          
+          "Tvoja pokožka môže byť čistejšia a vlasy jemnejšie – to je zásluha vysokej hladiny estrogénu. Mnohé ženy v týchto dňoch pociťujú, že vyzerajú lepšie. Nie je to náhoda, ale prirodzený efekt hormónov."
+        ],
         body: "rýchla regenerácia, telo výborne znáša záťaž, energia na vysokej úrovni",
         emotional: "vysoká motivácia, kreativita, pozitívne naladenie, sebadôvera",
         nutrition: {
@@ -470,7 +554,13 @@ serve(async (req) => {
       },
       'follicular-late': {
         hormones: "Estrogén dosahuje vrchol pred ovuláciou",
-        expectation: "Telo sa v týchto dňoch pravdepodobne pripravuje na ovuláciu. Energia môže byť stále vysoká, kreativita vrcholí a môžeš pociťovať chuť spájať sa s ľuďmi. Pre mnohé ženy je toto vrchol produktivity v cykle. Využi tento čas na dokončenie projektov a sociálne aktivity.",
+        expectationVariants: [
+          "Telo sa v týchto dňoch pravdepodobne pripravuje na ovuláciu. Energia môže byť stále vysoká, kreativita vrcholí a môžeš pociťovať chuť spájať sa s ľuďmi. Pre mnohé ženy je toto vrchol produktivity v cykle. Využi tento čas na dokončenie projektov a sociálne aktivity.",
+          
+          "Cervikálny hlien sa môže meniť – môže byť ťahavejší a priehľadnejší. To je úplne prirodzené a signalizuje, že sa blíži ovulácia. Ak to pozoruješ, je to dobrý znak, že tvoje telo pracuje správne.",
+          
+          "Niektoré ženy v týchto dňoch pociťujú vyššiu chuť na pohyb – telo ti signalizuje, že je v top forme. Môžeš si dovoliť intenzívnejší tréning alebo dlhšiu prechádzku. Tvoje svaly a kĺby sú teraz pripravené."
+        ],
         body: "vrchol energie, telo je pripravené na ovuláciu, výborná regenerácia",
         emotional: "vysoká sebadôvera, kreativita, chuť do sociálnych aktivít, optimizmus",
         nutrition: {
@@ -549,7 +639,13 @@ serve(async (req) => {
       },
       lutealEarly: {
         hormones: "Progesterón začína stúpať",
-        expectation: "Progesterón v tvojom tele začína stúpať a s ním môže prísť pocit väčšej stability a pokoja. Energia môže byť stále dobrá, ale telo sa postupne upokojuje a prechádza do režimu regenerácie. Je to prirodzené – telo si žiada viac pokoja a pravidelnosti.",
+        expectationVariants: [
+          "Progesterón v tvojom tele začína stúpať a s ním môže prísť pocit väčšej stability a pokoja. Energia môže byť stále dobrá, ale telo sa postupne upokojuje a prechádza do režimu regenerácie. Je to prirodzené – telo si žiada viac pokoja a pravidelnosti.",
+          
+          "V týchto dňoch sa môže zmeniť tvoja chuť do sociálnych aktivít. Ak ti vyhovuje menej stretnutí a viac času pre seba, je to úplne v poriadku. Progesterón ti pomáha spomaliť a sústrediť sa dovnútra.",
+          
+          "Môžeš si všimnúť, že sa ti lepšie pracuje na úlohách, ktoré vyžadujú sústredenosť a detaily. Progesterón podporuje dokončovanie vecí a organizáciu."
+        ],
         body: "stále dobrá regenerácia, ale telo sa pomaly upokojuje",
         emotional: "stabilita, vnútorný pokoj, väčšia potreba pravidelnosti",
         nutrition: {
@@ -588,7 +684,13 @@ serve(async (req) => {
       },
       lutealMid: {
         hormones: "Progesterón je na vrchole",
-        expectation: "Progesterón je teraz pravdepodobne na svojom vrchole. Telo môže reagovať citlivejšie na stres, chaos či preťaženie. Je prirodzené, ak cítiš menší záujem o sociálny kontakt a väčšiu potrebu priestoru pre seba. Dopraj si pravidelnosť, jemnosť a dostatok pokoja.",
+        expectationVariants: [
+          "Progesterón je teraz pravdepodobne na svojom vrchole. Telo môže reagovať citlivejšie na stres, chaos či preťaženie. Je prirodzené, ak cítiš menší záujem o sociálny kontakt a väčšiu potrebu priestoru pre seba. Dopraj si pravidelnosť, jemnosť a dostatok pokoja.",
+          
+          "V týchto dňoch môžeš pociťovať väčšiu potrebu odpočinku a menšiu chuť riešiť nové veci. To je úplne v poriadku – telo sa pripravuje na záverečnú časť cyklu a potrebuje šetriť energiu.",
+          
+          "Môžeš si všimnúť, že sa ti horšie koncentruje na viacero vecí naraz. Progesterón na vrchole môže spomaliť rýchlosť spracovania informácií. Skús sa sústrediť len na jednu vec v danom momente."
+        ],
         body: "spomalené trávenie, možné nafukovanie, citlivosť na stres",
         emotional: "introspekcia, menší záujem o sociálny kontakt, vyššia citlivosť",
         nutrition: {
@@ -627,7 +729,13 @@ serve(async (req) => {
       },
       lutealLate: {
         hormones: "Progesterón klesá, estrogén klesá",
-        expectation: "Progesterón aj estrogén ti v týchto dňoch pravdepodobne klesajú a telo sa pripravuje na menštruáciu. Je možné pociťovať príznaky PMS – napätie, únavu, kŕče alebo nafukovanie. Je to čas spomaliť a dopriať si viac pokoja a jemnosti.",
+        expectationVariants: [
+          "Progesterón aj estrogén ti v týchto dňoch pravdepodobne klesajú a telo sa pripravuje na menštruáciu. Je možné pociťovať príznaky PMS – napätie, únavu, kŕče alebo nafukovanie. Je to čas spomaliť a dopriať si viac pokoja a jemnosti.",
+          
+          "V týchto dňoch môžeš byť citlivejšia na kritiku alebo stres. To nie je tvoja chyba – hormóny ovplyvňujú spracovanie emócií. Ak sa cítiš zraniteľnejšia, dopraj si viac pokoja a menej náročných situácií.",
+          
+          "Môžeš si všimnúť, že máš chuť na sladké alebo slanú stravu. To je prirodzená reakcia tela na klesajúce hormóny. Skús vybrať zdravšie alternatívy, ktoré ti pomôžu stabilizovať cukry."
+        ],
         body: "možné príznaky PMS – kŕče, nafukovanie, únava, napätie",
         emotional: "citlivosť, podráždenie, nižšia tolerancia stresu",
         nutrition: {
@@ -682,9 +790,13 @@ serve(async (req) => {
       template = masterTemplates.ovulation;
     }
 
-    // Rotate content for diversity
+    // Rotate content for diversity across all cycle lengths
     const walkBenefitIndex = day % template.movement.walkBenefits.length;
     const thoughtIndex = day % template.mind.practicalThoughts.length;
+
+    // Rotate expectation variants within subphase
+    const expectationVariantIndex = (phaseContext.dayWithinSubphase - 1) % template.expectationVariants.length;
+    const selectedExpectation = template.expectationVariants[expectationVariantIndex];
 
     // System prompt - AI is FORMATTER with softer language and bullet points
     const systemPrompt = `Si expert na ženské zdravie a menštruačný cyklus. Tvorcom personalizovaných denných plánov pre ženy vo veku 25-45 rokov, väčšinou mamy.
@@ -802,7 +914,7 @@ KRITICKÉ PRE UNIKÁTNOSŤ:
 
 MASTER TEMPLATE - REFERENCIA (použij obsah, nie štruktúru):
 Hormóny: ${template.hormones}
-Základný text pre očakávanie (prispôsob pre ${phaseContext.relativePosition} ${phaseContext.phase} fázy): ${selectedContextDescription}
+Základný text pre očakávanie (prispôsob pre ${phaseContext.relativePosition} ${phaseContext.phase} fázy): ${selectedExpectation}
 Telo: ${template.body}
 Emócie: ${template.emotional}
 
