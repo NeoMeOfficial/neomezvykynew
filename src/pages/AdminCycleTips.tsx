@@ -36,9 +36,10 @@ const PHASE_LABELS: Record<string, string> = {
 };
 
 const SUBPHASE_LABELS: Record<string, string> = {
-  early: 'Včasná',
-  mid: 'Stredná',
-  late: 'Neskorá'
+  early: 'Začiatok',
+  mid: 'Stred',
+  late: 'Koniec',
+  transition: 'Stred'
 };
 
 // Lookup tabuľka pre typické rozsahy krvácania podľa dĺžky cyklu
@@ -777,7 +778,17 @@ export default function AdminCycleTips() {
                     <h2 className="text-xl font-semibold" style={{ color: '#955F6A' }}>
                       Deň {day}
                     </h2>
-                    <div className="flex gap-2 mt-1">
+                    {tip && (
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {PHASE_LABELS[tip.phase]}
+                        {tip.subphase && tip.phase !== 'ovulation' && ` - ${SUBPHASE_LABELS[tip.subphase]}`}
+                        {` ${tip.phase === 'menstrual' ? 'menštruačnej' : 
+                            tip.phase === 'follicular' ? 'folikulárnej' : 
+                            tip.phase === 'luteal' ? 'luteálnej' : 
+                            tip.phase === 'ovulation' ? '' : ''} ${tip.phase === 'ovulation' ? '' : 'fázy'}`}
+                      </p>
+                    )}
+                    <div className="flex gap-2 mt-2">
                       {tip && (
                         <>
                           <Badge variant="outline" style={{ borderColor: '#FF7782', color: '#955F6A' }}>

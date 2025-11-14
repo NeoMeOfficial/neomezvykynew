@@ -923,12 +923,6 @@ FORMÁTOVANIE - BULLET POINTS:
 
 DIVERZITA A UNIKÁTNOSŤ:
 - Každý deň v cykle musí mať SKUTOČNE ODLIŠNÝ obsah (nie len kozmetické zmeny)
-- Využi progres vo fáze (X%) na jemné variácie v tóne a formuláciách:
-  - 0-20%: "práve vstupuješ", "začína sa", "prvé náznaky"
-  - 21-40%: "postupne", "pomaly", "čoraz viac"
-  - 41-60%: "už si v strede", "telo pracuje naplno"
-  - 61-80%: "blížiš sa do záverečnej časti", "postupne sa mení"
-  - 81-100%: "končí sa", "pripravuje sa na ďalšiu fázu"
 - Každý deň musí mať RÔZNE konkrétne príklady:
   - Iné kombinácie potravín z poskytnutého zoznamu (NIKDY tie isté 6 ako predošlý deň)
   - Iný benefit prechádzky z poskytnutého zoznamu (rotuj ho na základe progressPercent)
@@ -952,6 +946,14 @@ PRAVIDLÁ:
    ✅ "pravdepodobne vstupuješ do folikulárnej fázy"
    ✅ "si na konci folikulárnej fázy"
    ✅ "tvoje telo sa pripravuje na ovuláciu"
+
+6. OVULÁCIA trvá len 1 deň - NIKDY nepíš "koniec ovulačnej fázy", "záver ovulácie" alebo podobné
+   ❌ "na konci ovulačnej fázy"
+   ❌ "blížiš sa ku koncu ovulácie"
+   ❌ "záverečná časť ovulácie"
+   ✅ "si v ovulačnej fáze"
+   ✅ "tvoje telo je na vrchole"
+   ✅ "estrogén je teraz na svojom maximum"
 
 ZDROJE (overené):
 - Dr. Mary Claire Haver (menopause & hormonal health)
