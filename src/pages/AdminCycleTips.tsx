@@ -780,12 +780,17 @@ export default function AdminCycleTips() {
                     </h2>
                     {tip && (
                       <p className="text-sm text-muted-foreground mt-1">
-                        {PHASE_LABELS[tip.phase]}
-                        {tip.subphase && tip.phase !== 'ovulation' && ` - ${SUBPHASE_LABELS[tip.subphase]}`}
-                        {` ${tip.phase === 'menstrual' ? 'menštruačnej' : 
-                            tip.phase === 'follicular' ? 'folikulárnej' : 
-                            tip.phase === 'luteal' ? 'luteálnej' : 
-                            tip.phase === 'ovulation' ? '' : ''} ${tip.phase === 'ovulation' ? '' : 'fázy'}`}
+                        {tip.phase === 'ovulation' ? 'Ovulácia' : 
+                          tip.subphase ? (
+                            `${SUBPHASE_LABELS[tip.subphase]} ${
+                              tip.phase === 'menstrual' ? 'menštruačnej' : 
+                              tip.phase === 'follicular' ? 'folikulárnej' : 
+                              tip.phase === 'luteal' ? 'luteálnej' : ''
+                            } fázy`
+                          ) : (
+                            `${PHASE_LABELS[tip.phase]} fáza (regeneruj)`
+                          )
+                        }
                       </p>
                     )}
                     <div className="flex gap-2 mt-2">
