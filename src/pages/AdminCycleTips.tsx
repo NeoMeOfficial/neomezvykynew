@@ -788,7 +788,7 @@ export default function AdminCycleTips() {
                               tip.phase === 'luteal' ? 'luteálnej' : ''
                             } fázy`
                           ) : (
-                            `${PHASE_LABELS[tip.phase]} fáza (regeneruj)`
+                            `${PHASE_LABELS[tip.phase]} fáza`
                           )
                         }
                       </p>
@@ -796,10 +796,19 @@ export default function AdminCycleTips() {
                     <div className="flex gap-2 mt-2">
                       {tip && (
                         <>
-                          <Badge variant="outline" style={{ borderColor: '#FF7782', color: '#955F6A' }}>
-                            {PHASE_LABELS[tip.phase]}
-                            {tip.subphase && ` - ${SUBPHASE_LABELS[tip.subphase]}`}
-                          </Badge>
+                      <Badge variant="outline" style={{ borderColor: '#FF7782', color: '#955F6A' }}>
+                        {tip.phase === 'ovulation' ? 'Ovulácia' : 
+                          tip.subphase ? (
+                            `${SUBPHASE_LABELS[tip.subphase]} ${
+                              tip.phase === 'menstrual' ? 'menštruačnej' : 
+                              tip.phase === 'follicular' ? 'folikulárnej' : 
+                              tip.phase === 'luteal' ? 'luteálnej' : ''
+                            } fázy`
+                          ) : (
+                            `${PHASE_LABELS[tip.phase]} fáza`
+                          )
+                        }
+                      </Badge>
                           <Badge variant={tip.created_by === 'ai' ? 'secondary' : 'default'}>
                             {tip.created_by === 'ai' ? 'AI' : 'Manuálne'}
                           </Badge>
