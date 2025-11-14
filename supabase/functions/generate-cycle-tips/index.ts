@@ -286,12 +286,27 @@ serve(async (req) => {
     const getPhaseInfoDynamic = (d: number, cycleLength: number, periodLength: number) => {
       const ranges = calculatePhaseRanges(cycleLength, periodLength);
       
-      if (d >= ranges.menstrual.start && d <= ranges.menstrual.end) 
-        return { phase: 'menstrual', subphase: null };
-      if (d >= ranges.follicular.start && d <= ranges.follicular.end) 
-        return { phase: 'follicular', subphase: null };
+      // MENSTRUAL subphases
+      if (ranges.menstrualEarly && d >= ranges.menstrualEarly.start && d <= ranges.menstrualEarly.end) 
+        return { phase: 'menstrual', subphase: 'early' };
+      if (ranges.menstrualMid && d >= ranges.menstrualMid.start && d <= ranges.menstrualMid.end) 
+        return { phase: 'menstrual', subphase: 'mid' };
+      if (ranges.menstrualLate && d >= ranges.menstrualLate.start && d <= ranges.menstrualLate.end) 
+        return { phase: 'menstrual', subphase: 'late' };
+      
+      // FOLLICULAR subphases
+      if (ranges.follicularTransition && d >= ranges.follicularTransition.start && d <= ranges.follicularTransition.end) 
+        return { phase: 'follicular', subphase: 'transition' };
+      if (ranges.follicularMid && d >= ranges.follicularMid.start && d <= ranges.follicularMid.end) 
+        return { phase: 'follicular', subphase: 'mid' };
+      if (ranges.follicularLate && d >= ranges.follicularLate.start && d <= ranges.follicularLate.end) 
+        return { phase: 'follicular', subphase: 'late' };
+      
+      // OVULATION (no subphase)
       if (d >= ranges.ovulation.start && d <= ranges.ovulation.end) 
         return { phase: 'ovulation', subphase: null };
+      
+      // LUTEAL subphases
       if (d >= ranges.lutealEarly.start && d <= ranges.lutealEarly.end) 
         return { phase: 'luteal', subphase: 'early' };
       if (d >= ranges.lutealMid.start && d <= ranges.lutealMid.end) 
