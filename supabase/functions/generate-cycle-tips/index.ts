@@ -226,7 +226,7 @@ serve(async (req) => {
           subphase = 'transition';
           phaseStart = ranges.follicularTransition.start;
           phaseEnd = ranges.follicularTransition.end;
-          phaseNameSk = 'prechodu folikulárnej';
+          phaseNameSk = 'stredu folikulárnej';
         } else if (ranges.follicularMid && day >= ranges.follicularMid.start && day <= ranges.follicularMid.end) {
           subphase = 'mid';
           phaseStart = ranges.follicularMid.start;
@@ -236,7 +236,7 @@ serve(async (req) => {
           subphase = 'late';
           phaseStart = ranges.follicularLate.start;
           phaseEnd = ranges.follicularLate.end;
-          phaseNameSk = 'záverečnej časti folikulárnej';
+          phaseNameSk = 'konca folikulárnej';
         }
       } else if (day === ranges.ovulation.start) {
         phase = 'ovulation';
@@ -249,19 +249,19 @@ serve(async (req) => {
         subphase = 'early';
         phaseStart = ranges.lutealEarly.start;
         phaseEnd = ranges.lutealEarly.end;
-        phaseNameSk = 'včasnej luteálnej';
+        phaseNameSk = 'začiatku luteálnej';
       } else if (day >= ranges.lutealMid.start && day <= ranges.lutealMid.end) {
         phase = 'luteal';
         subphase = 'mid';
         phaseStart = ranges.lutealMid.start;
         phaseEnd = ranges.lutealMid.end;
-        phaseNameSk = 'strednej luteálnej';
+        phaseNameSk = 'stredu luteálnej';
       } else if (day >= ranges.lutealLate.start && day <= ranges.lutealLate.end) {
         phase = 'luteal';
         subphase = 'late';
         phaseStart = ranges.lutealLate.start;
         phaseEnd = ranges.lutealLate.end;
-        phaseNameSk = 'neskorej luteálnej';
+        phaseNameSk = 'konca luteálnej';
       }
 
       const dayInPhase = day - phaseStart + 1;
@@ -979,12 +979,6 @@ KRITICKÉ PRE UNIKÁTNOSŤ:
 - Obsah sa MUSÍ líšiť od dňa ${day > 1 ? day - 1 : cycleLength} aj od dňa ${day < cycleLength ? day + 1 : 1}
 - Použi rozdielne príklady potravín z poskytnutého zoznamu (min 6 odlišných než predošlý deň)
 - Použi rozdielny benefit prechádzky z poskytnutého zoznamu
-- Variuj formulácie podľa ${progressPercent}% progresu:
-  - 0-20%: "práve vstupuješ", "začína sa"
-  - 21-40%: "postupne", "pomaly" 
-  - 41-60%: "v strede", "telo pracuje naplno"
-  - 61-80%: "blížiš sa do záverečnej časti"
-  - 81-100%: "končí sa", "pripravuje sa na ďalšiu fázu"
 
 MASTER TEMPLATE - REFERENCIA (použij obsah, nie štruktúru):
 Hormóny: ${template.hormones}
