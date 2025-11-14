@@ -33,36 +33,150 @@ serve(async (req) => {
       throw new Error('Period length must be 2-8 days.');
     }
 
-    // Dynamic phase calculation for different cycle lengths (25-35 days) and period lengths (3-8 days)
-    const calculatePhaseRanges = (cycleLength: number, periodLength: number) => {
-      // Menstrual phase: flexible based on periodLength
-      const menstrualEnd = periodLength;
-      
-      // Ovulation: always 1 day at cycleLength - 14
-      const ovulationDay = cycleLength - 14;
-      
-      // Luteal phase: always starts at cycleLength - 13 (14 days total)
-      const lutealStart = cycleLength - 13;
-      const lutealLength = 14;
-      
-      // Follicular: from end of menstrual to before ovulation
-      const follicularStart = menstrualEnd + 1;
-      const follicularEnd = ovulationDay - 1;
-      
-      // Luteal subphases (14 days total): 35% early, 40% mid, 25% late
-      // Note: Biologically, menstruation is part of the follicular phase, but we display it as a separate phase in the UI
-      const lutealEarlyEnd = lutealStart + Math.round(lutealLength * 0.35) - 1; // 35% = ~5 days
-      const lutealMidEnd = lutealStart + Math.round(lutealLength * 0.75) - 1;   // 75% (35% + 40%) = ~10 days
-      // Late luteal: from lutealMidEnd + 1 to cycleLength (remaining 25% = ~4 days)
-      
-      return {
-        menstrual: { start: 1, end: menstrualEnd },
-        follicular: { start: follicularStart, end: follicularEnd },
-        ovulation: { start: ovulationDay, end: ovulationDay }, // 1 day only
-        lutealEarly: { start: lutealStart, end: lutealEarlyEnd },
-        lutealMid: { start: lutealEarlyEnd + 1, end: lutealMidEnd },
-        lutealLate: { start: lutealMidEnd + 1, end: cycleLength }
+    // Universal segment splitter for dynamic subphase calculation
+    function split_segment(
+      len: number,
+      pct: [number, number, number],
+      min: [number, number, number],
+      prefer: 'MID' | 'FIRST' = 'MID'
+    ): [number, number, number] {
+      let r1 = Math.floor(len * pct[0]);
+      let r2 = Math.floor(len * pct[1]);
+      let r3 = len - r1 - r2;
+
+      let a1 = Math.max(r1, min[0]);
+      let a2 = Math.max(r2, min[1]);
+      let a3 = Math.max(r3, min[2]);
+
+      let sum = a1 + a2 + a3;
+
+      if (sum > len) {
+        const order = prefer === 'MID' ? [1, 0, 2] : [0, 1, 2];
+        let remaining = sum - len;
+        
+        for (const i of order) {
+          const arr = [a1, a2, a3];
+          const take = Math.min(remaining, arr[i] - min[i]);
+          if (i === 0) a1 -= take;
+          else if (i === 1) a2 -= take;
+          else a3 -= take;
+          remaining -= take;
+          if (remaining === 0) break;
+        }
+      } else if (sum < len) {
+        a2 += (len - sum);
+      }
+
+      return [a1, a2, a3];
+    }
+
+    // Dynamic phase calculation for different cycle lengths (25-35 days) and period lengths (2-8 days)
+    const calculatePhaseRanges = (cycleLength: number, periodLength: number, lutealLength: number = 14) => {
+      const ovulation_day = cycleLength - lutealLength;
+
+      // Basic phases
+      const M_start = 1;
+      const M_end = periodLength;
+      const F_disp_start = periodLength + 1;
+      const F_disp_end = ovulation_day - 1;
+      const O_day = ovulation_day;
+      const L_start = ovulation_day + 1;
+      const L_end = cycleLength;
+
+      // Lengths
+      const M_len = M_end - M_start + 1;
+      const F_disp_len = Math.max(0, F_disp_end - F_disp_start + 1);
+      const L_len = L_end - L_start + 1;
+
+      // --- MENSTRUAL SUBPHASES ---
+      let M_early = 0, M_mid = 0, M_late = 0;
+      if (M_len >= 3) {
+        [M_early, M_mid, M_late] = split_segment(M_len, [0.40, 0.35, 0.25], [2, 1, 1], 'MID');
+      } else {
+        M_early = M_len;
+      }
+
+      // --- FOLLICULAR SUBPHASES (displayed after menstruation) ---
+      let F_trans = 0, F_mid = 0, F_late = 0;
+      if (F_disp_len <= 0) {
+        // No follicular display
+      } else if (F_disp_len <= 8) {
+        // 2 blocks: MID 70% | LATE 30%
+        F_mid = Math.max(1, Math.floor(F_disp_len * 0.70));
+        F_late = F_disp_len - F_mid;
+        if (F_late === 0 && F_mid > 1) {
+          F_mid -= 1;
+          F_late += 1;
+        }
+      } else {
+        // 3 blocks: TRANSITION 15% | MID 55% | LATE 30%
+        F_trans = Math.max(1, Math.floor(F_disp_len * 0.15));
+        F_mid = Math.max(3, Math.floor(F_disp_len * 0.55));
+        F_late = F_disp_len - F_trans - F_mid;
+        
+        if (F_late < 2 && F_mid > 3) {
+          const borrow = Math.min(2 - F_late, F_mid - 3);
+          F_mid -= borrow;
+          F_late += borrow;
+        }
+        if (F_late < 2 && F_trans > 1) {
+          const borrow = Math.min(2 - F_late, F_trans - 1);
+          F_trans -= borrow;
+          F_late += borrow;
+        }
+      }
+
+      // --- LUTEAL SUBPHASES ---
+      const [L_early, L_mid, L_late] = split_segment(L_len, [0.35, 0.40, 0.25], [2, 2, 2], 'MID');
+
+      // --- BUILD RANGES OBJECT ---
+      const ranges: any = {
+        menstrual: { start: M_start, end: M_end },
+        ovulation: { start: O_day, end: O_day },
       };
+
+      // Menstrual subphases
+      let cursor = M_start;
+      if (M_early > 0) {
+        ranges.menstrualEarly = { start: cursor, end: cursor + M_early - 1 };
+        cursor += M_early;
+      }
+      if (M_mid > 0) {
+        ranges.menstrualMid = { start: cursor, end: cursor + M_mid - 1 };
+        cursor += M_mid;
+      }
+      if (M_late > 0) {
+        ranges.menstrualLate = { start: cursor, end: cursor + M_late - 1 };
+      }
+
+      // Follicular subphases (displayed after menstruation)
+      if (F_disp_len > 0) {
+        ranges.follicular = { start: F_disp_start, end: F_disp_end };
+        cursor = F_disp_start;
+        
+        if (F_trans > 0) {
+          ranges.follicularTransition = { start: cursor, end: cursor + F_trans - 1 };
+          cursor += F_trans;
+        }
+        if (F_mid > 0) {
+          ranges.follicularMid = { start: cursor, end: cursor + F_mid - 1 };
+          cursor += F_mid;
+        }
+        if (F_late > 0) {
+          ranges.follicularLate = { start: cursor, end: cursor + F_late - 1 };
+        }
+      }
+
+      // Luteal subphases
+      ranges.luteal = { start: L_start, end: L_end };
+      cursor = L_start;
+      ranges.lutealEarly = { start: cursor, end: cursor + L_early - 1 };
+      cursor += L_early;
+      ranges.lutealMid = { start: cursor, end: cursor + L_mid - 1 };
+      cursor += L_mid;
+      ranges.lutealLate = { start: cursor, end: cursor + L_late - 1 };
+
+      return ranges;
     };
 
     // Get detailed context about a day's position within its phase
@@ -73,38 +187,69 @@ serve(async (req) => {
       totalDaysInPhase: number;
       relativePosition: string;
       description: string;
+      dayWithinSubphase: number; // VARIANT B: absolútny deň od dňa 1 cyklu
+      totalDaysInSubphase: number;
+      subfazaStart: number; // potrebné pre rotáciu variantov
     }
 
     const getPhaseContext = (day: number, cycleLength: number, periodLength: number): PhaseContext => {
       const ranges = calculatePhaseRanges(cycleLength, periodLength);
       
-      let phase = 'menstrual';
+      let phase = '';
       let subphase: string | null = null;
-      let phaseStart = ranges.menstrual.start;
-      let phaseEnd = ranges.menstrual.end;
-      let phaseNameSk = 'menštruačnej';
+      let phaseStart = 1;
+      let phaseEnd = 1;
+      let phaseNameSk = '';
 
+      // Detect phase + subphase from ranges
       if (day >= ranges.menstrual.start && day <= ranges.menstrual.end) {
         phase = 'menstrual';
-        phaseStart = ranges.menstrual.start;
-        phaseEnd = ranges.menstrual.end;
-        phaseNameSk = 'menštruačnej';
-      } else if (day >= ranges.follicular.start && day <= ranges.follicular.end) {
+        if (ranges.menstrualEarly && day >= ranges.menstrualEarly.start && day <= ranges.menstrualEarly.end) {
+          subphase = 'early';
+          phaseStart = ranges.menstrualEarly.start;
+          phaseEnd = ranges.menstrualEarly.end;
+          phaseNameSk = 'začiatku menštruačnej';
+        } else if (ranges.menstrualMid && day >= ranges.menstrualMid.start && day <= ranges.menstrualMid.end) {
+          subphase = 'mid';
+          phaseStart = ranges.menstrualMid.start;
+          phaseEnd = ranges.menstrualMid.end;
+          phaseNameSk = 'stredu menštruačnej';
+        } else if (ranges.menstrualLate && day >= ranges.menstrualLate.start && day <= ranges.menstrualLate.end) {
+          subphase = 'late';
+          phaseStart = ranges.menstrualLate.start;
+          phaseEnd = ranges.menstrualLate.end;
+          phaseNameSk = 'konca menštruačnej';
+        }
+      } else if (ranges.follicular && day >= ranges.follicular.start && day <= ranges.follicular.end) {
         phase = 'follicular';
-        phaseStart = ranges.follicular.start;
-        phaseEnd = ranges.follicular.end;
-        phaseNameSk = 'folikulárnej';
-      } else if (day >= ranges.ovulation.start && day <= ranges.ovulation.end) {
+        if (ranges.follicularTransition && day >= ranges.follicularTransition.start && day <= ranges.follicularTransition.end) {
+          subphase = 'transition';
+          phaseStart = ranges.follicularTransition.start;
+          phaseEnd = ranges.follicularTransition.end;
+          phaseNameSk = 'prechodu folikulárnej';
+        } else if (ranges.follicularMid && day >= ranges.follicularMid.start && day <= ranges.follicularMid.end) {
+          subphase = 'mid';
+          phaseStart = ranges.follicularMid.start;
+          phaseEnd = ranges.follicularMid.end;
+          phaseNameSk = 'stredu folikulárnej';
+        } else if (ranges.follicularLate && day >= ranges.follicularLate.start && day <= ranges.follicularLate.end) {
+          subphase = 'late';
+          phaseStart = ranges.follicularLate.start;
+          phaseEnd = ranges.follicularLate.end;
+          phaseNameSk = 'záverečnej časti folikulárnej';
+        }
+      } else if (day === ranges.ovulation.start) {
         phase = 'ovulation';
+        subphase = 'peak';
         phaseStart = ranges.ovulation.start;
         phaseEnd = ranges.ovulation.end;
-        phaseNameSk = 'ovulačnej';
+        phaseNameSk = 'ovulácie';
       } else if (day >= ranges.lutealEarly.start && day <= ranges.lutealEarly.end) {
         phase = 'luteal';
         subphase = 'early';
         phaseStart = ranges.lutealEarly.start;
         phaseEnd = ranges.lutealEarly.end;
-        phaseNameSk = 'skorej luteálnej';
+        phaseNameSk = 'včasnej luteálnej';
       } else if (day >= ranges.lutealMid.start && day <= ranges.lutealMid.end) {
         phase = 'luteal';
         subphase = 'mid';
@@ -121,88 +266,8 @@ serve(async (req) => {
 
       const dayInPhase = day - phaseStart + 1;
       const totalDaysInPhase = phaseEnd - phaseStart + 1;
-      
-      // Calculate relative position (začiatok, stred, koniec) with phase-specific percentages
-      let relativePosition = 'stred';
-      const positionRatio = dayInPhase / totalDaysInPhase;
-      
-      if (phase === 'menstrual') {
-        // M: 40% | 35% | 25%
-        if (positionRatio <= 0.40) relativePosition = 'začiatok';
-        else if (positionRatio <= 0.75) relativePosition = 'stred';
-        else relativePosition = 'koniec';
-      } else if (phase === 'follicular') {
-        // ŠPECIÁL: folikulárna fáza sa počíta OD DŇA 1 (začiatok menštruácie) až po koniec ovulácie
-        const follicularTotalDays = ranges.ovulation.end; // koniec ovulácie
-        const positionInFullFollicular = day / follicularTotalDays;
-        
-        // F: 30% | 45% | 25%
-        if (positionInFullFollicular <= 0.30) relativePosition = 'začiatok';
-        else if (positionInFullFollicular <= 0.75) relativePosition = 'stred';
-        else relativePosition = 'koniec';
-      } else if (phase === 'luteal') {
-        // L: 35% | 40% | 25%
-        if (positionRatio <= 0.35) relativePosition = 'začiatok';
-        else if (positionRatio <= 0.75) relativePosition = 'stred';
-        else relativePosition = 'koniec';
-      } else {
-        // ovulation - single day, no subphases
-        relativePosition = 'stred';
-      }
-
-      const description = `${relativePosition.charAt(0).toUpperCase() + relativePosition.slice(1)} ${phaseNameSk} fázy`;
-
-      // Calculate day within current subphase (for variant rotation)
-      let dayWithinSubphase = 1;
-      let totalDaysInSubphase = 1;
-
-      if (phase === 'menstrual') {
-        // M: 40% | 35% | 25%
-        const earlyDays = Math.round(totalDaysInPhase * 0.40);
-        const midDays = Math.round(totalDaysInPhase * 0.35);
-        
-        if (relativePosition === 'začiatok') {
-          totalDaysInSubphase = earlyDays;
-          dayWithinSubphase = dayInPhase;
-        } else if (relativePosition === 'stred') {
-          totalDaysInSubphase = midDays;
-          dayWithinSubphase = dayInPhase - earlyDays;
-        } else {
-          totalDaysInSubphase = totalDaysInPhase - earlyDays - midDays;
-          dayWithinSubphase = dayInPhase - earlyDays - midDays;
-        }
-      } else if (phase === 'follicular') {
-        // F: 30% | 45% | 25% (počíta sa od dňa 1)
-        const follicularTotalDays = ranges.ovulation.end;
-        const earlyDays = Math.round(follicularTotalDays * 0.30);
-        const midDays = Math.round(follicularTotalDays * 0.45);
-        
-        if (relativePosition === 'začiatok') {
-          totalDaysInSubphase = earlyDays;
-          dayWithinSubphase = day;
-        } else if (relativePosition === 'stred') {
-          totalDaysInSubphase = midDays;
-          dayWithinSubphase = day - earlyDays;
-        } else {
-          totalDaysInSubphase = follicularTotalDays - earlyDays - midDays;
-          dayWithinSubphase = day - earlyDays - midDays;
-        }
-      } else if (phase === 'luteal') {
-        // L: 35% | 40% | 25%
-        const earlyDays = Math.round(totalDaysInPhase * 0.35);
-        const midDays = Math.round(totalDaysInPhase * 0.40);
-        
-        if (relativePosition === 'začiatok') {
-          totalDaysInSubphase = earlyDays;
-          dayWithinSubphase = dayInPhase;
-        } else if (relativePosition === 'stred') {
-          totalDaysInSubphase = midDays;
-          dayWithinSubphase = dayInPhase - earlyDays;
-        } else {
-          totalDaysInSubphase = totalDaysInPhase - earlyDays - midDays;
-          dayWithinSubphase = dayInPhase - earlyDays - midDays;
-        }
-      }
+      const relativePosition = subphase || 'peak';
+      const description = phaseNameSk.charAt(0).toUpperCase() + phaseNameSk.slice(1) + ' fázy';
 
       return {
         phase,
@@ -211,8 +276,9 @@ serve(async (req) => {
         totalDaysInPhase,
         relativePosition,
         description,
-        dayWithinSubphase,
-        totalDaysInSubphase
+        dayWithinSubphase: day, // VARIANT B: absolútny deň od začiatku cyklu
+        totalDaysInSubphase: totalDaysInPhase,
+        subfazaStart: phaseStart // potrebné pre rotáciu variantov
       };
     };
 
@@ -461,7 +527,7 @@ serve(async (req) => {
           ]
         }
       },
-      'follicular-early': {
+      'follicular-transition': {
         hormones: "Estrogén naďalej stúpa",
         expectationVariants: [
           "Menštruácia ti už pravdepodobne skončila a hladina estrogénu ti naďalej stúpa. S tým prichádza prvý nárast energie a motivácie. Môžeš pociťovať pocit úľavy a prvé náznaky chuti do aktivity. Je to vhodný čas na pomaly sa vrátiť k bežným aktivitám.",
@@ -777,14 +843,20 @@ serve(async (req) => {
     // Select master template based on phase and subphase
     let template;
     if (phaseContext.phase === 'menstrual') {
-      // Use menstrual subphases based on relative position
-      template = masterTemplates[`menstrual-${phaseContext.relativePosition === 'začiatok' ? 'early' : phaseContext.relativePosition === 'stred' ? 'mid' : 'late'}`];
+      template = masterTemplates[`menstrual-${phaseContext.subphase}`];
     } else if (phaseContext.phase === 'follicular') {
-      // Use follicular subphases based on relative position
-      template = masterTemplates[`follicular-${phaseContext.relativePosition === 'začiatok' ? 'early' : phaseContext.relativePosition === 'stred' ? 'mid' : 'late'}`];
+      if (phaseContext.subphase === 'transition') {
+        template = masterTemplates['follicular-transition'];
+      } else if (phaseContext.subphase === 'mid') {
+        template = masterTemplates['follicular-mid'];
+      } else if (phaseContext.subphase === 'late') {
+        template = masterTemplates['follicular-late'];
+      } else {
+        // Fallback pre krátke folikulárne fázy bez transition
+        template = masterTemplates['follicular-mid'];
+      }
     } else if (phaseContext.phase === 'luteal') {
-      // Use luteal subphases
-      template = masterTemplates[`luteal${subphase?.charAt(0).toUpperCase()}${subphase?.slice(1)}`];
+      template = masterTemplates[`luteal${phaseContext.subphase?.charAt(0).toUpperCase()}${phaseContext.subphase?.slice(1)}`];
     } else {
       // Ovulation - single template
       template = masterTemplates.ovulation;
@@ -794,8 +866,10 @@ serve(async (req) => {
     const walkBenefitIndex = day % template.movement.walkBenefits.length;
     const thoughtIndex = day % template.mind.practicalThoughts.length;
 
-    // Rotate expectation variants within subphase
-    const expectationVariantIndex = (phaseContext.dayWithinSubphase - 1) % template.expectationVariants.length;
+    // Rotate expectation variants within subphase (VARIANT B)
+    // Formula: (dayWithinSubphase - subfazaStart) % pocetVariantov
+    // This ensures Variant 1 always appears on the first day of each subphase
+    const expectationVariantIndex = (phaseContext.dayWithinSubphase - phaseContext.subfazaStart) % template.expectationVariants.length;
     const selectedExpectation = template.expectationVariants[expectationVariantIndex];
 
     // System prompt - AI is FORMATTER with softer language and bullet points
@@ -853,7 +927,7 @@ DIVERZITA A UNIKÁTNOSŤ:
   - 0-20%: "práve vstupuješ", "začína sa", "prvé náznaky"
   - 21-40%: "postupne", "pomaly", "čoraz viac"
   - 41-60%: "už si v strede", "telo pracuje naplno"
-  - 61-80%: "blížiš sa ku koncu", "postupne sa mení"
+  - 61-80%: "blížiš sa do záverečnej časti", "postupne sa mení"
   - 81-100%: "končí sa", "pripravuje sa na ďalšiu fázu"
 - Každý deň musí mať RÔZNE konkrétne príklady:
   - Iné kombinácie potravín z poskytnutého zoznamu (NIKDY tie isté 6 ako predošlý deň)
@@ -909,7 +983,7 @@ KRITICKÉ PRE UNIKÁTNOSŤ:
   - 0-20%: "práve vstupuješ", "začína sa"
   - 21-40%: "postupne", "pomaly" 
   - 41-60%: "v strede", "telo pracuje naplno"
-  - 61-80%: "blížiš sa ku koncu"
+  - 61-80%: "blížiš sa do záverečnej časti"
   - 81-100%: "končí sa", "pripravuje sa na ďalšiu fázu"
 
 MASTER TEMPLATE - REFERENCIA (použij obsah, nie štruktúru):
