@@ -415,11 +415,11 @@ serve(async (req) => {
       'menstrual-early': {
         hormones: "Estrogén a progesterón sú na najnižšej úrovni",
         expectationVariants: [
-          "Progesterón aj estrogén sú na najnižších úrovniach. Môžeš pociťovať kŕče, únavu a zvýšenú citlivosť na bolesť. Retencia tekutín postupne ustupuje. Trávenie môže byť citlivejšie.",
+          "Progesterón aj estrogén sú na najnižších úrovniach. Môžeš pociťovať kŕče, únavu a zvýšenú citlivosť na bolesť. Retencia tekutín (odvodňovanie) postupne pokračuje. Trávenie môže byť citlivejšie.",
           
-          "Tvoje telo stráca krv a s ňou železo a minerály. Energia je nízka, nálada môže kolísať. Pleť môže byť mastnejšia kvôli androgénom z predchádzajúcej fázy.",
+          "Tvoje telo stráca krv a s ňou železo a minerály. Energia je nízka, nálada môže kolísať. Pleť môže byť mastnejšia kvôli androgénom z predchádzajúcej fázy. Brucho môže byť citlivé.",
           
-          "Maternica sa zbavuje sliznice, čo si vyžaduje energiu. Môžeš potrebovať viac pokoja. Vyvaruj sa ťažkým jedlám. Váha sa stabilizuje."
+          "Maternica sa zbavuje sliznice, čo si vyžaduje energiu. Môžeš potrebovať viac pokoja a menej intenzívne aktivity. Vyvaruj sa ťažkým jedlám. Váha sa stabilizuje, pretože odvodňovanie pokračuje."
         ],
         body: "začiatok krvácania, možné silné kŕče, únavnosť, citlivé brucho",
         emotional: "zvýšená citlivosť, introverzia, potreba pokoja",
@@ -459,7 +459,7 @@ serve(async (req) => {
       'menstrual-mid': {
         hormones: "Estrogén a progesterón sú stále nízko",
         expectationVariants: [
-          "Krvácanie pokračuje, ale kŕče zvyčajne slabujú. Energia zostáva nízka, ale nálada sa môže mierne zlepšiť. Retencia tekutín už takmer zmizla.",
+          "Krvácanie pokračuje, ale kŕče zvyčajne oslabujú. Energia zostáva nízka, ale nálada sa môže mierne zlepšiť. Odvodňovanie pokračuje, môžeš sa cítiť ľahšie.",
           
           "Tvoje telo stále regeneruje vnútornú výstelku maternice. Môžeš pociťovať ľahší únavový stav. Pleť sa postupne zlepšuje, ako sa hormóny začínajú normalizovať.",
           
@@ -917,6 +917,10 @@ NIKDY NEPOUŽÍVAJ:
 - NIKDY negeneruj nové medicínske fakty
 - NIKDY neuvádzaj percentá, čísla alebo výskumné štúdie, ktoré nie sú v master template
 - NIKDY nevymýšľaj špecifické údaje o hormónoch, ktoré nie sú v template
+- NIKDY nepridávaj vlastné subjektívne frázy ako "Dobrou správou je", "Skvelou správou je", "Dobrá vec je"
+- NIKDY nepoužívaj imperatívne frázy ako "Vnímaj", "Počúvaj svoje telo", "Uvedom si"
+- NIKDY nemení terminológiu z master template (napr. "retencia tekutín" → "zadržiavanie tekutín")
+- NIKDY nevytvára celé vety z parametrov `body` a `emotional` - použi ich len ako kontext
 
 VŽDY SA SÚSTREĎ NA:
 - Konkrétne hormóny a ich vplyv (presne ako je to popísané v master template)
@@ -1040,6 +1044,9 @@ Vytvor unikátny text, ktorý:
 - Používa mäkký, kondicionálny jazyk ("pravdepodobne", "môžeš pociťovať", "je možné")
 - Neobsahuje umelé frázy, klišé alebo nové medicínske tvrdenia
 - Vychádza VÝHRADNE z expectationVariants v master template
+- NEPRIDÁVA vlastné subjektívne frázy ako "Dobrou správou je", "Vnímaj", "Skvelá vec"
+- NESMIE meniť terminológiu z template (napr. "retencia tekutín" zostáva "retencia tekutín")
+- Parametry `body` a `emotional` použi LEN ako kontext, nevytváraj z nich plné vety
 
 STRAVA - REFERENCIA:
 Potreby: ${template.nutrition.needs.join(', ')}
