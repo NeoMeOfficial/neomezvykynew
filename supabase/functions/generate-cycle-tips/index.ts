@@ -636,7 +636,7 @@ serve(async (req) => {
       'follicular-late': {
         hormones: "Estrogén dosahuje vrchol pred ovuláciou",
         expectationVariants: [
-          "Estrogén dosahuje vrchol. Energia je vysoká, sebavedomie na maximum. Pleť žiari, vlasy sú lesklé. Tvoje telo sa pripravuje na ovuláciu - fertilita je najvyššia.",
+          "Estrogén dosahuje vrchol. Energia je vysoká, sebavedomie na maximum. Pleť žiari, vlasy sú lesklé. Tvoje telo sa pripravuje na ovuláciu - cítiš sa atraktívnejšia a vitálnejšia.",
           
           "Môžeš pociťovať maximálnu kreativitu a komunikatívnosť. Telo je fyzicky aj mentálne na vrchole. Trávenie je rýchle a efektívne.",
           
@@ -921,6 +921,8 @@ NIKDY NEPOUŽÍVAJ:
 - NIKDY nepoužívaj imperatívne frázy ako "Vnímaj", "Počúvaj svoje telo", "Uvedom si"
 - NIKDY nemení terminológiu z master template (napr. "retencia tekutín" → "zadržiavanie tekutín")
 - NIKDY nevytvára celé vety z parametrov `body` a `emotional` - použi ich len ako kontext
+- NIKDY nepoužívaj gramaticky nesprávne tvary ako "ovih" (správne je "týchto"), "tich" (správne je "týchto"), alebo iné neexistujúce slovenské slová
+- NIKDY nemení správne slovenské slová z template na nesprávne formy
 
 VŽDY SA SÚSTREĎ NA:
 - Konkrétne hormóny a ich vplyv (presne ako je to popísané v master template)
@@ -1047,6 +1049,7 @@ Vytvor unikátny text, ktorý:
 - NEPRIDÁVA vlastné subjektívne frázy ako "Dobrou správou je", "Vnímaj", "Skvelá vec"
 - NESMIE meniť terminológiu z template (napr. "retencia tekutín" zostáva "retencia tekutín")
 - Parametry `body` a `emotional` použi LEN ako kontext, nevytváraj z nich plné vety
+- Používa VÝHRADNE správne slovenské slová a gramatiku (napr. "týchto", nie "ovih")
 
 STRAVA - REFERENCIA:
 Potreby: ${template.nutrition.needs.join(', ')}
