@@ -410,6 +410,147 @@ serve(async (req) => {
 
     const selectedContextDescription = getContextDescription(phaseContext);
 
+    // NUTRITION THEMES - 9 mini-sections for daily rotation
+    const nutritionThemes: Record<string, any> = {
+      plet: {
+        name: "Pleť",
+        emoji: "🔮",
+        phases: ["menstrual", "follicular", "lutealEarly", "lutealLate"],
+        nutrients: ["zinok", "omega-3", "vitamín C", "antioxidanty"],
+        foods: ["losos", "chia", "brokolica", "bobule", "kiwi", "tekvicové semienka"],
+        tips: [
+          "Teplá voda ráno pomôže pleť vyčistiť zvnútra.",
+          "Menej cukru = menej zápalu = čistejšia pleť.",
+          "Hydratácia je kľúč - 2L vody denne."
+        ]
+      },
+      vlasy: {
+        name: "Vlasy",
+        emoji: "💇‍♀️",
+        phases: ["follicular", "lutealEarly", "lutealLate"],
+        nutrients: ["proteíny", "omega-3", "zinok", "biotín"],
+        foods: ["vajcia", "losos", "šošovica", "orechy", "tekvicové semienka"],
+        tips: [
+          "Vlasy rastú lepšie pri dostatku bielkovín.",
+          "Omega-3 dodá vlasom lesk.",
+          "Zinok pomáha proti vypadávaniu vlasov."
+        ]
+      },
+      travenie: {
+        name: "Trávenie",
+        emoji: "🌿",
+        phases: ["menstrual", "lutealEarly", "lutealMid", "lutealLate"],
+        nutrients: ["vláknina", "probiotiká", "teplé jedlá"],
+        foods: ["kefír", "jogurt", "čučoriedky", "ovsené vločky", "bataty", "zázvor"],
+        tips: [
+          "Teplé jedlá sú šetrnejšie k citlivému tráveniu.",
+          "Probiotiká podporia črevnú mikrobiotu.",
+          "Menej ťažkých jedál večer = lepší spánok."
+        ]
+      },
+      energia: {
+        name: "Energia",
+        emoji: "⚡",
+        phases: ["menstrual", "lutealLate", "follicular"],
+        nutrients: ["bielkoviny", "komplexné sacharidy", "B-vitamíny", "železo"],
+        foods: ["quinoa", "vajcia", "šošovica", "jogurt", "tofu"],
+        tips: [
+          "Bielkoviny + sacharidy = stabilná energia.",
+          "B-vitamíny podporia tvorbu energie v bunkách.",
+          "Železo je kľúčové po krvácaní."
+        ]
+      },
+      spanok: {
+        name: "Spánok",
+        emoji: "😴",
+        phases: ["lutealMid", "lutealLate"],
+        nutrients: ["magnézium", "tryptofán", "B6"],
+        foods: ["banán", "ovos", "cícer", "mandľové maslo"],
+        tips: [
+          "Teplý bylinkový čaj pred spaním ti pomôže zaspať.",
+          "Menej kofeínu po 14:00 = lepší spánok.",
+          "Magnézium uvoľňuje nervový systém."
+        ]
+      },
+      zavodnenie: {
+        name: "Zavodnenie",
+        emoji: "💧",
+        phases: ["lutealMid", "lutealLate"],
+        nutrients: ["draslík", "horčík", "vláknina"],
+        foods: ["avokádo", "banán", "uhorka", "špargľa", "petržlen", "citrón"],
+        tips: [
+          "Menej soli = menšie zadržiavanie vody.",
+          "Voda z potravín je lepšie stráviteľná.",
+          "Draslík pomáha vyplaviť prebytočné tekutiny."
+        ]
+      },
+      nalada: {
+        name: "Nálada & Stres",
+        emoji: "💛",
+        phases: ["lutealEarly", "lutealMid", "lutealLate", "menstrual"],
+        nutrients: ["B6", "horčík", "omega-3"],
+        foods: ["losos", "vajcia", "banán", "orechy", "špenát"],
+        tips: [
+          "Malé stabilné jedlá cez deň = stabilná nálada.",
+          "Omega-3 znižuje zápal aj depresiu.",
+          "B6 podporuje tvorbu serotonínu."
+        ]
+      },
+      pms: {
+        name: "PMS",
+        emoji: "🔥",
+        phases: ["lutealLate"],
+        nutrients: ["magnézium", "B6", "omega-3"],
+        foods: ["šošovica", "bataty", "losos", "tmavá čokoláda"],
+        tips: [
+          "Teplý čaj s harmanček upokoí telo aj myseľ.",
+          "Menej cukru = menej PMS príznakov.",
+          "Pravidelná hydratácia znižuje nafukovanie."
+        ]
+      },
+      imunita: {
+        name: "Imunita",
+        emoji: "🛡",
+        phases: ["menstrual", "ovulation"],
+        nutrients: ["antioxidanty", "vitamín C", "zinok"],
+        foods: ["citrusy", "bobule", "paprika", "zázvor", "cesnak"],
+        tips: [
+          "Vývar je najlepší liek na podporu imunity.",
+          "Teplé tekutiny pomáhajú telu regenerovať.",
+          "Vitamín C + zinok = silnejšia imunita."
+        ]
+      }
+    };
+
+    // Theme selection function - ensures no repetition and phase relevance
+    const selectThemeForPhase = (subphaseKey: string, previousTheme: string | null): string => {
+      const phaseThemeMapping: Record<string, string[]> = {
+        "menstrual": ["plet", "travenie", "energia", "imunita"],
+        "follicular": ["plet", "vlasy", "energia", "imunita"],
+        "ovulation": ["plet", "zavodnenie", "imunita", "vlasy"],
+        "lutealEarly": ["travenie", "vlasy", "nalada", "energia"],
+        "lutealMid": ["spanok", "nalada", "zavodnenie", "travenie"],
+        "lutealLate": ["pms", "plet", "zavodnenie", "nalada"]
+      };
+
+      // Map subphase to main phase for theme selection
+      let mainPhase = "menstrual";
+      if (subphaseKey.includes("luteal")) mainPhase = subphaseKey.replace("luteal", "luteal");
+      else if (subphaseKey.includes("follicular")) mainPhase = "follicular";
+      else if (subphaseKey.includes("menstrual")) mainPhase = "menstrual";
+      else if (subphaseKey === "ovulation") mainPhase = "ovulation";
+
+      const availableThemes = phaseThemeMapping[mainPhase] || ["plet", "energia"];
+      
+      // Remove previous theme to avoid repetition
+      const filteredThemes = previousTheme 
+        ? availableThemes.filter(t => t !== previousTheme)
+        : availableThemes;
+      
+      // Select based on day for consistent rotation
+      return filteredThemes[day % filteredThemes.length];
+    };
+
     // MASTER TEMPLATES - UPDATED with new content and softer language
     const masterTemplates: Record<string, any> = {
       'menstrual-early': {
@@ -429,6 +570,7 @@ serve(async (req) => {
           foods: ["vajcia", "tofu", "cícer", "šošovica", "hovädzie mäso", "jahody", "pomaranč", "kiwi", 
                   "granátové jablko", "špenát", "kel", "brokolica", "červená repa", "losos", "sardinky", 
                   "chia", "ľan", "kurkuma", "zázvor", "vývary", "polievky", "ovsená kaša", "quinoa"],
+          habits: ["teplé jedlá", "menšie porcie, pravidelné jedlá", "železo + vitamín C spolu", "obmedziť kofeín", "hydratácia: teplé nápoje, vývary"],
           tip: "Dopraj si kombinovať železo s vitamínom C pre lepšiu vstrebateľnosť. Teplé jedlá ti uľahčia trávenie."
         },
         mind: {
@@ -472,6 +614,7 @@ serve(async (req) => {
           keyNutrients: ["Železo", "Proteíny", "Omega-3", "Vitamín C"],
           foods: ["červená šošovica", "fazuľa", "špenát", "rukola", "červená repa", "orechy", "semienka",
                   "teplé polievky", "vývary", "vajcia", "tofu", "losos", "banány", "jahody", "čučoriedky"],
+          habits: ["pokračovať v teplých jedlách", "pravidelné jedlá každé 3-4 hodiny", "kombinovať bielkoviny so sacharidmi", "hydratácia teplými nápojmi"],
           tip: "Pokračuj v teplých jedlách a nápojoch. Telo stále regeneruje a potrebuje šetrný prístup v stravovaní."
         },
         mind: {
@@ -515,6 +658,7 @@ serve(async (req) => {
           keyNutrients: ["Železo", "Vitamín C", "Proteíny", "Komplex B"],
           foods: ["listová zelenina", "strukoviny", "ovocie bohaté na vitamín C", "celozrnné produkty",
                   "zdravé tuky", "avokádo", "orechy", "vajcia", "losos", "tofu", "quinoa", "bataty"],
+          habits: ["pestrejšia strava", "väčšie porcie podľa chuti", "kombinovať železo s vitamínom C", "hydratácia s citrónovou vodou"],
           tip: "Telo sa vracia do normálu. Môžeš si začať dopriať pestrejšiu stravu a väčšie porcie, ak cítiš chuť."
         },
         mind: {
@@ -558,6 +702,7 @@ serve(async (req) => {
           keyNutrients: ["Proteíny", "Vitamín C", "Vláknina", "B-komplex"],
           foods: ["zelenina bohatá na vitamíny", "brokolica", "paprika", "rukola", "celozrnné obilniny",
                   "chudé bielkoviny", "kurča", "ryby", "vajcia", "ovocie", "jahody", "jablká", "citrusy"],
+          habits: ["pestrejšia strava", "pravidelné jedlá každé 3-4 hodiny", "viac zeleniny a ovocia", "hydratácia čistou vodou"],
           tip: "Telo sa vracia do normálu. Dopraj si pestrejšiu stravu a väčšie porcie, ak cítiš chuť do jedla."
         },
         mind: {
@@ -604,6 +749,7 @@ serve(async (req) => {
           foods: ["zelenina všetkých farieb", "brokolica", "mrkva", "paprika", "rajčiny", "celozrnné obilniny",
                   "ovos", "quinoa", "hnedá ryža", "chudé bielkoviny", "kuracie mäso", "ryby", "tofu", "strukoviny",
                   "ovocie", "jahody", "čučoriedky", "banány"],
+          habits: ["experimentovať s novými receptami", "bielkoviny v každom jedle", "pestré jedlá", "hydratácia pred a po cvičení"],
           tip: "Teraz môžeš experimentovať s novou stravou alebo receptami. Telo je silné a chutí ti to."
         },
         mind: {
@@ -649,6 +795,7 @@ serve(async (req) => {
           keyNutrients: ["Antioxidanty", "Omega-3", "Proteíny", "Vitamín C"],
           foods: ["zelenina bohatá na vlákninu", "brokolica", "kapusta", "špenát", "celozrnné produkty",
                   "zdravé tuky", "avokádo", "orechy", "olivový olej", "ovocie", "citrusy", "jahody"],
+          habits: ["nové recepty", "pestré jedlá", "bielkoviny + zdravé tuky", "hydratácia pred výkonom"],
           tip: "Teraz je skvelý čas na pestré jedlá a nové recepty. Telo je silné a má vysoké nároky na energiu."
         },
         mind: {
@@ -695,6 +842,7 @@ serve(async (req) => {
           foods: ["vajcia", "losos", "tofu", "cottage", "citrusy", "bobuľové", "kiwi",
                   "brokolica", "paprika", "rukola", "špenát", "ľan", "chia", "avokádo", 
                   "orechy", "olivový olej"],
+          habits: ["protizápalová strava", "bielkoviny v každom jedle", "hydratácia kokosovou vodou", "jedlá bohaté na omega-3"],
           tip: "Dopraj si bielkoviny do každého jedla a kombinuj ich s čerstvou zeleninou na podporu optimálneho výkonu."
         },
         mind: {
@@ -740,6 +888,7 @@ serve(async (req) => {
           keyNutrients: ["Magnézium", "B6", "Omega-3", "Komplex sacharidov"],
           foods: ["bataty", "ryža natural", "quinoa", "ovos", "banány", "tmavá čokoláda", "mandle",
                   "losos", "avokádo", "špenát", "brokolica", "kel", "vajcia", "cottage", "grécky jogurt"],
+          habits: ["pravidelné jedlá každé 3-4 hodiny", "kombinovať sacharidy s proteínmi", "viac magnézia", "teplé nápoje"],
           tip: "Dopraj si pravidelné jedlá každé 3-4 hodiny a kombinuj sacharidy s proteínmi pre stabilnú energiu."
         },
         mind: {
@@ -785,6 +934,7 @@ serve(async (req) => {
           keyNutrients: ["Magnézium", "Vláknina", "Probiótiká", "Komplex B"],
           foods: ["kvások", "kefír", "grécky jogurt", "banány", "ovsená kaša", "špenát", "kel",
                   "bataty", "quinoa", "ľan", "chia", "tmavá čokoláda", "mandle", "vlašské orechy"],
+          habits: ["menšie porcie", "jesť pomaly", "vyhýbať sa ťažkým jedlám večer", "teplé jedlá", "probiotiká denne"],
           tip: "Dopraj si menšie porcie, jedz pomaly a vyvaruj sa ťažkým jedlám večer. Teplé jedlá ti uľahčia trávenie."
         },
         mind: {
@@ -830,6 +980,7 @@ serve(async (req) => {
           keyNutrients: ["Magnézium", "Omega-3", "Vitamín B6", "Komplex sacharidov"],
           foods: ["tmavá čokoláda", "banány", "ovsená kaša", "mandle", "vlašské orechy", "losos",
                   "avokádo", "špenát", "kel", "bataty", "quinoa", "vajcia", "cottage", "grécky jogurt"],
+          habits: ["menšie porcie", "obmedziť kofeín", "vyhýbať sa alkoholu", "teplé čaje", "pravidelná hydratácia"],
           tip: "Dopraj si menšie porcie, jedz pomaly a vyhýbaj sa nadmernému kofeínu a alkoholu, ktoré môžu zhoršiť PMS príznaky."
         },
         mind: {
@@ -958,11 +1109,18 @@ PREPOJENIE SEKCIÍ:
 - Ak v "Expectation" hovoríš o nízkej energii → v "Movement" odkazuj na tento kontext ("Vzhľadom na nízku energiu...")
 - Zabezpeč konzistenciu energie, hormónov a emócií naprieč sekciami
 
-FORMÁTOVANIE - BULLET POINTS:
-- Sekcia STRAVA: Každá veta komunikujúca novú informáciu = nová odrážka (začni každú "- ")
-  - Rozdeľ na 4-5 odrážok: (1) Potreby tela, (2) Konkrétne potraviny, (3) Živiny, (4) Praktický tip, (5) Doplnková informácia ak je
-  - Každá odrážka musí byť samostatná veta s vlastnou pointou
-  - Príklad: "- Tvoje telo potrebuje X.\n- Skús Y.\n- Dodajú ti Z.\n- Tip: kombinuj A s B."
+FORMÁTOVANIE STRAVA - 4 ODSEKY (NIE ODRÁŽKY):
+- STRAVA je v 4 odsekoch (oddelené prázdnymi riadkami), každý odsek = 1-2 vety
+- Odsek 1: Kontext + fyziologická potreba (napr. "Tvoje telo dnes reaguje na stúpajúci progesterón...")
+- Odsek 2: "Skús zaradiť:" + 6 konkrétnych potravín z foods (napr. "Skús zaradiť: losos, tekvicové semienka...")
+- Odsek 3: "Pomôžu ti..." + 4 benefity z keyNutrients (napr. "Pomôžu ti doplniť omega-3 na zníženie zápalu...")
+- Odsek 4: "Tip:" + 1 praktický návyk z habits (napr. "Tip: Doobeda si daj 1 PL tekvicových semienok...")
+- POUŽÍVAJ PRESNE tieto potraviny z master template, NIE iné!
+- POUŽÍVAJ PRESNE tieto živiny z master template, NIE iné!
+- Vyber PRÁVE 1 tému (mini-sekciu) denne z povoleného zoznamu pre danú fázu
+- NIKDY neopakuj tú istú tému dva dni po sebe
+
+FORMÁTOVANIE - BULLET POINTS (pre Movement):
   
 - Sekcia POHYB: Každá veta komunikujúca novú informáciu = nová odrážka (začni každú "- ")
   - Rozdeľ na 4-6 odrážok: (1) Kontext energie/tela, (2) Odporúčanie cvičenia, (3) Neome tip, (4) Kardio ak je, (5) Prechádzka, (6) Benefit prechádzky
@@ -1051,11 +1209,23 @@ Vytvor unikátny text, ktorý:
 - Parametry `body` a `emotional` použi LEN ako kontext, nevytváraj z nich plné vety
 - Používa VÝHRADNE správne slovenské slová a gramatiku (napr. "týchto", nie "ovih")
 
-STRAVA - REFERENCIA:
+STRAVA - REFERENCIA (NOVÝ FORMÁT - 4 ODSEKY):
 Potreby: ${template.nutrition.needs.join(', ')}
-Kľúčové živiny: ${template.nutrition.keyNutrients.join(', ')}
+Kľúčové živiny (vyber 4): ${template.nutrition.keyNutrients.join(', ')}
 Vyber 6 RÔZNYCH potravín z tohto zoznamu: ${template.nutrition.foods.join(', ')}
-Tip: ${template.nutrition.tip}
+Návyky (vyber 1): ${template.nutrition.habits.join(', ')}
+Tip kontext: ${template.nutrition.tip}
+
+FORMÁT VÝSTUPU PRE STRAVU (4 ODSEKY - NIE ODRÁŽKY):
+Príklad (ranná luteálna fáza - téma PLEŤ):
+
+Tvoje telo dnes reaguje na stúpajúci progesterón — trávenie sa mierne spomaľuje a pleť môže tvoriť viac mazu. Preto potrebuješ protizápalové živiny, zinok a dostatok vlákniny, aby sa pleť udržala čo najčistejšia.
+
+Skús zaradiť: losos, tekvicové semienka, bataty, rukolu, čučoriedky a kefír.
+
+Pomôžu ti doplniť omega-3 na zníženie zápalu, zinok na zníženie tvorby mazu, vlákninu na detox estrogénu a probiotiká na vyrovnanie črevnej mikrobioty, ktorá priamo ovplyvňuje pleť.
+
+Tip: Doobeda si daj 1 PL tekvicových semienok — zinok ti pomôže znížiť mastenie pleti aj tvorbu drobných vyrážok.
 
 MYSEĽ - REFERENCIA:
 Praktická myšlienka (použi presne túto): ${template.mind.practicalThoughts[thoughtIndex]}
@@ -1087,12 +1257,14 @@ Príklad výstupu:
 PRÍKLAD VÝSTUPU:
 expectation: "V týchto dňoch by si mala cítiť nižšiu energiu a rýchlejšie vyčerpanie, pretože estrogén aj progesterón sú nízko."
 
-nutrition (4-5 odrážok, každá veta = nová odrážka):
-- Tvoje telo teraz potrebuje znížiť zápal, doplniť železo a podporiť trávenie teplými jedlami.
-- Skús kombinovať vajcia, špenát, jahody, losos, quinoa a kurkumu.
-- Tieto potraviny dodajú železo, vitamín C a omega-3 mastné kyseliny.
-- Tip: Kombinuj železo s vitamínom C pre lepšiu vstrebateľnosť, napríklad špenát s jahodami.
-- Teplé jedlá, ako vývary alebo polievky, uľahčujú trávenie a pomáhajú stabilizovať hladinu cukru v krvi.
+nutrition (4 odseky - NIE odrážky):
+Tvoje telo teraz potrebuje znížiť zápal, doplniť železo a podporiť trávenie teplými jedlami.
+
+Skús kombinovať vajcia, špenát, jahody, losos, quinoa a kurkumu.
+
+Tieto potraviny dodajú železo na doplnenie strát krvi, vitamín C na lepšiu vstrebateľnosť železa, omega-3 na zníženie zápalu a antioxidanty na ochranu buniek.
+
+Tip: Kombinuj železo s vitamínom C pre lepšiu vstrebateľnosť — napríklad špenát s jahodami v rannom smoothie.
 
 mind (1-2 odseky):
 "Dnes si dovoľ urobiť menej. Aj ticho a oddych sú súčasť regenerácie."
@@ -1132,7 +1304,7 @@ movement (4-6 odrážok, každá veta = nová odrážka):
                 },
                 nutrition: {
                   type: 'string',
-                  description: 'Strava ako 4-5 odrážok (začni každú "- "). KAŽDÁ VETA = NOVÁ ODRÁŽKA. SOFT jazyk: "Dopraj si...". Prepoj prvú odrážku s expectation. Rozdeľ informácie: (1) potreby tela, (2) konkrétne potraviny, (3) živiny, (4) praktický tip, (5) doplnková info. Každá odrážka má jednu samostatnú pointu. Čistý text bez markdown.'
+                  description: 'Strava ako 4 ODSEKY (oddelené prázdnymi riadkami \\n\\n), NIE odrážky. Odsek 1: Kontext + fyziologická potreba (1-2 vety). Odsek 2: "Skús zaradiť:" + 6 konkrétnych potravín. Odsek 3: "Pomôžu ti..." + 4 benefity živín. Odsek 4: "Tip:" + 1 praktický návyk. SOFT jazyk: "môžeš skúsiť", "dopraj si". Prepoj s expectation. Použi PRESNE potraviny a živiny z master template. Čistý text bez markdown.'
                 },
                 mind: {
                   type: 'string',
