@@ -76,14 +76,13 @@ export function DailyPlanView({ currentDay, currentPhase }: DailyPlanViewProps) 
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <ul className="text-sm space-y-2 leading-relaxed text-foreground/90 list-none">
-                {parseBulletPoints(tips.nutrition).map((item, i) => (
-                  <li key={i} className="flex gap-2">
-                    <span className="text-rose-400 mt-1">•</span>
-                    <span>{item}</span>
-                  </li>
+              <div className="text-sm space-y-3 leading-relaxed text-foreground/90">
+                {tips.nutrition.split('\n\n').map((para, i) => (
+                  <p key={i}>
+                    {para}
+                  </p>
                 ))}
-              </ul>
+              </div>
             </CardContent>
           </Card>
         )}
