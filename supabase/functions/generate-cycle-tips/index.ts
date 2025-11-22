@@ -523,7 +523,7 @@ serve(async (req) => {
     };
 
     // Theme selection function - ensures no repetition and phase relevance
-    const selectThemeForPhase = (subphaseKey: string, previousTheme: string | null): string => {
+    const selectThemeForPhase = (day: number, subphaseKey: string, previousTheme: string | null): string => {
       const phaseThemeMapping: Record<string, string[]> = {
         "menstrual": ["plet", "travenie", "energia", "imunita"],
         "follicular": ["plet", "vlasy", "energia", "imunita"],
@@ -1071,7 +1071,7 @@ NIKDY NEPOUŽÍVAJ:
 - NIKDY nepridávaj vlastné subjektívne frázy ako "Dobrou správou je", "Skvelou správou je", "Dobrá vec je"
 - NIKDY nepoužívaj imperatívne frázy ako "Vnímaj", "Počúvaj svoje telo", "Uvedom si"
 - NIKDY nemení terminológiu z master template (napr. "retencia tekutín" → "zadržiavanie tekutín")
-- NIKDY nevytvára celé vety z parametrov `body` a `emotional` - použi ich len ako kontext
+- NIKDY nevytvára celé vety z parametrov 'body' a 'emotional' - použi ich len ako kontext
 - NIKDY nepoužívaj gramaticky nesprávne tvary ako "ovih" (správne je "týchto"), "tich" (správne je "týchto"), alebo iné neexistujúce slovenské slová
 - NIKDY nemení správne slovenské slová z template na nesprávne formy
 
@@ -1206,7 +1206,7 @@ Vytvor unikátny text, ktorý:
 - Vychádza VÝHRADNE z expectationVariants v master template
 - NEPRIDÁVA vlastné subjektívne frázy ako "Dobrou správou je", "Vnímaj", "Skvelá vec"
 - NESMIE meniť terminológiu z template (napr. "retencia tekutín" zostáva "retencia tekutín")
-- Parametry `body` a `emotional` použi LEN ako kontext, nevytváraj z nich plné vety
+- Parametry 'body' a 'emotional' použi LEN ako kontext, nevytváraj z nich plné vety
 - Používa VÝHRADNE správne slovenské slová a gramatiku (napr. "týchto", nie "ovih")
 
 STRAVA - REFERENCIA (NOVÝ FORMÁT - 4 ODSEKY):
