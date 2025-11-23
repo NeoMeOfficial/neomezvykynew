@@ -1048,6 +1048,21 @@ serve(async (req) => {
     const selectedThemeKey = selectThemeForPhase(day, phaseContext.subphase || phaseContext.phase, null);
     const selectedTheme = nutritionThemes[selectedThemeKey];
 
+    // Generate nutrition text deterministically (Option A - no AI)
+    const generateNutritionText = (theme: typeof selectedTheme): string => {
+      // Select 4 nutrients and 6 foods from the theme
+      const nutrients = theme.nutrients.slice(0, 4);
+      const foods = theme.foods.slice(0, 6);
+      
+      // Paragraph 1: List nutrients
+      const nutrientsList = nutrients.join(', ');
+      
+      // Paragraph 2: List foods
+      const foodsList = foods.join(', ');
+      
+      return `Tvoje telo dnes potrebuje tieto živiny: ${nutrientsList}.\n\nSkús zaradiť: ${foodsList}.`;
+    };
+
     // System prompt - AI is FORMATTER with softer language and bullet points
     const systemPrompt = `Si expert na ženské zdravie a menštruačný cyklus. Tvorcom personalizovaných denných plánov pre ženy vo veku 25-45 rokov, väčšinou mamy.
 
@@ -1307,10 +1322,6 @@ movement (4-6 odrážok, každá veta = nová odrážka):
                   type: 'string',
                   description: 'Čo môžem dnes očakávať? Vytvor unikátny text pre tento konkrétny deň na základe relatívneho kontextu. Čistý text bez markdown.'
                 },
-                nutrition: {
-                  type: 'string',
-                  description: 'Strava ako 4 ODSEKY (oddelené prázdnymi riadkami \\n\\n), NIE odrážky. Odsek 1: Kontext + fyziologická potreba (1-2 vety). Odsek 2: "Skús zaradiť:" + 6 konkrétnych potravín. Odsek 3: "Pomôžu ti..." + 4 benefity živín. Odsek 4: "Tip:" + 1 praktický návyk. SOFT jazyk: "môžeš skúsiť", "dopraj si". Prepoj s expectation. Použi PRESNE potraviny a živiny z master template. Čistý text bez markdown.'
-                },
                 mind: {
                   type: 'string',
                   description: 'Myseľ ako 1-2 plynulé odseky s praktickou myšlienkou/habitom. Použi PRESNE text z practicalThoughts. Max 60 slov. Čistý text bez markdown.'
@@ -1320,7 +1331,7 @@ movement (4-6 odrážok, každá veta = nová odrážka):
                   description: 'Pohyb ako 4-6 odrážok (začni každú "- "). KAŽDÁ VETA = NOVÁ ODRÁŽKA. SOFT jazyk: "by si mala pociťovať", "vyskúšaj si dopriať". Prepoj prvú odrážku s expectation. Rozdeľ na samostatné odrážky: (1) kontext energie/tela, (2) odporúčanie cvičenia, (3) Neome tip, (4) kardio ak je, (5) prechádzka, (6) benefit prechádzky. Každá odrážka má jednu samostatnú pointu. Čistý text bez markdown.'
                 }
               },
-              required: ['expectation', 'nutrition', 'mind', 'movement']
+              required: ['expectation', 'mind', 'movement']
             }
           }
         }],
@@ -1343,6 +1354,9 @@ movement (4-6 odrážok, každá veta = nová odrážka):
     }
 
     const generatedContent = JSON.parse(toolCall.function.arguments);
+    
+    // Add deterministically generated nutrition text
+    generatedContent.nutrition = generateNutritionText(selectedTheme);
 
     console.log(`✨ Generated content for day ${day}:`, {
       expectation: generatedContent.expectation.substring(0, 50) + '...',
