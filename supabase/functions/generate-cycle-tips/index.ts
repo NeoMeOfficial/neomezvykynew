@@ -1044,6 +1044,10 @@ serve(async (req) => {
     const expectationVariantIndex = (phaseContext.dayWithinSubphase - phaseContext.subfazaStart) % template.expectationVariants.length;
     const selectedExpectation = template.expectationVariants[expectationVariantIndex];
 
+    // Select nutrition theme for the day
+    const selectedThemeKey = selectThemeForPhase(day, phaseContext.subphase || phaseContext.phase, null);
+    const selectedTheme = nutritionThemes[selectedThemeKey];
+
     // System prompt - AI is FORMATTER with softer language and bullet points
     const systemPrompt = `Si expert na ženské zdravie a menštruačný cyklus. Tvorcom personalizovaných denných plánov pre ženy vo veku 25-45 rokov, väčšinou mamy.
 
@@ -1210,22 +1214,23 @@ Vytvor unikátny text, ktorý:
 - Používa VÝHRADNE správne slovenské slová a gramatiku (napr. "týchto", nie "ovih")
 
 STRAVA - REFERENCIA (NOVÝ FORMÁT - 4 ODSEKY):
-Potreby: ${template.nutrition.needs.join(', ')}
-Kľúčové živiny (vyber 4): ${template.nutrition.keyNutrients.join(', ')}
-Vyber 6 RÔZNYCH potravín z tohto zoznamu: ${template.nutrition.foods.join(', ')}
-Návyky (vyber 1): ${template.nutrition.habits.join(', ')}
-Tip kontext: ${template.nutrition.tip}
+TÉMA DŇA: ${selectedTheme.emoji} ${selectedTheme.name}
+Účel témy: ${selectedTheme.purpose}
+Potreby fázy: ${template.nutrition.needs.join(', ')}
+Kľúčové živiny témy: ${selectedTheme.nutrients.join(', ')}
+Potraviny pre túto tému: ${selectedTheme.foods.join(', ')}
+Tip na používanie: ${selectedTheme.tips[0]}
 
 FORMÁT VÝSTUPU PRE STRAVU (4 ODSEKY - NIE ODRÁŽKY):
-Príklad (ranná luteálna fáza - téma PLEŤ):
+Príklad (${selectedTheme.emoji} ${selectedTheme.name}):
 
-Tvoje telo dnes reaguje na stúpajúci progesterón — trávenie sa mierne spomaľuje a pleť môže tvoriť viac mazu. Preto potrebuješ protizápalové živiny, zinok a dostatok vlákniny, aby sa pleť udržala čo najčistejšia.
+Tvoje telo dnes reaguje na ${template.expectationVariants[0].body} — ${selectedTheme.purpose}. Preto potrebuješ ${selectedTheme.nutrients.slice(0, 2).join(' a ')}.
 
-Skús zaradiť: losos, tekvicové semienka, bataty, rukolu, čučoriedky a kefír.
+Skús zaradiť: ${selectedTheme.foods.slice(0, 6).join(', ')}.
 
-Pomôžu ti doplniť omega-3 na zníženie zápalu, zinok na zníženie tvorby mazu, vlákninu na detox estrogénu a probiotiká na vyrovnanie črevnej mikrobioty, ktorá priamo ovplyvňuje pleť.
+Pomôžu ti doplniť živiny potrebné pre ${selectedTheme.name.toLowerCase()}: ${selectedTheme.nutrients.join(', ')}.
 
-Tip: Doobeda si daj 1 PL tekvicových semienok — zinok ti pomôže znížiť mastenie pleti aj tvorbu drobných vyrážok.
+Tip: ${selectedTheme.tips[0]}
 
 MYSEĽ - REFERENCIA:
 Praktická myšlienka (použi presne túto): ${template.mind.practicalThoughts[thoughtIndex]}
