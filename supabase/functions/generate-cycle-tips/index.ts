@@ -1201,27 +1201,19 @@ serve(async (req) => {
     const selectedThemeKey = selectThemeForPhase(day, phaseContext.subphase || phaseContext.phase, null);
     const selectedTheme = nutritionThemes[selectedThemeKey];
 
-    // Generate nutrition text deterministically with 4 paragraphs
+    // Generate nutrition text with 2 bullet points
     const generateNutritionText = (theme: typeof selectedTheme): string => {
-      // Paragraph 1: Context and physiological need
-      const intro = theme.description;
-      
-      // Paragraph 2: List 4 nutrients with explanations
+      // Bullet 1: 4 nutrients with scientific explanations
       const nutrientsList = theme.nutrients
-        .map((n: any) => `${n.name} (${n.explanation})`)
+        .map((n: any) => `${n.name} - ${n.explanation}`)
         .join(', ');
-      const nutrients = `Tvoje telo dnes potrebuje: ${nutrientsList}.`;
       
-      // Paragraph 3: List 6 foods with explanations
+      // Bullet 2: 6 foods with nutrient content
       const foodsList = theme.foods
-        .map((f: any) => `${f.name} (${f.explanation})`)
+        .map((f: any) => `${f.name} - ${f.explanation}`)
         .join(', ');
-      const foods = `Skús zaradiť: ${foodsList}.`;
       
-      // Paragraph 4: Random tip from theme
-      const tip = theme.tips[Math.floor(Math.random() * theme.tips.length)];
-      
-      return `${intro}\n\n${nutrients}\n\n${foods}\n\n💡 Tip: ${tip}`;
+      return `• Tvoje telo dnes potrebuje: ${nutrientsList}.\n\n• Skús zaradiť: ${foodsList}.`;
     };
 
     // System prompt - AI is FORMATTER with softer language and bullet points
