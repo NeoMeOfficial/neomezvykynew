@@ -1379,15 +1379,7 @@ serve(async (req) => {
 
     // Select nutrition theme for the day
     const selectedThemeKey = selectThemeForPhase(day, phaseContext.subphase || phaseContext.phase, null);
-    console.log(`🎯 Selected theme key: ${selectedThemeKey}`);
     const selectedTheme = nutritionThemes[selectedThemeKey];
-    console.log(`📦 Selected theme:`, { 
-      name: selectedTheme?.name, 
-      hasNutrients: !!selectedTheme?.nutrients, 
-      hasFoodPool: !!selectedTheme?.foodPool,
-      nutrientsLength: selectedTheme?.nutrients?.length,
-      foodPoolLength: selectedTheme?.foodPool?.length
-    });
 
     // Generate nutrition text with phase-specific explanations and random food selection
     const generateNutritionText = (theme: typeof selectedTheme, currentPhase: string): string => {
