@@ -410,268 +410,448 @@ serve(async (req) => {
 
     const selectedContextDescription = getContextDescription(phaseContext);
 
-    // NUTRITION THEMES - 9 verified themes with scientific backing
+    // NUTRITION THEMES - 9 verified themes with phase-specific explanations and food pools
     const nutritionThemes: Record<string, any> = {
       plet: {
         name: "Pleť",
         emoji: "🔮",
-        description: "Tvoja pleť je citlivá na hormonálne výkyvy - podpor ju správnymi živinami.",
         phases: ["menstrual", "follicular", "lutealEarly", "lutealLate"],
         nutrients: [
-          { name: "Zinok", explanation: "reguluje tvorbu mazu a znižuje zápaly" },
-          { name: "Omega-3", explanation: "protizápalové mastné kyseliny pre hydratáciu" },
-          { name: "Vitamín E", explanation: "antioxidant chrániacich bunky pred poškodením" },
-          { name: "Antioxidanty", explanation: "neutralizujú voľné radikály a spomaľujú starnutie" }
+          { 
+            name: "Zinok", 
+            explanations: {
+              menstrual: "reguluje tvorbu mazu a znižuje zápalové akné",
+              follicular: "podporuje hojenie a regeneráciu pokožky",
+              ovulation: "vyvažuje produkciu mazu pri zvýšenom estrogéne",
+              luteal: "znižuje zápalové procesy a produkciu kožného mazu"
+            }
+          },
+          { 
+            name: "Omega-3", 
+            explanations: {
+              menstrual: "protizápalové účinky zmierňujú začervenanie a podráždenie",
+              follicular: "hydratujú pokožku zvnútra a dodávajú jej pružnosť",
+              ovulation: "udržujú pokožku jemnú a vláčnu",
+              luteal: "znižujú zápal a pomáhajú predchádzať akné"
+            }
+          },
+          { 
+            name: "Vitamín E", 
+            explanations: {
+              menstrual: "antioxidant chrániaci citlivú pokožku",
+              follicular: "podporuje regeneráciu a obnovu buniek",
+              ovulation: "chráni pokožku pred oxidačným stresom",
+              luteal: "zmierňuje poškodenie voľnými radikálmi"
+            }
+          },
+          { 
+            name: "Antioxidanty", 
+            explanations: {
+              menstrual: "neutralizujú voľné radikály a podporujú hojenie",
+              follicular: "chránia kolagén a elastín pre pevnú pokožku",
+              ovulation: "spomaľujú starnutie a udržujú mladistvý vzhľad",
+              luteal: "bojujú proti oxidačnému stresu pred menštruáciou"
+            }
+          }
         ],
-        foods: [
-          { name: "Losos", explanation: "bohatý na omega-3 a vitamín E" },
-          { name: "Chia semienka", explanation: "obsahujú omega-3 a antioxidanty" },
-          { name: "Brokolica", explanation: "zdroj vitamínu C a zinku" },
-          { name: "Čučoriedky", explanation: "vysoký obsah antioxidantov" },
-          { name: "Kiwi", explanation: "vitamín C a E pre kolagén" },
-          { name: "Tekvicové semienka", explanation: "zinok a vitamín E" }
+        foodPool: [
+          "losos", "chia semienka", "brokolica", "čučoriedky", "kiwi", 
+          "tekvicové semienka", "avokádo", "mandle", "paradajky", 
+          "špenát", "dýňa hokkaido", "ľanové semienka", "vlašské orechy", "jahody"
         ],
-        tips: [
-          "Hydratácia je kľúč - minimálne 2L vody denne.",
-          "Menej cukru = menej zápalov = čistejšia pleť.",
-          "Antioxidanty z potravín sú účinnejšie ako doplnky."
-        ],
-        sources: [
-          "https://pubmed.ncbi.nlm.nih.gov/24553997/",
-          "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7146365/"
-        ]
+        sources: ["https://pubmed.ncbi.nlm.nih.gov/24553997/"]
       },
       vlasy: {
         name: "Vlasy",
         emoji: "💇‍♀️",
-        description: "Zdravé vlasy potrebujú proteíny, zdravé tuky a stopové prvky.",
         phases: ["follicular", "lutealEarly", "lutealLate"],
         nutrients: [
-          { name: "Proteíny", explanation: "stavebné látky vlasov (keratín)" },
-          { name: "Omega-3", explanation: "živia vlasové folikuly a dodávajú lesk" },
-          { name: "Zinok", explanation: "podporuje rast a zabraňuje vypadávaniu" },
-          { name: "Biotín (B7)", explanation: "potrebný pre tvorbu keratínu" }
+          { 
+            name: "Proteíny", 
+            explanations: {
+              menstrual: "stavebné látky pre keratín - základ vlasov",
+              follicular: "podporujú rast a hustotu vlasov pri zvýšenom estrogéne",
+              ovulation: "posilňujú štruktúru vlasu a predchádzajú lámavosti",
+              luteal: "udržujú silu a pevnosť vlasov"
+            }
+          },
+          { 
+            name: "Omega-3", 
+            explanations: {
+              menstrual: "živia vlasové folikuly a zmierňujú suché vlasy",
+              follicular: "dodávajú vlasom prirodzený lesk",
+              ovulation: "hydratujú pokožku hlavy a predchádzajú lupinám",
+              luteal: "podporujú zdravú pokožku hlavy"
+            }
+          },
+          { 
+            name: "Zinok", 
+            explanations: {
+              menstrual: "podporuje rast vlasov a obmedzuje ich vypadávanie",
+              follicular: "posilňuje vlasové folikuly",
+              ovulation: "vyvažuje produkciu mazu na pokožke hlavy",
+              luteal: "regeneruje vlasové korienky a zabraňuje slabnutiu"
+            }
+          },
+          { 
+            name: "Biotín (B7)", 
+            explanations: {
+              menstrual: "potrebný pre tvorbu keratínu - stavebnej látky vlasov",
+              follicular: "podporuje rast silných vlasov",
+              ovulation: "zvyšuje objem a hustotu vlasov",
+              luteal: "predchádza lámavosti a štiepeniu končekov"
+            }
+          }
         ],
-        foods: [
-          { name: "Vajcia", explanation: "proteíny a biotín" },
-          { name: "Losos", explanation: "omega-3 a vitamín D" },
-          { name: "Šošovica", explanation: "rastlinné proteíny a železo" },
-          { name: "Orechy", explanation: "biotín a vitamín E" },
-          { name: "Tekvicové semienka", explanation: "zinok a železo" },
-          { name: "Bataty", explanation: "beta-karotén pre zdravé folikuly" }
+        foodPool: [
+          "vajcia", "losos", "šošovica", "vlašské orechy", "tekvicové semienka", 
+          "bataty", "špenát", "quinoa", "kuracie mäso", "греcky jogurt", 
+          "slnečnicové semienka", "mandle", "tofu", "cícer"
         ],
-        tips: [
-          "Proteíny pri každom jedle podporujú rast vlasov.",
-          "Omega-3 dodávajú vlasom prirodzený lesk.",
-          "Zinok pomáha pri regenerácii vlasových folikulov."
-        ],
-        sources: [
-          "https://pubmed.ncbi.nlm.nih.gov/28925637/",
-          "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5582478/"
-        ]
+        sources: ["https://pubmed.ncbi.nlm.nih.gov/28925637/"]
       },
       travenie: {
         name: "Trávenie",
         emoji: "🌿",
-        description: "Hormonálne zmeny ovplyvňujú črevá - podpor ich vlákninou a probiotickými potravinami.",
         phases: ["menstrual", "lutealEarly", "lutealMid", "lutealLate"],
         nutrients: [
-          { name: "Vláknina", explanation: "reguluje vyprázdňovanie a podporuje črevnú mikrobiotu" },
-          { name: "Probiotiká", explanation: "živé baktérie pre zdravé črevá" },
-          { name: "Magnézium", explanation: "uvoľňuje črevné svaly a zmierňuje kŕče" },
-          { name: "Vitamín B-komplex", explanation: "podporuje trávenie a absorpciu živín" }
+          { 
+            name: "Vláknina", 
+            explanations: {
+              menstrual: "reguluje vyprázdňovanie a zmierňuje kŕče",
+              follicular: "podporuje zdravú črevnú mikrobiotu",
+              ovulation: "pomáha udržať pravidelné trávenie",
+              luteal: "predchádza zápche a nafukovaniu pred menštruáciou"
+            }
+          },
+          { 
+            name: "Probiotiká", 
+            explanations: {
+              menstrual: "živé baktérie pre zdravé črevá počas citlivého obdobia",
+              follicular: "posilňujú črevnú mikrobiotu a imunitu",
+              ovulation: "udržujú rovnováhu črevných baktérií",
+              luteal: "znižujú nafukovanie a podporujú trávenie"
+            }
+          },
+          { 
+            name: "Magnézium", 
+            explanations: {
+              menstrual: "uvoľňuje črevné svaly a zmierňuje menštruačné kŕče",
+              follicular: "podporuje peristaltiku črevného traktu",
+              ovulation: "pomáha s pravidelným vyprázdňovaním",
+              luteal: "znižuje napätie črevných svalov a nafukovanie"
+            }
+          },
+          { 
+            name: "Vitamín B-komplex", 
+            explanations: {
+              menstrual: "podporuje absorpciu živín pri citlivom trávení",
+              follicular: "zlepšuje metabolizmus a energiu z jedla",
+              ovulation: "pomáha telu efektívne využívať živiny",
+              luteal: "reguluje tvorbu energie a podporuje trávenie tukov"
+            }
+          }
         ],
-        foods: [
-          { name: "Kefír", explanation: "probiotiká a vápnik" },
-          { name: "Prírodný jogurt", explanation: "probiotiká a proteíny" },
-          { name: "Čučoriedky", explanation: "vláknina a antioxidanty" },
-          { name: "Ovsené vločky", explanation: "rozpustná vláknina" },
-          { name: "Bataty", explanation: "vláknina a magnézium" },
-          { name: "Zázvor", explanation: "podporuje trávenie a znižuje nafukovanie" }
+        foodPool: [
+          "kefír", "prírodný jogurt", "čučoriedky", "ovsené vločky", "bataty", 
+          "zázvor", "kysnutá kapusta", "banány", "ľanové semienka", "jablká", 
+          "mrkva", "pór", "špenát", "tekvica", "maliny"
         ],
-        tips: [
-          "Fermentované potraviny denne podporia črevnú mikrobiotu.",
-          "Teplé jedlá sú šetrnejšie k citlivému tráveniu.",
-          "Hydratácia + vláknina = zdravé vyprázdňovanie."
-        ],
-        sources: [
-          "https://pubmed.ncbi.nlm.nih.gov/31335243/",
-          "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6406667/"
-        ]
+        sources: ["https://pubmed.ncbi.nlm.nih.gov/31335243/"]
       },
       energia: {
         name: "Energia",
         emoji: "⚡",
-        description: "Nízke hladiny estrogénu a progesterónu môžu spôsobiť únavu - doplň železo a B-vitamíny.",
         phases: ["menstrual", "lutealLate", "follicular"],
         nutrients: [
-          { name: "Železo", explanation: "nesie kyslík v krvi, kľúčové po krvácani" },
-          { name: "Proteíny", explanation: "stabilizujú hladinu cukru a poskytujú dlhodobú energiu" },
-          { name: "Komplexné sacharidy", explanation: "pomalé uvoľňovanie glukózy pre stabilnú energiu" },
-          { name: "B-vitamíny", explanation: "kľúčové pre tvorbu energie v bunkách" }
+          { 
+            name: "Železo", 
+            explanations: {
+              menstrual: "nesie kyslík v krvi, kľúčové počas straty krvi",
+              follicular: "doplní zásoby po menštruácii a vracia energiu",
+              ovulation: "udržuje vysokú hladinu energie",
+              luteal: "predchádza únave pred menštruáciou"
+            }
+          },
+          { 
+            name: "Proteíny", 
+            explanations: {
+              menstrual: "stabilizujú hladinu cukru a dodávajú dlhodobú energiu",
+              follicular: "podporujú regeneráciu a rast tkanív",
+              ovulation: "udržujú stabilnú energiu počas aktívneho obdobia",
+              luteal: "predchádzajú energetickým prepadom"
+            }
+          },
+          { 
+            name: "Komplexné sacharidy", 
+            explanations: {
+              menstrual: "pomalé uvoľňovanie energie bez výkyvov nálady",
+              follicular: "zabezpečujú stabilnú energiu pre aktívne dni",
+              ovulation: "podporujú vytrvalosť a koncentráciu",
+              luteal: "regulujú chuť na sladké a udržujú stabilnú glykémiu"
+            }
+          },
+          { 
+            name: "B-vitamíny", 
+            explanations: {
+              menstrual: "kľúčové pre tvorbu energie v bunkách",
+              follicular: "zvyšujú energiu a vitalitu",
+              ovulation: "podporujú metabolizmus a produkciu energie",
+              luteal: "znižujú únavu a podporujú nervový systém"
+            }
+          }
         ],
-        foods: [
-          { name: "Quinoa", explanation: "komplexné sacharidy a železo" },
-          { name: "Vajcia", explanation: "proteíny a B12" },
-          { name: "Šošovica", explanation: "rastlinné železo a proteíny" },
-          { name: "Prírodný jogurt", explanation: "proteíny a B-vitamíny" },
-          { name: "Tofu", explanation: "rastlinné proteíny a železo" },
-          { name: "Špenát", explanation: "železo a foláty" }
+        foodPool: [
+          "quinoa", "vajcia", "šošovica", "prírodný jogurt", "tofu", "špenát", 
+          "hnedá ryža", "ovos", "kuracie mäso", "losos", "červená fazuľa", 
+          "čierne fazule", "bataty", "celozrnné pečivo", "kešu orechy"
         ],
-        tips: [
-          "Kombinácia proteínov + sacharidov = stabilná energia bez výkyvov.",
-          "Železo absorbuj spolu s vitamínom C (napr. špenát + citrón).",
-          "Časté menšie jedlá predchádzajú energetickým prepadom."
-        ],
-        sources: [
-          "https://pubmed.ncbi.nlm.nih.gov/23803882/",
-          "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3257725/"
-        ]
+        sources: ["https://pubmed.ncbi.nlm.nih.gov/23803882/"]
       },
       spanok: {
         name: "Spánok",
         emoji: "😴",
-        description: "Progesterón ovplyvňuje kvalitu spánku - podpor ho magnéziom a tryptofánom.",
         phases: ["lutealMid", "lutealLate"],
         nutrients: [
-          { name: "Magnézium", explanation: "uvoľňuje nervový systém a podporuje hlboký spánok" },
-          { name: "Tryptofán", explanation: "prekurzor melatonínu a serotonínumu" },
-          { name: "Vitamín B6", explanation: "premieňa tryptofán na serotonín" },
-          { name: "Vápnik", explanation: "pomáha mozgu využívať tryptofán" }
+          { 
+            name: "Magnézium", 
+            explanations: {
+              menstrual: "uvoľňuje napäté svaly a podporuje hlboký spánok",
+              follicular: "pomáha relaxovať nervový systém",
+              ovulation: "podporuje kvalitný odpočinok",
+              luteal: "zmierňuje nepokoj a podporuje hlboký spánok pred menštruáciou"
+            }
+          },
+          { 
+            name: "Tryptofán", 
+            explanations: {
+              menstrual: "prekurzor melatonínu pre kvalitný spánok",
+              follicular: "podporuje tvorbu serotonínumu pre dobrú náladu",
+              ovulation: "pomáha regulovať spánkový cyklus",
+              luteal: "zvyšuje hladinu serotonínumu a zlepšuje náladu aj spánok"
+            }
+          },
+          { 
+            name: "Vitamín B6", 
+            explanations: {
+              menstrual: "premieňa tryptofán na serotonín pre lepší spánok",
+              follicular: "podporuje reguláciu spánkového cyklu",
+              ovulation: "pomáha mozgu vytvárať melatonín",
+              luteal: "znižuje príznaky PMS a zlepšuje kvalitu spánku"
+            }
+          },
+          { 
+            name: "Vápnik", 
+            explanations: {
+              menstrual: "pomáha mozgu využívať tryptofán na tvorbu melatonínu",
+              follicular: "podporuje zdravý spánkový rytmus",
+              ovulation: "reguluje nervové signály pre kvalitný spánok",
+              luteal: "znižuje nepokoj a podporuje pokojný spánok"
+            }
+          }
         ],
-        foods: [
-          { name: "Banán", explanation: "magnézium a tryptofán" },
-          { name: "Ovos", explanation: "komplexné sacharidy podporujúce vstrebávanie tryptofánu" },
-          { name: "Cícer", explanation: "tryptofán a B6" },
-          { name: "Mandľové maslo", explanation: "magnézium a vápnik" },
-          { name: "Kešu orechy", explanation: "magnézium a tryptofán" },
-          { name: "Čerešne", explanation: "prirodzený melatonín" }
+        foodPool: [
+          "banány", "ovos", "cícer", "mandľové maslo", "kešu orechy", "čerešne", 
+          "kivi", "mlieko", "prírodný jogurt", "tvaroh", "kalkún", "kuracina", 
+          "tekvicové semienka", "slnečnicové semienka", "pistacie"
         ],
-        tips: [
-          "Teplý bylinkový čaj pred spaním podporí relaxáciu.",
-          "Magnézium večer pomáha uvoľniť svaly a myseľ.",
-          "Menej kofeínu po 14:00 = kvalitnejší spánok."
-        ],
-        sources: [
-          "https://pubmed.ncbi.nlm.nih.gov/23853635/",
-          "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3703169/"
-        ]
+        sources: ["https://pubmed.ncbi.nlm.nih.gov/23853635/"]
       },
       zavodnenie: {
         name: "Zadržiavanie vody",
         emoji: "💧",
-        description: "Progesterón môže spôsobiť zadržiavanie tekutín - doplň draslík a znížiť sodík.",
         phases: ["lutealMid", "lutealLate"],
         nutrients: [
-          { name: "Draslík", explanation: "vyvažuje sodík a pomáha vyplaviť prebytočné tekutiny" },
-          { name: "Horčík (Magnézium)", explanation: "znižuje zadržiavanie vody a nafukovanie" },
-          { name: "Vláknina", explanation: "podporuje pravidelné vyprázdňovanie a znižuje nafukovanie" },
-          { name: "Vitamín B6", explanation: "prirodzené diuretikum znižujúce zadržiavanie vody" }
+          { 
+            name: "Draslík", 
+            explanations: {
+              menstrual: "vyvažuje sodík a znižuje opuchy",
+              follicular: "podporuje vylučovanie prebytočných tekutín",
+              ovulation: "udržuje rovnováhu tekutín v tele",
+              luteal: "pomáha vyplaviť zadržané tekutiny pred menštruáciou"
+            }
+          },
+          { 
+            name: "Magnézium", 
+            explanations: {
+              menstrual: "znižuje nafukovanie a zadržiavanie vody",
+              follicular: "podporuje reguláciu tekutín",
+              ovulation: "pomáha predchádzať opuchom",
+              luteal: "výrazně znižuje zadržiavanie vody a nafukovanie"
+            }
+          },
+          { 
+            name: "Vláknina", 
+            explanations: {
+              menstrual: "podporuje vyprázdňovanie a znižuje nafukovanie",
+              follicular: "udržuje pravidelné trávenie",
+              ovulation: "pomáha predchádzať zápche",
+              luteal: "znižuje nafukovanie a pocit ťažkosti"
+            }
+          },
+          { 
+            name: "Vitamín B6", 
+            explanations: {
+              menstrual: "prirodzené diuretikum znižujúce zadržiavanie vody",
+              follicular: "podporuje metabolizmus tekutín",
+              ovulation: "pomáha regulovať vodný metabolizmus",
+              luteal: "účinne znižuje zadržiavanie vody a opuchy"
+            }
+          }
         ],
-        foods: [
-          { name: "Avokádo", explanation: "draslík a horčík" },
-          { name: "Banán", explanation: "draslík a B6" },
-          { name: "Uhorka", explanation: "hydratácia a draslík" },
-          { name: "Špargľa", explanation: "prirodzené diuretikum" },
-          { name: "Petržlen", explanation: "znižuje zadržiavanie vody" },
-          { name: "Citrón", explanation: "podporuje detoxikáciu a hydratáciu" }
+        foodPool: [
+          "avokádo", "banány", "uhorka", "špargľa", "petržlen", "citrón", 
+          "melón", "rajčiny", "špenát", "brokolica", "kel", "šalát", 
+          "zelené fazuľky", "cuketa", "celer"
         ],
-        tips: [
-          "Menej soli = menej zadržiavanej vody.",
-          "Paradoxne, viac vody ti pomôže vyplaviť prebytočné tekutiny.",
-          "Draslík z potravín je bezpečnejší ako doplnky."
-        ],
-        sources: [
-          "https://pubmed.ncbi.nlm.nih.gov/9861593/",
-          "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4446768/"
-        ]
+        sources: ["https://pubmed.ncbi.nlm.nih.gov/9861593/"]
       },
       nalada: {
         name: "Nálada & Stres",
         emoji: "💛",
-        description: "Výkyvy hormónov ovplyvňujú neurotransmitery - podpor tvorbu serotonínumu správnou stravou.",
         phases: ["lutealEarly", "lutealMid", "lutealLate", "menstrual"],
         nutrients: [
-          { name: "Omega-3", explanation: "znižujú zápaly a podporujú funkciu mozgu" },
-          { name: "Magnézium", explanation: "reguluje stres a nervový systém" },
-          { name: "B-vitamíny", explanation: "potrebné pre tvorbu serotonínumu a dopamínu" },
-          { name: "Tryptofán", explanation: "prekurzor serotonínumu (hormón šťastia)" }
+          { 
+            name: "Omega-3", 
+            explanations: {
+              menstrual: "znižujú zápaly a podporujú produkciu serotonínumu",
+              follicular: "podporujú funkciu mozgu a dobrú náladu",
+              ovulation: "udržujú mentálnu jasnosť a pozitívnu náladu",
+              luteal: "zmierňujú PMS nálady a podráždenie"
+            }
+          },
+          { 
+            name: "Magnézium", 
+            explanations: {
+              menstrual: "reguluje stresovú reakciu a uvoľňuje nervový systém",
+              follicular: "podporuje výrobu energie a vitality",
+              ovulation: "pomáha udržať emotívnu rovnováhu",
+              luteal: "znižuje úzkosť, podráždenie a napätie pred menštruáciou"
+            }
+          },
+          { 
+            name: "B-vitamíny", 
+            explanations: {
+              menstrual: "podporujú tvorbu serotonínumu a dopamínu",
+              follicular: "zvyšujú energiu a mentálnu jasnosť",
+              ovulation: "udržujú stabilnú náladu a koncentráciu",
+              luteal: "znižujú únavu, nepokoj a výkyvy nálady"
+            }
+          },
+          { 
+            name: "Tryptofán", 
+            explanations: {
+              menstrual: "prekurzor serotonínumu - hormónu šťastia",
+              follicular: "podporuje dobrú náladu a optimizmus",
+              ovulation: "udržuje pozitívnu náladu",
+              luteal: "zvyšuje hladinu serotonínumu a zmierňuje PMS nálady"
+            }
+          }
         ],
-        foods: [
-          { name: "Losos", explanation: "omega-3 a vitamín D" },
-          { name: "Vajcia", explanation: "tryptofán a B-vitamíny" },
-          { name: "Banán", explanation: "tryptofán a magnézium" },
-          { name: "Orechy", explanation: "omega-3 a magnézium" },
-          { name: "Špenát", explanation: "foláty a magnézium" },
-          { name: "Tmavá čokoláda (70%+)", explanation: "magnézium a antioxidanty" }
+        foodPool: [
+          "losos", "vajcia", "banány", "vlašské orechy", "špenát", "tmavá čokoláda 70%", 
+          "avokádo", "kešu orechy", "quinoa", "kalkún", "kuracina", "čučoriedky", 
+          "jahody", "mandle", "celozrnné pečivo"
         ],
-        tips: [
-          "Malé stabilné jedlá cez deň = stabilná nálada.",
-          "Omega-3 znižujú zápal aj príznaky depresie.",
-          "B6 podporuje premenu tryptofánu na serotonín."
-        ],
-        sources: [
-          "https://pubmed.ncbi.nlm.nih.gov/21525519/",
-          "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2908269/"
-        ]
+        sources: ["https://pubmed.ncbi.nlm.nih.gov/21525519/"]
       },
       pms: {
         name: "PMS Príznaky",
         emoji: "🔥",
-        description: "Pred menštruáciou estrogén klesá a progesterón vrcholí - zmierňuj PMS magnéziom a B6.",
         phases: ["lutealLate"],
         nutrients: [
-          { name: "Magnézium", explanation: "znižuje kŕče, nafukovanie a emocionálne výkyvy" },
-          { name: "Vitamín B6", explanation: "znižuje zadržiavanie vody a podporuje tvorbu serotonínumu" },
-          { name: "Vápnik", explanation: "znižuje úzkosť, kŕče a únavu" },
-          { name: "Omega-3", explanation: "protizápalové, znižujú bolesti a nálady" }
+          { 
+            name: "Magnézium", 
+            explanations: {
+              menstrual: "uvoľňuje kŕče a znižuje menštruačnú bolesť",
+              follicular: "podporuje relaxáciu svalov",
+              ovulation: "pomáha predchádzať napätiu",
+              luteal: "znižuje kŕče, nafukovanie, úzkosť a emocionálne výkyvy"
+            }
+          },
+          { 
+            name: "Vitamín B6", 
+            explanations: {
+              menstrual: "znižuje zadržiavanie vody a podporuje dobru náladu",
+              follicular: "podporuje metabolizmus hormónov",
+              ovulation: "udržuje hormonálnu rovnováhu",
+              luteal: "výrazne znižuje PMS príznaky - vodu, nálady a únavu"
+            }
+          },
+          { 
+            name: "Vápnik", 
+            explanations: {
+              menstrual: "znižuje kŕče a bolesti v bedernej oblasti",
+              follicular: "podporuje zdravie kostí",
+              ovulation: "pomáha predchádzať svalovým kŕčom",
+              luteal: "znižuje úzkosť, kŕče, únavu a premenštruačné príznaky"
+            }
+          },
+          { 
+            name: "Omega-3", 
+            explanations: {
+              menstrual: "protizápalové účinky zmierňujú menštruačné bolesti",
+              follicular: "podporujú zdravie buniek",
+              ovulation: "udržujú protizápalové procesy",
+              luteal: "znižujú bolesti, zápaly a výkyvy nálady pred menštruáciou"
+            }
+          }
         ],
-        foods: [
-          { name: "Šošovica", explanation: "magnézium a B-vitamíny" },
-          { name: "Bataty", explanation: "B6 a vláknina" },
-          { name: "Losos", explanation: "omega-3 a vitamín D" },
-          { name: "Tmavá čokoláda (70%+)", explanation: "magnézium a endorfíny" },
-          { name: "Mandľové mlieko", explanation: "vápnik a magnézium" },
-          { name: "Banán", explanation: "B6 a draslík" }
+        foodPool: [
+          "šošovica", "bataty", "losos", "tmavá čokoláda 70%", "mandľové mlieko", 
+          "banány", "brokolica", "špenát", "prírodný jogurt", "sardinky", 
+          "tekvicové semienka", "mandle", "avokádo", "tvaroh", "kefír"
         ],
-        tips: [
-          "Menej cukru a soli = menej PMS príznakov.",
-          "Magnézium denne (300-400mg) znižuje kŕče až o 50%.",
-          "Teplý harmanček upokoí telo aj myseľ."
-        ],
-        sources: [
-          "https://pubmed.ncbi.nlm.nih.gov/20216473/",
-          "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3208934/"
-        ]
+        sources: ["https://pubmed.ncbi.nlm.nih.gov/20216473/"]
       },
       imunita: {
         name: "Imunitný systém",
         emoji: "🛡",
-        description: "Počas menštruácie a ovulácie je telo zraniteľnejšie - posilni imunitu antioxidantmi.",
         phases: ["menstrual", "ovulation"],
         nutrients: [
-          { name: "Vitamín C", explanation: "posilňuje imunitné bunky a znižuje oxidačný stres" },
-          { name: "Zinok", explanation: "podporuje funkciu imunitných buniek" },
-          { name: "Vitamín D", explanation: "reguluje imunitnú odpoveď" },
-          { name: "Antioxidanty", explanation: "chránia bunky pred poškodením" }
+          { 
+            name: "Vitamín C", 
+            explanations: {
+              menstrual: "posilňuje imunitné bunky počas menštruácie",
+              follicular: "podporuje regeneráciu a obnovu tkanív",
+              ovulation: "chráni bunky pri zvýšenom metabolizme",
+              luteal: "znižuje oxidačný stres a podporuje imunitu"
+            }
+          },
+          { 
+            name: "Zinok", 
+            explanations: {
+              menstrual: "podporuje funkciu imunitných buniek počas citlivého obdobia",
+              follicular: "posilňuje imunitnú odpoveď",
+              ovulation: "udržuje silnú imunitu pri hormonálnom vrchole",
+              luteal: "pomáha predchádzať infekciám"
+            }
+          },
+          { 
+            name: "Vitamín D", 
+            explanations: {
+              menstrual: "reguluje imunitnú odpoveď a podporuje hojenie",
+              follicular: "posilňuje prirodzenú obranu tela",
+              ovulation: "udržuje silnú imunitu",
+              luteal: "podporuje imunitný systém pred menštruáciou"
+            }
+          },
+          { 
+            name: "Antioxidanty", 
+            explanations: {
+              menstrual: "chránia bunky pred poškodením počas menštruácie",
+              follicular: "podporujú regeneráciu a obnovu",
+              ovulation: "neutralizujú voľné radikály pri vysokej aktivite",
+              luteal: "znižujú oxidačný stres a podporujú imunitu"
+            }
+          }
         ],
-        foods: [
-          { name: "Citrusy", explanation: "vitamín C" },
-          { name: "Čučoriedky", explanation: "antioxidanty a vitamín C" },
-          { name: "Červená paprika", explanation: "najvyšší obsah vitamínu C" },
-          { name: "Zázvor", explanation: "protizápalové a imuno-podporné" },
-          { name: "Cesnak", explanation: "allicín s antibakteriálnymi účinkami" },
-          { name: "Brokolica", explanation: "vitamín C, zinok a antioxidanty" }
+        foodPool: [
+          "citrusy", "čučoriedky", "červená paprika", "zázvor", "cesnak", "brokolica", 
+          "jahody", "kivi", "špenát", "tekvicové semienka", "mandľe", "paradajky", 
+          "kel", "ružičkový kel", "zelený čaj"
         ],
-        tips: [
-          "Vývar zo zeleniny je ideálny na podporu imunity.",
-          "Vitamín C je najlepší z potravín, nie z doplnkov.",
-          "Teplé tekutiny pomáhajú telu regenerovať."
-        ],
-        sources: [
-          "https://pubmed.ncbi.nlm.nih.gov/29099763/",
-          "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5707683/"
-        ]
+        sources: ["https://pubmed.ncbi.nlm.nih.gov/29099763/"]
       }
     };
 
@@ -1201,19 +1381,26 @@ serve(async (req) => {
     const selectedThemeKey = selectThemeForPhase(day, phaseContext.subphase || phaseContext.phase, null);
     const selectedTheme = nutritionThemes[selectedThemeKey];
 
-    // Generate nutrition text with 2 bullet points
-    const generateNutritionText = (theme: typeof selectedTheme): string => {
-      // Bullet 1: 4 nutrients with scientific explanations
+    // Generate nutrition text with phase-specific explanations and random food selection
+    const generateNutritionText = (theme: typeof selectedTheme, currentPhase: string): string => {
+      // Determine the phase key for explanations (map subphase to main phase)
+      let phaseKey: 'menstrual' | 'follicular' | 'ovulation' | 'luteal' = 'menstrual';
+      if (currentPhase.includes('luteal')) phaseKey = 'luteal';
+      else if (currentPhase.includes('follicular')) phaseKey = 'follicular';
+      else if (currentPhase === 'ovulation') phaseKey = 'ovulation';
+      else if (currentPhase.includes('menstrual')) phaseKey = 'menstrual';
+      
+      // Bullet 1: 4 nutrients with phase-specific explanations
       const nutrientsList = theme.nutrients
-        .map((n: any) => `${n.name} - ${n.explanation}`)
+        .map((n: any) => `${n.name} - ${n.explanations[phaseKey] || n.explanations.menstrual}`)
         .join(', ');
       
-      // Bullet 2: 6 foods with nutrient content
-      const foodsList = theme.foods
-        .map((f: any) => `${f.name} - ${f.explanation}`)
-        .join(', ');
+      // Bullet 2: 6 random foods from the food pool
+      const shuffledFoods = [...theme.foodPool].sort(() => Math.random() - 0.5);
+      const selectedFoods = shuffledFoods.slice(0, 6);
+      const foodsList = selectedFoods.join(', ');
       
-      return `• Tvoje telo dnes potrebuje: ${nutrientsList}.\n\n• Skús zaradiť: ${foodsList}.`;
+      return `Tvoje telo dnes potrebuje extra dávku:\n- ${theme.nutrients.map((n: any) => `${n.name} - ${n.explanations[phaseKey] || n.explanations.menstrual}`).join('\n- ')}\n\nNájdeš ich v potravinách ako sú: ${foodsList}.`;
     };
 
     // System prompt - AI is FORMATTER with softer language and bullet points
@@ -1508,8 +1695,8 @@ movement (4-6 odrážok, každá veta = nová odrážka):
 
     const generatedContent = JSON.parse(toolCall.function.arguments);
     
-    // Add deterministically generated nutrition text
-    generatedContent.nutrition = generateNutritionText(selectedTheme);
+    // Add deterministically generated nutrition text with phase-specific explanations
+    generatedContent.nutrition = generateNutritionText(selectedTheme, phaseContext.subphase || phaseContext.phase);
 
     console.log(`✨ Generated content for day ${day}:`, {
       expectation: generatedContent.expectation.substring(0, 50) + '...',
