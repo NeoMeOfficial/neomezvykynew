@@ -1381,6 +1381,27 @@ serve(async (req) => {
     const selectedThemeKey = selectThemeForPhase(day, phaseContext.subphase || phaseContext.phase, null);
     const selectedTheme = nutritionThemes[selectedThemeKey];
 
+    // Deterministic shuffle using Fisher-Yates algorithm with day as seed
+    const seededShuffle = (array: string[], seed: number): string[] => {
+      const arr = [...array];
+      let currentIndex = arr.length;
+      
+      // Create seeded pseudo-random generator
+      const random = () => {
+        const x = Math.sin(seed++) * 10000;
+        return x - Math.floor(x);
+      };
+
+      // Fisher-Yates shuffle
+      while (currentIndex > 0) {
+        const randomIndex = Math.floor(random() * currentIndex);
+        currentIndex--;
+        [arr[currentIndex], arr[randomIndex]] = [arr[randomIndex], arr[currentIndex]];
+      }
+      
+      return arr;
+    };
+
     // Generate nutrition text with phase-specific explanations and random food selection
     const generateNutritionText = (theme: typeof selectedTheme, currentPhase: string): string => {
       // Determine the phase key for explanations (map subphase to main phase)
@@ -1395,8 +1416,8 @@ serve(async (req) => {
         .map((n: any) => `${n.name} - ${n.explanations[phaseKey] || n.explanations.menstrual}`)
         .join(', ');
       
-      // Bullet 2: 6 random foods from the food pool
-      const shuffledFoods = [...theme.foodPool].sort(() => Math.random() - 0.5);
+      // Bullet 2: 6 random foods from the food pool (deterministically shuffled by day)
+      const shuffledFoods = seededShuffle(theme.foodPool, day);
       const selectedFoods = shuffledFoods.slice(0, 6);
       const foodsList = selectedFoods.join(', ');
       
