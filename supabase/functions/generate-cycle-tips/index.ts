@@ -1379,7 +1379,15 @@ serve(async (req) => {
 
     // Select nutrition theme for the day
     const selectedThemeKey = selectThemeForPhase(day, phaseContext.subphase || phaseContext.phase, null);
+    console.log(`🎯 Selected theme key: ${selectedThemeKey}`);
     const selectedTheme = nutritionThemes[selectedThemeKey];
+    console.log(`📦 Selected theme:`, { 
+      name: selectedTheme?.name, 
+      hasNutrients: !!selectedTheme?.nutrients, 
+      hasFoodPool: !!selectedTheme?.foodPool,
+      nutrientsLength: selectedTheme?.nutrients?.length,
+      foodPoolLength: selectedTheme?.foodPool?.length
+    });
 
     // Generate nutrition text with phase-specific explanations and random food selection
     const generateNutritionText = (theme: typeof selectedTheme, currentPhase: string): string => {
@@ -1572,20 +1580,19 @@ STRAVA - REFERENCIA (NOVÝ FORMÁT - 4 ODSEKY):
 TÉMA DŇA: ${selectedTheme.emoji} ${selectedTheme.name}
 Účel témy: ${selectedTheme.purpose}
 Potreby fázy: ${template.nutrition.needs.join(', ')}
-Kľúčové živiny témy: ${selectedTheme.nutrients.join(', ')}
-Potraviny pre túto tému: ${selectedTheme.foods.join(', ')}
-Tip na používanie: ${selectedTheme.tips[0]}
+Kľúčové živiny témy: ${selectedTheme.nutrients.map(n => n.name).join(', ')}
+Potraviny pre túto tému: ${selectedTheme.foodPool.join(', ')}
 
-FORMÁT VÝSTUPU PRE STRAVU (4 ODSEKY - NIE ODRÁŽKY):
+FORMÁT VÝSTUPU PRE STRAVU (NOVÝ FORMÁT):
 Príklad (${selectedTheme.emoji} ${selectedTheme.name}):
 
-Tvoje telo dnes reaguje na ${template.expectationVariants[0].body} — ${selectedTheme.purpose}. Preto potrebuješ ${selectedTheme.nutrients.slice(0, 2).join(' a ')}.
+Tvoje telo dnes potrebuje extra dávku:
+- ${selectedTheme.nutrients[0].name} - ${selectedTheme.nutrients[0].explanations[phaseContext.phase]}
+- ${selectedTheme.nutrients[1].name} - ${selectedTheme.nutrients[1].explanations[phaseContext.phase]}
+- ${selectedTheme.nutrients[2].name} - ${selectedTheme.nutrients[2].explanations[phaseContext.phase]}
+- ${selectedTheme.nutrients[3].name} - ${selectedTheme.nutrients[3].explanations[phaseContext.phase]}
 
-Skús zaradiť: ${selectedTheme.foods.slice(0, 6).join(', ')}.
-
-Pomôžu ti doplniť živiny potrebné pre ${selectedTheme.name.toLowerCase()}: ${selectedTheme.nutrients.join(', ')}.
-
-Tip: ${selectedTheme.tips[0]}
+Nájdeš ich v potravinách ako sú: ${selectedTheme.foodPool.slice(0, 6).join(', ')}.
 
 MYSEĽ - REFERENCIA:
 Praktická myšlienka (použi presne túto): ${template.mind.practicalThoughts[thoughtIndex]}
