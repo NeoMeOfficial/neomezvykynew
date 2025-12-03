@@ -420,19 +420,19 @@ serve(async (req) => {
       // MENSTRUAL PHASE - krvotvorba, zápal, energia
       menstrual: {
         nutrients: [
-          "Železo", "Vitamín C", "Folát (B9)", "Vitamín B12",
-          "Omega-3", "Kurkumín", "Antioxidanty A, C, E", "Polyfenoly",
-          "Horčík", "Vitamín B6", "Vitamín B1 a B2", "Draslík", "Komplexné sacharidy", "Proteíny",
-          "Vláknina", "Probiotiká", "Enzýmy", "Zázvor"
+          "železo", "vitamín C", "folát (B9)", "vitamín B12",
+          "omega-3", "kurkumín", "antioxidanty A, C, E", "polyfenoly",
+          "horčík", "vitamín B6", "vitamín B1 a B2", "draslík", "komplexné sacharidy", "proteíny",
+          "vláknina", "probiotiká", "enzýmy", "zázvor"
         ],
         foods: [
-          "Šošovica", "Cícer", "Čierna fazuľa", "Vajcia", "Tofu",
-          "Hovädzie mäso", "Morčacie mäso", "Jahody", "Pomaranč", "Kiwi",
-          "Granátové jablko", "Červená paprika", "Špenát", "Kel", "Brokolica",
-          "Červená repa", "Losos", "Sardinky", "Chia semienka", "Ľanové semienka",
-          "Vlašské orechy", "Kurkuma", "Zázvor", "Polievky", "Vývary",
-          "Ovsená kaša", "Quinoa", "Hnedá ryža", "Bataty", "Teplý čaj",
-          "Kefír", "Jogurt"
+          "šošovica", "cícer", "čierna fazuľa", "vajcia", "tofu",
+          "hovädzie mäso", "morčacie mäso", "jahody", "pomaranč", "kiwi",
+          "granátové jablko", "červená paprika", "špenát", "kel", "brokolica",
+          "červená repa", "losos", "sardinky", "chia semienka", "ľanové semienka",
+          "vlašské orechy", "kurkuma", "zázvor", "polievky", "vývary",
+          "ovsená kaša", "quinoa", "hnedá ryža", "bataty", "teplý čaj",
+          "kefír", "jogurt"
         ],
         benefits: [
           "znížiš zápal a bolestivosť",
@@ -452,20 +452,20 @@ serve(async (req) => {
       // FOLLICULAR PHASE - energia, hormóny, jasná myseľ
       follicular: {
         nutrients: [
-          "Proteíny", "Omega-3", "Vláknina", "B-komplex",
-          "Zinok", "Vitamín C", "Vitamín E", "Železo",
-          "Horčík", "Selén", "Jód", "Kolagén",
-          "Antioxidanty", "Probiotika", "Komplexné sacharidy", "Zdravé tuky",
-          "Vitamín D", "Vitamín K"
+          "proteíny", "omega-3", "vláknina", "B-komplex",
+          "zinok", "vitamín C", "vitamín E", "železo",
+          "horčík", "selén", "jód", "kolagén",
+          "antioxidanty", "probiotika", "komplexné sacharidy", "zdravé tuky",
+          "vitamín D", "vitamín K"
         ],
         foods: [
-          "Vajcia", "Losos", "Kuracie mäso", "Tofu", "Quinoa",
-          "Brokolica", "Špenát", "Rukola", "Kel", "Mrkva",
-          "Paprika", "Rajčiny", "Avokádo", "Orechy", "Mandle",
-          "Vlašské orechy", "Ľanové semienka", "Chia semienka", "Tekvicové semienka", "Slnečnicové semienka",
-          "Jahody", "Čučoriedky", "Maliny", "Jablká", "Citrusy",
-          "Pomaranč", "Grapefruit", "Kiwi", "Banán", "Celozrnné pečivo",
-          "Hnedá ryža", "Ovsené vločky", "Fazuľa", "Šošovica", "Cícer"
+          "vajcia", "losos", "kuracie mäso", "tofu", "quinoa",
+          "brokolica", "špenát", "rukola", "kel", "mrkva",
+          "paprika", "rajčiny", "avokádo", "orechy", "mandle",
+          "vlašské orechy", "ľanové semienka", "chia semienka", "tekvicové semienka", "slnečnicové semienka",
+          "jahody", "čučoriedky", "maliny", "jablká", "citrusy",
+          "pomaranč", "grapefruit", "kiwi", "banán", "celozrnné pečivo",
+          "hnedá ryža", "ovsené vločky", "fazuľa", "šošovica", "cícer"
         ],
         benefits: [
           "podporíš rastúcu energiu a vitalitu",
@@ -485,20 +485,20 @@ serve(async (req) => {
       // OVULATION PHASE - hormonálna rovnováha, zápal, čistá energia
       ovulation: {
         nutrients: [
-          "Folát (B9)", "Vitamín D", "Zinok", "Selén",
-          "Omega-3", "Antioxidanty C, E, beta-karotén", "Polyfenoly",
-          "Horčík", "Vitamín B6", "Draslík",
-          "Sodík", "Vápnik", "Bielkoviny", "Vitamín E",
-          "Vitamín C", "Vláknina"
+          "folát (B9)", "vitamín D", "zinok", "selén",
+          "omega-3", "antioxidanty C, E, beta-karotén", "polyfenoly",
+          "horčík", "vitamín B6", "draslík",
+          "sodík", "vápnik", "bielkoviny", "vitamín E",
+          "vitamín C", "vláknina"
         ],
         foods: [
-          "Vajcia", "Šošovica", "Fazuľa čierna", "Fazuľa biela", "Fazuľa kidney",
-          "Špenát", "Brokolica", "Cícer", "Tekvicové semienka", "Hovädzie mäso",
-          "Tofu", "Losos", "Sardinky", "Makrela", "Ľanové semienka",
-          "Chia semienka", "Vlašské orechy", "Čučoriedky", "Jahody", "Pomaranč",
-          "Mango", "Kiwi", "Granátové jablko", "Červená paprika", "Mrkva",
-          "Kokosová voda", "Banán", "Jogurt", "Kefír", "Avokádo",
-          "Quinoa", "Rukola", "Kel", "Cottage", "Olivový olej"
+          "vajcia", "šošovica", "fazuľa čierna", "fazuľa biela", "fazuľa kidney",
+          "špenát", "brokolica", "cícer", "tekvicové semienka", "hovädzie mäso",
+          "tofu", "losos", "sardinky", "makrela", "ľanové semienka",
+          "chia semienka", "vlašské orechy", "čučoriedky", "jahody", "pomaranč",
+          "mango", "kiwi", "granátové jablko", "červená paprika", "mrkva",
+          "kokosová voda", "banán", "jogurt", "kefír", "avokádo",
+          "quinoa", "rukola", "kel", "cottage", "olivový olej"
         ],
         benefits: [
           "podporíš zdravú ovuláciu a hormonálnu rovnováhu",
@@ -517,23 +517,23 @@ serve(async (req) => {
       // LUTEAL EARLY - tekutiny, energia, príprava
       lutealEarly: {
         nutrients: [
-          "Draslík", "Horčík", "Vitamín B6", "Omega-3",
-          "Bielkoviny", "Komplexné sacharidy", "Vláknina", "Chróm",
-          "Tryptofán", "Vitamín D", "Zinok", "Vitamín C"
+          "draslík", "horčík", "vitamín B6", "omega-3",
+          "bielkoviny", "komplexné sacharidy", "vláknina", "chróm",
+          "tryptofán", "vitamín D", "zinok", "vitamín C"
         ],
         foods: [
           // Draslík + tekutiny
-          "Banán", "Avokádo", "Zemiaky", "Kiwi", "Melón", "Mrkva",
+          "banán", "avokádo", "zemiaky", "kiwi", "melón", "mrkva",
           // Horčík + B6
-          "Špenát", "Tmavá čokoláda 85%", "Vlašské orechy", "Tekvicové semienka", "Mandle",
+          "špenát", "tmavá čokoláda 85%", "vlašské orechy", "tekvicové semienka", "mandle",
           // Omega-3
-          "Losos", "Sardinky", "Chia semienka", "Ľanové semienka",
+          "losos", "sardinky", "chia semienka", "ľanové semienka",
           // Bielkoviny + Tryptofán
-          "Morčacie mäso", "Tofu", "Vajcia", "Grécky jogurt", "Cottage cheese",
+          "morčacie mäso", "tofu", "vajcia", "grécky jogurt", "cottage cheese",
           // Komplexné sacharidy
-          "Hnedá ryža", "Quinoa", "Ovsené vločky", "Bataty",
+          "hnedá ryža", "quinoa", "ovsené vločky", "bataty",
           // Vláknina + Trávenie
-          "Cícer", "Šošovica", "Brokolica", "Cuketa"
+          "cícer", "šošovica", "brokolica", "cuketa"
         ],
         benefits: [
           "pomôžeš stabilizovať náladu pri zvyšujúcom sa progesteróne",
@@ -548,23 +548,23 @@ serve(async (req) => {
       // LUTEAL MID - trávenie, nafukovanie, nálada
       lutealMid: {
         nutrients: [
-          "Horčík", "Vitamín B6", "Omega-3", "Zinok",
-          "Probiotiká", "Prebiotiká", "Vláknina", "Draslík",
-          "Sodík", "Bielkoviny", "Komplexné sacharidy", "Hydratačné minerály"
+          "horčík", "vitamín B6", "omega-3", "zinok",
+          "probiotiká", "prebiotiká", "vláknina", "draslík",
+          "sodík", "bielkoviny", "komplexné sacharidy", "hydratačné minerály"
         ],
         foods: [
           // Probiotiká + trávenie
-          "Kefír", "Jogurt", "Kyslá kapusta", "Kimchi", "Tempeh",
+          "kefír", "jogurt", "kyslá kapusta", "kimchi", "tempeh",
           // Prebiotiká + Vláknina
-          "Cuketa", "Zázvor", "Cícer", "Fazuľa čierna", "Špargľa",
+          "cuketa", "zázvor", "cícer", "fazuľa čierna", "špargľa",
           // Horčík + B6
-          "Rukola", "Kel", "Špenát", "Tekvicové semienka", "Mandle",
+          "rukola", "kel", "špenát", "tekvicové semienka", "mandle",
           // Omega-3 + Zinok
-          "Sardinky", "Losos", "Chia semienka", "Vlašské orechy",
+          "sardinky", "losos", "chia semienka", "vlašské orechy",
           // Komplexné sacharidy
-          "Bataty", "Quinoa", "Ovsené vločky", "Pohánka",
+          "bataty", "quinoa", "ovsené vločky", "pohánka",
           // Antioxidanty + Bielkoviny
-          "Maliny", "Čučoriedky", "Kurkuma", "Vajcia", "Tofu"
+          "maliny", "čučoriedky", "kurkuma", "vajcia", "tofu"
         ],
         benefits: [
           "znížiš nafukovanie a tlak v bruchu",
@@ -579,23 +579,23 @@ serve(async (req) => {
       // LUTEAL LATE - upokojenie, zápal, PMS
       lutealLate: {
         nutrients: [
-          "Horčík", "Vitamín B6", "Omega-3", "Vitamín E",
-          "Antioxidanty C", "Polyfenoly", "Kurkumín", "Vláknina",
-          "Bielkoviny", "Vitamín C"
+          "horčík", "vitamín B6", "omega-3", "vitamín E",
+          "antioxidanty C", "polyfenoly", "kurkumín", "vláknina",
+          "bielkoviny", "vitamín C"
         ],
         foods: [
           // Horčík + B6 (PMS)
-          "Tmavá čokoláda 85%", "Banán", "Špenát", "Mandle", "Vlašské orechy",
+          "tmavá čokoláda 85%", "banán", "špenát", "mandle", "vlašské orechy",
           // Omega-3 (zápal)
-          "Losos", "Makrela", "Sardinky", "Chia semienka", "Ľanové semienka",
+          "losos", "makrela", "sardinky", "chia semienka", "ľanové semienka",
           // Vitamín E + Antioxidanty
-          "Avokádo", "Mandľové maslo", "Slnečnicové semienka", "Maliny", "Čučoriedky",
+          "avokádo", "mandľové maslo", "slnečnicové semienka", "maliny", "čučoriedky",
           // Kurkumín + Polyfenoly
-          "Kurkuma", "Zázvor", "Zelený čaj", "Jahody",
+          "kurkuma", "zázvor", "zelený čaj", "jahody",
           // Komplexné sacharidy
-          "Ovsené vločky", "Zemiaky", "Bataty", "Quinoa", "Šošovica",
+          "ovsené vločky", "zemiaky", "bataty", "quinoa", "šošovica",
           // Bielkoviny + Ukľudňujúce
-          "Hummus", "Tofu", "Vajcia", "Grécky jogurt", "Med"
+          "hummus", "tofu", "vajcia", "grécky jogurt", "med"
         ],
         benefits: [
           "znížiš podráždenosť a PMS",
