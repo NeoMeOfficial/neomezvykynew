@@ -522,10 +522,18 @@ serve(async (req) => {
           "Tryptofán", "Vitamín D", "Zinok", "Vitamín C"
         ],
         foods: [
-          "Banán", "Avokádo", "Losos", "Vlašské orechy",
-          "Tmavá čokoláda 85%", "Hnedá ryža", "Cícer", "Šošovica",
-          "Tofu", "Grécky jogurt", "Zemiaky", "Kiwi",
-          "Špenát", "Paradajky"
+          // Draslík + tekutiny
+          "Banán", "Avokádo", "Zemiaky", "Kiwi", "Melón", "Mrkva",
+          // Horčík + B6
+          "Špenát", "Tmavá čokoláda 85%", "Vlašské orechy", "Tekvicové semienka", "Mandle",
+          // Omega-3
+          "Losos", "Sardinky", "Chia semienka", "Ľanové semienka",
+          // Bielkoviny + Tryptofán
+          "Morčacie mäso", "Tofu", "Vajcia", "Grécky jogurt", "Cottage cheese",
+          // Komplexné sacharidy
+          "Hnedá ryža", "Quinoa", "Ovsené vločky", "Bataty",
+          // Vláknina + Trávenie
+          "Cícer", "Šošovica", "Brokolica", "Cuketa"
         ],
         benefits: [
           "pomôžeš stabilizovať náladu pri zvyšujúcom sa progesteróne",
@@ -545,10 +553,18 @@ serve(async (req) => {
           "Sodík", "Bielkoviny", "Komplexné sacharidy", "Hydratačné minerály"
         ],
         foods: [
-          "Kefír", "Jogurt", "Zázvor", "Kurkuma",
-          "Bataty", "Quinoa", "Mandľové maslo", "Rukola",
-          "Kel", "Maliny", "Čučoriedky", "Vajcia",
-          "Tekvicové semienka", "Chia semienka"
+          // Probiotiká + trávenie
+          "Kefír", "Jogurt", "Kyslá kapusta", "Kimchi", "Tempeh",
+          // Prebiotiká + Vláknina
+          "Cuketa", "Zázvor", "Cícer", "Fazuľa čierna", "Špargľa",
+          // Horčík + B6
+          "Rukola", "Kel", "Špenát", "Tekvicové semienka", "Mandle",
+          // Omega-3 + Zinok
+          "Sardinky", "Losos", "Chia semienka", "Vlašské orechy",
+          // Komplexné sacharidy
+          "Bataty", "Quinoa", "Ovsené vločky", "Pohánka",
+          // Antioxidanty + Bielkoviny
+          "Maliny", "Čučoriedky", "Kurkuma", "Vajcia", "Tofu"
         ],
         benefits: [
           "znížiš nafukovanie a tlak v bruchu",
@@ -568,10 +584,18 @@ serve(async (req) => {
           "Bielkoviny", "Vitamín C"
         ],
         foods: [
-          "Tmavá čokoláda 85%", "Banán", "Hummus", "Losos",
-          "Makrela", "Chia puding", "Kurkuma latte", "Šošovicová polievka",
-          "Ovsené vločky", "Maliny", "Med", "Zemiaky",
-          "Špenát", "Mandľové mlieko"
+          // Horčík + B6 (PMS)
+          "Tmavá čokoláda 85%", "Banán", "Špenát", "Mandle", "Vlašské orechy",
+          // Omega-3 (zápal)
+          "Losos", "Makrela", "Sardinky", "Chia semienka", "Ľanové semienka",
+          // Vitamín E + Antioxidanty
+          "Avokádo", "Mandľové maslo", "Slnečnicové semienka", "Maliny", "Čučoriedky",
+          // Kurkumín + Polyfenoly
+          "Kurkuma", "Zázvor", "Zelený čaj", "Jahody",
+          // Komplexné sacharidy
+          "Ovsené vločky", "Zemiaky", "Bataty", "Quinoa", "Šošovica",
+          // Bielkoviny + Ukľudňujúce
+          "Hummus", "Tofu", "Vajcia", "Grécky jogurt", "Med"
         ],
         benefits: [
           "znížiš podráždenosť a PMS",
