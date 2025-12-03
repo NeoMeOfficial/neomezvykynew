@@ -675,13 +675,13 @@ serve(async (req) => {
         neome: "Ak nemáš veľa času a chceš čas ušetriť, vyskúšaj 15-min cvičenia od Neome.",
         cardioWithCardio: [
           "Ak máš dnes energiu navyše, môžeš skúsiť 15-min intervalové kardio — beh, bicykel alebo švihadlo v rytme 2 min rýchlo / 1 min voľne.",
-          "Toto je skvelý deň aj na ľahké intervalové kardio. Skús beh či bicykel: 2 min v tempe, 1 min voľnejšie.",
+          "Toto je skvelý deň aj na ľahké 15-min intervalové kardio. Skús beh či bicykel: 2 min v tempe, 1 min voľnejšie.",
           "Ak ti to telo dovolí, môžeš pridať krátke 15-min intervalové kardio — 2 min rýchlo, 1 min oddychovejšie.",
           "Dnešná fáza zvláda aj kardio. Skús 15 min: napr. švihadlo alebo rýchlu chôdzu do kopca v intervale 2:1.",
           "Ak cítiš drive, 15-min intervalové kardio (beh/bike) v pomere 2:1 ti môže pekne zdvihnúť tep aj náladu.",
-          "Môžeš zaradiť aj krátke intervalové kardio. Napr. 2 min svižného tempa pri behu či bicykli, potom 1 min voľnejšie.",
+          "Môžeš zaradiť aj 15-min intervalové kardio. Napr. 2 min svižného tempa pri behu či bicykli, potom 1 min voľnejšie.",
           "Ak máš chuť, dopraj si 15-min intervalové kardio: 2 min rýchle tempo + 1 min odpočinkového.",
-          "Dnešné telo dobre reaguje aj na kardio – 2 min rýchlo, 1 min pomalšie. Môžeš skúsiť beh, bicykel alebo švihadlo.",
+          "Dnešné telo dobre reaguje aj na 15-min kardio – 2 min rýchlo, 1 min pomalšie. Môžeš skúsiť beh, bicykel alebo švihadlo.",
           "Ak chceš pridať niečo navyše, skvelou voľbou je intervalové kardio: 2 min choď naplno, 1 min choď voľnejšie, 15 min spolu.",
           "Dnes môžeš zaradiť aj 15-min intervalové kardio. Beh, bicykel či švihadlo v rytme 2:1, 2 min naplno, 1 min voľnejšie. Krásne podporia energiu."
         ],
@@ -765,10 +765,10 @@ serve(async (req) => {
         neome: "Ak nemáš veľa času a chceš čas ušetriť, vyskúšaj 15-min cvičenia od Neome.",
         cardioWithCardio: [
           "Ak máš energiu, skús 15–20 minút kardia v rovnom tempe — beh, bicykel alebo eliptický trenažér sú skvelé voľby.",
-          "Dnes môžeš zaradiť kratšie steady kardio bez intervalov, napríklad plynulý beh, bicykel či rýchlu chôdzu do kopca.",
+          "Dnes môžeš zaradiť 15-20 min steady kardio bez intervalov, napríklad plynulý beh, bicykel či rýchlu chôdzu do kopca.",
           "Skús si dopriať 15–20 minút jedného tempa — či už na bicykli, eliptickom trenažéri alebo pri pomalom behu.",
-          "Ak ti to sedí, dopraj si dnes steady kardio: beh, bicykel alebo eliptický trenažér v plynulom, miernom tempe.",
-          "Dnes môže byť fajn zaradiť mierne kardio bez prerušenia — napríklad rovnomerný beh, bicykel alebo eliptický trenažér."
+          "Ak ti to sedí, dopraj si dnes 15-20 min steady kardio: beh, bicykel alebo eliptický trenažér v plynulom, miernom tempe.",
+          "Dnes môže byť fajn zaradiť 15-20 min kardia bez prerušenia — napríklad rovnomerný beh, bicykel alebo eliptický trenažér."
         ],
         cardioNoCardio: [
           "Dnes kardio vynechaj — tvoje telo prirodzene spomaľuje a viac ocení pokojnejší pohyb.",
