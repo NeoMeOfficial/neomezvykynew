@@ -7,10 +7,24 @@ import { getPhaseColor } from './suggestions';
 interface DailyPlanViewProps {
   currentDay: number;
   currentPhase: PhaseRange;
+  cycleLength: number;
+  periodLength: number;
+  phaseRanges: PhaseRange[];
 }
 
-export function DailyPlanView({ currentDay, currentPhase }: DailyPlanViewProps) {
-  const { data: tips, isLoading } = useCycleTips(currentDay, currentPhase.key);
+export function DailyPlanView({ 
+  currentDay, 
+  currentPhase,
+  cycleLength,
+  periodLength,
+  phaseRanges
+}: DailyPlanViewProps) {
+  const { data: tips, isLoading } = useCycleTips(
+    currentDay, 
+    cycleLength, 
+    periodLength, 
+    phaseRanges
+  );
   
   // Helper function to parse bullet points from text
   const parseBulletPoints = (text: string) => {

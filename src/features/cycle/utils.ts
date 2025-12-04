@@ -1,6 +1,189 @@
 import { format, differenceInDays, addDays, subDays, isBefore, isAfter } from 'date-fns';
 import { PhaseRange, PhaseKey, DerivedState, CycleData } from './types';
 
+// Universal segment splitter for dynamic subphase calculation
+function splitSegment(
+  len: number,
+  pct: [number, number, number],
+  min: [number, number, number],
+  prefer: 'MID' | 'FIRST' = 'MID'
+): [number, number, number] {
+  let r1 = Math.floor(len * pct[0]);
+  let r2 = Math.floor(len * pct[1]);
+  let r3 = len - r1 - r2;
+
+  let a1 = Math.max(r1, min[0]);
+  let a2 = Math.max(r2, min[1]);
+  let a3 = Math.max(r3, min[2]);
+
+  let sum = a1 + a2 + a3;
+
+  if (sum > len) {
+    const order = prefer === 'MID' ? [1, 0, 2] : [0, 1, 2];
+    let remaining = sum - len;
+    
+    for (const i of order) {
+      const arr = [a1, a2, a3];
+      const take = Math.min(remaining, arr[i] - min[i]);
+      if (i === 0) a1 -= take;
+      else if (i === 1) a2 -= take;
+      else a3 -= take;
+      remaining -= take;
+      if (remaining === 0) break;
+    }
+  } else if (sum < len) {
+    a2 += (len - sum);
+  }
+
+  return [a1, a2, a3];
+}
+
+// Calculate detailed phase ranges including subphases
+export function getDetailedPhaseRanges(cycleLength: number, periodLength: number, lutealLength: number = 14) {
+  const ovulationDay = cycleLength - lutealLength;
+
+  // Basic phases
+  const M_start = 1;
+  const M_end = periodLength;
+  const F_disp_start = periodLength + 1;
+  const F_disp_end = ovulationDay - 1;
+  const O_day = ovulationDay;
+  const L_start = ovulationDay + 1;
+  const L_end = cycleLength;
+
+  // Lengths
+  const M_len = M_end - M_start + 1;
+  const F_disp_len = Math.max(0, F_disp_end - F_disp_start + 1);
+  const L_len = L_end - L_start + 1;
+
+  // --- MENSTRUAL SUBPHASES ---
+  let M_early = 0, M_mid = 0, M_late = 0;
+  if (M_len >= 3) {
+    [M_early, M_mid, M_late] = splitSegment(M_len, [0.40, 0.35, 0.25], [2, 1, 1], 'MID');
+  } else {
+    M_early = M_len;
+  }
+
+  // --- FOLLICULAR SUBPHASES ---
+  let F_trans = 0, F_mid = 0, F_late = 0;
+  if (F_disp_len > 0) {
+    if (F_disp_len <= 8) {
+      F_mid = Math.max(1, Math.floor(F_disp_len * 0.70));
+      F_late = F_disp_len - F_mid;
+      if (F_late === 0 && F_mid > 1) {
+        F_mid -= 1;
+        F_late += 1;
+      }
+    } else {
+      F_trans = Math.max(1, Math.floor(F_disp_len * 0.15));
+      F_mid = Math.max(3, Math.floor(F_disp_len * 0.55));
+      F_late = F_disp_len - F_trans - F_mid;
+      
+      if (F_late < 2 && F_mid > 3) {
+        const borrow = Math.min(2 - F_late, F_mid - 3);
+        F_mid -= borrow;
+        F_late += borrow;
+      }
+      if (F_late < 2 && F_trans > 1) {
+        const borrow = Math.min(2 - F_late, F_trans - 1);
+        F_trans -= borrow;
+        F_late += borrow;
+      }
+    }
+  }
+
+  // --- LUTEAL SUBPHASES ---
+  const [L_early, L_mid, L_late] = splitSegment(L_len, [0.35, 0.40, 0.25], [2, 2, 2], 'MID');
+
+  // --- BUILD RANGES OBJECT ---
+  const ranges: Record<string, { start: number; end: number }> = {
+    menstrual: { start: M_start, end: M_end },
+    ovulation: { start: O_day, end: O_day },
+  };
+
+  // Menstrual subphases
+  let cursor = M_start;
+  if (M_early > 0) {
+    ranges.menstrualEarly = { start: cursor, end: cursor + M_early - 1 };
+    cursor += M_early;
+  }
+  if (M_mid > 0) {
+    ranges.menstrualMid = { start: cursor, end: cursor + M_mid - 1 };
+    cursor += M_mid;
+  }
+  if (M_late > 0) {
+    ranges.menstrualLate = { start: cursor, end: cursor + M_late - 1 };
+  }
+
+  // Follicular subphases
+  if (F_disp_len > 0) {
+    ranges.follicular = { start: F_disp_start, end: F_disp_end };
+    cursor = F_disp_start;
+    
+    if (F_trans > 0) {
+      ranges.follicularTransition = { start: cursor, end: cursor + F_trans - 1 };
+      cursor += F_trans;
+    }
+    if (F_mid > 0) {
+      ranges.follicularMid = { start: cursor, end: cursor + F_mid - 1 };
+      cursor += F_mid;
+    }
+    if (F_late > 0) {
+      ranges.follicularLate = { start: cursor, end: cursor + F_late - 1 };
+    }
+  }
+
+  // Luteal subphases
+  ranges.luteal = { start: L_start, end: L_end };
+  cursor = L_start;
+  ranges.lutealEarly = { start: cursor, end: cursor + L_early - 1 };
+  cursor += L_early;
+  ranges.lutealMid = { start: cursor, end: cursor + L_mid - 1 };
+  cursor += L_mid;
+  ranges.lutealLate = { start: cursor, end: cursor + L_late - 1 };
+
+  return ranges;
+}
+
+// Get subphase for a given day
+export function getSubphase(
+  day: number,
+  cycleLength: number,
+  periodLength: number
+): { phase: string; subphase: string | null } {
+  const ranges = getDetailedPhaseRanges(cycleLength, periodLength);
+  
+  // MENSTRUAL subphases
+  if (ranges.menstrualEarly && day >= ranges.menstrualEarly.start && day <= ranges.menstrualEarly.end) 
+    return { phase: 'menstrual', subphase: 'early' };
+  if (ranges.menstrualMid && day >= ranges.menstrualMid.start && day <= ranges.menstrualMid.end) 
+    return { phase: 'menstrual', subphase: 'mid' };
+  if (ranges.menstrualLate && day >= ranges.menstrualLate.start && day <= ranges.menstrualLate.end) 
+    return { phase: 'menstrual', subphase: 'late' };
+  
+  // FOLLICULAR subphases
+  if (ranges.follicularTransition && day >= ranges.follicularTransition.start && day <= ranges.follicularTransition.end) 
+    return { phase: 'follicular', subphase: 'transition' };
+  if (ranges.follicularMid && day >= ranges.follicularMid.start && day <= ranges.follicularMid.end) 
+    return { phase: 'follicular', subphase: 'mid' };
+  if (ranges.follicularLate && day >= ranges.follicularLate.start && day <= ranges.follicularLate.end) 
+    return { phase: 'follicular', subphase: 'late' };
+  
+  // OVULATION
+  if (day >= ranges.ovulation.start && day <= ranges.ovulation.end) 
+    return { phase: 'ovulation', subphase: 'peak' };
+  
+  // LUTEAL subphases
+  if (ranges.lutealEarly && day >= ranges.lutealEarly.start && day <= ranges.lutealEarly.end) 
+    return { phase: 'luteal', subphase: 'early' };
+  if (ranges.lutealMid && day >= ranges.lutealMid.start && day <= ranges.lutealMid.end) 
+    return { phase: 'luteal', subphase: 'mid' };
+  if (ranges.lutealLate && day >= ranges.lutealLate.start && day <= ranges.lutealLate.end) 
+    return { phase: 'luteal', subphase: 'late' };
+    
+  return { phase: 'menstrual', subphase: null }; // fallback
+}
+
 export function lerp(a: number, b: number, t: number): number {
   return a + (b - a) * t;
 }

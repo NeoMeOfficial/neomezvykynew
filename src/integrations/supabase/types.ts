@@ -307,6 +307,39 @@ export type Database = {
         }
         Relationships: []
       }
+      phase_tips: {
+        Row: {
+          created_at: string | null
+          expectation_text: string
+          id: string
+          is_approved: boolean | null
+          mind_text: string
+          phase: string
+          subphase: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          expectation_text: string
+          id?: string
+          is_approved?: boolean | null
+          mind_text: string
+          phase: string
+          subphase?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          expectation_text?: string
+          id?: string
+          is_approved?: boolean | null
+          mind_text?: string
+          phase?: string
+          subphase?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
