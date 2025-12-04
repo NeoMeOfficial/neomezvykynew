@@ -112,7 +112,10 @@ export function TodaysEstimateSection({
           {/* Daily Plan View - NEW COMPONENT */}
           <DailyPlanView 
             currentDay={currentDay} 
-            currentPhase={derivedState.currentPhase} 
+            currentPhase={derivedState.currentPhase}
+            cycleLength={cycleData.cycleLength}
+            periodLength={cycleData.periodLength}
+            phaseRanges={derivedState.phaseRanges}
           />
           
           {/* Smart period prediction button */}
