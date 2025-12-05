@@ -40,18 +40,18 @@ export const MASTER_STRAVA: Record<string, {
         "grepfrút", "limetka", "petržlen", "rajčiny", "rukola", "kel", "mandarínky", "melón"
       ],
       "folát (B9)": [
-        "špenát", "šošovica", "cícer", "brokolica", "rukola", "kel", "avokádo", "špargľa",
-        "červená fazuľa", "čierna fazuľa", "hrášok", "kapusta", "karfiol", "zelený šalát", "mangold",
-        "cvikla", "pomaranč", "banán", "vajcia", "celozrnný chlieb", "ovsené vločky", "quinoa"
+        "kel", "rukola", "šošovica", "cícer", "brokolica", "avokádo", "špargľa", "rímsky šalát",
+        "červená fazuľa", "čierna fazuľa", "hrášok", "kapusta", "karfiol", "zelený šalát",
+        "cvikla", "pomaranč", "banán", "vajcia", "žitný chlieb", "ovsené vločky", "quinoa"
       ],
       "vitamín B12": [
-        "vajcia", "hovädzie mäso", "morčacie mäso", "losos", "sardinky", "mliečne výrobky", "tofu fortifikované", "tempeh",
-        "kuracie mäso", "tuniak", "makrela", "pstruh", "grécky jogurt", "cottage cheese", "mozzarella",
+        "vajcia", "hovädzie mäso", "morčacie mäso", "losos", "sardinky", "mliečne výrobky", "tempeh", "tuniak z konzervy",
+        "kuracie mäso", "tuniak", "makrela", "grécky jogurt", "cottage cheese", "mozzarella",
         "ementál", "parmezán", "kefír", "tvaroh", "fortifikované rastlinné mlieko"
       ],
       "omega-3": [
         "losos", "sardinky", "makrela", "chia semienka", "ľanové semienka", "vlašské orechy", "konopné semienka",
-        "tuniak", "pstruh", "sleď", "vajcia obohatené omega-3", "tofu", "edamame", "sójové bôby",
+        "tuniak", "edamame", "vajcia obohatené omega-3", "sójové bôby", "tuniak z konzervy",
         "ľanový olej", "repkový olej", "avokádo", "mandle", "pekanové orechy", "zelená listová zelenina"
       ],
       "kurkumín": [
@@ -76,7 +76,7 @@ export const MASTER_STRAVA: Record<string, {
       "draslík": [
         "banán", "avokádo", "zemiaky", "bataty", "špenát", "melón", "pomaranč", "kokosová voda",
         "paradajky", "cvikla", "šošovica", "fazuľa", "hrášok", "hrozienka", "sušené marhule",
-        "grécky jogurt", "mlieko", "losos", "kuracie mäso", "mandle", "arašidy"
+        "grécky jogurt", "mlieko", "losos", "morčacie mäso", "mandle", "arašidy"
       ],
       "kolagén-podpora": [
         "kuracie mäso", "hovädzie mäso", "vajcia", "losos", "sardinky", "kostný vývar", "slepačí vývar",
@@ -128,18 +128,17 @@ export const MASTER_STRAVA: Record<string, {
       ],
       "vitamín E": [
         "mandle", "slnečnicové semienka", "avokádo", "olivový olej", "špargľa", "červená paprika", "mango", "kiwi",
-        "lieskové orechy", "arašidy", "špenát", "brokolica", "rajčiny", "mrkva", "bataty",
-        "tekvicové semienka", "vlašské orechy", "celozrnný chlieb", "vajcia", "ryby"
+        "lieskové orechy", "arašidy", "kel", "brokolica", "rajčiny", "mrkva", "bataty",
+        "tekvicové semienka", "vlašské orechy", "žitný chlieb", "vajcia", "ryby"
       ],
       "zdravé tuky": [
         "avokádo", "olivový olej", "mandle", "vlašské orechy", "losos", "chia semienka", "kokosový olej", "mandľové maslo",
         "arašidové maslo", "kešu orechy", "lieskové orechy", "pekanové orechy", "makadamové orechy",
-        "ľanové semienka", "konopné semienka", "sardinky", "makrela", "vajcia", "tofu", "tmavá čokoláda"
+        "ľanové semienka", "konopné semienka", "sardinky", "makrela", "vajcia", "edamame", "tmavá čokoláda"
       ],
       "vitamín D": [
-        "losos", "sardinky", "vajcia", "fortifikované mlieko", "tofu fortifikované", "makrela", "tuniak",
-        "pstruh", "sleď", "fortifikovaný jogurt", "fortifikované rastlinné mlieko", "maslo",
-        "syr", "vaječný žĺtok", "hovädzia pečeň", "rybie oleje"
+        "losos", "sardinky", "vajcia", "fortifikované mlieko", "makrela", "tuniak", "fortifikovaný jogurt",
+        "fortifikované rastlinné mlieko", "maslo", "syr", "vaječný žĺtok", "hovädzia pečeň", "rybie oleje"
       ],
       "kolagén-podpora": [
         "kuracie mäso", "hovädzie mäso", "vajcia", "losos", "sardinky", "kostný vývar", "slepačí vývar",
@@ -165,9 +164,9 @@ export const MASTER_STRAVA: Record<string, {
   ovulation: {
     nutrients: {
       "folát (B9)": [
-        "špenát", "šošovica", "cícer", "brokolica", "rukola", "kel", "avokádo", "špargľa",
-        "červená fazuľa", "čierna fazuľa", "hrášok", "kapusta", "karfiol", "zelený šalát", "mangold",
-        "cvikla", "pomaranč", "banán", "vajcia", "celozrnný chlieb", "ovsené vločky", "quinoa"
+        "rímsky šalát", "kapusta", "šošovica", "cícer", "brokolica", "rukola", "avokádo", "špargľa",
+        "červená fazuľa", "čierna fazuľa", "hrášok", "kel", "karfiol", "zelený šalát",
+        "cvikla", "pomaranč", "banán", "vajcia", "grahamové pečivo", "ovsené vločky", "quinoa"
       ],
       "zinok": [
         "tekvicové semienka", "hovädzie mäso", "cícer", "kešu orechy", "vajcia", "tofu", "quinoa", "sezamové semienka",
@@ -176,8 +175,8 @@ export const MASTER_STRAVA: Record<string, {
       ],
       "selén": [
         "para orechy", "vajcia", "losos", "sardinky", "slnečnicové semienka", "hovädzie mäso", "hnedá ryža", "šampiňóny",
-        "kuracie mäso", "morčacie mäso", "tuniak", "tofu", "tvaroh", "jogurt", "mlieko",
-        "celozrnný chlieb", "ovsené vločky", "cesnak", "cibuľa", "brokolica", "špenát"
+        "kuracie mäso", "morčacie mäso", "tuniak", "tvaroh", "jogurt", "mlieko", "cottage cheese",
+        "grahamové pečivo", "ovsené vločky", "cesnak", "cibuľa", "brokolica", "kel"
       ],
       "omega-3": [
         "losos", "sardinky", "makrela", "chia semienka", "ľanové semienka", "vlašské orechy", "konopné semienka", "avokádo",
@@ -237,7 +236,7 @@ export const MASTER_STRAVA: Record<string, {
         "fazuľa", "edamame", "syr", "mozzarella", "ricotta", "kefír", "skyr"
       ],
       "komplexné sacharidy": [
-        "bataty", "quinoa", "ovsené vločky", "hnedá ryža", "celozrnný chlieb", "pohánka", "cícer", "šošovica",
+        "bataty", "quinoa", "ovsené vločky", "hnedá ryža", "žitný chlieb", "pohánka", "cícer", "šošovica",
         "zemiaky", "fazuľa", "hrášok", "kukurica", "celozrnné cestoviny", "jačmeň", "proso",
         "bulgur", "kuskus celozrnný", "ryžové rezance", "celozrnné pečivo", "müsli"
       ],
@@ -247,9 +246,9 @@ export const MASTER_STRAVA: Record<string, {
         "kapusta", "karfiol", "zeler", "uhorka", "rajčiny", "banán", "slivky"
       ],
       "tryptofán": [
-        "morčacie mäso", "vajcia", "losos", "tekvicové semienka", "tofu", "syr", "banán", "mlieko",
+        "morčacie mäso", "vajcia", "losos", "tekvicové semienka", "edamame", "syr", "banán", "mlieko",
         "kuracie mäso", "tuniak", "tvaroh", "grécky jogurt", "ovsené vločky", "quinoa", "orechy",
-        "slnečnicové semienka", "sezamové semienka", "čokoláda", "arašidy", "špenát"
+        "slnečnicové semienka", "sezamové semienka", "čokoláda", "arašidy", "tofu"
       ]
     },
     benefits: [
@@ -305,14 +304,14 @@ export const MASTER_STRAVA: Record<string, {
         "celozrnný chlieb", "fazuľa", "hrášok", "mandle", "arašidy", "slnečnicové semienka"
       ],
       "komplexné sacharidy": [
-        "bataty", "quinoa", "ovsené vločky", "hnedá ryža", "pohánka", "cícer", "šošovica", "celozrnný chlieb",
+        "bataty", "quinoa", "ovsené vločky", "hnedá ryža", "pohánka", "cícer", "šošovica", "grahamové pečivo",
         "zemiaky", "fazuľa", "hrášok", "kukurica", "celozrnné cestoviny", "jačmeň", "proso",
         "bulgur", "kuskus celozrnný", "ryžové rezance", "celozrnné pečivo", "müsli"
       ],
       "bielkoviny": [
-        "vajcia", "grécky jogurt", "cottage cheese", "tofu", "morčacie mäso", "losos", "tempeh", "quinoa",
+        "vajcia", "grécky jogurt", "cottage cheese", "tempeh", "morčacie mäso", "losos", "edamame", "quinoa",
         "kuracie mäso", "hovädzie mäso", "tuniak", "sardinky", "tvaroh", "šošovica", "cícer",
-        "fazuľa", "edamame", "syr", "mozzarella", "ricotta", "kefír", "skyr"
+        "fazuľa", "skyr", "syr", "mozzarella", "ricotta", "kefír", "tuniak z konzervy"
       ]
     },
     benefits: [
@@ -330,7 +329,7 @@ export const MASTER_STRAVA: Record<string, {
       "horčík": [
         "tmavá čokoláda 85%", "mandle", "tekvicové semienka", "špenát", "avokádo", "čierna fazuľa", "hnedá ryža", "banán",
         "kešu orechy", "lieskové orechy", "vlašské orechy", "ovsené vločky", "quinoa", "tofu", "šošovica",
-        "cícer", "celozrnný chlieb", "pohánka", "sezamové semienka", "slnečnicové semienka", "edamame"
+        "cícer", "grahamové pečivo", "pohánka", "sezamové semienka", "slnečnicové semienka", "edamame"
       ],
       "vitamín B6": [
         "banán", "morčacie mäso", "losos", "zemiaky", "cícer", "avokádo", "slnečnicové semienka", "pistácie",
@@ -344,8 +343,8 @@ export const MASTER_STRAVA: Record<string, {
       ],
       "vitamín E": [
         "mandle", "slnečnicové semienka", "avokádo", "olivový olej", "špargľa", "kiwi", "mango", "papája",
-        "lieskové orechy", "arašidy", "špenát", "brokolica", "rajčiny", "mrkva", "bataty",
-        "tekvicové semienka", "vlašské orechy", "celozrnný chlieb", "vajcia", "ryby"
+        "lieskové orechy", "arašidy", "rukola", "brokolica", "rajčiny", "mrkva", "bataty",
+        "tekvicové semienka", "vlašské orechy", "žitný chlieb", "vajcia", "ryby"
       ],
       "antioxidanty": [
         "čučoriedky", "jahody", "maliny", "granátové jablko", "tmavá čokoláda", "zelený čaj", "brusnice",
@@ -362,9 +361,9 @@ export const MASTER_STRAVA: Record<string, {
         "kapusta", "karfiol", "zeler", "uhorka", "rajčiny", "banán", "slivky"
       ],
       "bielkoviny": [
-        "vajcia", "grécky jogurt", "tofu", "cottage cheese", "losos", "morčacie mäso", "tempeh", "quinoa",
+        "vajcia", "grécky jogurt", "tempeh", "cottage cheese", "losos", "morčacie mäso", "edamame", "quinoa",
         "kuracie mäso", "hovädzie mäso", "tuniak", "sardinky", "tvaroh", "šošovica", "cícer",
-        "fazuľa", "edamame", "syr", "mozzarella", "ricotta", "kefír", "skyr"
+        "fazuľa", "tuniak z konzervy", "syr", "mozzarella", "ricotta", "kefír", "skyr"
       ],
       "kolagén-podpora": [
         "kuracie mäso", "hovädzie mäso", "vajcia", "losos", "sardinky", "kostný vývar", "slepačí vývar",
