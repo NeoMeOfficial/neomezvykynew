@@ -684,9 +684,11 @@ export function CalendarView({
       isPastPeriod: false,
       isFuturePeriod: false
     };
-    const lastPeriodDate = typeof cycleData.lastPeriodStart === 'string' ? new Date(cycleData.lastPeriodStart) : cycleData.lastPeriodStart;
-    const isPeriod = isPeriodDate(date, lastPeriodDate.toISOString().split('T')[0], cycleData.cycleLength, cycleData.periodLength);
-    const isFertile = isFertilityDate(date, lastPeriodDate.toISOString().split('T')[0], cycleData.cycleLength);
+    const lastPeriodDateStr = typeof cycleData.lastPeriodStart === 'string' 
+      ? cycleData.lastPeriodStart 
+      : format(cycleData.lastPeriodStart, 'yyyy-MM-dd');
+    const isPeriod = isPeriodDate(date, lastPeriodDateStr, cycleData.cycleLength, cycleData.periodLength);
+    const isFertile = isFertilityDate(date, lastPeriodDateStr, cycleData.cycleLength);
     const today = startOfDay(new Date());
     const isPastPeriod = isPeriod && isBefore(date, today);
     const isFuturePeriod = isPeriod && !isBefore(date, today);
@@ -699,8 +701,10 @@ export function CalendarView({
   };
   const getCurrentDayPhase = (date: Date) => {
     if (!cycleData.lastPeriodStart) return null;
-    const lastPeriodDate = typeof cycleData.lastPeriodStart === 'string' ? new Date(cycleData.lastPeriodStart) : cycleData.lastPeriodStart;
-    const daysSinceStart = Math.floor((date.getTime() - lastPeriodDate.getTime()) / (1000 * 60 * 60 * 24));
+    const lastPeriodDate = typeof cycleData.lastPeriodStart === 'string' 
+      ? new Date(cycleData.lastPeriodStart + 'T00:00:00') 
+      : cycleData.lastPeriodStart;
+    const daysSinceStart = Math.floor((startOfDay(date).getTime() - startOfDay(lastPeriodDate).getTime()) / (1000 * 60 * 60 * 24));
     const cycleDay = (daysSinceStart % cycleData.cycleLength + cycleData.cycleLength) % cycleData.cycleLength + 1;
 
     // Find which phase this day belongs to
