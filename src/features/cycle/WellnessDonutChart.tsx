@@ -16,9 +16,21 @@ interface WellnessDonutChartProps {
   cycleData?: CycleData;
 }
 
+// Helper function for Slovak locative case of phase names
+const getPhaseNameInLocative = (phaseName: string): string => {
+  const phaseNames: Record<string, string> = {
+    'Folikulárna': 'folikulárnej',
+    'Luteálna': 'luteálnej',
+    'Ovulačná': 'ovulačnej',
+    'Menštruačná': 'menštruačnej'
+  };
+  return phaseNames[phaseName] || phaseName.toLowerCase();
+};
+
 export function WellnessDonutChart({ derivedState, onEditClick, className = "", selectedOutcome, cycleData }: WellnessDonutChartProps) {
   const { currentDay, phaseRanges, currentPhase } = derivedState;
   const cycleLength = phaseRanges[phaseRanges.length - 1].end;
+  const phaseNameLocative = getPhaseNameInLocative(currentPhase.name);
   
   // Helper function to check if a day should be highlighted
   const isDayHighlighted = (day: number): boolean => {
@@ -240,10 +252,10 @@ export function WellnessDonutChart({ derivedState, onEditClick, className = "", 
             <>
               <div className="text-center px-4">
                 <div className="text-base font-semibold leading-tight" style={{ color: 'hsl(var(--foreground))' }}>
-                  {currentPhase.name} fáza
+                  Si vo {phaseNameLocative} fáze
                 </div>
                 <div className="text-sm font-medium mt-1" style={{ color: 'hsl(var(--muted-foreground))' }}>
-                  Deň {currentDay} cyklu
+                  Tvoj {currentDay}. deň cyklu
                 </div>
               </div>
             </>
