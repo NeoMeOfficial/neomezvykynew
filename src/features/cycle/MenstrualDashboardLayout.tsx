@@ -164,13 +164,6 @@ export function MenstrualDashboardLayout({
             onUseCustomDatePicker={() => setShowDatePicker(true)}
           />
 
-          <FeelBetterSection 
-            phaseRanges={phaseRanges} 
-            currentPhase={currentPhase} 
-            currentDay={currentDay}
-            cycleLength={cycleData.cycleLength}
-            periodLength={cycleData.periodLength}
-          />
 
           <CalendarViewSection cycleData={cycleData} derivedState={derivedState} onOutcomeSelect={setSelectedOutcome} selectedOutcome={selectedOutcome} onPeriodIntensityChange={setPeriodIntensity} getPeriodIntensity={getPeriodIntensity} accessCode={accessCode} onAccessCodeGenerated={onAccessCodeGenerated} />
         </div>
