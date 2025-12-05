@@ -852,9 +852,6 @@ export function CalendarView({
                   case 'fertile':
                     onOutcomeSelect(selectedOutcome === 'fertile-days' ? null : 'fertile-days');
                     break;
-                  case 'today':
-                    setCurrentDate(new Date());
-                    break;
                   case 'notes':
                     // TODO: Implement notes filter
                     break;
@@ -875,12 +872,6 @@ export function CalendarView({
                   <div className="flex items-center gap-2">
                     <Heart className="w-3 h-3" />
                     <span>Plodné dni</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="today" className="text-[#955F6A] hover:bg-[#FF7782]/10 focus:bg-[#FF7782]/10">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-3 h-3" />
-                    <span>Dnes</span>
                   </div>
                 </SelectItem>
                 <SelectItem value="notes" className="text-[#955F6A] hover:bg-[#FF7782]/10 focus:bg-[#FF7782]/10">
