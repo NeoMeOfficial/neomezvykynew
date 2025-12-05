@@ -547,7 +547,13 @@ export default function MenstrualCycleTracker({
         </TabsContent>
 
         <TabsContent value="overview" className="mt-5">
-          <PhaseOverview phaseRanges={derivedState.phaseRanges} currentPhase={derivedState.currentPhase} />
+          <PhaseOverview 
+            phaseRanges={derivedState.phaseRanges} 
+            currentPhase={derivedState.currentPhase}
+            currentDay={derivedState.currentDay}
+            cycleLength={cycleData.cycleLength}
+            periodLength={cycleData.periodLength}
+          />
         </TabsContent>
       </Tabs>
 

@@ -141,6 +141,9 @@ export default function MenstrualCycleTrackerFast({
               <PhaseOverview 
                 phaseRanges={derivedState!.phaseRanges}
                 currentPhase={derivedState!.currentPhase}
+                currentDay={derivedState!.currentDay}
+                cycleLength={cycleData.cycleLength}
+                periodLength={cycleData.periodLength}
               />
               </Suspense>
             </div>

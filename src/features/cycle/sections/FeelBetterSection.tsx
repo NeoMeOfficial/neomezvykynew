@@ -1,15 +1,22 @@
 import React from 'react';
 import { TrendingUp } from 'lucide-react';
 import { PhaseOverview } from '../PhaseOverview';
+import { PhaseRange } from '../types';
 
 interface FeelBetterSectionProps {
-  phaseRanges: any;
-  currentPhase: any;
+  phaseRanges: PhaseRange[];
+  currentPhase: PhaseRange;
+  currentDay: number;
+  cycleLength: number;
+  periodLength: number;
 }
 
 export function FeelBetterSection({
   phaseRanges,
-  currentPhase
+  currentPhase,
+  currentDay,
+  cycleLength,
+  periodLength
 }: FeelBetterSectionProps) {
   return (
     <>
@@ -50,6 +57,9 @@ export function FeelBetterSection({
           <PhaseOverview
             phaseRanges={phaseRanges}
             currentPhase={currentPhase}
+            currentDay={currentDay}
+            cycleLength={cycleLength}
+            periodLength={periodLength}
           />
         </div>
       </div>

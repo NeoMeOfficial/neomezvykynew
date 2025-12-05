@@ -113,6 +113,9 @@ export default function MenstrualCycleTrackerAccordion({
         <FeelBetterSection
           phaseRanges={phaseRanges}
           currentPhase={currentPhase}
+          currentDay={currentDay}
+          cycleLength={cycleData.cycleLength}
+          periodLength={cycleData.periodLength}
         />
 
         <CalendarViewSection

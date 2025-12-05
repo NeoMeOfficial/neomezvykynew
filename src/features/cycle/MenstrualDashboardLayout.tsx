@@ -155,7 +155,13 @@ export function MenstrualDashboardLayout({
             onUseCustomDatePicker={() => setShowDatePicker(true)}
           />
 
-          <FeelBetterSection phaseRanges={phaseRanges} currentPhase={currentPhase} />
+          <FeelBetterSection 
+            phaseRanges={phaseRanges} 
+            currentPhase={currentPhase} 
+            currentDay={currentDay}
+            cycleLength={cycleData.cycleLength}
+            periodLength={cycleData.periodLength}
+          />
 
           <CalendarViewSection cycleData={cycleData} derivedState={derivedState} onOutcomeSelect={setSelectedOutcome} selectedOutcome={selectedOutcome} onPeriodIntensityChange={setPeriodIntensity} getPeriodIntensity={getPeriodIntensity} accessCode={accessCode} onAccessCodeGenerated={onAccessCodeGenerated} />
         </div>
@@ -242,7 +248,13 @@ export function MenstrualDashboardLayout({
               onUseCustomDatePicker={() => setShowDatePicker(true)}
             />}
 
-            {activeSection === 'feel-better' && <FeelBetterSection phaseRanges={phaseRanges} currentPhase={currentPhase} />}
+            {activeSection === 'feel-better' && <FeelBetterSection 
+              phaseRanges={phaseRanges} 
+              currentPhase={currentPhase}
+              currentDay={currentDay}
+              cycleLength={cycleData.cycleLength}
+              periodLength={cycleData.periodLength}
+            />}
 
             {activeSection === 'calendar' && <CalendarViewSection cycleData={cycleData} derivedState={derivedState} onOutcomeSelect={setSelectedOutcome} selectedOutcome={selectedOutcome} onPeriodIntensityChange={setPeriodIntensity} getPeriodIntensity={getPeriodIntensity} accessCode={accessCode} onAccessCodeGenerated={onAccessCodeGenerated} />}
           </div>
