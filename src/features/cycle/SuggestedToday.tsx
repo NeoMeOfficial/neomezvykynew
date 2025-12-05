@@ -15,7 +15,9 @@ export function SuggestedToday({
   accessCode,
   lastPeriodStart
 }: SuggestedTodayProps) {
-  const suggestion = suggestForDay(derivedState.currentDay, derivedState.phaseRanges);
+  // Derive cycleLength from phaseRanges (luteal phase ends at cycleLength)
+  const cycleLength = derivedState.phaseRanges[derivedState.phaseRanges.length - 1].end;
+  const suggestion = suggestForDay(derivedState.currentDay, derivedState.phaseRanges, cycleLength);
   const phaseInsights = PHASE_INSIGHTS[suggestion.phaseKey];
 
   // Get daily variation based on current day in phase

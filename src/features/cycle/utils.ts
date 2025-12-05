@@ -151,6 +151,11 @@ export function getSubphase(
   cycleLength: number,
   periodLength: number
 ): { phase: string; subphase: string | null } {
+  // Ak deň presahuje cycleLength, sme v "predĺženej" luteálnej late fáze (menštruácia mešká)
+  if (day > cycleLength) {
+    return { phase: 'luteal', subphase: 'late' };
+  }
+  
   const ranges = getDetailedPhaseRanges(cycleLength, periodLength);
   
   // MENSTRUAL subphases
@@ -211,14 +216,20 @@ export function getPhaseRanges(cycleLength: number, periodLength: number): Phase
   ];
 }
 
-export function getPhaseByDay(day: number, ranges: PhaseRange[]): PhaseRange {
+export function getPhaseByDay(day: number, ranges: PhaseRange[], cycleLength?: number): PhaseRange {
+  // Ak deň presahuje dĺžku cyklu (menštruácia mešká), zostávame v luteálnej fáze
+  if (cycleLength && day > cycleLength) {
+    return ranges.find(r => r.key === 'luteal') || ranges[ranges.length - 1];
+  }
   return ranges.find(range => day >= range.start && day <= range.end) || ranges[0];
 }
 
 export function getCurrentCycleDay(lastPeriodStart: string, today: Date, cycleLength: number): number {
   const startDate = new Date(lastPeriodStart + 'T00:00:00');
   const daysSince = differenceInDays(today, startDate);
-  return ((daysSince % cycleLength) + cycleLength) % cycleLength + 1; // Handle negative values
+  // Ak menštruácia mešká (deň > cycleLength), nevracaj modulo
+  // Nechaj deň pokračovať (29, 30, 31...) kým používateľka nezadá nový začiatok
+  return daysSince + 1;
 }
 
 export function getDerivedState(cycleData: CycleData): DerivedState {
@@ -231,7 +242,7 @@ export function getDerivedState(cycleData: CycleData): DerivedState {
     : 1;
     
   const phaseRanges = getPhaseRanges(cycleData.cycleLength, cycleData.periodLength);
-  const currentPhase = getPhaseByDay(currentDay, phaseRanges);
+  const currentPhase = getPhaseByDay(currentDay, phaseRanges, cycleData.cycleLength);
   
   const isFirstRun = !cycleData.lastPeriodStart;
 
