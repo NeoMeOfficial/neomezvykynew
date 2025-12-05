@@ -330,7 +330,7 @@ export function NextDatesInfo({
                     : "bg-white/20 text-white hover:bg-white/30"
                 )}
               >
-                🩸 Už mi začala menštruácia
+                🩸 {daysUntilNextPeriod > 0 ? "Menštruácia mi začala skôr" : "Menštruácia mi začala"}
               </button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0 pointer-events-auto" align="center">
