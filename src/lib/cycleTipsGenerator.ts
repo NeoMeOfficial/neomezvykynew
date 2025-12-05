@@ -522,7 +522,7 @@ export const MASTER_POHYB: Record<string, {
   cardioNoCardio: string[];
   walkBenefits: string[];
 }> = {
-  menstrual: {
+  menstrualEarly: {
     primaryExercise: [
       "Skús si dopriať pár minút jemného strečingu, ktorý uvoľní napätie v panve a krížoch.",
       "Dnes ti môže pomôcť pomalý strečing — uvoľní brucho, zlepší cirkuláciu a zníži kŕče.",
@@ -534,6 +534,88 @@ export const MASTER_POHYB: Record<string, {
       "Ak cítiš napätie, jemný strečing ti prinesie okamžitú úľavu.",
       "Dopraj si pár minút príjemného strečingu — pomalé natiahnutie bokov a panvy môže urobiť veľký rozdiel.",
       "Jemný strečing dnes podporí cirkuláciu, uvoľní kŕče a dodá ti príjemný pocit ľahkosti."
+    ],
+    neome: "Ak nemáš veľa času a chceš čas ušetriť, vyskúšaj 15-min cvičenia od Neome.",
+    cardioWithCardio: [],
+    cardioNoCardio: [
+      "Dnes tvojmu telu najviac prospeje, ak si dáš pauzu od intenzívneho kardia a necháš ho ďalej regenerovať.",
+      "Telo je teraz v režime obnovy, preto mu padne lepšie pokojnejší pohyb než intenzívne kardio.",
+      "Skús si dnes dopriať deň bez náročného kardia — tvoje telo energiu potrebuje na regeneráciu.",
+      "V tejto fáze môže byť intenzívne kardio pre telo náročné, jemnejší pohyb ti dnes padne lepšie.",
+      "Tvoje telo sa teraz zotavuje, preto môže byť príjemnejšie vynechať intenzívne kardio a zvoliť niečo ľahšie.",
+      "Dnes je ideálny čas zvoliť jemnejší pohyb a nechať si intenzívne kardio na obdobie s väčšou energiou.",
+      "Aby sa telo mohlo naplno obnoviť, môže mu dnes pomôcť, ak si dáš pauzu od intenzívneho kardia.",
+      "Tvoje hormóny sú teraz nastavené na regeneráciu, preto ľahší pohyb urobí väčšiu službu než intenzívne kardio.",
+      "Skús dnes uprednostniť pokojnejší pohyb — intenzívne kardio si nechaj na dni, keď bude energia vyššia.",
+      "Regenerácia je teraz prioritou, a preto môže byť fajn dať si dnes prestávku od náročného kardia."
+    ],
+    walkBenefits: [
+      "jemne uvoľniť panvové svaly a znížiť menštruačné kŕče.",
+      "podporiť prirodzený tok krvi a zmierni pocit ťažoby v podbrušku.",
+      "dodať viac kyslíka a energie bez toho, aby ťa unavila.",
+      "zvýšiť hladinu endorfínov a prinesie úľavu od bolesti.",
+      "podporiť lepší spánok tým, že upokojí nervový systém.",
+      "zmierniť nafúknutie tým, že rozhýbe trávenie a lymfu.",
+      "stabilizovať náladu a pomôže znížiť podráždenosť.",
+      "znížiť zápal v tele a prinesie viac fyzickej pohody.",
+      "uvoľniť napätie v krížoch a spodnej časti chrbta.",
+      "vyrovnať hladinu stresových hormónov a prinesie pocit pokoja."
+    ]
+  },
+
+  menstrualMid: {
+    primaryExercise: [
+      "Skús si dopriať pár minút jemného strečingu, ktorý uvoľní napätie v panve a krížoch.",
+      "Dnes ti môže pomôcť pomalý strečing — uvoľní brucho, zlepší cirkuláciu a zníži kŕče.",
+      "Zvoľ si jemný pohyb, ktorý ti prinesie úľavu — napríklad pár jednoduchých strečových pozícií.",
+      "Skús pár hlbokých nádychov a ľahký strečing, ktorý podporí prekrvenie a zníži bolestivosť.",
+      "Dnes telu padne najlepšie vedomé spomalenie — jemná joga ti môže uľahčiť celý deň.",
+      "Skús pár minút nenáročného strečingu, ktorý uvoľní spodný chrbát a zmierni tlak v bruchu.",
+      "Pomalý pohyb je dnes tvoj najlepší priateľ — pár strečových pozícií ti pomôže uvoľniť celé telo.",
+      "Ak cítiš napätie, jemný strečing ti prinesie okamžitú úľavu.",
+      "Dopraj si pár minút príjemného strečingu — pomalé natiahnutie bokov a panvy môže urobiť veľký rozdiel.",
+      "Jemný strečing dnes podporí cirkuláciu, uvoľní kŕče a dodá ti príjemný pocit ľahkosti."
+    ],
+    neome: "Ak nemáš veľa času a chceš čas ušetriť, vyskúšaj 15-min cvičenia od Neome.",
+    cardioWithCardio: [],
+    cardioNoCardio: [
+      "Dnes tvojmu telu najviac prospeje, ak si dáš pauzu od intenzívneho kardia a necháš ho ďalej regenerovať.",
+      "Telo je teraz v režime obnovy, preto mu padne lepšie pokojnejší pohyb než intenzívne kardio.",
+      "Skús si dnes dopriať deň bez náročného kardia — tvoje telo energiu potrebuje na regeneráciu.",
+      "V tejto fáze môže byť intenzívne kardio pre telo náročné, jemnejší pohyb ti dnes padne lepšie.",
+      "Tvoje telo sa teraz zotavuje, preto môže byť príjemnejšie vynechať intenzívne kardio a zvoliť niečo ľahšie.",
+      "Dnes je ideálny čas zvoliť jemnejší pohyb a nechať si intenzívne kardio na obdobie s väčšou energiou.",
+      "Aby sa telo mohlo naplno obnoviť, môže mu dnes pomôcť, ak si dáš pauzu od intenzívneho kardia.",
+      "Tvoje hormóny sú teraz nastavené na regeneráciu, preto ľahší pohyb urobí väčšiu službu než intenzívne kardio.",
+      "Skús dnes uprednostniť pokojnejší pohyb — intenzívne kardio si nechaj na dni, keď bude energia vyššia.",
+      "Regenerácia je teraz prioritou, a preto môže byť fajn dať si dnes prestávku od náročného kardia."
+    ],
+    walkBenefits: [
+      "jemne uvoľniť panvové svaly a znížiť menštruačné kŕče.",
+      "podporiť prirodzený tok krvi a zmierni pocit ťažoby v podbrušku.",
+      "dodať viac kyslíka a energie bez toho, aby ťa unavila.",
+      "zvýšiť hladinu endorfínov a prinesie úľavu od bolesti.",
+      "podporiť lepší spánok tým, že upokojí nervový systém.",
+      "zmierniť nafúknutie tým, že rozhýbe trávenie a lymfu.",
+      "stabilizovať náladu a pomôže znížiť podráždenosť.",
+      "znížiť zápal v tele a prinesie viac fyzickej pohody.",
+      "uvoľniť napätie v krížoch a spodnej časti chrbta.",
+      "vyrovnať hladinu stresových hormónov a prinesie pocit pokoja."
+    ]
+  },
+
+  menstrualLate: {
+    primaryExercise: [
+      "Posledné dni menštruácie sú ideálne na jemný pilates — posilníš jadro a pripravíš telo na aktívnejšiu fázu.",
+      "Skús dnes pilates — pomôže ti aktivovať hlboké svaly a zlepší stabilitu panvy.",
+      "Pilates je dnes výborná voľba — jemne posilňuje a pripravuje telo na nadchádzajúcu folikulárnu fázu.",
+      "Dopraj si dnes pilates cvičenie — podporí držanie tela a pomáha uvoľniť napätie v spodnom chrbte.",
+      "Jemný pilates ti dnes pomôže prebudiť svaly jadra a pripraviť sa na aktívnejšie dni.",
+      "Skús pilates, ktorý aktivuje hlboké stabilizačné svaly — ideálne pred koncom menštruácie.",
+      "Pilates dnes podporí správne držanie a jemne posilní svaly, ktoré počas menštruácie odpočívali.",
+      "Dnes je perfektný deň na pilates — jemná aktivácia svalov ti dodá energiu bez preťaženia.",
+      "Pilates ti pomôže prejsť z regeneračnej fázy do aktívnejšej — skús pár cvikov na jadro a panvu.",
+      "Jemný pilates je ideálny na záver menštruácie — posilňuje, ale nezaťažuje telo príliš."
     ],
     neome: "Ak nemáš veľa času a chceš čas ušetriť, vyskúšaj 15-min cvičenia od Neome.",
     cardioWithCardio: [],
@@ -784,7 +866,12 @@ export const MASTER_POHYB: Record<string, {
 // Get master key from phase + subphase
 export function getMasterKey(phase: string, subphase: string | null): string {
   if (phase === 'ovulation') return 'ovulation';
-  if (phase === 'menstrual') return 'menstrual';
+  if (phase === 'menstrual') {
+    if (subphase === 'early') return 'menstrualEarly';
+    if (subphase === 'mid') return 'menstrualMid';
+    if (subphase === 'late') return 'menstrualLate';
+    return 'menstrualMid'; // fallback
+  }
   if (phase === 'follicular') return 'follicular';
   if (phase === 'luteal') {
     if (subphase === 'early') return 'lutealEarly';
@@ -792,7 +879,7 @@ export function getMasterKey(phase: string, subphase: string | null): string {
     if (subphase === 'late') return 'lutealLate';
     return 'lutealMid'; // fallback
   }
-  return 'menstrual'; // fallback
+  return 'menstrualMid'; // fallback
 }
 
 // Generate nutrition text from MASTER_STRAVA with proper nutrient-food pairing
