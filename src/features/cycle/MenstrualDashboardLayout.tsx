@@ -118,7 +118,7 @@ export function MenstrualDashboardLayout({
           <PeriodkaTour accessCode={accessCode} autoStart={true} activeSection={activeSection} onSectionChange={setActiveSection} />
         </div>
 
-        {/* Next Dates Info for Mobile */}
+        {/* Next Dates Info for Mobile - unified calendar with onboarding */}
         <NextDatesInfo 
           lastPeriodStart={cycleData.lastPeriodStart} 
           cycleLength={cycleData.cycleLength}
@@ -135,11 +135,20 @@ export function MenstrualDashboardLayout({
             setCalendarModalMode('select-end');
             setShowCalendarModal(true);
           }}
+          onSetupComplete={(data) => {
+            setLastPeriodStart(data.lastPeriodStart);
+            setPeriodLength(data.periodLength);
+            setCycleLength(data.cycleLength);
+            handleFirstInteraction();
+          }}
+          onPeriodLengthChange={(length) => {
+            setPeriodLength(length);
+            handleFirstInteraction();
+          }}
         />
 
         {/* All sections for mobile */}
         <div className="space-y-8">
-          <CycleInfoSection cycleData={cycleData} />
           
           <TodaysEstimateSection 
             derivedState={derivedState} 
