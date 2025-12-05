@@ -843,7 +843,7 @@ export function CalendarView({
 
             {/* Calendar Actions Dropdown */}
             <Select
-              value=""
+              value={selectedOutcome === 'next-period' ? 'period' : selectedOutcome === 'fertile-days' ? 'fertile' : ''}
               onValueChange={(value) => {
                 switch(value) {
                   case 'period':
@@ -1075,7 +1075,7 @@ export function CalendarView({
                         </span>
                         
                         {/* Notes indicator - positioned in top-right corner */}
-                        {hasNotes && <Pen className="w-3 h-3 text-[#955F6A] absolute top-0.5 right-0.5" strokeWidth={2.5} />}
+                        {hasNotes && <div className="w-2 h-2 rounded-full bg-[#955F6A] absolute top-1 right-1" />}
                         
                         {/* Indicators container */}
                         <div className="absolute bottom-1 left-1 right-1 flex justify-center gap-1 flex-wrap">
