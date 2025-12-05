@@ -11,6 +11,7 @@ import MenstrualCalendar from "./pages/MenstrualCalendar"; // Remove lazy loadin
 const Checkout = lazy(() => import("./pages/Checkout"));
 const SharedCalendar = lazy(() => import("./pages/SharedCalendar"));
 const AdminCycleTips = lazy(() => import("./pages/AdminCycleTips"));
+const CycleTipsDebug = lazy(() => import("./pages/CycleTipsDebug"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Optimized loading component
@@ -38,6 +39,7 @@ const App = () => (
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/shared/:shareCode" element={<SharedCalendar />} />
             <Route path="/admin/cycle-tips" element={<AdminCycleTips />} />
+            <Route path="/debug/cycle-tips" element={<CycleTipsDebug />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
