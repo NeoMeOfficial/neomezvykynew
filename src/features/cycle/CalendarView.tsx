@@ -937,7 +937,10 @@ export function CalendarView({
         <Button 
           variant="outline" 
           size="sm" 
-          onClick={() => setCurrentDate(new Date())}
+          onClick={() => {
+            setCurrentDate(new Date());
+            onOutcomeSelect(null);
+          }}
           className="flex items-center gap-2 border-amber-400 text-amber-700 hover:bg-amber-50"
         >
           <Calendar className="w-4 h-4" />
