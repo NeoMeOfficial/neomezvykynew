@@ -39,7 +39,7 @@ export function TodaysEstimateSection({
   const [dialogOpen, setDialogOpen] = useState(false);
 
   // Calculate period prediction data
-  const startDate = lastPeriodStart ? new Date(lastPeriodStart) : null;
+  const startDate = lastPeriodStart ? new Date(lastPeriodStart + 'T00:00:00') : null;
   const nextPeriodDate = startDate ? addDays(startDate, cycleData.cycleLength) : null;
   const today = new Date();
   const daysUntilPeriod = nextPeriodDate ? differenceInDays(nextPeriodDate, today) : null;

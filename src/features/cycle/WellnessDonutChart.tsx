@@ -36,7 +36,7 @@ export function WellnessDonutChart({ derivedState, onEditClick, className = "", 
   const isDayHighlighted = (day: number): boolean => {
     if (!selectedOutcome || !cycleData?.lastPeriodStart) return false;
     
-    const dayDate = new Date(cycleData.lastPeriodStart);
+    const dayDate = new Date(cycleData.lastPeriodStart + 'T00:00:00');
     dayDate.setDate(dayDate.getDate() + day - 1);
     
     if (selectedOutcome === 'next-period') {
