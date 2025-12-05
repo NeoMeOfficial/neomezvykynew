@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { format, addDays, differenceInDays } from 'date-fns';
 import { sk } from 'date-fns/locale';
 import { Calendar as CalendarIcon, ChevronRight } from 'lucide-react';
+import { toast } from 'sonner';
 import { Calendar } from '@/components/ui/calendar';
 import { Button } from '@/components/ui/button';
 import {
@@ -83,9 +84,14 @@ export function NextDatesInfo({
     if (startDate) {
       const actualDuration = differenceInDays(endDate, startDate) + 1;
       
-      // If actual duration is longer than expected, update periodLength
-      if (actualDuration > periodLength && actualDuration <= 10) {
+      // Update periodLength if actual duration is DIFFERENT (longer OR shorter)
+      if (actualDuration !== periodLength && actualDuration >= 2 && actualDuration <= 10) {
         onPeriodLengthChange?.(actualDuration);
+        toast.success(`Dĺžka krvácania aktualizovaná na ${actualDuration} dní`, {
+          description: 'Folikulárna fáza bola prepočítaná'
+        });
+      } else {
+        toast.success('Menštruácia zaznamenaná');
       }
       
       // Notify parent about period end (for history tracking)

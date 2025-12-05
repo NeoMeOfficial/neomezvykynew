@@ -99,7 +99,7 @@ export function useCycleData(accessCode?: string) {
 
   // Set period length
   const setPeriodLength = useCallback((length: number) => {
-    updateCycleData({ periodLength: Math.max(2, Math.min(8, length)) });
+    updateCycleData({ periodLength: Math.max(2, Math.min(10, length)) });
   }, [updateCycleData]);
 
   // Add period to history
