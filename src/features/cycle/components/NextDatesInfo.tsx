@@ -326,9 +326,10 @@ export function NextDatesInfo({
                 className={cn(
                   "w-full mt-3 py-2 px-4 rounded-lg font-medium text-sm transition-all",
                   daysUntilNextPeriod <= 0 
-                    ? "bg-white text-pink-600 shadow-md hover:shadow-lg" 
-                    : "bg-white/20 text-white hover:bg-white/30"
+                    ? "bg-white shadow-md hover:shadow-lg" 
+                    : "bg-white/20 hover:bg-white/30"
                 )}
+                style={{ color: '#955F6A' }}
               >
                 🩸 {daysUntilNextPeriod > 0 ? "Menštruácia mi začala skôr" : "Menštruácia mi začala"}
               </button>
