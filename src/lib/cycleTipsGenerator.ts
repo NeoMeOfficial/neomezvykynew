@@ -18,29 +18,25 @@ export function seededShuffle<T>(array: T[], seed: number): T[] {
   return result;
 }
 
-// MASTER STRAVA - nutrition data per phase
+// NEW MASTER STRAVA - nutrition data per phase with nutrient-to-food mapping
 export const MASTER_STRAVA: Record<string, {
-  nutrients: string[];
-  foods: string[];
+  nutrients: Record<string, string[]>;  // nutrient → list of foods
   benefits: string[];
   reasonTemplate: string;
 }> = {
   menstrual: {
-    nutrients: [
-      "železo", "vitamín C", "folát (B9)", "vitamín B12",
-      "omega-3", "kurkumín", "antioxidanty A, C, E", "polyfenoly",
-      "horčík", "vitamín B6", "vitamín B1 a B2", "draslík", "komplexné sacharidy", "proteíny",
-      "vláknina", "probiotiká", "enzýmy", "zázvor"
-    ],
-    foods: [
-      "šošovica", "cícer", "čierna fazuľa", "vajcia", "tofu",
-      "hovädzie mäso", "morčacie mäso", "jahody", "pomaranč", "kiwi",
-      "granátové jablko", "červená paprika", "špenát", "kel", "brokolica",
-      "červená repa", "losos", "sardinky", "chia semienka", "ľanové semienka",
-      "vlašské orechy", "kurkuma", "zázvor", "polievky", "vývary",
-      "ovsená kaša", "quinoa", "hnedá ryža", "bataty", "teplý čaj",
-      "kefír", "jogurt"
-    ],
+    nutrients: {
+      "železo": ["šošovica", "cícer", "čierna fazuľa", "hovädzie mäso", "morčacie mäso", "špenát", "tofu", "vajcia"],
+      "vitamín C": ["jahody", "pomaranč", "kiwi", "granátové jablko", "červená paprika", "brokolica", "citrusy", "maliny"],
+      "folát (B9)": ["špenát", "šošovica", "cícer", "brokolica", "rukola", "kel", "avokádo", "špargľa"],
+      "vitamín B12": ["vajcia", "hovädzie mäso", "morčacie mäso", "losos", "sardinky", "mliečne výrobky", "tofu fortifikované", "tempeh"],
+      "omega-3": ["losos", "sardinky", "makrela", "chia semienka", "ľanové semienka", "vlašské orechy", "konopné semienka", "morské riasy"],
+      "kurkumín": ["kurkuma", "zázvor", "čierne korenie", "curry", "zlaté mlieko", "kurkumový čaj", "kurkumová pasta"],
+      "antioxidanty": ["čučoriedky", "jahody", "granátové jablko", "červená repa", "tmavá čokoláda", "zelený čaj", "brusnice", "acai"],
+      "horčík": ["tmavá čokoláda 85%", "mandle", "tekvicové semienka", "špenát", "banán", "avokádo", "čierna fazuľa", "hnedá ryža"],
+      "vitamín B6": ["banán", "kuracie mäso", "morčacie mäso", "losos", "zemiaky", "cícer", "avokádo", "slnečnicové semienka"],
+      "draslík": ["banán", "avokádo", "zemiaky", "bataty", "špenát", "melón", "pomaranč", "kokosová voda"]
+    },
     benefits: [
       "znížiš zápal a bolestivosť",
       "doplníš železo stratené krvácaním",
@@ -57,22 +53,16 @@ export const MASTER_STRAVA: Record<string, {
   },
 
   follicular: {
-    nutrients: [
-      "proteíny", "omega-3", "vláknina", "B-komplex",
-      "zinok", "vitamín C", "vitamín E", "železo",
-      "horčík", "selén", "jód", "kolagén",
-      "antioxidanty", "probiotika", "komplexné sacharidy", "zdravé tuky",
-      "vitamín D", "vitamín K"
-    ],
-    foods: [
-      "vajcia", "losos", "kuracie mäso", "tofu", "quinoa",
-      "brokolica", "špenát", "rukola", "kel", "mrkva",
-      "paprika", "rajčiny", "avokádo", "orechy", "mandle",
-      "vlašské orechy", "ľanové semienka", "chia semienka", "tekvicové semienka", "slnečnicové semienka",
-      "jahody", "čučoriedky", "maliny", "jablká", "citrusy",
-      "pomaranč", "grapefruit", "kiwi", "banán", "celozrnné pečivo",
-      "hnedá ryža", "ovsené vločky", "fazuľa", "šošovica", "cícer"
-    ],
+    nutrients: {
+      "proteíny": ["vajcia", "losos", "kuracie mäso", "morčacie mäso", "tofu", "tempeh", "grécky jogurt", "cottage cheese"],
+      "omega-3": ["losos", "sardinky", "makrela", "chia semienka", "ľanové semienka", "vlašské orechy", "konopné semienka", "avokádo"],
+      "vláknina": ["ovsené vločky", "quinoa", "šošovica", "cícer", "brokolica", "jablká", "hrušky", "maliny"],
+      "B-komplex": ["vajcia", "losos", "kuracie mäso", "avokádo", "celozrnné pečivo", "špenát", "banán", "šošovica"],
+      "zinok": ["tekvicové semienka", "hovädzie mäso", "cícer", "kešu orechy", "šošovica", "tofu", "quinoa", "sezamové semienka"],
+      "vitamín E": ["mandle", "slnečnicové semienka", "avokádo", "olivový olej", "špargľa", "červená paprika", "mango", "kiwi"],
+      "zdravé tuky": ["avokádo", "olivový olej", "mandle", "vlašské orechy", "losos", "chia semienka", "kokosový olej", "mandľové maslo"],
+      "vitamín D": ["losos", "sardinky", "vajcia", "hríby shiitake", "fortifikované mlieko", "tofu fortifikované", "makrela", "tuniak"]
+    },
     benefits: [
       "podporíš rastúcu energiu a vitalitu",
       "zlepšíš koncentráciu a jasné myslenie",
@@ -89,22 +79,14 @@ export const MASTER_STRAVA: Record<string, {
   },
 
   ovulation: {
-    nutrients: [
-      "folát (B9)", "vitamín D", "zinok", "selén",
-      "omega-3", "antioxidanty C, E, beta-karotén", "polyfenoly",
-      "horčík", "vitamín B6", "draslík",
-      "sodík", "vápnik", "bielkoviny", "vitamín E",
-      "vitamín C", "vláknina"
-    ],
-    foods: [
-      "vajcia", "šošovica", "fazuľa čierna", "fazuľa biela", "fazuľa kidney",
-      "špenát", "brokolica", "cícer", "tekvicové semienka", "hovädzie mäso",
-      "tofu", "losos", "sardinky", "makrela", "ľanové semienka",
-      "chia semienka", "vlašské orechy", "čučoriedky", "jahody", "pomaranč",
-      "mango", "kiwi", "granátové jablko", "červená paprika", "mrkva",
-      "kokosová voda", "banán", "jogurt", "kefír", "avokádo",
-      "quinoa", "rukola", "kel", "cottage", "olivový olej"
-    ],
+    nutrients: {
+      "folát (B9)": ["špenát", "šošovica", "cícer", "brokolica", "rukola", "kel", "avokádo", "špargľa"],
+      "zinok": ["tekvicové semienka", "hovädzie mäso", "cícer", "kešu orechy", "vajcia", "tofu", "quinoa", "sezamové semienka"],
+      "selén": ["para orechy", "vajcia", "losos", "sardinky", "slnečnicové semienka", "hovädzie mäso", "hnedá ryža", "šampiňóny"],
+      "omega-3": ["losos", "sardinky", "makrela", "chia semienka", "ľanové semienka", "vlašské orechy", "konopné semienka", "avokádo"],
+      "antioxidanty": ["čučoriedky", "jahody", "granátové jablko", "červená paprika", "mrkva", "tmavá čokoláda", "zelený čaj", "rajčiny"],
+      "vitamín E": ["mandle", "slnečnicové semienka", "avokádo", "olivový olej", "špargľa", "kiwi", "mango", "papája"]
+    },
     benefits: [
       "podporíš zdravú ovuláciu a hormonálnu rovnováhu",
       "zlepšíš energiu počas náročného dňa",
@@ -120,19 +102,16 @@ export const MASTER_STRAVA: Record<string, {
   },
 
   lutealEarly: {
-    nutrients: [
-      "draslík", "horčík", "vitamín B6", "omega-3",
-      "bielkoviny", "komplexné sacharidy", "vláknina", "chróm",
-      "tryptofán", "vitamín D", "zinok", "vitamín C"
-    ],
-    foods: [
-      "banán", "avokádo", "zemiaky", "kiwi", "melón", "mrkva",
-      "špenát", "tmavá čokoláda 85%", "vlašské orechy", "tekvicové semienka", "mandle",
-      "losos", "sardinky", "chia semienka", "ľanové semienka",
-      "morčacie mäso", "tofu", "vajcia", "grécky jogurt", "cottage cheese",
-      "hnedá ryža", "quinoa", "ovsené vločky", "bataty",
-      "cícer", "šošovica", "brokolica", "cuketa"
-    ],
+    nutrients: {
+      "draslík": ["banán", "avokádo", "zemiaky", "bataty", "špenát", "melón", "kiwi", "kokosová voda"],
+      "horčík": ["tmavá čokoláda 85%", "mandle", "tekvicové semienka", "špenát", "avokádo", "čierna fazuľa", "hnedá ryža", "banán"],
+      "vitamín B6": ["banán", "morčacie mäso", "losos", "zemiaky", "cícer", "avokádo", "slnečnicové semienka", "pistácie"],
+      "omega-3": ["losos", "sardinky", "makrela", "chia semienka", "ľanové semienka", "vlašské orechy", "konopné semienka", "avokádo"],
+      "bielkoviny": ["vajcia", "grécky jogurt", "cottage cheese", "tofu", "morčacie mäso", "losos", "tempeh", "quinoa"],
+      "komplexné sacharidy": ["bataty", "quinoa", "ovsené vločky", "hnedá ryža", "celozrnný chlieb", "pohánka", "cícer", "šošovica"],
+      "vláknina": ["brokolica", "cuketa", "ovsené vločky", "jablká", "hrušky", "šošovica", "cícer", "maliny"],
+      "tryptofán": ["morčacie mäso", "vajcia", "losos", "tekvicové semienka", "tofu", "syr", "banán", "mlieko"]
+    },
     benefits: [
       "pomôžeš stabilizovať náladu pri zvyšujúcom sa progesteróne",
       "znížiš zadržiavanie vody",
@@ -144,19 +123,18 @@ export const MASTER_STRAVA: Record<string, {
   },
 
   lutealMid: {
-    nutrients: [
-      "horčík", "vitamín B6", "omega-3", "zinok",
-      "probiotiká", "prebiotiká", "vláknina", "draslík",
-      "sodík", "bielkoviny", "komplexné sacharidy", "hydratačné minerály"
-    ],
-    foods: [
-      "kefír", "jogurt", "kyslá kapusta", "kimchi", "tempeh",
-      "cuketa", "zázvor", "cícer", "fazuľa čierna", "špargľa",
-      "rukola", "kel", "špenát", "tekvicové semienka", "mandle",
-      "sardinky", "losos", "chia semienka", "vlašské orechy",
-      "bataty", "quinoa", "ovsené vločky", "pohánka",
-      "maliny", "čučoriedky", "kurkuma", "vajcia", "tofu"
-    ],
+    nutrients: {
+      "horčík": ["tmavá čokoláda 85%", "mandle", "tekvicové semienka", "špenát", "avokádo", "čierna fazuľa", "hnedá ryža", "banán"],
+      "vitamín B6": ["banán", "morčacie mäso", "losos", "zemiaky", "cícer", "avokádo", "slnečnicové semienka", "pistácie"],
+      "omega-3": ["losos", "sardinky", "makrela", "chia semienka", "ľanové semienka", "vlašské orechy", "konopné semienka", "avokádo"],
+      "probiotiká": ["kefír", "grécky jogurt", "kyslá kapusta", "kimchi", "tempeh", "miso", "kombucha", "acidofilné mlieko"],
+      "prebiotiká": ["cesnak", "cibuľa", "špargľa", "banán", "jablká", "ovsené vločky", "pór", "artičoky"],
+      "vláknina": ["brokolica", "cuketa", "ovsené vločky", "šošovica", "cícer", "maliny", "hrušky", "fazuľa"],
+      "draslík": ["banán", "avokádo", "zemiaky", "bataty", "špenát", "melón", "kiwi", "kokosová voda"],
+      "zinok": ["tekvicové semienka", "hovädzie mäso", "cícer", "kešu orechy", "vajcia", "tofu", "quinoa", "sezamové semienka"],
+      "komplexné sacharidy": ["bataty", "quinoa", "ovsené vločky", "hnedá ryža", "pohánka", "cícer", "šošovica", "celozrnný chlieb"],
+      "bielkoviny": ["vajcia", "grécky jogurt", "cottage cheese", "tofu", "morčacie mäso", "losos", "tempeh", "quinoa"]
+    },
     benefits: [
       "znížiš nafukovanie a tlak v bruchu",
       "stabilizuješ náladu počas hormonálnych výkyvov",
@@ -168,19 +146,16 @@ export const MASTER_STRAVA: Record<string, {
   },
 
   lutealLate: {
-    nutrients: [
-      "horčík", "vitamín B6", "omega-3", "vitamín E",
-      "antioxidanty C", "polyfenoly", "kurkumín", "vláknina",
-      "bielkoviny", "vitamín C"
-    ],
-    foods: [
-      "tmavá čokoláda 85%", "banán", "špenát", "mandle", "vlašské orechy",
-      "losos", "makrela", "sardinky", "chia semienka", "ľanové semienka",
-      "avokádo", "mandľové maslo", "slnečnicové semienka", "maliny", "čučoriedky",
-      "kurkuma", "zázvor", "zelený čaj", "jahody",
-      "ovsené vločky", "zemiaky", "bataty", "quinoa", "šošovica",
-      "hummus", "tofu", "vajcia", "grécky jogurt", "med"
-    ],
+    nutrients: {
+      "horčík": ["tmavá čokoláda 85%", "mandle", "tekvicové semienka", "špenát", "avokádo", "čierna fazuľa", "hnedá ryža", "banán"],
+      "vitamín B6": ["banán", "morčacie mäso", "losos", "zemiaky", "cícer", "avokádo", "slnečnicové semienka", "pistácie"],
+      "omega-3": ["losos", "sardinky", "makrela", "chia semienka", "ľanové semienka", "vlašské orechy", "konopné semienka", "avokádo"],
+      "vitamín E": ["mandle", "slnečnicové semienka", "avokádo", "olivový olej", "špargľa", "kiwi", "mango", "papája"],
+      "antioxidanty": ["čučoriedky", "jahody", "maliny", "granátové jablko", "tmavá čokoláda", "zelený čaj", "brusnice", "acai"],
+      "kurkumín": ["kurkuma", "zázvor", "čierne korenie", "curry", "zlaté mlieko", "kurkumový čaj", "zázvorový čaj"],
+      "vláknina": ["ovsené vločky", "šošovica", "cícer", "jablká", "hrušky", "brokolica", "maliny", "fazuľa"],
+      "bielkoviny": ["vajcia", "grécky jogurt", "tofu", "cottage cheese", "losos", "morčacie mäso", "tempeh", "quinoa"]
+    },
     benefits: [
       "znížiš podráždenosť a PMS",
       "zlepšíš spánok",
@@ -473,25 +448,36 @@ export function getMasterKey(phase: string, subphase: string | null): string {
   return 'menstrual'; // fallback
 }
 
-// Generate nutrition text from MASTER_STRAVA
+// Generate nutrition text from MASTER_STRAVA with proper nutrient-food pairing
 export function generateNutrition(day: number, phase: string, subphase: string | null): string {
   const masterKey = getMasterKey(phase, subphase);
   const master = MASTER_STRAVA[masterKey];
   
   if (!master) return '';
   
-  // Use seeded shuffle for deterministic but varied selection
-  const shuffledNutrients = seededShuffle(master.nutrients, day);
-  const shuffledFoods = seededShuffle(master.foods, day * 2);
-  const shuffledBenefits = seededShuffle(master.benefits, day * 3);
+  const nutrientNames = Object.keys(master.nutrients);
   
+  // Select 4 nutrients using seeded shuffle (deterministic based on day)
+  const shuffledNutrients = seededShuffle(nutrientNames, day);
   const selectedNutrients = shuffledNutrients.slice(0, 4);
-  const selectedFoods = shuffledFoods.slice(0, 6);
+  
+  // For each nutrient, select foods from its own food list
+  // First 2 nutrients get 2 foods each, last 2 get 1 food each = 6 foods total
+  const foods: string[] = [];
+  selectedNutrients.forEach((nutrient, index) => {
+    const nutrientFoods = master.nutrients[nutrient];
+    const shuffledFoods = seededShuffle(nutrientFoods, day * (index + 2));
+    const foodCount = index < 2 ? 2 : 1; // 2+2+1+1 = 6 foods
+    foods.push(...shuffledFoods.slice(0, foodCount));
+  });
+  
+  // Select benefit
+  const shuffledBenefits = seededShuffle(master.benefits, day * 3);
   const selectedBenefit = shuffledBenefits[0];
   
   // Format: 3 sentences
   const nutrientsStr = selectedNutrients.join(', ');
-  const foodsStr = selectedFoods.join(', ');
+  const foodsStr = foods.join(', ');
   
   return `Tvoje telo dnes potrebuje ${nutrientsStr} — ${master.reasonTemplate}.\n\nNájdeš ich v potravinách ako ${foodsStr}.\n\nTento výber ti dnes pomôže ${selectedBenefit}.`;
 }
