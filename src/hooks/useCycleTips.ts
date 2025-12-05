@@ -47,6 +47,6 @@ export function useCycleTips(
         movement
       };
     },
-    enabled: currentDay >= 1 && currentDay <= cycleLength,
+    enabled: currentDay >= 1,
   });
 }
