@@ -314,7 +314,7 @@ export function SymptomTracker({
       <h4 className="text-base font-medium mb-2" style={{
       color: '#955F6A'
     }}>
-        Ako sa cítiš:
+        Zaznač si, ako sa dnes naozaj cítiš
       </h4>
       
 
