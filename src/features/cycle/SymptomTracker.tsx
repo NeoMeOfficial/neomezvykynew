@@ -321,12 +321,12 @@ export function SymptomTracker({
               {isExpanded ? (
                 <>
                   <ChevronUp className="w-3.5 h-3.5" />
-                  Skryť všetky príznaky
+                  Skryť príznaky
                 </>
               ) : (
                 <>
                   <ChevronDown className="w-3.5 h-3.5" />
-                  Zobraziť všetky príznaky
+                  Zobraziť ďalšie príznaky
                 </>
               )}
             </Button>
