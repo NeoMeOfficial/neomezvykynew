@@ -33,7 +33,8 @@ export function NextDatesInfo({
   onEditClick,
   onPeriodEndClick,
   onSetupComplete,
-  onPeriodLengthChange
+  onPeriodLengthChange,
+  onPeriodStart
 }: NextDatesInfoProps) {
   
   // Onboarding state
@@ -42,6 +43,7 @@ export function NextDatesInfo({
   const [setupPeriodLength, setSetupPeriodLength] = useState(5);
   const [setupNextPeriod, setSetupNextPeriod] = useState<Date | undefined>(undefined);
   const [showPeriodLengthPopover, setShowPeriodLengthPopover] = useState(false);
+  const [showPeriodStartPopover, setShowPeriodStartPopover] = useState(false);
 
   const formatDate = (date: Date) => {
     return format(date, 'd. M. yyyy', { locale: sk });
@@ -279,19 +281,78 @@ export function NextDatesInfo({
   // EXISTING USER VIEW - show all cycle info
   return (
     <div className="space-y-2 px-1">
-      {/* Countdown to next period - highlight box */}
-      {daysUntilNextPeriod !== null && daysUntilNextPeriod > 0 && (
+      {/* Countdown to next period - dynamic highlight box */}
+      {daysUntilNextPeriod !== null && (
         <div className="p-4 rounded-xl mb-3" 
              style={{ 
-               background: 'linear-gradient(135deg, #FF7782 0%, #FFB3B8 100%)',
-               boxShadow: '0 4px 12px rgba(255, 119, 130, 0.3)'
+               background: daysUntilNextPeriod < 0 
+                 ? 'linear-gradient(135deg, #FFA726 0%, #FFD54F 100%)'
+                 : daysUntilNextPeriod === 0
+                   ? 'linear-gradient(135deg, #FF5252 0%, #FF7782 100%)'
+                   : 'linear-gradient(135deg, #FF7782 0%, #FFB3B8 100%)',
+               boxShadow: daysUntilNextPeriod < 0 
+                 ? '0 4px 12px rgba(255, 167, 38, 0.3)'
+                 : '0 4px 12px rgba(255, 119, 130, 0.3)'
              }}>
-          <p className="text-white text-sm font-medium text-center">
-            Do ďalšej menštruácie ti ostáva
-          </p>
-          <p className="text-white text-2xl font-bold text-center mt-1">
-            {daysUntilNextPeriod} {daysUntilNextPeriod === 1 ? 'deň' : daysUntilNextPeriod < 5 ? 'dni' : 'dní'}
-          </p>
+          
+          {/* Dynamic text based on period status */}
+          {daysUntilNextPeriod > 0 && (
+            <>
+              <p className="text-white text-sm font-medium text-center">
+                Do ďalšej menštruácie ti ostáva
+              </p>
+              <p className="text-white text-2xl font-bold text-center mt-1">
+                {daysUntilNextPeriod} {daysUntilNextPeriod === 1 ? 'deň' : daysUntilNextPeriod < 5 ? 'dni' : 'dní'}
+              </p>
+            </>
+          )}
+          
+          {daysUntilNextPeriod === 0 && (
+            <p className="text-white text-base font-semibold text-center">
+              🩸 Dnes je očakávaný začiatok menštruácie
+            </p>
+          )}
+          
+          {daysUntilNextPeriod < 0 && (
+            <p className="text-white text-base font-semibold text-center">
+              ⏳ Menštruácia mešká o {Math.abs(daysUntilNextPeriod)} {Math.abs(daysUntilNextPeriod) === 1 ? 'deň' : Math.abs(daysUntilNextPeriod) < 5 ? 'dni' : 'dní'}
+            </p>
+          )}
+
+          {/* Period start button with date picker */}
+          <Popover open={showPeriodStartPopover} onOpenChange={setShowPeriodStartPopover}>
+            <PopoverTrigger asChild>
+              <button
+                className={cn(
+                  "w-full mt-3 py-2 px-4 rounded-lg font-medium text-sm transition-all",
+                  daysUntilNextPeriod <= 0 
+                    ? "bg-white text-pink-600 shadow-md hover:shadow-lg" 
+                    : "bg-white/20 text-white hover:bg-white/30"
+                )}
+              >
+                🩸 Už mi začala menštruácia
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0 pointer-events-auto" align="center">
+              <div className="p-3 border-b">
+                <p className="text-sm font-medium" style={{ color: '#955F6A' }}>
+                  Kedy ti začala menštruácia?
+                </p>
+              </div>
+              <Calendar
+                mode="single"
+                onSelect={(date) => {
+                  if (date && onPeriodStart) {
+                    onPeriodStart(date);
+                    setShowPeriodStartPopover(false);
+                  }
+                }}
+                disabled={(date) => date > new Date()}
+                initialFocus
+                className="pointer-events-auto"
+              />
+            </PopoverContent>
+          </Popover>
         </div>
       )}
 
