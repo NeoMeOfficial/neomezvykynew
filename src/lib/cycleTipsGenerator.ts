@@ -884,7 +884,13 @@ export function getMasterKey(phase: string, subphase: string | null): string {
 
 // Generate nutrition text from MASTER_STRAVA with proper nutrient-food pairing
 export function generateNutrition(day: number, phase: string, subphase: string | null): string {
-  const masterKey = getMasterKey(phase, subphase);
+  let masterKey = getMasterKey(phase, subphase);
+  
+  // Fallback for menstrual phase - MASTER_STRAVA does not have menstrual subphases
+  if (phase === 'menstrual') {
+    masterKey = 'menstrual';
+  }
+  
   const master = MASTER_STRAVA[masterKey];
   
   if (!master) return '';
