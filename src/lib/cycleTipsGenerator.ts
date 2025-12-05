@@ -25,6 +25,7 @@ export const MASTER_STRAVA: Record<string, {
   nutrients: Record<string, string[]>;  // nutrient → list of foods
   benefits: string[];
   reasonTemplate: string;
+  nutrientReasons: Record<string, string>;  // nutrient → reason for this phase
 }> = {
   menstrual: {
     nutrients: {
@@ -96,7 +97,20 @@ export const MASTER_STRAVA: Record<string, {
       "zlepšíš náladu a znížiš únavu",
       "podporíš regeneráciu tela"
     ],
-    reasonTemplate: "aby podporilo krvotvorbu, znížilo zápal a udržalo energiu stabilnú počas krvácania"
+    reasonTemplate: "aby podporilo krvotvorbu, znížilo zápal a udržalo energiu stabilnú počas krvácania",
+    nutrientReasons: {
+      "železo": "dopĺňa zásoby strácané počas krvácania",
+      "vitamín C": "podporuje vstrebávanie železa",
+      "folát (B9)": "podporuje tvorbu nových červených krviniek",
+      "vitamín B12": "pomáha udržať energiu a predísť únave",
+      "omega-3": "zmierňujú zápal a menštruačné kŕče",
+      "kurkumín": "má silné protizápalové účinky",
+      "antioxidanty": "chránia bunky a znižujú oxidatívny stres",
+      "horčík": "uvoľňuje svalové kŕče a napätie",
+      "vitamín B6": "stabilizuje náladu a zmierňuje PMS príznaky",
+      "draslík": "reguluje tekutiny a predchádza opuchom",
+      "kolagén-podpora": "podporuje regeneráciu tkanív"
+    }
   },
 
   follicular: {
@@ -158,7 +172,18 @@ export const MASTER_STRAVA: Record<string, {
       "pripravíš telo na ovuláciu",
       "posilníš svaly a kosti"
     ],
-    reasonTemplate: "podporia rastúcu energiu, hormonálnu rovnováhu a jasnú myseľ, ktorá je typická pre túto fázu"
+    reasonTemplate: "podporia rastúcu energiu, hormonálnu rovnováhu a jasnú myseľ, ktorá je typická pre túto fázu",
+    nutrientReasons: {
+      "proteíny": "podporujú rast a obnovu tkanív v aktívnej fáze",
+      "omega-3": "živia mozog a podporujú hormonálnu produkciu",
+      "vláknina": "podporuje trávenie a detoxikáciu estrogénu",
+      "B-komplex": "podporuje energetický metabolizmus a vitalitu",
+      "zinok": "podporuje hormonálnu rovnováhu a imunitu",
+      "vitamín E": "chráni bunky pred oxidatívnym stresom",
+      "zdravé tuky": "podporujú produkciu hormónov",
+      "vitamín D": "posilňuje kosti a imunitný systém",
+      "kolagén-podpora": "podporuje zdravú pleť a vlasy"
+    }
   },
 
   ovulation: {
@@ -205,7 +230,15 @@ export const MASTER_STRAVA: Record<string, {
       "podporíš plodnosť a zdravie vajíčka",
       "podporíš lepší spánok počas hormonálne aktívneho obdobia"
     ],
-    reasonTemplate: "podporia hormonálnu rovnováhu, znížia možný zápal okolo ovulácie a dodajú čistú, stabilnú energiu"
+    reasonTemplate: "podporia hormonálnu rovnováhu, znížia možný zápal okolo ovulácie a dodajú čistú, stabilnú energiu",
+    nutrientReasons: {
+      "folát (B9)": "podporuje zdravie vajíčka a bunkové delenie",
+      "zinok": "je kľúčový pre plodnosť a hormonálnu rovnováhu",
+      "selén": "chráni bunky a podporuje funkciu štítnej žľazy",
+      "omega-3": "znižujú zápal okolo ovulácie",
+      "antioxidanty": "chránia vajíčko a podporujú plodnosť",
+      "vitamín E": "chráni vajíčko pred oxidatívnym poškodením"
+    }
   },
 
   lutealEarly: {
@@ -258,7 +291,17 @@ export const MASTER_STRAVA: Record<string, {
       "podporíš trávenie, ktoré sa začína spomaľovať",
       "predídeš PMS podráždenosti"
     ],
-    reasonTemplate: "stabilizujú tekutiny, podporia energiu a pripravia telo na najdlhšiu fázu cyklu"
+    reasonTemplate: "stabilizujú tekutiny, podporia energiu a pripravia telo na najdlhšiu fázu cyklu",
+    nutrientReasons: {
+      "draslík": "reguluje tekutiny a predchádza opuchom",
+      "horčík": "uvoľňuje napätie a podporuje kvalitný spánok",
+      "vitamín B6": "zmierňuje PMS príznaky a podporuje náladu",
+      "omega-3": "znižujú zápal a podporujú mozgovú funkciu",
+      "bielkoviny": "stabilizujú hladinu cukru a sýtia",
+      "komplexné sacharidy": "udržiavajú stabilnú energiu bez cravingov",
+      "vláknina": "podporuje trávenie, ktoré sa spomaľuje",
+      "tryptofán": "podporuje tvorbu serotonínu a lepšiu náladu"
+    }
   },
 
   lutealMid: {
@@ -321,7 +364,19 @@ export const MASTER_STRAVA: Record<string, {
       "upokojíš nervový systém",
       "podporíš kvalitný spánok pri vysokom progesteróne"
     ],
-    reasonTemplate: "podporia trávenie, znížia nafukovanie a stabilizujú náladu počas vysokého progesterónu"
+    reasonTemplate: "podporia trávenie, znížia nafukovanie a stabilizujú náladu počas vysokého progesterónu",
+    nutrientReasons: {
+      "horčík": "zmierňuje nafukovanie a podporuje relaxáciu",
+      "vitamín B6": "reguluje náladu a znižuje podráždenosť",
+      "omega-3": "znižujú zápal a podporujú mozgovú funkciu",
+      "probiotiká": "podporujú trávenie a črevnú mikroflóru",
+      "prebiotiká": "živia prospešné baktérie v črevách",
+      "vláknina": "podporuje spomalené trávenie",
+      "draslík": "reguluje tekutiny a znižuje opuchy",
+      "zinok": "podporuje imunitu a hormonálnu rovnováhu",
+      "komplexné sacharidy": "udržiavajú stabilnú energiu počas vysokého progesterónu",
+      "bielkoviny": "stabilizujú hladinu cukru a predchádzajú cravingom"
+    }
   },
 
   lutealLate: {
@@ -378,7 +433,18 @@ export const MASTER_STRAVA: Record<string, {
       "znížiš zápal a bolesť",
       "stabilizuješ energiu v najcitlivejšej časti cyklu"
     ],
-    reasonTemplate: "upokojiť telo pred menštruáciou, znížiť zápal a podporiť stabilnú energiu"
+    reasonTemplate: "upokojiť telo pred menštruáciou, znížiť zápal a podporiť stabilnú energiu",
+    nutrientReasons: {
+      "horčík": "uvoľňuje kŕče a pripravuje telo na menštruáciu",
+      "vitamín B6": "zmierňuje PMS príznaky a stabilizuje náladu",
+      "omega-3": "znižujú zápal a menštruačné bolesti",
+      "vitamín E": "chráni bunky a zmierňuje citlivosť",
+      "antioxidanty": "znižujú zápal pred menštruáciou",
+      "kurkumín": "má protizápalové účinky a zmierňuje bolesť",
+      "vláknina": "podporuje pravidelné trávenie",
+      "bielkoviny": "udržiavajú stabilnú energiu",
+      "kolagén-podpora": "podporuje regeneráciu tkanív"
+    }
   }
 };
 
@@ -690,11 +756,18 @@ export function generateNutrition(day: number, phase: string, subphase: string |
   const shuffledBenefits = seededShuffle(master.benefits, day * 3);
   const selectedBenefit = shuffledBenefits[0];
   
-  // Format: 3 sentences
+  // Format: 3 sentences with dynamic reasons based on first 2 nutrients
   const nutrientsStr = selectedNutrients.join(', ');
   const foodsStr = foods.join(', ');
   
-  return `Tvoje telo dnes potrebuje ${nutrientsStr} — ${master.reasonTemplate}.\n\nNájdeš ich v potravinách ako ${foodsStr}.\n\nTento výber ti dnes pomôže ${selectedBenefit}.`;
+  // Build dynamic reason from first 2 selected nutrients
+  const reason1 = master.nutrientReasons?.[selectedNutrients[0]] || '';
+  const reason2 = master.nutrientReasons?.[selectedNutrients[1]] || '';
+  const dynamicReason = reason1 && reason2 
+    ? `${selectedNutrients[0]} ${reason1} a ${selectedNutrients[1]} ${reason2}`
+    : master.reasonTemplate;
+  
+  return `Tvoje telo dnes potrebuje ${nutrientsStr} — ${dynamicReason}.\n\nNájdeš ich v potravinách ako ${foodsStr}.\n\nTento výber ti dnes pomôže ${selectedBenefit}.`;
 }
 
 // Determine if today is a cardio day based on phase and day position
