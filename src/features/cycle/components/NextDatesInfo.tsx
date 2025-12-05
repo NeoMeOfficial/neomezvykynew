@@ -64,9 +64,35 @@ export function NextDatesInfo({
 
   // Calculate days until next period
   const today = new Date();
+  today.setHours(0, 0, 0, 0);
   const daysUntilNextPeriod = nextPeriodDate ? differenceInDays(nextPeriodDate, today) : null;
 
+  // Calculate current cycle day (1-based)
+  const currentCycleDay = startDate ? differenceInDays(today, startDate) + 1 : null;
+  
+  // Determine if user is in menstruation phase
   const isInMenstruationPhase = currentPhase === 'Menštruácia';
+  const isCurrentlyBleeding = isInMenstruationPhase && currentCycleDay !== null && currentCycleDay >= 1;
+  const isBleedingProlonged = isCurrentlyBleeding && currentCycleDay !== null && currentCycleDay > periodLength;
+  
+  // State for period end popover
+  const [showPeriodEndPopover, setShowPeriodEndPopover] = useState(false);
+
+  // Handle period end click
+  const handlePeriodEndConfirm = (endDate: Date) => {
+    if (startDate) {
+      const actualDuration = differenceInDays(endDate, startDate) + 1;
+      
+      // If actual duration is longer than expected, update periodLength
+      if (actualDuration > periodLength && actualDuration <= 10) {
+        onPeriodLengthChange?.(actualDuration);
+      }
+      
+      // Notify parent about period end (for history tracking)
+      onPeriodEndClick?.();
+      setShowPeriodEndPopover(false);
+    }
+  };
 
   // Handle onboarding completion
   const handleOnboardingComplete = () => {
@@ -281,79 +307,142 @@ export function NextDatesInfo({
   // EXISTING USER VIEW - show all cycle info
   return (
     <div className="space-y-2 px-1">
-      {/* Countdown to next period - dynamic highlight box */}
-      {daysUntilNextPeriod !== null && (
+      {/* Dynamic highlight box - changes based on menstruation status */}
+      {startDate && (
         <div className="p-4 rounded-xl mb-3" 
              style={{ 
-               background: daysUntilNextPeriod < 0 
-                 ? 'linear-gradient(135deg, #FFA726 0%, #FFD54F 100%)'
-                 : daysUntilNextPeriod === 0
-                   ? 'linear-gradient(135deg, #FF5252 0%, #FF7782 100%)'
-                   : 'linear-gradient(135deg, #FF7782 0%, #FFB3B8 100%)',
-               boxShadow: daysUntilNextPeriod < 0 
-                 ? '0 4px 12px rgba(255, 167, 38, 0.3)'
-                 : '0 4px 12px rgba(255, 119, 130, 0.3)'
+               background: isCurrentlyBleeding
+                 ? isBleedingProlonged
+                   ? 'linear-gradient(135deg, #E57373 0%, #FF8A80 100%)' // Prolonged bleeding - lighter red
+                   : 'linear-gradient(135deg, #E53935 0%, #FF5252 100%)' // Currently bleeding - deep red
+                 : daysUntilNextPeriod !== null && daysUntilNextPeriod < 0 
+                   ? 'linear-gradient(135deg, #FFA726 0%, #FFD54F 100%)' // Late
+                   : daysUntilNextPeriod === 0
+                     ? 'linear-gradient(135deg, #FF5252 0%, #FF7782 100%)' // Today
+                     : 'linear-gradient(135deg, #FF7782 0%, #FFB3B8 100%)', // Waiting
+               boxShadow: isCurrentlyBleeding
+                 ? '0 4px 12px rgba(229, 57, 53, 0.3)'
+                 : daysUntilNextPeriod !== null && daysUntilNextPeriod < 0 
+                   ? '0 4px 12px rgba(255, 167, 38, 0.3)'
+                   : '0 4px 12px rgba(255, 119, 130, 0.3)'
              }}>
           
-          {/* Dynamic text based on period status */}
-          {daysUntilNextPeriod > 0 && (
+          {/* STATE 1: Currently in menstruation */}
+          {isCurrentlyBleeding && currentCycleDay !== null && (
             <>
-              <p className="text-white text-sm font-medium text-center">
-                Do ďalšej menštruácie ti ostáva
-              </p>
-              <p className="text-white text-2xl font-bold text-center mt-1">
-                {daysUntilNextPeriod} {daysUntilNextPeriod === 1 ? 'deň' : daysUntilNextPeriod < 5 ? 'dni' : 'dní'}
-              </p>
+              <div className="text-center">
+                <p className="text-white text-sm font-medium">
+                  🩸 Práve máš menštruáciu
+                </p>
+                <p className="text-white text-2xl font-bold mt-1">
+                  Deň {currentCycleDay} {currentCycleDay <= periodLength ? `z ${periodLength}` : ''}
+                </p>
+                {isBleedingProlonged && (
+                  <p className="text-white/90 text-xs mt-1">
+                    (predĺžená o {currentCycleDay - periodLength} {currentCycleDay - periodLength === 1 ? 'deň' : currentCycleDay - periodLength < 5 ? 'dni' : 'dní'})
+                  </p>
+                )}
+              </div>
+
+              {/* Period end button */}
+              <Popover open={showPeriodEndPopover} onOpenChange={setShowPeriodEndPopover}>
+                <PopoverTrigger asChild>
+                  <button
+                    className="w-full mt-3 py-2 px-4 rounded-lg font-medium text-sm transition-all bg-white shadow-md hover:shadow-lg"
+                    style={{ color: '#955F6A' }}
+                  >
+                    ✓ Menštruácia mi skončila
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0 pointer-events-auto" align="center">
+                  <div className="p-3 border-b">
+                    <p className="text-sm font-medium" style={{ color: '#955F6A' }}>
+                      Kedy ti skončila menštruácia?
+                    </p>
+                  </div>
+                  <Calendar
+                    mode="single"
+                    onSelect={(date) => {
+                      if (date) {
+                        handlePeriodEndConfirm(date);
+                      }
+                    }}
+                    disabled={(date) => date > new Date() || (startDate && date < startDate)}
+                    defaultMonth={today}
+                    initialFocus
+                    className="pointer-events-auto"
+                  />
+                </PopoverContent>
+              </Popover>
             </>
           )}
           
-          {daysUntilNextPeriod === 0 && (
-            <p className="text-white text-base font-semibold text-center">
-              🩸 Dnes je očakávaný začiatok menštruácie
-            </p>
-          )}
-          
-          {daysUntilNextPeriod < 0 && (
-            <p className="text-white text-base font-semibold text-center">
-              ⏳ Menštruácia mešká o {Math.abs(daysUntilNextPeriod)} {Math.abs(daysUntilNextPeriod) === 1 ? 'deň' : Math.abs(daysUntilNextPeriod) < 5 ? 'dni' : 'dní'}
-            </p>
-          )}
-
-          {/* Period start button with date picker */}
-          <Popover open={showPeriodStartPopover} onOpenChange={setShowPeriodStartPopover}>
-            <PopoverTrigger asChild>
-              <button
-                className={cn(
-                  "w-full mt-3 py-2 px-4 rounded-lg font-medium text-sm transition-all",
-                  daysUntilNextPeriod <= 0 
-                    ? "bg-white shadow-md hover:shadow-lg" 
-                    : "bg-white/20 hover:bg-white/30"
-                )}
-                style={{ color: '#955F6A' }}
-              >
-                🩸 {daysUntilNextPeriod > 0 ? "Menštruácia mi začala skôr" : "Menštruácia mi začala"}
-              </button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0 pointer-events-auto" align="center">
-              <div className="p-3 border-b">
-                <p className="text-sm font-medium" style={{ color: '#955F6A' }}>
-                  Kedy ti začala menštruácia?
+          {/* STATE 2: Not in menstruation - show countdown or late status */}
+          {!isCurrentlyBleeding && daysUntilNextPeriod !== null && (
+            <>
+              {/* Waiting for next period */}
+              {daysUntilNextPeriod > 0 && (
+                <>
+                  <p className="text-white text-sm font-medium text-center">
+                    Do ďalšej menštruácie ti ostáva
+                  </p>
+                  <p className="text-white text-2xl font-bold text-center mt-1">
+                    {daysUntilNextPeriod} {daysUntilNextPeriod === 1 ? 'deň' : daysUntilNextPeriod < 5 ? 'dni' : 'dní'}
+                  </p>
+                </>
+              )}
+              
+              {/* Today is expected start */}
+              {daysUntilNextPeriod === 0 && (
+                <p className="text-white text-base font-semibold text-center">
+                  🩸 Dnes je očakávaný začiatok menštruácie
                 </p>
-              </div>
-              <Calendar
-                mode="single"
-                onSelect={(date) => {
-                  if (date && onPeriodStart) {
-                    onPeriodStart(date);
-                    setShowPeriodStartPopover(false);
-                  }
-                }}
-                disabled={(date) => date > new Date()}
-                initialFocus
-                className="pointer-events-auto"
-              />
-            </PopoverContent>
-          </Popover>
+              )}
+              
+              {/* Period is late */}
+              {daysUntilNextPeriod < 0 && (
+                <p className="text-white text-base font-semibold text-center">
+                  ⏳ Menštruácia mešká o {Math.abs(daysUntilNextPeriod)} {Math.abs(daysUntilNextPeriod) === 1 ? 'deň' : Math.abs(daysUntilNextPeriod) < 5 ? 'dni' : 'dní'}
+                </p>
+              )}
+
+              {/* Period start button with date picker */}
+              <Popover open={showPeriodStartPopover} onOpenChange={setShowPeriodStartPopover}>
+                <PopoverTrigger asChild>
+                  <button
+                    className={cn(
+                      "w-full mt-3 py-2 px-4 rounded-lg font-medium text-sm transition-all",
+                      daysUntilNextPeriod <= 0 
+                        ? "bg-white shadow-md hover:shadow-lg" 
+                        : "bg-white/20 hover:bg-white/30"
+                    )}
+                    style={{ color: '#955F6A' }}
+                  >
+                    🩸 {daysUntilNextPeriod > 0 ? "Menštruácia mi začala skôr" : "Menštruácia mi začala"}
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0 pointer-events-auto" align="center">
+                  <div className="p-3 border-b">
+                    <p className="text-sm font-medium" style={{ color: '#955F6A' }}>
+                      Kedy ti začala menštruácia?
+                    </p>
+                  </div>
+                  <Calendar
+                    mode="single"
+                    onSelect={(date) => {
+                      if (date && onPeriodStart) {
+                        onPeriodStart(date);
+                        setShowPeriodStartPopover(false);
+                      }
+                    }}
+                    disabled={(date) => date > new Date()}
+                    initialFocus
+                    className="pointer-events-auto"
+                  />
+                </PopoverContent>
+              </Popover>
+            </>
+          )}
         </div>
       )}
 
