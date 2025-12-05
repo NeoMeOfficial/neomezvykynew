@@ -19,6 +19,8 @@ export function seededShuffle<T>(array: T[], seed: number): T[] {
 }
 
 // NEW MASTER STRAVA - nutrition data per phase with nutrient-to-food mapping
+// All foods are commonly available in SK/CZ, no pork, no exotic ingredients
+// Each nutrient has 20+ foods for better rotation
 export const MASTER_STRAVA: Record<string, {
   nutrients: Record<string, string[]>;  // nutrient → list of foods
   benefits: string[];
@@ -26,17 +28,61 @@ export const MASTER_STRAVA: Record<string, {
 }> = {
   menstrual: {
     nutrients: {
-      "železo": ["šošovica", "cícer", "čierna fazuľa", "hovädzie mäso", "morčacie mäso", "špenát", "tofu", "vajcia"],
-      "vitamín C": ["jahody", "pomaranč", "kiwi", "granátové jablko", "červená paprika", "brokolica", "citrusy", "maliny"],
-      "folát (B9)": ["špenát", "šošovica", "cícer", "brokolica", "rukola", "kel", "avokádo", "špargľa"],
-      "vitamín B12": ["vajcia", "hovädzie mäso", "morčacie mäso", "losos", "sardinky", "mliečne výrobky", "tofu fortifikované", "tempeh"],
-      "omega-3": ["losos", "sardinky", "makrela", "chia semienka", "ľanové semienka", "vlašské orechy", "konopné semienka", "morské riasy"],
-      "kurkumín": ["kurkuma", "zázvor", "čierne korenie", "curry", "zlaté mlieko", "kurkumový čaj", "kurkumová pasta"],
-      "antioxidanty": ["čučoriedky", "jahody", "granátové jablko", "červená repa", "tmavá čokoláda", "zelený čaj", "brusnice", "acai"],
-      "horčík": ["tmavá čokoláda 85%", "mandle", "tekvicové semienka", "špenát", "banán", "avokádo", "čierna fazuľa", "hnedá ryža"],
-      "vitamín B6": ["banán", "kuracie mäso", "morčacie mäso", "losos", "zemiaky", "cícer", "avokádo", "slnečnicové semienka"],
-      "draslík": ["banán", "avokádo", "zemiaky", "bataty", "špenát", "melón", "pomaranč", "kokosová voda"],
-      "kolagén": ["mäsový vývar", "slepačí vývar", "losos s kožou", "hovädzie šľachy", "bravčové nožičky", "želatína", "kostný vývar", "kuracie krídla"]
+      "železo": [
+        "šošovica", "cícer", "čierna fazuľa", "hovädzie mäso", "morčacie mäso", "špenát", "tofu", "vajcia",
+        "červená šošovica", "tekvicové semienka", "quinoa", "tahini", "celozrnný chlieb", "pohánka", 
+        "kuracie mäso", "sušené marhule", "sezamové semienka", "mandle", "kešu orechy", "brokolica",
+        "kel", "červená fazuľa", "hrášok", "ovsené vločky", "hnedá ryža"
+      ],
+      "vitamín C": [
+        "jahody", "pomaranč", "kiwi", "granátové jablko", "červená paprika", "brokolica", "citróny", "maliny",
+        "mango", "ananás", "zelená paprika", "žltá paprika", "karfiol", "kapusta", "černice", "ríbezle",
+        "grepfrút", "limetka", "petržlen", "rajčiny", "rukola", "kel", "mandarínky", "melón"
+      ],
+      "folát (B9)": [
+        "špenát", "šošovica", "cícer", "brokolica", "rukola", "kel", "avokádo", "špargľa",
+        "červená fazuľa", "čierna fazuľa", "hrášok", "kapusta", "karfiol", "zelený šalát", "mangold",
+        "cvikla", "pomaranč", "banán", "vajcia", "celozrnný chlieb", "ovsené vločky", "quinoa"
+      ],
+      "vitamín B12": [
+        "vajcia", "hovädzie mäso", "morčacie mäso", "losos", "sardinky", "mliečne výrobky", "tofu fortifikované", "tempeh",
+        "kuracie mäso", "tuniak", "makrela", "pstruh", "grécky jogurt", "cottage cheese", "mozzarella",
+        "ementál", "parmezán", "kefír", "tvaroh", "fortifikované rastlinné mlieko"
+      ],
+      "omega-3": [
+        "losos", "sardinky", "makrela", "chia semienka", "ľanové semienka", "vlašské orechy", "konopné semienka",
+        "tuniak", "pstruh", "sleď", "vajcia obohatené omega-3", "tofu", "edamame", "sójové bôby",
+        "ľanový olej", "repkový olej", "avokádo", "mandle", "pekanové orechy", "zelená listová zelenina"
+      ],
+      "kurkumín": [
+        "kurkuma", "zázvor", "čierne korenie", "curry", "zlaté mlieko", "kurkumový čaj", "kurkumová pasta",
+        "zázvorový čaj", "korenie garam masala", "kurkumový prášok", "čerstvý zázvor", "sušený zázvor"
+      ],
+      "antioxidanty": [
+        "čučoriedky", "jahody", "granátové jablko", "červená repa", "tmavá čokoláda", "zelený čaj", "brusnice",
+        "maliny", "černice", "čerešne", "slivky", "červené hrozno", "červená kapusta", "mrkva",
+        "paradajky", "špargľa", "brokolica", "špenát", "kel", "cvikla", "kakao", "orechy"
+      ],
+      "horčík": [
+        "tmavá čokoláda 85%", "mandle", "tekvicové semienka", "špenát", "banán", "avokádo", "čierna fazuľa", "hnedá ryža",
+        "kešu orechy", "lieskové orechy", "vlašské orechy", "ovsené vločky", "quinoa", "tofu", "šošovica",
+        "cícer", "celozrnný chlieb", "pohánka", "sezamové semienka", "slnečnicové semienka", "edamame"
+      ],
+      "vitamín B6": [
+        "banán", "kuracie mäso", "morčacie mäso", "losos", "zemiaky", "cícer", "avokádo", "slnečnicové semienka",
+        "tuniak", "hovädzie mäso", "bataty", "špenát", "paprika", "brokolica", "mrkva",
+        "melón", "sušené slivky", "pistácie", "vlašské orechy", "ovsené vločky", "hnedá ryža"
+      ],
+      "draslík": [
+        "banán", "avokádo", "zemiaky", "bataty", "špenát", "melón", "pomaranč", "kokosová voda",
+        "paradajky", "cvikla", "šošovica", "fazuľa", "hrášok", "hrozienka", "sušené marhule",
+        "grécky jogurt", "mlieko", "losos", "kuracie mäso", "mandle", "arašidy"
+      ],
+      "kolagén-podpora": [
+        "kuracie mäso", "hovädzie mäso", "vajcia", "losos", "sardinky", "kostný vývar", "slepačí vývar",
+        "paprika", "jahody", "citrusy", "kiwi", "brokolica", "paradajky", "cesnak", "mrkva",
+        "tekvicové semienka", "mandle", "kešu orechy", "špenát", "avokádo", "zelený čaj"
+      ]
     },
     benefits: [
       "znížiš zápal a bolestivosť",
@@ -55,15 +101,51 @@ export const MASTER_STRAVA: Record<string, {
 
   follicular: {
     nutrients: {
-      "proteíny": ["vajcia", "losos", "kuracie mäso", "morčacie mäso", "tofu", "tempeh", "grécky jogurt", "cottage cheese"],
-      "omega-3": ["losos", "sardinky", "makrela", "chia semienka", "ľanové semienka", "vlašské orechy", "konopné semienka", "avokádo"],
-      "vláknina": ["ovsené vločky", "quinoa", "šošovica", "cícer", "brokolica", "jablká", "hrušky", "maliny"],
-      "B-komplex": ["vajcia", "losos", "kuracie mäso", "avokádo", "celozrnné pečivo", "špenát", "banán", "šošovica"],
-      "zinok": ["tekvicové semienka", "hovädzie mäso", "cícer", "kešu orechy", "šošovica", "tofu", "quinoa", "sezamové semienka"],
-      "vitamín E": ["mandle", "slnečnicové semienka", "avokádo", "olivový olej", "špargľa", "červená paprika", "mango", "kiwi"],
-      "zdravé tuky": ["avokádo", "olivový olej", "mandle", "vlašské orechy", "losos", "chia semienka", "kokosový olej", "mandľové maslo"],
-      "vitamín D": ["losos", "sardinky", "vajcia", "hríby shiitake", "fortifikované mlieko", "tofu fortifikované", "makrela", "tuniak"],
-      "kolagén": ["mäsový vývar", "slepačí vývar", "losos s kožou", "hovädzie šľachy", "kostný vývar", "želatína", "kuracie krídla", "bravčové nožičky"]
+      "proteíny": [
+        "vajcia", "losos", "kuracie mäso", "morčacie mäso", "tofu", "tempeh", "grécky jogurt", "cottage cheese",
+        "hovädzie mäso", "tuniak", "sardinky", "tvaroh", "quinoa", "šošovica", "cícer",
+        "fazuľa", "edamame", "syr", "mozzarella", "ricotta", "kefír", "skyr"
+      ],
+      "omega-3": [
+        "losos", "sardinky", "makrela", "chia semienka", "ľanové semienka", "vlašské orechy", "konopné semienka", "avokádo",
+        "tuniak", "pstruh", "sleď", "vajcia obohatené omega-3", "tofu", "edamame",
+        "ľanový olej", "repkový olej", "mandle", "pekanové orechy", "zelená listová zelenina", "brokolica"
+      ],
+      "vláknina": [
+        "ovsené vločky", "quinoa", "šošovica", "cícer", "brokolica", "jablká", "hrušky", "maliny",
+        "celozrnný chlieb", "hnedá ryža", "pohánka", "fazuľa", "hrášok", "mrkva", "cvikla",
+        "kapusta", "karfiol", "zeler", "uhorka", "rajčiny", "banán", "slivky"
+      ],
+      "B-komplex": [
+        "vajcia", "losos", "kuracie mäso", "avokádo", "celozrnné pečivo", "špenát", "banán", "šošovica",
+        "hovädzie mäso", "morčacie mäso", "tuniak", "sardinky", "grécky jogurt", "mlieko", "syr",
+        "ovsené vločky", "quinoa", "slnečnicové semienka", "mandle", "arašidy", "hrášok"
+      ],
+      "zinok": [
+        "tekvicové semienka", "hovädzie mäso", "cícer", "kešu orechy", "šošovica", "tofu", "quinoa", "sezamové semienka",
+        "kuracie mäso", "morčacie mäso", "vajcia", "syr", "jogurt", "mlieko", "ovsené vločky",
+        "celozrnný chlieb", "fazuľa", "hrášok", "mandle", "arašidy", "slnečnicové semienka"
+      ],
+      "vitamín E": [
+        "mandle", "slnečnicové semienka", "avokádo", "olivový olej", "špargľa", "červená paprika", "mango", "kiwi",
+        "lieskové orechy", "arašidy", "špenát", "brokolica", "rajčiny", "mrkva", "bataty",
+        "tekvicové semienka", "vlašské orechy", "celozrnný chlieb", "vajcia", "ryby"
+      ],
+      "zdravé tuky": [
+        "avokádo", "olivový olej", "mandle", "vlašské orechy", "losos", "chia semienka", "kokosový olej", "mandľové maslo",
+        "arašidové maslo", "kešu orechy", "lieskové orechy", "pekanové orechy", "makadamové orechy",
+        "ľanové semienka", "konopné semienka", "sardinky", "makrela", "vajcia", "tofu", "tmavá čokoláda"
+      ],
+      "vitamín D": [
+        "losos", "sardinky", "vajcia", "fortifikované mlieko", "tofu fortifikované", "makrela", "tuniak",
+        "pstruh", "sleď", "fortifikovaný jogurt", "fortifikované rastlinné mlieko", "maslo",
+        "syr", "vaječný žĺtok", "hovädzia pečeň", "rybie oleje"
+      ],
+      "kolagén-podpora": [
+        "kuracie mäso", "hovädzie mäso", "vajcia", "losos", "sardinky", "kostný vývar", "slepačí vývar",
+        "paprika", "jahody", "citrusy", "kiwi", "brokolica", "paradajky", "cesnak", "mrkva",
+        "tekvicové semienka", "mandle", "kešu orechy", "špenát", "avokádo", "zelený čaj"
+      ]
     },
     benefits: [
       "podporíš rastúcu energiu a vitalitu",
@@ -82,12 +164,36 @@ export const MASTER_STRAVA: Record<string, {
 
   ovulation: {
     nutrients: {
-      "folát (B9)": ["špenát", "šošovica", "cícer", "brokolica", "rukola", "kel", "avokádo", "špargľa"],
-      "zinok": ["tekvicové semienka", "hovädzie mäso", "cícer", "kešu orechy", "vajcia", "tofu", "quinoa", "sezamové semienka"],
-      "selén": ["para orechy", "vajcia", "losos", "sardinky", "slnečnicové semienka", "hovädzie mäso", "hnedá ryža", "šampiňóny"],
-      "omega-3": ["losos", "sardinky", "makrela", "chia semienka", "ľanové semienka", "vlašské orechy", "konopné semienka", "avokádo"],
-      "antioxidanty": ["čučoriedky", "jahody", "granátové jablko", "červená paprika", "mrkva", "tmavá čokoláda", "zelený čaj", "rajčiny"],
-      "vitamín E": ["mandle", "slnečnicové semienka", "avokádo", "olivový olej", "špargľa", "kiwi", "mango", "papája"]
+      "folát (B9)": [
+        "špenát", "šošovica", "cícer", "brokolica", "rukola", "kel", "avokádo", "špargľa",
+        "červená fazuľa", "čierna fazuľa", "hrášok", "kapusta", "karfiol", "zelený šalát", "mangold",
+        "cvikla", "pomaranč", "banán", "vajcia", "celozrnný chlieb", "ovsené vločky", "quinoa"
+      ],
+      "zinok": [
+        "tekvicové semienka", "hovädzie mäso", "cícer", "kešu orechy", "vajcia", "tofu", "quinoa", "sezamové semienka",
+        "kuracie mäso", "morčacie mäso", "šošovica", "syr", "jogurt", "mlieko", "ovsené vločky",
+        "celozrnný chlieb", "fazuľa", "hrášok", "mandle", "arašidy", "slnečnicové semienka"
+      ],
+      "selén": [
+        "para orechy", "vajcia", "losos", "sardinky", "slnečnicové semienka", "hovädzie mäso", "hnedá ryža", "šampiňóny",
+        "kuracie mäso", "morčacie mäso", "tuniak", "tofu", "tvaroh", "jogurt", "mlieko",
+        "celozrnný chlieb", "ovsené vločky", "cesnak", "cibuľa", "brokolica", "špenát"
+      ],
+      "omega-3": [
+        "losos", "sardinky", "makrela", "chia semienka", "ľanové semienka", "vlašské orechy", "konopné semienka", "avokádo",
+        "tuniak", "pstruh", "sleď", "vajcia obohatené omega-3", "tofu", "edamame",
+        "ľanový olej", "repkový olej", "mandle", "pekanové orechy", "zelená listová zelenina", "brokolica"
+      ],
+      "antioxidanty": [
+        "čučoriedky", "jahody", "granátové jablko", "červená paprika", "mrkva", "tmavá čokoláda", "zelený čaj", "rajčiny",
+        "maliny", "černice", "čerešne", "slivky", "červené hrozno", "červená kapusta", "brokolica",
+        "špenát", "kel", "cvikla", "kakao", "orechy", "avokádo", "pomaranč"
+      ],
+      "vitamín E": [
+        "mandle", "slnečnicové semienka", "avokádo", "olivový olej", "špargľa", "kiwi", "mango", "papája",
+        "lieskové orechy", "arašidy", "špenát", "brokolica", "rajčiny", "mrkva", "bataty",
+        "tekvicové semienka", "vlašské orechy", "celozrnný chlieb", "vajcia", "ryby"
+      ]
     },
     benefits: [
       "podporíš zdravú ovuláciu a hormonálnu rovnováhu",
@@ -105,14 +211,46 @@ export const MASTER_STRAVA: Record<string, {
 
   lutealEarly: {
     nutrients: {
-      "draslík": ["banán", "avokádo", "zemiaky", "bataty", "špenát", "melón", "kiwi", "kokosová voda"],
-      "horčík": ["tmavá čokoláda 85%", "mandle", "tekvicové semienka", "špenát", "avokádo", "čierna fazuľa", "hnedá ryža", "banán"],
-      "vitamín B6": ["banán", "morčacie mäso", "losos", "zemiaky", "cícer", "avokádo", "slnečnicové semienka", "pistácie"],
-      "omega-3": ["losos", "sardinky", "makrela", "chia semienka", "ľanové semienka", "vlašské orechy", "konopné semienka", "avokádo"],
-      "bielkoviny": ["vajcia", "grécky jogurt", "cottage cheese", "tofu", "morčacie mäso", "losos", "tempeh", "quinoa"],
-      "komplexné sacharidy": ["bataty", "quinoa", "ovsené vločky", "hnedá ryža", "celozrnný chlieb", "pohánka", "cícer", "šošovica"],
-      "vláknina": ["brokolica", "cuketa", "ovsené vločky", "jablká", "hrušky", "šošovica", "cícer", "maliny"],
-      "tryptofán": ["morčacie mäso", "vajcia", "losos", "tekvicové semienka", "tofu", "syr", "banán", "mlieko"]
+      "draslík": [
+        "banán", "avokádo", "zemiaky", "bataty", "špenát", "melón", "kiwi", "kokosová voda",
+        "paradajky", "cvikla", "šošovica", "fazuľa", "hrášok", "hrozienka", "sušené marhule",
+        "grécky jogurt", "mlieko", "losos", "kuracie mäso", "mandle", "arašidy"
+      ],
+      "horčík": [
+        "tmavá čokoláda 85%", "mandle", "tekvicové semienka", "špenát", "avokádo", "čierna fazuľa", "hnedá ryža", "banán",
+        "kešu orechy", "lieskové orechy", "vlašské orechy", "ovsené vločky", "quinoa", "tofu", "šošovica",
+        "cícer", "celozrnný chlieb", "pohánka", "sezamové semienka", "slnečnicové semienka", "edamame"
+      ],
+      "vitamín B6": [
+        "banán", "morčacie mäso", "losos", "zemiaky", "cícer", "avokádo", "slnečnicové semienka", "pistácie",
+        "kuracie mäso", "tuniak", "hovädzie mäso", "bataty", "špenát", "paprika", "brokolica",
+        "mrkva", "melón", "sušené slivky", "vlašské orechy", "ovsené vločky", "hnedá ryža"
+      ],
+      "omega-3": [
+        "losos", "sardinky", "makrela", "chia semienka", "ľanové semienka", "vlašské orechy", "konopné semienka", "avokádo",
+        "tuniak", "pstruh", "sleď", "vajcia obohatené omega-3", "tofu", "edamame",
+        "ľanový olej", "repkový olej", "mandle", "pekanové orechy", "zelená listová zelenina", "brokolica"
+      ],
+      "bielkoviny": [
+        "vajcia", "grécky jogurt", "cottage cheese", "tofu", "morčacie mäso", "losos", "tempeh", "quinoa",
+        "kuracie mäso", "hovädzie mäso", "tuniak", "sardinky", "tvaroh", "šošovica", "cícer",
+        "fazuľa", "edamame", "syr", "mozzarella", "ricotta", "kefír", "skyr"
+      ],
+      "komplexné sacharidy": [
+        "bataty", "quinoa", "ovsené vločky", "hnedá ryža", "celozrnný chlieb", "pohánka", "cícer", "šošovica",
+        "zemiaky", "fazuľa", "hrášok", "kukurica", "celozrnné cestoviny", "jačmeň", "proso",
+        "bulgur", "kuskus celozrnný", "ryžové rezance", "celozrnné pečivo", "müsli"
+      ],
+      "vláknina": [
+        "brokolica", "cuketa", "ovsené vločky", "jablká", "hrušky", "šošovica", "cícer", "maliny",
+        "celozrnný chlieb", "hnedá ryža", "pohánka", "fazuľa", "hrášok", "mrkva", "cvikla",
+        "kapusta", "karfiol", "zeler", "uhorka", "rajčiny", "banán", "slivky"
+      ],
+      "tryptofán": [
+        "morčacie mäso", "vajcia", "losos", "tekvicové semienka", "tofu", "syr", "banán", "mlieko",
+        "kuracie mäso", "tuniak", "tvaroh", "grécky jogurt", "ovsené vločky", "quinoa", "orechy",
+        "slnečnicové semienka", "sezamové semienka", "čokoláda", "arašidy", "špenát"
+      ]
     },
     benefits: [
       "pomôžeš stabilizovať náladu pri zvyšujúcom sa progesteróne",
@@ -126,16 +264,56 @@ export const MASTER_STRAVA: Record<string, {
 
   lutealMid: {
     nutrients: {
-      "horčík": ["tmavá čokoláda 85%", "mandle", "tekvicové semienka", "špenát", "avokádo", "čierna fazuľa", "hnedá ryža", "banán"],
-      "vitamín B6": ["banán", "morčacie mäso", "losos", "zemiaky", "cícer", "avokádo", "slnečnicové semienka", "pistácie"],
-      "omega-3": ["losos", "sardinky", "makrela", "chia semienka", "ľanové semienka", "vlašské orechy", "konopné semienka", "avokádo"],
-      "probiotiká": ["kefír", "grécky jogurt", "kyslá kapusta", "kimchi", "tempeh", "miso", "kombucha", "acidofilné mlieko"],
-      "prebiotiká": ["cesnak", "cibuľa", "špargľa", "banán", "jablká", "ovsené vločky", "pór", "artičoky"],
-      "vláknina": ["brokolica", "cuketa", "ovsené vločky", "šošovica", "cícer", "maliny", "hrušky", "fazuľa"],
-      "draslík": ["banán", "avokádo", "zemiaky", "bataty", "špenát", "melón", "kiwi", "kokosová voda"],
-      "zinok": ["tekvicové semienka", "hovädzie mäso", "cícer", "kešu orechy", "vajcia", "tofu", "quinoa", "sezamové semienka"],
-      "komplexné sacharidy": ["bataty", "quinoa", "ovsené vločky", "hnedá ryža", "pohánka", "cícer", "šošovica", "celozrnný chlieb"],
-      "bielkoviny": ["vajcia", "grécky jogurt", "cottage cheese", "tofu", "morčacie mäso", "losos", "tempeh", "quinoa"]
+      "horčík": [
+        "tmavá čokoláda 85%", "mandle", "tekvicové semienka", "špenát", "avokádo", "čierna fazuľa", "hnedá ryža", "banán",
+        "kešu orechy", "lieskové orechy", "vlašské orechy", "ovsené vločky", "quinoa", "tofu", "šošovica",
+        "cícer", "celozrnný chlieb", "pohánka", "sezamové semienka", "slnečnicové semienka", "edamame"
+      ],
+      "vitamín B6": [
+        "banán", "morčacie mäso", "losos", "zemiaky", "cícer", "avokádo", "slnečnicové semienka", "pistácie",
+        "kuracie mäso", "tuniak", "hovädzie mäso", "bataty", "špenát", "paprika", "brokolica",
+        "mrkva", "melón", "sušené slivky", "vlašské orechy", "ovsené vločky", "hnedá ryža"
+      ],
+      "omega-3": [
+        "losos", "sardinky", "makrela", "chia semienka", "ľanové semienka", "vlašské orechy", "konopné semienka", "avokádo",
+        "tuniak", "pstruh", "sleď", "vajcia obohatené omega-3", "tofu", "edamame",
+        "ľanový olej", "repkový olej", "mandle", "pekanové orechy", "zelená listová zelenina", "brokolica"
+      ],
+      "probiotiká": [
+        "kefír", "grécky jogurt", "kyslá kapusta", "tempeh", "kombucha", "acidofilné mlieko",
+        "jogurt s živými kultúrami", "tvaroh", "biely jogurt", "probiotické nápoje", "fermentovaná zelenina",
+        "cottage cheese", "acidofilný jogurt", "kvasená repa", "domáca kyslá uhorka"
+      ],
+      "prebiotiká": [
+        "cesnak", "cibuľa", "špargľa", "banán", "jablká", "ovsené vločky", "pór",
+        "čakanka", "celozrnný chlieb", "jačmeň", "šošovica", "cícer", "fazuľa",
+        "hrášok", "mrkva", "cvikla", "kapusta", "brokolica", "slivky", "hrozienka"
+      ],
+      "vláknina": [
+        "brokolica", "cuketa", "ovsené vločky", "šošovica", "cícer", "maliny", "hrušky", "fazuľa",
+        "celozrnný chlieb", "hnedá ryža", "pohánka", "hrášok", "mrkva", "cvikla",
+        "kapusta", "karfiol", "zeler", "uhorka", "rajčiny", "banán", "slivky", "jablká"
+      ],
+      "draslík": [
+        "banán", "avokádo", "zemiaky", "bataty", "špenát", "melón", "kiwi", "kokosová voda",
+        "paradajky", "cvikla", "šošovica", "fazuľa", "hrášok", "hrozienka", "sušené marhule",
+        "grécky jogurt", "mlieko", "losos", "kuracie mäso", "mandle", "arašidy"
+      ],
+      "zinok": [
+        "tekvicové semienka", "hovädzie mäso", "cícer", "kešu orechy", "vajcia", "tofu", "quinoa", "sezamové semienka",
+        "kuracie mäso", "morčacie mäso", "šošovica", "syr", "jogurt", "mlieko", "ovsené vločky",
+        "celozrnný chlieb", "fazuľa", "hrášok", "mandle", "arašidy", "slnečnicové semienka"
+      ],
+      "komplexné sacharidy": [
+        "bataty", "quinoa", "ovsené vločky", "hnedá ryža", "pohánka", "cícer", "šošovica", "celozrnný chlieb",
+        "zemiaky", "fazuľa", "hrášok", "kukurica", "celozrnné cestoviny", "jačmeň", "proso",
+        "bulgur", "kuskus celozrnný", "ryžové rezance", "celozrnné pečivo", "müsli"
+      ],
+      "bielkoviny": [
+        "vajcia", "grécky jogurt", "cottage cheese", "tofu", "morčacie mäso", "losos", "tempeh", "quinoa",
+        "kuracie mäso", "hovädzie mäso", "tuniak", "sardinky", "tvaroh", "šošovica", "cícer",
+        "fazuľa", "edamame", "syr", "mozzarella", "ricotta", "kefír", "skyr"
+      ]
     },
     benefits: [
       "znížiš nafukovanie a tlak v bruchu",
@@ -149,15 +327,50 @@ export const MASTER_STRAVA: Record<string, {
 
   lutealLate: {
     nutrients: {
-      "horčík": ["tmavá čokoláda 85%", "mandle", "tekvicové semienka", "špenát", "avokádo", "čierna fazuľa", "hnedá ryža", "banán"],
-      "vitamín B6": ["banán", "morčacie mäso", "losos", "zemiaky", "cícer", "avokádo", "slnečnicové semienka", "pistácie"],
-      "omega-3": ["losos", "sardinky", "makrela", "chia semienka", "ľanové semienka", "vlašské orechy", "konopné semienka", "avokádo"],
-      "vitamín E": ["mandle", "slnečnicové semienka", "avokádo", "olivový olej", "špargľa", "kiwi", "mango", "papája"],
-      "antioxidanty": ["čučoriedky", "jahody", "maliny", "granátové jablko", "tmavá čokoláda", "zelený čaj", "brusnice", "acai"],
-      "kurkumín": ["kurkuma", "zázvor", "čierne korenie", "curry", "zlaté mlieko", "kurkumový čaj", "zázvorový čaj"],
-      "vláknina": ["ovsené vločky", "šošovica", "cícer", "jablká", "hrušky", "brokolica", "maliny", "fazuľa"],
-      "bielkoviny": ["vajcia", "grécky jogurt", "tofu", "cottage cheese", "losos", "morčacie mäso", "tempeh", "quinoa"],
-      "kolagén": ["mäsový vývar", "slepačí vývar", "losos s kožou", "kostný vývar", "želatína", "hovädzie šľachy", "kuracie krídla", "bravčové nožičky"]
+      "horčík": [
+        "tmavá čokoláda 85%", "mandle", "tekvicové semienka", "špenát", "avokádo", "čierna fazuľa", "hnedá ryža", "banán",
+        "kešu orechy", "lieskové orechy", "vlašské orechy", "ovsené vločky", "quinoa", "tofu", "šošovica",
+        "cícer", "celozrnný chlieb", "pohánka", "sezamové semienka", "slnečnicové semienka", "edamame"
+      ],
+      "vitamín B6": [
+        "banán", "morčacie mäso", "losos", "zemiaky", "cícer", "avokádo", "slnečnicové semienka", "pistácie",
+        "kuracie mäso", "tuniak", "hovädzie mäso", "bataty", "špenát", "paprika", "brokolica",
+        "mrkva", "melón", "sušené slivky", "vlašské orechy", "ovsené vločky", "hnedá ryža"
+      ],
+      "omega-3": [
+        "losos", "sardinky", "makrela", "chia semienka", "ľanové semienka", "vlašské orechy", "konopné semienka", "avokádo",
+        "tuniak", "pstruh", "sleď", "vajcia obohatené omega-3", "tofu", "edamame",
+        "ľanový olej", "repkový olej", "mandle", "pekanové orechy", "zelená listová zelenina", "brokolica"
+      ],
+      "vitamín E": [
+        "mandle", "slnečnicové semienka", "avokádo", "olivový olej", "špargľa", "kiwi", "mango", "papája",
+        "lieskové orechy", "arašidy", "špenát", "brokolica", "rajčiny", "mrkva", "bataty",
+        "tekvicové semienka", "vlašské orechy", "celozrnný chlieb", "vajcia", "ryby"
+      ],
+      "antioxidanty": [
+        "čučoriedky", "jahody", "maliny", "granátové jablko", "tmavá čokoláda", "zelený čaj", "brusnice",
+        "černice", "čerešne", "slivky", "červené hrozno", "červená kapusta", "mrkva", "brokolica",
+        "špenát", "kel", "cvikla", "kakao", "orechy", "avokádo", "pomaranč", "rajčiny"
+      ],
+      "kurkumín": [
+        "kurkuma", "zázvor", "čierne korenie", "curry", "zlaté mlieko", "kurkumový čaj", "zázvorový čaj",
+        "korenie garam masala", "kurkumový prášok", "čerstvý zázvor", "sušený zázvor", "kurkumová pasta"
+      ],
+      "vláknina": [
+        "ovsené vločky", "šošovica", "cícer", "jablká", "hrušky", "brokolica", "maliny", "fazuľa",
+        "celozrnný chlieb", "hnedá ryža", "pohánka", "hrášok", "mrkva", "cvikla",
+        "kapusta", "karfiol", "zeler", "uhorka", "rajčiny", "banán", "slivky"
+      ],
+      "bielkoviny": [
+        "vajcia", "grécky jogurt", "tofu", "cottage cheese", "losos", "morčacie mäso", "tempeh", "quinoa",
+        "kuracie mäso", "hovädzie mäso", "tuniak", "sardinky", "tvaroh", "šošovica", "cícer",
+        "fazuľa", "edamame", "syr", "mozzarella", "ricotta", "kefír", "skyr"
+      ],
+      "kolagén-podpora": [
+        "kuracie mäso", "hovädzie mäso", "vajcia", "losos", "sardinky", "kostný vývar", "slepačí vývar",
+        "paprika", "jahody", "citrusy", "kiwi", "brokolica", "paradajky", "cesnak", "mrkva",
+        "tekvicové semienka", "mandle", "kešu orechy", "špenát", "avokádo", "zelený čaj"
+      ]
     },
     benefits: [
       "znížiš podráždenosť a PMS",
