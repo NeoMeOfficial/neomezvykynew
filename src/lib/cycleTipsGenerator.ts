@@ -26,6 +26,7 @@ export const MASTER_STRAVA: Record<string, {
   benefits: string[];
   reasonTemplate: string;
   nutrientReasons: Record<string, string>;  // nutrient → reason for this phase
+  nutrientBenefits: Record<string, string>;  // nutrient → user-centric benefit
 }> = {
   menstrual: {
     nutrients: {
@@ -110,6 +111,19 @@ export const MASTER_STRAVA: Record<string, {
       "vitamín B6": "stabilizuje náladu a zmierňuje PMS príznaky",
       "draslík": "reguluje tekutiny a predchádza opuchom",
       "kolagén-podpora": "podporuje regeneráciu tkanív"
+    },
+    nutrientBenefits: {
+      "železo": "doplniť energiu a predísť únave spôsobenej stratou krvi",
+      "vitamín C": "podporiť vstrebávanie železa a posilniť imunitu",
+      "folát (B9)": "obnoviť červené krvinky a dodať telu novú silu",
+      "vitamín B12": "znížiť únavu a podporiť jasnú myseľ",
+      "omega-3": "zmierniť zápal, kŕče a bolestivosť",
+      "kurkumín": "prirodzene znížiť bolesť a zápal v tele",
+      "antioxidanty": "ochrániť bunky a podporiť zdravú pleť",
+      "horčík": "uvoľniť kŕče a napätie v bruchu a chrbte",
+      "vitamín B6": "stabilizovať náladu a zmierniť podráždenosť",
+      "draslík": "znížiť opuchy a pocit nafúknutia",
+      "kolagén-podpora": "podporiť regeneráciu tkanív a zdravú pleť"
     }
   },
 
@@ -183,6 +197,17 @@ export const MASTER_STRAVA: Record<string, {
       "zdravé tuky": "podporujú produkciu hormónov",
       "vitamín D": "posilňuje kosti a imunitný systém",
       "kolagén-podpora": "podporuje zdravú pleť a vlasy"
+    },
+    nutrientBenefits: {
+      "proteíny": "podporiť svalovú regeneráciu a rast vlasov",
+      "omega-3": "živiť mozog a zlepšiť koncentráciu",
+      "vláknina": "podporiť trávenie a prirodzenú detoxikáciu estrogénu",
+      "B-komplex": "zvýšiť energiu a podporiť metabolizmus",
+      "zinok": "posilniť imunitu a podporiť zdravú pleť",
+      "vitamín E": "chrániť bunky a dodať pleťi žiarivý vzhľad",
+      "zdravé tuky": "podporiť tvorbu hormónov a lesk vlasov",
+      "vitamín D": "posilniť kosti a zlepšiť náladu",
+      "kolagén-podpora": "podporiť elasticitu pleti a pevnosť nechtov"
     }
   },
 
@@ -238,6 +263,14 @@ export const MASTER_STRAVA: Record<string, {
       "omega-3": "znižujú zápal okolo ovulácie",
       "antioxidanty": "chránia vajíčko a podporujú plodnosť",
       "vitamín E": "chráni vajíčko pred oxidatívnym poškodením"
+    },
+    nutrientBenefits: {
+      "folát (B9)": "podporiť hormonálnu rovnováhu a bunkové zdravie",
+      "zinok": "posilniť imunitu a pridať pleťi prirodzený glow",
+      "selén": "chrániť bunky a podporiť štítnu žľazu",
+      "omega-3": "znížiť možný zápal okolo ovulácie",
+      "antioxidanty": "dodať pleťi žiarivosť a chrániť pred voľnými radikálmi",
+      "vitamín E": "podporiť hormonálnu rovnováhu a zdravie pokožky"
     }
   },
 
@@ -301,6 +334,16 @@ export const MASTER_STRAVA: Record<string, {
       "komplexné sacharidy": "udržiavajú stabilnú energiu bez cravingov",
       "vláknina": "podporuje trávenie, ktoré sa spomaľuje",
       "tryptofán": "podporuje tvorbu serotonínu a lepšiu náladu"
+    },
+    nutrientBenefits: {
+      "draslík": "predísť opuchom a zadržiavaniu vody",
+      "horčík": "uvoľniť napätie a podporiť pokojný spánok",
+      "vitamín B6": "stabilizovať náladu a predísť PMS podráždenosti",
+      "omega-3": "podporiť mozgovú funkciu a jasnú myseľ",
+      "bielkoviny": "udržať stabilnú energiu a predísť cravingom",
+      "komplexné sacharidy": "predísť výkyvom energie a chutiam na sladké",
+      "vláknina": "podporiť trávenie, ktoré sa začína spomaľovať",
+      "tryptofán": "zlepšiť náladu a podporiť tvorbu serotonínu"
     }
   },
 
@@ -376,6 +419,18 @@ export const MASTER_STRAVA: Record<string, {
       "zinok": "podporuje imunitu a hormonálnu rovnováhu",
       "komplexné sacharidy": "udržiavajú stabilnú energiu počas vysokého progesterónu",
       "bielkoviny": "stabilizujú hladinu cukru a predchádzajú cravingom"
+    },
+    nutrientBenefits: {
+      "horčík": "zmierniť nafukovanie a pocit tlaku v bruchu",
+      "vitamín B6": "znížiť podráždenosť a stabilizovať emócie",
+      "omega-3": "podporiť mozgovú funkciu a zmierniť zápal",
+      "probiotiká": "zlepšiť trávenie a znížiť nafukovanie",
+      "prebiotiká": "nakŕmiť prospešné baktérie a podporiť črevnú pohodu",
+      "vláknina": "podporiť spomalené trávenie",
+      "draslík": "znížiť opuchy a zadržiavanie vody",
+      "zinok": "podporiť imunitu a hormonálnu rovnováhu",
+      "komplexné sacharidy": "udržať stabilnú energiu bez cravingov",
+      "bielkoviny": "predísť chutiam na sladké a udržať sýtosť"
     }
   },
 
@@ -444,6 +499,17 @@ export const MASTER_STRAVA: Record<string, {
       "vláknina": "podporuje pravidelné trávenie",
       "bielkoviny": "udržiavajú stabilnú energiu",
       "kolagén-podpora": "podporuje regeneráciu tkanív"
+    },
+    nutrientBenefits: {
+      "horčík": "uvoľniť kŕče a pripraviť telo na menštruáciu",
+      "vitamín B6": "zmierniť PMS príznaky a podporiť pokojnú myseľ",
+      "omega-3": "znížiť zápal a predísť menštruačným bolestiam",
+      "vitamín E": "zmierniť citlivosť prsníkov a podporiť regeneráciu",
+      "antioxidanty": "znížiť zápal a podporiť zdravú pleť",
+      "kurkumín": "prirodzene zmierniť bolesť a nepríjemné pocity",
+      "vláknina": "podporiť pravidelné trávenie pred menštruáciou",
+      "bielkoviny": "udržať stabilnú energiu v najcitlivejšej časti cyklu",
+      "kolagén-podpora": "podporiť regeneráciu a elasticitu pleti"
     }
   }
 };
@@ -752,10 +818,6 @@ export function generateNutrition(day: number, phase: string, subphase: string |
     foods.push(...shuffledFoods.slice(0, foodCount));
   });
   
-  // Select benefit
-  const shuffledBenefits = seededShuffle(master.benefits, day * 3);
-  const selectedBenefit = shuffledBenefits[0];
-  
   // Format: 3 sentences with dynamic reasons based on first 2 nutrients
   const nutrientsStr = selectedNutrients.join(', ');
   const foodsStr = foods.join(', ');
@@ -767,7 +829,10 @@ export function generateNutrition(day: number, phase: string, subphase: string |
     ? `${selectedNutrients[0]} ${reason1} a ${selectedNutrients[1]} ${reason2}`
     : master.reasonTemplate;
   
-  return `Tvoje telo dnes potrebuje ${nutrientsStr} — ${dynamicReason}.\n\nNájdeš ich v potravinách ako ${foodsStr}.\n\nTento výber ti dnes pomôže ${selectedBenefit}.`;
+  // Build dynamic benefit from first selected nutrient
+  const benefit = master.nutrientBenefits?.[selectedNutrients[0]] || seededShuffle(master.benefits, day * 3)[0];
+  
+  return `Tvoje telo dnes potrebuje ${nutrientsStr} — ${dynamicReason}.\n\nNájdeš ich v potravinách ako ${foodsStr}.\n\nTento výber ti dnes pomôže ${benefit}.`;
 }
 
 // Determine if today is a cardio day based on phase and day position
