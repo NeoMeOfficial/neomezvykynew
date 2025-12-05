@@ -163,7 +163,7 @@ export function getSubphase(
   
   // FOLLICULAR subphases
   if (ranges.follicularTransition && day >= ranges.follicularTransition.start && day <= ranges.follicularTransition.end) 
-    return { phase: 'follicular', subphase: 'transition' };
+    return { phase: 'follicular', subphase: 'mid' };
   if (ranges.follicularMid && day >= ranges.follicularMid.start && day <= ranges.follicularMid.end) 
     return { phase: 'follicular', subphase: 'mid' };
   if (ranges.follicularLate && day >= ranges.follicularLate.start && day <= ranges.follicularLate.end) 
@@ -171,7 +171,7 @@ export function getSubphase(
   
   // OVULATION
   if (day >= ranges.ovulation.start && day <= ranges.ovulation.end) 
-    return { phase: 'ovulation', subphase: 'peak' };
+    return { phase: 'ovulation', subphase: null };
   
   // LUTEAL subphases
   if (ranges.lutealEarly && day >= ranges.lutealEarly.start && day <= ranges.lutealEarly.end) 
