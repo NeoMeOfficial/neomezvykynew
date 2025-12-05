@@ -101,11 +101,11 @@ export function SymptomTracker({
   // Calculate the actual date for the currentDay
   const getDateForCurrentDay = (): string => {
     if (!lastPeriodStart) {
-      return new Date().toISOString().split('T')[0];
+      return format(new Date(), 'yyyy-MM-dd');
     }
-    const periodStartDate = new Date(lastPeriodStart);
+    const periodStartDate = new Date(lastPeriodStart + 'T00:00:00');
     const targetDate = addDays(periodStartDate, currentDay - 1);
-    return targetDate.toISOString().split('T')[0];
+    return format(targetDate, 'yyyy-MM-dd');
   };
   const currentDate = getDateForCurrentDay();
 

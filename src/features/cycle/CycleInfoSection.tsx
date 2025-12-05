@@ -11,7 +11,7 @@ interface CycleInfoSectionProps {
 export function CycleInfoSection({ cycleData }: CycleInfoSectionProps) {
   if (!cycleData.lastPeriodStart) return null;
   
-  const startDate = new Date(cycleData.lastPeriodStart);
+  const startDate = new Date(cycleData.lastPeriodStart + 'T00:00:00');
   const endDate = addDays(startDate, cycleData.periodLength - 1);
   const nextPeriodDate = addDays(startDate, cycleData.cycleLength);
   

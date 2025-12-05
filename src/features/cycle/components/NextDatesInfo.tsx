@@ -48,7 +48,7 @@ export function NextDatesInfo({
   };
 
   // Calculate dates if lastPeriodStart exists
-  const startDate = lastPeriodStart ? new Date(lastPeriodStart) : null;
+  const startDate = lastPeriodStart ? new Date(lastPeriodStart + 'T00:00:00') : null;
   const nextPeriodDate = startDate ? addDays(startDate, cycleLength) : null;
   const periodEndDate = startDate ? addDays(startDate, periodLength - 1) : null;
   

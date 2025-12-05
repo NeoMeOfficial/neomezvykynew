@@ -216,7 +216,7 @@ export function getPhaseByDay(day: number, ranges: PhaseRange[]): PhaseRange {
 }
 
 export function getCurrentCycleDay(lastPeriodStart: string, today: Date, cycleLength: number): number {
-  const startDate = new Date(lastPeriodStart);
+  const startDate = new Date(lastPeriodStart + 'T00:00:00');
   const daysSince = differenceInDays(today, startDate);
   return ((daysSince % cycleLength) + cycleLength) % cycleLength + 1; // Handle negative values
 }
@@ -247,14 +247,14 @@ export function getDerivedState(cycleData: CycleData): DerivedState {
 }
 
 export function getNextPeriodDate(lastPeriodStart: string, cycleLength: number): Date {
-  const startDate = new Date(lastPeriodStart);
+  const startDate = new Date(lastPeriodStart + 'T00:00:00');
   return addDays(startDate, cycleLength);
 }
 
 export function isPeriodDate(date: Date, lastPeriodStart: string, cycleLength: number, periodLength: number): boolean {
   if (!lastPeriodStart) return false;
   
-  const startDate = new Date(lastPeriodStart);
+  const startDate = new Date(lastPeriodStart + 'T00:00:00');
   const daysSince = differenceInDays(date, startDate);
   
   // Handle past periods (negative days)
@@ -285,7 +285,7 @@ export function formatDateSk(date: Date): string {
 export function isFertilityDate(date: Date, lastPeriodStart: string, cycleLength: number): boolean {
   if (!lastPeriodStart) return false;
   
-  const startDate = new Date(lastPeriodStart);
+  const startDate = new Date(lastPeriodStart + 'T00:00:00');
   const daysSince = differenceInDays(date, startDate);
   
   // Handle past periods (negative days)
@@ -317,7 +317,7 @@ export function isFertilityDate(date: Date, lastPeriodStart: string, cycleLength
 export function isOvulationDate(date: Date, lastPeriodStart: string, cycleLength: number): boolean {
   if (!lastPeriodStart) return false;
   
-  const startDate = new Date(lastPeriodStart);
+  const startDate = new Date(lastPeriodStart + 'T00:00:00');
   const daysSince = differenceInDays(date, startDate);
   
   // Handle past periods (negative days)
