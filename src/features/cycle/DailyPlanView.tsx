@@ -62,7 +62,7 @@ export function DailyPlanView({
           <CardHeader>
             <CardTitle className="flex items-center gap-3 text-xl">
               <span className="text-3xl">🌸</span>
-              <span>Čo môžem dnes očakávať?</span>
+              <span>Čo môžeš dnes očakávať?</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
