@@ -279,14 +279,6 @@ export function NextDatesInfo({
   // EXISTING USER VIEW - show all cycle info
   return (
     <div className="space-y-2 px-1">
-      {/* Header */}
-      <div className="flex items-center gap-2 mb-3">
-        <CalendarIcon className="w-5 h-5" style={{ color: '#FF7782' }} />
-        <h3 className="text-base font-semibold" style={{ color: '#955F6A' }}>
-          Môj cyklus
-        </h3>
-      </div>
-
       {/* Countdown to next period - highlight box */}
       {daysUntilNextPeriod !== null && daysUntilNextPeriod > 0 && (
         <div className="p-4 rounded-xl mb-3" 
