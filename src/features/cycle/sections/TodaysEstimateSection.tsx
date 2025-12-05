@@ -93,7 +93,7 @@ export function TodaysEstimateSection({
               <h3 className="text-lg font-medium" style={{
               color: '#FF7782'
             }}>
-                Odhad na dnes
+                Tvoj dnešný prehľad
               </h3>
             </div>
           </div>
