@@ -6,7 +6,7 @@ import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isToday, addWeeks, subWeeks, startOfWeek, endOfWeek, addDays, differenceInDays } from 'date-fns';
+import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isToday, addWeeks, subWeeks, startOfWeek, endOfWeek, addDays, differenceInDays, startOfDay, isBefore } from 'date-fns';
 import { sk } from 'date-fns/locale';
 import jsPDF from 'jspdf';
 import { DerivedState, CycleData, PeriodIntensity } from './types';
@@ -680,14 +680,21 @@ export function CalendarView({
   const getDayInfo = (date: Date) => {
     if (!cycleData.lastPeriodStart) return {
       isPeriod: false,
-      isFertile: false
+      isFertile: false,
+      isPastPeriod: false,
+      isFuturePeriod: false
     };
     const lastPeriodDate = typeof cycleData.lastPeriodStart === 'string' ? new Date(cycleData.lastPeriodStart) : cycleData.lastPeriodStart;
     const isPeriod = isPeriodDate(date, lastPeriodDate.toISOString().split('T')[0], cycleData.cycleLength, cycleData.periodLength);
     const isFertile = isFertilityDate(date, lastPeriodDate.toISOString().split('T')[0], cycleData.cycleLength);
+    const today = startOfDay(new Date());
+    const isPastPeriod = isPeriod && isBefore(date, today);
+    const isFuturePeriod = isPeriod && !isBefore(date, today);
     return {
       isPeriod,
-      isFertile
+      isFertile,
+      isPastPeriod,
+      isFuturePeriod
     };
   };
   const getCurrentDayPhase = (date: Date) => {
@@ -1038,9 +1045,15 @@ export function CalendarView({
                   };
                 } else if (!selectedOutcome) {
                   // Show normal phase colors when no filter is active
-                  if (dayInfo.isPeriod) {
+                  if (dayInfo.isFuturePeriod) {
+                    // Future/current period - prominent styling
                     dayClasses += " bg-rose-100";
                     dayStyle.border = '2px solid #fb7185'; // rose-400
+                  } else if (dayInfo.isPastPeriod) {
+                    // Past period - muted styling for visual hierarchy
+                    dayClasses += " bg-rose-50/60";
+                    dayStyle.border = '1px solid hsl(350, 30%, 85%)';
+                    dayStyle.opacity = 0.85;
                   } else {
                     dayClasses += " hover:bg-white/80 border-gray-100 bg-white/60";
                   }
