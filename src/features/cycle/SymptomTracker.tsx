@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Save, RotateCcw, ChevronDown, ChevronUp } from 'lucide-react';
 import { PhaseKey } from './types';
@@ -227,182 +229,185 @@ export function SymptomTracker({
   const topSymptoms = getTopSymptoms();
 
   return (
-    <div className="space-y-4">
-      {/* Header */}
-      <h4 className="text-base font-medium mb-2" style={{ color: '#955F6A' }}>
-        Zaznač si, ako sa dnes naozaj cítiš
-      </h4>
+    <Card className="border-[#E5D4D7] shadow-sm rounded-xl" style={{ backgroundColor: '#FBF8F9' }}>
+      <CardContent className="p-4 space-y-3">
+        {/* Header */}
+        <h4 className="text-base font-medium" style={{ color: '#955F6A' }}>
+          Zaznač si, ako sa dnes naozaj cítiš
+        </h4>
 
-      {/* Top Symptoms - Always visible */}
-      <div className="flex flex-wrap gap-2">
-        {topSymptoms.map(renderSymptomBadge)}
-      </div>
-
-      {/* Expandable Section */}
-      <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
-        <CollapsibleTrigger asChild>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="w-full flex items-center justify-center gap-2 text-xs py-2"
-            style={{ color: '#955F6A' }}
-          >
-            {isExpanded ? (
-              <>
-                <ChevronUp className="w-4 h-4" />
-                Skryť všetky príznaky
-              </>
-            ) : (
-              <>
-                <ChevronDown className="w-4 h-4" />
-                Zobraziť všetky príznaky
-              </>
-            )}
-          </Button>
-        </CollapsibleTrigger>
-
-        <CollapsibleContent className="space-y-4 pt-2">
-          {/* All Categories */}
-          {Object.entries(SYMPTOM_CATEGORIES).map(([category, symptoms]) => (
-            <div key={category} className="space-y-2">
-              <h5 className="text-xs font-medium uppercase tracking-wide" style={{ color: '#B8929A' }}>
-                {category}
-              </h5>
-              <div className="flex flex-wrap gap-2">
-                {symptoms.map(renderSymptomBadge)}
-              </div>
-            </div>
-          ))}
-
-          {/* Custom Symptoms Category */}
-          {customSymptoms.length > 0 && (
-            <div className="space-y-2">
-              <h5 className="text-xs font-medium uppercase tracking-wide" style={{ color: '#B8929A' }}>
-                Vlastné príznaky
-              </h5>
-              <div className="flex flex-wrap gap-2">
-                {customSymptoms.map(renderSymptomBadge)}
-              </div>
-            </div>
-          )}
-        </CollapsibleContent>
-      </Collapsible>
-
-      {/* Add Custom Symptom Button */}
-      {!isAddingCustom && (
-        <Badge
-          variant="outline"
-          className="cursor-pointer select-none text-xs py-1 px-2.5 transition-all duration-200 hover:bg-muted border-dashed"
-          onClick={() => setIsAddingCustom(true)}
-          style={{
-            backgroundColor: '#FBF8F9',
-            color: '#955F6A',
-            borderColor: '#E5D4D7'
-          }}
-          data-tour="custom-symptom"
-        >
-          <span className="mr-1.5">+</span>
-          Zadaj vlastný
-        </Badge>
-      )}
-
-      {/* Custom Symptom Input */}
-      {isAddingCustom && (
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <input
-              type="text"
-              value={customSymptomInput}
-              onChange={e => {
-                setCustomSymptomInput(e.target.value);
-                setValidationError('');
+        {/* Top Symptoms + Custom Button */}
+        <div className="flex flex-wrap gap-2">
+          {topSymptoms.map(renderSymptomBadge)}
+          {!isAddingCustom && (
+            <Badge
+              variant="outline"
+              className="cursor-pointer select-none text-xs py-1 px-2.5 transition-all duration-200 hover:bg-muted border-dashed"
+              onClick={() => setIsAddingCustom(true)}
+              style={{
+                backgroundColor: 'transparent',
+                color: '#955F6A',
+                borderColor: '#B8929A'
               }}
-              onKeyDown={e => {
-                if (e.key === 'Enter') {
-                  addCustomSymptom();
-                } else if (e.key === 'Escape') {
+              data-tour="custom-symptom"
+            >
+              <span className="mr-1.5">+</span>
+              Zadaj vlastný
+            </Badge>
+          )}
+        </div>
+
+        {/* Custom Symptom Input */}
+        {isAddingCustom && (
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                value={customSymptomInput}
+                onChange={e => {
+                  setCustomSymptomInput(e.target.value);
+                  setValidationError('');
+                }}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') {
+                    addCustomSymptom();
+                  } else if (e.key === 'Escape') {
+                    setIsAddingCustom(false);
+                    setCustomSymptomInput('');
+                    setValidationError('');
+                  }
+                }}
+                placeholder="Zadaj príznak..."
+                className="text-xs py-2 px-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-rose-300 flex-1"
+                style={{
+                  backgroundColor: 'white',
+                  borderColor: '#E5D4D7',
+                  color: '#955F6A'
+                }}
+                autoFocus
+                maxLength={50}
+              />
+              <Button size="sm" onClick={addCustomSymptom} className="text-xs">
+                Pridať
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
                   setIsAddingCustom(false);
                   setCustomSymptomInput('');
                   setValidationError('');
-                }
-              }}
-              placeholder="Zadaj príznak..."
-              className="text-xs py-2 px-3 border border-rose-200 rounded-md focus:outline-none focus:ring-2 focus:ring-rose-300 flex-1"
-              style={{
-                backgroundColor: '#FBF8F9',
-                color: '#955F6A'
-              }}
-              autoFocus
-              maxLength={50}
-            />
-            <Button size="sm" onClick={addCustomSymptom} className="text-xs">
-              Pridať
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => {
-                setIsAddingCustom(false);
-                setCustomSymptomInput('');
-                setValidationError('');
-              }}
-              className="text-xs"
-            >
-              Zrušiť
-            </Button>
+                }}
+                className="text-xs"
+              >
+                Zrušiť
+              </Button>
+            </div>
+            {validationError && (
+              <p className="text-xs text-red-500">{validationError}</p>
+            )}
           </div>
-          {validationError && (
-            <p className="text-xs text-red-500">{validationError}</p>
-          )}
-        </div>
-      )}
+        )}
 
-      {/* Notes Section */}
-      <div className="space-y-2" data-tour="notes">
-        <div className="flex items-center justify-between">
-          <span className="text-base font-medium" style={{ color: '#955F6A' }}>
+        {/* Expandable Section */}
+        <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
+          <CollapsibleTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full flex items-center justify-center gap-2 text-xs py-1.5 h-auto"
+              style={{ color: '#955F6A' }}
+            >
+              {isExpanded ? (
+                <>
+                  <ChevronUp className="w-3.5 h-3.5" />
+                  Skryť všetky príznaky
+                </>
+              ) : (
+                <>
+                  <ChevronDown className="w-3.5 h-3.5" />
+                  Zobraziť všetky príznaky
+                </>
+              )}
+            </Button>
+          </CollapsibleTrigger>
+
+          <CollapsibleContent className="space-y-3 pt-2">
+            {/* All Categories */}
+            {Object.entries(SYMPTOM_CATEGORIES).map(([category, symptoms]) => (
+              <div key={category} className="space-y-1.5">
+                <h5 className="text-xs font-medium uppercase tracking-wide" style={{ color: '#B8929A' }}>
+                  {category}
+                </h5>
+                <div className="flex flex-wrap gap-2">
+                  {symptoms.map(renderSymptomBadge)}
+                </div>
+              </div>
+            ))}
+
+            {/* Custom Symptoms Category */}
+            {customSymptoms.length > 0 && (
+              <div className="space-y-1.5">
+                <h5 className="text-xs font-medium uppercase tracking-wide" style={{ color: '#B8929A' }}>
+                  Vlastné príznaky
+                </h5>
+                <div className="flex flex-wrap gap-2">
+                  {customSymptoms.map(renderSymptomBadge)}
+                </div>
+              </div>
+            )}
+          </CollapsibleContent>
+        </Collapsible>
+
+        {/* Separator before Notes */}
+        <Separator className="bg-[#E5D4D7]" />
+
+        {/* Notes Section */}
+        <div className="space-y-1.5" data-tour="notes">
+          <span className="text-sm font-medium" style={{ color: '#955F6A' }}>
             Poznámky o svojom dni:
           </span>
+          <Textarea
+            value={notes}
+            onChange={e => {
+              setNotes(e.target.value);
+              setHasChanges(true);
+            }}
+            placeholder="..."
+            className="min-h-[70px] resize-none placeholder:text-[#B8929A] focus:border-rose-300 focus:ring-2 focus:ring-rose-200 text-sm"
+            style={{
+              backgroundColor: 'white',
+              borderColor: '#E5D4D7',
+              color: '#955F6A'
+            }}
+          />
         </div>
 
-        <Textarea
-          value={notes}
-          onChange={e => {
-            setNotes(e.target.value);
-            setHasChanges(true);
-          }}
-          placeholder="..."
-          className="min-h-[80px] resize-none placeholder:text-[#955F6A] focus:border-rose-300 focus:ring-2 focus:ring-rose-200"
-          style={{
-            backgroundColor: '#FBF8F9',
-            borderColor: '#E5D4D7',
-            color: '#955F6A'
-          }}
-        />
-      </div>
-
-      {/* Action Buttons */}
-      {hasChanges && (
-        <div className="flex gap-2 pt-2">
-          <Button size="sm" onClick={saveSymptoms} className="flex items-center gap-1.5">
-            <Save className="w-3 h-3" />
-            Uložiť
-          </Button>
-          <Button size="sm" variant="outline" onClick={resetSymptoms} className="flex items-center gap-1.5">
-            <RotateCcw className="w-3 h-3" />
-            Vymazať
-          </Button>
+        {/* Footer: Actions + Count */}
+        <div className="flex items-center justify-between pt-1">
+          <div className="flex gap-2">
+            {hasChanges && (
+              <>
+                <Button size="sm" onClick={saveSymptoms} className="flex items-center gap-1.5 h-8 text-xs">
+                  <Save className="w-3 h-3" />
+                  Uložiť
+                </Button>
+                <Button size="sm" variant="outline" onClick={resetSymptoms} className="flex items-center gap-1.5 h-8 text-xs">
+                  <RotateCcw className="w-3 h-3" />
+                  Vymazať
+                </Button>
+              </>
+            )}
+          </div>
+          {(selectedSymptoms.length > 0 || notes.trim()) && (
+            <div className="text-xs" style={{ color: '#B8929A' }}>
+              {selectedSymptoms.length > 0 && `${selectedSymptoms.length} príznakov`}
+              {selectedSymptoms.length > 0 && notes.trim() && ' • '}
+              {notes.trim() && 'poznámky'}
+            </div>
+          )}
         </div>
-      )}
-
-      {/* Selected Count */}
-      {(selectedSymptoms.length > 0 || notes.trim()) && (
-        <div className="text-xs text-muted-foreground pt-1">
-          {selectedSymptoms.length > 0 && `Zaznamenaných: ${selectedSymptoms.length} príznakov`}
-          {selectedSymptoms.length > 0 && notes.trim() && ' • '}
-          {notes.trim() && 'Poznámky pridané'}
-        </div>
-      )}
-    </div>
+      </CardContent>
+    </Card>
   );
 }
