@@ -1,8 +1,8 @@
 import { PhaseRange, PhaseKey, Suggestion } from './types';
 import { getPhaseByDay, dayFractionInPhase, lerp } from './utils';
 
-export function suggestForDay(day: number, ranges: PhaseRange[]): Suggestion {
-  const phase = getPhaseByDay(day, ranges);
+export function suggestForDay(day: number, ranges: PhaseRange[], cycleLength?: number): Suggestion {
+  const phase = getPhaseByDay(day, ranges, cycleLength);
   const f = dayFractionInPhase(day, phase);
   
   let energy = 60, mood = 3.5;

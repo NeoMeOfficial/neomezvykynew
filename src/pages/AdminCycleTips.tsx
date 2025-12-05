@@ -245,7 +245,7 @@ export default function AdminCycleTips() {
     ? getCurrentCycleDay(cycleData.lastPeriodStart, new Date(), cycleData.cycleLength)
     : 1;
   const phaseRanges = getPhaseRanges(cycleData.cycleLength, cycleData.periodLength);
-  const currentPhase = getPhaseByDay(currentDay, phaseRanges);
+  const currentPhase = getPhaseByDay(currentDay, phaseRanges, cycleData.cycleLength);
 
   const handleEditTestData = () => {
     setEditLastPeriodStart(cycleData.lastPeriodStart || format(new Date(), 'yyyy-MM-dd'));
