@@ -35,7 +35,8 @@ export const MASTER_STRAVA: Record<string, {
       "antioxidanty": ["čučoriedky", "jahody", "granátové jablko", "červená repa", "tmavá čokoláda", "zelený čaj", "brusnice", "acai"],
       "horčík": ["tmavá čokoláda 85%", "mandle", "tekvicové semienka", "špenát", "banán", "avokádo", "čierna fazuľa", "hnedá ryža"],
       "vitamín B6": ["banán", "kuracie mäso", "morčacie mäso", "losos", "zemiaky", "cícer", "avokádo", "slnečnicové semienka"],
-      "draslík": ["banán", "avokádo", "zemiaky", "bataty", "špenát", "melón", "pomaranč", "kokosová voda"]
+      "draslík": ["banán", "avokádo", "zemiaky", "bataty", "špenát", "melón", "pomaranč", "kokosová voda"],
+      "kolagén": ["mäsový vývar", "slepačí vývar", "losos s kožou", "hovädzie šľachy", "bravčové nožičky", "želatína", "kostný vývar", "kuracie krídla"]
     },
     benefits: [
       "znížiš zápal a bolestivosť",
@@ -61,7 +62,8 @@ export const MASTER_STRAVA: Record<string, {
       "zinok": ["tekvicové semienka", "hovädzie mäso", "cícer", "kešu orechy", "šošovica", "tofu", "quinoa", "sezamové semienka"],
       "vitamín E": ["mandle", "slnečnicové semienka", "avokádo", "olivový olej", "špargľa", "červená paprika", "mango", "kiwi"],
       "zdravé tuky": ["avokádo", "olivový olej", "mandle", "vlašské orechy", "losos", "chia semienka", "kokosový olej", "mandľové maslo"],
-      "vitamín D": ["losos", "sardinky", "vajcia", "hríby shiitake", "fortifikované mlieko", "tofu fortifikované", "makrela", "tuniak"]
+      "vitamín D": ["losos", "sardinky", "vajcia", "hríby shiitake", "fortifikované mlieko", "tofu fortifikované", "makrela", "tuniak"],
+      "kolagén": ["mäsový vývar", "slepačí vývar", "losos s kožou", "hovädzie šľachy", "kostný vývar", "želatína", "kuracie krídla", "bravčové nožičky"]
     },
     benefits: [
       "podporíš rastúcu energiu a vitalitu",
@@ -154,7 +156,8 @@ export const MASTER_STRAVA: Record<string, {
       "antioxidanty": ["čučoriedky", "jahody", "maliny", "granátové jablko", "tmavá čokoláda", "zelený čaj", "brusnice", "acai"],
       "kurkumín": ["kurkuma", "zázvor", "čierne korenie", "curry", "zlaté mlieko", "kurkumový čaj", "zázvorový čaj"],
       "vláknina": ["ovsené vločky", "šošovica", "cícer", "jablká", "hrušky", "brokolica", "maliny", "fazuľa"],
-      "bielkoviny": ["vajcia", "grécky jogurt", "tofu", "cottage cheese", "losos", "morčacie mäso", "tempeh", "quinoa"]
+      "bielkoviny": ["vajcia", "grécky jogurt", "tofu", "cottage cheese", "losos", "morčacie mäso", "tempeh", "quinoa"],
+      "kolagén": ["mäsový vývar", "slepačí vývar", "losos s kožou", "kostný vývar", "želatína", "hovädzie šľachy", "kuracie krídla", "bravčové nožičky"]
     },
     benefits: [
       "znížiš podráždenosť a PMS",
