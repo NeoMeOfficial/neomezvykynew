@@ -118,59 +118,6 @@ export function TodaysEstimateSection({
             phaseRanges={derivedState.phaseRanges}
           />
           
-          {/* Smart period prediction button */}
-          {uiState && nextPeriodDate && (
-            <div className="mt-4">
-              {uiState === 'info' && (
-                <button
-                  onClick={() => setDialogOpen(true)}
-                  className="w-full flex items-center justify-center px-4 py-2.5 text-sm font-medium rounded-3xl bg-white border border-rose-200/20 hover:bg-rose-50 transition-all"
-                  style={{ color: '#FF7782' }}
-                >
-                  <span>Ďalšia menštruácia by ti mala začať: {formatDate(nextPeriodDate)}</span>
-                </button>
-              )}
-
-              {uiState === 'approaching' && (
-                <button
-                  onClick={() => setDialogOpen(true)}
-                  className="w-full flex flex-col items-center gap-1 px-4 py-3 text-center rounded-3xl bg-amber-50 border border-amber-200 hover:bg-amber-100 transition-all"
-                  style={{ color: '#d97706' }}
-                >
-                  <span className="text-sm font-semibold">
-                    O {Math.abs(daysUntilPeriod!)} {Math.abs(daysUntilPeriod!) === 1 ? 'deň' : 'dni'} by mala začať menštruácia
-                  </span>
-                  <span className="text-xs opacity-60 font-normal">Klikni pre potvrdenie</span>
-                </button>
-              )}
-
-              {uiState === 'imminent' && (
-                <button
-                  onClick={() => setDialogOpen(true)}
-                  className="w-full flex flex-col items-center gap-1 px-4 py-3 text-center rounded-3xl bg-rose-50 border border-rose-300 hover:bg-rose-100 transition-all animate-pulse"
-                  style={{ color: '#FF7782' }}
-                >
-                  <span className="text-sm font-semibold">
-                    Menštruácia by mala začať {daysUntilPeriod === 0 ? 'dnes' : `o ${daysUntilPeriod} ${daysUntilPeriod === 1 ? 'deň' : 'dni'}`}
-                  </span>
-                  <span className="text-xs opacity-60 font-semibold">Už začala?</span>
-                </button>
-              )}
-
-              {(uiState === 'overdue' || uiState === 'late') && (
-                <button
-                  onClick={() => setDialogOpen(true)}
-                  className="w-full flex flex-col items-center gap-1 px-4 py-3 text-center rounded-3xl bg-red-50 border-2 border-red-400 hover:bg-red-100 transition-all"
-                  style={{ color: '#dc2626' }}
-                >
-                  <span className="text-sm font-semibold">
-                    Menštruácia mešká {Math.abs(daysUntilPeriod!)} {Math.abs(daysUntilPeriod!) === 1 ? 'deň' : 'dní'}
-                  </span>
-                  <span className="text-xs opacity-60 font-semibold">Potvrdiť začiatok</span>
-                </button>
-              )}
-            </div>
-          )}
 
           {/* How do you feel today section */}
           <div className="space-y-2 mt-6" data-tour="symptom-tracker">
