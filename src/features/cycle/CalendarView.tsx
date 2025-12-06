@@ -10,7 +10,7 @@ import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterv
 import { sk } from 'date-fns/locale';
 import jsPDF from 'jspdf';
 import { DerivedState, CycleData, PeriodIntensity } from './types';
-import { isPeriodDate, isFertilityDate } from './utils';
+import { isPeriodDate, isFertilityDate, isOvulationDate } from './utils';
 import { PeriodIntensitySelector } from './components/PeriodIntensitySelector';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { SymptomTracker } from './SymptomTracker';
@@ -681,6 +681,7 @@ export function CalendarView({
     if (!cycleData.lastPeriodStart) return {
       isPeriod: false,
       isFertile: false,
+      isOvulation: false,
       isPastPeriod: false,
       isFuturePeriod: false
     };
@@ -689,12 +690,14 @@ export function CalendarView({
       : format(cycleData.lastPeriodStart, 'yyyy-MM-dd');
     const isPeriod = isPeriodDate(date, lastPeriodDateStr, cycleData.cycleLength, cycleData.periodLength);
     const isFertile = isFertilityDate(date, lastPeriodDateStr, cycleData.cycleLength);
+    const isOvulation = isOvulationDate(date, lastPeriodDateStr, cycleData.cycleLength);
     const today = startOfDay(new Date());
     const isPastPeriod = isPeriod && isBefore(date, today);
     const isFuturePeriod = isPeriod && !isBefore(date, today);
     return {
       isPeriod,
       isFertile,
+      isOvulation,
       isPastPeriod,
       isFuturePeriod
     };
@@ -933,10 +936,14 @@ export function CalendarView({
       </div>
 
       {/* Color Legend */}
-      <div className="flex items-center justify-center gap-6 py-3 px-4">
+      <div className="flex items-center justify-center gap-4 py-3 px-4 flex-wrap">
         <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-md bg-rose-100" style={{ border: '2px solid #fb7185' }}></div>
-          <span className="text-sm font-medium text-[#955F6A]">Menštruácia</span>
+          <div className="w-5 h-5 rounded-md bg-rose-100" style={{ border: '2px solid #fb7185' }}></div>
+          <span className="text-xs font-medium text-[#955F6A]">Menštruácia</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-5 h-5 rounded-md" style={{ backgroundColor: 'hsl(285, 55%, 85%)', border: '2px solid hsl(285, 55%, 65%)' }}></div>
+          <span className="text-xs font-medium text-[#955F6A]">Ovulácia</span>
         </div>
         <Button 
           variant="outline" 
@@ -1052,6 +1059,11 @@ export function CalendarView({
                     dayClasses += " bg-rose-50/60";
                     dayStyle.border = '1px solid hsl(350, 30%, 85%)';
                     dayStyle.opacity = 0.85;
+                  } else if (dayInfo.isOvulation) {
+                    // Ovulation day - prominent purple styling
+                    dayClasses += " bg-[hsl(285,55%,85%)] font-semibold";
+                    dayStyle.border = '2px solid hsl(285, 55%, 65%)';
+                    dayStyle.color = 'hsl(285, 55%, 35%)';
                   } else {
                     dayClasses += " hover:bg-white/80 border-gray-100 bg-white/60";
                   }
