@@ -137,7 +137,9 @@ export function MenstrualSidebar({
                         <Lightbulb className="w-3 h-3" />
                         Nastavenia
                       </button>
-                      <PeriodkaTour accessCode={accessCode} autoStart={false} activeSection={activeSection} onSectionChange={onSectionChange} />
+                      <div className="flex justify-end">
+                        <PeriodkaTour accessCode={accessCode} autoStart={false} activeSection={activeSection} onSectionChange={onSectionChange} />
+                      </div>
                       {accessCode && onShareClick && (
                         <button
                           onClick={onShareClick}
