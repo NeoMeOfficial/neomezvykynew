@@ -588,11 +588,19 @@ export function NextDatesInfo({
              background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(253, 242, 248, 0.65) 100%)',
              boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 1px 3px rgba(149, 95, 106, 0.06)'
            }}>
-        <p className="text-xs font-medium" style={{ color: '#955F6A' }}>
-          Dĺžka cyklu: <span style={{ color: '#FF7782' }}>
-            {cycleLength} dní
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-xs font-medium" style={{ color: '#955F6A' }}>
+            Dĺžka cyklu: <span style={{ color: '#FF7782' }}>
+              {cycleLength} dní
+            </span>
+          </p>
+          <span 
+            className="px-2 py-1 text-xs font-medium rounded-lg bg-white/50 flex-shrink-0 cursor-default"
+            style={{ color: '#955F6A', opacity: 0.7 }}
+          >
+            auto
           </span>
-        </p>
+        </div>
       </div>
 
       {/* Fertile window info */}
@@ -602,11 +610,19 @@ export function NextDatesInfo({
                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(253, 242, 248, 0.65) 100%)',
                boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 1px 3px rgba(149, 95, 106, 0.06)'
              }}>
-          <p className="text-xs font-medium" style={{ color: '#955F6A' }}>
-            Odhadované plodné dni: <span style={{ color: '#FF7782' }}>
-              {formatDate(fertilityStart)} - {formatDate(fertilityEnd)}
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-xs font-medium" style={{ color: '#955F6A' }}>
+              Odhadované plodné dni: <span style={{ color: '#FF7782' }}>
+                {formatDate(fertilityStart)} - {formatDate(fertilityEnd)}
+              </span>
+            </p>
+            <span 
+              className="px-2 py-1 text-xs font-medium rounded-lg bg-white/50 flex-shrink-0 cursor-default"
+              style={{ color: '#955F6A', opacity: 0.7 }}
+            >
+              auto
             </span>
-          </p>
+          </div>
         </div>
       )}
     </div>
