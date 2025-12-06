@@ -45,9 +45,9 @@ export function QuestionnaireView({ onComplete }: QuestionnaireViewProps) {
       warnings.push(`⚠️ Dĺžka cyklu ${calculatedCycleLength} dní je mimo rozsahu 25-35 dní. Tieto údaje môžu ovplyvniť presnosť výpočtu.`);
     }
     
-    // Validácia 2: periodLength 2-8 dní
-    if (setupPeriodLength < 2 || setupPeriodLength > 8) {
-      warnings.push('⚠️ Dĺžka krvácania musí byť 2-8 dní.');
+    // Validácia 2: periodLength 2-10 dní
+    if (setupPeriodLength < 2 || setupPeriodLength > 10) {
+      warnings.push('⚠️ Dĺžka krvácania musí byť 2-10 dní.');
       return { valid: false, warnings };
     }
     
@@ -92,7 +92,7 @@ export function QuestionnaireView({ onComplete }: QuestionnaireViewProps) {
     const incomplete = [];
     if (!setupAge || setupAge < 13 || setupAge > 60) incomplete.push({ step: 1, question: 'Vek' });
     if (!cycleStartDate || !cycleEndDate) incomplete.push({ step: 2, question: 'Dátum cyklu' });
-    if (!setupPeriodLength || setupPeriodLength < 2 || setupPeriodLength > 8) incomplete.push({ step: 3, question: 'Dĺžka menštruácie' });
+    if (!setupPeriodLength || setupPeriodLength < 2 || setupPeriodLength > 10) incomplete.push({ step: 3, question: 'Dĺžka menštruácie' });
     return incomplete;
   };
 
@@ -259,7 +259,7 @@ export function QuestionnaireView({ onComplete }: QuestionnaireViewProps) {
                   id="setupPeriodLength" 
                   type="number" 
                   min="2" 
-                  max="8" 
+                  max="10"
                   value={setupPeriodLength} 
                   onChange={e => setSetupPeriodLength(Number(e.target.value))} 
                   placeholder="5 dni" 

@@ -204,8 +204,8 @@ export function NextDatesInfo({
               </div>
             </div>
             
-            <div className="mt-3 flex items-center gap-2">
-              {[3, 4, 5, 6, 7].map((days) => (
+            <div className="mt-3 flex items-center gap-2 flex-wrap">
+              {[2, 3, 4, 5, 6, 7, 8, 9, 10].map((days) => (
                 <button
                   key={days}
                   onClick={() => {
@@ -499,8 +499,8 @@ export function NextDatesInfo({
             </PopoverTrigger>
             <PopoverContent className="w-auto p-3 pointer-events-auto" align="end">
               <p className="text-sm font-medium mb-2" style={{ color: '#955F6A' }}>Dĺžka krvácania</p>
-              <div className="flex items-center gap-2">
-                {[3, 4, 5, 6, 7].map((days) => (
+              <div className="flex items-center gap-2 flex-wrap">
+                {[2, 3, 4, 5, 6, 7, 8, 9, 10].map((days) => (
                   <button
                     key={days}
                     onClick={() => {
