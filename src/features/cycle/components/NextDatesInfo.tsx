@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { format, addDays, differenceInDays } from 'date-fns';
 import { sk } from 'date-fns/locale';
-import { Calendar as CalendarIcon, ChevronRight } from 'lucide-react';
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { Calendar } from '@/components/ui/calendar';
 import { Button } from '@/components/ui/button';
@@ -48,6 +48,18 @@ export function NextDatesInfo({
   const [setupNextPeriod, setSetupNextPeriod] = useState<Date | undefined>(undefined);
   const [showPeriodLengthPopover, setShowPeriodLengthPopover] = useState(false);
   const [showPeriodStartPopover, setShowPeriodStartPopover] = useState(false);
+  
+  // Scroll refs for period length selectors
+  const onboardingScrollRef = useRef<HTMLDivElement>(null);
+  const popoverScrollRef = useRef<HTMLDivElement>(null);
+  
+  const scrollContainer = (direction: 'left' | 'right', container: 'onboarding' | 'popover') => {
+    const ref = container === 'onboarding' ? onboardingScrollRef : popoverScrollRef;
+    if (ref.current) {
+      const scrollAmount = direction === 'left' ? -80 : 80;
+      ref.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
   const [showNextPeriodPopover, setShowNextPeriodPopover] = useState(false);
 
   const formatDate = (date: Date) => {
@@ -204,28 +216,49 @@ export function NextDatesInfo({
               </div>
             </div>
             
-            <div className="mt-3 flex items-center gap-2 flex-wrap">
-              {[2, 3, 4, 5, 6, 7, 8, 9, 10].map((days) => (
-                <button
-                  key={days}
-                  onClick={() => {
-                    setSetupPeriodLength(days);
-                    setOnboardingStep(3);
-                  }}
-                  className={cn(
-                    "w-10 h-10 rounded-full text-sm font-medium transition-all",
-                    setupPeriodLength === days 
-                      ? "text-white shadow-md" 
-                      : "bg-white/50 hover:bg-white/80"
-                  )}
-                  style={{ 
-                    backgroundColor: setupPeriodLength === days ? '#FF7782' : undefined,
-                    color: setupPeriodLength === days ? 'white' : '#955F6A'
-                  }}
-                >
-                  {days}
-                </button>
-              ))}
+            <div className="mt-3 flex items-center gap-1">
+              <button
+                onClick={() => scrollContainer('left', 'onboarding')}
+                className="w-7 h-7 rounded-full bg-white/50 hover:bg-white/80 flex items-center justify-center flex-shrink-0"
+              >
+                <ChevronLeft className="w-4 h-4" style={{ color: '#955F6A' }} />
+              </button>
+              
+              <div 
+                ref={onboardingScrollRef}
+                className="flex items-center gap-2 overflow-x-auto scrollbar-hide"
+                style={{ scrollBehavior: 'smooth', maxWidth: '200px' }}
+              >
+                {[2, 3, 4, 5, 6, 7, 8, 9, 10].map((days) => (
+                  <button
+                    key={days}
+                    onClick={() => {
+                      setSetupPeriodLength(days);
+                      setOnboardingStep(3);
+                    }}
+                    className={cn(
+                      "w-10 h-10 rounded-full text-sm font-medium transition-all flex-shrink-0",
+                      setupPeriodLength === days 
+                        ? "text-white shadow-md" 
+                        : "bg-white/50 hover:bg-white/80"
+                    )}
+                    style={{ 
+                      backgroundColor: setupPeriodLength === days ? '#FF7782' : undefined,
+                      color: setupPeriodLength === days ? 'white' : '#955F6A'
+                    }}
+                  >
+                    {days}
+                  </button>
+                ))}
+              </div>
+              
+              <button
+                onClick={() => scrollContainer('right', 'onboarding')}
+                className="w-7 h-7 rounded-full bg-white/50 hover:bg-white/80 flex items-center justify-center flex-shrink-0"
+              >
+                <ChevronRight className="w-4 h-4" style={{ color: '#955F6A' }} />
+              </button>
+              
               <span className="text-sm ml-1" style={{ color: '#955F6A' }}>dní</span>
             </div>
           </div>
@@ -499,28 +532,48 @@ export function NextDatesInfo({
             </PopoverTrigger>
             <PopoverContent className="w-auto p-3 pointer-events-auto" align="end">
               <p className="text-sm font-medium mb-2" style={{ color: '#955F6A' }}>Dĺžka krvácania</p>
-              <div className="flex items-center gap-2 flex-wrap">
-                {[2, 3, 4, 5, 6, 7, 8, 9, 10].map((days) => (
-                  <button
-                    key={days}
-                    onClick={() => {
-                      onPeriodLengthChange?.(days);
-                      setShowPeriodLengthPopover(false);
-                    }}
-                    className={cn(
-                      "w-9 h-9 rounded-full text-sm font-medium transition-all",
-                      periodLength === days 
-                        ? "text-white shadow-md" 
-                        : "bg-gray-100 hover:bg-gray-200"
-                    )}
-                    style={{ 
-                      backgroundColor: periodLength === days ? '#FF7782' : undefined,
-                      color: periodLength === days ? 'white' : '#955F6A'
-                    }}
-                  >
-                    {days}
-                  </button>
-                ))}
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => scrollContainer('left', 'popover')}
+                  className="w-6 h-6 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center flex-shrink-0"
+                >
+                  <ChevronLeft className="w-3 h-3" style={{ color: '#955F6A' }} />
+                </button>
+                
+                <div 
+                  ref={popoverScrollRef}
+                  className="flex items-center gap-2 overflow-x-auto scrollbar-hide"
+                  style={{ scrollBehavior: 'smooth', maxWidth: '160px' }}
+                >
+                  {[2, 3, 4, 5, 6, 7, 8, 9, 10].map((days) => (
+                    <button
+                      key={days}
+                      onClick={() => {
+                        onPeriodLengthChange?.(days);
+                        setShowPeriodLengthPopover(false);
+                      }}
+                      className={cn(
+                        "w-9 h-9 rounded-full text-sm font-medium transition-all flex-shrink-0",
+                        periodLength === days 
+                          ? "text-white shadow-md" 
+                          : "bg-gray-100 hover:bg-gray-200"
+                      )}
+                      style={{ 
+                        backgroundColor: periodLength === days ? '#FF7782' : undefined,
+                        color: periodLength === days ? 'white' : '#955F6A'
+                      }}
+                    >
+                      {days}
+                    </button>
+                  ))}
+                </div>
+                
+                <button
+                  onClick={() => scrollContainer('right', 'popover')}
+                  className="w-6 h-6 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center flex-shrink-0"
+                >
+                  <ChevronRight className="w-3 h-3" style={{ color: '#955F6A' }} />
+                </button>
               </div>
             </PopoverContent>
           </Popover>

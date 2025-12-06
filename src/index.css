@@ -449,3 +449,12 @@ All colors MUST be HSL.
   opacity: 0.5 !important;
   border-radius: 8px !important;
 }
+
+/* Hide scrollbar for horizontal scroll containers */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
