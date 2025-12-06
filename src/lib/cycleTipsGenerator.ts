@@ -911,21 +911,24 @@ export function generateNutrition(day: number, phase: string, subphase: string |
     foods.push(...shuffledFoods.slice(0, foodCount));
   });
   
-  // Format: 3 sentences with dynamic reasons based on first 2 nutrients
+  // Format: 4 paragraphs - nutrients, reasons, foods, benefit
   const nutrientsStr = selectedNutrients.join(', ');
   const foodsStr = foods.join(', ');
   
-  // Build dynamic reason from first 2 selected nutrients
+  // Helper to capitalize first letter
+  const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
+  
+  // Build separate sentences for each nutrient reason
   const reason1 = master.nutrientReasons?.[selectedNutrients[0]] || '';
   const reason2 = master.nutrientReasons?.[selectedNutrients[1]] || '';
-  const dynamicReason = reason1 && reason2 
-    ? `${selectedNutrients[0]} ${reason1} a ${selectedNutrients[1]} ${reason2}`
-    : master.reasonTemplate;
+  const nutrientSentence1 = reason1 ? `${capitalize(selectedNutrients[0])} ${reason1}.` : '';
+  const nutrientSentence2 = reason2 ? `${capitalize(selectedNutrients[1])} ${reason2}.` : '';
+  const reasonsSentences = [nutrientSentence1, nutrientSentence2].filter(Boolean).join(' ');
   
   // Build dynamic benefit from first selected nutrient
   const benefit = master.nutrientBenefits?.[selectedNutrients[0]] || seededShuffle(master.benefits, day * 3)[0];
   
-  return `Tvoje telo dnes potrebuje ${nutrientsStr} — ${dynamicReason}.\n\nNájdeš ich v potravinách ako ${foodsStr}.\n\nTento výber ti dnes pomôže ${benefit}.`;
+  return `Tvoje telo dnes potrebuje ${nutrientsStr}.\n\n${reasonsSentences}\n\nNájdeš ich v potravinách ako ${foodsStr}.\n\nTento výber ti dnes pomôže ${benefit}.`;
 }
 
 // Determine if today is a cardio day based on phase and day position
