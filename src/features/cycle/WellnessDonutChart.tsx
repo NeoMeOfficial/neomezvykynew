@@ -5,7 +5,7 @@ import { DerivedState, PhaseKey, CycleData } from './types';
 import { getPhaseColor } from './suggestions';
 import { isPeriodDate, isFertilityDate, getNextPeriodDate } from './utils';
 
-type OutcomeType = 'next-period' | 'fertile-days';
+type OutcomeType = 'next-period' | 'fertile-days' | 'ovulation';
 import { UI_TEXT } from './insights';
 
 interface WellnessDonutChartProps {

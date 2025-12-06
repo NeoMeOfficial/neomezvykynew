@@ -16,7 +16,7 @@ import { PeriodkaTour } from './PeriodkaTour';
 import { NextDatesInfo } from './components/NextDatesInfo';
 import { CalendarViewModal } from './components/CalendarViewModal';
 import { CycleInfoSection } from './CycleInfoSection';
-type OutcomeType = 'next-period' | 'fertile-days';
+type OutcomeType = 'next-period' | 'fertile-days' | 'ovulation';
 interface MenstrualDashboardLayoutProps {
   accessCode?: string;
   compact?: boolean;

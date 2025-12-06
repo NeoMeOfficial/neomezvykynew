@@ -7,8 +7,8 @@ import { CycleData, DerivedState, PeriodIntensity } from '../types';
 interface CalendarViewSectionProps {
   cycleData: CycleData;
   derivedState: DerivedState;
-  onOutcomeSelect: (outcome: 'next-period' | 'fertile-days' | null) => void;
-  selectedOutcome: 'next-period' | 'fertile-days' | null;
+  onOutcomeSelect: (outcome: 'next-period' | 'fertile-days' | 'ovulation' | null) => void;
+  selectedOutcome: 'next-period' | 'fertile-days' | 'ovulation' | null;
   onPeriodIntensityChange: (date: string, intensity: PeriodIntensity | null) => void;
   getPeriodIntensity: (date: string) => PeriodIntensity | undefined;
   accessCode?: string;

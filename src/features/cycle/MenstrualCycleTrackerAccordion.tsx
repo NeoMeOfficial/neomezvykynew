@@ -8,7 +8,7 @@ import { TodaysEstimateSection } from './sections/TodaysEstimateSection';
 import { FeelBetterSection } from './sections/FeelBetterSection';
 import { CalendarViewSection } from './sections/CalendarViewSection';
 
-type OutcomeType = 'next-period' | 'fertile-days';
+type OutcomeType = 'next-period' | 'fertile-days' | 'ovulation';
 
 interface MenstrualCycleTrackerAccordionProps {
   accessCode?: string;

@@ -14,7 +14,7 @@ import { isPeriodDate, isFertilityDate, isOvulationDate } from './utils';
 import { PeriodIntensitySelector } from './components/PeriodIntensitySelector';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { SymptomTracker } from './SymptomTracker';
-type OutcomeType = 'next-period' | 'fertile-days';
+type OutcomeType = 'next-period' | 'fertile-days' | 'ovulation';
 type ViewType = 'monthly' | 'weekly';
 interface HistoricalEntry {
   date: string;
@@ -850,17 +850,17 @@ export function CalendarView({
 
             {/* Calendar Actions Dropdown */}
             <Select
-              value={selectedOutcome === 'next-period' ? 'period' : selectedOutcome === 'fertile-days' ? 'fertile' : ''}
+              value={selectedOutcome === 'next-period' ? 'period' : selectedOutcome === 'fertile-days' ? 'fertile' : selectedOutcome === 'ovulation' ? 'ovulation' : ''}
               onValueChange={(value) => {
                 switch(value) {
                   case 'period':
                     onOutcomeSelect(selectedOutcome === 'next-period' ? null : 'next-period');
                     break;
+                  case 'ovulation':
+                    onOutcomeSelect(selectedOutcome === 'ovulation' ? null : 'ovulation');
+                    break;
                   case 'fertile':
                     onOutcomeSelect(selectedOutcome === 'fertile-days' ? null : 'fertile-days');
-                    break;
-                  case 'notes':
-                    // TODO: Implement notes filter
                     break;
                 }
               }}
@@ -871,20 +871,20 @@ export function CalendarView({
               <SelectContent className="bg-white border-[#FF7782] z-50">
                 <SelectItem value="period" className="text-[#955F6A] hover:bg-[#FF7782]/10 focus:bg-[#FF7782]/10">
                   <div className="flex items-center gap-2">
-                    <Droplets className="w-3 h-3" />
+                    <div className="w-3 h-3 rounded-full bg-rose-400" />
                     <span>Menštruácia</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="ovulation" className="text-[#955F6A] hover:bg-[#FF7782]/10 focus:bg-[#FF7782]/10">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: 'hsl(285, 55%, 65%)' }} />
+                    <span>Ovulácia</span>
                   </div>
                 </SelectItem>
                 <SelectItem value="fertile" className="text-[#955F6A] hover:bg-[#FF7782]/10 focus:bg-[#FF7782]/10">
                   <div className="flex items-center gap-2">
-                    <Heart className="w-3 h-3" />
+                    <div className="w-3 h-3 rounded-full bg-pink-300" />
                     <span>Plodné dni</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="notes" className="text-[#955F6A] hover:bg-[#FF7782]/10 focus:bg-[#FF7782]/10">
-                  <div className="flex items-center gap-2">
-                    <FileText className="w-3 h-3" />
-                    <span>Poznámky</span>
                   </div>
                 </SelectItem>
               </SelectContent>
@@ -935,16 +935,8 @@ export function CalendarView({
         </Button>
       </div>
 
-      {/* Color Legend */}
-      <div className="flex items-center justify-center gap-4 py-3 px-4 flex-wrap">
-        <div className="flex items-center gap-2">
-          <div className="w-5 h-5 rounded-md bg-rose-100" style={{ border: '2px solid #fb7185' }}></div>
-          <span className="text-xs font-medium text-[#955F6A]">Menštruácia</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-5 h-5 rounded-md" style={{ backgroundColor: 'hsl(285, 55%, 85%)', border: '2px solid hsl(285, 55%, 65%)' }}></div>
-          <span className="text-xs font-medium text-[#955F6A]">Ovulácia</span>
-        </div>
+      {/* Today Button Only */}
+      <div className="flex items-center justify-center py-3 px-4">
         <Button 
           variant="outline" 
           size="sm" 
@@ -1048,8 +1040,13 @@ export function CalendarView({
                     color: 'white',
                     borderWidth: '2px'
                   };
+                } else if (selectedOutcome === 'ovulation' && dayInfo.isOvulation) {
+                  // Ovulation filter active - show ovulation day
+                  dayClasses += " bg-[hsl(285,55%,85%)] font-semibold";
+                  dayStyle.border = '2px solid hsl(285, 55%, 65%)';
+                  dayStyle.color = 'hsl(285, 55%, 35%)';
                 } else if (!selectedOutcome) {
-                  // Show normal phase colors when no filter is active
+                  // Show normal phase colors when no filter is active (only menstruation)
                   if (dayInfo.isFuturePeriod) {
                     // Future/current period - prominent styling
                     dayClasses += " bg-rose-100";
@@ -1059,11 +1056,6 @@ export function CalendarView({
                     dayClasses += " bg-rose-50/60";
                     dayStyle.border = '1px solid hsl(350, 30%, 85%)';
                     dayStyle.opacity = 0.85;
-                  } else if (dayInfo.isOvulation) {
-                    // Ovulation day - prominent purple styling
-                    dayClasses += " bg-[hsl(285,55%,85%)] font-semibold";
-                    dayStyle.border = '2px solid hsl(285, 55%, 65%)';
-                    dayStyle.color = 'hsl(285, 55%, 35%)';
                   } else {
                     dayClasses += " hover:bg-white/80 border-gray-100 bg-white/60";
                   }

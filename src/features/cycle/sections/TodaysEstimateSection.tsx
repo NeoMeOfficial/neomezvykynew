@@ -9,7 +9,7 @@ import { PeriodConfirmationDialog } from '../components/PeriodConfirmationDialog
 import { CycleData, DerivedState, PhaseKey } from '../types';
 interface TodaysEstimateSectionProps {
   derivedState: DerivedState;
-  selectedOutcome: 'next-period' | 'fertile-days' | null;
+  selectedOutcome: 'next-period' | 'fertile-days' | 'ovulation' | null;
   cycleData: CycleData;
   currentDay: number;
   currentPhase: {
