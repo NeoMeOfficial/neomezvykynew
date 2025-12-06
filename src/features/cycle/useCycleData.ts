@@ -1,6 +1,61 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { format } from 'date-fns';
-import { CycleData, DerivedState, CustomSettings, PeriodIntensity, DailyPeriodData } from './types';
+import { format, differenceInDays } from 'date-fns';
+import { CycleData, DerivedState, CustomSettings, PeriodIntensity, DailyPeriodData, PeriodLog } from './types';
+
+// Calculate weighted average cycle length from history
+// More recent cycles have higher weight for better predictions
+export function calculateAverageCycleLength(history: PeriodLog[]): { average: number; cycleCount: number } | null {
+  if (!history || history.length < 2) {
+    return null;
+  }
+
+  // Sort history by date (newest first)
+  const sortedHistory = [...history]
+    .filter(entry => entry.startDate)
+    .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
+
+  if (sortedHistory.length < 2) {
+    return null;
+  }
+
+  // Calculate cycle lengths between consecutive periods (max 6 cycles)
+  const cycleLengths: number[] = [];
+  const maxCycles = Math.min(sortedHistory.length - 1, 6);
+
+  for (let i = 0; i < maxCycles; i++) {
+    const currentStart = new Date(sortedHistory[i].startDate);
+    const previousStart = new Date(sortedHistory[i + 1].startDate);
+    const length = differenceInDays(currentStart, previousStart);
+
+    // Only include reasonable cycle lengths (21-35 days)
+    if (length >= 21 && length <= 35) {
+      cycleLengths.push(length);
+    }
+  }
+
+  if (cycleLengths.length === 0) {
+    return null;
+  }
+
+  // Weighted average - more recent cycles have higher weight
+  // Weights: most recent = 3, second = 2.5, third = 2, then 1.5, 1, 0.5
+  const weights = [3, 2.5, 2, 1.5, 1, 0.5];
+  let weightedSum = 0;
+  let totalWeight = 0;
+
+  cycleLengths.forEach((length, index) => {
+    const weight = weights[index] || 0.5;
+    weightedSum += length * weight;
+    totalWeight += weight;
+  });
+
+  const average = Math.round(weightedSum / totalWeight);
+
+  return {
+    average: Math.max(21, Math.min(35, average)),
+    cycleCount: cycleLengths.length
+  };
+}
 import { getDerivedState } from './utils';
 
 const STORAGE_KEY = 'cycle_data';
