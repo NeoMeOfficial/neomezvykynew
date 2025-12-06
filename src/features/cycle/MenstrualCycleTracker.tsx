@@ -19,7 +19,7 @@ import { UI_TEXT } from './insights';
 import { formatDateSk, getNextPeriodDate } from './utils';
 import { PhaseKey } from './types';
 
-type OutcomeType = 'next-period' | 'fertile-days';
+type OutcomeType = 'next-period' | 'fertile-days' | 'ovulation';
 
 interface MenstrualCycleTrackerProps {
   accessCode?: string;
