@@ -107,7 +107,7 @@ export function SettingsModal({
                 <span className="text-sm" style={{ color: '#955F6A' }}>{UI_TEXT.days}</span>
               </div>
               <p className="text-xs" style={{ color: '#955F6A', opacity: 0.7 }}>
-                Obvykle 3-7 dní
+                Obvykle 2-10 dní
               </p>
             </div>
           </div>
