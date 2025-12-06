@@ -14,7 +14,7 @@ import { isPeriodDate, isFertilityDate, isOvulationDate } from './utils';
 import { PeriodIntensitySelector } from './components/PeriodIntensitySelector';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { SymptomTracker } from './SymptomTracker';
-type OutcomeType = 'next-period' | 'fertile-days' | 'ovulation';
+type OutcomeType = 'next-period' | 'fertile-days' | 'ovulation' | 'notes';
 type ViewType = 'monthly' | 'weekly';
 interface HistoricalEntry {
   date: string;
@@ -850,7 +850,7 @@ export function CalendarView({
 
             {/* Calendar Actions Dropdown */}
             <Select
-              value={selectedOutcome === 'next-period' ? 'period' : selectedOutcome === 'fertile-days' ? 'fertile' : selectedOutcome === 'ovulation' ? 'ovulation' : ''}
+              value={selectedOutcome === 'next-period' ? 'period' : selectedOutcome === 'fertile-days' ? 'fertile' : selectedOutcome === 'ovulation' ? 'ovulation' : selectedOutcome === 'notes' ? 'notes' : ''}
               onValueChange={(value) => {
                 switch(value) {
                   case 'period':
@@ -861,6 +861,9 @@ export function CalendarView({
                     break;
                   case 'fertile':
                     onOutcomeSelect(selectedOutcome === 'fertile-days' ? null : 'fertile-days');
+                    break;
+                  case 'notes':
+                    onOutcomeSelect(selectedOutcome === 'notes' ? null : 'notes');
                     break;
                 }
               }}
@@ -885,6 +888,12 @@ export function CalendarView({
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-pink-300" />
                     <span>Plodné dni</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="notes" className="text-[#955F6A] hover:bg-[#FF7782]/10 focus:bg-[#FF7782]/10">
+                  <div className="flex items-center gap-2">
+                    <Pen className="w-3 h-3" style={{ color: '#F59E0B' }} />
+                    <span>Poznámky</span>
                   </div>
                 </SelectItem>
               </SelectContent>

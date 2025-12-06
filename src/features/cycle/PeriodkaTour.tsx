@@ -136,11 +136,12 @@ export const PeriodkaTour = ({
     <>
       <button
         onClick={startFullTour}
-        className="px-2 py-1 text-xs font-medium rounded-lg bg-white/50 hover:bg-white/80 transition-colors flex-shrink-0"
+        className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-3xl bg-white border border-rose-200/20 hover:bg-gray-50 transition-all w-full"
         style={{ color: '#FF7782' }}
         title="Spustiť návod"
         data-tour="welcome"
       >
+        <HelpCircle className="w-3 h-3" />
         Návod
       </button>
 
