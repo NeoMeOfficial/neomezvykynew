@@ -11,6 +11,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
+import { getFertilityDates, getOvulationDay } from '../utils';
 
 interface NextDatesInfoProps {
   lastPeriodStart: string | null;
@@ -55,13 +56,10 @@ export function NextDatesInfo({
   const nextPeriodDate = startDate ? addDays(startDate, cycleLength) : null;
   const periodEndDate = startDate ? addDays(startDate, periodLength - 1) : null;
   
-  // Calculate fertile window (ovulation typically 14 days before next period)
-  const ovulationDay = cycleLength - 14;
-  const fertilityStartDay = ovulationDay - 2;
-  const fertilityEndDay = ovulationDay;
-  
-  const fertilityStart = startDate ? addDays(startDate, fertilityStartDay) : null;
-  const fertilityEnd = startDate ? addDays(startDate, fertilityEndDay) : null;
+  // Calculate fertile window using centralized functions
+  const { startDate: fertilityStart, endDate: fertilityEnd } = lastPeriodStart 
+    ? getFertilityDates(lastPeriodStart, cycleLength)
+    : { startDate: null, endDate: null };
 
   // Calculate days until next period
   const today = new Date();
