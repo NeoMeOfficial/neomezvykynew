@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import { Calendar as CalendarIcon, TrendingUp } from 'lucide-react';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { MenstrualSidebar } from './MenstrualSidebar';
@@ -10,7 +11,7 @@ import { CalendarViewSection } from './sections/CalendarViewSection';
 import { DatePickerModal } from './DatePickerModal';
 import { SettingsModal } from './SettingsModal';
 import { ShareCalendarDialog } from '@/components/ShareCalendarDialog';
-import { useCycleData } from './useCycleData';
+import { useCycleData, calculateAverageCycleLength } from './useCycleData';
 import { PeriodkaTour } from './PeriodkaTour';
 import { NextDatesInfo } from './components/NextDatesInfo';
 import { CalendarViewModal } from './components/CalendarViewModal';
@@ -50,6 +51,42 @@ export function MenstrualDashboardLayout({
   } = useCycleData(accessCode);
   
   const handlePeriodStart = (date: Date) => {
+    // If there's a previous period, add it to history and calculate new cycle length
+    if (cycleData.lastPeriodStart) {
+      const previousStart = new Date(cycleData.lastPeriodStart);
+      const actualCycleLength = differenceInDays(date, previousStart);
+      
+      // Add previous period to history first
+      addPeriodToHistory(cycleData.lastPeriodStart);
+      
+      // Create updated history for calculation (include the cycle we just completed)
+      const updatedHistory = [
+        { startDate: cycleData.lastPeriodStart },
+        ...(cycleData.history || [])
+      ];
+      
+      // Calculate weighted average from history
+      const avgResult = calculateAverageCycleLength(updatedHistory);
+      
+      if (avgResult && avgResult.cycleCount >= 1) {
+        // Use weighted average if we have enough history
+        if (avgResult.average !== cycleData.cycleLength) {
+          setCycleLength(avgResult.average);
+          toast.success(`Dĺžka cyklu aktualizovaná na ${avgResult.average} dní`, {
+            description: avgResult.cycleCount > 1 
+              ? `Vypočítané z ${avgResult.cycleCount} posledných cyklov`
+              : 'Na základe posledného cyklu'
+          });
+        }
+      } else if (actualCycleLength >= 21 && actualCycleLength <= 35 && actualCycleLength !== cycleData.cycleLength) {
+        // Fallback to actual cycle length if no history yet
+        setCycleLength(actualCycleLength);
+        toast.success(`Dĺžka cyklu aktualizovaná na ${actualCycleLength} dní`, {
+          description: 'Na základe posledného cyklu'
+        });
+      }
+    }
+    
     setLastPeriodStart(date);
     handleFirstInteraction();
   };
