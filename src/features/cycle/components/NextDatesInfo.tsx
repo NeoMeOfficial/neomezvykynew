@@ -459,11 +459,9 @@ export function NextDatesInfo({
              background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(253, 242, 248, 0.65) 100%)',
              boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 1px 3px rgba(149, 95, 106, 0.06)'
            }}>
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center justify-between gap-2 mb-1">
           <p className="text-xs font-medium" style={{ color: '#955F6A' }}>
-            Posledná menštruácia: <span style={{ color: '#FF7782' }}>
-              {formatDate(startDate!)}
-            </span>
+            Posledná menštruácia
           </p>
           {onEditClick && (
             <button
@@ -475,6 +473,9 @@ export function NextDatesInfo({
             </button>
           )}
         </div>
+        <p className="text-sm font-semibold" style={{ color: '#FF7782' }}>
+          {formatDate(startDate!)}
+        </p>
       </div>
 
       {/* Bleeding duration */}
@@ -483,11 +484,9 @@ export function NextDatesInfo({
              background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(253, 242, 248, 0.65) 100%)',
              boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 1px 3px rgba(149, 95, 106, 0.06)'
            }}>
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center justify-between gap-2 mb-1">
           <p className="text-xs font-medium" style={{ color: '#955F6A' }}>
-            Dĺžka krvácania: <span style={{ color: '#FF7782' }}>
-              {periodLength} {periodLength === 1 ? 'deň' : periodLength < 5 ? 'dni' : 'dní'}
-            </span>
+            Dĺžka krvácania
           </p>
           <Popover open={showPeriodLengthPopover} onOpenChange={setShowPeriodLengthPopover}>
             <PopoverTrigger asChild>
@@ -526,6 +525,9 @@ export function NextDatesInfo({
             </PopoverContent>
           </Popover>
         </div>
+        <p className="text-sm font-semibold" style={{ color: '#FF7782' }}>
+          {periodLength} {periodLength === 1 ? 'deň' : periodLength < 5 ? 'dni' : 'dní'}
+        </p>
       </div>
 
       {/* Predicted next period */}
@@ -535,11 +537,9 @@ export function NextDatesInfo({
                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(253, 242, 248, 0.65) 100%)',
                boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 1px 3px rgba(149, 95, 106, 0.06)'
              }}>
-          <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center justify-between gap-2 mb-1">
             <p className="text-xs font-medium" style={{ color: '#955F6A' }}>
-              Odhadovaná ďalšia menštruácia: <span style={{ color: '#FF7782' }}>
-                {formatDate(nextPeriodDate)}
-              </span>
+              Ďalšia menštruácia
             </p>
             <Popover open={showNextPeriodPopover} onOpenChange={setShowNextPeriodPopover}>
               <PopoverTrigger asChild>
@@ -579,6 +579,9 @@ export function NextDatesInfo({
               </PopoverContent>
             </Popover>
           </div>
+          <p className="text-sm font-semibold" style={{ color: '#FF7782' }}>
+            {formatDate(nextPeriodDate)}
+          </p>
         </div>
       )}
 
@@ -588,11 +591,9 @@ export function NextDatesInfo({
              background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(253, 242, 248, 0.65) 100%)',
              boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 1px 3px rgba(149, 95, 106, 0.06)'
            }}>
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center justify-between gap-2 mb-1">
           <p className="text-xs font-medium" style={{ color: '#955F6A' }}>
-            Dĺžka cyklu: <span style={{ color: '#FF7782' }}>
-              {cycleLength} dní
-            </span>
+            Dĺžka cyklu
           </p>
           <span 
             className="px-2 py-1 text-xs font-medium rounded-lg bg-white/50 flex-shrink-0 cursor-default"
@@ -601,6 +602,9 @@ export function NextDatesInfo({
             auto
           </span>
         </div>
+        <p className="text-sm font-semibold" style={{ color: '#FF7782' }}>
+          {cycleLength} dní
+        </p>
       </div>
 
       {/* Fertile window info */}
@@ -610,11 +614,9 @@ export function NextDatesInfo({
                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(253, 242, 248, 0.65) 100%)',
                boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 1px 3px rgba(149, 95, 106, 0.06)'
              }}>
-          <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center justify-between gap-2 mb-1">
             <p className="text-xs font-medium" style={{ color: '#955F6A' }}>
-              Odhadované plodné dni: <span style={{ color: '#FF7782' }}>
-                {formatDate(fertilityStart)} - {formatDate(fertilityEnd)}
-              </span>
+              Plodné dni
             </p>
             <span 
               className="px-2 py-1 text-xs font-medium rounded-lg bg-white/50 flex-shrink-0 cursor-default"
@@ -623,6 +625,9 @@ export function NextDatesInfo({
               auto
             </span>
           </div>
+          <p className="text-sm font-semibold" style={{ color: '#FF7782' }}>
+            {formatDate(fertilityStart)} - {formatDate(fertilityEnd)}
+          </p>
         </div>
       )}
     </div>
