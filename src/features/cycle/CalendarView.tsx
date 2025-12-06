@@ -892,7 +892,7 @@ export function CalendarView({
                 </SelectItem>
                 <SelectItem value="notes" className="text-[#955F6A] hover:bg-[#FF7782]/10 focus:bg-[#FF7782]/10">
                   <div className="flex items-center gap-2">
-                    <Pen className="w-3 h-3" style={{ color: '#F59E0B' }} />
+                    <Pen className="w-3 h-3" style={{ color: '#6B7280' }} />
                     <span>Poznámky</span>
                   </div>
                 </SelectItem>
@@ -1058,9 +1058,9 @@ export function CalendarView({
                   // Notes filter active - highlight days with symptoms or notes
                   const hasSymptomsOrNotes = dayData.symptoms.length > 0 || dayData.notes.length > 0;
                   if (hasSymptomsOrNotes) {
-                    dayClasses += " bg-amber-100";
-                    dayStyle.border = '2px solid #F59E0B'; // amber-500
-                    dayStyle.color = '#92400E'; // amber-800
+                    dayClasses += " bg-gray-100";
+                    dayStyle.border = '2px solid #6B7280'; // gray-500
+                    dayStyle.color = '#374151'; // gray-700
                   } else {
                     dayClasses += " hover:bg-white/80 border-gray-100 bg-white/60";
                   }
@@ -1242,24 +1242,24 @@ export function CalendarView({
       </Dialog>
 
       {/* Current Selection Info */}
-      {selectedOutcome && <div className={`mt-4 p-3 rounded-lg border ${selectedOutcome === 'notes' ? 'bg-amber-50 border-amber-200/50' : 'bg-white/80 border-rose-200/50'}`}>
+      {selectedOutcome && <div className={`mt-4 p-3 rounded-lg border ${selectedOutcome === 'notes' ? 'bg-gray-50 border-gray-200/50' : 'bg-white/80 border-rose-200/50'}`}>
           <div className="flex items-center gap-2 mb-2">
             {selectedOutcome === 'next-period' && <Droplets className="w-4 h-4 text-rose-400" />}
             {selectedOutcome === 'fertile-days' && <Heart className="w-4 h-4 text-pink-400" />}
             {selectedOutcome === 'ovulation' && <Heart className="w-4 h-4 text-purple-500" />}
-            {selectedOutcome === 'notes' && <Pen className="w-4 h-4 text-amber-500" />}
-            <span className={`font-medium text-sm ${selectedOutcome === 'notes' ? 'text-amber-800' : ''}`} style={selectedOutcome !== 'notes' ? { color: '#955F6A' } : {}}>
+            {selectedOutcome === 'notes' && <Pen className="w-4 h-4 text-gray-500" />}
+            <span className={`font-medium text-sm ${selectedOutcome === 'notes' ? 'text-gray-700' : ''}`} style={selectedOutcome !== 'notes' ? { color: '#955F6A' } : {}}>
               {selectedOutcome === 'next-period' && 'Perioda'}
               {selectedOutcome === 'fertile-days' && 'Plodné dni'}
               {selectedOutcome === 'ovulation' && 'Ovulácia'}
               {selectedOutcome === 'notes' && 'Poznámky a príznaky'}
             </span>
           </div>
-          <p className={`text-xs ${selectedOutcome === 'notes' ? 'text-amber-700' : ''}`} style={selectedOutcome !== 'notes' ? { color: '#955F6A' } : {}}>
+          <p className={`text-xs ${selectedOutcome === 'notes' ? 'text-gray-600' : ''}`} style={selectedOutcome !== 'notes' ? { color: '#955F6A' } : {}}>
             {selectedOutcome === 'next-period' && 'Červené dni označujú očakávanú menštruáciu na základe vášho cyklu.'}
             {selectedOutcome === 'fertile-days' && <>Ružové dni označujú <strong>odhadované</strong> plodné dni, kedy je najväčšia pravdepodobnosť otehotnenia.</>}
             {selectedOutcome === 'ovulation' && 'Fialový deň označuje odhadovaný deň ovulácie.'}
-            {selectedOutcome === 'notes' && 'Oranžové dni označujú záznamy s príznakmi alebo poznámkami. Klikni na deň pre zobrazenie detailov.'}
+            {selectedOutcome === 'notes' && 'Sivé dni označujú záznamy s príznakmi alebo poznámkami. Klikni na deň pre zobrazenie detailov.'}
           </p>
         </div>}
 
