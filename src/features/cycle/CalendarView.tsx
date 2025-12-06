@@ -1054,6 +1054,16 @@ export function CalendarView({
                   dayClasses += " bg-[hsl(285,55%,85%)] font-semibold";
                   dayStyle.border = '2px solid hsl(285, 55%, 65%)';
                   dayStyle.color = 'hsl(285, 55%, 35%)';
+                } else if (selectedOutcome === 'notes') {
+                  // Notes filter active - highlight days with symptoms or notes
+                  const hasSymptomsOrNotes = dayData.symptoms.length > 0 || dayData.notes.length > 0;
+                  if (hasSymptomsOrNotes) {
+                    dayClasses += " bg-amber-100";
+                    dayStyle.border = '2px solid #F59E0B'; // amber-500
+                    dayStyle.color = '#92400E'; // amber-800
+                  } else {
+                    dayClasses += " hover:bg-white/80 border-gray-100 bg-white/60";
+                  }
                 } else if (!selectedOutcome) {
                   // Show normal phase colors when no filter is active (only menstruation)
                   if (dayInfo.isFuturePeriod) {
@@ -1232,22 +1242,24 @@ export function CalendarView({
       </Dialog>
 
       {/* Current Selection Info */}
-      {selectedOutcome && <div className="mt-4 p-3 bg-white/80 rounded-lg border border-rose-200/50">
+      {selectedOutcome && <div className={`mt-4 p-3 rounded-lg border ${selectedOutcome === 'notes' ? 'bg-amber-50 border-amber-200/50' : 'bg-white/80 border-rose-200/50'}`}>
           <div className="flex items-center gap-2 mb-2">
-            {selectedOutcome === 'next-period' ? <Droplets className="w-4 h-4 text-rose-400" /> : <Heart className="w-4 h-4 text-pink-400" />}
-            <span className="font-medium text-sm" style={{
-          color: '#955F6A'
-        }}>
-              {selectedOutcome === 'next-period' ? 'Perioda' : 'Plodné dni'}
+            {selectedOutcome === 'next-period' && <Droplets className="w-4 h-4 text-rose-400" />}
+            {selectedOutcome === 'fertile-days' && <Heart className="w-4 h-4 text-pink-400" />}
+            {selectedOutcome === 'ovulation' && <Heart className="w-4 h-4 text-purple-500" />}
+            {selectedOutcome === 'notes' && <Pen className="w-4 h-4 text-amber-500" />}
+            <span className={`font-medium text-sm ${selectedOutcome === 'notes' ? 'text-amber-800' : ''}`} style={selectedOutcome !== 'notes' ? { color: '#955F6A' } : {}}>
+              {selectedOutcome === 'next-period' && 'Perioda'}
+              {selectedOutcome === 'fertile-days' && 'Plodné dni'}
+              {selectedOutcome === 'ovulation' && 'Ovulácia'}
+              {selectedOutcome === 'notes' && 'Poznámky a príznaky'}
             </span>
           </div>
-          <p className="text-xs" style={{
-        color: '#955F6A'
-      }}>
-            {selectedOutcome === 'next-period' 
-              ? 'Červené dni označujú očakávanú menštruáciu na základe vášho cyklu.' 
-              : <>Ružové dni označujú <strong>odhadované</strong> plodné dni, kedy je najväčšia pravdepodobnosť otehotnenia.</>
-            }
+          <p className={`text-xs ${selectedOutcome === 'notes' ? 'text-amber-700' : ''}`} style={selectedOutcome !== 'notes' ? { color: '#955F6A' } : {}}>
+            {selectedOutcome === 'next-period' && 'Červené dni označujú očakávanú menštruáciu na základe vášho cyklu.'}
+            {selectedOutcome === 'fertile-days' && <>Ružové dni označujú <strong>odhadované</strong> plodné dni, kedy je najväčšia pravdepodobnosť otehotnenia.</>}
+            {selectedOutcome === 'ovulation' && 'Fialový deň označuje odhadovaný deň ovulácie.'}
+            {selectedOutcome === 'notes' && 'Oranžové dni označujú záznamy s príznakmi alebo poznámkami. Klikni na deň pre zobrazenie detailov.'}
           </p>
         </div>}
 
