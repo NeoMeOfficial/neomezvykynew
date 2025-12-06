@@ -102,7 +102,13 @@ export function CalendarView({
                 'acne': 'Akné',
                 'sleep_issues': 'Problémy so spánkom',
                 'anxiety': 'Úzkosť',
-                'depression': 'Smútok'
+                'depression': 'Smútok',
+                'good_energy': 'Dobrá energia',
+                'no_energy': 'Bez energie',
+                'sadness': 'Smútok',
+                'water_retention': 'Zavodnená',
+                'oily_skin_acne': 'Mastná pleť, vyrážky',
+                'constipation': 'Zápcha'
               };
               return symptomMap[id] || id;
             });
@@ -116,7 +122,19 @@ export function CalendarView({
       }
       setHistoricalData(data);
     };
+    
     loadHistoricalData();
+    
+    // Listen for symptoms updates from SymptomTracker
+    const handleSymptomsUpdate = () => {
+      loadHistoricalData();
+    };
+    
+    window.addEventListener('symptomsUpdated', handleSymptomsUpdate);
+    
+    return () => {
+      window.removeEventListener('symptomsUpdated', handleSymptomsUpdate);
+    };
   }, [accessCode]);
 
   // Listen for export dialog trigger from header

@@ -198,6 +198,9 @@ export function SymptomTracker({
     localStorage.setItem(symptomsKey, JSON.stringify(selectedSymptoms));
     localStorage.setItem(notesKey, notes);
     setHasChanges(false);
+    
+    // Notify calendar to reload historical data
+    window.dispatchEvent(new CustomEvent('symptomsUpdated'));
   };
 
   const resetSymptoms = () => {
