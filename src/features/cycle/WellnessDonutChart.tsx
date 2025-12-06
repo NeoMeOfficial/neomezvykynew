@@ -3,7 +3,7 @@ import { Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DerivedState, PhaseKey, CycleData } from './types';
 import { getPhaseColor } from './suggestions';
-import { isPeriodDate, isFertilityDate, getNextPeriodDate } from './utils';
+import { isPeriodDate, isFertilityDate, getNextPeriodDate, getOvulationDay, getFertilityWindow } from './utils';
 
 type OutcomeType = 'next-period' | 'fertile-days' | 'ovulation';
 import { UI_TEXT } from './insights';
@@ -163,10 +163,8 @@ export function WellnessDonutChart({ derivedState, onEditClick, className = "", 
                 {selectedOutcome === 'next-period' ? 
                   (currentPhase.key === 'menstrual' ? 'Period končia o' : 'Ďalšia perioda začne') : 
                   (() => {
-                    // Check if we're currently in fertile days
-                    const ovulationDay = Math.round((cycleData?.cycleLength || 28) * 0.5);
-                    const fertileStart = ovulationDay - 5;
-                    const fertileEnd = ovulationDay + 1;
+                    // Check if we're currently in fertile days using centralized function
+                    const { start: fertileStart, end: fertileEnd } = getFertilityWindow(cycleData?.cycleLength || 28);
                     const inFertileDays = derivedState.currentDay >= fertileStart && derivedState.currentDay <= fertileEnd;
                     return inFertileDays ? 'Plodné dni končia o' : 'Plodné dni začnú';
                   })()}
@@ -205,10 +203,8 @@ export function WellnessDonutChart({ derivedState, onEditClick, className = "", 
                       );
                     }
                   } else {
-                    // Fertile days calculation (ovulation is around day 14 in a 28-day cycle)
-                    const ovulationDay = Math.round(cycleData.cycleLength * 0.5);
-                    const fertileStart = ovulationDay - 5;
-                    const fertileEnd = ovulationDay + 1;
+                    // Fertile days calculation using centralized function
+                    const { start: fertileStart, end: fertileEnd } = getFertilityWindow(cycleData.cycleLength);
                     
                     let daysToShow;
                     if (derivedState.currentDay >= fertileStart && derivedState.currentDay <= fertileEnd) {
