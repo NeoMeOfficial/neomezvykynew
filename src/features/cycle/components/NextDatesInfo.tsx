@@ -25,6 +25,7 @@ interface NextDatesInfoProps {
   onPeriodEndClick?: () => void;
   onSetupComplete?: (data: { lastPeriodStart: Date; periodLength: number; cycleLength: number }) => void;
   onPeriodLengthChange?: (length: number) => void;
+  onCycleLengthChange?: (length: number) => void;
 }
 
 export function NextDatesInfo({ 
@@ -36,6 +37,7 @@ export function NextDatesInfo({
   onPeriodEndClick,
   onSetupComplete,
   onPeriodLengthChange,
+  onCycleLengthChange,
   onPeriodStart
 }: NextDatesInfoProps) {
   
@@ -46,6 +48,7 @@ export function NextDatesInfo({
   const [setupNextPeriod, setSetupNextPeriod] = useState<Date | undefined>(undefined);
   const [showPeriodLengthPopover, setShowPeriodLengthPopover] = useState(false);
   const [showPeriodStartPopover, setShowPeriodStartPopover] = useState(false);
+  const [showNextPeriodPopover, setShowNextPeriodPopover] = useState(false);
 
   const formatDate = (date: Date) => {
     return format(date, 'd. M. yyyy', { locale: sk });
@@ -532,12 +535,51 @@ export function NextDatesInfo({
                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(253, 242, 248, 0.65) 100%)',
                boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 1px 3px rgba(149, 95, 106, 0.06)'
              }}>
-        <p className="text-xs font-medium" style={{ color: '#955F6A' }}>
-          Odhadovaná ďalšia menštruácia: <span style={{ color: '#FF7782' }}>
-            {formatDate(nextPeriodDate)}
-          </span>
-        </p>
-      </div>
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-xs font-medium" style={{ color: '#955F6A' }}>
+              Odhadovaná ďalšia menštruácia: <span style={{ color: '#FF7782' }}>
+                {formatDate(nextPeriodDate)}
+              </span>
+            </p>
+            <Popover open={showNextPeriodPopover} onOpenChange={setShowNextPeriodPopover}>
+              <PopoverTrigger asChild>
+                <button 
+                  className="px-2 py-1 text-xs font-medium rounded-lg bg-white/50 hover:bg-white/80 transition-colors flex-shrink-0"
+                  style={{ color: '#FF7782' }}
+                >
+                  Zmeniť
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0 pointer-events-auto" align="end">
+                <div className="p-3 border-b">
+                  <p className="text-sm font-medium" style={{ color: '#955F6A' }}>
+                    Kedy očakávaš ďalšiu menštruáciu?
+                  </p>
+                </div>
+                <Calendar
+                  mode="single"
+                  selected={nextPeriodDate}
+                  onSelect={(date) => {
+                    if (date && startDate && onCycleLengthChange) {
+                      const newCycleLength = differenceInDays(date, startDate);
+                      if (newCycleLength >= 21 && newCycleLength <= 35) {
+                        onCycleLengthChange(newCycleLength);
+                        toast.success(`Dĺžka cyklu aktualizovaná na ${newCycleLength} dní`);
+                      } else {
+                        toast.error('Dĺžka cyklu musí byť medzi 21-35 dňami');
+                      }
+                      setShowNextPeriodPopover(false);
+                    }
+                  }}
+                  disabled={(date) => date <= new Date() || (startDate && date <= startDate)}
+                  defaultMonth={nextPeriodDate}
+                  initialFocus
+                  className="pointer-events-auto"
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+        </div>
       )}
 
       {/* Cycle length - calculated automatically */}

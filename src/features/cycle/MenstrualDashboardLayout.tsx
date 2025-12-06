@@ -182,6 +182,10 @@ export function MenstrualDashboardLayout({
             setPeriodLength(length);
             handleFirstInteraction();
           }}
+          onCycleLengthChange={(length) => {
+            setCycleLength(length);
+            handleFirstInteraction();
+          }}
         />
 
         {/* All sections for mobile */}
@@ -256,6 +260,10 @@ export function MenstrualDashboardLayout({
           onPeriodEndClick={() => {
             setCalendarModalMode('select-end');
             setShowCalendarModal(true);
+          }}
+          onCycleLengthChange={(length) => {
+            setCycleLength(length);
+            handleFirstInteraction();
           }}
         />
         
