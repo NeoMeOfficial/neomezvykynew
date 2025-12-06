@@ -150,7 +150,7 @@ export function MenstrualDashboardLayout({
           <h2 className="text-xl font-semibold leading-tight" style={{
             color: '#955F6A'
           }}>
-            Menštruačný kalendár
+            Tvoja Periodka
           </h2>
           <PeriodkaTour accessCode={accessCode} autoStart={true} activeSection={activeSection} onSectionChange={setActiveSection} />
         </div>
