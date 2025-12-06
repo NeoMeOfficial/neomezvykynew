@@ -152,7 +152,9 @@ export function MenstrualDashboardLayout({
           }}>
             Tvoja Periodka
           </h2>
-          <PeriodkaTour accessCode={accessCode} autoStart={true} activeSection={activeSection} onSectionChange={setActiveSection} />
+          <div className="ml-auto">
+            <PeriodkaTour accessCode={accessCode} autoStart={true} activeSection={activeSection} onSectionChange={setActiveSection} />
+          </div>
         </div>
 
         {/* Next Dates Info for Mobile - unified calendar with onboarding */}
