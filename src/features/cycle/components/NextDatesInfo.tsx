@@ -316,7 +316,7 @@ export function NextDatesInfo({
     <div className="space-y-2 px-1">
       {/* Dynamic highlight box - changes based on menstruation status */}
       {startDate && (
-        <div className="p-4 rounded-xl mb-3" 
+        <div className="p-3 rounded-xl mb-2" 
              style={{ 
                background: isCurrentlyBleeding
                  ? isBleedingProlonged
@@ -341,7 +341,7 @@ export function NextDatesInfo({
                 <p className="text-white text-sm font-medium">
                   🩸 Práve máš menštruáciu
                 </p>
-                <p className="text-white text-2xl font-bold mt-1">
+                <p className="text-white text-xl font-bold mt-1">
                   Deň {currentCycleDay} {currentCycleDay <= periodLength ? `z ${periodLength}` : ''}
                 </p>
                 {isBleedingProlonged && (
@@ -355,7 +355,7 @@ export function NextDatesInfo({
               <Popover open={showPeriodEndPopover} onOpenChange={setShowPeriodEndPopover}>
                 <PopoverTrigger asChild>
                   <button
-                    className="w-full mt-3 py-2 px-4 rounded-lg font-medium text-sm transition-all bg-white shadow-md hover:shadow-lg"
+                    className="w-full mt-2 py-2 px-4 rounded-lg font-medium text-sm transition-all bg-white shadow-md hover:shadow-lg"
                     style={{ color: '#955F6A' }}
                   >
                     ✓ Menštruácia mi skončila
@@ -393,7 +393,7 @@ export function NextDatesInfo({
                   <p className="text-white text-sm font-medium text-center">
                     Do ďalšej menštruácie ti ostáva
                   </p>
-                  <p className="text-white text-2xl font-bold text-center mt-1">
+                <p className="text-white text-xl font-bold text-center mt-1">
                     {daysUntilNextPeriod} {daysUntilNextPeriod === 1 ? 'deň' : daysUntilNextPeriod < 5 ? 'dni' : 'dní'}
                   </p>
                 </>
@@ -454,7 +454,7 @@ export function NextDatesInfo({
       )}
 
       {/* Last period start date */}
-      <div className="p-3 rounded-lg" 
+      <div className="py-2 px-3 rounded-lg"
            style={{ 
              background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(253, 242, 248, 0.65) 100%)',
              boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 1px 3px rgba(149, 95, 106, 0.06)'
@@ -479,7 +479,7 @@ export function NextDatesInfo({
       </div>
 
       {/* Bleeding duration */}
-      <div className="p-3 rounded-lg" 
+      <div className="py-2 px-3 rounded-lg"
            style={{ 
              background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(253, 242, 248, 0.65) 100%)',
              boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 1px 3px rgba(149, 95, 106, 0.06)'
@@ -532,7 +532,7 @@ export function NextDatesInfo({
 
       {/* Predicted next period */}
       {nextPeriodDate && (
-        <div className="p-3 rounded-lg" 
+        <div className="py-2 px-3 rounded-lg"
              style={{ 
                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(253, 242, 248, 0.65) 100%)',
                boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 1px 3px rgba(149, 95, 106, 0.06)'
@@ -586,7 +586,7 @@ export function NextDatesInfo({
       )}
 
       {/* Cycle length - calculated automatically */}
-      <div className="p-3 rounded-lg" 
+      <div className="py-2 px-3 rounded-lg"
            style={{ 
              background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(253, 242, 248, 0.65) 100%)',
              boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 1px 3px rgba(149, 95, 106, 0.06)'
@@ -609,7 +609,7 @@ export function NextDatesInfo({
 
       {/* Fertile window info */}
       {fertilityStart && fertilityEnd && (
-        <div className="p-3 rounded-lg"
+        <div className="py-2 px-3 rounded-lg"
              style={{ 
                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(253, 242, 248, 0.65) 100%)',
                boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 1px 3px rgba(149, 95, 106, 0.06)'
