@@ -1,0 +1,81 @@
+import { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
+import GlassCard from '../../components/v2/GlassCard';
+import EmptyStateDiary from '../../components/v2/EmptyStateDiary';
+
+interface DiaryEntry {
+  id?: string;
+  date?: string;
+  text?: string;
+  content?: string;
+  timestamp?: string;
+  createdAt?: string;
+}
+
+export default function DennikHistory() {
+  const navigate = useNavigate();
+
+  const grouped = useMemo(() => {
+    try {
+      const raw = localStorage.getItem('neome-diary-entries');
+      if (!raw) return {};
+      const entries: DiaryEntry[] = JSON.parse(raw);
+      const groups: Record<string, DiaryEntry[]> = {};
+      for (const e of entries) {
+        const date = e.date || (e.timestamp ? e.timestamp.slice(0, 10) : (e.createdAt ? e.createdAt.slice(0, 10) : 'Neznámy dátum'));
+        if (!groups[date]) groups[date] = [];
+        groups[date].push(e);
+      }
+      return groups;
+    } catch {
+      return {};
+    }
+  }, []);
+
+  const sortedDates = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
+
+  return (
+    <div className="space-y-4 pb-8">
+      <div className="flex items-center gap-3">
+        <button onClick={() => navigate('/kniznica')} className="p-1">
+          <ArrowLeft className="w-5 h-5 text-[#2E2218]" strokeWidth={1.5} />
+        </button>
+        <h1 className="text-xl font-semibold text-[#2E2218]">Osobný denník</h1>
+      </div>
+
+      {sortedDates.length === 0 ? (
+        <EmptyStateDiary onCreateEntry={() => console.log('Creating diary entry...')} />
+      ) : (
+        sortedDates.map(date => (
+          <GlassCard key={date}>
+            <p className="text-[15px] font-semibold text-[#2E2218] mb-3">{formatDateLabel(date)}</p>
+            <div className="space-y-3">
+              {grouped[date].map((entry, i) => (
+                <div key={i}>
+                  {i > 0 && <div className="border-t border-[#D0BCA8] my-2" />}
+                  <p className="text-[12px] text-[#888] mb-1">
+                    {entry.timestamp ? new Date(entry.timestamp).toLocaleTimeString('sk-SK', { hour: '2-digit', minute: '2-digit' }) :
+                     entry.createdAt ? new Date(entry.createdAt).toLocaleTimeString('sk-SK', { hour: '2-digit', minute: '2-digit' }) : ''}
+                  </p>
+                  <p className="text-[13px] text-[#8B7560] leading-relaxed whitespace-pre-wrap">
+                    {entry.text || entry.content || ''}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </GlassCard>
+        ))
+      )}
+    </div>
+  );
+}
+
+function formatDateLabel(date: string): string {
+  try {
+    const d = new Date(date + 'T00:00:00');
+    return d.toLocaleDateString('sk-SK', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  } catch {
+    return date;
+  }
+}

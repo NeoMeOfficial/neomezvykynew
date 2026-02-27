@@ -104,12 +104,23 @@ export default {
 				blush: 'hsl(var(--blush))',
 				lavender: 'hsl(var(--lavender))',
 				mint: 'hsl(var(--mint))',
-				gold: 'hsl(var(--gold))'
+				gold: 'hsl(var(--gold))',
+				// NeoMe design system tokens
+				neome: {
+					primary: '#5F3E31',
+					bg: '#F6F6F1',
+					peach: '#F5D5C8',
+					blush: '#F2C6C2',
+					sage: '#C5D5C0',
+					lavender: '#D5C8E0',
+					card: '#FFFFFF',
+				}
 			},
 			fontFamily: {
 				'heading': ['Raleway', 'sans-serif'],
 				'body': ['Raleway', 'sans-serif'],
 				'caveat': ['Caveat', 'cursive'],
+				'lufga': ['"Plus Jakarta Sans"', 'sans-serif'],
 			},
 			fontSize: {
 				// Optimized for readability - minimum 16px for body text on mobile
@@ -126,6 +137,10 @@ export default {
 				'gradient-success': 'var(--gradient-success)',
 				'gradient-improve': 'var(--gradient-improve)',
 				'gradient-widget': 'var(--gradient-widget)'
+			},
+			boxShadow: {
+				'neome': '0 4px 20px rgba(95, 62, 49, 0.08)',
+				'neome-lg': '0 8px 32px rgba(95, 62, 49, 0.12)',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

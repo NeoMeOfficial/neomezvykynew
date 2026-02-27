@@ -1,348 +1,244 @@
+import { useState, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
+import { useAuthContext } from '../contexts/AuthContext';
 
-import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-
-export interface Habit {
+interface Habit {
   id: string;
   name: string;
-  emoji: string;
-  color: string;
-  target: number;
+  durationDays: number;
   unit: string;
+  targetPerDay: number;
+  startDate: string; // ISO date string
+  completions: Record<string, number>; // date -> count completed
 }
 
-export const useSupabaseHabits = (onSuccess?: () => void) => {
+interface DatabaseHabit {
+  id: string;
+  name: string;
+  duration_days: number;
+  unit: string;
+  target_per_day: number;
+  start_date: string;
+  active: boolean;
+}
+
+interface HabitCompletion {
+  completion_date: string;
+  count: number;
+}
+
+export function useSupabaseHabits() {
+  const { user } = useAuthContext();
   const [habits, setHabits] = useState<Habit[]>([]);
-  const [habitData, setHabitData] = useState<Record<string, Record<string, number>>>({});
   const [loading, setLoading] = useState(true);
-  const [connected, setConnected] = useState(false);
-  const [userId, setUserId] = useState<string>('');
 
-  const defaultHabits = [
-    { 
-      id: 'water', 
-      name: 'Hydratácia', 
-      emoji: '💧', 
-      color: '#80B9C8',
-      target: 2,
-      unit: 'L'
-    },
-    { 
-      id: 'steps', 
-      name: 'Pohyb', 
-      emoji: '👟', 
-      color: '#E5B050',
-      target: 10000,
-      unit: 'krokov'
-    },
-    { 
-      id: 'nutrition', 
-      name: 'Výživa', 
-      emoji: '🥗', 
-      color: '#B2D9C4',
-      target: 3,
-      unit: 'jedál'
-    },
-  ];
-
-  // Initialize persistent anonymous authentication
   useEffect(() => {
-    const STORED_USER_KEY = 'habit_tracker_user_id';
-    
-    const initAuth = async () => {
-      try {
-        // First, set up auth state listener for session persistence
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(
-          async (event, session) => {
-            if (session?.user) {
-              setUserId(session.user.id);
-              setConnected(true);
-              // Store user ID in localStorage for persistence
-              localStorage.setItem(STORED_USER_KEY, session.user.id);
-            } else {
-              // Try to recover from stored user ID
-              const storedUserId = localStorage.getItem(STORED_USER_KEY);
-              if (storedUserId) {
-                setUserId(storedUserId);
-                setConnected(false); // Mark as disconnected but keep user ID
-              }
-            }
-          }
+    if (user) {
+      fetchHabits();
+    } else {
+      setHabits([]);
+      setLoading(false);
+    }
+  }, [user]);
+
+  const fetchHabits = async () => {
+    if (!user) return;
+
+    try {
+      // Fetch habits
+      const { data: habitsData, error: habitsError } = await supabase
+        .from('habits')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('active', true)
+        .order('created_at', { ascending: true });
+
+      if (habitsError) throw habitsError;
+
+      if (habitsData && habitsData.length > 0) {
+        // Fetch completions for all habits
+        const habitIds = habitsData.map(h => h.id);
+        const { data: completionsData, error: completionsError } = await supabase
+          .from('habit_completions')
+          .select('habit_id, completion_date, count')
+          .in('habit_id', habitIds);
+
+        if (completionsError) throw completionsError;
+
+        // Transform data to match frontend format
+        const transformedHabits: Habit[] = habitsData.map((dbHabit: DatabaseHabit) => {
+          // Get completions for this habit
+          const habitCompletions = completionsData?.filter(c => c.habit_id === dbHabit.id) || [];
+          const completionsMap: Record<string, number> = {};
+          
+          habitCompletions.forEach((comp: HabitCompletion) => {
+            completionsMap[comp.completion_date] = comp.count;
+          });
+
+          return {
+            id: dbHabit.id,
+            name: dbHabit.name,
+            durationDays: dbHabit.duration_days,
+            unit: dbHabit.unit,
+            targetPerDay: dbHabit.target_per_day,
+            startDate: dbHabit.start_date,
+            completions: completionsMap,
+          };
+        });
+
+        setHabits(transformedHabits);
+      } else {
+        setHabits([]);
+      }
+    } catch (error) {
+      console.error('Error fetching habits:', error);
+      setHabits([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addHabit = async (data: { 
+    name: string; 
+    durationDays: number; 
+    unit: string; 
+    targetPerDay: number; 
+  }): Promise<boolean> => {
+    if (!user) return false;
+
+    try {
+      const { error } = await supabase
+        .from('habits')
+        .insert([{
+          user_id: user.id,
+          name: data.name,
+          duration_days: data.durationDays,
+          unit: data.unit,
+          target_per_day: data.targetPerDay,
+          start_date: new Date().toISOString().split('T')[0], // today
+        }]);
+
+      if (error) throw error;
+
+      await fetchHabits(); // Refresh
+      return true;
+    } catch (error) {
+      console.error('Error adding habit:', error);
+      return false;
+    }
+  };
+
+  const editHabit = async (
+    id: string, 
+    data: { name: string; durationDays: number; unit: string; targetPerDay: number; }
+  ): Promise<boolean> => {
+    if (!user) return false;
+
+    try {
+      const { error } = await supabase
+        .from('habits')
+        .update({
+          name: data.name,
+          duration_days: data.durationDays,
+          unit: data.unit,
+          target_per_day: data.targetPerDay,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', id)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      await fetchHabits(); // Refresh
+      return true;
+    } catch (error) {
+      console.error('Error editing habit:', error);
+      return false;
+    }
+  };
+
+  const toggleHabitCompletion = async (habitId: string): Promise<boolean> => {
+    if (!user) return false;
+
+    const today = new Date().toISOString().split('T')[0];
+    const habit = habits.find(h => h.id === habitId);
+    if (!habit) return false;
+
+    try {
+      const currentCount = habit.completions[today] || 0;
+      const isSimpleCheckbox = habit.targetPerDay === 1 || 
+        ['minúty', 'minút', 'min', 'hodín', 'hodiny'].some(u => 
+          habit.unit.toLowerCase().includes(u)
         );
 
-        // Check for existing session first
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        
-        if (session?.user) {
-          // Existing session found
-          setUserId(session.user.id);
-          setConnected(true);
-          localStorage.setItem(STORED_USER_KEY, session.user.id);
-        } else {
-          // No active session, check for stored user ID
-          const storedUserId = localStorage.getItem(STORED_USER_KEY);
-          
-          if (storedUserId) {
-            // Try to restore previous anonymous session
-            setUserId(storedUserId);
-            setConnected(false); // Will use localStorage until we can reconnect
-            
-            // Attempt to create new session with stored user context
-            try {
-              const { data, error } = await supabase.auth.signInAnonymously();
-              if (!error && data.user) {
-                // New session created, migrate data if needed
-                const newUserId = data.user.id;
-                if (newUserId !== storedUserId) {
-                  // Different user ID, but we'll keep using stored data
-                  console.log('Session restored with new user ID, keeping existing data');
-                }
-                setUserId(newUserId);
-                setConnected(true);
-                localStorage.setItem(STORED_USER_KEY, newUserId);
-              }
-            } catch (error) {
-              console.log('Could not create new session, using localStorage mode');
-            }
-          } else {
-            // No stored user, create new anonymous session
-            const { data, error } = await supabase.auth.signInAnonymously();
-            if (error) {
-              console.error('Error signing in anonymously:', error);
-              setConnected(false);
-              return;
-            }
-            const newUserId = data.user?.id || '';
-            setUserId(newUserId);
-            setConnected(true);
-            localStorage.setItem(STORED_USER_KEY, newUserId);
-          }
-        }
-
-        return () => {
-          subscription.unsubscribe();
-        };
-      } catch (error) {
-        console.error('Auth initialization failed:', error);
-        // Fallback to localStorage mode with stored user ID
-        const storedUserId = localStorage.getItem(STORED_USER_KEY);
-        if (storedUserId) {
-          setUserId(storedUserId);
-        }
-        setConnected(false);
+      let newCount: number;
+      if (isSimpleCheckbox) {
+        // Toggle: complete or uncomplete
+        newCount = currentCount >= habit.targetPerDay ? 0 : habit.targetPerDay;
+      } else {
+        // Increment, wrap to 0 after reaching target
+        newCount = currentCount >= habit.targetPerDay ? 0 : currentCount + 1;
       }
-    };
 
-    initAuth();
-  }, []);
+      // Upsert the completion
+      const { error } = await supabase
+        .from('habit_completions')
+        .upsert({
+          habit_id: habitId,
+          user_id: user.id,
+          completion_date: today,
+          count: newCount,
+          updated_at: new Date().toISOString(),
+        }, {
+          onConflict: 'habit_id,completion_date'
+        });
 
-  // Load and seed habits from Supabase
-  useEffect(() => {
-    const loadHabits = async () => {
-      if (!userId) return;
-      
-      try {
-        const { data: existingHabits, error } = await supabase
-          .from('habits')
-          .select('*')
-          .eq('user_id', userId);
+      if (error) throw error;
 
-        if (error) {
-          console.error('Error loading habits:', error);
-          setConnected(false);
-          // Use default habits as fallback
-          setHabits(defaultHabits);
-        } else if (existingHabits && existingHabits.length > 0) {
-          // Convert database habits to our format
-          const dbHabits = existingHabits.map(habit => ({
-            id: habit.id,
-            name: habit.name,
-            emoji: habit.emoji,
-            color: habit.color,
-            target: habit.target,
-            unit: habit.unit
-          }));
-          setHabits(dbHabits);
-          setConnected(true);
-        } else {
-          // No habits exist, seed the default ones
-          console.log('Seeding default habits for user:', userId);
-          const { data: seededHabits, error: seedError } = await supabase
-            .from('habits')
-            .insert(
-              defaultHabits.map(habit => ({
-                user_id: userId,
-                name: habit.name,
-                emoji: habit.emoji,
-                color: habit.color,
-                target: habit.target,
-                unit: habit.unit
-              }))
-            )
-            .select();
+      // Update local state immediately for responsiveness
+      setHabits(prev => 
+        prev.map(h => 
+          h.id === habitId 
+            ? { ...h, completions: { ...h.completions, [today]: newCount } }
+            : h
+        )
+      );
 
-          if (seedError) {
-            console.error('Error seeding habits:', seedError);
-            setHabits(defaultHabits);
-            setConnected(false);
-          } else if (seededHabits) {
-            const newHabits = seededHabits.map(habit => ({
-              id: habit.id,
-              name: habit.name,
-              emoji: habit.emoji,
-              color: habit.color,
-              target: habit.target,
-              unit: habit.unit
-            }));
-            setHabits(newHabits);
-            setConnected(true);
-          }
-        }
-      } catch (error) {
-        console.error('Database connection failed:', error);
-        setConnected(false);
-        setHabits(defaultHabits);
-      }
-    };
-
-    loadHabits();
-  }, [userId]);
-
-  // Load data from Supabase
-  useEffect(() => {
-    const loadData = async () => {
-      if (!userId || habits.length === 0) return;
-      
-      try {
-        const { data: entries, error } = await supabase
-          .from('habit_entries')
-          .select('*')
-          .eq('user_id', userId);
-
-        if (error) {
-          console.error('Error loading habit entries:', error);
-          setConnected(false);
-          // Fallback to localStorage
-          const savedData = localStorage.getItem('habit_tracker_data');
-          if (savedData) {
-            try {
-              setHabitData(JSON.parse(savedData));
-            } catch (e) {
-              console.error('Failed to parse saved data');
-            }
-          }
-        } else {
-          setConnected(true);
-          const dataMap: Record<string, Record<string, number>> = {};
-          
-          entries?.forEach(entry => {
-            if (!dataMap[entry.habit_id]) {
-              dataMap[entry.habit_id] = {};
-            }
-            dataMap[entry.habit_id][entry.date] = Number(entry.value);
-          });
-          
-          setHabitData(dataMap);
-          console.log('Loaded habit data:', dataMap);
-        }
-      } catch (error) {
-        console.error('Database connection failed:', error);
-        setConnected(false);
-        // Fallback to localStorage
-        const savedData = localStorage.getItem('habit_tracker_data');
-        if (savedData) {
-          try {
-            setHabitData(JSON.parse(savedData));
-          } catch (e) {
-            console.error('Failed to parse saved data');
-          }
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadData();
-  }, [userId, habits]);
-
-  const formatDate = (date: Date): string => {
-    const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const day = date.getDate().toString().padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
-
-  const startOfDay = (date: Date): Date => {
-    const newDate = new Date(date);
-    newDate.setHours(0, 0, 0, 0);
-    return newDate;
-  };
-
-  const updateHabitProgress = useCallback(async (habitId: string, date: Date, value: number) => {
-    const dateStr = formatDate(startOfDay(date));
-    const numValue = Math.max(0, Number(value) || 0);
-    
-    console.log('Updating habit progress:', { habitId, dateStr, numValue });
-    
-    // Update local state immediately
-    setHabitData(prev => {
-      const newData = {
-        ...prev,
-        [habitId]: {
-          ...prev[habitId],
-          [dateStr]: numValue
-        }
-      };
-      localStorage.setItem('habit_tracker_data', JSON.stringify(newData));
-      return newData;
-    });
-
-    // Try to save to Supabase
-    if (connected && userId) {
-      try {
-        const { error } = await supabase
-          .from('habit_entries')
-          .upsert({
-            user_id: userId,
-            habit_id: habitId,
-            date: dateStr,
-            value: numValue
-          }, {
-            onConflict: 'user_id,habit_id,date'
-          });
-
-        if (error) {
-          console.error('Error saving to database:', error);
-          setConnected(false);
-        } else {
-          console.log('Successfully saved to database');
-          if (onSuccess) {
-            setTimeout(() => {
-              onSuccess();
-            }, 200);
-          }
-        }
-      } catch (error) {
-        console.error('Database save failed:', error);
-        setConnected(false);
-      }
-    } else {
-      // Show localStorage save confirmation
-      if (onSuccess) {
-        setTimeout(() => {
-          onSuccess();
-        }, 200);
-      }
+      return true;
+    } catch (error) {
+      console.error('Error toggling habit completion:', error);
+      return false;
     }
-  }, [onSuccess, connected, userId]);
+  };
+
+  const removeHabit = async (id: string): Promise<boolean> => {
+    if (!user) return false;
+
+    try {
+      // Mark as inactive instead of deleting (for data preservation)
+      const { error } = await supabase
+        .from('habits')
+        .update({ active: false, updated_at: new Date().toISOString() })
+        .eq('id', id)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      await fetchHabits(); // Refresh
+      return true;
+    } catch (error) {
+      console.error('Error removing habit:', error);
+      return false;
+    }
+  };
 
   return {
     habits,
     loading,
-    connected,
-    updateHabitProgress,
-    habitData,
-    formatDate,
-    startOfDay
+    addHabit,
+    editHabit,
+    toggleHabitCompletion,
+    removeHabit,
+    refreshHabits: fetchHabits,
   };
-};
+}

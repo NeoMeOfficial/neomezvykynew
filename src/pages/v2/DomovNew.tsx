@@ -1,0 +1,360 @@
+import React, { useState } from 'react';
+import GreetingHeader from '../../components/v2/home/GreetingHeader';
+import WeeklyCalendarStrip, { getWeekDays } from '../../components/v2/home/WeeklyCalendarStrip';
+import TodayOverview from '../../components/v2/home/TodayOverview';
+import HabitTracker from '../../components/v2/home/HabitTracker';
+import ReflectionSection from '../../components/v2/home/ReflectionSection';
+import { useAuthContext } from '../../contexts/AuthContext';
+import WaterIntakeWidget from '../../components/v2/tracking/WaterIntakeWidget';
+import MoodEnergyTracker from '../../components/v2/tracking/MoodEnergyTracker';
+import FavoritesShortcut from '../../components/v2/favorites/FavoritesShortcut';
+import CommunityStatusWidget from '../../components/v2/achievements/CommunityStatusWidget';
+import WorkoutStatsWidget from '../../components/v2/workouts/WorkoutStatsWidget';
+import WorkoutDemoShortcut from '../../components/v2/workouts/WorkoutDemoShortcut';
+import BuddyShortcut from '../../components/v2/buddy/BuddyShortcut';
+import { useWorkoutHistory } from '../../hooks/useWorkoutHistory';
+import { Leaf, Droplets, MessageCircle } from 'lucide-react';
+
+// Nordic Card Wrapper - Enhanced layered effect, no borders
+function NordicCard({ children, className = "", priority = "standard" }) {
+  const shadows = {
+    priority: "0 16px 64px rgba(107, 76, 59, 0.12), 0 8px 32px rgba(107, 76, 59, 0.08), 0 4px 16px rgba(107, 76, 59, 0.04)",
+    standard: "0 12px 48px rgba(107, 76, 59, 0.08), 0 6px 24px rgba(107, 76, 59, 0.04), 0 3px 12px rgba(107, 76, 59, 0.02)",
+    subtle: "0 8px 32px rgba(107, 76, 59, 0.06), 0 4px 16px rgba(107, 76, 59, 0.03), 0 2px 8px rgba(107, 76, 59, 0.01)"
+  };
+
+  return (
+    <div 
+      className={`bg-white rounded-3xl border-0 transition-all duration-300 hover:-translate-y-1 hover:scale-[1.01] ${className}`}
+      style={{ 
+        boxShadow: shadows[priority],
+        backdropFilter: 'blur(20px)',
+        border: 'none'
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+// Nordic Section Divider
+function SectionDivider({ label }) {
+  if (!label) {
+    return <div className="h-8" />;
+  }
+  
+  return (
+    <div className="flex items-center gap-4 my-12">
+      <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(168, 132, 139, 0.2), transparent)' }} />
+      <span className="text-[10px] font-medium tracking-[0.3em] uppercase px-3" style={{ color: '#A89B8C' }}>
+        {label}
+      </span>
+      <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(168, 132, 139, 0.2), transparent)' }} />
+    </div>
+  );
+}
+
+// Custom Water Intake as a Habit-like Component
+function WaterHabitCard() {
+  const { user } = useAuthContext();
+  const [waterData, setWaterData] = React.useState({ glasses: 0, goal: 8 }); // 8 glasses = 2L
+  const [justCompleted, setJustCompleted] = React.useState(false);
+  const [isEditing, setIsEditing] = React.useState(false);
+  
+  React.useEffect(() => {
+    if (!user?.id) return;
+    const today = new Date().toISOString().split('T')[0];
+    const storageKey = `water_intake_${user.id}_${today}`;
+    const saved = localStorage.getItem(storageKey);
+    if (saved) {
+      const parsedData = JSON.parse(saved);
+      setWaterData(parsedData);
+    }
+  }, [user?.id]);
+
+  const updateWaterData = (newData) => {
+    if (!user?.id) return;
+    const today = new Date().toISOString().split('T')[0];
+    const storageKey = `water_intake_${user.id}_${today}`;
+    localStorage.setItem(storageKey, JSON.stringify(newData));
+    setWaterData(newData);
+
+    if (newData.glasses === newData.goal && newData.glasses > waterData.glasses) {
+      setJustCompleted(true);
+      setTimeout(() => setJustCompleted(false), 600);
+    }
+  };
+
+  const handleGlassClick = (index) => {
+    const newGlasses = index + 1 <= waterData.glasses ? index : index + 1;
+    updateWaterData({ ...waterData, glasses: newGlasses });
+  };
+
+  const handleGoalChange = (newGoal) => {
+    updateWaterData({ ...waterData, goal: newGoal, glasses: Math.min(waterData.glasses, newGoal) });
+    setIsEditing(false);
+  };
+
+  const isComplete = waterData.glasses >= waterData.goal;
+  const goalLitres = (waterData.goal * 0.25).toFixed(1);
+
+  return (
+    <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+      <div className="flex items-start gap-3">
+        {/* Complete indicator with water droplet */}
+        <div className={`w-10 h-10 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all duration-300 ${
+            isComplete ? 'bg-[#8FA3A3] border-[#8FA3A3]' : 'border-gray-300 bg-transparent'
+          } ${justCompleted ? 'animate-bounce' : ''}`}
+        >
+          <Droplets className={`w-5 h-5 ${isComplete ? 'text-white' : 'text-[#8FA3A3]'}`} />
+        </div>
+
+        {/* Info */}
+        <div className="flex-1 min-w-0">
+          {/* Title with edit icon */}
+          <div className="flex items-center justify-between">
+            <h4 className={`text-sm font-medium ${isComplete ? 'text-gray-500 line-through' : 'text-gray-800'}`}>
+              Pitný režim ({goalLitres} litre)
+            </h4>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-gray-600">
+                {waterData.glasses}/{waterData.goal}
+              </span>
+              <button 
+                onClick={() => setIsEditing(true)}
+                className="w-5 h-5 text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-4 h-4">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          {/* Goal editing */}
+          {isEditing && (
+            <div className="mt-3 p-3 bg-gray-50 rounded-lg">
+              <p className="text-xs text-gray-600 mb-2">Denný cieľ (poháre po 250ml):</p>
+              <div className="flex gap-1">
+                {[4, 6, 8, 10, 12].map((goal) => (
+                  <button
+                    key={goal}
+                    onClick={() => handleGoalChange(goal)}
+                    className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+                      goal === waterData.goal ? 'bg-[#8FA3A3] text-white' : 'bg-white text-gray-600 border border-gray-200 hover:border-[#8FA3A3]'
+                    }`}
+                  >
+                    {goal} ({(goal * 0.25).toFixed(1)}L)
+                  </button>
+                ))}
+              </div>
+              <button onClick={() => setIsEditing(false)} className="text-xs text-gray-400 mt-2">
+                Zrušiť
+              </button>
+            </div>
+          )}
+
+          {/* Interactive glasses - Single row, overflow scroll if needed */}
+          <div className="mt-3 overflow-x-auto">
+            <div className="flex gap-2 min-w-fit">
+              {Array.from({ length: waterData.goal }, (_, i) => (
+                <button
+                  key={i}
+                  onClick={() => handleGlassClick(i)}
+                  className="shrink-0 transition-all duration-200 active:scale-95 hover:scale-105"
+                >
+                  <svg 
+                    className={`w-6 h-8 transition-colors ${
+                      i < waterData.glasses ? 'text-[#8FA3A3]' : 'text-gray-300'
+                    }`} 
+                    fill="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M5,2 C4.45,2 4,2.45 4,3 C4,3.55 4.45,4 5,4 L5,16 C5,19.31 7.69,22 11,22 L13,22 C16.31,22 19,19.31 19,16 L19,4 C19.55,4 20,3.55 20,3 C20,2.45 19.55,2 19,2 L5,2 Z M7,4 L17,4 L17,16 C17,18.21 15.21,20 13,20 L11,20 C8.79,20 7,18.21 7,16 L7,4 Z" />
+                  </svg>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Custom Enhanced Navyky Card with Water Intake
+function EnhancedNavykyCard() {
+  return (
+    <div className="space-y-4">
+      {/* Návyky Header - Restored */}
+      <div className="flex items-center gap-2 mb-3">
+        <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(184, 134, 74, 0.14)` }}>
+          <svg className="w-4 h-4" style={{ color: '#B8864A' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+            <polyline points="9,9 9,15"/>
+            <polyline points="15,9 15,15"/>
+          </svg>
+        </div>
+        <h3 className="text-[14px] font-semibold" style={{ color: '#2E2218' }}>Návyky</h3>
+      </div>
+
+      {/* Sub-header */}
+      <div className="text-center mb-4">
+        <p className="text-sm font-medium" style={{ color: '#6B4C3B' }}>
+          Vybuduj si zdravé návyky krok za krokom
+        </p>
+      </div>
+
+      {/* Water Intake Habit - In its own white card */}
+      <WaterHabitCard />
+
+      {/* Other Habits - Each in separate cards */}
+      <HabitTracker hideHeader hideCTA hideWarning renderInCards />
+        
+      {/* Single Brown CTA */}
+      <div className="text-center pt-2">
+        <button 
+          className="text-sm font-medium px-6 py-3 rounded-xl text-white transition-colors hover:opacity-90"
+          style={{ background: '#6B4C3B' }}
+        >
+          Pridať návyk
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export default function DomovNew() {
+  const days = getWeekDays();
+  const todayIdx = days.findIndex((d) => d.isToday);
+  const [selectedDay, setSelectedDay] = useState(todayIdx >= 0 ? todayIdx : 0);
+  const { stats } = useWorkoutHistory();
+
+  // Override parent container styles
+  React.useEffect(() => {
+    const mainElement = document.querySelector('main');
+    if (mainElement) {
+      mainElement.style.maxWidth = 'none';
+      mainElement.style.paddingLeft = '0';
+      mainElement.style.paddingRight = '0';
+      mainElement.style.marginLeft = '0';
+      mainElement.style.marginRight = '0';
+    }
+    
+    return () => {
+      if (mainElement) {
+        mainElement.style.maxWidth = '';
+        mainElement.style.paddingLeft = '';
+        mainElement.style.paddingRight = '';
+        mainElement.style.marginLeft = '';
+        mainElement.style.marginRight = '';
+      }
+    };
+  }, []);
+
+  return (
+    <div 
+      className="min-h-screen w-full overflow-x-hidden"
+      style={{ 
+        background: 'linear-gradient(180deg, #FDFCFA 0%, #FAF7F3 100%)',
+        border: 'none',
+        outline: 'none',
+        margin: '0',
+        padding: '0'
+      }}
+    >
+      <div className="w-full min-h-screen px-3 py-6 pb-28 space-y-8">
+        
+        {/* Header + Calendar - Merged Section */}
+        <NordicCard className="px-4 py-6" priority="standard">
+          <div className="space-y-6">
+            <GreetingHeader />
+            <WeeklyCalendarStrip days={days} selectedIdx={selectedDay} onSelect={setSelectedDay} />
+          </div>
+        </NordicCard>
+
+        <SectionDivider label="DNES" />
+
+        {/* Today Overview - Priority Card */}
+        <NordicCard className="px-4 py-6" priority="priority">
+          <TodayOverview />
+        </NordicCard>
+
+        <SectionDivider label="POKROKY" />
+
+        {/* Workout Stats - Conditional */}
+        {stats.totalWorkouts > 0 && (
+          <NordicCard className="px-4 py-5" priority="standard">
+            <WorkoutStatsWidget variant="compact" />
+          </NordicCard>
+        )}
+
+        {/* Enhanced Habits with Water Intake */}
+        <NordicCard className="px-4 py-6" priority="priority">
+          <EnhancedNavykyCard />
+        </NordicCard>
+
+        {/* Enhanced Reflection - Reduced Gap */}
+        <NordicCard className="px-4 py-6 mt-4" priority="standard">
+          <ReflectionSection />
+        </NordicCard>
+
+        <SectionDivider label="KOMUNITA" />
+
+        {/* Community Section */}
+        <div className="space-y-6">
+          {/* Buddy System */}
+          <NordicCard className="px-4 py-5" priority="standard">
+            <BuddyShortcut />
+          </NordicCard>
+
+          {/* Community Topics - Placeholder */}
+          <NordicCard className="px-4 py-5" priority="standard">
+            <div className="space-y-4">
+              {/* Header */}
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(184, 134, 74, 0.14)` }}>
+                  <MessageCircle className="w-4 h-4" style={{ color: '#B8864A' }} />
+                </div>
+                <h3 className="text-[14px] font-semibold" style={{ color: '#2E2218' }}>Sledované témy</h3>
+              </div>
+
+              {/* Sub-header */}
+              <div className="text-center">
+                <p className="text-sm font-medium" style={{ color: '#6B4C3B' }}>
+                  Zatiaľ nemáš uložené žiadne témy z komunity
+                </p>
+              </div>
+            </div>
+          </NordicCard>
+
+          {/* Community Achievement/Badge */}
+          <NordicCard className="px-4 py-5" priority="priority">
+            <CommunityStatusWidget variant="compact" />
+          </NordicCard>
+        </div>
+
+        {/* Quote - Nordic End */}
+        <div className="text-center py-16 space-y-8">
+          <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto" style={{ 
+            background: 'rgba(168, 132, 139, 0.06)',
+            border: '1px solid rgba(168, 132, 139, 0.1)'
+          }}>
+            <Leaf className="w-6 h-6 opacity-50" style={{ color: '#A8848B' }} />
+          </div>
+          
+          <p className="text-lg font-light leading-relaxed italic px-6" style={{ color: '#8B7560' }}>
+            „Každý malý krok ťa posúva bližšie k tvojmu cieľu."
+          </p>
+          
+          <div className="flex justify-center items-center gap-6">
+            <div className="w-8 h-px" style={{ background: '#C27A6E', opacity: 0.3 }} />
+            <div className="w-2 h-2 rounded-full" style={{ background: '#7A9E78', opacity: 0.4 }} />
+            <div className="w-8 h-px" style={{ background: '#B8864A', opacity: 0.3 }} />
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+}

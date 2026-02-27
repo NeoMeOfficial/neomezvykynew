@@ -8,6 +8,24 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
+    cors: true,
+    // Fix SIGKILL crashes - limit file watching
+    watch: {
+      ignored: [
+        '**/node_modules/**',
+        '**/dist/**',
+        '**/.git/**',
+        '**/coverage/**',
+        '**/database/**',
+        '**/public/assets/**',
+        '**/*.log'
+      ],
+      usePolling: false, // Use native file events instead of polling
+    },
+    // Increase memory allocation
+    hmr: {
+      overlay: false // Reduce overlay rendering overhead
+    }
   },
   plugins: [
     react(),
@@ -18,6 +36,10 @@ export default defineConfig(({ mode }) => ({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
+  },
+  // Optimize build to reduce memory usage
+  esbuild: {
+    logOverride: { 'this-is-undefined-in-esm': 'silent' }
   },
   build: {
     // Optimize for better loading performance
@@ -34,12 +56,19 @@ export default defineConfig(({ mode }) => ({
       }
     },
     // Use default minifier (esbuild) which is faster and doesn't require terser
-    minify: true
+    minify: true,
+    // Prevent memory issues during build
+    chunkSizeWarningLimit: 1000
   },
   // Enable gzip compression for better network performance
   preview: {
     headers: {
       'Cache-Control': 'public, max-age=31536000',
     }
+  },
+  // Optimize dependency handling
+  optimizeDeps: {
+    include: ['react', 'react-dom'],
+    exclude: ['@supabase/supabase-js'] // Large deps that don't need optimization
   }
 }));

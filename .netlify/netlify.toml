@@ -1,0 +1,64 @@
+plugins = []
+
+[functions]
+
+[functions."*"]
+
+[build]
+publish = "/Users/sambot/.openclaw/workspace/projects/neome/neomezvykynew/dist"
+publishOrigin = "ui"
+commandOrigin = "ui"
+command = "npm run build"
+
+[build.environment]
+
+[build.processing]
+
+[build.processing.css]
+
+[build.processing.html]
+
+[build.processing.images]
+
+[build.processing.js]
+
+[build.services]
+
+[[headers]]
+for = "/*"
+
+[headers.values]
+Permissions-Policy = "publickey-credentials-get=*, publickey-credentials-create=*"
+X-Content-Type-Options = "nosniff"
+X-Frame-Options = "SAMEORIGIN"
+Referrer-Policy = "strict-origin-when-cross-origin"
+Cross-Origin-Embedder-Policy = "unsafe-none"
+Cross-Origin-Opener-Policy = "same-origin-allow-popups"
+Cross-Origin-Resource-Policy = "cross-origin"
+
+[[headers]]
+for = "/api/*"
+
+[headers.values]
+Access-Control-Allow-Origin = "*"
+Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
+Access-Control-Allow-Headers = "Content-Type, Authorization"
+
+[[headers]]
+for = "/"
+
+[headers.values]
+X-Frame-Options = "ALLOWALL"
+Content-Security-Policy = "frame-ancestors *"
+
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200.0
+force = false
+
+[redirects.query]
+
+[redirects.conditions]
+
+[redirects.headers]
