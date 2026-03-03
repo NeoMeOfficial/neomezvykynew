@@ -1,9 +1,10 @@
 import GlassCard from '../../components/v2/GlassCard';
 import MenstrualCycleTracker from '../../features/cycle/MenstrualCycleTracker';
+import { colors, glassCard } from '../../theme/warmDusk';
 
 export default function Cyklus() {
   return (
-    <div className="space-y-6">
+    <div className="min-h-screen space-y-6 p-6" style={{ background: colors.bgGradient }}>
       <h1 className="text-xl font-semibold text-[#2E2218]">Môj cyklus</h1>
 
       {/* Current Phase Info */}

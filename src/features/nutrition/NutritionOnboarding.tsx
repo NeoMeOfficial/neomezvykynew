@@ -7,7 +7,7 @@ const PRIMARY = '#6B4C3B';
 const ACCENT = '#B8864A';
 const MUTED = '#777';
 const MUTED_LIGHT = '#888';
-const TOTAL_STEPS = 6;
+const TOTAL_STEPS = 7;
 
 type Goal = 'lose' | 'maintain' | 'gain';
 type Activity = 'sedentary' | 'light' | 'moderate' | 'active';
@@ -36,7 +36,7 @@ const s: Record<string, CSSProperties> = {
     height: '100dvh',
     display: 'flex',
     flexDirection: 'column',
-    background: 'linear-gradient(180deg, #FAF5F0 0%, #F0E6DB 100%)',
+    background: 'linear-gradient(to bottom, #FAF7F2, #F5F1E8)',
     fontFamily: 'Lufga, sans-serif',
     color: PRIMARY,
     position: 'relative',
@@ -55,7 +55,7 @@ const s: Record<string, CSSProperties> = {
   header: {
     display: 'flex',
     alignItems: 'center',
-    padding: '16px 20px 0',
+    padding: '16px 16px 0',
     minHeight: 44,
   },
   backBtn: {
@@ -69,14 +69,14 @@ const s: Record<string, CSSProperties> = {
   },
   body: {
     flex: 1,
-    padding: '8px 20px 0',
+    padding: '8px 16px 0',
     display: 'flex',
     flexDirection: 'column',
     overflowY: 'auto',
     WebkitOverflowScrolling: 'touch',
   },
   footer: {
-    padding: '12px 20px 24px',
+    padding: '12px 16px 24px',
     paddingBottom: 'max(24px, env(safe-area-inset-bottom))',
     flexShrink: 0,
   },
@@ -175,10 +175,33 @@ const s: Record<string, CSSProperties> = {
 };
 
 /* ─── component ─── */
+function getNextMondays(count: number): Date[] {
+  const mondays: Date[] = [];
+  const d = new Date();
+  // Find next Monday
+  const dayOfWeek = d.getDay();
+  const daysUntilMonday = dayOfWeek === 0 ? 1 : dayOfWeek === 1 ? 7 : 8 - dayOfWeek;
+  const nextMon = new Date(d);
+  nextMon.setDate(d.getDate() + daysUntilMonday);
+  nextMon.setHours(0, 0, 0, 0);
+  for (let i = 0; i < count; i++) {
+    const m = new Date(nextMon);
+    m.setDate(nextMon.getDate() + i * 7);
+    mondays.push(m);
+  }
+  return mondays;
+}
+
+function formatDate(d: Date): string {
+  const days = ['Nedeľa', 'Pondelok', 'Utorok', 'Streda', 'Štvrtok', 'Piatok', 'Sobota'];
+  const months = ['jan', 'feb', 'mar', 'apr', 'máj', 'jún', 'júl', 'aug', 'sep', 'okt', 'nov', 'dec'];
+  return `${days[d.getDay()]} ${d.getDate()}. ${months[d.getMonth()]}`;
+}
+
 export default function NutritionOnboarding({
   onComplete,
 }: {
-  onComplete: (profile: NutritionProfile) => void;
+  onComplete: (profile: NutritionProfile, startDate: Date) => void;
 }) {
   const [step, setStep] = useState(1);
   const [goal, setGoal] = useState<Goal | null>(null);
@@ -189,6 +212,8 @@ export default function NutritionOnboarding({
   const [meals, setMeals] = useState<3 | 4 | 5 | null>(null);
   const [diet, setDiet] = useState<Diet>('normal');
   const [allergies, setAllergies] = useState<Set<Allergy>>(new Set());
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const mondays = getNextMondays(4);
 
   const canNext = (): boolean => {
     switch (step) {
@@ -198,6 +223,7 @@ export default function NutritionOnboarding({
       case 4: return meals !== null;
       case 5: return true;
       case 6: return true;
+      case 7: return startDate !== null;
       default: return false;
     }
   };
@@ -233,7 +259,7 @@ export default function NutritionOnboarding({
       dailyProtein: macros.protein,
       dailyCarbs: macros.carbs,
       dailyFat: macros.fat,
-    });
+    }, startDate!);
   };
 
   const toggleAllergy = (a: Allergy) => {
@@ -434,7 +460,36 @@ export default function NutritionOnboarding({
     );
   };
 
-  const steps = [renderStep1, renderStep2, renderStep3, renderStep4, renderStep5, renderStep6];
+  const renderStep7 = () => (
+    <>
+      <div style={s.title}>Kedy chceš začať?</div>
+      <div style={{ fontSize: 12, color: MUTED, marginBottom: 16 }}>
+        Jedálniček vždy začína v pondelok
+      </div>
+      {mondays.map((m) => (
+        <GlassCard
+          key={m.toISOString()}
+          onClick={() => setStartDate(m)}
+          style={{
+            ...s.optionCard,
+            ...(startDate?.toISOString() === m.toISOString() ? selectedBorder : {}),
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <span style={{ fontSize: 20 }}>📅</span>
+            <div>
+              <div style={s.optionTitle}>{formatDate(m)}</div>
+              <div style={s.optionDesc}>
+                {m.getTime() - Date.now() < 7 * 86400000 ? 'Tento pondelok' : `O ${Math.ceil((m.getTime() - Date.now()) / 86400000)} dní`}
+              </div>
+            </div>
+          </div>
+        </GlassCard>
+      ))}
+    </>
+  );
+
+  const steps = [renderStep1, renderStep2, renderStep3, renderStep4, renderStep5, renderStep6, renderStep7];
 
   return (
     <div style={s.wrap}>
@@ -459,7 +514,7 @@ export default function NutritionOnboarding({
 
       {/* CTA — always visible at bottom */}
       <div style={s.footer}>
-        {step < 6 ? (
+        {step < 7 ? (
           <button
             style={{ ...s.nextBtn, opacity: canNext() ? 1 : 0.4, width: '100%' }}
             disabled={!canNext()}

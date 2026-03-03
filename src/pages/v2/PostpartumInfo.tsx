@@ -65,10 +65,10 @@ function FAQ({ question, answer }: { question: string; answer: string }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="border border-gray-200 rounded-2xl overflow-hidden">
+    <div className="border border-white/35 rounded-2xl overflow-hidden">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full p-4 text-left flex items-center justify-between bg-white hover:bg-gray-50 transition-colors"
+        className="w-full p-4 text-left flex items-center justify-between bg-white hover:bg-white/20 transition-colors"
       >
         <span className="font-medium" style={{ color: colors.textPrimary }}>{question}</span>
         {isOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
@@ -100,7 +100,7 @@ export default function PostpartumInfo() {
           </div>
 
           {/* Progress Overview */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+          <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-6 border border-white/30">
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h2 className="text-lg font-bold" style={{ color: colors.textPrimary }}>
@@ -131,7 +131,7 @@ export default function PostpartumInfo() {
           </div>
 
           {/* Today's Workout */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+          <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-6 border border-white/30">
             <h3 className="text-lg font-bold mb-4" style={{ color: colors.textPrimary }}>Dnešné cvičenie</h3>
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${colors.telo}, ${colors.telo}CC)` }}>
@@ -170,7 +170,7 @@ export default function PostpartumInfo() {
         </div>
 
         {/* Hero Section */}
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white/30 backdrop-blur-xl rounded-3xl p-6 border border-white/30">
           <div className="text-center mb-6">
             <div className="w-20 h-20 rounded-full mx-auto mb-4" style={{ background: `linear-gradient(135deg, ${colors.telo}, ${colors.telo}CC)` }}>
               <div className="w-full h-full flex items-center justify-center">
@@ -187,7 +187,7 @@ export default function PostpartumInfo() {
 
           {/* Start Program Button */}
           <button
-            onClick={() => {/* Navigate to program start */}}
+            onClick={() => navigate('/program/postpartum')}
             className="w-full py-4 rounded-2xl text-white font-bold text-lg shadow-md"
             style={{ background: `linear-gradient(135deg, ${colors.telo}, ${colors.telo}CC)` }}
           >
@@ -196,7 +196,7 @@ export default function PostpartumInfo() {
         </div>
 
         {/* Program Features */}
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white/30 backdrop-blur-xl rounded-3xl p-6 border border-white/30">
           <h3 className="text-xl font-bold mb-4" style={{ color: colors.textPrimary }}>
             Čo obsahuje program
           </h3>
@@ -213,7 +213,7 @@ export default function PostpartumInfo() {
         </div>
 
         {/* Weekly Schedule */}
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white/30 backdrop-blur-xl rounded-3xl p-6 border border-white/30">
           <h3 className="text-xl font-bold mb-4" style={{ color: colors.textPrimary }}>
             Týždňový rozvrh
           </h3>
@@ -234,7 +234,7 @@ export default function PostpartumInfo() {
         </div>
 
         {/* Progress Phases */}
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white/30 backdrop-blur-xl rounded-3xl p-6 border border-white/30">
           <h3 className="text-xl font-bold mb-4" style={{ color: colors.textPrimary }}>
             Postup programu
           </h3>
@@ -256,7 +256,7 @@ export default function PostpartumInfo() {
         </div>
 
         {/* FAQ Section */}
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white/30 backdrop-blur-xl rounded-3xl p-6 border border-white/30">
           <h3 className="text-xl font-bold mb-6" style={{ color: colors.textPrimary }}>
             Často kladené otázky
           </h3>

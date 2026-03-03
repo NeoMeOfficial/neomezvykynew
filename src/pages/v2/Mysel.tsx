@@ -126,8 +126,8 @@ export default function Mysel() {
   return (
     <div className="w-full min-h-screen px-3 py-6 pb-28 space-y-6">
       {/* Nordic Header */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
-        <div className="flex items-center gap-3 mb-4">
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
+        <div className="flex items-center gap-3">
           <button onClick={() => navigate('/kniznica')} className="p-1">
             <ArrowLeft className="w-5 h-5 text-gray-600" strokeWidth={1.5} />
           </button>
@@ -138,37 +138,12 @@ export default function Mysel() {
             <h1 className="text-[16px] font-semibold" style={{ color: '#2E2218' }}>Myseľ</h1>
           </div>
         </div>
-
-        {/* Sub-header */}
-        <div className="text-center">
-          <p className="text-sm font-medium" style={{ color: '#6B4C3B' }}>
-            Pokoj, rovnováha a vnútorný rast
-          </p>
-        </div>
       </div>
 
-      {/* Hero Section */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-50 overflow-hidden">
-        <div className="relative h-64">
-          <img
-            src="/images/mysel-hero.jpg"
-            alt="NeoMe Myseľ"
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/20 via-transparent to-black/30" />
-          <div className="absolute bottom-6 left-6">
-            <h2 className="text-2xl font-bold text-white mb-2">
-              Nájdi svoj vnútorný pokoj
-            </h2>
-            <p className="text-white/90 text-sm">
-              Meditácie, mindfulness a denné zamyslenia
-            </p>
-          </div>
-        </div>
-      </div>
+      {/* Hero Section Removed */}
 
       {/* Tabs */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
         <div className="flex gap-2">
           {tabs.map((t) => (
             <button 
@@ -177,7 +152,7 @@ export default function Mysel() {
               className={`flex-1 px-3 py-2 rounded-xl text-sm font-medium transition-all ${
                 t === tab 
                   ? 'bg-[#A8848B] text-white' 
-                  : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                  : 'bg-white/20 text-gray-600 hover:bg-white/25'
               }`}
             >
               {t}
@@ -190,7 +165,7 @@ export default function Mysel() {
       {tab === 'Mindfulness' && (
         <div className="space-y-4">
           {/* Section intro */}
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50 text-center">
+          <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20 text-center">
             <p className="text-sm font-medium" style={{ color: '#6B4C3B' }}>
               Malé chvíľky pozornosti môžu zmeniť celý deň
             </p>
@@ -204,7 +179,7 @@ export default function Mysel() {
               return (
                 <div
                   key={card.id}
-                  className={`bg-white rounded-2xl p-4 shadow-sm border border-gray-50 cursor-pointer transition-all active:scale-[0.98] ${
+                  className={`bg-white rounded-2xl p-4 shadow-sm border border-white/20 cursor-pointer transition-all active:scale-[0.98] ${
                     isCompleted ? 'opacity-75' : 'hover:shadow-md'
                   }`}
                   onClick={() => !isCompleted && handleMindfulnessCardAction(card.id, card.type)}
@@ -261,7 +236,7 @@ export default function Mysel() {
       {tab === 'Meditácie' && (
         <div className="space-y-4">
           {/* Header section */}
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+          <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
             <div className="flex items-center justify-between">
               <p className="text-sm font-medium" style={{ color: '#6B4C3B' }}>
                 Nájdi pokoj v tichosti
@@ -277,7 +252,7 @@ export default function Mysel() {
           </div>
           
           {/* Categories */}
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+          <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
             <div className="flex gap-2 overflow-x-auto scrollbar-hide">
               {categories.map((c) => (
                 <button 
@@ -286,7 +261,7 @@ export default function Mysel() {
                   className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${
                     catFilter === c 
                       ? 'bg-[#A8848B] text-white' 
-                      : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                      : 'bg-white/20 text-gray-600 hover:bg-white/25'
                   }`}
                 >
                   {c}
@@ -302,7 +277,7 @@ export default function Mysel() {
               .map((m) => (
                 <div
                   key={m.id} 
-                  className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50 cursor-pointer hover:shadow-md active:scale-[0.98] transition-all"
+                  className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20 cursor-pointer hover:shadow-md active:scale-[0.98] transition-all"
                   onClick={() => handlePlayMeditation(m.id)}
                 >
                   <div className="flex items-center gap-3">
@@ -338,7 +313,7 @@ export default function Mysel() {
       {tab === 'Zamyslenia' && (
         <div className="space-y-4">
           {/* Header section */}
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+          <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
             <div className="flex items-center justify-between">
               <p className="text-sm font-medium" style={{ color: '#6B4C3B' }}>
                 Tvoje myšlienky a zamyslenia
@@ -358,7 +333,7 @@ export default function Mysel() {
               {reflections.map((r) => (
                 <div
                   key={r.date} 
-                  className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50 cursor-pointer hover:shadow-md active:scale-[0.98] transition-all"
+                  className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20 cursor-pointer hover:shadow-md active:scale-[0.98] transition-all"
                   onClick={() => navigate('/dennik/detail', { state: { entry: r } })}
                 >
                   <div className="flex items-start gap-3">
@@ -381,7 +356,7 @@ export default function Mysel() {
               ))}
             </div>
           ) : (
-            <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-50 text-center">
+            <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-8 shadow-sm border border-white/20 text-center">
               <div 
                 className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center"
                 style={{ backgroundColor: 'rgba(168, 132, 139, 0.14)' }}

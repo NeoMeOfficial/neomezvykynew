@@ -3,7 +3,7 @@ import { Home, BookOpen, Users, MessageCircle, User } from 'lucide-react';
 import { colors, glassCard } from '../../theme/warmDusk';
 
 const tabs = [
-  { path: '/domov', icon: Home, label: 'Domov' },
+  { path: '/domov-new', icon: Home, label: 'Domov' },
   { path: '/kniznica', icon: BookOpen, label: 'Knižnica' },
   { path: '/komunita', icon: Users, label: 'Komunita' },
   { path: '/spravy', icon: MessageCircle, label: 'Správy', badge: true },

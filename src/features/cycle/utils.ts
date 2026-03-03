@@ -203,17 +203,29 @@ export function getPhaseRanges(cycleLength: number, periodLength: number): Phase
   const follicularStart = periodLength + 1;
   
   // Ovulation: always 1 day at cycleLength - 14
-  const ovulationDay = cycleLength - 14;
+  const ovulationDay = Math.max(periodLength + 1, cycleLength - 14);
   
-  // Luteal: always starts at cycleLength - 13 (14 days total)
-  const lutealStart = cycleLength - 13;
+  // Luteal: always starts day after ovulation
+  const lutealStart = ovulationDay + 1;
 
-  return [
+  // Guard: if cycle is too short for a follicular phase, skip it
+  const hasFollicular = follicularStart < ovulationDay;
+
+  const ranges: PhaseRange[] = [
     { key: "menstrual", name: "Menštruácia", start: 1, end: periodLength },
-    { key: "follicular", name: "Folikulárna", start: follicularStart, end: ovulationDay - 1 },
-    { key: "ovulation", name: "Ovulácia", start: ovulationDay, end: ovulationDay },
-    { key: "luteal", name: "Luteálna", start: lutealStart, end: cycleLength }
   ];
+
+  if (hasFollicular) {
+    ranges.push({ key: "follicular", name: "Folikulárna", start: follicularStart, end: ovulationDay - 1 });
+  }
+
+  ranges.push({ key: "ovulation", name: "Ovulácia", start: ovulationDay, end: ovulationDay });
+
+  if (lutealStart <= cycleLength) {
+    ranges.push({ key: "luteal", name: "Luteálna", start: lutealStart, end: cycleLength });
+  }
+
+  return ranges;
 }
 
 export function getPhaseByDay(day: number, ranges: PhaseRange[], cycleLength?: number): PhaseRange {
@@ -271,14 +283,13 @@ export function isPeriodDate(date: Date, lastPeriodStart: string, cycleLength: n
   // Handle past periods (negative days)
   if (daysSince < 0) {
     const daysSinceAbs = Math.abs(daysSince);
-    const cyclesSince = Math.floor(daysSinceAbs / cycleLength);
     const remainingDays = daysSinceAbs % cycleLength;
-    const daysFromPreviousPeriodStart = cycleLength - remainingDays;
-    return daysFromPreviousPeriodStart < periodLength;
+    // remainingDays=0 means exactly on a cycle start boundary
+    const dayInCycle = remainingDays === 0 ? 0 : cycleLength - remainingDays;
+    return dayInCycle < periodLength;
   }
   
   // Handle current and future periods
-  const cyclesSince = Math.floor(daysSince / cycleLength);
   const dayInCurrentCycle = daysSince % cycleLength;
   
   // Check if it's within period length from any cycle start

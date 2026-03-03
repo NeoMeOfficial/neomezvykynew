@@ -1,252 +1,229 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { ArrowLeft, CheckCircle, RotateCcw, Heart } from 'lucide-react';
-import VideoPlayer from '../../components/v2/VideoPlayer';
-import GlassCard from '../../components/v2/GlassCard';
-import { colors } from '../../theme/warmDusk';
-
-interface Exercise {
-  id: string;
-  name: string;
-  duration: string;
-  type: string;
-  videoUrl: string;
-  thumbnail: string;
-  description: string;
-  instructions?: string[];
-  tips?: string[];
-}
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import { useState } from 'react';
+import { ArrowLeft, Play, Pause, RotateCcw, Airplay, Clock } from 'lucide-react';
+import { colors, glassCard } from '../../theme/warmDusk';
+import { exercises } from '../../data/exercises';
 
 export default function ExercisePlayer() {
   const navigate = useNavigate();
   const location = useLocation();
-  const exercise = location.state?.exercise as Exercise;
-  const programName = location.state?.programName as string;
-  const [isCompleted, setIsCompleted] = useState(false);
-  const [isFavorited, setIsFavorited] = useState(false);
+  const params = useParams();
+  
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [progress, setProgress] = useState(0);
+  
+  // Get exercise from route state or find by ID/path
+  let exercise = location.state?.exercise;
+  
+  // If no exercise in state, try to find it by route
+  if (!exercise) {
+    // Extract exercise index from route (e.g., /stretch/0, /exercise/extra/1)
+    const routePath = location.pathname;
+    exercise = exercises.find(e => e.route === routePath || routePath.includes(e.id));
+  }
+  
+  // Fallback: get first exercise if still not found
+  if (!exercise) {
+    exercise = exercises[0];
+  }
 
-  useEffect(() => {
-    if (!exercise) {
-      navigate(-1);
-      return;
-    }
-  }, [exercise, navigate]);
-
-  if (!exercise) return null;
-
-  const handleComplete = () => {
-    setIsCompleted(true);
-    
-    // In real app, this would track completion
-    console.log('Exercise completed:', exercise.name);
-    
-    // Show completion message after 2 seconds
-    setTimeout(() => {
-      setIsCompleted(false);
-    }, 3000);
-  };
-
-  const toggleFavorite = () => {
-    setIsFavorited(!isFavorited);
-    // In real app, this would save to user preferences
-  };
-
-  const getTypeColor = (type: string) => {
-    switch (type) {
-      case 'strength': return colors.telo;
-      case 'cardio': return colors.strava;
-      case 'flexibility': return colors.mysel;
-      case 'core': return colors.accent;
-      default: return colors.primary;
+  const handlePlayPause = () => {
+    setIsPlaying(!isPlaying);
+    if (!isPlaying) {
+      // Simulate progress for demo
+      const interval = setInterval(() => {
+        setProgress(prev => {
+          if (prev >= 100) {
+            clearInterval(interval);
+            setIsPlaying(false);
+            return 100;
+          }
+          return prev + 1;
+        });
+      }, 100);
     }
   };
 
-  const getTypeName = (type: string) => {
-    switch (type) {
-      case 'strength': return 'Sila';
-      case 'cardio': return 'Kardio';
-      case 'flexibility': return 'Flexibilita';
-      case 'core': return 'Core';
-      default: return type;
+  const handleRestart = () => {
+    setProgress(0);
+    setIsPlaying(false);
+  };
+
+  const handleAirplay = () => {
+    alert(`AirPlay aktivovaný pre ${exercise.name}`);
+  };
+
+  const formatDuration = (duration: string): string => {
+    // Convert "15 min" to "15:00"
+    const match = duration.match(/(\d+)\s*min/);
+    if (match) {
+      const minutes = parseInt(match[1]);
+      return `${minutes}:00`;
+    }
+    return duration;
+  };
+
+  const getBackPath = (): string => {
+    if (location.state?.fromRecommendation) {
+      return '/domov';
+    }
+    
+    if (exercise.category === 'stretch') {
+      return '/kniznica/telo/strecing';
+    }
+    
+    return '/kniznica/telo/extra';
+  };
+
+  const getIntensityColor = (intensity: string) => {
+    switch (intensity) {
+      case 'low': return '#7A9E78';
+      case 'medium': return '#B8864A';
+      case 'high': return '#C27A6E';
+      default: return colors.telo;
     }
   };
 
   return (
-    <div className="min-h-screen pb-20" style={{ background: `linear-gradient(135deg, ${colors.background} 0%, #F5EDE4 100%)` }}>
+    <div className="w-full min-h-screen px-3 py-6 pb-28 space-y-6" style={{ background: colors.bgGradient }}>
       {/* Header */}
-      <div className="sticky top-0 z-10 p-5 backdrop-blur-xl" style={{ background: 'rgba(248, 244, 240, 0.8)' }}>
-        <div className="flex items-center justify-between">
-          <button 
-            onClick={() => navigate(-1)} 
-            className="p-2 rounded-full hover:bg-white/10 transition-colors"
-          >
-            <ArrowLeft className="w-6 h-6" style={{ color: colors.textPrimary }} />
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20">
+        <div className="flex items-center gap-3">
+          <button onClick={() => navigate(getBackPath())} className="p-1">
+            <ArrowLeft className="w-5 h-5 text-[#8B7560]" strokeWidth={1.5} />
           </button>
-          
-          <div className="text-center">
-            <h1 className="text-lg font-semibold" style={{ color: colors.textPrimary }}>
+          <div className="flex-1">
+            <h1 className="text-[16px] font-semibold" style={{ color: '#2E2218' }}>
               {exercise.name}
             </h1>
-            {programName && (
-              <p className="text-sm" style={{ color: colors.textSecondary }}>
-                {programName}
-              </p>
-            )}
+            <div className="flex items-center gap-2 mt-1">
+              <Clock className="w-3 h-3 text-[#8B7560]" strokeWidth={1.5} />
+              <span className="text-[12px] text-[#8B7560]">{exercise.duration}</span>
+            </div>
           </div>
-
+          
           <button 
-            onClick={toggleFavorite}
-            className="p-2 rounded-full hover:bg-white/10 transition-colors"
+            onClick={handleAirplay}
+            className="w-10 h-10 rounded-full flex items-center justify-center active:scale-95 transition-transform"
+            style={{ background: 'rgba(255,255,255,0.5)', backdropFilter: 'blur(4px)' }}
           >
-            <Heart 
-              className="w-6 h-6" 
-              style={{ color: isFavorited ? '#E53E3E' : colors.textSecondary }}
-              fill={isFavorited ? '#E53E3E' : 'none'}
-            />
+            <Airplay size={16} className="text-[#8B7560]" />
           </button>
         </div>
       </div>
 
       {/* Video Player */}
-      <div className="px-5 mb-8">
-        <VideoPlayer
-          videoUrl={exercise.videoUrl}
-          title={exercise.name}
-          thumbnail={exercise.thumbnail}
-          onComplete={handleComplete}
-          autoplay={false}
-        />
-      </div>
-
-      {/* Exercise Info */}
-      <div className="px-5 mb-8">
-        <GlassCard className="p-6">
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl overflow-hidden shadow-sm border border-white/20">
+        <div className="relative aspect-video bg-black rounded-t-2xl overflow-hidden">
+          <img 
+            src={exercise.thumb} 
+            alt={exercise.name} 
+            className="w-full h-full object-cover" 
+          />
+          
+          {/* Video overlay */}
+          <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+            <button
+              onClick={handlePlayPause}
+              className="w-16 h-16 rounded-full flex items-center justify-center active:scale-95 transition-transform"
+              style={{ 
+                backgroundColor: 'rgba(255,255,255,0.9)',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+              }}
+            >
+              {isPlaying ? (
+                <Pause className="w-7 h-7" style={{ color: colors.telo }} />
+              ) : (
+                <Play className="w-7 h-7 ml-1" style={{ color: colors.telo }} fill={colors.telo} strokeWidth={0} />
+              )}
+            </button>
+          </div>
+          
+          {/* Progress bar */}
+          <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/20">
+            <div 
+              className="h-full bg-white transition-all duration-300"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+          
+          {/* Duration badge */}
+          <div className="absolute top-3 right-3 bg-black/60 text-white text-[11px] px-2 py-1 rounded-full backdrop-blur-sm">
+            {formatDuration(exercise.duration)}
+          </div>
+        </div>
+        
+        {/* Controls */}
+        <div className="p-4">
           <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="font-semibold" style={{ color: colors.textPrimary }}>
-                {exercise.name}
-              </h3>
-              <div className="flex items-center gap-3 mt-1">
-                <span 
-                  className="px-2 py-1 rounded-full text-xs font-medium text-white"
-                  style={{ backgroundColor: getTypeColor(exercise.type) }}
-                >
-                  {getTypeName(exercise.type)}
-                </span>
-                <span className="text-sm" style={{ color: colors.textSecondary }}>
-                  {exercise.duration}
-                </span>
+            <button
+              onClick={handleRestart}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/40 text-[#8B7560] text-sm font-medium active:scale-95 transition-transform"
+            >
+              <RotateCcw className="w-4 h-4" strokeWidth={1.5} />
+              Reštart
+            </button>
+            
+            <div className="text-center">
+              <div className="text-[12px] text-[#8B7560]">
+                {Math.round(progress)}% dokončené
               </div>
             </div>
           </div>
           
-          <p className="text-sm leading-relaxed mb-4" style={{ color: colors.textSecondary }}>
-            {exercise.description}
-          </p>
-
-          {exercise.instructions && exercise.instructions.length > 0 && (
-            <div className="mt-4 pt-4 border-t border-white/10">
-              <h4 className="font-medium mb-3" style={{ color: colors.textPrimary }}>
-                Pokyny na vykonávanie
-              </h4>
-              <ol className="space-y-2">
-                {exercise.instructions.map((instruction, index) => (
-                  <li key={index} className="text-sm flex gap-3" style={{ color: colors.textSecondary }}>
-                    <span 
-                      className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-xs font-medium text-white"
-                      style={{ backgroundColor: getTypeColor(exercise.type) }}
-                    >
-                      {index + 1}
-                    </span>
-                    {instruction}
-                  </li>
-                ))}
-              </ol>
-            </div>
-          )}
-
-          {exercise.tips && exercise.tips.length > 0 && (
-            <div className="mt-4 pt-4 border-t border-white/10">
-              <h4 className="font-medium mb-3" style={{ color: colors.textPrimary }}>
-                💡 Tipy
-              </h4>
-              <ul className="space-y-2">
-                {exercise.tips.map((tip, index) => (
-                  <li key={index} className="text-sm" style={{ color: colors.textSecondary }}>
-                    • {tip}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </GlassCard>
-      </div>
-
-      {/* Quick Actions */}
-      <div className="px-5">
-        <GlassCard className="p-4">
-          <div className="grid grid-cols-2 gap-3">
-            <button 
-              className="flex items-center justify-center gap-2 p-3 rounded-2xl transition-all active:scale-95"
+          {/* Exercise info tags */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <span 
+              className="text-[11px] px-2 py-1 rounded-full font-medium"
               style={{ 
-                background: `linear-gradient(135deg, ${getTypeColor(exercise.type)} 0%, ${colors.accent} 100%)`,
-                color: 'white'
-              }}
-              onClick={() => {
-                // Mark as completed
-                handleComplete();
+                backgroundColor: `${colors.telo}15`,
+                color: colors.telo,
               }}
             >
-              <CheckCircle className="w-5 h-5" />
-              <span className="font-medium">Dokončené</span>
-            </button>
-            
-            <button 
-              className="flex items-center justify-center gap-2 p-3 rounded-2xl transition-all active:scale-95"
-              style={{ 
-                background: 'rgba(255,255,255,0.5)',
-                color: colors.textPrimary,
-                backdropFilter: 'blur(10px)'
-              }}
-              onClick={() => {
-                // Restart exercise
-                window.location.reload();
+              {exercise.body}
+            </span>
+            <span 
+              className="text-[11px] px-2 py-1 rounded-full font-medium"
+              style={{
+                backgroundColor: `${colors.accent}15`,
+                color: colors.accent,
               }}
             >
-              <RotateCcw className="w-5 h-5" />
-              <span className="font-medium">Reštart</span>
-            </button>
-          </div>
-        </GlassCard>
-      </div>
-
-      {/* Completion Overlay */}
-      {isCompleted && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div 
-            className="mx-5 p-8 rounded-3xl text-center"
-            style={{ 
-              background: `linear-gradient(135deg, ${getTypeColor(exercise.type)} 0%, ${colors.accent} 100%)`,
-              color: 'white'
-            }}
-          >
-            <div className="text-4xl mb-4">💪</div>
-            <h3 className="text-xl font-semibold mb-2">Výborná práca!</h3>
-            <p className="text-white/80">
-              Dokončili ste cvičenie<br />
-              "{exercise.name}"
-            </p>
-            <div className="mt-6">
-              <button 
-                onClick={() => navigate(-1)}
-                className="px-6 py-3 bg-white/20 backdrop-blur-sm rounded-2xl font-medium hover:bg-white/30 transition-colors"
-              >
-                Pokračovať
-              </button>
-            </div>
+              {exercise.equip}
+            </span>
+            <span 
+              className="text-[11px] px-2 py-1 rounded-full font-medium"
+              style={{
+                backgroundColor: `${getIntensityColor(exercise.intensity)}15`,
+                color: getIntensityColor(exercise.intensity),
+              }}
+            >
+              {exercise.intensity === 'low' ? 'Nízka intenzita' : 
+               exercise.intensity === 'medium' ? 'Stredná intenzita' : 
+               'Vysoká intenzita'}
+            </span>
           </div>
         </div>
-      )}
+      </div>
+
+      {/* Exercise description */}
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20">
+        <h3 className="text-[14px] font-semibold text-[#2E2218] mb-2">O cvičení</h3>
+        <p className="text-[13px] leading-relaxed text-[#8B7560]">
+          {exercise.category === 'stretch' ? 
+            'Jemný strečing pre uvoľnenie napätia a zlepšenie flexibility. Ideálny pre dni, keď potrebuješ zmierniť stres a upokojiť myseľ.' :
+            'Posilňovacie cvičenie pre budovanie sily a vytrvalosti. Skvelé pre dni s vyššou energiou, keď sa cítiš pripravená na výzvy.'
+          }
+        </p>
+        
+        {location.state?.fromRecommendation && (
+          <div className="mt-3 p-3 rounded-xl" style={{ backgroundColor: `${colors.mysel}10` }}>
+            <p className="text-[12px] font-medium text-[#A8848B]">
+              💡 Toto cvičenie bolo odporúčané na základe aktuálnej fázy tvojho cyklu
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

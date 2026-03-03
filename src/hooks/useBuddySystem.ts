@@ -23,7 +23,11 @@ export function useBuddySystem() {
   // Load user's buddy data from localStorage
   useEffect(() => {
     if (!user?.id) {
-      // Demo/guest mode - set empty defaults
+      // Demo/guest mode - create demo user ID
+      const demoUserId = 'demo_user_' + Math.random().toString(36).substr(2, 9);
+      console.log('Demo mode: Using demo user ID:', demoUserId);
+      
+      // Set empty defaults but don't return early
       setMyBuddyCode(null);
       setBuddyConnections([]);
       setPendingRequests([]);
@@ -101,7 +105,8 @@ export function useBuddySystem() {
 
   // Generate or get user's buddy code
   const getMyBuddyCode = useCallback(async (): Promise<string> => {
-    if (!user?.id) throw new Error('User not authenticated');
+    const userId = user?.id || `demo_user_${Date.now()}`;
+    console.log('Generating buddy code for user:', userId);
 
     if (myBuddyCode && myBuddyCode.active) {
       return myBuddyCode.code;
@@ -117,21 +122,25 @@ export function useBuddySystem() {
 
     const buddyCode: BuddyCode = {
       id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      userId: user.id,
+      userId: userId,
       code: newCode,
       active: true,
       createdAt: new Date().toISOString()
     };
 
     setMyBuddyCode(buddyCode);
-    saveToStorage(buddyCode, buddyConnections, pendingRequests, buddyNotifications);
+    
+    // Save to localStorage for demo
+    const codeKey = `neome_buddy_code_${userId}`;
+    localStorage.setItem(codeKey, JSON.stringify(buddyCode));
     
     return newCode;
-  }, [user?.id, myBuddyCode, buddyConnections, pendingRequests, buddyNotifications, saveToStorage]);
+  }, [user?.id, myBuddyCode, buddyConnections, pendingRequests, buddyNotifications]);
 
   // Send buddy request by code
   const sendBuddyRequest = useCallback(async (buddyCode: string): Promise<boolean> => {
-    if (!user?.id || isLoading) return false;
+    const userId = user?.id || `demo_user_${Date.now()}`;
+    if (isLoading) return false;
 
     setIsLoading(true);
 
@@ -160,8 +169,8 @@ export function useBuddySystem() {
 
       // Check if request already exists
       const existingRequest = pendingRequests.find(r => 
-        (r.requesterId === user.id && r.targetId === targetUser.id) ||
-        (r.requesterId === targetUser.id && r.targetId === user.id)
+        (r.requesterId === userId && r.targetId === targetUser.id) ||
+        (r.requesterId === targetUser.id && r.targetId === userId)
       );
 
       if (existingRequest) {
@@ -172,9 +181,9 @@ export function useBuddySystem() {
       // Create buddy request
       const request: BuddyRequest = {
         id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        requesterId: user.id,
+        requesterId: userId,
         targetId: targetUser.id,
-        requesterName: user.email?.split('@')[0] || 'Používateľ',
+        requesterName: user?.email?.split('@')[0] || 'Demo Používateľ',
         targetName: targetUser.name,
         status: 'pending',
         createdAt: new Date().toISOString()
@@ -187,7 +196,10 @@ export function useBuddySystem() {
 
       const newRequests = [...pendingRequests, request];
       setPendingRequests(newRequests);
-      saveToStorage(myBuddyCode, buddyConnections, newRequests, buddyNotifications);
+      
+      // Save to localStorage for demo
+      const requestsKey = `neome_buddy_requests_${userId}`;
+      localStorage.setItem(requestsKey, JSON.stringify(newRequests));
 
       setIsLoading(false);
       return true;
@@ -195,7 +207,7 @@ export function useBuddySystem() {
       setIsLoading(false);
       throw error;
     }
-  }, [user?.id, isLoading, buddyConnections, pendingRequests, myBuddyCode, buddyNotifications, saveToStorage]);
+  }, [user?.id, isLoading, buddyConnections, pendingRequests, myBuddyCode, buddyNotifications]);
 
   // Accept buddy request
   const acceptBuddyRequest = useCallback(async (requestId: string): Promise<boolean> => {

@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Dumbbell, Flame, Calendar, TrendingUp, ChevronRight } from 'lucide-react';
 import { useWorkoutHistory } from '../../../hooks/useWorkoutHistory';
+import { colors, glassCard } from '../../theme/warmDusk';
 
 interface WorkoutStatsWidgetProps {
   variant?: 'compact' | 'full';

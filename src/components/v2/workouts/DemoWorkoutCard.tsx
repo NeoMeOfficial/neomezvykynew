@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Play, Clock, Users, Star } from 'lucide-react';
 import CompleteWorkoutButton from './CompleteWorkoutButton';
 import FavoriteButton from '../favorites/FavoriteButton';
+import { colors, glassCard } from '../../theme/warmDusk';
 
 const DEMO_WORKOUTS = [
   {

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Dumbbell, UtensilsCrossed, Sparkles, Plus } from 'lucide-react';
 import GlassCard from '../../components/v2/GlassCard';
+import { colors, glassCard } from '../../theme/warmDusk';
 
 const tabs = ['Cvičenie', 'Výživa', 'Auto-plán ✨'];
 const DAYS = ['Po', 'Ut', 'St', 'Št', 'Pi', 'So', 'Ne'];
@@ -27,7 +28,7 @@ export default function Programy() {
   const navigate = useNavigate();
 
   return (
-    <div className="space-y-6">
+    <div className="min-h-screen space-y-6 p-6" style={{ background: colors.bgGradient }}>
       <h1 className="text-xl font-semibold text-[#2E2218]">Programy</h1>
 
       {/* Tabs */}

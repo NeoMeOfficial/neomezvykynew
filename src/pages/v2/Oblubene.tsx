@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useUniversalFavorites, ContentType } from '../../hooks/useUniversalFavorites';
 import FavoriteButton from '../../components/v2/favorites/FavoriteButton';
 import { Heart, ChefHat, Dumbbell, Brain, FileText, Target, ArrowLeft } from 'lucide-react';
+import { colors, glassCard } from '../../theme/warmDusk';
 
 const contentTypeIcons = {
   recipe: ChefHat,
@@ -42,12 +43,12 @@ export default function Oblubene() {
 
   if (favorites.length === 0) {
     return (
-      <div className="w-full min-h-screen px-3 py-6 pb-28 space-y-6">
+      <div className="w-full min-h-screen px-3 py-6 pb-28 space-y-6" style={{ background: colors.bgGradient }}>
         {/* Nordic Header */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+        <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20">
           <div className="flex items-center gap-3 mb-4">
             <button onClick={() => navigate('/domov')} className="p-1">
-              <ArrowLeft className="w-5 h-5 text-gray-600" strokeWidth={1.5} />
+              <ArrowLeft className="w-5 h-5 text-[#8B7560]" strokeWidth={1.5} />
             </button>
             <div className="flex items-center gap-2 flex-1">
               <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(194, 122, 110, 0.14)` }}>
@@ -66,7 +67,7 @@ export default function Oblubene() {
         </div>
 
         {/* Empty State */}
-        <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-50 text-center space-y-4">
+        <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-8 shadow-sm border border-white/20 text-center space-y-4">
           <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto" style={{ background: `rgba(194, 122, 110, 0.14)` }}>
             <Heart size={32} style={{ color: '#C27A6E' }} />
           </div>
@@ -92,10 +93,10 @@ export default function Oblubene() {
   return (
     <div className="w-full min-h-screen px-3 py-6 pb-28 space-y-6">
       {/* Nordic Header */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20">
         <div className="flex items-center gap-3 mb-4">
           <button onClick={() => navigate('/domov')} className="p-1">
-            <ArrowLeft className="w-5 h-5 text-gray-600" strokeWidth={1.5} />
+            <ArrowLeft className="w-5 h-5 text-[#8B7560]" strokeWidth={1.5} />
           </button>
           <div className="flex items-center gap-2 flex-1">
             <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(194, 122, 110, 0.14)` }}>
@@ -114,7 +115,7 @@ export default function Oblubene() {
       </div>
 
       {/* Tabs */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20">
         <div className="grid grid-cols-3 gap-1">
           {tabs.slice(0, 6).map((tab) => {
             const Icon = tab.icon;

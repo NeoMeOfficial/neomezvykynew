@@ -17,8 +17,8 @@ export const colors = {
   textTertiary: '#A0907E',  // muted — descriptions, placeholders
 
   // Backgrounds
-  bgGradient: 'linear-gradient(170deg, #F0E6DA 0%, #E0CFC0 25%, #D0BCA8 50%, #C8B498 70%, #E0D4C4 100%)',
-  bgFlat: '#F0E6DA',       // fallback flat bg
+  bgGradient: 'linear-gradient(to bottom, #FAF7F2, #F5F1E8)',
+  bgFlat: '#FAF7F2',       // fallback flat bg
 
   // Phase colors (period tracker)
   phaseMenstrual: '#C27A6E',

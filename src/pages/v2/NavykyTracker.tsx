@@ -3,6 +3,7 @@ import { Droplets, Moon, BookOpen, Dumbbell, Apple, Plus, Check, ArrowLeft } fro
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../contexts/AuthContext';
 import { useSubscription } from '../../contexts/SimpleSubscriptionContext';
+import { colors, glassCard } from '../../theme/warmDusk';
 
 const DAYS = ['Po', 'Ut', 'St', 'Št', 'Pi', 'So', 'Ne'];
 
@@ -93,12 +94,12 @@ export default function NavykyTracker() {
   const navigate = useNavigate();
 
   return (
-    <div className="w-full min-h-screen px-3 py-6 pb-28 space-y-6">
+    <div className="w-full min-h-screen px-3 py-6 pb-28 space-y-6" style={{ background: colors.bgGradient }}>
       {/* Nordic Header */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+      <div className="p-4" style={glassCard}>
         <div className="flex items-center gap-3 mb-4">
           <button onClick={() => navigate('/domov')} className="p-1">
-            <ArrowLeft className="w-5 h-5 text-gray-600" strokeWidth={1.5} />
+            <ArrowLeft className="w-5 h-5 text-[#8B7560]" strokeWidth={1.5} />
           </button>
           <div className="flex items-center gap-2 flex-1">
             <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(122, 158, 120, 0.14)` }}>
@@ -117,7 +118,7 @@ export default function NavykyTracker() {
       </div>
 
       {/* Streak */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50 flex items-center gap-3 hover:shadow-md transition-all">
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20 flex items-center gap-3 hover:shadow-md transition-all">
         <span className="text-2xl">🔥</span>
         <div>
           <p className="text-sm font-medium" style={{ color: '#2E2218' }}>12 dní v rade</p>
@@ -126,14 +127,14 @@ export default function NavykyTracker() {
       </div>
 
       {/* Weekly Dots */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20">
         <div className="flex justify-between">
           {DAYS.map((d, i) => (
             <div key={d} className="flex flex-col items-center gap-1.5">
               <span className="text-xs" style={{ color: '#6B4C3B' }}>{d}</span>
               <div
                 className={`w-6 h-6 rounded-full ${
-                  weekDots[i] ? 'bg-[#7A9E78]' : 'border-2 border-gray-200'
+                  weekDots[i] ? 'bg-[#7A9E78]' : 'border-2 border-white/35'
                 }`}
               />
             </div>
@@ -144,7 +145,7 @@ export default function NavykyTracker() {
       {/* Habit Items */}
       <div className="space-y-3">
         {habits.map((h, i) => (
-          <div key={h.name} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50 flex items-center gap-3 hover:shadow-md transition-all">
+          <div key={h.name} className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20 flex items-center gap-3 hover:shadow-md transition-all">
             <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: 'rgba(184, 134, 74, 0.14)' }}>
               <h.icon className="w-4 h-4" style={{ color: '#B8864A' }} strokeWidth={1.5} />
             </div>
@@ -155,7 +156,7 @@ export default function NavykyTracker() {
             <button
               onClick={() => toggleHabit(i)}
               className={`w-7 h-7 rounded-full flex items-center justify-center transition-all ${
-                h.done ? 'bg-[#7A9E78] text-white' : 'border-2 border-gray-200 hover:border-[#7A9E78]'
+                h.done ? 'bg-[#7A9E78] text-white' : 'border-2 border-white/35 hover:border-[#7A9E78]'
               }`}
             >
               {h.done && <Check className="w-4 h-4" />}
@@ -165,7 +166,7 @@ export default function NavykyTracker() {
       </div>
 
       {/* Water Tracker */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20">
         <div className="flex items-center gap-2 mb-4">
           <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(122, 158, 120, 0.14)` }}>
             <Droplets className="w-4 h-4" style={{ color: '#7A9E78' }} strokeWidth={1.5} />
@@ -177,7 +178,7 @@ export default function NavykyTracker() {
             <div
               key={i}
               className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
-                i < 6 ? 'bg-[#7A9E78]/10 border-2 border-[#7A9E78]' : 'border-2 border-gray-200'
+                i < 6 ? 'bg-[#7A9E78]/10 border-2 border-[#7A9E78]' : 'border-2 border-white/35'
               }`}
             >
               {i < 6 && <Droplets className="w-3.5 h-3.5" style={{ color: '#7A9E78' }} strokeWidth={1.5} />}
@@ -188,7 +189,7 @@ export default function NavykyTracker() {
 
       {/* Non-subscriber daily reset warning */}
       {!isSubscribed && (
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+        <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(184, 134, 74, 0.14)` }}>
               <span style={{ color: '#B8864A' }} className="text-sm">⏰</span>
@@ -204,7 +205,7 @@ export default function NavykyTracker() {
       {/* Paywall Modal */}
       {showPaywall && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 shadow-lg max-w-sm w-full">
+          <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-6 shadow-lg max-w-sm w-full">
             <div className="text-center space-y-4">
               <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto" style={{ background: `rgba(184, 134, 74, 0.14)` }}>
                 <span className="text-2xl">💾</span>
@@ -218,7 +219,7 @@ export default function NavykyTracker() {
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowPaywall(false)}
-                  className="flex-1 py-3 rounded-xl bg-gray-100 font-medium text-sm hover:bg-gray-200 transition-all"
+                  className="flex-1 py-3 rounded-xl bg-white/25 font-medium text-sm hover:bg-white/30 transition-all"
                   style={{ color: '#6B4C3B' }}
                 >
                   Zatiaľ nie
@@ -240,8 +241,8 @@ export default function NavykyTracker() {
       )}
 
       {/* Add Habit */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
-        <button className="w-full flex items-center justify-center gap-2 text-sm font-medium py-2 rounded-xl border-2 border-dashed border-gray-200 hover:border-[#7A9E78] transition-all" style={{ color: '#6B4C3B' }}>
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20">
+        <button className="w-full flex items-center justify-center gap-2 text-sm font-medium py-2 rounded-xl border-2 border-dashed border-white/35 hover:border-[#7A9E78] transition-all" style={{ color: '#6B4C3B' }}>
           <Plus className="w-4 h-4" /> Pridať návyk
         </button>
       </div>

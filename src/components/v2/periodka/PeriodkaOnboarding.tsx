@@ -8,6 +8,7 @@ import { sk } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import GlassCard from '../GlassCard';
 import { useCycleData } from '../../../features/cycle/useCycleData';
+import { colors, glassCard } from '../../theme/warmDusk';
 
 const WEEKDAYS = ['Po', 'Ut', 'St', 'Št', 'Pi', 'So', 'Ne'];
 
@@ -142,14 +143,14 @@ export default function PeriodkaOnboarding() {
 
             <input
               type="range"
-              min={25}
-              max={35}
+              min={21}
+              max={45}
               value={cycleLenVal}
               onChange={e => setCycleLenVal(Number(e.target.value))}
               className="w-full accent-[#6B4C3B]"
             />
             <div className="flex justify-between text-[12px] text-[#A0907E] mt-1">
-              <span>25</span><span>35</span>
+              <span>21</span><span>45</span>
             </div>
           </div>
         )}

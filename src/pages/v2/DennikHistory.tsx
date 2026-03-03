@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import GlassCard from '../../components/v2/GlassCard';
 import EmptyStateDiary from '../../components/v2/EmptyStateDiary';
+import { colors, glassCard } from '../../theme/warmDusk';
 
 interface DiaryEntry {
   id?: string;
@@ -36,7 +37,7 @@ export default function DennikHistory() {
   const sortedDates = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
 
   return (
-    <div className="space-y-4 pb-8">
+    <div className="min-h-screen space-y-4 pb-8" style={{ background: colors.bgGradient }}>
       <div className="flex items-center gap-3">
         <button onClick={() => navigate('/kniznica')} className="p-1">
           <ArrowLeft className="w-5 h-5 text-[#2E2218]" strokeWidth={1.5} />

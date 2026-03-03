@@ -19,6 +19,22 @@ const notifPrefs = [
   { label: 'Novinky', key: 'news' },
 ];
 
+// Nordic Card Component
+function NordicCard({ children, onClick, className = "" }) {
+  return (
+    <div 
+      onClick={onClick}
+      className={`bg-white rounded-3xl transition-all duration-300 ${onClick ? 'cursor-pointer hover:-translate-y-1 hover:scale-[1.01]' : ''} ${className}`}
+      style={{ 
+        boxShadow: '0 12px 48px rgba(107, 76, 59, 0.08), 0 6px 24px rgba(107, 76, 59, 0.04), 0 3px 12px rgba(107, 76, 59, 0.02)',
+        backdropFilter: 'blur(20px)'
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
 export default function Profil() {
   const navigate = useNavigate();
   const { user, signOut } = useAuthContext();
@@ -73,98 +89,126 @@ export default function Profil() {
   };
 
   return (
-    <div className="w-full min-h-screen px-3 py-6 pb-28 space-y-6">
-      {/* Avatar + Info */}
-      <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-50">
-        <div className="flex flex-col items-center">
-          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#D0BCA8] to-[#D4B8A0] mb-3 flex items-center justify-center">
-            {user?.email && (
-              <span className="text-2xl font-semibold" style={{ color: '#6B4C3B' }}>
-                {user.email.charAt(0).toUpperCase()}
-              </span>
-            )}
+    <div 
+      className="w-full min-h-screen px-3 py-6 pb-28 space-y-6"
+      style={{ 
+        background: 'linear-gradient(to bottom, #FAF7F2, #F5F1E8)', 
+        minHeight: '100vh' 
+      }}
+    >
+      {/* Nordic Header */}
+      <NordicCard className="p-4">
+        <div className="flex items-center gap-3 mb-4">
+          <button onClick={() => navigate(-1)} className="p-1">
+            <ArrowLeft className="w-5 h-5" style={{ color: '#A89B8C' }} strokeWidth={1.5} />
+          </button>
+          <div className="flex items-center gap-2 flex-1">
+            <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(107, 76, 59, 0.14)` }}>
+              <User className="w-4 h-4" style={{ color: '#6B4C3B' }} />
+            </div>
+            <h1 className="text-[16px] font-semibold" style={{ color: '#2E2218' }}>Profil</h1>
           </div>
-          <h1 className="text-lg font-semibold" style={{ color: '#2E2218' }}>
+        </div>
+      </NordicCard>
+
+      {/* Nordic Avatar + Info */}
+      <NordicCard className="p-6">
+        <div className="text-center">
+          <div className="w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center text-white text-2xl font-semibold" style={{ background: 'linear-gradient(135deg, #6B4C3B, #8B6A5B)' }}>
+            {user?.email ? user.email.charAt(0).toUpperCase() : 'U'}
+          </div>
+          <h2 className="text-[16px] font-semibold mb-1" style={{ color: '#2E2218' }}>
             {user?.user_metadata?.firstName && user?.user_metadata?.lastName 
               ? `${user.user_metadata.firstName} ${user.user_metadata.lastName}`
               : user?.user_metadata?.full_name 
               ? user.user_metadata.full_name
               : 'Používateľ'
             }
-          </h1>
-          <p className="text-xs text-gray-500 mb-4">
+          </h2>
+          <p className="text-[12px] mb-4" style={{ color: '#A89B8C' }}>
             {user?.email || 'email@example.com'}
           </p>
-          <div className="flex gap-3">
+          <div className="flex gap-2 justify-center">
             <button 
               onClick={handleEditProfile}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-medium transition-all hover:bg-gray-100 active:scale-95 bg-gray-50 text-gray-700"
+              className="flex items-center gap-1 px-3 py-2 rounded-2xl text-[11px] font-medium transition-all"
+              style={{ backgroundColor: 'rgba(107, 76, 59, 0.14)', color: '#6B4C3B' }}
             >
-              <Edit3 className="w-3.5 h-3.5" strokeWidth={1.5} /> 
+              <Edit3 className="w-3 h-3" strokeWidth={1.5} /> 
               Upraviť profil
             </button>
             <button 
               onClick={handleDeviceConnection}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-medium transition-all hover:bg-gray-100 active:scale-95 bg-gray-50 text-gray-700"
+              className="flex items-center gap-1 px-3 py-2 rounded-2xl text-[11px] font-medium transition-all"
+              style={{ backgroundColor: 'rgba(107, 76, 59, 0.14)', color: '#6B4C3B' }}
             >
-              <Smartphone className="w-3.5 h-3.5" strokeWidth={1.5} /> 
-              Pripojiť zariadenie
+              <Smartphone className="w-3 h-3" strokeWidth={1.5} /> 
+              Zariadenie
             </button>
           </div>
         </div>
-      </div>
+      </NordicCard>
 
-      {/* Active Program or Offer */}
+      {/* Nordic Active Program */}
       {hasProgram ? (
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50 cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate('/program/bodyforming')}>
+        <NordicCard onClick={() => navigate('/program/bodyforming')} className="p-4">
           <div className="flex items-center gap-4">
-            <ProgressRing progress={29} size={52} stroke={4} color="#6B4C3B">
-              <span className="text-[10px] font-semibold text-[#2E2218]">29%</span>
+            <ProgressRing progress={29} size={44} stroke={3} color="#6B4C3B">
+              <span className="text-[9px] font-semibold" style={{ color: '#2E2218' }}>29%</span>
             </ProgressRing>
             <div className="flex-1">
-              <p className="text-sm font-semibold text-[#2E2218]">BodyForming</p>
-              <p className="text-xs text-gray-500">Deň 8 / 28</p>
+              <p className="text-[13px] font-semibold mb-1" style={{ color: '#2E2218' }}>BodyForming</p>
+              <p className="text-[10px]" style={{ color: '#A89B8C' }}>Deň 8 / 28</p>
             </div>
-            <span className="text-xs font-medium text-[#6B4C3B] flex items-center gap-1">Pokračovať <ChevronRight className="w-3.5 h-3.5" /></span>
+            <div className="flex items-center gap-1">
+              <span className="text-[11px] font-medium" style={{ color: '#6B4C3B' }}>Pokračovať</span>
+              <ChevronRight className="w-3 h-3" style={{ color: '#6B4C3B' }} />
+            </div>
           </div>
-        </div>
+        </NordicCard>
       ) : (
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50" style={{ background: 'linear-gradient(135deg, rgba(107, 76, 59, 0.05), rgba(255,255,255,1))' }}>
-          <p className="text-sm font-semibold text-[#2E2218]">Špeciálna ponuka</p>
-          <p className="text-xs text-gray-600 mt-1">Začni svoj prvý program so zľavou 20%!</p>
-          <button onClick={() => navigate('/kniznica/telo')} className="mt-3 text-xs font-medium text-[#6B4C3B] flex items-center gap-1">
-            Pozrieť programy <ChevronRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
+        <NordicCard className="p-4">
+          <div>
+            <p className="text-[13px] font-semibold mb-1" style={{ color: '#2E2218' }}>Špeciálna ponuka</p>
+            <p className="text-[11px] mb-3" style={{ color: '#A89B8C' }}>Začni svoj prvý program so zľavou 20%!</p>
+            <button 
+              onClick={() => navigate('/kniznica/telo')} 
+              className="flex items-center gap-1 text-[11px] font-medium"
+              style={{ color: '#6B4C3B' }}
+            >
+              Pozrieť programy <ChevronRight className="w-3 h-3" />
+            </button>
+          </div>
+        </NordicCard>
       )}
 
-      {/* Stats */}
+      {/* Nordic Stats */}
       <div className="flex gap-3">
-        <div className="flex-1 bg-white rounded-2xl p-4 shadow-sm border border-gray-50 text-center">
-          <Flame className="w-6 h-6 text-[#B8864A] mx-auto mb-1" strokeWidth={1.5} />
-          <p className="text-lg font-bold text-[#2E2218]">12</p>
-          <p className="text-[10px] text-gray-500">dní v sérii</p>
-        </div>
-        <div className="flex-1 bg-white rounded-2xl p-4 shadow-sm border border-gray-50 text-center">
-          <Dumbbell className="w-6 h-6 text-[#6B4C3B] mx-auto mb-1" strokeWidth={1.5} />
-          <p className="text-lg font-bold text-[#2E2218]">34</p>
-          <p className="text-[10px] text-gray-500">tréningov</p>
-        </div>
+        <NordicCard className="flex-1 p-4 text-center">
+          <Flame className="w-5 h-5 mx-auto mb-2" style={{ color: '#B8864A' }} strokeWidth={1.5} />
+          <p className="text-[16px] font-bold mb-1" style={{ color: '#2E2218' }}>12</p>
+          <p className="text-[9px]" style={{ color: '#A89B8C' }}>dní v sérii</p>
+        </NordicCard>
+        <NordicCard className="flex-1 p-4 text-center">
+          <Dumbbell className="w-5 h-5 mx-auto mb-2" style={{ color: '#6B4C3B' }} strokeWidth={1.5} />
+          <p className="text-[16px] font-bold mb-1" style={{ color: '#2E2218' }}>34</p>
+          <p className="text-[9px]" style={{ color: '#A89B8C' }}>tréningov</p>
+        </NordicCard>
       </div>
 
-      {/* Monthly Overview */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
-        <div className="flex items-center gap-2 mb-2">
+      {/* Nordic Monthly Overview */}
+      <NordicCard className="p-4">
+        <div className="flex items-center gap-3 mb-3">
           <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(107, 76, 59, 0.14)` }}>
             <Settings className="w-4 h-4" style={{ color: '#6B4C3B' }} />
           </div>
-          <h3 className="text-[14px] font-semibold" style={{ color: '#2E2218' }}>Tento mesiac</h3>
+          <h3 className="text-[13px] font-semibold" style={{ color: '#2E2218' }}>Tento mesiac</h3>
         </div>
-        <p className="text-xs text-gray-600">12 cvičení · 8-dňová séria · 5 meditácií</p>
-      </div>
+        <p className="text-[11px]" style={{ color: '#A89B8C' }}>12 cvičení · 8-dňová séria · 5 meditácií</p>
+      </NordicCard>
 
-      {/* Notification Preferences */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+      {/* Nordic Notification Preferences */}
+      <NordicCard className="p-4">
         <div className="flex items-center gap-2 mb-4">
           <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(107, 76, 59, 0.14)` }}>
             <Settings className="w-4 h-4" style={{ color: '#6B4C3B' }} />
@@ -186,24 +230,24 @@ export default function Profil() {
         </div>
       </div>
 
-      {/* Settings */}
-      <div className="bg-white rounded-2xl p-0 shadow-sm border border-gray-50 overflow-hidden">
+      {/* Nordic Settings */}
+      <NordicCard className="p-0 overflow-hidden">
         {settingsItems.map((item, i) => (
           <button 
             key={item.label} 
             onClick={() => handleSettingClick(item.action)}
-            className={`w-full flex items-center gap-3 px-4 py-4 text-sm transition-all hover:bg-gray-50 active:bg-gray-100 ${
+            className={`w-full flex items-center gap-3 px-4 py-4 text-left transition-all hover:bg-gray-50 ${
               i < settingsItems.length - 1 ? 'border-b border-gray-100' : ''
             }`}
           >
-            <item.icon size={18} className="text-gray-500" />
-            <span className="flex-1 text-left text-gray-700">
+            <item.icon size={16} style={{ color: '#A89B8C' }} />
+            <span className="flex-1 text-[13px]" style={{ color: '#2E2218' }}>
               {item.label}
             </span>
-            <ChevronRight className="w-4 h-4 text-gray-400" strokeWidth={1.5} />
+            <ChevronRight className="w-4 h-4" style={{ color: '#A89B8C' }} strokeWidth={1.5} />
           </button>
         ))}
-      </div>
+      </NordicCard>
 
       {/* Logout */}
       <button 

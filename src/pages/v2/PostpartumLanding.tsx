@@ -83,10 +83,10 @@ function FAQ({ question, answer }: { question: string; answer: string }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="border border-gray-200 rounded-2xl overflow-hidden">
+    <div className="border border-white/35 rounded-2xl overflow-hidden">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full p-4 text-left flex items-center justify-between bg-white hover:bg-gray-50 transition-colors"
+        className="w-full p-4 text-left flex items-center justify-between bg-white hover:bg-white/20 transition-colors"
       >
         <span className="font-medium text-[#2E2218] pr-4">{question}</span>
         {isOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
@@ -118,7 +118,7 @@ export default function PostpartumLanding() {
         </div>
 
         {/* Progress Overview */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-6 border border-white/30">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h2 className="text-lg font-bold" style={{ color: colors.textPrimary }}>
@@ -150,7 +150,7 @@ export default function PostpartumLanding() {
 
         {/* Today's Workout */}
         {userProgram.todaysExercise && (
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+          <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-6 border border-white/30">
             <h3 className="text-lg font-semibold mb-4" style={{ color: colors.textPrimary }}>
               Dnešné cvičenie
             </h3>
@@ -185,7 +185,7 @@ export default function PostpartumLanding() {
         )}
 
         {/* Program Controls */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-6 border border-white/30">
           <h3 className="text-lg font-semibold mb-4" style={{ color: colors.textPrimary }}>
             Ovládanie programu
           </h3>
@@ -197,7 +197,7 @@ export default function PostpartumLanding() {
               ⏸️ Pozastaviť program
             </button>
             <button 
-              className="w-full py-3 rounded-2xl border-2 border-gray-200 text-gray-600 font-semibold"
+              className="w-full py-3 rounded-2xl border-2 border-white/35 text-gray-600 font-semibold"
               onClick={() => navigate('/program/postpartum/schedule')}
             >
               📅 Zobraziť rozpis týždňov
@@ -270,7 +270,7 @@ export default function PostpartumLanding() {
 
       {/* Expert Endorsement */}
       <div className="px-5">
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white/30 backdrop-blur-xl rounded-3xl p-6 border border-white/30">
           <div className="flex items-start gap-4">
             <div className="w-16 h-16 bg-gradient-to-br from-pink-100 to-pink-200 rounded-full flex items-center justify-center">
               <Shield size={24} color="#ec4899" />
@@ -304,7 +304,7 @@ export default function PostpartumLanding() {
             '"Potrebujem mať aspoň chvíľku času na seba"',
             '"Som po sekcii a neviem, ako ďalej"'
           ].map((reason, i) => (
-            <div key={i} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+            <div key={i} className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
               <div className="flex items-center gap-3">
                 <div className="w-6 h-6 bg-pink-100 rounded-full flex items-center justify-center">
                   <Check size={14} color="#ec4899" strokeWidth={3} />
@@ -323,7 +323,7 @@ export default function PostpartumLanding() {
         </h2>
         <div className="space-y-4">
           {progressPhases.map((phase, i) => (
-            <div key={i} className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+            <div key={i} className="bg-white/30 backdrop-blur-xl rounded-3xl p-6 border border-white/30">
               <div className="flex items-start gap-4">
                 <div className="text-3xl">{phase.icon}</div>
                 <div className="flex-1">
@@ -346,10 +346,10 @@ export default function PostpartumLanding() {
         <h2 className="text-2xl font-bold text-[#2E2218] mb-6 text-center">
           Ako vyzerá bežný týždeň?
         </h2>
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white/30 backdrop-blur-xl rounded-3xl p-6 border border-white/30">
           <div className="space-y-4">
             {weeklySchedule.map((day, i) => (
-              <div key={i} className="flex items-center gap-4 p-3 bg-gray-50 rounded-2xl">
+              <div key={i} className="flex items-center gap-4 p-3 bg-white/20 rounded-2xl">
                 <div className="w-12 h-12 bg-[#6B4C3B] rounded-full flex items-center justify-center text-white font-bold text-sm">
                   {day.day.slice(0, 2)}
                 </div>
@@ -374,7 +374,7 @@ export default function PostpartumLanding() {
         <h2 className="text-2xl font-bold text-[#2E2218] mb-6 text-center">
           Čo program obsahuje
         </h2>
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white/30 backdrop-blur-xl rounded-3xl p-6 border border-white/30">
           <div className="space-y-4">
             {programFeatures.map((feature, i) => (
               <div key={i} className="flex items-center gap-3">
@@ -395,7 +395,7 @@ export default function PostpartumLanding() {
         </h2>
         <div className="space-y-3">
           {bonuses.map((bonus, i) => (
-            <div key={i} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+            <div key={i} className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <Gift size={20} color="#ec4899" />
@@ -418,7 +418,7 @@ export default function PostpartumLanding() {
         </h2>
         <div className="space-y-4">
           {testimonials.map((testimonial, i) => (
-            <div key={i} className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+            <div key={i} className="bg-white/30 backdrop-blur-xl rounded-3xl p-6 border border-white/30">
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 bg-gradient-to-br from-pink-100 to-pink-200 rounded-full flex items-center justify-center text-xl">
                   💕
@@ -448,7 +448,7 @@ export default function PostpartumLanding() {
             Dopraj si aj ty, čo tvoje telo potrebuje
           </p>
           
-          <div className="bg-white rounded-2xl p-6 mb-6 shadow-sm">
+          <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-6 mb-6 shadow-sm">
             <div className="text-center">
               <div className="text-4xl font-black text-[#2E2218] mb-2">€97</div>
               <p className="text-sm text-[#8B7560] mb-4">Jednorazová platba • Prístup na 2 mesiace</p>
@@ -523,7 +523,7 @@ export default function PostpartumLanding() {
       {/* Video Modal */}
       {showVideoPlayer && (
         <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-5" onClick={() => setShowVideoPlayer(false)}>
-          <div className="bg-white rounded-3xl p-4 w-full max-w-lg">
+          <div className="bg-white/30 backdrop-blur-xl rounded-3xl p-4 w-full max-w-lg">
             <div className="aspect-video bg-gray-900 rounded-2xl flex items-center justify-center">
               <p className="text-white">Demo Video Player</p>
             </div>

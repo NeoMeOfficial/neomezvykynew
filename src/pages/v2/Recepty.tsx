@@ -80,8 +80,8 @@ export default function Recepty() {
   return (
     <div className="w-full min-h-screen px-3 py-6 pb-28 space-y-6">
       {/* Nordic Header */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
-        <div className="flex items-center gap-3 mb-4">
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
+        <div className="flex items-center gap-3">
           <button onClick={() => navigate('/strava')} className="p-1">
             <ArrowLeft className="w-5 h-5 text-gray-600" strokeWidth={1.5} />
           </button>
@@ -92,17 +92,10 @@ export default function Recepty() {
             <h1 className="text-[16px] font-semibold" style={{ color: '#2E2218' }}>Recepty</h1>
           </div>
         </div>
-
-        {/* Sub-header */}
-        <div className="text-center">
-          <p className="text-sm font-medium" style={{ color: '#6B4C3B' }}>
-            Zdravé a chutné jedlá
-          </p>
-        </div>
       </div>
 
       {/* Category Selection */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
         <div className="flex gap-2 overflow-x-auto scrollbar-hide">
           {/* Favorites pill */}
           <button
@@ -113,7 +106,7 @@ export default function Recepty() {
             className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all flex items-center gap-1.5 ${
               showingFavorites
                 ? 'bg-[#C27A6E] text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                : 'bg-white/25 text-gray-600 hover:bg-gray-200'
             }`}
           >
             <Heart size={14} fill={showingFavorites ? 'white' : 'none'} />
@@ -130,7 +123,7 @@ export default function Recepty() {
               className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${
                 active === i && !showingFavorites
                   ? 'bg-[#6B4C3B] text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  : 'bg-white/25 text-gray-600 hover:bg-gray-200'
               }`}
             >
               {c}
@@ -154,7 +147,7 @@ export default function Recepty() {
           const currentCategory = showingFavorites ? favRecipes.find(f => f.id === r.id)?.category || categoryNames[0] : categoryNames[active];
           
           return (
-            <div key={r.id} className="bg-white rounded-2xl shadow-sm border border-gray-50 overflow-hidden">
+            <div key={r.id} className="bg-white/30 backdrop-blur-xl rounded-2xl shadow-sm border border-white/20 overflow-hidden">
               <button
                 onClick={() => navigate(`/recept/${r.id}`)}
                 className="relative w-full h-52 block active:scale-[0.98] transition-transform text-left"
@@ -194,7 +187,7 @@ export default function Recepty() {
 
         {/* Locked recipes for free users */}
         {hasMoreRecipes && allRecipes.slice(currentRecipes.length).map((r) => (
-          <div key={`locked-${r.id}`} className="bg-white rounded-2xl shadow-sm border border-gray-50 overflow-hidden opacity-75">
+          <div key={`locked-${r.id}`} className="bg-white/30 backdrop-blur-xl rounded-2xl shadow-sm border border-white/20 overflow-hidden opacity-75">
             <button
               onClick={() => showContentPaywall('recipes')}
               className="relative w-full h-52 block active:scale-[0.98] transition-transform text-left"
@@ -220,6 +213,26 @@ export default function Recepty() {
           </div>
         ))}
       </div>
+
+      {/* Jedálniček na mieru promo banner */}
+      {!localStorage.getItem('neome-meal-plan') && (
+        <button
+          onClick={() => navigate('/jedalnicek-promo')}
+          className="w-full rounded-2xl overflow-hidden shadow-lg active:scale-[0.98] transition-transform"
+          style={{ background: `linear-gradient(135deg, ${colors.strava}, #5A8A58)` }}
+        >
+          <div className="p-5 flex items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center flex-shrink-0">
+              <span className="text-2xl">🥗</span>
+            </div>
+            <div className="flex-1 text-left">
+              <p className="text-white font-bold text-sm">Jedálniček na mieru</p>
+              <p className="text-white/80 text-xs mt-0.5">Personalizovaný 7-dňový plán na základe tvojich cieľov a preferencií</p>
+            </div>
+            <div className="text-white/80 text-lg">→</div>
+          </div>
+        </button>
+      )}
 
       {/* Paywall modal */}
       <PaywallModal

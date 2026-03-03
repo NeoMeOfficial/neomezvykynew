@@ -1,54 +1,67 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowLeft, Users, UserPlus, Heart } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import BuddyCodeCard from '../../components/v2/buddy/BuddyCodeCard';
 import BuddyFinder from '../../components/v2/buddy/BuddyFinder';
 import BuddyDashboard from '../../components/v2/buddy/BuddyDashboard';
+import BreadcrumbBack from '../../components/v2/BreadcrumbBack';
 import { useBuddySystem } from '../../hooks/useBuddySystem';
+import { colors, glassCard } from '../../theme/warmDusk';
 
 export default function BuddySystem() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { stats, hasBuddies } = useBuddySystem();
   const [activeTab, setActiveTab] = useState<'dashboard' | 'find' | 'mycode'>(
     hasBuddies ? 'dashboard' : 'mycode'
   );
 
+  // Determine where user came from for proper back navigation
+  const referrer = location.state?.from || '/domov-new';
+  const getBackLabel = () => {
+    switch (referrer) {
+      case '/domov-new':
+        return 'Domov';
+      case '/komunita':
+        return 'Komunita';
+      case '/profil':
+        return 'Profil';
+      default:
+        return 'Späť';
+    }
+  };
+
   return (
-    <div className="w-full min-h-screen px-3 py-6 pb-28 space-y-6">
+    <div className="w-full min-h-screen px-3 py-6 pb-28 space-y-6" style={{ background: colors.bgGradient }}>
+      {/* Breadcrumb Back Button */}
+      <BreadcrumbBack to={referrer} label={getBackLabel()} />
+
       {/* Nordic Header */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+      <div className="p-4" style={glassCard}>
         <div className="flex items-center gap-3 mb-4">
-          <button onClick={() => navigate('/komunita')} className="p-1">
-            <ArrowLeft className="w-5 h-5 text-gray-600" strokeWidth={1.5} />
-          </button>
           <div className="flex items-center gap-2 flex-1">
             <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(122, 158, 120, 0.14)` }}>
               <Users className="w-4 h-4" style={{ color: '#7A9E78' }} />
             </div>
-            <h1 className="text-[16px] font-semibold" style={{ color: '#2E2218' }}>Buddy System</h1>
+            <h1 className="text-[16px] font-semibold" style={{ color: '#2E2218' }}>
+              Buddy System • Motivuj sa s kamarátkami
+            </h1>
           </div>
-        </div>
-
-        {/* Sub-header */}
-        <div className="text-center">
-          <p className="text-sm font-medium" style={{ color: '#6B4C3B' }}>
-            Motivuj sa s kamarátkami
-          </p>
         </div>
       </div>
 
       {/* Stats Overview */}
       {(stats.totalBuddies > 0 || stats.pendingRequestsCount > 0) && (
         <div className="grid grid-cols-3 gap-4">
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50 text-center hover:shadow-md transition-all">
+          <div className="p-4 text-center hover:shadow-md transition-all" style={glassCard}>
             <div className="text-[#7A9E78] font-bold text-2xl">{stats.totalBuddies}</div>
             <div className="text-[#6B4C3B] text-sm">Buddy</div>
           </div>
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50 text-center hover:shadow-md transition-all">
+          <div className="p-4 text-center hover:shadow-md transition-all" style={glassCard}>
             <div className="text-[#B8864A] font-bold text-2xl">{stats.pendingRequestsCount}</div>
             <div className="text-[#6B4C3B] text-sm">Žiadosti</div>
           </div>
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50 text-center hover:shadow-md transition-all">
+          <div className="p-4 text-center hover:shadow-md transition-all" style={glassCard}>
             <div className="text-[#A8848B] font-bold text-2xl">{stats.unreadNotifications}</div>
             <div className="text-[#6B4C3B] text-sm">Nové aktivity</div>
           </div>
@@ -56,14 +69,14 @@ export default function BuddySystem() {
       )}
 
       {/* Tab Navigation */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+      <div className="p-4" style={glassCard}>
         <div className="flex gap-2">
           <button
             onClick={() => setActiveTab('dashboard')}
             className={`flex-1 px-3 py-2 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2 ${
               activeTab === 'dashboard'
                 ? 'bg-[#7A9E78] text-white' 
-                : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                : 'bg-white/20 text-[#8B7560] hover:bg-white/25'
             }`}
           >
             <Users size={16} />
@@ -74,7 +87,7 @@ export default function BuddySystem() {
             className={`flex-1 px-3 py-2 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2 ${
               activeTab === 'find'
                 ? 'bg-[#7A9E78] text-white' 
-                : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                : 'bg-white/20 text-[#8B7560] hover:bg-white/25'
             }`}
           >
             <UserPlus size={16} />
@@ -85,7 +98,7 @@ export default function BuddySystem() {
             className={`flex-1 px-3 py-2 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2 ${
               activeTab === 'mycode'
                 ? 'bg-[#7A9E78] text-white' 
-                : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                : 'bg-white/20 text-[#8B7560] hover:bg-white/25'
             }`}
           >
             <Heart size={16} />
@@ -102,7 +115,7 @@ export default function BuddySystem() {
       </div>
 
       {/* How It Works */}
-      <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-50">
+      <div className="p-6" style={glassCard}>
         <h3 className="text-[16px] font-semibold mb-4 flex items-center gap-2" style={{ color: '#2E2218' }}>
           <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(184, 134, 74, 0.14)` }}>
             <Heart className="w-4 h-4" style={{ color: '#B8864A' }} />
@@ -144,7 +157,7 @@ export default function BuddySystem() {
       </div>
 
       {/* Tips */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+      <div className="p-4" style={glassCard}>
         <h4 className="text-sm font-medium mb-3 flex items-center gap-2" style={{ color: '#2E2218' }}>
           <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ background: `rgba(122, 158, 120, 0.14)` }}>
             💡

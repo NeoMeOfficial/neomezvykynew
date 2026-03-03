@@ -91,7 +91,7 @@ export default function PaywallModal({ isOpen, onClose, feature, title }: Paywal
           </div>
           <button
             onClick={onClose}
-            className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-1 hover:bg-white/25 rounded-full transition-colors"
           >
             <X className="w-5 h-5" style={{ color: colors.textTertiary }} />
           </button>
@@ -135,7 +135,7 @@ export default function PaywallModal({ isOpen, onClose, feature, title }: Paywal
 
         {/* Pricing */}
         <div className="grid grid-cols-2 gap-3 mb-6">
-          <div className="text-center p-3 rounded-2xl border-2 border-gray-200">
+          <div className="text-center p-3 rounded-2xl border-2 border-white/35">
             <div className="text-lg font-bold" style={{ color: colors.textPrimary }}>
               €14.90
             </div>

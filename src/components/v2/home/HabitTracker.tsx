@@ -511,21 +511,21 @@ export default function HabitTracker({
       <div className="space-y-3">
         {/* Add form in its own card if needed */}
         {showForm && (
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+          <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
             <HabitForm onSave={addHabit} onCancel={() => setShowForm(false)} title="Nový návyk" saveLabel="Uložiť" />
           </div>
         )}
 
         {/* Data save warning only when interacting */}
         {shouldShowDataSaveWarning && !hideWarning && showForm && (
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+          <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
             <DataSaveWarning onUpgrade={showDataSavePaywall} compact />
           </div>
         )}
 
         {/* Each habit in its own white card */}
         {habits.map((h) => (
-          <div key={h.id} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+          <div key={h.id} className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
             <HabitCard
               habit={h}
               onToggleComplete={() => toggleComplete(h.id)}
@@ -537,7 +537,7 @@ export default function HabitTracker({
 
         {/* Celebration in its own card */}
         {allDone && total > 0 && (
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50 text-center">
+          <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20 text-center">
             <p className="text-[13px] font-semibold" style={{ color: colors.strava }}>
               Všetky návyky splnené! 🎉
             </p>

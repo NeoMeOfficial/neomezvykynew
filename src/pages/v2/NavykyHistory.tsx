@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import GlassCard from '../../components/v2/GlassCard';
 import EmptyStateHabits from '../../components/v2/EmptyStateHabits';
+import { colors, glassCard } from '../../theme/warmDusk';
 
 interface Habit {
   id?: string;
@@ -28,7 +29,7 @@ export default function NavykyHistory() {
   }, []);
 
   return (
-    <div className="space-y-4 pb-8">
+    <div className="min-h-screen space-y-4 pb-8" style={{ background: colors.bgGradient }}>
       <div className="flex items-center gap-3">
         <button onClick={() => navigate('/kniznica')} className="p-1">
           <ArrowLeft className="w-5 h-5 text-[#2E2218]" strokeWidth={1.5} />

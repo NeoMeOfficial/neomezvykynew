@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import DemoWorkoutCard from '../../components/v2/workouts/DemoWorkoutCard';
 import WorkoutStatsWidget from '../../components/v2/workouts/WorkoutStatsWidget';
 import { useWorkoutHistory } from '../../hooks/useWorkoutHistory';
+import { colors, glassCard } from '../../theme/warmDusk';
 
 export default function WorkoutDemo() {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ export default function WorkoutDemo() {
   ];
 
   return (
-    <div className="min-h-screen space-y-6">
+    <div className="min-h-screen space-y-6" style={{ background: colors.bgGradient }}>
       {/* Header */}
       <div className="flex items-center gap-4">
         <button

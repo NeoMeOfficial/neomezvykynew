@@ -131,8 +131,8 @@ export default function Meditacie() {
   return (
     <div className="w-full min-h-screen px-3 py-6 pb-28 space-y-6">
       {/* Nordic Header */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
-        <div className="flex items-center gap-3 mb-4">
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
+        <div className="flex items-center gap-3">
           <button onClick={() => navigate('/kniznica/mysel')} className="p-1">
             <ArrowLeft className="w-5 h-5 text-gray-600" strokeWidth={1.5} />
           </button>
@@ -143,17 +143,10 @@ export default function Meditacie() {
             <h1 className="text-[16px] font-semibold" style={{ color: '#2E2218' }}>Meditácie</h1>
           </div>
         </div>
-
-        {/* Sub-header */}
-        <div className="text-center">
-          <p className="text-sm font-medium" style={{ color: '#6B4C3B' }}>
-            Relaxácia a mindfulness cvičenia
-          </p>
-        </div>
       </div>
 
       {/* Featured Meditation */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-50 overflow-hidden">
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl shadow-sm border border-white/20 overflow-hidden">
         <button
           onClick={() => handlePlayMeditation(featured)}
           className="relative w-full h-32 block active:scale-[0.98] transition-transform text-left"
@@ -224,7 +217,7 @@ export default function Meditacie() {
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
         {/* Category Filter */}
         <div className="mb-4">
           <h3 className="text-sm font-semibold mb-3 text-gray-800">Kategória</h3>
@@ -236,7 +229,7 @@ export default function Meditacie() {
                 className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${
                   activeCategory === i 
                     ? 'bg-[#A8848B] text-white' 
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    : 'bg-white/25 text-gray-600 hover:bg-gray-200'
                 }`}
               >
                 {c.name}
@@ -256,7 +249,7 @@ export default function Meditacie() {
                 className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${
                   activeDuration === i 
                     ? 'bg-[#A8848B] text-white' 
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    : 'bg-white/25 text-gray-600 hover:bg-gray-200'
                 }`}
               >
                 {d}
@@ -271,7 +264,7 @@ export default function Meditacie() {
         {filteredSessions.map((session) => (
           <div 
             key={session.id} 
-            className="bg-white rounded-2xl shadow-sm border border-gray-50 overflow-hidden"
+            className="bg-white/30 backdrop-blur-xl rounded-2xl shadow-sm border border-white/20 overflow-hidden"
           >
             <button
               onClick={() => handlePlayMeditation(session)}
@@ -349,7 +342,7 @@ export default function Meditacie() {
       </div>
       
       {filteredSessions.length === 0 && (
-        <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-50 text-center">
+        <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-8 shadow-sm border border-white/20 text-center">
           <p className="text-sm text-gray-600">
             Žiadne meditácie sa nenašli pre vybrané filtre.
           </p>

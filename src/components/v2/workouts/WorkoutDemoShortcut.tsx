@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Dumbbell, Play, ChevronRight } from 'lucide-react';
+import { colors, glassCard } from '../../theme/warmDusk';
 
 export default function WorkoutDemoShortcut() {
   const navigate = useNavigate();

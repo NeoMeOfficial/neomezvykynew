@@ -13,7 +13,7 @@ export default function ReferralMenuItem() {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 opacity-50">
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/30 opacity-50">
         <div className="animate-pulse">
           <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
           <div className="h-3 bg-gray-200 rounded w-1/2"></div>
@@ -25,7 +25,7 @@ export default function ReferralMenuItem() {
   return (
     <button
       onClick={() => navigate('/referral')}
-      className="w-full bg-white rounded-2xl p-4 shadow-sm border border-gray-100 transition-all active:scale-95"
+      className="w-full bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/30 transition-all active:scale-95"
     >
       <div className="flex items-center gap-4">
         <div 

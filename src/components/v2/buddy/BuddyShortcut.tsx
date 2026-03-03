@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Users, UserPlus, Bell, ChevronRight } from 'lucide-react';
 import { useBuddySystem } from '../../../hooks/useBuddySystem';
+import { colors, glassCard } from '../../theme/warmDusk';
 
 export default function BuddyShortcut() {
   const navigate = useNavigate();
@@ -12,31 +13,38 @@ export default function BuddyShortcut() {
       <div className="space-y-4">
         {/* Header */}
         <div className="flex items-center gap-2 mb-3">
-          <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(184, 134, 74, 0.14)` }}>
-            <UserPlus className="w-4 h-4" style={{ color: '#B8864A' }} />
+          <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(107, 76, 59, 0.14)` }}>
+            <UserPlus className="w-4 h-4" style={{ color: '#6B4C3B' }} />
           </div>
-          <h3 className="text-[14px] font-semibold" style={{ color: '#2E2218' }}>Buddy System</h3>
-        </div>
-
-        {/* Sub-header */}
-        <div className="text-center mb-4">
-          <p className="text-sm font-medium" style={{ color: '#6B4C3B' }}>
-            Pripoj sa s kamarátkami a motivujte sa
-          </p>
+          <h3 className="text-[14px] font-semibold" style={{ color: '#2E2218' }}>
+            Buddy System • Pripoj sa s kamarátkami a motivujte sa
+          </h3>
         </div>
 
         {/* CTA Button */}
         <button
-          onClick={() => navigate('/buddy-system')}
-          className="w-full flex items-center justify-between p-3 bg-white rounded-2xl shadow-sm border border-gray-50 hover:shadow-md transition-shadow"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Debug: Buddy button clicked!');
+            console.log('Debug: Navigating to buddy-system page...');
+            navigate('/buddy-system');
+          }}
+          className="w-full flex items-center justify-between p-4 rounded-2xl font-medium text-white shadow-lg hover:shadow-xl transition-all duration-300 active:scale-95"
+          style={{ 
+            background: '#6B4C3B',
+            cursor: 'pointer'
+          }}
         >
           <div className="flex items-center gap-3">
-            <div>
-              <p className="text-sm font-medium text-gray-800">Nájdi svoju buddy</p>
+            <UserPlus className="w-5 h-5" />
+            <div className="text-left">
+              <p className="text-sm font-semibold">Nájdi svoju buddy</p>
+              <p className="text-xs opacity-90">Motivujte sa spolu</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <ChevronRight size={16} className="text-gray-400" />
+            <ChevronRight size={16} className="opacity-70" />
           </div>
         </button>
       </div>
@@ -73,7 +81,7 @@ export default function BuddyShortcut() {
       {/* Buddy Overview Button */}
       <button
         onClick={() => navigate('/buddy-system')}
-        className="w-full flex items-center justify-between p-3 bg-white rounded-2xl shadow-sm border border-gray-50 hover:shadow-md transition-shadow"
+        className="w-full flex items-center justify-between p-3 bg-white/30 backdrop-blur-xl rounded-2xl shadow-sm border border-white/20 hover:shadow-md transition-shadow"
       >
         <div className="flex items-center gap-3">
           <div>

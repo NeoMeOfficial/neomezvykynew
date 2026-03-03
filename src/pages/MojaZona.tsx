@@ -56,7 +56,13 @@ export default function MojaZona() {
   const navigate = useNavigate();
 
   return (
-    <div className="w-full min-h-screen px-3 py-6 pb-28 space-y-6">
+    <div 
+      className="w-full min-h-screen px-3 py-6 pb-28 space-y-6"
+      style={{ 
+        background: 'linear-gradient(to bottom, #FAF7F2, #F5F1E8)', 
+        minHeight: '100vh' 
+      }}
+    >
       {/* Nordic Welcome Header */}
       <NordicCard className="p-6 text-center">
         <h1 className="text-[20px] font-semibold mb-2" style={{ color: '#2E2218' }}>

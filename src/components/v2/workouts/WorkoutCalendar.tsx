@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight, Dumbbell } from 'lucide-react';
 import { useWorkoutHistory } from '../../../hooks/useWorkoutHistory';
+import { colors, glassCard } from '../../theme/warmDusk';
 
 const MONTHS_SK = [
   'Január', 'Február', 'Marec', 'Apríl', 'Máj', 'Jún',

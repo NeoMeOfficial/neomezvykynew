@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { X, Star } from 'lucide-react';
 import { Achievement } from '../../../types/achievements';
 import AchievementBadge from './AchievementBadge';
+import { colors, glassCard } from '../../theme/warmDusk';
 
 interface AchievementToastProps {
   achievement: Achievement;

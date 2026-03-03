@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Copy, Check, RefreshCw, Users, Share } from 'lucide-react';
 import { useBuddySystem } from '../../../hooks/useBuddySystem';
+import { colors, glassCard } from '../../theme/warmDusk';
 
 export default function BuddyCodeCard() {
   const { myBuddyCode, getMyBuddyCode, isLoading } = useBuddySystem();
@@ -59,7 +60,7 @@ export default function BuddyCodeCard() {
   };
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-50 space-y-4">
+    <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-6 shadow-sm border border-white/20 space-y-4">
       {/* Header */}
       <div className="flex items-center gap-3">
         <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(184, 134, 74, 0.14)` }}>
@@ -74,7 +75,7 @@ export default function BuddyCodeCard() {
       {/* Code Display */}
       {code ? (
         <div className="space-y-4">
-          <div className="bg-gray-50 rounded-xl p-4 text-center">
+          <div className="bg-white/20 rounded-xl p-4 text-center">
             <div className="font-mono font-bold text-3xl letter-spacing-wide mb-2" style={{ color: '#2E2218' }}>
               {code}
             </div>
@@ -109,7 +110,7 @@ export default function BuddyCodeCard() {
         </div>
       ) : (
         <div className="text-center space-y-4">
-          <div className="bg-gray-50 rounded-xl p-6">
+          <div className="bg-white/20 rounded-xl p-6">
             <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3" style={{ background: `rgba(184, 134, 74, 0.14)` }}>
               <Users size={24} style={{ color: '#B8864A' }} />
             </div>
@@ -135,7 +136,7 @@ export default function BuddyCodeCard() {
       )}
 
       {/* Info */}
-      <div className="bg-gray-50 rounded-xl p-3">
+      <div className="bg-white/20 rounded-xl p-3">
         <p className="text-sm font-medium mb-1 flex items-center gap-2" style={{ color: '#2E2218' }}>
           <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ background: `rgba(122, 158, 120, 0.14)` }}>
             💡

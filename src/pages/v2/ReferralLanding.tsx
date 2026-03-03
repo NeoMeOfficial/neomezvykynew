@@ -42,7 +42,7 @@ export default function ReferralLanding() {
           </p>
 
           {code && validCode && (
-            <div className="bg-white rounded-2xl p-4 mx-auto max-w-xs mb-8 shadow-sm border border-gray-100">
+            <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 mx-auto max-w-xs mb-8 border border-white/30">
               <p className="text-sm mb-2" style={{ color: colors.textSecondary }}>Používaš kód:</p>
               <div className="text-2xl font-black" style={{ color: colors.accent }}>
                 {code}
@@ -52,7 +52,7 @@ export default function ReferralLanding() {
         </div>
 
         {/* Features Preview */}
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white/30 backdrop-blur-xl rounded-3xl p-6 border border-white/30">
           <h2 className="text-xl font-bold mb-6 text-center" style={{ color: colors.textPrimary }}>
             Čo ťa čaká v NeoMe
           </h2>
@@ -101,7 +101,7 @@ export default function ReferralLanding() {
         </div>
 
         {/* Special Offer */}
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 text-center">
+        <div className="bg-white/30 backdrop-blur-xl rounded-3xl p-6 shadow-sm border border-white/30 text-center">
           <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center" style={{ backgroundColor: colors.periodka }}>
             <Heart className="w-8 h-8 text-white" />
           </div>
@@ -130,7 +130,7 @@ export default function ReferralLanding() {
         </div>
 
         {/* Social Proof */}
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white/30 backdrop-blur-xl rounded-3xl p-6 border border-white/30">
           <h3 className="text-lg font-bold mb-4" style={{ color: colors.textPrimary }}>
             Už tisíce žien dôverujú NeoMe
           </h3>

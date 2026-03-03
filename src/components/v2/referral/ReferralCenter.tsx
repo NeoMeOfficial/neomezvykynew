@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Share2, Copy, Users, Gift, Euro, CheckCircle, Clock } from 'lucide-react';
-import { colors } from '../../../theme/warmDusk';
+import { colors, glassCard } from '../../../theme/warmDusk';
 import { useReferral } from '../../../hooks/useReferral';
 
 export default function ReferralCenter() {
@@ -51,7 +51,7 @@ export default function ReferralCenter() {
     return (
       <div className="min-h-screen pb-20" style={{ background: colors.bgGradient }}>
         <div className="p-5 pt-16">
-          <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 text-center">
+          <div className="p-8 text-center" style={glassCard}>
             <div className="animate-spin w-8 h-8 border-2 border-gray-300 border-t-blue-600 rounded-full mx-auto"></div>
             <p className="mt-4 text-gray-600">Načítavam...</p>
           </div>
@@ -74,7 +74,7 @@ export default function ReferralCenter() {
         </div>
 
         {/* Credits Overview */}
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+        <div className="p-6" style={glassCard}>
           <div className="text-center mb-6">
             <div className="w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${colors.accent}, ${colors.accent}CC)` }}>
               <Euro className="w-10 h-10 text-white" />
@@ -110,7 +110,7 @@ export default function ReferralCenter() {
         </div>
 
         {/* How It Works */}
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+        <div className="p-6" style={glassCard}>
           <h3 className="text-xl font-bold mb-4" style={{ color: colors.textPrimary }}>
             Ako to funguje
           </h3>
@@ -155,7 +155,7 @@ export default function ReferralCenter() {
         </div>
 
         {/* Referral Code & Share */}
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+        <div className="p-6" style={glassCard}>
           <h3 className="text-xl font-bold mb-4" style={{ color: colors.textPrimary }}>
             Tvoj odporúčací kód
           </h3>
@@ -207,7 +207,7 @@ export default function ReferralCenter() {
 
         {/* Pending Referrals */}
         {stats && stats.pendingReferrals > 0 && (
-          <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+          <div className="p-6" style={glassCard}>
             <h3 className="text-xl font-bold mb-4" style={{ color: colors.textPrimary }}>
               Čakajúce odporúčania
             </h3>
@@ -227,7 +227,7 @@ export default function ReferralCenter() {
         )}
 
         {/* Terms */}
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+        <div className="p-6" style={glassCard}>
           <h3 className="text-lg font-bold mb-3" style={{ color: colors.textPrimary }}>
             Podmienky programu
           </h3>

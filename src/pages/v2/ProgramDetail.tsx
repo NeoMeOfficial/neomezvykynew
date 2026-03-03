@@ -41,9 +41,9 @@ const programData: Record<string, ProgramData> = {
     name: 'Postpartum',
     description: 'Program je vhodný pre ženy, ktoré potrebujú spevniť brušný korzet, vyriešiť diastázu či inkontinenciu, mesiace aj roky po pôrode.',
     totalWeeks: 8,
-    currentWeek: 2,
-    currentDay: 3,
-    startDate: '2026-02-01',
+    currentWeek: 1,
+    currentDay: 1,
+    startDate: '2026-02-27',
     isPaused: false,
     weekPlans: [
       {
@@ -55,9 +55,9 @@ const programData: Record<string, ProgramData> = {
             name: 'Dychové cvičenia a core aktivácia', 
             duration: '10 min', 
             type: 'core', 
-            videoUrl: '', 
+            videoUrl: 'https://www.youtube.com/watch?v=VQiGJRBkkSQ&t=66s', 
             thumbnail: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&h=300&fit=crop', 
-            description: 'Základné dychové techniky pre aktiváciu hlbokého stabilizačného systému',
+            description: '🎥 DEMO: Základné dychové techniky pre aktiváciu hlbokého stabilizačného systému',
             instructions: [
               'Ľahni si na chrbát, nohy zohnú v kolenách',
               'Polož jednu ruku na hruď, druhú na brucho',
@@ -191,9 +191,9 @@ const programData: Record<string, ProgramData> = {
     name: 'BodyForming', 
     description: 'Formovanie postavy s dôrazom na problémové partie — brucho, stehná, zadok.',
     totalWeeks: 8,
-    currentWeek: 3,
-    currentDay: 2,
-    startDate: '2026-01-15',
+    currentWeek: 1,
+    currentDay: 1,
+    startDate: '2026-02-27',
     isPaused: false,
     weekPlans: [
       {
@@ -345,7 +345,7 @@ export default function ProgramDetail() {
   return (
     <div className="w-full min-h-screen px-3 py-6 pb-28 space-y-6">
       {/* Nordic Header */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
         <div className="flex items-center gap-3 mb-4">
           <button onClick={() => navigate('/kniznica/telo/programy')} className="p-1">
             <ArrowLeft className="w-5 h-5 text-gray-600" strokeWidth={1.5} />
@@ -360,7 +360,7 @@ export default function ProgramDetail() {
       </div>
 
       {/* Program Welcome */}
-      <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-50 text-center">
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-6 shadow-sm border border-white/20 text-center">
         <h2 className="text-lg font-bold mb-3" style={{ color: '#2E2218' }}>
           Vitaj v programe {program.name}! 
         </h2>
@@ -378,7 +378,7 @@ export default function ProgramDetail() {
       </div>
 
       {/* Progress Section */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
         <div className="flex items-center gap-2 mb-4">
           <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(107, 76, 59, 0.14)` }}>
             <Calendar className="w-4 h-4" style={{ color: '#6B4C3B' }} />
@@ -404,7 +404,7 @@ export default function ProgramDetail() {
 
       {/* Today's Workout */}
       {todaysExercise && (
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+        <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
           <div className="flex items-center gap-2 mb-4">
             <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(107, 76, 59, 0.14)` }}>
               <Play className="w-4 h-4" style={{ color: '#6B4C3B' }} />
@@ -419,7 +419,7 @@ export default function ProgramDetail() {
                 programName: program.name 
               } 
             })}
-            className="w-full flex items-center gap-3 p-3 rounded-xl bg-gray-50 hover:bg-gray-100 active:scale-[0.98] transition-all"
+            className="w-full flex items-center gap-3 p-3 rounded-xl bg-white/20 hover:bg-white/25 active:scale-[0.98] transition-all"
           >
             <div className="relative w-16 h-16 rounded-xl overflow-hidden flex-shrink-0">
               <img src={todaysExercise.thumbnail} alt={todaysExercise.name} className="w-full h-full object-cover" />
@@ -439,29 +439,9 @@ export default function ProgramDetail() {
         </div>
       )}
 
-      {/* Program Actions */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
-        <div className="flex gap-3">
-          <button
-            onClick={() => setShowPauseConfirm(true)}
-            disabled={program.isPaused}
-            className="flex-1 py-3 px-4 rounded-xl text-sm font-medium transition-all active:scale-95 disabled:opacity-50 bg-[#B8864A] bg-opacity-10 text-[#B8864A] hover:bg-opacity-20"
-          >
-            Pozastaviť
-          </button>
-          <button
-            onClick={() => setShowRestartConfirm(true)}
-            className="flex-1 py-3 px-4 rounded-xl text-sm font-medium transition-all active:scale-95 bg-[#6B4C3B] bg-opacity-10 text-[#6B4C3B] hover:bg-opacity-20"
-          >
-            <RotateCcw className="w-4 h-4 mr-1" />
-            Nový začiatok
-          </button>
-        </div>
-      </div>
-
       {/* Exercise Accordion by Weeks */}
       <div className="space-y-4">
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+        <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
           <div className="flex items-center gap-2 mb-4">
             <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(107, 76, 59, 0.14)` }}>
               <Calendar className="w-4 h-4" style={{ color: '#6B4C3B' }} />
@@ -473,11 +453,11 @@ export default function ProgramDetail() {
             {program.weekPlans.map((week) => (
               <div 
                 key={week.week}
-                className="bg-gray-50 rounded-xl overflow-hidden"
+                className="bg-white/20 rounded-xl overflow-hidden"
               >
                 <button
                   onClick={() => setOpenWeek(openWeek === week.week ? null : week.week)}
-                  className="w-full p-4 flex items-center justify-between text-left hover:bg-gray-100 transition-colors"
+                  className="w-full p-4 flex items-center justify-between text-left hover:bg-white/25 transition-colors"
                 >
                   <div>
                     <p className="text-sm font-semibold text-gray-800">
@@ -495,11 +475,11 @@ export default function ProgramDetail() {
                 </button>
                 
                 {openWeek === week.week && (
-                  <div className="border-t border-gray-200 bg-white">
+                  <div className="border-t border-white/35 bg-white">
                     {week.exercises.map((exercise, idx) => (
                       <button 
                         key={exercise.id}
-                        className="w-full p-3 border-b border-gray-100 last:border-b-0 flex items-center gap-3 hover:bg-gray-50 active:scale-[0.98] transition-all text-left"
+                        className="w-full p-3 border-b border-white/30 last:border-b-0 flex items-center gap-3 hover:bg-white/20 active:scale-[0.98] transition-all text-left"
                         onClick={() => navigate('/exercise-player', { 
                           state: { 
                             exercise, 
@@ -531,10 +511,29 @@ export default function ProgramDetail() {
         </div>
       </div>
 
+      {/* Program Actions — always last */}
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
+        <div className="flex gap-3">
+          <button
+            onClick={() => setShowPauseConfirm(true)}
+            disabled={program.isPaused}
+            className="flex-1 py-3 px-4 rounded-xl text-sm font-medium transition-all active:scale-95 disabled:opacity-50 bg-[#B8864A] bg-opacity-10 text-[#B8864A] hover:bg-opacity-20"
+          >
+            Pozastaviť
+          </button>
+          <button
+            onClick={() => setShowRestartConfirm(true)}
+            className="flex-1 py-3 px-4 rounded-xl text-sm font-medium transition-all active:scale-95 bg-[#6B4C3B] bg-opacity-10 text-[#6B4C3B] hover:bg-opacity-20"
+          >
+            Nový začiatok
+          </button>
+        </div>
+      </div>
+
       {/* Pause Confirmation Modal */}
       {showPauseConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-xl">
+          <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-6 w-full max-w-sm shadow-xl">
             <div className="text-center space-y-4">
               <div className="w-12 h-12 rounded-full mx-auto flex items-center justify-center bg-[#B8864A] bg-opacity-15">
                 <AlertTriangle size={20} style={{ color: '#B8864A' }} />
@@ -548,7 +547,7 @@ export default function ProgramDetail() {
               <div className="flex gap-2">
                 <button
                   onClick={() => setShowPauseConfirm(false)}
-                  className="flex-1 py-2.5 px-4 rounded-xl text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+                  className="flex-1 py-2.5 px-4 rounded-xl text-sm font-medium bg-white/25 text-gray-600 hover:bg-gray-200 transition-colors"
                 >
                   Zrušiť
                 </button>
@@ -567,7 +566,7 @@ export default function ProgramDetail() {
       {/* Restart Confirmation Modal */}
       {showRestartConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-xl">
+          <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-6 w-full max-w-sm shadow-xl">
             <div className="text-center space-y-4">
               <div className="w-12 h-12 rounded-full mx-auto flex items-center justify-center bg-[#6B4C3B] bg-opacity-15">
                 <RotateCcw size={20} style={{ color: '#6B4C3B' }} />
@@ -581,7 +580,7 @@ export default function ProgramDetail() {
               <div className="flex gap-2">
                 <button
                   onClick={() => setShowRestartConfirm(false)}
-                  className="flex-1 py-2.5 px-4 rounded-xl text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+                  className="flex-1 py-2.5 px-4 rounded-xl text-sm font-medium bg-white/25 text-gray-600 hover:bg-gray-200 transition-colors"
                 >
                   Zrušiť
                 </button>

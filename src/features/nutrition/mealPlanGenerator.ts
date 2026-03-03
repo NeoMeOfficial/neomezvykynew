@@ -30,7 +30,7 @@ const CATEGORY_MAP: Record<MealSlot['type'], string[]> = {
   desiata: ['snack'],
   obed: ['obed'],
   olovrant: ['snack', 'smoothie'],
-  vecera: ['vecera'],
+  vecera: ['vecera', 'obed'], // fallback to obed if no vecera recipes exist
 };
 
 function pickRandom<T>(arr: T[], count: number): T[] {
@@ -99,14 +99,14 @@ function hashProfile(profile: NutritionProfile): string {
   return hash.toString(36);
 }
 
-export function generateMealPlan(profile: NutritionProfile): MealPlan {
+export function generateMealPlan(profile: NutritionProfile, startDate?: Date): MealPlan {
   const distribution = MEAL_DISTRIBUTIONS[profile.mealsPerDay];
   const days: DayPlan[] = [];
-  const today = new Date();
+  const baseDate = startDate ?? new Date();
 
   for (let d = 0; d < 7; d++) {
-    const date = new Date(today);
-    date.setDate(today.getDate() + d);
+    const date = new Date(baseDate);
+    date.setDate(baseDate.getDate() + d);
     const dateStr = date.toISOString().split('T')[0];
 
     const meals: MealSlot[] = distribution.map((slot) => {
@@ -126,9 +126,10 @@ export function generateMealPlan(profile: NutritionProfile): MealPlan {
 
       // Calculate portion multiplier for the selected (default 0) recipe
       const selectedRecipe = compatible.find((r) => r.id === options[0]);
-      const portionMultiplier = selectedRecipe
+      const rawMultiplier = selectedRecipe
         ? Math.round((targetCalories / selectedRecipe.calories) * 100) / 100
         : 1;
+      const portionMultiplier = Math.min(rawMultiplier, 2.5); // Cap at 2.5x
 
       return {
         type: slot.type,

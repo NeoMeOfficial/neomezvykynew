@@ -273,7 +273,13 @@ function NordicCard({ children, onClick, className = "" }) {
 }
 
   return (
-    <div className="w-full min-h-screen px-3 py-6 pb-28 space-y-6 relative">
+    <div 
+      className="w-full min-h-screen px-3 py-6 pb-28 space-y-6 relative"
+      style={{ 
+        background: 'linear-gradient(to bottom, #FAF7F2, #F5F1E8)', 
+        minHeight: '100vh' 
+      }}
+    >
       {/* Toast */}
       {toast && (
         <div className="fixed top-4 left-4 right-4 z-50 bg-[#6B4C3B] text-white text-xs font-medium px-4 py-3 rounded-2xl text-center shadow-lg">

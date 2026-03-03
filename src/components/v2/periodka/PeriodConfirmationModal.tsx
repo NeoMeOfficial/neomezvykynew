@@ -89,14 +89,14 @@ export default function PeriodConfirmationModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-3xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white/30 backdrop-blur-xl rounded-3xl max-w-md w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="p-6 border-b border-gray-100">
+        <div className="p-6 border-b border-white/30">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold" style={{ color: colors.textPrimary }}>
               Potvrdenie menštruácie
             </h2>
-            <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full">
+            <button onClick={onClose} className="p-2 hover:bg-white/25 rounded-full">
               <XCircle className="w-5 h-5" style={{ color: colors.textSecondary }} />
             </button>
           </div>
@@ -127,7 +127,7 @@ export default function PeriodConfirmationModal({
                 className={`w-full p-4 rounded-2xl border-2 transition-all ${
                   confirmationType === 'on_time' 
                     ? 'border-green-500 bg-green-50' 
-                    : 'border-gray-200 hover:border-gray-300'
+                    : 'border-white/35 hover:border-gray-300'
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -151,7 +151,7 @@ export default function PeriodConfirmationModal({
                   className={`w-full p-4 rounded-2xl border-2 transition-all ${
                     confirmationType === 'early' 
                       ? 'border-blue-500 bg-blue-50' 
-                      : 'border-gray-200 hover:border-gray-300'
+                      : 'border-white/35 hover:border-gray-300'
                   }`}
                 >
                   <div className="flex items-center gap-3">
@@ -175,7 +175,7 @@ export default function PeriodConfirmationModal({
                 className={`w-full p-4 rounded-2xl border-2 transition-all ${
                   confirmationType === 'late' 
                     ? `border-[${colors.periodka}] bg-[${colors.periodka}]/10` 
-                    : 'border-gray-200 hover:border-gray-300'
+                    : 'border-white/35 hover:border-gray-300'
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -197,8 +197,8 @@ export default function PeriodConfirmationModal({
                 onClick={() => setConfirmationType('not_yet')}
                 className={`w-full p-4 rounded-2xl border-2 transition-all ${
                   confirmationType === 'not_yet' 
-                    ? 'border-gray-500 bg-gray-50' 
-                    : 'border-gray-200 hover:border-gray-300'
+                    ? 'border-gray-500 bg-white/20' 
+                    : 'border-white/35 hover:border-gray-300'
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -232,7 +232,7 @@ export default function PeriodConfirmationModal({
                     className={`w-10 h-10 rounded-full transition-all ${
                       daysDifference === days
                         ? 'text-white shadow-md'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        : 'bg-white/25 text-gray-600 hover:bg-gray-200'
                     }`}
                     style={{
                       backgroundColor: daysDifference === days ? colors.periodka : undefined
@@ -263,7 +263,7 @@ export default function PeriodConfirmationModal({
                     className={`p-3 rounded-2xl border transition-all ${
                       flowIntensity === option.value
                         ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-200 hover:border-gray-300'
+                        : 'border-white/35 hover:border-gray-300'
                     }`}
                   >
                     <div className="text-lg mb-1">{option.emoji}</div>
@@ -290,7 +290,7 @@ export default function PeriodConfirmationModal({
                     className={`p-3 rounded-2xl border transition-all text-left ${
                       selectedSymptoms.includes(symptom.id)
                         ? `border-[${colors.periodka}] bg-[${colors.periodka}]/10`
-                        : 'border-gray-200 hover:border-gray-300'
+                        : 'border-white/35 hover:border-gray-300'
                     }`}
                   >
                     <div className="flex items-center gap-2">
@@ -314,7 +314,7 @@ export default function PeriodConfirmationModal({
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Akékoľvek dodatočné poznámky..."
-              className="w-full p-3 rounded-2xl border border-gray-200 resize-none focus:outline-none focus:border-blue-500"
+              className="w-full p-3 rounded-2xl border border-white/35 resize-none focus:outline-none focus:border-blue-500"
               rows={3}
               style={{ color: colors.textPrimary }}
             />
@@ -322,10 +322,10 @@ export default function PeriodConfirmationModal({
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-gray-100 flex gap-3">
+        <div className="p-6 border-t border-white/30 flex gap-3">
           <button
             onClick={onClose}
-            className="flex-1 py-3 px-4 rounded-2xl border border-gray-300 font-medium transition-colors hover:bg-gray-50"
+            className="flex-1 py-3 px-4 rounded-2xl border border-gray-300 font-medium transition-colors hover:bg-white/20"
             style={{ color: colors.textSecondary }}
           >
             Zrušiť

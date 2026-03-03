@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Users, Clock, Check, X, Bell, Heart, Dumbbell, Flame, Droplets } from 'lucide-react';
 import { useBuddySystem } from '../../../hooks/useBuddySystem';
+import { colors, glassCard } from '../../theme/warmDusk';
 
 export default function BuddyDashboard() {
   const { 
@@ -65,7 +66,7 @@ export default function BuddyDashboard() {
 
   if (buddyConnections.length === 0 && pendingRequests.length === 0) {
     return (
-      <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-50 text-center">
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-8 shadow-sm border border-white/20 text-center">
         <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: `rgba(122, 158, 120, 0.14)` }}>
           <Users size={32} style={{ color: '#7A9E78' }} />
         </div>
@@ -80,7 +81,7 @@ export default function BuddyDashboard() {
   }
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-50 space-y-4">
+    <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-6 shadow-sm border border-white/20 space-y-4">
       {/* Header */}
       <div className="flex items-center gap-3">
         <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(122, 158, 120, 0.14)` }}>
@@ -95,14 +96,14 @@ export default function BuddyDashboard() {
       </div>
 
       {/* Tab Navigation */}
-      <div className="bg-gray-50 rounded-xl p-1">
+      <div className="bg-white/20 rounded-xl p-1">
         <div className="grid grid-cols-3 gap-1">
           <button
             onClick={() => setActiveTab('buddies')}
             className={`py-2 px-3 rounded-lg text-sm font-medium transition-all ${
               activeTab === 'buddies'
                 ? 'bg-[#7A9E78] text-white'
-                : 'text-gray-600 hover:bg-gray-100'
+                : 'text-gray-600 hover:bg-white/25'
             }`}
           >
             Buddy ({buddyConnections.length})
@@ -112,7 +113,7 @@ export default function BuddyDashboard() {
             className={`py-2 px-3 rounded-lg text-sm font-medium transition-all relative ${
               activeTab === 'requests'
                 ? 'bg-[#7A9E78] text-white'
-                : 'text-gray-600 hover:bg-gray-100'
+                : 'text-gray-600 hover:bg-white/25'
             }`}
           >
             Žiadosti ({pendingRequests.length})
@@ -125,7 +126,7 @@ export default function BuddyDashboard() {
             className={`py-2 px-3 rounded-lg text-sm font-medium transition-all relative ${
               activeTab === 'notifications'
                 ? 'bg-[#7A9E78] text-white'
-                : 'text-gray-600 hover:bg-gray-100'
+                : 'text-gray-600 hover:bg-white/25'
             }`}
           >
             Aktivity
@@ -142,7 +143,7 @@ export default function BuddyDashboard() {
         {activeTab === 'buddies' && (
           <>
             {buddyConnections.map((connection) => (
-              <div key={connection.id} className="bg-gray-50 rounded-xl p-4 hover:shadow-sm transition-all">
+              <div key={connection.id} className="bg-white/20 rounded-xl p-4 hover:shadow-sm transition-all">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: `rgba(122, 158, 120, 0.14)` }}>
                     <span className="font-bold text-sm" style={{ color: '#2E2218' }}>
@@ -178,7 +179,7 @@ export default function BuddyDashboard() {
               </div>
             ) : (
               pendingRequests.map((request) => (
-                <div key={request.id} className="bg-gray-50 rounded-xl p-4 hover:shadow-sm transition-all">
+                <div key={request.id} className="bg-white/20 rounded-xl p-4 hover:shadow-sm transition-all">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: `rgba(184, 134, 74, 0.14)` }}>
                       <span className="font-bold text-sm" style={{ color: '#2E2218' }}>
@@ -250,7 +251,7 @@ export default function BuddyDashboard() {
                   return (
                     <div 
                       key={notification.id} 
-                      className={`bg-gray-50 rounded-xl p-4 border-l-4 hover:shadow-sm transition-all ${
+                      className={`bg-white/20 rounded-xl p-4 border-l-4 hover:shadow-sm transition-all ${
                         !notification.seen ? 'bg-orange-50 border-l-[#B8864A]' : 'border-l-transparent'
                       }`}
                     >

@@ -2,6 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Lock, Users, Check, ChevronDown, Clock, Dumbbell } from 'lucide-react';
 import GlassCard from '../../components/v2/GlassCard';
 import { useState } from 'react';
+import { colors, glassCard } from '../../theme/warmDusk';
 
 const programData: Record<string, { name: string; tagline: string; weeks: number; perWeek: number; price: string; gradient: string }> = {
   postpartum: { name: 'Postpartum', tagline: 'Obnov svoju silu po pôrode', weeks: 6, perWeek: 4, price: '39,90 €', gradient: 'from-[#F2C6C2] to-[#E8A0A0]' },
@@ -23,7 +24,7 @@ export default function ProgramSales() {
   ];
 
   return (
-    <div className="space-y-4">
+    <div className="min-h-screen space-y-4" style={{ background: colors.bgGradient }}>
       {/* Hero */}
       <div className={`-mx-5 -mt-6 px-5 pt-6 pb-8 bg-gradient-to-br ${p.gradient}`}>
         <button onClick={() => navigate(-1)} className="p-1 mb-4"><ArrowLeft className="w-5 h-5 text-white" strokeWidth={1.5} /></button>

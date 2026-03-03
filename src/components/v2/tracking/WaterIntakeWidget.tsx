@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuthContext } from '../../../contexts/AuthContext';
 import { useAchievements } from '../../../hooks/useAchievements';
 import { useBuddySystem } from '../../../hooks/useBuddySystem';
+import { colors, glassCard } from '../../theme/warmDusk';
 
 interface WaterIntakeData {
   date: string;

@@ -27,8 +27,8 @@ export function calculateAverageCycleLength(history: PeriodLog[]): { average: nu
     const previousStart = new Date(sortedHistory[i + 1].startDate);
     const length = differenceInDays(currentStart, previousStart);
 
-    // Only include reasonable cycle lengths (21-35 days)
-    if (length >= 21 && length <= 35) {
+    // Only include reasonable cycle lengths (21-45 days, supports irregular/PCOS cycles)
+    if (length >= 21 && length <= 45) {
       cycleLengths.push(length);
     }
   }
@@ -52,7 +52,7 @@ export function calculateAverageCycleLength(history: PeriodLog[]): { average: nu
   const average = Math.round(weightedSum / totalWeight);
 
   return {
-    average: Math.max(21, Math.min(35, average)),
+    average: Math.max(21, Math.min(45, average)),
     cycleCount: cycleLengths.length
   };
 }
@@ -149,7 +149,7 @@ export function useCycleData(accessCode?: string) {
 
   // Set cycle length
   const setCycleLength = useCallback((length: number) => {
-    updateCycleData({ cycleLength: Math.max(25, Math.min(35, length)) });
+    updateCycleData({ cycleLength: Math.max(21, Math.min(45, length)) });
   }, [updateCycleData]);
 
   // Set period length

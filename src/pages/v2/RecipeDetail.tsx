@@ -102,7 +102,7 @@ export default function RecipeDetail() {
   return (
     <div className="w-full min-h-screen px-3 py-6 pb-28 space-y-6">
       {/* Nordic Header */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
         <div className="flex items-center gap-3 mb-4">
           <button onClick={() => navigate(-1)} className="p-1">
             <ArrowLeft className="w-5 h-5 text-gray-600" strokeWidth={1.5} />
@@ -117,7 +117,7 @@ export default function RecipeDetail() {
           </div>
           <button
             onClick={handleFavoriteToggle}
-            className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-1 hover:bg-white/25 rounded-lg transition-colors"
           >
             <Heart
               className="w-5 h-5"
@@ -130,7 +130,7 @@ export default function RecipeDetail() {
       </div>
 
       {/* Hero Image */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-50 overflow-hidden">
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl shadow-sm border border-white/20 overflow-hidden">
         <img
           src="https://images.unsplash.com/photo-1517673400267-0251440c45dc?w=800&h=500&fit=crop"
           alt="Recipe"
@@ -138,7 +138,7 @@ export default function RecipeDetail() {
         />
       </div>
       {/* Recipe Info */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
         <p className="text-sm leading-relaxed mb-4" style={{ color: '#6B4C3B' }}>
           {recipe.description}
         </p>
@@ -159,7 +159,7 @@ export default function RecipeDetail() {
           ].map((m) => (
             <span
               key={m.label}
-              className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-xl bg-gray-50 text-gray-600"
+              className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-xl bg-white/20 text-gray-600"
             >
               <m.icon className="w-3.5 h-3.5" strokeWidth={1.5} />
               {m.label}
@@ -169,7 +169,7 @@ export default function RecipeDetail() {
       </div>
 
       {/* Add to Meal Plan Button */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
         <button
           onClick={handleAddToMealPlan}
           disabled={addedToMealPlan}
@@ -194,7 +194,7 @@ export default function RecipeDetail() {
       </div>
 
       {/* Ingredients */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
         <div className="flex items-center gap-2 mb-4">
           <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(122, 158, 120, 0.14)` }}>
             <Users className="w-4 h-4" style={{ color: '#7A9E78' }} />
@@ -204,27 +204,17 @@ export default function RecipeDetail() {
 
         <div className="space-y-3">
           {ingredients.map((ing, i) => (
-            <label key={i} className="flex items-center gap-3 cursor-pointer p-2 -m-2 rounded-xl hover:bg-gray-50">(
-                <div
-                  className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all active:scale-95`}
-                  style={{
-                    backgroundColor: checked[i] ? colors.telo : 'transparent',
-                    borderColor: checked[i] ? colors.telo : `${colors.telo}60`,
-                    color: checked[i] ? 'white' : colors.telo,
-                  }}
-                  onClick={() => toggle(i)}
-                >
-                  {checked[i] && <span className="text-xs font-bold">✓</span>}
-                </div>
-              <input
-                type="checkbox"
-                checked={checked[i]}
-                onChange={() => toggle(i)}
-                className="w-4 h-4 text-[#7A9E78] bg-gray-100 border-gray-300 rounded focus:ring-[#7A9E78] focus:ring-2"
-              />
-              <span
-                className={`text-sm ${checked[i] ? 'line-through text-gray-500' : 'text-gray-800'}`}
+            <label key={i} className="flex items-center gap-3 cursor-pointer p-2 -m-2 rounded-xl hover:bg-white/20" onClick={() => toggle(i)}>
+              <div
+                className="w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all active:scale-95 flex-shrink-0"
+                style={{
+                  backgroundColor: checked[i] ? colors.telo : 'transparent',
+                  borderColor: checked[i] ? colors.telo : `${colors.telo}60`,
+                }}
               >
+                {checked[i] && <span className="text-xs font-bold text-white">✓</span>}
+              </div>
+              <span className={`text-sm ${checked[i] ? 'line-through' : ''}`} style={{ color: checked[i] ? colors.textTertiary : colors.textPrimary }}>
                 {ing}
               </span>
             </label>
@@ -233,7 +223,7 @@ export default function RecipeDetail() {
       </div>
 
       {/* Steps */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
         <div className="flex items-center gap-2 mb-4">
           <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(107, 76, 59, 0.14)` }}>
             <Clock className="w-4 h-4" style={{ color: '#6B4C3B' }} />
@@ -256,7 +246,7 @@ export default function RecipeDetail() {
       </div>
 
       {/* Nutrition */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
         <div className="flex items-center gap-2 mb-4">
           <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(184, 134, 74, 0.14)` }}>
             <Flame className="w-4 h-4" style={{ color: '#B8864A' }} />
@@ -272,7 +262,7 @@ export default function RecipeDetail() {
           ].map((n) => (
             <div 
               key={n.label} 
-              className="p-3 bg-gray-50 rounded-xl text-center"
+              className="p-3 bg-white/20 rounded-xl text-center"
             >
               <span className="text-lg font-bold block" style={{ color: '#2E2218' }}>
                 {n.value}

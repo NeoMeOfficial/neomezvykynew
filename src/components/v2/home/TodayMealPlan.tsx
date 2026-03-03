@@ -3,6 +3,7 @@ import { Clock, Flame, ChevronRight } from 'lucide-react';
 import GlassCard from '../GlassCard';
 import { useMealPlan } from '../../../features/nutrition/useMealPlan';
 import { recipes } from '../../../data/recipes';
+import { colors, glassCard } from '../../theme/warmDusk';
 
 export default function TodayMealPlan() {
   const navigate = useNavigate();

@@ -18,6 +18,7 @@ import { suggestForDay, getMoodEmoji } from '../../../features/cycle/suggestions
 import type { PhaseKey } from '../../../features/cycle/types';
 import { usePaywall } from '../../../hooks/useSubscriptionStatus';
 import PaywallModal from '../subscription/PaywallModal';
+import { colors, glassCard } from '../../theme/warmDusk';
 
 const PHASE_COLORS: Record<PhaseKey, string> = {
   menstrual: '#C27A6E',
@@ -85,9 +86,9 @@ function MiniCalendar({ onSelect, onClose }: { onSelect: (d: Date) => void; onCl
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-5" onClick={onClose}>
       <GlassCard className="w-full max-w-sm" onClick={e => (e as any).stopPropagation()}>
         <div className="flex items-center justify-between mb-3">
-          <button onClick={() => setMonth(subMonths(month, 1))} className="p-2 bg-white rounded-full shadow-sm border border-gray-100"><ChevronLeft className="w-5 h-5 text-[#6B4C3B]" /></button>
+          <button onClick={() => setMonth(subMonths(month, 1))} className="p-2 bg-white rounded-full shadow-sm border border-white/30"><ChevronLeft className="w-5 h-5 text-[#6B4C3B]" /></button>
           <span className="text-[14px] font-medium text-[#2E2218] capitalize">{format(month, 'LLLL yyyy', { locale: sk })}</span>
-          <button onClick={() => { if (isBefore(startOfMonth(addMonths(month, 1)), today)) setMonth(addMonths(month, 1)); }} className="p-2 bg-white rounded-full shadow-sm border border-gray-100"><ChevronRight className="w-5 h-5 text-[#6B4C3B]" /></button>
+          <button onClick={() => { if (isBefore(startOfMonth(addMonths(month, 1)), today)) setMonth(addMonths(month, 1)); }} className="p-2 bg-white rounded-full shadow-sm border border-white/30"><ChevronRight className="w-5 h-5 text-[#6B4C3B]" /></button>
         </div>
         <div className="grid grid-cols-7 mb-1">
           {WEEKDAYS.map(w => <div key={w} className="text-center text-[12px] text-[#A0907E] font-medium py-1">{w}</div>)}
@@ -225,7 +226,7 @@ export default function PeriodkaTracker() {
           </button>
           <h1 className="text-xl font-semibold text-[#2E2218]">Periodka</h1>
         </div>
-        <button onClick={() => { setSettingsCycle(cycleLength); setSettingsPeriod(periodLength); setShowSettings(true); }} className="p-2 bg-white rounded-full shadow-sm border border-gray-100">
+        <button onClick={() => { setSettingsCycle(cycleLength); setSettingsPeriod(periodLength); setShowSettings(true); }} className="p-2 bg-white rounded-full shadow-sm border border-white/30">
           <Settings className="w-5 h-5 text-[#A0907E]" strokeWidth={1.5} />
         </button>
       </div>
@@ -234,7 +235,7 @@ export default function PeriodkaTracker() {
       <PeriodOverview />
 
       {/* Hero Card */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
         <p className="text-[14px] font-semibold" style={{ color: phaseColor }}>
           {PHASE_NAMES[phase.key]}
         </p>
@@ -249,10 +250,37 @@ export default function PeriodkaTracker() {
         <div className="mt-3 h-1.5 rounded-full bg-black/5 overflow-hidden">
           <div className="h-full rounded-full transition-all" style={{ width: `${progressPct}%`, background: phaseColor }} />
         </div>
+
+        {/* Mark period as ended — only show during/after menstrual phase, within first 10 days */}
+        {phase.key === 'menstrual' && currentDay >= 2 && (
+          <button
+            onClick={() => {
+              // Auto-learn period length from actual tracking
+              const actualLength = currentDay;
+              if (actualLength >= 2 && actualLength <= 10) {
+                setPeriodLength(actualLength);
+                // Add to history
+                if (lastPeriodStart) {
+                  const endDate = format(addDays(new Date(lastPeriodStart + 'T00:00:00'), actualLength - 1), 'yyyy-MM-dd');
+                  updateCycleData({
+                    periodLength: actualLength,
+                    history: [
+                      ...(cycleData.history || []),
+                      { startDate: lastPeriodStart, endDate }
+                    ]
+                  });
+                }
+              }
+            }}
+            className="mt-3 w-full py-2.5 rounded-xl text-[13px] font-medium border border-[#C27A6E]/30 text-[#C27A6E] bg-[#C27A6E]/5 active:bg-[#C27A6E]/10 transition-colors"
+          >
+            ✓ Menštruácia skončila (deň {currentDay})
+          </button>
+        )}
       </div>
 
       {/* Phase Timeline */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
         <p className="text-[12px] text-[#A0907E] mb-2">Fázy cyklu</p>
         <div className="flex h-3 rounded-full overflow-hidden">
           {ranges.map(r => {
@@ -289,7 +317,7 @@ export default function PeriodkaTracker() {
       </div>
 
       {/* Key Dates */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
         <p className="text-[15px] font-semibold text-[#2E2218] mb-3">Dôležité dátumy</p>
         <div className="space-y-2.5">
           {nextPeriod && (
@@ -305,7 +333,7 @@ export default function PeriodkaTracker() {
       </div>
 
       {/* Today's Insights */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
         <p className="text-[15px] font-semibold text-[#2E2218] mb-3">Čo môžeš dnes očakávať</p>
 
         {/* Energy */}
@@ -326,7 +354,7 @@ export default function PeriodkaTracker() {
       </div>
 
       {/* Quick Symptom Log */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
         <p className="text-[15px] font-semibold text-[#2E2218] mb-3">Ako sa dnes naozaj cítiš?</p>
         {/* Horizontal scroll with fade cue */}
         <div className="relative">
@@ -427,7 +455,7 @@ export default function PeriodkaTracker() {
 
               <div>
                 <label className="text-[13px] text-[#8B7560] block mb-1">Dĺžka cyklu: {settingsCycle} dní</label>
-                <input type="range" min={25} max={35} value={settingsCycle} onChange={e => setSettingsCycle(Number(e.target.value))} className="w-full accent-[#6B4C3B]" />
+                <input type="range" min={21} max={45} value={settingsCycle} onChange={e => setSettingsCycle(Number(e.target.value))} className="w-full accent-[#6B4C3B]" />
               </div>
 
               <div>
@@ -500,15 +528,15 @@ function SymptomCalendarSection() {
 
   return (
     <>
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
         <p className="text-[13px] font-semibold text-[#2E2218] mb-2">Kalendár symptómov</p>
         {/* Month nav */}
         <div className="flex items-center justify-between mb-2">
-          <button onClick={() => setCalMonth(new Date(calMonth.getFullYear(), calMonth.getMonth() - 1))} className="p-2 bg-white rounded-full shadow-sm border border-gray-100">
+          <button onClick={() => setCalMonth(new Date(calMonth.getFullYear(), calMonth.getMonth() - 1))} className="p-2 bg-white rounded-full shadow-sm border border-white/30">
             <ChevronLeft className="w-4 h-4 text-[#6B4C3B]" />
           </button>
           <span className="text-[13px] font-medium text-[#2E2218] capitalize">{monthLabel}</span>
-          <button onClick={() => setCalMonth(new Date(calMonth.getFullYear(), calMonth.getMonth() + 1))} className="p-2 bg-white rounded-full shadow-sm border border-gray-100">
+          <button onClick={() => setCalMonth(new Date(calMonth.getFullYear(), calMonth.getMonth() + 1))} className="p-2 bg-white rounded-full shadow-sm border border-white/30">
             <ChevronRight className="w-4 h-4 text-[#6B4C3B]" />
           </button>
         </div>
@@ -566,7 +594,7 @@ function SymptomCalendarSection() {
 
       {/* Selected day detail */}
       {selectedDate && (
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+        <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
           <p className="text-[15px] font-semibold text-[#2E2218] mb-3">
             {new Date(selectedDate + 'T00:00:00').toLocaleDateString('sk-SK', { weekday: 'long', day: 'numeric', month: 'long' })}
           </p>

@@ -17,7 +17,7 @@ export default function Kniznica() {
   return (
     <div className="w-full min-h-screen px-3 py-6 pb-28 space-y-6">
       {/* Nordic Header */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50 text-center">
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20 text-center">
         <h1 className="text-2xl font-bold mb-2" style={{ color: '#2E2218' }}>Knižnica</h1>
         <p className="text-sm font-medium" style={{ color: '#6B4C3B' }}>
           Výber kategórií pre tvoju cestu k lepšiemu zdraviu
@@ -27,7 +27,7 @@ export default function Kniznica() {
       {/* Nordic Cards */}
       <div className="space-y-4">
         {sections.map((s) => (
-          <div key={s.label} className="bg-white rounded-2xl shadow-sm border border-gray-50 overflow-hidden">
+          <div key={s.label} className="bg-white/30 backdrop-blur-xl rounded-2xl shadow-sm border border-white/20 overflow-hidden">
             <button
               onClick={() => navigate(s.path)}
               className="relative w-full h-48 block hover:opacity-95 active:scale-[0.99] transition-all"

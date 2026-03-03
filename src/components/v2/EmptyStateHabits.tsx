@@ -24,7 +24,7 @@ export default function EmptyStateHabits({ onCreateHabit }: EmptyStateHabitsProp
     // In real implementation, this would add the habit
     console.log('Adding habit:', habitName);
     onCreateHabit?.();
-    navigate('/domov');
+    navigate('/domov-new');
   };
 
   return (
@@ -76,7 +76,7 @@ export default function EmptyStateHabits({ onCreateHabit }: EmptyStateHabitsProp
 
         <div className="space-y-3">
           <button
-            onClick={() => navigate('/domov')}
+            onClick={() => navigate('/domov-new')}
             className="w-full py-4 px-6 rounded-2xl font-semibold text-white transition-all active:scale-95 flex items-center justify-center gap-2"
             style={{ 
               background: `linear-gradient(135deg, ${colors.telo} 0%, ${colors.accent} 100%)`,

@@ -1,4 +1,5 @@
 import { Achievement } from '../../../types/achievements';
+import { colors, glassCard } from '../../theme/warmDusk';
 
 interface AchievementBadgeProps {
   achievement: Achievement;

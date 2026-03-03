@@ -83,7 +83,13 @@ export default function Programy() {
   const filtered = active === "Všetky" ? programs : programs.filter((p) => p.category === active);
 
   return (
-    <div className="w-full min-h-screen px-3 py-6 pb-28 space-y-6">
+    <div 
+      className="w-full min-h-screen px-3 py-6 pb-28 space-y-6"
+      style={{ 
+        background: 'linear-gradient(to bottom, #FAF7F2, #F5F1E8)', 
+        minHeight: '100vh' 
+      }}
+    >
       {/* Nordic Header */}
       <NordicCard className="p-4">
         <div className="flex items-center gap-3 mb-4">

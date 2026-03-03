@@ -8,6 +8,7 @@ import { useMealPlan } from '../../features/nutrition/useMealPlan';
 import NutritionOnboarding from '../../features/nutrition/NutritionOnboarding';
 import { recipes } from '../../data/recipes';
 import type { NutritionProfile } from '../../features/nutrition/types';
+import { colors, glassCard } from '../../theme/warmDusk';
 
 const tabs = ['Recepty', 'Jedálniček'] as const;
 const categories = [
@@ -52,11 +53,11 @@ export default function Strava() {
   // Full-screen onboarding
   if (showOnboarding) {
     return (
-      <div className="w-full min-h-screen px-3 py-6 pb-28 space-y-6">
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+      <div className="w-full min-h-screen px-3 py-6 pb-28 space-y-6" style={{ background: colors.bgGradient }}>
+        <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20">
           <div className="flex items-center gap-3 mb-4">
             <button onClick={() => setShowOnboarding(false)} className="p-1">
-              <ArrowLeft className="w-5 h-5 text-gray-600" strokeWidth={1.5} />
+              <ArrowLeft className="w-5 h-5 text-[#8B7560]" strokeWidth={1.5} />
             </button>
             <div className="flex items-center gap-2 flex-1">
               <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(122, 158, 120, 0.14)` }}>
@@ -66,7 +67,7 @@ export default function Strava() {
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+        <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20">
           <NutritionOnboarding onComplete={handleOnboardingComplete} />
         </div>
       </div>
@@ -76,10 +77,10 @@ export default function Strava() {
   return (
     <div className="w-full min-h-screen px-3 py-6 pb-28 space-y-6">
       {/* Nordic Header */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
-        <div className="flex items-center gap-3 mb-4">
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20">
+        <div className="flex items-center gap-3">
           <button onClick={() => navigate('/kniznica')} className="p-1">
-            <ArrowLeft className="w-5 h-5 text-gray-600" strokeWidth={1.5} />
+            <ArrowLeft className="w-5 h-5 text-[#8B7560]" strokeWidth={1.5} />
           </button>
           <div className="flex items-center gap-2 flex-1">
             <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(122, 158, 120, 0.14)` }}>
@@ -88,37 +89,12 @@ export default function Strava() {
             <h1 className="text-[16px] font-semibold" style={{ color: '#2E2218' }}>Strava</h1>
           </div>
         </div>
-
-        {/* Sub-header */}
-        <div className="text-center">
-          <p className="text-sm font-medium" style={{ color: '#6B4C3B' }}>
-            Zdravá výživa pre tvoje ciele
-          </p>
-        </div>
       </div>
 
-      {/* Hero Section */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-50 overflow-hidden">
-        <div className="relative h-64">
-          <img
-            src="/images/strava-hero.jpg"
-            alt="NeoMe Strava"
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/20 via-transparent to-black/30" />
-          <div className="absolute bottom-6 left-6">
-            <h2 className="text-2xl font-bold text-white mb-2">
-              Jedz zdravo a chutne
-            </h2>
-            <p className="text-white/90 text-sm">
-              108 receptov a personalizované jedálničky
-            </p>
-          </div>
-        </div>
-      </div>
+      {/* Hero Section Removed */}
 
       {/* Tabs */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20">
         <div className="flex gap-2">
           {tabs.map((t) => (
             <button
@@ -127,7 +103,7 @@ export default function Strava() {
               className={`flex-1 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                 t === tab 
                   ? 'bg-[#7A9E78] text-white' 
-                  : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                  : 'bg-white/20 text-[#8B7560] hover:bg-white/25'
               }`}
             >
               {t}
@@ -140,7 +116,7 @@ export default function Strava() {
       {tab === 'Recepty' && (
         <div className="space-y-4">
           {categories.map((c) => (
-            <div key={c.label} className="bg-white rounded-2xl shadow-sm border border-gray-50 overflow-hidden">
+            <div key={c.label} className="bg-white/30 backdrop-blur-xl rounded-2xl shadow-sm border border-white/20 overflow-hidden">
               <button
                 onClick={() => navigate(`/recepty?cat=${encodeURIComponent(c.label)}`)}
                 className="relative w-full h-44 block active:scale-[0.99] transition-transform"
@@ -162,7 +138,7 @@ export default function Strava() {
         plan && selectedDay ? (
           <div className="space-y-4">
             {/* Day pills */}
-            <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+            <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20">
               <div className="flex gap-2 overflow-x-auto scrollbar-hide">
                 {plan.days.map((d, i) => {
                   const date = new Date(d.date);
@@ -177,7 +153,7 @@ export default function Strava() {
                           ? 'bg-[#7A9E78] text-white'
                           : isToday
                           ? 'bg-[#7A9E78]/10 text-[#7A9E78] border border-[#7A9E78]/20'
-                          : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                          : 'bg-white/20 text-[#8B7560] hover:bg-white/25'
                       }`}
                     >
                       <span className="text-xs">{dayLabel}</span>
@@ -195,11 +171,11 @@ export default function Strava() {
               if (!recipe) return null;
               const adjustedCal = Math.round(recipe.calories * meal.portionMultiplier);
               return (
-                <div key={meal.type} className="bg-white rounded-2xl shadow-sm border border-gray-50 overflow-hidden">
+                <div key={meal.type} className="bg-white/30 backdrop-blur-xl rounded-2xl shadow-sm border border-white/20 overflow-hidden">
                   <div className="p-4 pb-2">
                     <div className="flex items-center justify-between mb-3">
-                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">{meal.label}</p>
-                      <span className="text-[10px] text-gray-400">{Math.round(meal.portionMultiplier * 100)}% porcia</span>
+                      <p className="text-xs font-medium text-[#8B7560] uppercase tracking-wide">{meal.label}</p>
+                      <span className="text-[10px] text-[#A0907E]">{Math.round(meal.portionMultiplier * 100)}% porcia</span>
                     </div>
                   </div>
                   <button
@@ -225,7 +201,7 @@ export default function Strava() {
                     <div className="p-4 pt-3">
                       <button
                         onClick={() => swapMeal(selectedDayIdx, mealIdx)}
-                        className="flex items-center gap-2 w-full px-3 py-2 rounded-xl bg-gray-50 text-xs text-gray-600 hover:bg-gray-100 active:scale-95 transition-all"
+                        className="flex items-center gap-2 w-full px-3 py-2 rounded-xl bg-white/20 text-xs text-[#8B7560] hover:bg-white/25 active:scale-95 transition-all"
                       >
                         <RefreshCw className="w-3.5 h-3.5" strokeWidth={1.5} />
                         <span>Zameniť za: <span className="font-medium text-[#7A9E78]">{altRecipe.title}</span></span>
@@ -237,7 +213,7 @@ export default function Strava() {
             })}
 
             {/* Daily macro summary */}
-            <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+            <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20">
               <div className="flex items-center gap-4">
                 <ProgressRing
                   progress={Math.min(100, Math.round((selectedDay.totalCalories / (profile?.dailyCalories || 2000)) * 100))}
@@ -253,7 +229,7 @@ export default function Strava() {
                   <p className="text-sm font-semibold" style={{ color: '#2E2218' }}>
                     {selectedDay.totalCalories} / {profile?.dailyCalories || 2000} kcal
                   </p>
-                  <p className="text-xs text-gray-500 mt-0.5">
+                  <p className="text-xs text-[#8B7560] mt-0.5">
                     B: {selectedDay.totalProtein}g · S: {selectedDay.totalCarbs}g · T: {selectedDay.totalFat}g
                   </p>
                 </div>
@@ -264,14 +240,14 @@ export default function Strava() {
             <div className="text-center">
               <button
                 onClick={handleRegenerate}
-                className="text-xs text-gray-500 py-2 hover:text-[#7A9E78] transition-colors"
+                className="text-xs text-[#8B7560] py-2 hover:text-[#7A9E78] transition-colors"
               >
                 Vygenerovať nový jedálniček
               </button>
             </div>
           </div>
         ) : (
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-50 text-center">
+          <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-6 shadow-sm border border-white/20 text-center">
             <div className="w-12 h-12 rounded-xl mx-auto mb-4 flex items-center justify-center" style={{ background: `rgba(122, 158, 120, 0.14)` }}>
               <UtensilsCrossed className="w-6 h-6" style={{ color: '#7A9E78' }} />
             </div>
@@ -281,9 +257,9 @@ export default function Strava() {
             </p>
             <div className="space-y-3 mb-6">
               {['Vypočítame tvoje denné kalórie', 'Navrhneme recepty podľa preferencií', '2 možnosti na každé jedlo — vyber si'].map((q, i) => (
-                <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-gray-50">
+                <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-white/20">
                   <div className="w-5 h-5 rounded-full bg-[#7A9E78]/20 text-[#7A9E78] text-[10px] font-bold flex items-center justify-center">✓</div>
-                  <span className="text-sm text-gray-600 text-left">{q}</span>
+                  <span className="text-sm text-[#8B7560] text-left">{q}</span>
                 </div>
               ))}
             </div>

@@ -9,11 +9,21 @@ import {
   Send,
   HelpCircle,
   Flag,
+  UserPlus,
+  Gift,
+  ExternalLink,
+  Lock,
+  Copy,
+  Leaf,
+  Shirt,
+  Watch,
 } from 'lucide-react';
 import GlassCard from '../../components/v2/GlassCard';
-import BuddyShortcut from '../../components/v2/buddy/BuddyShortcut';
+import BreadcrumbBack from '../../components/v2/BreadcrumbBack';
 import { colors } from '../../theme/warmDusk';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { partnerDiscounts, getAvailableDiscounts, getNextDiscount, getCategoryIcon, getCategoryColor } from '../../data/partnerDiscounts';
+import { useAchievements } from '../../hooks/useAchievements';
 
 interface Comment {
   id: number;
@@ -111,11 +121,30 @@ const initialPosts: Post[] = [
 
 export default function Komunita() {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Tab state - check if coming from home with discount focus
+  const initialTab = location.state?.tab === 'discounts' ? 'discounts' : 'posts';
+  const [activeTab, setActiveTab] = useState<'posts' | 'discounts'>(initialTab);
+
+  // Determine back navigation
+  const referrer = location.state?.from || '/domov-new';
+  const getBackLabel = () => {
+    switch (referrer) {
+      case '/domov-new':
+        return 'Domov';
+      case '/profil':
+        return 'Profil';
+      default:
+        return 'Späť';
+    }
+  };
 
   // Composer state
   const [composerExpanded, setComposerExpanded] = useState(false);
   const [composerText, setComposerText] = useState('');
   const [composerType, setComposerType] = useState<'post' | 'question'>('post');
+  const [composerPhoto, setComposerPhoto] = useState<string | null>(null);
 
   // Feed state
   const [posts, setPosts] = useState<Post[]>(initialPosts);
@@ -160,12 +189,14 @@ export default function Komunita() {
       comments: 0,
       time: 'práve teraz',
     };
+    if (composerPhoto) (newPost as any).photo = composerPhoto;
     setPosts((prev) => [newPost, ...prev]);
     setNextId((n) => n + 1);
     setComposerText('');
+    setComposerPhoto(null);
     setComposerExpanded(false);
     setComposerType('post');
-  }, [composerText, composerType, nextId]);
+  }, [composerText, composerType, composerPhoto, nextId]);
 
   const toggleLike = useCallback((id: number) => {
     const isCurrentlyLiked = likedIds.has(id);
@@ -257,7 +288,13 @@ export default function Komunita() {
   }, [replyingTo, replyText]);
 
   return (
-    <div className="w-full min-h-screen px-3 py-6 pb-28 space-y-6 relative">
+    <div 
+      className="w-full min-h-screen px-3 py-6 pb-28 space-y-6 relative"
+      style={{ 
+        background: colors.bgGradient, 
+        minHeight: '100vh' 
+      }}
+    >
       {/* Toast */}
       {toast && (
         <div className="fixed top-4 left-4 right-4 z-50 bg-[#6B4C3B] text-white text-xs font-medium px-4 py-3 rounded-2xl text-center shadow-lg">
@@ -265,8 +302,13 @@ export default function Komunita() {
         </div>
       )}
 
+      {/* Breadcrumb Back Button - only show if not coming from main nav */}
+      {referrer !== '/domov-new' && (
+        <BreadcrumbBack to={referrer} label={getBackLabel()} />
+      )}
+
       {/* Nordic Header */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50 text-center">
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20 text-center">
         <div className="w-12 h-12 rounded-xl mx-auto mb-3 flex items-center justify-center" style={{ background: `rgba(184, 134, 74, 0.14)` }}>
           <Heart className="w-6 h-6" style={{ color: '#B8864A' }} />
         </div>
@@ -278,8 +320,41 @@ export default function Komunita() {
         </p>
       </div>
 
-      {/* Daily Achievements */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+      {/* Tab Navigation */}
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-1 shadow-sm border border-white/20">
+        <div className="flex gap-1">
+          <button
+            onClick={() => setActiveTab('posts')}
+            className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-medium transition-all ${
+              activeTab === 'posts'
+                ? 'bg-white/50 shadow-sm border border-white/30'
+                : 'text-[#8B7560] hover:text-[#6B4C3B]'
+            }`}
+            style={{ color: activeTab === 'posts' ? '#2E2218' : undefined }}
+          >
+            <Heart className="w-4 h-4" />
+            Príspevky
+          </button>
+          <button
+            onClick={() => setActiveTab('discounts')}
+            className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-medium transition-all ${
+              activeTab === 'discounts'
+                ? 'bg-white/50 shadow-sm border border-white/30'
+                : 'text-[#8B7560] hover:text-[#6B4C3B]'
+            }`}
+            style={{ color: activeTab === 'discounts' ? '#2E2218' : undefined }}
+          >
+            <Gift className="w-4 h-4" />
+            Zľavy partnerov
+          </button>
+        </div>
+      </div>
+
+      {/* Posts Tab Content */}
+      {activeTab === 'posts' && (
+        <>
+          {/* Daily Achievements */}
+          <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
         <div className="flex items-center gap-2 mb-4">
           <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(184, 134, 74, 0.14)` }}>
             <CheckCircle2 className="w-4 h-4" style={{ color: '#B8864A' }} />
@@ -315,44 +390,43 @@ export default function Komunita() {
         </div>
       </div>
 
-      {/* Buddy System & Workout Demo */}
-      <div className="space-y-4">
-        <BuddyShortcut />
-        
-        {/* Workout Demo Card */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
-          <button
-            onClick={() => navigate('/workout-demo')}
-            className="w-full flex items-center gap-3 text-left hover:bg-gray-50 rounded-xl p-2 -m-2 transition-colors"
-          >
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(122, 158, 120, 0.14)' }}>
-              <Dumbbell size={18} className="text-[#7A9E78]" />
+      {/* Buddy System */}
+      <GlassCard className="!p-4">
+        <div className="space-y-4">
+          {/* Header */}
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(184, 134, 74, 0.14)` }}>
+              <UserPlus className="w-4 h-4" style={{ color: '#B8864A' }} />
             </div>
-            
-            <div className="flex-1 min-w-0">
-              <h3 className="text-sm font-medium" style={{ color: '#2E2218' }}>Workout Demo</h3>
-              <p className="text-xs text-gray-600">
-                Skús interaktívne cvičenia a získaj body
-              </p>
-            </div>
+            <h3 className="text-[14px] font-semibold" style={{ color: '#2E2218' }}>Buddy System</h3>
+          </div>
 
-            <div className="text-xs px-2 py-1 rounded-full font-medium text-[#7A9E78]" style={{ background: 'rgba(122, 158, 120, 0.14)' }}>
-              Skúsiť
-            </div>
+          {/* Description */}
+          <p className="text-[12px]" style={{ color: '#A89B8C' }}>
+            Pripoj sa s kamarátkami a motivujte sa
+          </p>
+
+          {/* CTA Button */}
+          <button
+            onClick={() => navigate('/buddy-system')}
+            className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl text-[13px] font-medium transition-all"
+            style={{ backgroundColor: 'rgba(184, 134, 74, 0.14)', color: '#B8864A' }}
+          >
+            Nájsť buddy
           </button>
         </div>
-      </div>
+      </GlassCard>
 
       {/* Post Composer */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
         {!composerExpanded ? (
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#B8864A] to-[#D0BCA8] flex-shrink-0" />
             <button
               onClick={() => setComposerExpanded(true)}
-              className="flex-1 text-left text-sm text-gray-500 bg-gray-50 rounded-full px-4 py-3 hover:bg-gray-100 transition-colors"
+              className="flex-1 text-left text-sm text-gray-500 bg-white/20 rounded-full px-4 py-3 hover:bg-white/25 transition-colors"
             >
-              Čo máš na srdci, Katka?
+              Priestor na tvoj post
             </button>
           </div>
         ) : (
@@ -363,19 +437,25 @@ export default function Komunita() {
                 autoFocus
                 value={composerText}
                 onChange={(e) => setComposerText(e.target.value)}
-                placeholder="Čo máš na srdci, Katka?"
-                className="flex-1 text-sm bg-gray-50 rounded-2xl px-4 py-3 resize-none outline-none min-h-[80px] placeholder:text-gray-500 focus:bg-white focus:ring-2 focus:ring-gray-200 border border-gray-100"
+                placeholder="Priestor na tvoj post"
+                className="flex-1 text-sm bg-white/20 rounded-2xl px-4 py-3 resize-none outline-none min-h-[80px] placeholder:text-gray-500 focus:bg-white focus:ring-2 focus:ring-gray-200 border border-white/30"
                 style={{ color: '#2E2218' }}
               />
             </div>
             <div className="flex items-center justify-between">
+              {composerPhoto && (
+                <div className="w-full mb-2 relative">
+                  <img src={composerPhoto} alt="Preview" className="w-full h-32 object-cover rounded-xl" />
+                  <button onClick={() => setComposerPhoto(null)} className="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/50 flex items-center justify-center text-white text-xs">✕</button>
+                </div>
+              )}
               <div className="flex gap-2">
                 <button
                   onClick={() => setComposerType('post')}
                   className={`text-xs font-medium px-3 py-2 rounded-xl transition-colors ${
                     composerType === 'post'
                       ? 'bg-[#6B4C3B] text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      : 'bg-white/25 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
                   Príspevok
@@ -385,11 +465,22 @@ export default function Komunita() {
                   className={`text-xs font-medium px-3 py-2 rounded-xl transition-colors ${
                     composerType === 'question'
                       ? 'bg-[#6B4C3B] text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      : 'bg-white/25 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
                   Otázka
                 </button>
+                <label className="text-xs font-medium px-3 py-2 rounded-xl transition-colors bg-white/25 text-gray-700 hover:bg-gray-200 cursor-pointer flex items-center gap-1">
+                  📷 Foto
+                  <input type="file" accept="image/*" className="hidden" onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onload = (ev) => setComposerPhoto(ev.target?.result as string);
+                      reader.readAsDataURL(file);
+                    }
+                  }} />
+                </label>
               </div>
               <button
                 onClick={handleSubmitPost}
@@ -405,7 +496,7 @@ export default function Komunita() {
 
       {/* Followed Topics Section */}
       {followedPosts.size > 0 && (
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+        <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
           <div className="flex items-center gap-2 mb-4">
             <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(107, 76, 59, 0.14)` }}>
               <CheckCircle2 className="w-4 h-4" style={{ color: '#6B4C3B' }} />
@@ -421,7 +512,7 @@ export default function Komunita() {
               .map(post => (
                 <div 
                   key={`followed-${post.id}`} 
-                  className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100 hover:border-gray-200 transition-colors cursor-pointer"
+                  className="flex items-start gap-3 p-3 bg-white/20 rounded-xl border border-white/30 hover:border-white/35 transition-colors cursor-pointer"
                   onClick={() => toggleComments(post.id)}
                 >
                   <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#D0BCA8] to-[#D4B8A0] flex-shrink-0 mt-0.5" />
@@ -439,7 +530,7 @@ export default function Komunita() {
                     <div className="flex items-center gap-3 mt-2 text-[10px] text-[#A0907E]">
                       <span className="flex items-center gap-1">
                         <Heart className="w-3 h-3" />
-                        {post.likes + (likedIds.has(post.id) ? 1 : 0)}
+                        {post.likes}
                       </span>
                       <span className="flex items-center gap-1">
                         <MessageCircle className="w-3 h-3" />
@@ -473,7 +564,7 @@ export default function Komunita() {
       {/* 6. Feed Section */}
       <h2 className="text-[15px] font-semibold text-[#2E2218] pt-1">Novinky</h2>
       {posts.map((post) => (
-        <div key={post.id} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+        <div key={post.id} className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
           {/* Header */}
           <div className="flex items-center gap-2 mb-2">
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#D0BCA8] to-[#D4B8A0] flex-shrink-0" />
@@ -485,7 +576,7 @@ export default function Komunita() {
                   e.stopPropagation();
                   setOpenMenuId(openMenuId === post.id ? null : post.id);
                 }}
-                className="w-7 h-7 rounded-full bg-gray-50 hover:bg-gray-100 flex items-center justify-center transition-colors"
+                className="w-7 h-7 rounded-full bg-white/20 hover:bg-white/25 flex items-center justify-center transition-colors"
               >
                 <MoreHorizontal className="w-4 h-4 text-[#A0907E]" />
               </button>
@@ -531,7 +622,7 @@ export default function Komunita() {
                 }`}
                 strokeWidth={1.5}
               />
-              {post.likes + (likedIds.has(post.id) ? 1 : 0)}
+              {post.likes}
             </button>
             <button
               onClick={() => toggleComments(post.id)}
@@ -561,7 +652,7 @@ export default function Komunita() {
 
           {/* Expanded Comments */}
           {expandedComments.has(post.id) && post.commentsData && (
-            <div className="space-y-3 pt-3 border-t border-gray-100">
+            <div className="space-y-3 pt-3 border-t border-white/30">
               {post.commentsData.map((comment) => (
                 <div key={comment.id} className="flex items-start gap-3 pl-2">
                   <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#B8864A] to-[#D0BCA8] flex-shrink-0" />
@@ -590,7 +681,7 @@ export default function Komunita() {
               {/* Reply Input */}
               {replyingTo && replyingTo.postId === post.id && (
                 <div className="mt-3 pl-10">
-                  <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl border border-gray-200">
+                  <div className="flex items-start gap-3 p-3 bg-white/20 rounded-xl border border-white/35">
                     <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#B8864A] to-[#D0BCA8] flex-shrink-0" />
                     <div className="flex-1">
                       <textarea
@@ -626,6 +717,233 @@ export default function Komunita() {
       ))}
 
       {/* Challenges section removed per feedback */}
+        </>
+      )}
+
+      {/* Partner Discounts Tab Content */}
+      {activeTab === 'discounts' && (
+        <PartnerDiscountsSection />
+      )}
+    </div>
+  );
+}
+
+// Partner Discounts Section Component
+function PartnerDiscountsSection() {
+  const { stats } = useAchievements();
+  const [copiedCode, setCopiedCode] = useState<string | null>(null);
+  
+  const availableDiscounts = getAvailableDiscounts(stats.totalPoints);
+  const nextDiscount = getNextDiscount(stats.totalPoints);
+  const userLevel = Math.floor(stats.totalPoints / 250);
+
+  const copyDiscountCode = async (code: string) => {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopiedCode(code);
+      setTimeout(() => setCopiedCode(null), 2000);
+    } catch (err) {
+      console.error('Failed to copy code:', err);
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      {/* Status Header */}
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30 text-center">
+        <div className="w-12 h-12 rounded-xl mx-auto mb-3 flex items-center justify-center" style={{ background: `rgba(184, 134, 74, 0.14)` }}>
+          <Gift className="w-6 h-6" style={{ color: '#B8864A' }} />
+        </div>
+        <h2 className="text-[16px] font-semibold mb-1" style={{ color: '#2E2218' }}>
+          Zľavy partnerov Level {userLevel}
+        </h2>
+        <p className="text-sm" style={{ color: '#6B4C3B' }}>
+          {stats.totalPoints} bodov • {availableDiscounts.length} zľav odomknutých
+        </p>
+      </div>
+
+      {/* Next Unlock Preview */}
+      {nextDiscount && (
+        <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-gray-100">
+              <Lock className="w-4 h-4 text-gray-500" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-sm font-semibold" style={{ color: '#2E2218' }}>
+                Ďalšia zľava už čoskoro!
+              </h3>
+              <p className="text-xs" style={{ color: '#6B4C3B' }}>
+                {nextDiscount.requiredPoints - stats.totalPoints} bodov do odomknutia
+              </p>
+            </div>
+            <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${getCategoryColor(nextDiscount.category)}20` }}>
+              {(() => {
+                const iconName = getCategoryIcon(nextDiscount.category);
+                const iconProps = { className: "w-4 h-4", style: { color: getCategoryColor(nextDiscount.category) } };
+                switch (iconName) {
+                  case 'Dumbbell':
+                    return <Dumbbell {...iconProps} />;
+                  case 'Heart':
+                    return <Heart {...iconProps} />;
+                  case 'Leaf':
+                    return <Leaf {...iconProps} />;
+                  case 'Shirt':
+                    return <Shirt {...iconProps} />;
+                  case 'Watch':
+                    return <Watch {...iconProps} />;
+                  default:
+                    return <Gift {...iconProps} />;
+                }
+              })()}
+            </div>
+          </div>
+          <div className="bg-gray-100/50 rounded-xl p-3">
+            <div className="flex items-center justify-between mb-1">
+              <span className="font-medium text-sm text-gray-700">{nextDiscount.partner}</span>
+              <span className="font-bold text-sm" style={{ color: getCategoryColor(nextDiscount.category) }}>
+                {nextDiscount.discount}
+              </span>
+            </div>
+            <p className="text-xs text-gray-600">{nextDiscount.description}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Available Discounts */}
+      {availableDiscounts.length > 0 ? (
+        <div className="space-y-3">
+          <h3 className="text-sm font-semibold px-1" style={{ color: '#2E2218' }}>
+            Tvoje zľavy ({availableDiscounts.length})
+          </h3>
+          {availableDiscounts.map((discount) => (
+            <div key={discount.id} className="bg-white/40 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
+              <div className="flex items-start gap-3">
+                <div 
+                  className="w-12 h-12 rounded-xl flex items-center justify-center text-white flex-shrink-0"
+                  style={{ backgroundColor: getCategoryColor(discount.category) }}
+                >
+                  {(() => {
+                    const iconName = getCategoryIcon(discount.category);
+                    switch (iconName) {
+                      case 'Dumbbell':
+                        return <Dumbbell className="w-6 h-6" />;
+                      case 'Heart':
+                        return <Heart className="w-6 h-6" />;
+                      case 'Leaf':
+                        return <Leaf className="w-6 h-6" />;
+                      case 'Shirt':
+                        return <Shirt className="w-6 h-6" />;
+                      case 'Watch':
+                        return <Watch className="w-6 h-6" />;
+                      default:
+                        return <Gift className="w-6 h-6" />;
+                    }
+                  })()}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between mb-2">
+                    <div>
+                      <h4 className="font-semibold text-sm" style={{ color: '#2E2218' }}>
+                        {discount.partner}
+                      </h4>
+                      <p className="text-xs" style={{ color: '#6B4C3B' }}>
+                        {discount.description}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-bold text-lg" style={{ color: getCategoryColor(discount.category) }}>
+                        {discount.discount}
+                      </div>
+                      <div className="text-[10px] bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                        Level {discount.requiredLevel}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {discount.code && (
+                    <div className="flex items-center gap-2 mt-3">
+                      <div className="flex-1 bg-white/50 border border-white/40 rounded-lg px-3 py-2 font-mono text-sm font-semibold">
+                        {discount.code}
+                      </div>
+                      <button
+                        onClick={() => copyDiscountCode(discount.code!)}
+                        className="p-2 bg-[#6B4C3B] text-white rounded-lg hover:bg-[#5A3E2F] transition-colors active:scale-95"
+                      >
+                        {copiedCode === discount.code ? (
+                          <CheckCircle2 className="w-4 h-4" />
+                        ) : (
+                          <Copy className="w-4 h-4" />
+                        )}
+                      </button>
+                    </div>
+                  )}
+                  
+                  {discount.link && (
+                    <button
+                      onClick={() => window.open(discount.link, '_blank')}
+                      className="w-full mt-3 flex items-center justify-center gap-2 py-2.5 bg-[#6B4C3B] text-white rounded-lg text-sm font-medium hover:bg-[#5A3E2F] transition-colors active:scale-95"
+                    >
+                      Prejsť na stránku
+                      <ExternalLink className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-6 border border-white/30 text-center">
+          <div className="w-16 h-16 rounded-xl mx-auto mb-4 flex items-center justify-center bg-gray-100">
+            <Gift className="w-8 h-8 text-gray-400" />
+          </div>
+          <h3 className="text-lg font-semibold mb-2" style={{ color: '#2E2218' }}>
+            Zatiaľ žiadne zľavy
+          </h3>
+          <p className="text-sm mb-4" style={{ color: '#6B4C3B' }}>
+            Získaj 250 bodov a odomkni svoje prvé zľavy od partnerov!
+          </p>
+          <div className="text-xs" style={{ color: '#8B7560' }}>
+            Komentuj príspevky • Lajkuj • Motivuj ostatné • Zdieľaj skúsenosti
+          </div>
+        </div>
+      )}
+
+      {/* How to Earn Points */}
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
+        <h3 className="text-sm font-semibold mb-3" style={{ color: '#2E2218' }}>
+          Ako získať body?
+        </h3>
+        <div className="space-y-2">
+          <div className="flex items-center gap-3 text-sm">
+            <Heart className="w-4 h-4 text-red-500" />
+            <span style={{ color: '#6B4C3B' }}>Lajkni príspevok</span>
+            <span className="ml-auto font-semibold text-green-600">+5 bodov</span>
+          </div>
+          <div className="flex items-center gap-3 text-sm">
+            <MessageCircle className="w-4 h-4 text-blue-500" />
+            <span style={{ color: '#6B4C3B' }}>Napíš komentár</span>
+            <span className="ml-auto font-semibold text-green-600">+10 bodov</span>
+          </div>
+          <div className="flex items-center gap-3 text-sm">
+            <Send className="w-4 h-4 text-purple-500" />
+            <span style={{ color: '#6B4C3B' }}>Pridaj príspevok</span>
+            <span className="ml-auto font-semibold text-green-600">+25 bodov</span>
+          </div>
+          <div className="flex items-center gap-3 text-sm">
+            <UserPlus className="w-4 h-4 text-orange-500" />
+            <span style={{ color: '#6B4C3B' }}>Pozvi kamarátku</span>
+            <span className="ml-auto font-semibold text-green-600">+100 bodov</span>
+          </div>
+        </div>
+      </div>
+
+      {copiedCode && (
+        <div className="fixed bottom-20 left-4 right-4 z-50 bg-green-500 text-white text-sm font-medium px-4 py-3 rounded-2xl text-center shadow-lg">
+          Kód skopírovaný! ✓
+        </div>
+      )}
     </div>
   );
 }

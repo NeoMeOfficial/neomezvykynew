@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Check, Clock, Trophy } from 'lucide-react';
 import { useWorkoutHistory } from '../../../hooks/useWorkoutHistory';
 import { useBuddySystem } from '../../../hooks/useBuddySystem';
+import { colors, glassCard } from '../../theme/warmDusk';
 
 interface CompleteWorkoutButtonProps {
   workoutId: string | number;

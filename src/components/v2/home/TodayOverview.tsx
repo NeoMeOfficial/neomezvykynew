@@ -16,6 +16,7 @@ import { useUserProgram, usePromotionalOffers, useLoginCounter } from '../../../
 import { PromotionalBanner } from './PromotionalBanner';
 import MealPlanBanners from './MealPlanBanners';
 import { useSubscription } from '../../../contexts/SimpleSubscriptionContext';
+import { getRecommendedExercise, type Exercise } from '../../../data/exercises';
 
 const PHASE_NAMES: Record<PhaseKey, string> = {
   menstrual: 'Menštruácia', follicular: 'Folikulárna fáza', ovulation: 'Ovulácia', luteal: 'Luteálna fáza',
@@ -33,11 +34,12 @@ const PHASE_MESSAGES: Record<PhaseKey, string> = {
   luteal: 'Spomaľ a počúvaj svoje telo — zaslúžiš si starostlivosť',
 };
 
-const EXERCISE_BY_PHASE: Record<PhaseKey, { title: string; desc: string; img: string; duration: string }> = {
-  menstrual: { title: 'Jemná joga & strečing', desc: 'Nízka intenzita — tvoje telo regeneruje', img: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=600&h=340&fit=crop', duration: '20:00' },
-  follicular: { title: 'Silový tréning & HIIT', desc: 'Energia rastie — čas na výzvy!', img: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=600&h=340&fit=crop', duration: '35:00' },
-  ovulation: { title: 'Peak výkon — intenzívny tréning', desc: 'Si na vrchole — daj do toho maximum!', img: 'https://images.unsplash.com/photo-1534258936925-c58bed479fcb?w=600&h=340&fit=crop', duration: '40:00' },
-  luteal: { title: 'Pilates & stredná intenzita', desc: 'Spomaľ a počúvaj svoje telo', img: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=600&h=340&fit=crop', duration: '25:00' },
+// Phase descriptions for better user guidance
+const PHASE_DESCRIPTIONS: Record<PhaseKey, string> = {
+  menstrual: 'Nízka intenzita — tvoje telo regeneruje',
+  follicular: 'Energia rastie — čas na výzvy!',
+  ovulation: 'Si na vrchole — daj do toho maximum!',
+  luteal: 'Spomaľ a počúvaj svoje telo',
 };
 
 /* ── Section icon + label header ──────────── */
@@ -76,15 +78,22 @@ function TeloSection({ showPromoBanner }: { showPromoBanner: boolean }) {
   const currentDay = cycleData.lastPeriodStart ? getCurrentCycleDay(cycleData.lastPeriodStart, today, cycleLength) : 18;
   const ranges = getPhaseRanges(cycleLength, periodLength);
   const phase = getPhaseByDay(currentDay, ranges, cycleLength);
-  const exercise = EXERCISE_BY_PHASE[phase.key];
+  
+  // Get smart exercise recommendation based on cycle phase
+  const recommendedExercise = getRecommendedExercise(phase.key);
 
   const handleCardClick = () => {
     if (hasProgram && userProgram?.todaysExercise) {
-      // Navigate to today's exercise
+      // Navigate to today's program exercise
       navigate('/exercise/today', { state: { exercise: userProgram.todaysExercise } });
     } else {
-      // Navigate to Telo library
-      navigate('/kniznica/telo');
+      // Navigate directly to the recommended exercise video
+      navigate(recommendedExercise.route, { 
+        state: { 
+          exercise: recommendedExercise,
+          fromRecommendation: true 
+        } 
+      });
     }
   };
 
@@ -105,6 +114,9 @@ function TeloSection({ showPromoBanner }: { showPromoBanner: boolean }) {
       // In real app, this would trigger native AirPlay
       console.log('AirPlay requested for:', userProgram.todaysExercise.videoUrl);
       alert('AirPlay aktivovaný pre Apple TV');
+    } else if (recommendedExercise) {
+      console.log('AirPlay requested for recommended exercise:', recommendedExercise.name);
+      alert('AirPlay aktivovaný pre Apple TV');
     }
   };
 
@@ -123,11 +135,14 @@ function TeloSection({ showPromoBanner }: { showPromoBanner: boolean }) {
     }
   };
 
+  // Smart display logic: program exercise vs recommended exercise
   const displayImage = hasProgram && userProgram?.todaysExercise ? 
-    userProgram.todaysExercise.thumbnail : exercise.img;
-  const displayTitle = hasProgram && userProgram ? userProgram.name : exercise.title;
+    userProgram.todaysExercise.thumbnail : recommendedExercise.thumb;
+  const displayTitle = hasProgram && userProgram ? userProgram.name : recommendedExercise.name;
   const displayDuration = hasProgram && userProgram?.todaysExercise ? 
-    userProgram.todaysExercise.duration : exercise.duration;
+    userProgram.todaysExercise.duration : recommendedExercise.duration;
+  const displayDescription = hasProgram && userProgram?.todaysExercise ? 
+    userProgram.todaysExercise.description : PHASE_DESCRIPTIONS[phase.key];
 
   return (
     <>
@@ -143,16 +158,14 @@ function TeloSection({ showPromoBanner }: { showPromoBanner: boolean }) {
             </div>
           </div>
           
-          {/* AirPlay button for program users */}
-          {hasProgram && userProgram?.todaysExercise && (
-            <button
-              onClick={handleAirPlayClick}
-              className="absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center active:scale-95 transition-transform"
-              style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)' }}
-            >
-              <Airplay size={14} className="text-white" />
-            </button>
-          )}
+          {/* AirPlay button for both program users and recommended exercises */}
+          <button
+            onClick={handleAirPlayClick}
+            className="absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center active:scale-95 transition-transform"
+            style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)' }}
+          >
+            <Airplay size={14} className="text-white" />
+          </button>
           
           <div className="absolute bottom-2 right-2 bg-black/50 text-white text-[11px] px-2 py-0.5 rounded-full backdrop-blur-sm">
             {displayDuration}
@@ -176,8 +189,32 @@ function TeloSection({ showPromoBanner }: { showPromoBanner: boolean }) {
         </p>
         {!hasProgram && (
           <p className="text-[12px] mt-0.5" style={{ color: colors.textTertiary }}>
-            {exercise.desc}
+            {displayDescription}
           </p>
+        )}
+        
+        {/* Show exercise category/intensity tags for recommended exercises */}
+        {!hasProgram && recommendedExercise && (
+          <div className="flex items-center gap-2 mt-2">
+            <span 
+              className="text-[10px] px-2 py-0.5 rounded-full font-medium"
+              style={{ 
+                backgroundColor: `${colors.telo}15`,
+                color: colors.telo,
+              }}
+            >
+              {recommendedExercise.category === 'stretch' ? 'Strečing' : 'Posilňovanie'}
+            </span>
+            <span 
+              className="text-[10px] px-2 py-0.5 rounded-full font-medium"
+              style={{
+                backgroundColor: `${colors.accent}15`,
+                color: colors.accent,
+              }}
+            >
+              {recommendedExercise.equip}
+            </span>
+          </div>
         )}
         
         <CtaLink 
@@ -213,20 +250,24 @@ function StravaSection({ showMealBanner }: { showMealBanner: boolean }) {
   const hasRealPlan = todayPlan && todayPlan.meals.length > 0;
 
   const handleCardClick = () => {
-    navigate('/kniznica/strava');
+    if (hasRealPlan) {
+      navigate('/jedalnicek');
+    } else {
+      navigate('/kniznica/strava');
+    }
   };
 
   const handleCtaClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (hasRealPlan) {
-      navigate('/jedalnicek'); // Go to full meal planner
+      navigate('/jedalnicek');
     } else {
-      navigate('/recepty'); // Go to recipe library
+      navigate('/recepty');
     }
   };
 
   const handleMealBannerClick = () => {
-    navigate('/jedalnicek'); // Navigate to meal planner purchase
+    navigate('/jedalnicek');
   };
 
   return (
@@ -235,42 +276,51 @@ function StravaSection({ showMealBanner }: { showMealBanner: boolean }) {
         <SectionHeader icon={UtensilsCrossed} label="Strava" color={colors.strava} />
         
         {hasRealPlan ? (
-          <div className="space-y-2">
-            {todayPlan.meals.map((meal) => {
-              const recipe = recipesData.find((r) => r.id === meal.options[meal.selected]);
-              if (!recipe) return null;
-              const adjustedCal = Math.round(recipe.calories * meal.portionMultiplier);
-              return (
-                <div key={meal.type} className="flex items-center gap-3 p-2.5 rounded-xl" style={innerGlass}>
-                  <img src={recipe.image} alt={recipe.title} className="w-11 h-11 rounded-lg object-cover shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[11px] font-medium" style={{ color: colors.textTertiary }}>{meal.label}</p>
-                    <p className="text-[13px] font-medium truncate" style={{ color: colors.textPrimary }}>{recipe.title}</p>
+          <>
+            <p className="text-[11px] font-medium mb-2" style={{ color: colors.textTertiary }}>Dnešný jedálniček</p>
+            <div className="space-y-2">
+              {todayPlan!.meals.map((meal) => {
+                const recipe = recipesData.find((r) => r.id === meal.options[meal.selected]);
+                if (!recipe) return null;
+                const adjustedCal = Math.round(recipe.calories * meal.portionMultiplier);
+                return (
+                  <div key={meal.type} className="flex items-center gap-3 p-2.5 rounded-xl" style={innerGlass}>
+                    <img src={recipe.image} alt={recipe.title} className="w-11 h-11 rounded-lg object-cover shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[11px] font-medium" style={{ color: colors.textTertiary }}>{meal.label}</p>
+                      <p className="text-[13px] font-medium truncate" style={{ color: colors.textPrimary }}>{recipe.title}</p>
+                    </div>
+                    <span className="text-[11px] shrink-0" style={{ color: colors.textTertiary }}>{adjustedCal} kcal</span>
                   </div>
-                  <span className="text-[11px] shrink-0" style={{ color: colors.textTertiary }}>{adjustedCal} kcal</span>
-                </div>
-              );
-            })}
-          </div>
-        ) : (
-          <div className="flex items-center gap-3 p-3 rounded-2xl" style={innerGlass}>
-            <img src="https://images.unsplash.com/photo-1525351484163-7529414344d8?w=200&h=200&fit=crop" alt="Avokádový toast" className="w-14 h-14 rounded-xl object-cover shrink-0" />
-            <div className="flex-1">
-              <p className="text-[13px] font-medium" style={{ color: colors.textPrimary }}>Avokádový toast s vajíčkom</p>
-              <p className="text-[11px] mt-0.5" style={{ color: colors.textTertiary }}>280 kcal · 10 min</p>
+                );
+              })}
             </div>
-          </div>
+            <CtaLink 
+              label="Celý jedálniček" 
+              color={colors.strava} 
+              onClick={handleCtaClick} 
+            />
+          </>
+        ) : (
+          <>
+            <div className="flex items-center gap-3 p-3 rounded-2xl" style={innerGlass}>
+              <img src="https://images.unsplash.com/photo-1525351484163-7529414344d8?w=200&h=200&fit=crop" alt="Avokádový toast" className="w-14 h-14 rounded-xl object-cover shrink-0" />
+              <div className="flex-1">
+                <p className="text-[13px] font-medium" style={{ color: colors.textPrimary }}>Avokádový toast s vajíčkom</p>
+                <p className="text-[11px] mt-0.5" style={{ color: colors.textTertiary }}>280 kcal · 10 min</p>
+              </div>
+            </div>
+            <CtaLink 
+              label="Viac receptov" 
+              color={colors.strava} 
+              onClick={handleCtaClick} 
+            />
+          </>
         )}
-        
-        <CtaLink 
-          label={canUseMealPlanner ? 'Celý jedálniček' : 'Viac receptov'} 
-          color={colors.strava} 
-          onClick={handleCtaClick} 
-        />
       </GlassCard>
 
       {/* Rotating meal planner banners for users without meal planner */}
-      {!canUseMealPlanner && showMealBanner && (
+      {!canUseMealPlanner && !hasRealPlan && showMealBanner && (
         <MealPlanBanners
           variant={((Math.floor(Date.now() / (1000 * 60 * 60 * 24)) % 4) + 1) as 1 | 2 | 3 | 4}
           onPurchase={handleMealBannerClick}
@@ -430,9 +480,11 @@ export default function TodayOverview({ hideHeader = false }: { hideHeader?: boo
   const { canUseMealPlanner } = useSubscription();
   const { shouldShowBanner } = useLoginCounter();
   
-  // Banner logic: removed initial promotional banners as requested
+  // Banner logic: occasional promo for meal planner
   const shouldShowProgramBanner = false; // Removed first screen cards
-  const shouldShowMealBanner = false; // Removed first screen cards
+  // Show meal banner occasionally (30% chance daily for non-subscribers)
+  const shouldShowMealBanner = !canUseMealPlanner && 
+    Math.floor(Date.now() / (1000 * 60 * 60 * 24)) % 10 < 3;
 
   return (
     <div className="space-y-3">

@@ -1,214 +1,201 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, ArrowLeft, UtensilsCrossed } from 'lucide-react';
+import { ArrowLeft, UtensilsCrossed, ChefHat, Coffee, Moon, Cookie, RefreshCw } from 'lucide-react';
+import GlassCard from '../../components/v2/GlassCard';
 import ProgressRing from '../../components/v2/ProgressRing';
 import { useSubscription } from '../../contexts/SimpleSubscriptionContext';
 import { usePaywall } from '../../hooks/usePaywall';
 import { MealPlannerBanner } from '../../components/v2/paywall/MealPlannerBanner';
 import { PaywallModal } from '../../components/v2/paywall/PaywallModal';
+import NutritionOnboarding from '../../features/nutrition/NutritionOnboarding';
+import { useMealPlan } from '../../features/nutrition/useMealPlan';
+import { recipes } from '../../data/recipes';
+import { colors } from '../../theme/warmDusk';
+import type { NutritionProfile } from '../../features/nutrition/types';
 
 const DAYS = ['Po', 'Ut', 'St', 'Št', 'Pi', 'So', 'Ne'];
+const DAYS_FULL = ['Pondelok', 'Utorok', 'Streda', 'Štvrtok', 'Piatok', 'Sobota', 'Nedeľa'];
 
-const meals = [
-  {
-    type: 'Raňajky',
-    filled: true,
-    title: 'Proteínová kaša s ovocím',
-    kcal: 320,
-  },
-  {
-    type: 'Obed',
-    filled: true,
-    title: 'Grécky šalát s kuracím',
-    kcal: 450,
-  },
-  {
-    type: 'Večera',
-    filled: false,
-    title: '',
-    kcal: 0,
-  },
-  {
-    type: 'Snack',
-    filled: true,
-    title: 'Proteínová tyčinka',
-    kcal: 180,
-  },
-];
+const MEAL_ICONS: Record<string, typeof Coffee> = {
+  raňajky: Coffee,
+  obed: ChefHat,
+  večera: Moon,
+  snack: Cookie,
+};
+
+const MEAL_LABELS: Record<string, string> = {
+  raňajky: 'Raňajky',
+  obed: 'Obed',
+  večera: 'Večera',
+  snack: 'Snack',
+};
 
 export default function JedalnicekPlanner() {
   const navigate = useNavigate();
-  const [activeDay, setActiveDay] = useState(2);
+  const [activeDay, setActiveDay] = useState(new Date().getDay() === 0 ? 6 : new Date().getDay() - 1);
   const { canUseMealPlanner } = useSubscription();
   const { paywallState, showMealPlannerPaywall, closePaywall, handleUpgrade } = usePaywall();
+  const { plan, generatePlan, swapMeal } = useMealPlan();
+
+  // Show onboarding if no plan exists
+  if (!plan) {
+    return (
+      <NutritionOnboarding
+        onComplete={(profile: NutritionProfile, startDate: Date) => generatePlan(profile, startDate)}
+      />
+    );
+  }
+
+  const day = plan.days[activeDay];
+  const caloriePercent = day ? Math.min(Math.round((day.totalCalories / plan.profile.dailyCalories) * 100), 100) : 0;
 
   return (
-    <div className="w-full min-h-screen px-3 py-6 pb-28 space-y-6">
-      {/* Nordic Header */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
-        <div className="flex items-center gap-3 mb-4">
-          <button onClick={() => navigate(-1)} className="p-1">
-            <ArrowLeft className="w-5 h-5 text-gray-600" strokeWidth={1.5} />
-          </button>
-          <div className="flex items-center gap-2 flex-1">
-            <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(122, 158, 120, 0.14)` }}>
-              <UtensilsCrossed className="w-4 h-4" style={{ color: '#7A9E78' }} />
-            </div>
-            <h1 className="text-[16px] font-semibold" style={{ color: '#2E2218' }}>Jedálniček</h1>
+    <div className="w-full min-h-screen px-4 pt-5 pb-28 space-y-5" style={{ background: colors.bgGradient }}>
+      {/* Header */}
+      <div className="flex items-center gap-3">
+        <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-xl bg-white/40 backdrop-blur-sm flex items-center justify-center">
+          <ArrowLeft className="w-4 h-4" style={{ color: '#8B7560' }} strokeWidth={1.5} />
+        </button>
+        <div className="flex items-center gap-2.5 flex-1">
+          <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: 'rgba(122,158,120,0.14)' }}>
+            <UtensilsCrossed className="w-4 h-4" style={{ color: '#7A9E78' }} />
           </div>
+          <h1 className="text-base font-semibold" style={{ color: '#2E2218' }}>Jedálniček</h1>
         </div>
-
-        {/* Sub-header */}
-        <div className="text-center">
-          <p className="text-sm font-medium" style={{ color: '#6B4C3B' }}>
-            Personalizované menu pre každý deň
-          </p>
-        </div>
+{/* No regenerate — plan is fixed once purchased */}
       </div>
 
-      {/* Show banner and locked interface for free users */}
-      {!canUseMealPlanner ? (
-        <>
-          <MealPlannerBanner onPurchase={showMealPlannerPaywall} />
-          
-          {/* Preview interface (disabled) */}
-          <div className="relative">
-            <div className="absolute inset-0 bg-black/10 z-10 rounded-3xl" onClick={showMealPlannerPaywall} />
-            
-            {/* Day Pills - disabled */}
-            <div className="flex gap-2 opacity-50">
-              {DAYS.map((d, i) => (
-                <div
-                  key={d}
-                  className={`flex-1 py-2 rounded-2xl text-xs font-medium ${
-                    activeDay === i
-                      ? 'bg-[#2E2218] text-white'
-                      : 'text-[#999999]'
-                  }`}
-                  style={activeDay !== i ? {
-                    background: 'rgba(255,255,255,0.55)',
-                  } : undefined}
-                >
-                  {d}
-                </div>
-              ))}
-            </div>
+      {/* Paywall for free users */}
+      {!canUseMealPlanner && (
+        <MealPlannerBanner onPurchase={showMealPlannerPaywall} />
+      )}
 
-            {/* Meals - disabled */}
-            <div className="space-y-3 mt-6 opacity-50">
-              {meals.map((m) => (
-                <GlassCard key={m.type} className="!p-4">
-                  <p className="text-xs text-[#999999] mb-2">{m.type}</p>
-                  {m.filled ? (
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm text-[#2E2218]">{m.title}</p>
-                      <span className="text-xs text-[#999999]">{m.kcal} kcal</span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2 text-sm text-[#6B4C3B] font-medium border-2 border-dashed border-[#E0E0E0] rounded-2xl w-full py-3 justify-center">
-                      <Plus className="w-4 h-4" /> Pridať
-                    </div>
-                  )}
-                </GlassCard>
-              ))}
-            </div>
+      {/* Day selector */}
+      <div className="flex gap-1.5">
+        {DAYS.map((d, i) => (
+          <button
+            key={d}
+            onClick={() => setActiveDay(i)}
+            className="flex-1 py-2 rounded-xl text-xs font-medium transition-all"
+            style={activeDay === i
+              ? { background: '#2E2218', color: '#fff' }
+              : { background: 'rgba(255,255,255,0.5)', color: '#8B7560' }
+            }
+          >
+            {d}
+          </button>
+        ))}
+      </div>
 
-            {/* Summary - disabled */}
-            <GlassCard className="flex items-center gap-4 mt-6 opacity-50">
-              <ProgressRing progress={43} size={64} stroke={5} color="#B8864A">
-                <span className="text-xs font-semibold text-[#2E2218]">950</span>
-              </ProgressRing>
-              <div className="flex-1 space-y-2">
-                <p className="text-sm font-semibold text-[#2E2218]">950 / 2 200 kcal</p>
-                {[
-                  { label: 'Bielkoviny', current: 48, target: 120, color: '#6B4C3B' },
-                  { label: 'Sacharidy', current: 95, target: 250, color: '#B8864A' },
-                  { label: 'Tuky', current: 22, target: 70, color: '#7A9E78' },
-                ].map((m) => (
-                  <div key={m.label}>
-                    <div className="flex justify-between text-[10px] mb-0.5">
-                      <span className="text-[#666666]">{m.label}</span>
-                      <span className="text-[#999999]">{m.current}g / {m.target}g</span>
-                    </div>
-                    <div className="h-1 rounded-full bg-black/5">
-                      <div className="h-full rounded-full" style={{ width: `${(m.current / m.target) * 100}%`, background: m.color }} />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </GlassCard>
-          </div>
-        </>
-      ) : (
-        <>
-          {/* Full interface for premium users */}
-          {/* Day Pills */}
-          <div className="flex gap-2">
-            {DAYS.map((d, i) => (
-              <button
-                key={d}
-                onClick={() => setActiveDay(i)}
-                className={`flex-1 py-2 rounded-2xl text-xs font-medium transition-all ${
-                  activeDay === i
-                    ? 'bg-[#2E2218] text-white'
-                    : 'text-[#999999]'
-                }`}
-                style={activeDay !== i ? {
-                  background: 'rgba(255,255,255,0.55)',
-                } : undefined}
-              >
-                {d}
-              </button>
-            ))}
-          </div>
+      {/* Day label */}
+      <p className="text-xs font-medium text-center" style={{ color: '#8B7560' }}>
+        {DAYS_FULL[activeDay]}
+      </p>
 
-          {/* Meals */}
-          <div className="space-y-3">
-            {meals.map((m) => (
-              <GlassCard key={m.type} className="!p-4">
-                <p className="text-xs text-[#999999] mb-2">{m.type}</p>
-                {m.filled ? (
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm text-[#2E2218]">{m.title}</p>
-                    <span className="text-xs text-[#999999]">{m.kcal} kcal</span>
-                  </div>
-                ) : (
-                  <button 
-                    className="flex items-center gap-2 text-sm text-[#6B4C3B] font-medium border-2 border-dashed border-[#E0E0E0] rounded-2xl w-full py-3 justify-center"
-                  >
-                    <Plus className="w-4 h-4" /> Pridať
-                  </button>
-                )}
-              </GlassCard>
-            ))}
-          </div>
-
-          {/* Summary */}
-          <GlassCard className="flex items-center gap-4">
-            <ProgressRing progress={43} size={64} stroke={5} color="#B8864A">
-              <span className="text-xs font-semibold text-[#2E2218]">950</span>
+      {/* Calorie summary card */}
+      {day && (
+        <GlassCard className="!p-4">
+          <div className="flex items-center gap-4">
+            <ProgressRing progress={caloriePercent} size={60} stroke={5} color="#B8864A">
+              <span className="text-[11px] font-bold" style={{ color: '#2E2218' }}>{caloriePercent}%</span>
             </ProgressRing>
-            <div className="flex-1 space-y-2">
-              <p className="text-sm font-semibold text-[#2E2218]">950 / 2 200 kcal</p>
+            <div className="flex-1 space-y-1.5">
+              <p className="text-sm font-semibold" style={{ color: '#2E2218' }}>
+                {day.totalCalories} / {plan.profile.dailyCalories} kcal
+              </p>
               {[
-                { label: 'Bielkoviny', current: 48, target: 120, color: '#6B4C3B' },
-                { label: 'Sacharidy', current: 95, target: 250, color: '#B8864A' },
-                { label: 'Tuky', current: 22, target: 70, color: '#7A9E78' },
+                { label: 'Bielkoviny', current: day.totalProtein, target: plan.profile.dailyProtein, color: '#6B4C3B' },
+                { label: 'Sacharidy', current: day.totalCarbs, target: plan.profile.dailyCarbs, color: '#B8864A' },
+                { label: 'Tuky', current: day.totalFat, target: plan.profile.dailyFat, color: '#7A9E78' },
               ].map((m) => (
                 <div key={m.label}>
                   <div className="flex justify-between text-[10px] mb-0.5">
-                    <span className="text-[#666666]">{m.label}</span>
-                    <span className="text-[#999999]">{m.current}g / {m.target}g</span>
+                    <span style={{ color: '#8B7560' }}>{m.label}</span>
+                    <span style={{ color: '#A0907E' }}>{m.current}g / {m.target}g</span>
                   </div>
-                  <div className="h-1 rounded-full bg-black/5">
-                    <div className="h-full rounded-full" style={{ width: `${(m.current / m.target) * 100}%`, background: m.color }} />
+                  <div className="h-1 rounded-full" style={{ background: 'rgba(0,0,0,0.05)' }}>
+                    <div
+                      className="h-full rounded-full transition-all"
+                      style={{ width: `${Math.min((m.current / m.target) * 100, 100)}%`, background: m.color }}
+                    />
                   </div>
                 </div>
               ))}
             </div>
-          </GlassCard>
-        </>
+          </div>
+        </GlassCard>
       )}
+
+      {/* Meals */}
+      <div className="space-y-3">
+        {day?.meals.map((meal, mealIdx) => {
+          const recipeId = meal.options[meal.selected];
+          const recipe = recipes.find((r) => r.id === recipeId);
+          const Icon = MEAL_ICONS[meal.slot] || ChefHat;
+          const label = MEAL_LABELS[meal.slot] || meal.slot;
+
+          return (
+            <GlassCard key={mealIdx} className="!p-4">
+              <div className="flex items-start gap-3">
+                <div
+                  className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5"
+                  style={{ background: 'rgba(184,134,74,0.1)' }}
+                >
+                  <Icon className="w-4 h-4" style={{ color: '#B8864A' }} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[10px] font-medium uppercase tracking-wide" style={{ color: '#A0907E' }}>
+                      {label}
+                    </span>
+                    {recipe && (
+                      <span className="text-[11px] font-medium" style={{ color: '#8B7560' }}>
+                        {Math.round(recipe.calories * meal.portionMultiplier)} kcal
+                      </span>
+                    )}
+                  </div>
+                  {recipe ? (
+                    <>
+                      <p className="text-sm font-medium truncate" style={{ color: '#2E2218' }}>
+                        {recipe.name}
+                      </p>
+                      <div className="flex items-center gap-3 mt-1.5">
+                        <span className="text-[10px]" style={{ color: '#A0907E' }}>
+                          B {Math.round((recipe.protein ?? 0) * meal.portionMultiplier)}g
+                        </span>
+                        <span className="text-[10px]" style={{ color: '#A0907E' }}>
+                          S {Math.round((recipe.carbs ?? 0) * meal.portionMultiplier)}g
+                        </span>
+                        <span className="text-[10px]" style={{ color: '#A0907E' }}>
+                          T {Math.round((recipe.fat ?? 0) * meal.portionMultiplier)}g
+                        </span>
+                        {meal.portionMultiplier !== 1 && (
+                          <span className="text-[10px] font-medium" style={{ color: '#B8864A' }}>
+                            {meal.portionMultiplier.toFixed(1)}×
+                          </span>
+                        )}
+                      </div>
+                    </>
+                  ) : (
+                    <p className="text-sm italic" style={{ color: '#A0907E' }}>Žiadny recept</p>
+                  )}
+                </div>
+                {/* Swap button */}
+                {meal.options.length > 1 && (
+                  <button
+                    onClick={() => swapMeal(activeDay, mealIdx)}
+                    className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                    style={{ background: 'rgba(255,255,255,0.5)' }}
+                    title="Vymeniť recept"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5" style={{ color: '#8B7560' }} />
+                  </button>
+                )}
+              </div>
+            </GlassCard>
+          );
+        })}
+      </div>
 
       {/* Paywall modal */}
       <PaywallModal

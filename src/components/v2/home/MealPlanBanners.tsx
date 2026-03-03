@@ -207,7 +207,7 @@ function MealPlanBanner3({ onPurchase }: { onPurchase: () => void }) {
 function MealPlanBanner4({ onPurchase }: { onPurchase: () => void }) {
   return (
     <div 
-      className="mt-3 bg-white rounded-3xl p-6 cursor-pointer active:scale-[0.98] transition-all shadow-xl border border-gray-100"
+      className="mt-3 bg-white/30 backdrop-blur-xl rounded-3xl p-6 cursor-pointer active:scale-[0.98] transition-all shadow-xl border border-white/30"
       onClick={onPurchase}
     >
       <div className="text-center">

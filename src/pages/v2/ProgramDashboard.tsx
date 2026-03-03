@@ -2,6 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Play, Pause, CalendarDays, Check } from 'lucide-react';
 import GlassCard from '../../components/v2/GlassCard';
 import ProgressRing from '../../components/v2/ProgressRing';
+import { colors, glassCard } from '../../theme/warmDusk';
 
 const scheduleData = [
   { day: 1, name: 'Celé telo — Základ', duration: '30 min', done: true },
@@ -27,7 +28,7 @@ export default function ProgramDashboard() {
   const programName = id === 'postpartum' ? 'Postpartum' : id === 'bodyforming' ? 'BodyForming' : id === 'elastic-bands' ? 'Elastic Bands' : 'Strong&Sexy';
 
   return (
-    <div className="space-y-4">
+    <div className="min-h-screen space-y-4" style={{ background: colors.bgGradient }}>
       <div className="flex items-center gap-3">
         <button onClick={() => navigate('/kniznica/telo')} className="p-1"><ArrowLeft className="w-5 h-5 text-[#2E2218]" strokeWidth={1.5} /></button>
         <div className="flex-1">

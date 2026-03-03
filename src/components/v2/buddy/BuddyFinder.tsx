@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Search, UserPlus, Clock, Check, AlertCircle } from 'lucide-react';
 import { useBuddySystem } from '../../../hooks/useBuddySystem';
+import { colors, glassCard } from '../../theme/warmDusk';
 
 export default function BuddyFinder() {
   const { sendBuddyRequest, isLoading } = useBuddySystem();
@@ -66,7 +67,7 @@ export default function BuddyFinder() {
   };
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-50 space-y-4">
+    <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-6 shadow-sm border border-white/20 space-y-4">
       {/* Header */}
       <div className="flex items-center gap-3">
         <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(122, 158, 120, 0.14)` }}>
@@ -90,12 +91,12 @@ export default function BuddyFinder() {
             disabled={isLoading || searchResult === 'success'}
             className={`
               w-full px-4 py-3 rounded-xl font-mono font-semibold text-lg text-center letter-spacing-wide
-              bg-gray-50 border transition-all focus:outline-none focus:ring-2
+              bg-white/20 border transition-all focus:outline-none focus:ring-2
               ${searchResult === 'error' 
                 ? 'border-red-300 focus:ring-red-200 text-red-700' 
                 : searchResult === 'success'
                   ? 'border-green-300 bg-green-50 text-green-700'
-                  : 'border-gray-200 focus:border-[#7A9E78] focus:ring-[#7A9E78]/30'
+                  : 'border-white/35 focus:border-[#7A9E78] focus:ring-[#7A9E78]/30'
               }
               disabled:opacity-50 disabled:cursor-not-allowed
             `}
@@ -184,7 +185,7 @@ export default function BuddyFinder() {
       )}
 
       {/* Help */}
-      <div className="bg-gray-50 rounded-xl p-3">
+      <div className="bg-white/20 rounded-xl p-3">
         <p className="text-sm font-medium mb-1 flex items-center gap-2" style={{ color: '#2E2218' }}>
           <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ background: `rgba(184, 134, 74, 0.14)` }}>
             ℹ️

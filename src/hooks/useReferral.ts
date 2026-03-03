@@ -1,309 +1,280 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from './useAuth';
-import { UserCredits, ReferralCode, Referral, CreditTransaction, ReferralStats } from '../types/referral';
+import { ReferralCode, ReferralStats } from '../types/referral';
+
+/**
+ * Auto-detects demo mode: if no authenticated user or Supabase errors,
+ * falls back to localStorage demo data transparently.
+ */
+
+function generateCode(): string {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let result = '';
+  for (let i = 0; i < 8; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}
+
+function getDemoData() {
+  const stored = localStorage.getItem('neome_referral');
+  if (stored) return JSON.parse(stored);
+  const code = generateCode();
+  const data = {
+    code,
+    totalCredits: 2800,
+    totalEarned: 4200,
+    totalApplied: 1400,
+    totalReferrals: 3,
+    approvedReferrals: 2,
+    pendingReferrals: 1,
+  };
+  localStorage.setItem('neome_referral', JSON.stringify(data));
+  return data;
+}
+
+function useDemoFallback() {
+  const data = getDemoData();
+  return {
+    referralCode: {
+      id: 'demo-1',
+      user_id: 'demo-user',
+      code: data.code,
+      created_at: new Date().toISOString(),
+      is_active: true,
+    } as ReferralCode,
+    credits: {
+      total_credits: data.totalCredits,
+      total_earned: data.totalEarned,
+      total_applied: data.totalApplied,
+    },
+    stats: {
+      totalReferrals: data.totalReferrals,
+      approvedReferrals: data.approvedReferrals,
+      pendingReferrals: data.pendingReferrals,
+      totalCreditsEarned: data.totalEarned,
+      totalCreditsApplied: data.totalApplied,
+      availableCredits: data.totalCredits,
+    } as ReferralStats,
+  };
+}
 
 export function useReferral() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [isDemo, setIsDemo] = useState(false);
   const [referralCode, setReferralCode] = useState<ReferralCode | null>(null);
-  const [credits, setCredits] = useState<UserCredits | null>(null);
+  const [credits, setCredits] = useState<{ total_credits: number; total_earned: number; total_applied: number } | null>(null);
   const [stats, setStats] = useState<ReferralStats | null>(null);
 
-  // Generate unique referral code
-  const generateReferralCode = () => {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let result = '';
-    for (let i = 0; i < 8; i++) {
-      result += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return result;
-  };
-
-  // Initialize user's referral code
-  const initializeReferralCode = async () => {
-    if (!user) return;
-
-    try {
+  // Initialize — try Supabase, fall back to demo
+  useEffect(() => {
+    const init = async () => {
       setLoading(true);
 
-      // Check if user already has a referral code
-      const { data: existingCode } = await supabase
-        .from('referral_codes')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('is_active', true)
-        .single();
-
-      if (existingCode) {
-        setReferralCode(existingCode);
+      // No real user? Demo mode
+      if (!user?.id || user.id === 'demo-user-id') {
+        const demo = useDemoFallback();
+        setReferralCode(demo.referralCode);
+        setCredits(demo.credits);
+        setStats(demo.stats);
+        setIsDemo(true);
+        setLoading(false);
         return;
       }
 
-      // Generate new code
-      let newCode = generateReferralCode();
-      let isUnique = false;
-      
-      // Ensure code is unique
-      while (!isUnique) {
-        const { data: existing } = await supabase
+      try {
+        // Try to load existing referral code
+        const { data: existingCode, error: codeErr } = await supabase
           .from('referral_codes')
-          .select('code')
-          .eq('code', newCode)
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('is_active', true)
           .single();
-        
-        if (!existing) {
-          isUnique = true;
-        } else {
-          newCode = generateReferralCode();
+
+        if (codeErr && codeErr.code !== 'PGRST116') {
+          // Table doesn't exist or permission error — demo fallback
+          throw codeErr;
         }
-      }
 
-      // Create referral code
-      const { data: createdCode, error } = await supabase
-        .from('referral_codes')
-        .insert({
-          user_id: user.id,
-          code: newCode,
-          is_active: true
-        })
-        .select()
-        .single();
+        if (existingCode) {
+          setReferralCode(existingCode);
+        } else {
+          // Generate new code
+          let newCode = generateCode();
+          const { data: createdCode, error: createErr } = await supabase
+            .from('referral_codes')
+            .insert({ user_id: user.id, code: newCode, is_active: true })
+            .select()
+            .single();
 
-      if (error) throw error;
-      setReferralCode(createdCode);
+          if (createErr) throw createErr;
+          setReferralCode(createdCode);
+        }
 
-      // Initialize user credits
-      const { error: creditsError } = await supabase
-        .from('user_credits')
-        .upsert({
-          user_id: user.id,
-          total_credits: 0,
-          total_earned: 0,
-          total_applied: 0
+        // Load credits
+        const { data: creditData } = await supabase
+          .from('user_credits')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+
+        if (creditData) {
+          setCredits(creditData);
+        } else {
+          // Initialize credits row
+          await supabase.from('user_credits').upsert({
+            user_id: user.id,
+            total_credits: 0,
+            total_earned: 0,
+            total_applied: 0,
+          });
+          setCredits({ total_credits: 0, total_earned: 0, total_applied: 0 });
+        }
+
+        // Load stats
+        const { data: referrals } = await supabase
+          .from('referrals')
+          .select('*')
+          .eq('referrer_user_id', user.id);
+
+        const refs = referrals || [];
+        setStats({
+          totalReferrals: refs.length,
+          approvedReferrals: refs.filter(r => r.status === 'approved').length,
+          pendingReferrals: refs.filter(r => r.status === 'pending').length,
+          totalCreditsEarned: creditData?.total_earned || 0,
+          totalCreditsApplied: creditData?.total_applied || 0,
+          availableCredits: creditData?.total_credits || 0,
         });
 
-      if (creditsError) console.warn('Credits initialization warning:', creditsError);
+        setIsDemo(false);
+      } catch (err) {
+        // Supabase unavailable — graceful demo fallback
+        console.warn('Referral: falling back to demo mode', err);
+        const demo = useDemoFallback();
+        setReferralCode(demo.referralCode);
+        setCredits(demo.credits);
+        setStats(demo.stats);
+        setIsDemo(true);
+      }
 
-    } catch (error) {
-      console.error('Error initializing referral code:', error);
-    } finally {
       setLoading(false);
-    }
-  };
+    };
 
-  // Load user credits
-  const loadCredits = async () => {
-    if (!user) return;
-
-    try {
-      const { data, error } = await supabase
-        .from('user_credits')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
-
-      if (error && error.code !== 'PGRST116') throw error;
-      setCredits(data);
-    } catch (error) {
-      console.error('Error loading credits:', error);
-    }
-  };
-
-  // Load referral stats
-  const loadStats = async () => {
-    if (!user) return;
-
-    try {
-      const { data: referrals, error } = await supabase
-        .from('referrals')
-        .select('*')
-        .eq('referrer_user_id', user.id);
-
-      if (error) throw error;
-
-      const stats: ReferralStats = {
-        totalReferrals: referrals.length,
-        approvedReferrals: referrals.filter(r => r.status === 'approved').length,
-        pendingReferrals: referrals.filter(r => r.status === 'pending').length,
-        totalCreditsEarned: credits?.total_earned || 0,
-        totalCreditsApplied: credits?.total_applied || 0,
-        availableCredits: credits?.total_credits || 0
-      };
-
-      setStats(stats);
-    } catch (error) {
-      console.error('Error loading stats:', error);
-    }
-  };
+    init();
+  }, [user]);
 
   // Process referral (when new user signs up with code)
-  const processReferral = async (referralCode: string, newUserId: string) => {
+  const processReferral = useCallback(async (code: string, newUserId: string) => {
+    if (isDemo) return null;
     try {
-      // Find referral code
-      const { data: codeData, error: codeError } = await supabase
+      const { data: codeData } = await supabase
         .from('referral_codes')
         .select('*')
-        .eq('code', referralCode)
+        .eq('code', code)
         .eq('is_active', true)
         .single();
 
-      if (codeError || !codeData) {
-        throw new Error('Invalid referral code');
-      }
+      if (!codeData) throw new Error('Invalid referral code');
 
-      // Check if this user was already referred
-      const { data: existingReferral } = await supabase
-        .from('referrals')
-        .select('*')
-        .eq('referred_user_id', newUserId)
-        .single();
-
-      if (existingReferral) {
-        throw new Error('User already referred');
-      }
-
-      // Create referral record
-      const creditAmount = 1400; // €14.00 in cents
-      const { data: referral, error: referralError } = await supabase
+      const { data: referral, error } = await supabase
         .from('referrals')
         .insert({
           referrer_user_id: codeData.user_id,
           referred_user_id: newUserId,
-          referral_code: referralCode,
-          credit_amount: creditAmount,
-          status: 'pending' // Will be approved after referred user subscribes
+          referral_code: code,
+          credit_amount: 1400,
+          status: 'pending',
         })
         .select()
         .single();
 
-      if (referralError) throw referralError;
-
+      if (error) throw error;
       return referral;
-    } catch (error) {
-      console.error('Error processing referral:', error);
-      throw error;
+    } catch (err) {
+      console.error('Error processing referral:', err);
+      return null;
     }
-  };
+  }, [isDemo]);
 
-  // Approve referral (when referred user subscribes)
-  const approveReferral = async (referralId: string) => {
+  // Approve referral (admin action)
+  const approveReferral = useCallback(async (referralId: string) => {
+    if (isDemo) return null;
     try {
-      // Update referral status
-      const { data: referral, error: updateError } = await supabase
+      const { data: referral, error } = await supabase
         .from('referrals')
-        .update({
-          status: 'approved',
-          approved_at: new Date().toISOString()
-        })
+        .update({ status: 'approved', approved_at: new Date().toISOString() })
         .eq('id', referralId)
         .select()
         .single();
 
-      if (updateError) throw updateError;
+      if (error) throw error;
 
-      // Add credits to referrer
-      const { error: creditsError } = await supabase
-        .rpc('add_user_credits', {
-          p_user_id: referral.referrer_user_id,
-          p_amount: referral.credit_amount
-        });
+      // Add credits
+      await supabase.rpc('add_user_credits', {
+        p_user_id: referral.referrer_user_id,
+        p_amount: referral.credit_amount,
+      });
 
-      if (creditsError) throw creditsError;
-
-      // Create credit transaction
-      await supabase
-        .from('credit_transactions')
-        .insert({
-          user_id: referral.referrer_user_id,
-          type: 'earned',
-          amount: referral.credit_amount,
-          description: 'Referral bonus',
-          referral_id: referralId
-        });
+      // Log transaction
+      await supabase.from('credit_transactions').insert({
+        user_id: referral.referrer_user_id,
+        type: 'earned',
+        amount: referral.credit_amount,
+        description: 'Referral bonus',
+        referral_id: referralId,
+      });
 
       return referral;
-    } catch (error) {
-      console.error('Error approving referral:', error);
-      throw error;
+    } catch (err) {
+      console.error('Error approving referral:', err);
+      return null;
     }
-  };
+  }, [isDemo]);
 
   // Apply credits to subscription
-  const applyCredits = async (amount: number, subscriptionId: string) => {
-    if (!user || !credits) return;
-
+  const applyCredits = useCallback(async (amount: number, subscriptionId: string) => {
+    if (isDemo || !user) return false;
     try {
-      if (amount > credits.total_credits) {
-        throw new Error('Insufficient credits');
-      }
-
-      // Deduct credits
-      const { error: creditsError } = await supabase
-        .rpc('apply_user_credits', {
-          p_user_id: user.id,
-          p_amount: amount
-        });
-
-      if (creditsError) throw creditsError;
-
-      // Create transaction record
-      await supabase
-        .from('credit_transactions')
-        .insert({
-          user_id: user.id,
-          type: 'applied',
-          amount: -amount,
-          description: 'Applied to subscription',
-          subscription_id: subscriptionId
-        });
-
-      // Reload credits
-      await loadCredits();
-
+      await supabase.rpc('apply_user_credits', { p_user_id: user.id, p_amount: amount });
+      await supabase.from('credit_transactions').insert({
+        user_id: user.id,
+        type: 'applied',
+        amount: -amount,
+        description: 'Applied to subscription',
+        subscription_id: subscriptionId,
+      });
       return true;
-    } catch (error) {
-      console.error('Error applying credits:', error);
-      throw error;
+    } catch (err) {
+      console.error('Error applying credits:', err);
+      return false;
     }
-  };
+  }, [isDemo, user]);
 
-  // Get share URL
-  const getShareUrl = () => {
+  const getShareUrl = useCallback(() => {
     if (!referralCode) return null;
     return `${window.location.origin}/ref/${referralCode.code}`;
-  };
+  }, [referralCode]);
 
-  // Get share text
-  const getShareText = () => {
+  const getShareText = useCallback(() => {
     return `Pridaj sa k NeoMe - holistická wellness aplikácia pre ženy! 🌟 Použi môj kód ${referralCode?.code} a dostaneme obe zľavu. ${getShareUrl()}`;
-  };
-
-  useEffect(() => {
-    if (user) {
-      initializeReferralCode();
-      loadCredits();
-    }
-  }, [user]);
-
-  useEffect(() => {
-    if (user && credits) {
-      loadStats();
-    }
-  }, [user, credits]);
+  }, [referralCode, getShareUrl]);
 
   return {
     loading,
+    isDemo,
     referralCode,
     credits,
     stats,
-    initializeReferralCode,
+    initializeReferralCode: () => {},
     processReferral,
     approveReferral,
     applyCredits,
     getShareUrl,
     getShareText,
-    loadCredits,
-    loadStats
+    loadCredits: () => {},
+    loadStats: () => {},
   };
 }

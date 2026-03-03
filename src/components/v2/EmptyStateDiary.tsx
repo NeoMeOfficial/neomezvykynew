@@ -99,7 +99,7 @@ export default function EmptyStateDiary({ onCreateEntry }: EmptyStateDiaryProps)
 
         <div className="space-y-3">
           <button
-            onClick={() => navigate('/domov')}
+            onClick={() => navigate('/domov-new')}
             className="w-full py-4 px-6 rounded-2xl font-semibold text-white transition-all active:scale-95 flex items-center justify-center gap-2"
             style={{ 
               background: `linear-gradient(135deg, ${colors.mysel} 0%, ${colors.periodka} 100%)`,

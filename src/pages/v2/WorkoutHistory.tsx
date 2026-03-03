@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import WorkoutStatsWidget from '../../components/v2/workouts/WorkoutStatsWidget';
 import WorkoutCalendar from '../../components/v2/workouts/WorkoutCalendar';
 import { useWorkoutHistory } from '../../hooks/useWorkoutHistory';
+import { colors, glassCard } from '../../theme/warmDusk';
 
 export default function WorkoutHistory() {
   const navigate = useNavigate();
@@ -11,12 +12,12 @@ export default function WorkoutHistory() {
   const { stats, streak, workoutHistory } = useWorkoutHistory();
 
   return (
-    <div className="w-full min-h-screen px-3 py-6 pb-28 space-y-6">
+    <div className="w-full min-h-screen px-3 py-6 pb-28 space-y-6" style={{ background: colors.bgGradient }}>
       {/* Nordic Header */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20">
         <div className="flex items-center gap-3 mb-4">
           <button onClick={() => navigate('/profil')} className="p-1">
-            <ArrowLeft className="w-5 h-5 text-gray-600" strokeWidth={1.5} />
+            <ArrowLeft className="w-5 h-5 text-[#8B7560]" strokeWidth={1.5} />
           </button>
           <div className="flex items-center gap-2 flex-1">
             <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(122, 158, 120, 0.14)` }}>
@@ -35,14 +36,14 @@ export default function WorkoutHistory() {
       </div>
 
       {/* Tab Navigation */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20">
         <div className="flex gap-2">
           <button
             onClick={() => setActiveTab('stats')}
             className={`flex-1 px-3 py-2 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2 ${
               activeTab === 'stats'
                 ? 'bg-[#7A9E78] text-white' 
-                : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                : 'bg-white/20 text-[#8B7560] hover:bg-white/25'
             }`}
           >
             <BarChart3 size={16} />
@@ -53,7 +54,7 @@ export default function WorkoutHistory() {
             className={`flex-1 px-3 py-2 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2 ${
               activeTab === 'calendar'
                 ? 'bg-[#7A9E78] text-white' 
-                : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                : 'bg-white/20 text-[#8B7560] hover:bg-white/25'
             }`}
           >
             <Calendar size={16} />

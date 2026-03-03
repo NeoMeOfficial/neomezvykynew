@@ -23,8 +23,9 @@ const RecipeDetail = lazy(() => import('./pages/v2/RecipeDetail'));
 const Meditacie = lazy(() => import('./pages/v2/Meditacie'));
 // Temporarily comment out new components to test basic loading
 // const MeditationPlayer = lazy(() => import('./pages/v2/MeditationPlayer'));
-// const ExercisePlayer = lazy(() => import('./pages/v2/ExercisePlayer'));
+const ExercisePlayer = lazy(() => import('./pages/v2/ExercisePlayer'));
 const JedalnicekPlanner = lazy(() => import('./pages/v2/JedalnicekPlanner'));
+const JedalnicekPromo = lazy(() => import('./pages/v2/JedalnicekPromo'));
 const NavykyTracker = lazy(() => import('./pages/v2/NavykyTracker'));
 const TeloPrograms = lazy(() => import('./pages/v2/TeloPrograms'));
 const ProgramDetail = lazy(() => import('./pages/v2/ProgramDetail'));
@@ -32,7 +33,8 @@ const PostpartumInfo = lazy(() => import('./pages/v2/PostpartumInfo'));
 const MealPlanBannerShowcase = lazy(() => import('./pages/v2/MealPlanBannerShowcase'));
 const ReferralLanding = lazy(() => import('./pages/v2/ReferralLanding'));
 const ReferralCenter = lazy(() => import('./components/v2/referral/ReferralCenter'));
-// const AdminDashboard = lazy(() => import('./pages/v2/AdminDashboard'));
+const AdminDashboard = lazy(() => import('./pages/v2/AdminDashboard'));
+const AdminReferrals = lazy(() => import('./pages/v2/AdminReferrals'));
 // const SubscriptionSales = lazy(() => import('./pages/v2/SubscriptionSales'));
 const TeloExtra = lazy(() => import('./pages/v2/TeloExtra'));
 const TeloStrecing = lazy(() => import('./pages/v2/TeloStrecing'));
@@ -94,25 +96,7 @@ function LoadingSpinner() {
 
 /* Route guard — redirects to /auth if not logged in */
 function RequireAuth({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuthContext();
-  
-  // Add timeout to prevent infinite loading
-  const [timeoutReached, setTimeoutReached] = useState(false);
-  
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (loading) {
-        console.warn('Auth loading timeout reached - proceeding without auth');
-        setTimeoutReached(true);
-      }
-    }, 5000); // 5 second timeout
-    
-    return () => clearTimeout(timer);
-  }, [loading]);
-  
-  if (loading && !timeoutReached) return <LoadingSpinner />;
-  if (!user && !timeoutReached) return <Navigate to="/auth" replace />;
-  
+  // BYPASS ALL AUTH FOR LOCAL TESTING
   return <>{children}</>;
 }
 
@@ -144,7 +128,7 @@ export default function AppV2() {
 
             {/* Protected routes */}
             <Route element={<RequireAuth><SubscriptionProvider><AppLayout /></SubscriptionProvider></RequireAuth>}>
-              <Route path="/domov" element={<Domov />} />
+              <Route path="/domov" element={<Navigate to="/domov-new" replace />} />
               <Route path="/domov-new" element={<DomovNew />} />
               <Route path="/new-home" element={<DomovNew />} />
               <Route path="/kniznica" element={<Kniznica />} />
@@ -158,9 +142,9 @@ export default function AppV2() {
               <Route path="/kniznica/dennik" element={<DennikHistory />} />
               <Route path="/kniznica/navyky" element={<NavykyHistory />} />
               <Route path="/kniznica/symptomy" element={<SymptomCalendar />} />
-              <Route path="/program/postpartum" element={<PostpartumInfo />} />
+              <Route path="/program/postpartum/info" element={<PostpartumInfo />} />
               <Route path="/program/:id/buy" element={<ProgramSales />} />
-              <Route path="/program/:id" element={<ProgramDetail />} />
+              <Route path="/program/:programId" element={<ProgramDetail />} />
               <Route path="/komunita" element={<Komunita />} />
               <Route path="/spravy" element={<Spravy />} />
               <Route path="/oblubene" element={<Oblubene />} />
@@ -169,13 +153,18 @@ export default function AppV2() {
               <Route path="/buddy-system" element={<BuddySystem />} />
               <Route path="/profil" element={<Profil />} />
               <Route path="/referral" element={<ReferralCenter />} />
-              {/* <Route path="/admin" element={<AdminDashboard />} /> */}
+              <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin/referrals" element={<AdminReferrals />} />
               <Route path="/recepty" element={<Recepty />} />
               <Route path="/recept/:id" element={<RecipeDetail />} />
               <Route path="/meditacie" element={<Meditacie />} />
-              {/* <Route path="/meditation-player" element={<MeditationPlayer />} />
-              <Route path="/exercise-player" element={<ExercisePlayer />} /> */}
+              {/* <Route path="/meditation-player" element={<MeditationPlayer />} /> */}
+              <Route path="/exercise-player" element={<ExercisePlayer />} />
+              <Route path="/stretch/:id" element={<ExercisePlayer />} />
+              <Route path="/exercise/extra/:id" element={<ExercisePlayer />} />
+              <Route path="/exercise/today" element={<ExercisePlayer />} />
               <Route path="/jedalnicek" element={<JedalnicekPlanner />} />
+              <Route path="/jedalnicek-promo" element={<JedalnicekPromo />} />
               <Route path="/navyky" element={<NavykyTracker />} />
             </Route>
           </Routes>

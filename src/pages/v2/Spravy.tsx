@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ArrowLeft, Send } from 'lucide-react';
 import GlassCard from '../../components/v2/GlassCard';
+import { colors, glassCard } from '../../theme/warmDusk';
 
 const conversations = [
   { id: 'gabi', name: 'Gabi · NeoMe', last: 'Druhý týždeň — si úžasná! 💪', time: '10:30', unread: 2, pinned: true },
@@ -15,7 +16,13 @@ export default function Spravy() {
   if (selectedChat) {
     const conv = conversations.find((c) => c.id === selectedChat)!;
     return (
-      <div className="space-y-4">
+      <div 
+        className="w-full min-h-screen px-3 py-6 pb-28 space-y-4"
+        style={{ 
+          background: colors.bgGradient, 
+          minHeight: '100vh' 
+        }}
+      >
         <div className="flex items-center gap-3">
           <button onClick={() => setSelectedChat(null)} className="p-1"><ArrowLeft className="w-5 h-5 text-[#2E2218]" strokeWidth={1.5} /></button>
           <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#D0BCA8] to-[#D4B8A0]" />
@@ -44,7 +51,13 @@ export default function Spravy() {
   }
 
   return (
-    <div className="space-y-4">
+    <div 
+      className="w-full min-h-screen px-3 py-6 pb-28 space-y-4"
+      style={{ 
+        background: colors.bgGradient, 
+        minHeight: '100vh' 
+      }}
+    >
       <h1 className="text-xl font-semibold text-[#2E2218]">Správy</h1>
 
       {conversations.length > 0 ? (

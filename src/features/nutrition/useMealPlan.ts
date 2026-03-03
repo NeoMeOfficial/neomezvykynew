@@ -41,8 +41,8 @@ function recalculateDayTotals(day: DayPlan): DayPlan {
 export function useMealPlan() {
   const [plan, setPlan] = useState<MealPlan | null>(loadPlan);
 
-  const generatePlan = useCallback((profile: NutritionProfile) => {
-    const newPlan = generateMealPlan(profile);
+  const generatePlan = useCallback((profile: NutritionProfile, startDate?: Date) => {
+    const newPlan = generateMealPlan(profile, startDate);
     setPlan(newPlan);
   }, []);
 

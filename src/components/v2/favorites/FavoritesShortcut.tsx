@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Heart, ChevronRight } from 'lucide-react';
 import { useUniversalFavorites } from '../../../hooks/useUniversalFavorites';
+import { colors, glassCard } from '../../theme/warmDusk';
 
 export default function FavoritesShortcut() {
   const { getFavoriteCounts } = useUniversalFavorites();

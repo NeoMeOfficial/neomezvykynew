@@ -1,6 +1,7 @@
 import { useState, useEffect, type ReactNode } from 'react';
 import GlassCard from '../GlassCard';
 import { ChevronDown } from 'lucide-react';
+import { colors, glassCard } from '../../theme/warmDusk';
 
 const STORAGE_KEY = 'neome-onboarding-done';
 

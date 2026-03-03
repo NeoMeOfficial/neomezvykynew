@@ -44,7 +44,7 @@ export function useAuth() {
     const authTimeout = setTimeout(() => {
       console.warn('Supabase auth timeout - continuing without auth');
       setState(prev => ({ ...prev, loading: false }));
-    }, 3000); // Reduced to 3 second timeout
+    }, 1500); // Further reduced to 1.5 second timeout
 
     // Get initial session with error handling
     supabase.auth.getSession().then(async ({ data: { session }, error }) => {

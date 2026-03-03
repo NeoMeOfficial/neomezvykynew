@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Play, Pause, Volume2, VolumeX, RotateCcw, SkipBack, SkipForward } from 'lucide-react';
+import { colors, glassCard } from '../../theme/warmDusk';
 
 interface VideoPlayerProps {
   videoUrl: string;

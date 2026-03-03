@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, ArrowLeft, Mail, Lock, User } from 'lucide-react';
 import { useAuthContext } from '../../contexts/AuthContext';
+import { colors, glassCard, innerGlass } from '../../theme/warmDusk';
 
 type Mode = 'login' | 'register' | 'reset';
 
@@ -61,10 +62,10 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center px-3 py-6">
+    <div className="min-h-screen flex flex-col justify-center px-3 py-6" style={{ background: colors.bgGradient }}>
       <div className="w-full max-w-md mx-auto space-y-6">
         {/* Logo & Header */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-50 text-center">
+        <div className="text-center p-6" style={glassCard}>
           <div className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center text-2xl font-bold text-white bg-[#B8864A]">
             N
           </div>
@@ -73,7 +74,7 @@ export default function Auth() {
         </div>
 
         {/* Form card */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-50">
+        <div className="p-6" style={glassCard}>
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Name fields (register only) */}
             {mode === 'register' && (

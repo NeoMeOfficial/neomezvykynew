@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Footprints, Droplets, Dumbbell, Heart, CalendarDays, UtensilsCrossed, MessageCircle, Database } from 'lucide-react';
+import { colors, glassCard } from '../../theme/warmDusk';
 
 const screens = [
   {
@@ -39,7 +40,7 @@ export default function Onboarding() {
   const current = screens[step];
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center font-lufga px-6" style={{ background: '#F5F3F0' }}>
+    <div className="min-h-screen flex flex-col items-center justify-center font-lufga px-6" style={{ background: colors.bgGradient }}>
       {/* Illustration area */}
       <div className={`w-40 h-40 rounded-full bg-gradient-to-br ${current.gradient} flex items-center justify-center gap-3 mb-10`}>
         {current.icons.map((Icon, i) => (

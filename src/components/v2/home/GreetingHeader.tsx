@@ -32,12 +32,44 @@ function getSubline(): string {
 }
 
 export default function GreetingHeader() {
-  const { profile } = useAuthContext();
+  const { profile, user } = useAuthContext();
   
-  // Extract first name from full name or profile data
-  const firstName = profile?.first_name || 
-    (profile?.full_name ? profile.full_name.split(' ')[0] : 'tam');
+  // Enhanced name extraction with multiple fallbacks
+  const getFirstName = (): string => {
+    // For development/demo - check if there's a demo name in localStorage
+    const demoName = localStorage.getItem('demo_user_name');
+    if (demoName && demoName.trim()) {
+      return demoName.trim();
+    }
+    
+    // Try profile.full_name first
+    if (profile?.full_name && profile.full_name.trim()) {
+      return profile.full_name.trim().split(' ')[0];
+    }
+    
+    // Try user.user_metadata.full_name
+    if (user?.user_metadata?.full_name) {
+      return user.user_metadata.full_name.trim().split(' ')[0];
+    }
+    
+    // Try email prefix as last resort (before 'tam')
+    if (profile?.email || user?.email) {
+      const email = profile?.email || user?.email;
+      const emailPrefix = email?.split('@')[0];
+      if (emailPrefix && emailPrefix.length > 0) {
+        // Capitalize first letter and remove numbers/dots
+        const cleanName = emailPrefix.replace(/[0-9\.]/g, '');
+        if (cleanName.length > 0) {
+          return cleanName.charAt(0).toUpperCase() + cleanName.slice(1);
+        }
+      }
+    }
+    
+    // Development fallback - use a sample name instead of 'tam'
+    return process.env.NODE_ENV === 'development' ? 'Gabika' : 'tam';
+  };
   
+  const firstName = getFirstName();
   const greetingText = getGreeting(firstName);
   
   return (

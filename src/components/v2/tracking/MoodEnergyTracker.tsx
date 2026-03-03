@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuthContext } from '../../../contexts/AuthContext';
 import { useAchievements } from '../../../hooks/useAchievements';
+import { colors, glassCard } from '../../theme/warmDusk';
 
 interface MoodEnergyData {
   date: string;

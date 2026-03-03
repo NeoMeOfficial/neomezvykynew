@@ -30,11 +30,11 @@ export default function SubscriptionPromoBanner({
 
   if (variant === 'compact') {
     return (
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 relative">
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/30 relative">
         {dismissible && (
           <button
             onClick={handleDismiss}
-            className="absolute top-3 right-3 p-1 hover:bg-gray-100 rounded-full"
+            className="absolute top-3 right-3 p-1 hover:bg-white/25 rounded-full"
           >
             <X className="w-4 h-4" style={{ color: colors.textTertiary }} />
           </button>
@@ -70,11 +70,11 @@ export default function SubscriptionPromoBanner({
   }
 
   return (
-    <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 relative">
+    <div className="bg-white/30 backdrop-blur-xl rounded-3xl p-6 shadow-sm border border-white/30 relative">
       {dismissible && (
         <button
           onClick={handleDismiss}
-          className="absolute top-4 right-4 p-1 hover:bg-gray-100 rounded-full"
+          className="absolute top-4 right-4 p-1 hover:bg-white/25 rounded-full"
         >
           <X className="w-4 h-4" style={{ color: colors.textTertiary }} />
         </button>
