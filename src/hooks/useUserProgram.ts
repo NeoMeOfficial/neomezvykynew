@@ -38,8 +38,8 @@ export function useUserProgram() {
     }
 
     // Mock data - in real app this would come from database
-    // For now, randomly determine if user has a program
-    const hasProgram = Math.random() > 0.5; // 50% chance for testing
+    // TEMP: Always return no program for TeloPrograms navigation to work correctly
+    const hasProgram = false; // Always false so PostpartumInfo shows detailed view
     
     if (hasProgram) {
       setUserProgram({

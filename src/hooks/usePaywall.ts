@@ -29,32 +29,17 @@ export function usePaywall() {
     contentType: 'exercises' | 'recipes' | 'meditations' | 'stretches',
     requestedCount: number = 1
   ): boolean => {
-    if (tier !== 'free') return true; // Premium users have unlimited access
-    
-    const remaining = getRemainingCount(contentType);
-    if (remaining === null) return true; // unlimited
-    
-    return remaining >= requestedCount;
-  }, [tier, getRemainingCount]);
+    // 🎯 TESTING MODE: All content freely accessible
+    console.log('🎯 Testing Mode: Content access granted for', contentType);
+    return true; // Always allow access during testing
+  }, []);
 
   // Show content limit paywall
   const showContentPaywall = useCallback((contentType: 'exercises' | 'recipes' | 'meditations' | 'stretches') => {
-    const contentNames = {
-      exercises: 'cvičenia',
-      recipes: 'recepty', 
-      meditations: 'meditácie',
-      stretches: 'strečing',
-    };
-
-    const remaining = getRemainingCount(contentType);
-    
-    setPaywallState({
-      isOpen: true,
-      title: `Limit ${contentNames[contentType]} dosiahnutý`,
-      message: `Máš prístup len k ${remaining === 0 ? 'prvým 10' : `${remaining} zostávajúcim`} ${contentNames[contentType]}. Upgradni si účet pre prístup k celej knižnici.`,
-      limitType: 'content',
-    });
-  }, [getRemainingCount]);
+    // 🎯 TESTING MODE: Never show content paywall
+    console.log('🎯 Testing Mode: Content paywall bypassed for', contentType);
+    // Don't set paywall state - just log and return
+  }, []);
 
   // Show data save paywall
   const showDataSavePaywall = useCallback(() => {
@@ -90,23 +75,17 @@ export function usePaywall() {
 
   // Check if user needs to see data save warning
   const shouldShowDataSaveWarning = useCallback((): boolean => {
-    return !limits.canSaveData;
-  }, [limits.canSaveData]);
+    // 🎯 TESTING MODE: No data save warnings during testing
+    console.log('🎯 Testing Mode: Data save warning bypassed');
+    return false; // Never show data save warnings during testing
+  }, []);
 
   // Get content warning message (async)
   const getContentWarning = useCallback(async (contentType: 'exercises' | 'recipes' | 'meditations' | 'stretches'): Promise<string | null> => {
-    const remaining = await getRemainingCount(contentType);
-    if (remaining === null || remaining > 5) return null;
-    
-    const contentNames = {
-      exercises: 'cvičení',
-      recipes: 'receptov',
-      meditations: 'meditácií', 
-      stretches: 'strečingov',
-    };
-
-    return `Zostáva ti ${remaining} ${contentNames[contentType]} v bezplatnej verzii.`;
-  }, [getRemainingCount]);
+    // 🎯 TESTING MODE: No content warnings during testing
+    console.log('🎯 Testing Mode: Content warning bypassed for', contentType);
+    return null; // Never show warnings during testing
+  }, []);
 
   return {
     // State

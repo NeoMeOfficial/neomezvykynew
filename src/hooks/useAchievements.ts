@@ -5,6 +5,9 @@ import { ACHIEVEMENTS, COMMUNITY_RANKS, ACTIVITY_POINTS } from '../data/achievem
 
 export function useAchievements() {
   const { user } = useAuthContext();
+  
+  // Add demo mode logging
+  console.log('🎯 Achievements: User check', { userId: user?.id, hasUser: !!user });
   const [userAchievements, setUserAchievements] = useState<UserAchievement[]>([]);
   const [communityPoints, setCommunityPoints] = useState(0);
   const [communityRank, setCommunityRank] = useState(COMMUNITY_RANKS[0]);

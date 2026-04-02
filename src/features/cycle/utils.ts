@@ -202,38 +202,71 @@ export function dayFractionInPhase(day: number, phase: PhaseRange): number {
 export function getPhaseRanges(cycleLength: number, periodLength: number): PhaseRange[] {
   const follicularStart = periodLength + 1;
   
-  // Ovulation: always 1 day at cycleLength - 14
+  // Ovulation: always 1 day at cycleLength - 14  
   const ovulationDay = Math.max(periodLength + 1, cycleLength - 14);
   
   // Luteal: always starts day after ovulation
   const lutealStart = ovulationDay + 1;
 
-  // Guard: if cycle is too short for a follicular phase, skip it
-  const hasFollicular = follicularStart < ovulationDay;
-
+  // ALWAYS include all 4 phases for standard cycles (21-35 days, 3-10 period)
   const ranges: PhaseRange[] = [
     { key: "menstrual", name: "Menštruácia", start: 1, end: periodLength },
   ];
 
-  if (hasFollicular) {
+  // Always add follicular if there's at least 1 day for it
+  if (follicularStart <= ovulationDay - 1) {
     ranges.push({ key: "follicular", name: "Folikulárna", start: follicularStart, end: ovulationDay - 1 });
   }
 
   ranges.push({ key: "ovulation", name: "Ovulácia", start: ovulationDay, end: ovulationDay });
 
+  // Always add luteal if there are days after ovulation
   if (lutealStart <= cycleLength) {
     ranges.push({ key: "luteal", name: "Luteálna", start: lutealStart, end: cycleLength });
   }
+
+  console.log('🔥 getPhaseRanges DEBUG:', {
+    cycleLength,
+    periodLength,
+    follicularStart,
+    ovulationDay,
+    lutealStart,
+    follicularCondition: follicularStart <= ovulationDay - 1,
+    lutealCondition: lutealStart <= cycleLength,
+    totalRanges: ranges.length,
+    ranges: ranges.map(r => `${r.key}: ${r.start}-${r.end}`)
+  });
 
   return ranges;
 }
 
 export function getPhaseByDay(day: number, ranges: PhaseRange[], cycleLength?: number): PhaseRange {
+  console.log('🔥 getPhaseByDay DEBUG:', {
+    day,
+    ranges,
+    cycleLength,
+    rangesDetails: ranges.map(r => `${r.key}: ${r.start}-${r.end}`)
+  });
+  
   // Ak deň presahuje dĺžku cyklu (menštruácia mešká), zostávame v luteálnej fáze
   if (cycleLength && day > cycleLength) {
-    return ranges.find(r => r.key === 'luteal') || ranges[ranges.length - 1];
+    const result = ranges.find(r => r.key === 'luteal') || ranges[ranges.length - 1];
+    console.log('🔥 Late period result:', result);
+    return result;
   }
-  return ranges.find(range => day >= range.start && day <= range.end) || ranges[0];
+  
+  const matchingRange = ranges.find(range => day >= range.start && day <= range.end);
+  const result = matchingRange || ranges[0];
+  
+  console.log('🔥 getPhaseByDay DETAILED:', {
+    day,
+    ranges: ranges.map(r => ({ key: r.key, start: r.start, end: r.end, matches: day >= r.start && day <= r.end })),
+    matchingRange,
+    fallbackUsed: !matchingRange,
+    result
+  });
+  
+  return result;
 }
 
 export function getCurrentCycleDay(lastPeriodStart: string, today: Date, cycleLength: number): number {

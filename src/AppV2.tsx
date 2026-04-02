@@ -1,10 +1,13 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuthContext } from './contexts/AuthContext';
-import { SubscriptionProvider } from './contexts/SimpleSubscriptionContext';
+// import { SupabaseAuthProvider, useSupabaseAuth } from './contexts/SupabaseAuthContext';
+import { SubscriptionProvider } from './contexts/SubscriptionContext';
+import { SubscriptionProvider as SimpleSubscriptionProvider } from './contexts/SimpleSubscriptionContext';
 import AppLayout from './layouts/v2/AppLayout';
+// import ErrorBoundary from './components/ErrorBoundary';
 
-const Auth = lazy(() => import('./pages/v2/Auth'));
+const AuthReal = lazy(() => import('./pages/v2/AuthReal'));
+const AuthDemo = lazy(() => import('./pages/v2/AuthDemo'));
 const Welcome = lazy(() => import('./pages/v2/Welcome'));
 const Onboarding = lazy(() => import('./pages/v2/Onboarding'));
 const Domov = lazy(() => import('./pages/v2/Domov'));
@@ -12,7 +15,10 @@ const Kniznica = lazy(() => import('./pages/v2/Kniznica'));
 const Telo = lazy(() => import('./pages/v2/Telo'));
 const Strava = lazy(() => import('./pages/v2/Strava'));
 const Mysel = lazy(() => import('./pages/v2/Mysel'));
+const MyselNew = lazy(() => import('./pages/v2/MyselNew'));
 const Periodka = lazy(() => import('./pages/v2/Periodka'));
+const PeriodkaSettings = lazy(() => import('./components/v2/periodka/PeriodkaSettings'));
+const PeriodkaTestingConsole = lazy(() => import('./components/v2/periodka/PeriodkaTestingConsole'));
 const ProgramSales = lazy(() => import('./pages/v2/ProgramSales'));
 const ProgramDashboard = lazy(() => import('./pages/v2/ProgramDashboard'));
 const Komunita = lazy(() => import('./pages/v2/Komunita'));
@@ -20,9 +26,12 @@ const Spravy = lazy(() => import('./pages/v2/Spravy'));
 const Profil = lazy(() => import('./pages/v2/Profil'));
 const Recepty = lazy(() => import('./pages/v2/Recepty'));
 const RecipeDetail = lazy(() => import('./pages/v2/RecipeDetail'));
+// Spoonacular test versions
+const ReceptySpoonacular = lazy(() => import('./pages/v2/Recepty-Spoonacular'));
+const RecipeDetailSpoonacular = lazy(() => import('./pages/v2/RecipeDetail-Spoonacular'));
 const Meditacie = lazy(() => import('./pages/v2/Meditacie'));
 // Temporarily comment out new components to test basic loading
-// const MeditationPlayer = lazy(() => import('./pages/v2/MeditationPlayer'));
+const MeditationPlayer = lazy(() => import('./pages/v2/MeditationPlayer'));
 const ExercisePlayer = lazy(() => import('./pages/v2/ExercisePlayer'));
 const JedalnicekPlanner = lazy(() => import('./pages/v2/JedalnicekPlanner'));
 const JedalnicekPromo = lazy(() => import('./pages/v2/JedalnicekPromo'));
@@ -34,6 +43,7 @@ const MealPlanBannerShowcase = lazy(() => import('./pages/v2/MealPlanBannerShowc
 const ReferralLanding = lazy(() => import('./pages/v2/ReferralLanding'));
 const ReferralCenter = lazy(() => import('./components/v2/referral/ReferralCenter'));
 const AdminDashboard = lazy(() => import('./pages/v2/AdminDashboard'));
+const AdminNew = lazy(() => import('./pages/v2/AdminNew'));
 const AdminReferrals = lazy(() => import('./pages/v2/AdminReferrals'));
 // const SubscriptionSales = lazy(() => import('./pages/v2/SubscriptionSales'));
 const TeloExtra = lazy(() => import('./pages/v2/TeloExtra'));
@@ -57,6 +67,8 @@ const CalmDesign2 = lazy(() => import('./pages/v2/CalmDesign2'));
 const CalmDesign3 = lazy(() => import('./pages/v2/CalmDesign3'));
 const CalmDesign4 = lazy(() => import('./pages/v2/CalmDesign4'));
 const DomovNew = lazy(() => import('./pages/v2/DomovNew'));
+const Blog = lazy(() => import('./pages/v2/Blog'));
+const SubscriptionManagement = lazy(() => import('./pages/v2/SubscriptionManagement'));
 
 function LoadingSpinner() {
   const [loadingText, setLoadingText] = useState('Načítavam...');
@@ -94,20 +106,24 @@ function LoadingSpinner() {
   );
 }
 
-/* Route guard — redirects to /auth if not logged in */
+/* Disabled auth guard - always allow access */
 function RequireAuth({ children }: { children: React.ReactNode }) {
-  // BYPASS ALL AUTH FOR LOCAL TESTING
+  // Always allow access - no auth checks
   return <>{children}</>;
 }
 
 export default function AppV2() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
+    <SimpleSubscriptionProvider>
+      <BrowserRouter>
         <Suspense fallback={<LoadingSpinner />}>
-          <Routes>
+            <Routes>
             {/* Public routes */}
-            <Route path="/auth" element={<Auth />} />
+            <Route path="/auth-demo" element={<AuthDemo />} />
+            <Route path="/auth-real" element={<AuthReal />} />
+            <Route path="/auth" element={<Navigate to="/auth-demo" replace />} />
+            <Route path="/register" element={<Navigate to="/auth-demo" replace />} />
+            <Route path="/login" element={<Navigate to="/auth-demo" replace />} />
             <Route path="/design" element={<DesignShowcase />} />
             <Route path="/design2" element={<DesignShowcase2 />} />
             <Route path="/design3" element={<DesignShowcase3 />} />
@@ -124,6 +140,7 @@ export default function AppV2() {
             <Route path="/onboarding" element={<Onboarding />} />
             <Route path="/showcase/meal-plan-banners" element={<MealPlanBannerShowcase />} />
             <Route path="/ref/:code" element={<ReferralLanding />} />
+            <Route path="/admin-new" element={<AdminNew />} />
             {/* <Route path="/subscribe" element={<SubscriptionSales />} /> */}
 
             {/* Protected routes */}
@@ -137,12 +154,15 @@ export default function AppV2() {
               <Route path="/kniznica/telo/extra" element={<TeloExtra />} />
               <Route path="/kniznica/telo/strecing" element={<TeloStrecing />} />
               <Route path="/kniznica/strava" element={<Strava />} />
-              <Route path="/kniznica/mysel" element={<Mysel />} />
+              <Route path="/kniznica/mysel" element={<MyselNew />} />
+              <Route path="/kniznica/blog" element={<Blog />} />
               <Route path="/kniznica/periodka" element={<Periodka />} />
+              <Route path="/kniznica/periodka/nastavenia" element={<PeriodkaSettings />} />
+              <Route path="/kniznica/periodka/testing" element={<PeriodkaTestingConsole />} />
               <Route path="/kniznica/dennik" element={<DennikHistory />} />
               <Route path="/kniznica/navyky" element={<NavykyHistory />} />
               <Route path="/kniznica/symptomy" element={<SymptomCalendar />} />
-              <Route path="/program/postpartum/info" element={<PostpartumInfo />} />
+              <Route path="/program/:programId/info" element={<PostpartumInfo />} />
               <Route path="/program/:id/buy" element={<ProgramSales />} />
               <Route path="/program/:programId" element={<ProgramDetail />} />
               <Route path="/komunita" element={<Komunita />} />
@@ -152,13 +172,18 @@ export default function AppV2() {
               <Route path="/workout-demo" element={<WorkoutDemo />} />
               <Route path="/buddy-system" element={<BuddySystem />} />
               <Route path="/profil" element={<Profil />} />
+              <Route path="/profil/predplatne" element={<SubscriptionManagement />} />
               <Route path="/referral" element={<ReferralCenter />} />
               <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin/dashboard" element={<Navigate to="/admin" replace />} />
               <Route path="/admin/referrals" element={<AdminReferrals />} />
-              <Route path="/recepty" element={<Recepty />} />
+              <Route path="/recepty" element={<ReceptySpoonacular />} />
+              <Route path="/recepty/:id" element={<RecipeDetailSpoonacular />} />
+              {/* Old routes for backup */}
+              <Route path="/recepty-old" element={<Recepty />} />
               <Route path="/recept/:id" element={<RecipeDetail />} />
               <Route path="/meditacie" element={<Meditacie />} />
-              {/* <Route path="/meditation-player" element={<MeditationPlayer />} /> */}
+              <Route path="/meditacia/:meditationId" element={<MeditationPlayer />} />
               <Route path="/exercise-player" element={<ExercisePlayer />} />
               <Route path="/stretch/:id" element={<ExercisePlayer />} />
               <Route path="/exercise/extra/:id" element={<ExercisePlayer />} />
@@ -167,9 +192,12 @@ export default function AppV2() {
               <Route path="/jedalnicek-promo" element={<JedalnicekPromo />} />
               <Route path="/navyky" element={<NavykyTracker />} />
             </Route>
-          </Routes>
-        </Suspense>
-      </AuthProvider>
-    </BrowserRouter>
+            
+            {/* Catch-all route for unknown paths */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Suspense>
+      </BrowserRouter>
+    </SimpleSubscriptionProvider>
   );
 }

@@ -78,34 +78,9 @@ export function useSupabaseSubscription() {
     usedCount: number;
     limitCount: number;
   }> => {
-    if (!user || subscription.tier !== 'free') {
-      return { canAccess: true, usedCount: 0, limitCount: -1 };
-    }
-
-    try {
-      const { data, error } = await supabase.rpc('check_content_access', {
-        user_uuid: user.id,
-        content_type_param: contentType
-      });
-
-      if (error) {
-        console.error('Error checking content access:', error);
-        return { canAccess: false, usedCount: 0, limitCount: 10 };
-      }
-
-      if (data && data.length > 0) {
-        const result = data[0];
-        return {
-          canAccess: result.can_access,
-          usedCount: result.used_count,
-          limitCount: result.limit_count,
-        };
-      }
-    } catch (error) {
-      console.error('Error in checkContentAccess:', error);
-    }
-
-    return { canAccess: false, usedCount: 0, limitCount: 10 };
+    // 🎯 TESTING MODE: All content freely accessible
+    console.log('🎯 Testing Mode: Content access bypassed for', contentType);
+    return { canAccess: true, usedCount: 0, limitCount: -1 };
   };
 
   const trackContentUsage = async (contentType: string, contentId: string): Promise<boolean> => {

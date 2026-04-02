@@ -71,19 +71,22 @@ export function MenstrualDashboardLayout({
       if (avgResult && avgResult.cycleCount >= 1) {
         // Use weighted average if we have enough history
         if (avgResult.average !== cycleData.cycleLength) {
-          setCycleLength(avgResult.average);
-          toast.success(`Dĺžka cyklu aktualizovaná na ${avgResult.average} dní`, {
-            description: avgResult.cycleCount > 1 
-              ? `Vypočítané z ${avgResult.cycleCount} posledných cyklov`
-              : 'Na základe posledného cyklu'
-          });
+          // DISABLED: Automatic cycle length updates to preserve user's manual settings
+          // setCycleLength(avgResult.average);
+          // toast.success(`Dĺžka cyklu aktualizovaná na ${avgResult.average} dní`, {
+          //   description: avgResult.cycleCount > 1 
+          //     ? `Vypočítané z ${avgResult.cycleCount} posledných cyklov`
+          //     : 'Na základe posledného cyklu'
+          // });
+          console.log(`🔕 Automatic cycle length update disabled. Would have changed from ${cycleData.cycleLength} to ${avgResult.average} days based on ${avgResult.cycleCount} cycles.`);
         }
       } else if (actualCycleLength >= 21 && actualCycleLength <= 35 && actualCycleLength !== cycleData.cycleLength) {
-        // Fallback to actual cycle length if no history yet
-        setCycleLength(actualCycleLength);
-        toast.success(`Dĺžka cyklu aktualizovaná na ${actualCycleLength} dní`, {
-          description: 'Na základe posledného cyklu'
-        });
+        // DISABLED: Fallback to actual cycle length if no history yet
+        // setCycleLength(actualCycleLength);
+        // toast.success(`Dĺžka cyklu aktualizovaná na ${actualCycleLength} dní`, {
+        //   description: 'Na základe posledného cyklu'
+        // });
+        console.log(`🔕 Automatic cycle length update disabled. Would have changed from ${cycleData.cycleLength} to ${actualCycleLength} days based on actual cycle length.`);
       }
     }
     

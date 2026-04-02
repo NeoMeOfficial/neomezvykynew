@@ -32,25 +32,25 @@ type FilterState = {
 };
 
 const exercises: Exercise[] = [
-  // Celé telo exercises - unique images for each workout type
-  { id: 'ct-1', name: 'Celé telo', duration: '15 min', category: '15min', body: 'Celé telo', equip: 'Bez pomôcok', level: 1, diastasisSafe: true, thumb: 'https://images.unsplash.com/photo-1506629905496-f43367ee050d?w=400&h=225&fit=crop', description: 'Komplexné posilnenie celého tela pre začiatočníčky' },
-  { id: 'ct-2', name: 'Celé telo', duration: '15 min', category: '15min', body: 'Celé telo', equip: 'S činkami', level: 3, diastasisSafe: true, thumb: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=225&fit=crop', description: 'Pokročilé posilnenie s činkami' },
-  { id: 'ct-3', name: 'Celé telo', duration: '15 min', category: '15min', body: 'Celé telo', equip: 'S gumou', level: 2, diastasisSafe: true, thumb: 'https://images.unsplash.com/photo-1594737625785-a6cbdabd333c?w=400&h=225&fit=crop', description: 'Stredne náročné cvičenie s gumou' },
-  { id: 'ct-4', name: 'Celé telo', duration: '5 min', category: 'dopalovacka', body: 'Celé telo', equip: 'Bez pomôcok', level: 1, diastasisSafe: true, thumb: 'https://images.unsplash.com/photo-1601422407692-ec4eeec1d9b3?w=400&h=225&fit=crop', description: 'Jemná aktivácia celého tela' },
-  { id: 'ct-5', name: 'Celé telo', duration: '5 min', category: 'dopalovacka', body: 'Celé telo', equip: 'S činkami', level: 4, diastasisSafe: true, thumb: 'https://images.unsplash.com/photo-1549060279-7e168fcee0c2?w=400&h=225&fit=crop', description: 'Intenzívna dopaľovačka s činkami' },
-  { id: 'ct-6', name: 'Celé telo', duration: '5 min', category: 'dopalovacka', body: 'Celé telo', equip: 'S gumou', level: 2, diastasisSafe: true, thumb: 'https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=400&h=225&fit=crop', description: 'Stredná dopaľovačka s gumou' },
+  // Celé telo exercises - black and white aesthetic, women doing full body workouts
+  { id: 'ct-1', name: 'Celé telo', duration: '15 min', category: '15min', body: 'Celé telo', equip: 'Bez pomôcok', level: 1, diastasisSafe: true, thumb: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Komplexné posilnenie celého tela pre začiatočníčky' },
+  { id: 'ct-2', name: 'Celé telo', duration: '15 min', category: '15min', body: 'Celé telo', equip: 'S činkami', level: 3, diastasisSafe: true, thumb: 'https://images.unsplash.com/photo-1520877880798-5ee002cf2d03?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Pokročilé posilnenie s činkami' },
+  { id: 'ct-3', name: 'Celé telo', duration: '15 min', category: '15min', body: 'Celé telo', equip: 'S gumou', level: 2, diastasisSafe: true, thumb: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Stredne náročné cvičenie s gumou' },
+  { id: 'ct-4', name: 'Celé telo', duration: '5 min', category: 'dopalovacka', body: 'Celé telo', equip: 'Bez pomôcok', level: 1, diastasisSafe: true, thumb: 'https://images.unsplash.com/photo-1506629905496-f43367ee050d?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Jemná aktivácia celého tela' },
+  { id: 'ct-5', name: 'Celé telo', duration: '5 min', category: 'dopalovacka', body: 'Celé telo', equip: 'S činkami', level: 4, diastasisSafe: true, thumb: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Intenzívna dopaľovačka s činkami' },
+  { id: 'ct-6', name: 'Celé telo', duration: '5 min', category: 'dopalovacka', body: 'Celé telo', equip: 'S gumou', level: 2, diastasisSafe: true, thumb: 'https://images.unsplash.com/photo-1594737625785-a6cbdabd333c?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Stredná dopaľovačka s gumou' },
   
-  // Core/Abs exercises - unique ab/core focused images
-  { id: 'core-1', name: 'Core/Abs', duration: '15 min', category: '15min', body: 'Core/Abs', equip: 'Bez pomôcok', level: 3, diastasisSafe: false, thumb: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=225&fit=crop', description: 'Pokročilé posilnenie brušných svalov' },
-  { id: 'core-2', name: 'Core/Abs', duration: '15 min', category: '15min', body: 'Core/Abs', equip: 'Bez pomôcok', level: 1, diastasisSafe: true, thumb: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=225&fit=crop', description: 'Jemné posilnenie core pre diastázu' },
-  { id: 'core-3', name: 'Core/Abs', duration: '5 min', category: 'dopalovacka', body: 'Core/Abs', equip: 'Bez pomôcok', level: 4, diastasisSafe: false, thumb: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&h=225&fit=crop', description: 'Intenzívna aktivácia brucha' },
-  { id: 'core-4', name: 'Core/Abs', duration: '5 min', category: 'dopalovacka', body: 'Core/Abs', equip: 'Bez pomôcok', level: 1, diastasisSafe: true, thumb: 'https://images.unsplash.com/photo-1593080358201-8c69903ac8fe?w=400&h=225&fit=crop', description: 'Jemná aktivácia pre diastázu' },
+  // Core/Abs exercises - black and white, women doing core/ab focused exercises
+  { id: 'core-1', name: 'Core/Abs', duration: '15 min', category: '15min', body: 'Core/Abs', equip: 'Bez pomôcok', level: 3, diastasisSafe: false, thumb: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Pokročilé posilnenie brušných svalov' },
+  { id: 'core-2', name: 'Core/Abs', duration: '15 min', category: '15min', body: 'Core/Abs', equip: 'Bez pomôcok', level: 1, diastasisSafe: true, thumb: 'https://images.unsplash.com/photo-1593080358201-8c69903ac8fe?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Jemné posilnenie core pre diastázu' },
+  { id: 'core-3', name: 'Core/Abs', duration: '5 min', category: 'dopalovacka', body: 'Core/Abs', equip: 'Bez pomôcok', level: 4, diastasisSafe: false, thumb: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Intenzívna aktivácia brucha' },
+  { id: 'core-4', name: 'Core/Abs', duration: '5 min', category: 'dopalovacka', body: 'Core/Abs', equip: 'Bez pomôcok', level: 1, diastasisSafe: true, thumb: 'https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Jemná aktivácia pre diastázu' },
   
-  // Nohy/Zadok exercises - unique lower body focused images
-  { id: 'legs-1', name: 'Nohy/Zadok', duration: '15 min', category: '15min', body: 'Nohy/Zadok', equip: 'S gumou', level: 2, diastasisSafe: true, thumb: 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=400&h=225&fit=crop', description: 'Stredné posilnenie nôh a zadku' },
-  { id: 'legs-2', name: 'Nohy/Zadok', duration: '15 min', category: '15min', body: 'Nohy/Zadok', equip: 'Bez pomôcok', level: 1, diastasisSafe: true, thumb: 'https://images.unsplash.com/photo-1616279969856-759f316a32d4?w=400&h=225&fit=crop', description: 'Základné posilnenie bez pomôcok' },
-  { id: 'legs-3', name: 'Nohy/Zadok', duration: '5 min', category: 'dopalovacka', body: 'Nohy/Zadok', equip: 'S gumou', level: 3, diastasisSafe: true, thumb: 'https://images.unsplash.com/photo-1605296867304-46d5465a13f1?w=400&h=225&fit=crop', description: 'Pokročilá aktivácia s gumou' },
-  { id: 'legs-4', name: 'Nohy/Zadok', duration: '5 min', category: 'dopalovacka', body: 'Nohy/Zadok', equip: 'Bez pomôcok', level: 2, diastasisSafe: true, thumb: 'https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=400&h=225&fit=crop', description: 'Stredná aktivácia bez pomôcok' },
+  // Nohy/Zadok exercises - black and white, women doing leg/glute focused exercises  
+  { id: 'legs-1', name: 'Nohy/Zadok', duration: '15 min', category: '15min', body: 'Nohy/Zadok', equip: 'S gumou', level: 2, diastasisSafe: true, thumb: 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Stredné posilnenie nôh a zadku' },
+  { id: 'legs-2', name: 'Nohy/Zadok', duration: '15 min', category: '15min', body: 'Nohy/Zadok', equip: 'Bez pomôcok', level: 1, diastasisSafe: true, thumb: 'https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Základné posilnenie bez pomôcok' },
+  { id: 'legs-3', name: 'Nohy/Zadok', duration: '5 min', category: 'dopalovacka', body: 'Nohy/Zadok', equip: 'S gumou', level: 3, diastasisSafe: true, thumb: 'https://images.unsplash.com/photo-1605296867304-46d5465a13f1?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Pokročilá aktivácia s gumou' },
+  { id: 'legs-4', name: 'Nohy/Zadok', duration: '5 min', category: 'dopalovacka', body: 'Nohy/Zadok', equip: 'Bez pomôcok', level: 2, diastasisSafe: true, thumb: 'https://images.unsplash.com/photo-1616279969856-759f316a32d4?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Stredná aktivácia bez pomôcok' },
 ];
 
 const glassCard = {
@@ -66,27 +66,27 @@ function SliderExerciseCard({ exercise, onClick }: { exercise: Exercise; onClick
   
   return (
     <div 
-      className="w-52 flex-shrink-0 overflow-hidden cursor-pointer active:scale-[0.98] transition-all duration-200"
+      className="w-80 flex-shrink-0 overflow-hidden cursor-pointer active:scale-[0.98] transition-all duration-200"
       style={{
         ...glassCard,
-        borderRadius: 12,
+        borderRadius: 16,
         backgroundColor: 'rgba(255,255,255,0.9)',
         backdropFilter: 'blur(20px)',
       }}
       onClick={onClick}
     >
-      <div className="relative h-28">
+      <div className="relative h-40">
         <img src={exercise.thumb} alt={exercise.name} className="w-full h-full object-cover" />
         <div className="absolute inset-0 flex items-center justify-center bg-black/20">
           <div 
-            className="w-9 h-9 rounded-full flex items-center justify-center"
+            className="w-12 h-12 rounded-full flex items-center justify-center"
             style={{ 
               backgroundColor: 'rgba(255,255,255,0.95)',
               boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
             }}
           >
             <Play 
-              className="w-3.5 h-3.5 ml-0.5" 
+              className="w-5 h-5 ml-0.5" 
               style={{ color: colors.telo }} 
               fill={colors.telo} 
               strokeWidth={0} 
@@ -95,20 +95,25 @@ function SliderExerciseCard({ exercise, onClick }: { exercise: Exercise; onClick
         </div>
       </div>
       
-      <div className="p-2.5 space-y-1.5">
+      <div className="p-4 space-y-2">
+        {/* Exercise name */}
+        <h4 className="text-[15px] font-semibold text-[#2E2218] mb-2">
+          {exercise.name}
+        </h4>
+        
         {/* First row: Level + Duration */}
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-2">
           {/* Level tag */}
           <span 
-            className="text-[9px] px-1.5 py-0.5 rounded-full font-bold text-white"
+            className="text-[11px] px-2 py-1 rounded-full font-bold text-white"
             style={{ backgroundColor: levelColor }}
           >
-            L{exercise.level}
+            Level {exercise.level}
           </span>
           
           {/* Duration tag */}
           <span 
-            className="text-[9px] px-1.5 py-0.5 rounded-full font-medium bg-[#6B4C3B]/10"
+            className="text-[11px] px-2 py-1 rounded-full font-medium bg-[#6B4C3B]/10"
             style={{ color: colors.telo }}
           >
             {exercise.duration}
@@ -116,10 +121,10 @@ function SliderExerciseCard({ exercise, onClick }: { exercise: Exercise; onClick
         </div>
         
         {/* Second row: Equipment + Diastasis + Category */}
-        <div className="flex items-center gap-1.5 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap">
           {/* Equipment tag */}
           <span 
-            className="text-[9px] px-1.5 py-0.5 rounded-full font-medium"
+            className="text-[11px] px-2 py-1 rounded-full font-medium"
             style={{
               backgroundColor: `${colors.accent}15`,
               color: colors.accent,
@@ -130,8 +135,8 @@ function SliderExerciseCard({ exercise, onClick }: { exercise: Exercise; onClick
           
           {/* Diastasis safe tag */}
           {exercise.diastasisSafe && (
-            <span className="text-[9px] px-1.5 py-0.5 rounded-full font-medium bg-green-500/10 text-green-600 flex items-center gap-0.5">
-              <Shield className="w-2 h-2" strokeWidth={2} />
+            <span className="text-[11px] px-2 py-1 rounded-full font-medium bg-green-500/10 text-green-600 flex items-center gap-1">
+              <Shield className="w-3 h-3" strokeWidth={2} />
               Diastáza safe
             </span>
           )}
@@ -139,7 +144,7 @@ function SliderExerciseCard({ exercise, onClick }: { exercise: Exercise; onClick
           {/* Dopalovacka tag */}
           {exercise.category === 'dopalovacka' && (
             <span 
-              className="text-[9px] px-1.5 py-0.5 rounded-full font-medium bg-[#7A9E78]/10"
+              className="text-[11px] px-2 py-1 rounded-full font-medium bg-[#7A9E78]/10"
               style={{ color: colors.strava }}
             >
               Dopaľovačka
@@ -215,23 +220,31 @@ function CategorySection({ title, exercises, icon: Icon, color, allExercises }: 
   return (
     <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20">
       {/* Category header with filter */}
-      <div className="flex items-center gap-3 mb-4">
-        <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `${color}14` }}>
-          <Icon className="w-4 h-4" style={{ color }} />
-        </div>
+      <div className="mb-4 space-y-3">
+        {/* Category title */}
         <h3 className="text-[16px] font-semibold text-[#2E2218]">{title}</h3>
-        <div className="flex-1" />
-        <button
-          onClick={() => setShowFilters(!showFilters)}
-          className={`p-1.5 rounded-lg transition-all active:scale-95 ${
-            showFilters || hasActiveFilters
-              ? 'text-white shadow-sm' 
-              : 'bg-white/40 text-[#8B7560] hover:bg-white/60'
-          }`}
-          style={showFilters || hasActiveFilters ? { backgroundColor: color } : {}}
-        >
-          <Filter className="w-3.5 h-3.5" strokeWidth={1.5} />
-        </button>
+        
+        {/* Filter and swipe row */}
+        <div className="flex items-center justify-between">
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className={`px-3 py-2 rounded-xl transition-all active:scale-95 flex items-center gap-2 ${
+              showFilters || hasActiveFilters
+                ? 'text-white shadow-md' 
+                : 'bg-white/50 text-[#8B7560] hover:bg-white/70 border border-white/40'
+            }`}
+            style={showFilters || hasActiveFilters ? { backgroundColor: color } : {}}
+          >
+            <Filter className="w-4 h-4" strokeWidth={1.5} />
+            <span className="text-[13px] font-medium">Nájdi si vhodné cvičenie</span>
+          </button>
+          
+          {/* Swipe indicator */}
+          <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white/50">
+            <span className="text-[10px] font-medium text-[#8B7560]">Swipe</span>
+            <ArrowLeft className="w-3 h-3 text-[#8B7560] transform rotate-180" strokeWidth={2} />
+          </div>
+        </div>
       </div>
 
       {/* Organized filters */}
@@ -326,7 +339,7 @@ function CategorySection({ title, exercises, icon: Icon, color, allExercises }: 
       <div className="relative">
         {filteredExercises.length > 0 ? (
           <>
-            <div className="-mx-4 px-4 overflow-x-auto scrollbar-hide">
+            <div className="-mx-0.5 px-0.5 overflow-x-auto scrollbar-hide">
               <div className="flex gap-3 pb-2" style={{ scrollSnapType: 'x mandatory' }}>
                 {filteredExercises.map((exercise, i) => (
                   <div key={exercise.id} style={{ scrollSnapAlign: 'start' }}>
@@ -366,40 +379,33 @@ export default function TeloExtra() {
   };
 
   return (
-    <div className="w-full min-h-screen px-3 py-6 pb-28 space-y-6" style={{ background: colors.bgGradient }}>
-      {/* Nordic Header */}
-      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20">
-        <div className="flex items-center gap-3 mb-4">
+    <div className="min-h-screen pb-20" style={{ background: colors.bgGradient }}>
+      <div className="p-5 space-y-8">
+        {/* Header */}
+        <div className="flex items-center gap-3 pt-8">
           <button onClick={() => navigate('/kniznica/telo')} className="p-1">
-            <ArrowLeft className="w-5 h-5 text-[#8B7560]" strokeWidth={1.5} />
+            <ArrowLeft className="w-5 h-5" style={{ color: colors.textPrimary }} strokeWidth={1.5} />
           </button>
-          <div className="flex items-center gap-2 flex-1">
-            <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(122, 158, 120, 0.14)` }}>
-              <Zap className="w-4 h-4" style={{ color: '#7A9E78' }} />
-            </div>
-            <h1 className="text-[16px] font-semibold" style={{ color: '#2E2218' }}>Extra cvičenia</h1>
+          <div>
+            <h1 className="text-xl font-semibold" style={{ color: colors.textPrimary }}>Extra cvičenia</h1>
           </div>
         </div>
 
-        {/* Sub-header */}
-        <div className="text-center">
-          <p className="text-sm font-medium" style={{ color: '#6B4C3B' }}>
-            Pridaj si niečo extra k svojmu cvičeniu
-          </p>
+        {/* Hero Section */}
+        <div className="bg-white/30 backdrop-blur-xl rounded-3xl p-6 border border-white/30">
+          <div className="text-center mb-6">
+            <p className="text-sm" style={{ color: colors.textSecondary }}>
+              Máš extra čas a extra chuť si zacvičiť niečo extra?
+              <br />
+              Obohať si svoje 15-minútové denné cvičenia z programu a vyber si dopaľovačku zameranú na to, čo potrebuješ.
+            </p>
+          </div>
         </div>
-      </div>
 
-      {/* Description */}
-      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20">
-        <p className="text-[13px] leading-relaxed" style={{ color: '#6B4C3B' }}>
-          Vyber si cvičenie podľa zamerania. Každá kategória obsahuje <strong>15-minútové cvičenia</strong> aj <strong>5-minútové dopaľovačky</strong>. Posuň doprava pre viac možností.
-        </p>
-      </div>
-
-      {/* Category Sections with Horizontal Sliders */}
-      <div className="space-y-5">
-        {/* Celé telo */}
-        <CategorySection
+        {/* Category Sections with Horizontal Sliders */}
+        <div className="space-y-5">
+          {/* Celé telo */}
+          <CategorySection
           title="Celé telo" 
           exercises={exercisesByBodyPart['Celé telo']}
           icon={Zap}
@@ -407,30 +413,31 @@ export default function TeloExtra() {
           allExercises={allExercises}
         />
         
-        {/* Core/Abs */}
-        <CategorySection
-          title="Core/Abs" 
-          exercises={exercisesByBodyPart['Core/Abs']}
-          icon={Zap}
-          color={colors.strava}
-          allExercises={allExercises}
-        />
-        
-        {/* Nohy/Zadok */}
-        <CategorySection
-          title="Nohy/Zadok" 
-          exercises={exercisesByBodyPart['Nohy/Zadok']}
-          icon={Zap}
-          color={colors.accent}
-          allExercises={allExercises}
-        />
-      </div>
+          {/* Core/Abs */}
+          <CategorySection
+            title="Core/Abs" 
+            exercises={exercisesByBodyPart['Core/Abs']}
+            icon={Zap}
+            color={colors.strava}
+            allExercises={allExercises}
+          />
+          
+          {/* Nohy/Zadok */}
+          <CategorySection
+            title="Nohy/Zadok" 
+            exercises={exercisesByBodyPart['Nohy/Zadok']}
+            icon={Zap}
+            color={colors.accent}
+            allExercises={allExercises}
+          />
+        </div>
 
-      {/* Stats summary */}
-      <div className="text-center pt-4">
-        <p className="text-[12px] text-[#8B7560]">
-          {exercises.length} cvičení celkom • Swipe doprava pre viac
-        </p>
+        {/* Stats summary */}
+        <div className="text-center pt-4">
+          <p className="text-[12px] text-[#8B7560]">
+            {exercises.length} cvičení celkom • Swipe doprava pre viac
+          </p>
+        </div>
       </div>
     </div>
   );

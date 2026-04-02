@@ -1,79 +1,259 @@
-import { createContext, useContext, type ReactNode } from 'react';
-import { useAuthContext } from './AuthContext';
-import { useSupabaseSubscription } from '../hooks/useSupabaseSubscription';
-import type { Subscription, SubscriptionTier, SubscriptionLimits } from '../types/subscription';
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { useSupabaseAuth } from './SupabaseAuthContext';
+import { 
+  SubscriptionData, 
+  SubscriptionStatus,
+  isSubscriptionActive,
+  isTrialActive,
+  getDaysUntilExpiration,
+  createCheckoutSessionMock,
+  createPortalSessionMock,
+  SUBSCRIPTION_PLANS,
+  stripePromise
+} from '../lib/stripe';
+import { supabase } from '../lib/supabase';
 
 interface SubscriptionContextType {
-  subscription: Subscription;
-  limits: SubscriptionLimits;
-  tier: SubscriptionTier;
-  loading: boolean;
-  canAccess: (feature: keyof SubscriptionLimits) => boolean;
-  getRemainingCount: (contentType: 'exercises' | 'recipes' | 'meditations' | 'stretches') => Promise<number | null>;
-  canUseMealPlanner: boolean;
-  mealPlannerTokens: number;
-  checkContentAccess: (contentType: 'recipes' | 'exercises' | 'meditations' | 'stretches') => Promise<{
-    canAccess: boolean;
-    usedCount: number;
-    limitCount: number;
-  }>;
-  trackContentUsage: (contentType: string, contentId: string) => Promise<boolean>;
-  refreshSubscription: () => void;
+  subscription: SubscriptionData | null;
+  isLoading: boolean;
+  isPremium: boolean;
+  isTrialing: boolean;
+  daysLeft: number;
+  startCheckout: (priceId: string) => Promise<void>;
+  manageBilling: () => Promise<void>;
+  cancelSubscription: () => Promise<void>;
+  refreshSubscription: () => Promise<void>;
 }
 
-const SubscriptionContext = createContext<SubscriptionContextType | null>(null);
+const SubscriptionContext = createContext<SubscriptionContextType | undefined>(undefined);
 
 export function SubscriptionProvider({ children }: { children: ReactNode }) {
-  const { user } = useAuthContext();
-  const { 
-    subscription, 
-    loading, 
-    limits, 
-    checkContentAccess, 
-    trackContentUsage,
-    refreshSubscription 
-  } = useSupabaseSubscription();
-  
-  const canAccess = (feature: keyof SubscriptionLimits): boolean => {
-    return limits[feature] === true || limits[feature] === -1;
+  const { user, profile, updateProfile } = useSupabaseAuth();
+  const [subscription, setSubscription] = useState<SubscriptionData | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Load subscription data when user changes
+  useEffect(() => {
+    if (user) {
+      loadSubscription();
+    } else {
+      setSubscription(null);
+    }
+  }, [user]);
+
+  const loadSubscription = async () => {
+    if (!user) return;
+
+    setIsLoading(true);
+    try {
+      // For development: Load from localStorage first
+      const mockSubscription = localStorage.getItem(`subscription_${user.id}`);
+      if (mockSubscription) {
+        setSubscription(JSON.parse(mockSubscription));
+        setIsLoading(false);
+        return;
+      }
+
+      // TODO: Replace with actual Stripe API call
+      // const response = await fetch(`/api/subscription/${user.id}`);
+      // const subscriptionData = await response.json();
+      // setSubscription(subscriptionData);
+
+      // For now, check profile subscription status
+      if (profile?.subscription_status === 'premium') {
+        const mockActiveSubscription: SubscriptionData = {
+          id: 'sub_premium_' + user.id,
+          status: 'active',
+          current_period_start: Date.now() / 1000,
+          current_period_end: (Date.now() + (30 * 24 * 60 * 60 * 1000)) / 1000,
+          cancel_at_period_end: false,
+          customer_id: 'cus_' + user.id
+        };
+        setSubscription(mockActiveSubscription);
+      } else if (profile?.subscription_status === 'trial' && profile.trial_end_date) {
+        const trialEnd = new Date(profile.trial_end_date).getTime() / 1000;
+        const mockTrialSubscription: SubscriptionData = {
+          id: 'sub_trial_' + user.id,
+          status: 'trialing',
+          current_period_start: Date.now() / 1000,
+          current_period_end: trialEnd,
+          trial_end: trialEnd,
+          cancel_at_period_end: false,
+          customer_id: 'cus_' + user.id
+        };
+        setSubscription(mockTrialSubscription);
+      } else {
+        setSubscription(null);
+      }
+
+    } catch (error) {
+      console.error('Error loading subscription:', error);
+      setSubscription(null);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const getRemainingCount = async (
-    contentType: 'exercises' | 'recipes' | 'meditations' | 'stretches'
-  ): Promise<number | null> => {
-    if (!user) return 0;
-    
-    const { limitCount, usedCount } = await checkContentAccess(contentType);
-    
-    if (limitCount === -1) return null; // unlimited
-    return Math.max(0, limitCount - usedCount);
+  const startCheckout = async (priceId: string) => {
+    if (!user || !profile) {
+      throw new Error('User must be logged in');
+    }
+
+    setIsLoading(true);
+    try {
+      // For development: Use mock checkout
+      const sessionId = await createCheckoutSessionMock(priceId, user.id, profile.email);
+      
+      if (sessionId === 'demo_session_success') {
+        // Demo successful subscription
+        const newSubscription: SubscriptionData = {
+          id: 'sub_' + Date.now(),
+          status: 'trialing',
+          current_period_start: Date.now() / 1000,
+          current_period_end: (Date.now() + (30 * 24 * 60 * 60 * 1000)) / 1000,
+          trial_end: (Date.now() + (7 * 24 * 60 * 60 * 1000)) / 1000,
+          cancel_at_period_end: false,
+          customer_id: 'cus_' + user.id
+        };
+        
+        // Update subscription state
+        setSubscription(newSubscription);
+        
+        // Update user profile
+        await updateProfile({
+          subscription_status: 'trial',
+          subscription_id: newSubscription.id,
+          trial_end_date: new Date(newSubscription.trial_end! * 1000).toISOString()
+        });
+        
+        return;
+      }
+
+      // TODO: For production, redirect to Stripe Checkout
+      // const stripe = await stripePromise;
+      // if (stripe) {
+      //   await stripe.redirectToCheckout({ sessionId });
+      // }
+
+    } catch (error) {
+      console.error('Error starting checkout:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const canUseMealPlanner = subscription.tier === 'program_bundle' || subscription.mealPlannerTokens > 0;
+  const manageBilling = async () => {
+    if (!subscription) {
+      throw new Error('No active subscription');
+    }
 
-  const contextValue: SubscriptionContextType = {
+    setIsLoading(true);
+    try {
+      // For development: Use mock portal
+      const portalResult = await createPortalSessionMock(subscription.customer_id);
+      
+      if (portalResult === 'demo_portal_access') {
+        // Demo portal - show success notification
+        alert('🎯 Demo Mode: Billing portal accessed! In production, this would redirect to Stripe Customer Portal for payment method management, invoice history, and subscription changes.');
+        return;
+      }
+
+      // TODO: For production, redirect to Stripe portal
+      // window.location.href = portalUrl;
+
+    } catch (error) {
+      console.error('Error accessing billing portal:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const cancelSubscription = async () => {
+    if (!subscription || !user) {
+      throw new Error('No subscription to cancel');
+    }
+
+    setIsLoading(true);
+    try {
+      // For development: Mock cancellation
+      const canceledSubscription = {
+        ...subscription,
+        cancel_at_period_end: true
+      };
+      
+      setSubscription(canceledSubscription);
+      localStorage.setItem(`subscription_${user.id}`, JSON.stringify(canceledSubscription));
+      
+      // TODO: For production, call actual API
+      // await fetch(`/api/subscription/${subscription.id}/cancel`, {
+      //   method: 'POST'
+      // });
+
+    } catch (error) {
+      console.error('Error canceling subscription:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const refreshSubscription = async () => {
+    await loadSubscription();
+  };
+
+  // Computed values
+  const isPremium = isSubscriptionActive(subscription);
+  const isTrialing = isTrialActive(subscription);
+  const daysLeft = getDaysUntilExpiration(subscription);
+
+  const value: SubscriptionContextType = {
     subscription,
-    limits,
-    tier: subscription.tier,
-    loading,
-    canAccess,
-    getRemainingCount,
-    canUseMealPlanner,
-    mealPlannerTokens: subscription.mealPlannerTokens,
-    checkContentAccess,
-    trackContentUsage,
+    isLoading,
+    isPremium,
+    isTrialing,
+    daysLeft,
+    startCheckout,
+    manageBilling,
+    cancelSubscription,
     refreshSubscription,
   };
 
   return (
-    <SubscriptionContext.Provider value={contextValue}>
+    <SubscriptionContext.Provider value={value}>
       {children}
     </SubscriptionContext.Provider>
   );
 }
 
 export function useSubscription() {
-  const ctx = useContext(SubscriptionContext);
-  if (!ctx) throw new Error('useSubscription must be used within SubscriptionProvider');
-  return ctx;
+  const context = useContext(SubscriptionContext);
+  if (context === undefined) {
+    throw new Error('useSubscription must be used within a SubscriptionProvider');
+  }
+  return context;
+}
+
+// Utility hook for checking premium access
+export function useIsPremium(): boolean {
+  const { isPremium } = useSubscription();
+  return isPremium;
+}
+
+// Hook for paywall logic
+export function usePaywall() {
+  const { isPremium, isTrialing, daysLeft, startCheckout } = useSubscription();
+  
+  const showPaywall = !isPremium;
+  const showTrialBanner = isTrialing && daysLeft <= 3;
+  
+  return {
+    showPaywall,
+    showTrialBanner,
+    isPremium,
+    isTrialing,
+    daysLeft,
+    startCheckout
+  };
 }

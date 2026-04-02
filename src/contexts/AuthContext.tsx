@@ -12,6 +12,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export function useAuthContext() {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuthContext must be used within AuthProvider');
+  if (!ctx) {
+    // Return demo fallback instead of throwing error
+    console.log('🎯 Demo Mode: AuthContext not available, using demo fallback');
+    return {
+      user: null,
+      profile: null,
+      session: null,
+      loading: false,
+      isAdmin: false,
+      isCoach: false,
+      signIn: async () => ({ error: null }),
+      signUp: async () => ({ error: null }),
+      signOut: async () => ({ error: null }),
+      updateProfile: async () => ({ error: null }),
+      resetPassword: async () => ({ error: null })
+    };
+  }
   return ctx;
 }

@@ -279,7 +279,7 @@ export default function AdminCycleTips() {
     
     if (editNextPeriodEstimate && editLastPeriodStart) {
       const daysDiff = Math.abs(
-        Math.floor((parseISO(editNextPeriodEstimate).getTime() - parseISO(editLastPeriodStart).getTime()) / (1000 * 60 * 60 * 24))
+        getCurrentCycleDay(editLastPeriodStart, parseISO(editNextPeriodEstimate), 28) - 1
       );
       finalCycleLength = daysDiff;
       

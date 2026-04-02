@@ -1,6 +1,6 @@
 import { useCycleData } from '../../features/cycle/useCycleData';
 import PeriodkaOnboarding from '../../components/v2/periodka/PeriodkaOnboarding';
-import PeriodkaTracker from '../../components/v2/periodka/PeriodkaTracker';
+import SimplePeriodkaTracker from '../../components/v2/periodka/SimplePeriodkaTracker';
 import { colors, glassCard } from '../../theme/warmDusk';
 
 export default function Periodka() {
@@ -21,5 +21,5 @@ export default function Periodka() {
     return <PeriodkaOnboarding />;
   }
 
-  return <PeriodkaTracker />;
+  return <SimplePeriodkaTracker />;
 }

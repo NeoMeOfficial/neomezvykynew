@@ -10,7 +10,7 @@ import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterv
 import { sk } from 'date-fns/locale';
 import jsPDF from 'jspdf';
 import { DerivedState, CycleData, PeriodIntensity } from './types';
-import { isPeriodDate, isFertilityDate, isOvulationDate } from './utils';
+import { isPeriodDate, isFertilityDate, isOvulationDate, getCurrentCycleDay } from './utils';
 import { PeriodIntensitySelector } from './components/PeriodIntensitySelector';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { SymptomTracker } from './SymptomTracker';
@@ -722,11 +722,9 @@ export function CalendarView({
   };
   const getCurrentDayPhase = (date: Date) => {
     if (!cycleData.lastPeriodStart) return null;
-    const lastPeriodDate = typeof cycleData.lastPeriodStart === 'string' 
-      ? new Date(cycleData.lastPeriodStart + 'T00:00:00') 
-      : cycleData.lastPeriodStart;
-    const daysSinceStart = Math.floor((startOfDay(date).getTime() - startOfDay(lastPeriodDate).getTime()) / (1000 * 60 * 60 * 24));
-    const cycleDay = (daysSinceStart % cycleData.cycleLength + cycleData.cycleLength) % cycleData.cycleLength + 1;
+    
+    // Use unified logic from utils.ts
+    const cycleDay = getCurrentCycleDay(cycleData.lastPeriodStart, date, cycleData.cycleLength);
 
     // Find which phase this day belongs to
     return derivedState.phaseRanges.find(phase => cycleDay >= phase.start && cycleDay <= phase.end);
@@ -1219,14 +1217,10 @@ export function CalendarView({
                 
                 {/* Symptom Tracker for current day */}
                 {!readOnly && (() => {
-                  const lastPeriodDate = cycleData.lastPeriodStart 
-                    ? typeof cycleData.lastPeriodStart === 'string' 
-                      ? new Date(cycleData.lastPeriodStart) 
-                      : cycleData.lastPeriodStart 
-                    : null;
-                  if (!lastPeriodDate) return null;
-                  const daysSinceStart = differenceInDays(selectedDayData.date, lastPeriodDate);
-                  const currentDay = daysSinceStart + 1;
+                  if (!cycleData.lastPeriodStart) return null;
+                  
+                  // Use unified logic from utils.ts
+                  const currentDay = getCurrentCycleDay(cycleData.lastPeriodStart, selectedDayData.date, cycleData.cycleLength);
                   const currentPhaseInfo = getCurrentDayPhase(selectedDayData.date);
                   if (!currentPhaseInfo) return null;
                   return (

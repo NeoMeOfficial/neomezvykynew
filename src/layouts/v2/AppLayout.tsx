@@ -11,7 +11,7 @@ export default function AppLayout() {
     >
       
       {/* Mobile-optimized main content */}
-      <main className="relative z-10 pb-28 w-full max-w-lg mx-auto px-4 sm:px-5 pt-4 sm:pt-6 min-h-screen safe-area-padding">
+      <main className="relative z-10 pb-28 w-full max-w-none mx-auto px-0 sm:px-2 pt-4 sm:pt-6 min-h-screen safe-area-padding">
         <ErrorBoundary>
           <Outlet />
         </ErrorBoundary>

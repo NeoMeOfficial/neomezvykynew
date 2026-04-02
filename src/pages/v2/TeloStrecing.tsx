@@ -20,20 +20,20 @@ type FilterState = {
 };
 
 const stretches: Stretch[] = [
-  // Celé telo stretches - unique full body stretch images
-  { id: 'ct-1', name: 'Celé telo', duration: '15 min', category: '15min', body: 'Celé telo', equip: 'Bez pomôcok', thumb: 'https://images.unsplash.com/photo-1588286840104-8957b019727f?w=400&h=225&fit=crop', description: 'Komplexné uvoľnenie celého tela' },
-  { id: 'ct-2', name: 'Celé telo', duration: '15 min', category: '15min', body: 'Celé telo', equip: 'S gumou', thumb: 'https://images.unsplash.com/photo-1485727749690-d091e8284ef3?w=400&h=225&fit=crop', description: 'Večerné uvoľnenie s pomocou gumy' },
-  { id: 'ct-3', name: 'Celé telo', duration: '5 min', category: 'quickstretch', body: 'Celé telo', equip: 'Bez pomôcok', thumb: 'https://images.unsplash.com/photo-1540206395-68808572332f?w=400&h=225&fit=crop', description: 'Rýchla úľava pre celé telo' },
+  // Celé telo stretches - black and white, women doing full body stretches
+  { id: 'ct-1', name: 'Celé telo', duration: '15 min', category: '15min', body: 'Celé telo', equip: 'Bez pomôcok', thumb: 'https://images.unsplash.com/photo-1588286840104-8957b019727f?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Komplexné uvoľnenie celého tela' },
+  { id: 'ct-2', name: 'Celé telo', duration: '15 min', category: '15min', body: 'Celé telo', equip: 'S gumou', thumb: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Večerné uvoľnenie s pomocou gumy' },
+  { id: 'ct-3', name: 'Celé telo', duration: '5 min', category: 'quickstretch', body: 'Celé telo', equip: 'Bez pomôcok', thumb: 'https://images.unsplash.com/photo-1540206395-68808572332f?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Rýchla úľava pre celé telo' },
   
-  // Vršok/Stred tela stretches - unique upper body stretch images
-  { id: 'vs-1', name: 'Vršok/Stred tela', duration: '15 min', category: '15min', body: 'Vršok/Stred tela', equip: 'Bez pomôcok', thumb: 'https://images.unsplash.com/photo-1591027858406-a9a20dd3c95c?w=400&h=225&fit=crop', description: 'Uvoľnenie ramien a chrbtice' },
-  { id: 'vs-2', name: 'Vršok/Stred tela', duration: '15 min', category: '15min', body: 'Vršok/Stred tela', equip: 'S gumou', thumb: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&h=225&fit=crop', description: 'Mobilita chrbtice s gumou' },
-  { id: 'vs-3', name: 'Vršok/Stred tela', duration: '5 min', category: 'quickstretch', body: 'Vršok/Stred tela', equip: 'Bez pomôcok', thumb: 'https://images.unsplash.com/photo-1529693662653-9d480530b6da?w=400&h=225&fit=crop', description: 'Rýchle uvoľnenie ramien' },
+  // Vršok/Stred tela stretches - black and white, women doing upper body stretches
+  { id: 'vs-1', name: 'Vršok/Stred tela', duration: '15 min', category: '15min', body: 'Vršok/Stred tela', equip: 'Bez pomôcok', thumb: 'https://images.unsplash.com/photo-1591027858406-a9a20dd3c95c?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Uvoľnenie ramien a chrbtice' },
+  { id: 'vs-2', name: 'Vršok/Stred tela', duration: '15 min', category: '15min', body: 'Vršok/Stred tela', equip: 'S gumou', thumb: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Mobilita chrbtice s gumou' },
+  { id: 'vs-3', name: 'Vršok/Stred tela', duration: '5 min', category: 'quickstretch', body: 'Vršok/Stred tela', equip: 'Bez pomôcok', thumb: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Rýchle uvoľnenie ramien' },
   
-  // Dolná časť tela stretches - unique lower body stretch images  
-  { id: 'dc-1', name: 'Dolná časť tela', duration: '15 min', category: '15min', body: 'Dolná časť tela', equip: 'Bez pomôcok', thumb: 'https://images.unsplash.com/photo-1506629905496-f43367ee050d?w=400&h=225&fit=crop', description: 'Strečing nôh a bedier' },
-  { id: 'dc-2', name: 'Dolná časť tela', duration: '15 min', category: '15min', body: 'Dolná časť tela', equip: 'S gumou', thumb: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=225&fit=crop', description: 'Hlboký strečing s gumou' },
-  { id: 'dc-3', name: 'Dolná časť tela', duration: '5 min', category: 'quickstretch', body: 'Dolná časť tela', equip: 'Bez pomôcok', thumb: 'https://images.unsplash.com/photo-1518804727470-b52654d69120?w=400&h=225&fit=crop', description: 'Rýchly strečing nôh' },
+  // Dolná časť tela stretches - black and white, women doing lower body stretches
+  { id: 'dc-1', name: 'Dolná časť tela', duration: '15 min', category: '15min', body: 'Dolná časť tela', equip: 'Bez pomôcok', thumb: 'https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Strečing nôh a bedier' },
+  { id: 'dc-2', name: 'Dolná časť tela', duration: '15 min', category: '15min', body: 'Dolná časť tela', equip: 'S gumou', thumb: 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Hlboký strečing s gumou' },
+  { id: 'dc-3', name: 'Dolná časť tela', duration: '5 min', category: 'quickstretch', body: 'Dolná časť tela', equip: 'Bez pomôcok', thumb: 'https://images.unsplash.com/photo-1616279969856-759f316a32d4?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Rýchky strečing nôh' },
 ];
 
 const glassCard = {
@@ -69,27 +69,27 @@ function FilterButton({ label, active, onClick, color }: {
 function SliderStretchCard({ stretch, onClick }: { stretch: Stretch; onClick: () => void }) {
   return (
     <div 
-      className="w-52 flex-shrink-0 overflow-hidden cursor-pointer active:scale-[0.98] transition-all duration-200"
+      className="w-80 flex-shrink-0 overflow-hidden cursor-pointer active:scale-[0.98] transition-all duration-200"
       style={{
         ...glassCard,
-        borderRadius: 12,
+        borderRadius: 16,
         backgroundColor: 'rgba(255,255,255,0.9)',
         backdropFilter: 'blur(20px)',
       }}
       onClick={onClick}
     >
-      <div className="relative h-28">
+      <div className="relative h-40">
         <img src={stretch.thumb} alt={stretch.name} className="w-full h-full object-cover" />
         <div className="absolute inset-0 flex items-center justify-center bg-black/20">
           <div 
-            className="w-9 h-9 rounded-full flex items-center justify-center"
+            className="w-12 h-12 rounded-full flex items-center justify-center"
             style={{ 
               backgroundColor: 'rgba(255,255,255,0.95)',
               boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
             }}
           >
             <Play 
-              className="w-3.5 h-3.5 ml-0.5" 
+              className="w-5 h-5 ml-0.5" 
               style={{ color: colors.telo }} 
               fill={colors.telo} 
               strokeWidth={0} 
@@ -98,12 +98,17 @@ function SliderStretchCard({ stretch, onClick }: { stretch: Stretch; onClick: ()
         </div>
       </div>
       
-      <div className="p-2.5 space-y-1.5">
+      <div className="p-4 space-y-2">
+        {/* Stretch name */}
+        <h4 className="text-[15px] font-semibold text-[#2E2218] mb-2">
+          {stretch.name}
+        </h4>
+        
         {/* First row: Duration */}
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-2">
           {/* Duration tag */}
           <span 
-            className="text-[9px] px-1.5 py-0.5 rounded-full font-medium bg-[#6B4C3B]/10"
+            className="text-[11px] px-2 py-1 rounded-full font-medium bg-[#6B4C3B]/10"
             style={{ color: colors.telo }}
           >
             {stretch.duration}
@@ -111,10 +116,10 @@ function SliderStretchCard({ stretch, onClick }: { stretch: Stretch; onClick: ()
         </div>
         
         {/* Second row: Equipment + Category */}
-        <div className="flex items-center gap-1.5 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap">
           {/* Equipment tag */}
           <span 
-            className="text-[9px] px-1.5 py-0.5 rounded-full font-medium"
+            className="text-[11px] px-2 py-1 rounded-full font-medium"
             style={{
               backgroundColor: `${colors.accent}15`,
               color: colors.accent,
@@ -126,7 +131,7 @@ function SliderStretchCard({ stretch, onClick }: { stretch: Stretch; onClick: ()
           {/* Quick stretch tag */}
           {stretch.category === 'quickstretch' && (
             <span 
-              className="text-[9px] px-1.5 py-0.5 rounded-full font-medium bg-[#7A9E78]/10"
+              className="text-[11px] px-2 py-1 rounded-full font-medium bg-[#7A9E78]/10"
               style={{ color: colors.strava }}
             >
               Rýchly strečing
@@ -176,23 +181,31 @@ function CategorySection({ title, stretches, icon: Icon, color, allStretches }: 
   return (
     <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20">
       {/* Category header with filter */}
-      <div className="flex items-center gap-3 mb-4">
-        <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `${color}14` }}>
-          <Icon className="w-4 h-4" style={{ color }} />
-        </div>
+      <div className="mb-4 space-y-3">
+        {/* Category title */}
         <h3 className="text-[16px] font-semibold text-[#2E2218]">{title}</h3>
-        <div className="flex-1" />
-        <button
-          onClick={() => setShowFilters(!showFilters)}
-          className={`p-1.5 rounded-lg transition-all active:scale-95 ${
-            showFilters || hasActiveFilters
-              ? 'text-white shadow-sm' 
-              : 'bg-white/40 text-[#8B7560] hover:bg-white/60'
-          }`}
-          style={showFilters || hasActiveFilters ? { backgroundColor: color } : {}}
-        >
-          <Filter className="w-3.5 h-3.5" strokeWidth={1.5} />
-        </button>
+        
+        {/* Filter and swipe row */}
+        <div className="flex items-center justify-between">
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className={`px-3 py-2 rounded-xl transition-all active:scale-95 flex items-center gap-2 ${
+              showFilters || hasActiveFilters
+                ? 'text-white shadow-md' 
+                : 'bg-white/50 text-[#8B7560] hover:bg-white/70 border border-white/40'
+            }`}
+            style={showFilters || hasActiveFilters ? { backgroundColor: color } : {}}
+          >
+            <Filter className="w-4 h-4" strokeWidth={1.5} />
+            <span className="text-[13px] font-medium">Nájdi si vhodný strečing</span>
+          </button>
+          
+          {/* Swipe indicator */}
+          <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white/50">
+            <span className="text-[10px] font-medium text-[#8B7560]">Swipe</span>
+            <ArrowLeft className="w-3 h-3 text-[#8B7560] transform rotate-180" strokeWidth={2} />
+          </div>
+        </div>
       </div>
 
       {/* Organized filters */}
@@ -252,7 +265,7 @@ function CategorySection({ title, stretches, icon: Icon, color, allStretches }: 
       <div className="relative">
         {filteredStretches.length > 0 ? (
           <>
-            <div className="-mx-4 px-4 overflow-x-auto scrollbar-hide">
+            <div className="-mx-0.5 px-0.5 overflow-x-auto scrollbar-hide">
               <div className="flex gap-3 pb-2" style={{ scrollSnapType: 'x mandatory' }}>
                 {filteredStretches.map((stretch, i) => (
                   <div key={stretch.id} style={{ scrollSnapAlign: 'start' }}>
@@ -292,71 +305,65 @@ export default function TeloStrecing() {
   };
 
   return (
-    <div className="w-full min-h-screen px-3 py-6 pb-28 space-y-6" style={{ background: colors.bgGradient }}>
-      {/* Nordic Header */}
-      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20">
-        <div className="flex items-center gap-3 mb-4">
+    <div className="min-h-screen pb-20" style={{ background: colors.bgGradient }}>
+      <div className="p-5 space-y-8">
+        {/* Header */}
+        <div className="flex items-center gap-3 pt-8">
           <button onClick={() => navigate('/kniznica/telo')} className="p-1">
-            <ArrowLeft className="w-5 h-5 text-[#8B7560]" strokeWidth={1.5} />
+            <ArrowLeft className="w-5 h-5" style={{ color: colors.textPrimary }} strokeWidth={1.5} />
           </button>
-          <div className="flex items-center gap-2 flex-1">
-            <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(168, 132, 139, 0.14)` }}>
-              <Zap className="w-4 h-4" style={{ color: '#A8848B' }} />
-            </div>
-            <h1 className="text-[16px] font-semibold" style={{ color: '#2E2218' }}>Extra strečingy</h1>
+          <div>
+            <h1 className="text-xl font-semibold" style={{ color: colors.textPrimary }}>Extra strečingy</h1>
           </div>
         </div>
 
-        {/* Sub-header */}
-        <div className="text-center">
-          <p className="text-sm font-medium" style={{ color: '#6B4C3B' }}>
-            Uvoľni napätie a zlepši flexibilitu
+        {/* Hero Section */}
+        <div className="bg-white/30 backdrop-blur-xl rounded-3xl p-6 border border-white/30">
+          <div className="text-center mb-6">
+            <p className="text-sm" style={{ color: colors.textSecondary }}>
+              Pocíťuješ napätie a stuhnutosť?
+              <br />
+              Dopraj si rýchlu úľavu a vyber si express strečing zameraný na to, čo potrebuješ.
+            </p>
+          </div>
+        </div>
+
+        {/* Category Sections with Horizontal Sliders */}
+        <div className="space-y-5">
+          {/* Celé telo */}
+          <CategorySection
+            title="Celé telo" 
+            stretches={stretchesByBodyPart['Celé telo']}
+            icon={Zap}
+            color={colors.mysel}
+            allStretches={allStretches}
+          />
+          
+          {/* Vršok/Stred tela */}
+          <CategorySection
+            title="Vršok/Stred tela" 
+            stretches={stretchesByBodyPart['Vršok/Stred tela']}
+            icon={Zap}
+            color={colors.strava}
+            allStretches={allStretches}
+          />
+          
+          {/* Dolná časť tela */}
+          <CategorySection
+            title="Dolná časť tela" 
+            stretches={stretchesByBodyPart['Dolná časť tela']}
+            icon={Zap}
+            color={colors.accent}
+            allStretches={allStretches}
+          />
+        </div>
+
+        {/* Stats summary */}
+        <div className="text-center pt-4">
+          <p className="text-[12px] text-[#8B7560]">
+            {stretches.length} strečingov celkom • Swipe doprava pre viac
           </p>
         </div>
-      </div>
-
-      {/* Description */}
-      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20">
-        <p className="text-[13px] leading-relaxed" style={{ color: '#6B4C3B' }}>
-          Vyber si strečing podľa oblasti tela. Každá kategória obsahuje <strong>15-minútové strečingy</strong> aj <strong>5-minútové rýchle úľavy</strong>. Posuň doprava pre viac možností.
-        </p>
-      </div>
-
-      {/* Category Sections with Horizontal Sliders */}
-      <div className="space-y-5">
-        {/* Celé telo */}
-        <CategorySection
-          title="Celé telo" 
-          stretches={stretchesByBodyPart['Celé telo']}
-          icon={Zap}
-          color={colors.mysel}
-          allStretches={allStretches}
-        />
-        
-        {/* Vršok/Stred tela */}
-        <CategorySection
-          title="Vršok/Stred tela" 
-          stretches={stretchesByBodyPart['Vršok/Stred tela']}
-          icon={Zap}
-          color={colors.strava}
-          allStretches={allStretches}
-        />
-        
-        {/* Dolná časť tela */}
-        <CategorySection
-          title="Dolná časť tela" 
-          stretches={stretchesByBodyPart['Dolná časť tela']}
-          icon={Zap}
-          color={colors.accent}
-          allStretches={allStretches}
-        />
-      </div>
-
-      {/* Stats summary */}
-      <div className="text-center pt-4">
-        <p className="text-[12px] text-[#8B7560]">
-          {stretches.length} strečingov celkom • Swipe doprava pre viac
-        </p>
       </div>
     </div>
   );

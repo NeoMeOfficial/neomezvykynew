@@ -98,20 +98,11 @@ export function usePaywall(): PaywallTrigger & { isOpen: boolean; closePaywall: 
     feature: 'period_tracker' | 'daily_reflections' | 'habits',
     title?: string
   ): boolean => {
-    // If user is subscribed, don't show paywall
-    if (subscription.isSubscribed) {
-      return false;
-    }
-
-    // Show paywall
-    setPaywall({
-      isOpen: true,
-      feature,
-      title
-    });
-    
-    return true; // Indicates paywall was shown (block the action)
-  }, [subscription.isSubscribed]);
+    // 🎯 TESTING MODE: All content freely accessible
+    // Removed paywall checks for full app testing
+    console.log('🎯 Testing Mode: Paywall bypassed for', feature);
+    return false; // Never show paywall - everything is accessible
+  }, []);
 
   const closePaywall = useCallback(() => {
     setPaywall(prev => ({ ...prev, isOpen: false }));

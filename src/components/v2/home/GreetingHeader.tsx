@@ -1,6 +1,6 @@
 import { Bell } from 'lucide-react';
 import { colors, glassButton } from '../../../theme/warmDusk';
-import { useAuthContext } from '../../../contexts/AuthContext';
+import { useSupabaseAuth } from '../../../contexts/SupabaseAuthContext';
 
 function getGreeting(firstName: string = 'tam'): string {
   const h = new Date().getHours();
@@ -32,7 +32,7 @@ function getSubline(): string {
 }
 
 export default function GreetingHeader() {
-  const { profile, user } = useAuthContext();
+  const { profile, user } = useSupabaseAuth();
   
   // Enhanced name extraction with multiple fallbacks
   const getFirstName = (): string => {

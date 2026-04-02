@@ -11,12 +11,24 @@ import type { NutritionProfile } from '../../features/nutrition/types';
 import { colors, glassCard } from '../../theme/warmDusk';
 
 const tabs = ['Recepty', 'Jedálniček'] as const;
+// Dynamic category counts from actual recipes
+const getRecipeCount = (category: string) => {
+  switch (category) {
+    case 'Raňajky':
+      return recipes.filter(r => r.category === 'ranajky').length;
+    case 'Hlavné jedlá a polievky':
+      return recipes.filter(r => r.category === 'obed' || r.category === 'vecera').length;
+    case 'Snacky':
+      return recipes.filter(r => r.category === 'snack').length;
+    default:
+      return 0;
+  }
+};
+
 const categories = [
-  { label: 'Raňajky', count: 24, img: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?w=800&h=500&fit=crop' },
-  { label: 'Hlavné jedlá a polievky', count: 32, img: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&h=500&fit=crop' },
-  { label: 'Dobrotky', count: 16, img: 'https://images.unsplash.com/photo-1488900128323-21503983a07e?w=800&h=500&fit=crop' },
-  { label: 'Smoothie & Nápoje', count: 12, img: 'https://images.unsplash.com/photo-1638176066666-ffb2f013c7dd?w=800&h=500&fit=crop' },
-  { label: 'Snacky', count: 16, img: 'https://images.unsplash.com/photo-1604329760661-e71dc83f8f26?w=800&h=500&fit=crop' },
+  { label: 'Raňajky', count: getRecipeCount('Raňajky'), img: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?w=800&h=500&fit=crop' },
+  { label: 'Hlavné jedlá a polievky', count: getRecipeCount('Hlavné jedlá a polievky'), img: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&h=500&fit=crop' },
+  { label: 'Snacky', count: getRecipeCount('Snacky'), img: 'https://images.unsplash.com/photo-1604329760661-e71dc83f8f26?w=800&h=500&fit=crop' },
 ];
 
 const dayLabels = ['Po', 'Ut', 'St', 'Št', 'Pi', 'So', 'Ne'];
@@ -118,12 +130,25 @@ export default function Strava() {
           {categories.map((c) => (
             <div key={c.label} className="bg-white/30 backdrop-blur-xl rounded-2xl shadow-sm border border-white/20 overflow-hidden">
               <button
-                onClick={() => navigate(`/recepty?cat=${encodeURIComponent(c.label)}`)}
-                className="relative w-full h-44 block active:scale-[0.99] transition-transform"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  navigate(`/recepty?category=${encodeURIComponent(c.label)}`);
+                }}
+                className="relative w-full h-44 flex flex-col justify-end items-start p-4 active:scale-[0.99] transition-transform hover:opacity-90 cursor-pointer"
+                style={{ 
+                  touchAction: 'manipulation',
+                  pointerEvents: 'auto',
+                  zIndex: 10
+                }}
               >
-                <img src={c.img} alt={c.label} className="absolute inset-0 w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-                <div className="absolute bottom-4 left-4 right-4 text-left">
+                <img 
+                  src={c.img} 
+                  alt={c.label} 
+                  className="absolute inset-0 w-full h-full object-cover pointer-events-none" 
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent pointer-events-none" />
+                <div className="relative z-20 text-left pointer-events-none">
                   <p className="text-white text-xl font-bold leading-tight drop-shadow-lg">{c.label}</p>
                   <p className="text-white/80 text-xs mt-0.5">{c.count} receptov</p>
                 </div>

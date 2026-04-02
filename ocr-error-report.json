@@ -1,0 +1,4721 @@
+{
+  "timestamp": "2026-03-25T02:25:21.848Z",
+  "totalRecipes": 116,
+  "summary": {
+    "missingIngredients": 0,
+    "incompleteIngredients": 445,
+    "brokenWords": 0,
+    "measurementErrors": 0,
+    "grammarErrors": 290
+  },
+  "details": {
+    "missingIngredients": [],
+    "incompleteIngredients": [
+      {
+        "id": "obed-bbg-kura-s-mango-salsou",
+        "title": "BBG kura s mango salsou",
+        "ingredient": "........ (..)",
+        "index": 2
+      },
+      {
+        "id": "obed-bbg-kura-s-mango-salsou",
+        "title": "BBG kura s mango salsou",
+        "ingredient": "....... (..)",
+        "index": 5
+      },
+      {
+        "id": "obed-bbg-kura-s-mango-salsou",
+        "title": "BBG kura s mango salsou",
+        "ingredient": "....... (..l)",
+        "index": 6
+      },
+      {
+        "id": "obed-bbg-kura-s-mango-salsou",
+        "title": "BBG kura s mango salsou",
+        "ingredient": "........ (..)",
+        "index": 7
+      },
+      {
+        "id": "obed-bbg-kura-s-mango-salsou",
+        "title": "BBG kura s mango salsou",
+        "ingredient": "....... (..)",
+        "index": 11
+      },
+      {
+        "id": "obed-bata-tovy-kola-c-z-mlete-ho-ma-sa",
+        "title": "Batátový koláč z mletého mäsa",
+        "ingredient": "......... (..)",
+        "index": 0
+      },
+      {
+        "id": "obed-bata-tovy-kola-c-z-mlete-ho-ma-sa",
+        "title": "Batátový koláč z mletého mäsa",
+        "ingredient": ".......... (..g)",
+        "index": 5
+      },
+      {
+        "id": "obed-bata-tovy-kola-c-z-mlete-ho-ma-sa",
+        "title": "Batátový koláč z mletého mäsa",
+        "ingredient": "........... (..)",
+        "index": 7
+      },
+      {
+        "id": "obed-bata-tovy-s-ala-t-s-ryz-ou-a-s-os-ovicou",
+        "title": "Batátový šalát s ryžou a šošovicou",
+        "ingredient": "...... (1)",
+        "index": 6
+      },
+      {
+        "id": "obed-bata-tovy-s-ala-t-s-ryz-ou-a-s-os-ovicou",
+        "title": "Batátový šalát s ryžou a šošovicou",
+        "ingredient": "........... (½)",
+        "index": 7
+      },
+      {
+        "id": "obed-bata-tovy-s-ala-t-s-ryz-ou-a-s-os-ovicou",
+        "title": "Batátový šalát s ryžou a šošovicou",
+        "ingredient": ".......... (.g)",
+        "index": 8
+      },
+      {
+        "id": "obed-bata-tovy-s-ala-t-s-ryz-ou-a-s-os-ovicou",
+        "title": "Batátový šalát s ryžou a šošovicou",
+        "ingredient": "........... (..)",
+        "index": 9
+      },
+      {
+        "id": "obed-falafel-wrap",
+        "title": "Falafel wrap",
+        "ingredient": "........ (..g)",
+        "index": 2
+      },
+      {
+        "id": "obed-falafel-wrap",
+        "title": "Falafel wrap",
+        "ingredient": ".... (..)",
+        "index": 4
+      },
+      {
+        "id": "obed-falafel-wrap",
+        "title": "Falafel wrap",
+        "ingredient": "................. (..g)",
+        "index": 8
+      },
+      {
+        "id": "obed-grilovany-mexicky-s-ala-t",
+        "title": "Grilovaný mexický šalát",
+        "ingredient": "............. (..g)",
+        "index": 0
+      },
+      {
+        "id": "obed-grilovany-mexicky-s-ala-t",
+        "title": "Grilovaný mexický šalát",
+        "ingredient": "......... (..)",
+        "index": 1
+      },
+      {
+        "id": "obed-grilovany-mexicky-s-ala-t",
+        "title": "Grilovaný mexický šalát",
+        "ingredient": "............. (..)",
+        "index": 2
+      },
+      {
+        "id": "obed-grilovany-mexicky-s-ala-t",
+        "title": "Grilovaný mexický šalát",
+        "ingredient": "............ (1)",
+        "index": 3
+      },
+      {
+        "id": "obed-grilovany-mexicky-s-ala-t",
+        "title": "Grilovaný mexický šalát",
+        "ingredient": ".......... (.......o)",
+        "index": 4
+      },
+      {
+        "id": "obed-grilovany-mexicky-s-ala-t",
+        "title": "Grilovaný mexický šalát",
+        "ingredient": ".... (1)",
+        "index": 5
+      },
+      {
+        "id": "obed-grilovany-mexicky-s-ala-t",
+        "title": "Grilovaný mexický šalát",
+        "ingredient": "........... (1)",
+        "index": 6
+      },
+      {
+        "id": "obed-grilovany-mexicky-s-ala-t",
+        "title": "Grilovaný mexický šalát",
+        "ingredient": "........ (..g)",
+        "index": 8
+      },
+      {
+        "id": "obed-grilovany-sendvic-s-hova-dzi-m-ma-som",
+        "title": "Grilovaný sendvič s hovädzím mäsom",
+        "ingredient": ".................... (..)",
+        "index": 0
+      },
+      {
+        "id": "obed-grilovany-sendvic-s-hova-dzi-m-ma-som",
+        "title": "Grilovaný sendvič s hovädzím mäsom",
+        "ingredient": "..... (..)",
+        "index": 2
+      },
+      {
+        "id": "obed-grilovany-sendvic-s-hova-dzi-m-ma-som",
+        "title": "Grilovaný sendvič s hovädzím mäsom",
+        "ingredient": "...... (1)",
+        "index": 4
+      },
+      {
+        "id": "obed-grilovany-sendvic-s-hova-dzi-m-ma-som",
+        "title": "Grilovaný sendvič s hovädzím mäsom",
+        "ingredient": "........ (1)",
+        "index": 6
+      },
+      {
+        "id": "obed-grilovany-sendvic-s-hova-dzi-m-ma-som",
+        "title": "Grilovaný sendvič s hovädzím mäsom",
+        "ingredient": "... (....)",
+        "index": 7
+      },
+      {
+        "id": "obed-grilovany-sendvic-s-hova-dzi-m-ma-som",
+        "title": "Grilovaný sendvič s hovädzím mäsom",
+        "ingredient": "...... (2)",
+        "index": 8
+      },
+      {
+        "id": "obed-grilovany-sendvic-s-hova-dzi-m-ma-som",
+        "title": "Grilovaný sendvič s hovädzím mäsom",
+        "ingredient": ".......... (..)",
+        "index": 9
+      },
+      {
+        "id": "obed-hova-dzie-na-zelenine",
+        "title": "Hovädzie na zelenine",
+        "ingredient": "....... (...)",
+        "index": 1
+      },
+      {
+        "id": "obed-hova-dzie-na-zelenine",
+        "title": "Hovädzie na zelenine",
+        "ingredient": "........ (...)",
+        "index": 2
+      },
+      {
+        "id": "obed-hova-dzie-na-zelenine",
+        "title": "Hovädzie na zelenine",
+        "ingredient": ".......... (..g)",
+        "index": 3
+      },
+      {
+        "id": "obed-hova-dzie-na-zelenine",
+        "title": "Hovädzie na zelenine",
+        "ingredient": "....... (..l)",
+        "index": 4
+      },
+      {
+        "id": "obed-hova-dzie-na-zelenine",
+        "title": "Hovädzie na zelenine",
+        "ingredient": "...... (.g)",
+        "index": 5
+      },
+      {
+        "id": "obed-hova-dzie-s-tekvicovou-kas-ou",
+        "title": "Hovädzie s tekvicovou kašou",
+        "ingredient": "... (..g)",
+        "index": 1
+      },
+      {
+        "id": "obed-hova-dzie-s-tekvicovou-kas-ou",
+        "title": "Hovädzie s tekvicovou kašou",
+        "ingredient": ".. (..)",
+        "index": 3
+      },
+      {
+        "id": "obed-hova-dzie-s-tekvicovou-kas-ou",
+        "title": "Hovädzie s tekvicovou kašou",
+        "ingredient": "....... (.5)",
+        "index": 5
+      },
+      {
+        "id": "obed-hova-dzie-s-tekvicovou-kas-ou",
+        "title": "Hovädzie s tekvicovou kašou",
+        "ingredient": "........ (1)",
+        "index": 8
+      },
+      {
+        "id": "obed-hova-dzie-s-tekvicovou-kas-ou",
+        "title": "Hovädzie s tekvicovou kašou",
+        "ingredient": "............................. (1)",
+        "index": 10
+      },
+      {
+        "id": "obed-hova-dzie-s-tekvicovou-kas-ou",
+        "title": "Hovädzie s tekvicovou kašou",
+        "ingredient": "............ (1)",
+        "index": 13
+      },
+      {
+        "id": "obed-kuracia-sezamova-panvic-ka",
+        "title": "Kuracia sezamová panvička",
+        "ingredient": "........... (..g)",
+        "index": 0
+      },
+      {
+        "id": "obed-kuracia-sezamova-panvic-ka",
+        "title": "Kuracia sezamová panvička",
+        "ingredient": "... (.....)",
+        "index": 1
+      },
+      {
+        "id": "obed-kuracia-sezamova-panvic-ka",
+        "title": "Kuracia sezamová panvička",
+        "ingredient": ".......... (..g)",
+        "index": 2
+      },
+      {
+        "id": "obed-kuracia-sezamova-panvic-ka",
+        "title": "Kuracia sezamová panvička",
+        "ingredient": "........ (1)",
+        "index": 4
+      },
+      {
+        "id": "obed-kuracia-sezamova-panvic-ka",
+        "title": "Kuracia sezamová panvička",
+        "ingredient": ".......... (.......o)",
+        "index": 5
+      },
+      {
+        "id": "obed-kuracia-sezamova-panvic-ka",
+        "title": "Kuracia sezamová panvička",
+        "ingredient": "........ (...)",
+        "index": 6
+      },
+      {
+        "id": "obed-kuracia-sezamova-panvic-ka",
+        "title": "Kuracia sezamová panvička",
+        "ingredient": "....... (..)",
+        "index": 7
+      },
+      {
+        "id": "obed-kuracia-sezamova-panvic-ka",
+        "title": "Kuracia sezamová panvička",
+        "ingredient": ".. (..)",
+        "index": 13
+      },
+      {
+        "id": "obed-kuracia-sezamova-panvic-ka",
+        "title": "Kuracia sezamová panvička",
+        "ingredient": ".......... (..)",
+        "index": 14
+      },
+      {
+        "id": "obed-mexicke-tortilly",
+        "title": "Mexické tortilly",
+        "ingredient": "............ (..g)",
+        "index": 0
+      },
+      {
+        "id": "obed-mexicke-tortilly",
+        "title": "Mexické tortilly",
+        "ingredient": "................... (..)",
+        "index": 1
+      },
+      {
+        "id": "obed-mexicke-tortilly",
+        "title": "Mexické tortilly",
+        "ingredient": "........................... (..g)",
+        "index": 2
+      },
+      {
+        "id": "obed-mexicke-tortilly",
+        "title": "Mexické tortilly",
+        "ingredient": ".. (...)",
+        "index": 4
+      },
+      {
+        "id": "obed-mexicke-tortilly",
+        "title": "Mexické tortilly",
+        "ingredient": "................ (..)",
+        "index": 5
+      },
+      {
+        "id": "obed-mexicke-tortilly",
+        "title": "Mexické tortilly",
+        "ingredient": ".... (..)",
+        "index": 6
+      },
+      {
+        "id": "obed-placky-s-ricottou-cukinou-a-bata-tmi",
+        "title": "Placky s ricottou, cukinou a batátmi",
+        "ingredient": "......... (2)",
+        "index": 1
+      },
+      {
+        "id": "obed-placky-s-ricottou-cukinou-a-bata-tmi",
+        "title": "Placky s ricottou, cukinou a batátmi",
+        "ingredient": "..................... (1)",
+        "index": 3
+      },
+      {
+        "id": "obed-placky-s-ricottou-cukinou-a-bata-tmi",
+        "title": "Placky s ricottou, cukinou a batátmi",
+        "ingredient": "....... (....y)",
+        "index": 6
+      },
+      {
+        "id": "obed-plnene-sladke-zemiaky",
+        "title": "Plnené sladké zemiaky",
+        "ingredient": "........ (..g)",
+        "index": 1
+      },
+      {
+        "id": "obed-plnene-sladke-zemiaky",
+        "title": "Plnené sladké zemiaky",
+        "ingredient": "......... (.0)",
+        "index": 2
+      },
+      {
+        "id": "obed-plnene-sladke-zemiaky",
+        "title": "Plnené sladké zemiaky",
+        "ingredient": ".............. (2)",
+        "index": 4
+      },
+      {
+        "id": "obed-plnene-sladke-zemiaky",
+        "title": "Plnené sladké zemiaky",
+        "ingredient": "......... (.......o)",
+        "index": 5
+      },
+      {
+        "id": "obed-plnene-sladke-zemiaky",
+        "title": "Plnené sladké zemiaky",
+        "ingredient": "... (..)",
+        "index": 6
+      },
+      {
+        "id": "obed-plnene-sladke-zemiaky",
+        "title": "Plnené sladké zemiaky",
+        "ingredient": "........ (.....i)",
+        "index": 10
+      },
+      {
+        "id": "obed-poke-miska-s-kuraci-m-ma-som",
+        "title": "Poke miska s kuracím mäsom",
+        "ingredient": ".................... (...y)",
+        "index": 4
+      },
+      {
+        "id": "obed-poke-miska-s-kuraci-m-ma-som",
+        "title": "Poke miska s kuracím mäsom",
+        "ingredient": "......... (...y)",
+        "index": 5
+      },
+      {
+        "id": "obed-poke-miska-s-kuraci-m-ma-som",
+        "title": "Poke miska s kuracím mäsom",
+        "ingredient": ".............. (.......o)",
+        "index": 6
+      },
+      {
+        "id": "obed-poke-miska-s-kuraci-m-ma-som",
+        "title": "Poke miska s kuracím mäsom",
+        "ingredient": ".. (..)",
+        "index": 7
+      },
+      {
+        "id": "obed-poke-miska-s-kuraci-m-ma-som",
+        "title": "Poke miska s kuracím mäsom",
+        "ingredient": "....... (..)",
+        "index": 8
+      },
+      {
+        "id": "obed-slany-kola-c-z-bata-tov-a-slaniny",
+        "title": "Slaný koláč z batátov a slaniny",
+        "ingredient": ".............. (1)",
+        "index": 0
+      },
+      {
+        "id": "obed-slany-kola-c-z-bata-tov-a-slaniny",
+        "title": "Slaný koláč z batátov a slaniny",
+        "ingredient": "............ (1)",
+        "index": 1
+      },
+      {
+        "id": "obed-slany-kola-c-z-bata-tov-a-slaniny",
+        "title": "Slaný koláč z batátov a slaniny",
+        "ingredient": ".............. (..)",
+        "index": 3
+      },
+      {
+        "id": "obed-slany-kola-c-z-bata-tov-a-slaniny",
+        "title": "Slaný koláč z batátov a slaniny",
+        "ingredient": "..... (1)",
+        "index": 4
+      },
+      {
+        "id": "obed-slany-kola-c-z-bata-tov-a-slaniny",
+        "title": "Slaný koláč z batátov a slaniny",
+        "ingredient": ".. (...)",
+        "index": 5
+      },
+      {
+        "id": "obed-slany-kola-c-z-bata-tov-a-slaniny",
+        "title": "Slaný koláč z batátov a slaniny",
+        "ingredient": "............ (4)",
+        "index": 10
+      },
+      {
+        "id": "obed-slany-kola-c-z-bata-tov-a-slaniny",
+        "title": "Slaný koláč z batátov a slaniny",
+        "ingredient": "......... (1)",
+        "index": 11
+      },
+      {
+        "id": "obed-slany-kola-c-z-bata-tov-a-slaniny",
+        "title": "Slaný koláč z batátov a slaniny",
+        "ingredient": "............ (..)",
+        "index": 12
+      },
+      {
+        "id": "obed-slany-kola-c-z-tekvice-a-fety",
+        "title": "Slaný koláč z tekvice a fety",
+        "ingredient": "...... (1)",
+        "index": 3
+      },
+      {
+        "id": "obed-slany-kola-c-z-tekvice-a-fety",
+        "title": "Slaný koláč z tekvice a fety",
+        "ingredient": "........... (...y)",
+        "index": 4
+      },
+      {
+        "id": "obed-slany-kola-c-z-tekvice-a-fety",
+        "title": "Slaný koláč z tekvice a fety",
+        "ingredient": "............ (..g)",
+        "index": 6
+      },
+      {
+        "id": "obed-slany-kola-c-z-tekvice-a-fety",
+        "title": "Slaný koláč z tekvice a fety",
+        "ingredient": "........... (.g)",
+        "index": 10
+      },
+      {
+        "id": "obed-slany-kola-c-z-tekvice-a-fety",
+        "title": "Slaný koláč z tekvice a fety",
+        "ingredient": "......... (..)",
+        "index": 11
+      },
+      {
+        "id": "obed-slany-kola-c-z-tekvice-a-fety",
+        "title": "Slaný koláč z tekvice a fety",
+        "ingredient": "............. (...y)",
+        "index": 12
+      },
+      {
+        "id": "obed-slany-kola-c-z-tekvice-a-fety",
+        "title": "Slaný koláč z tekvice a fety",
+        "ingredient": "...... (1)",
+        "index": 13
+      },
+      {
+        "id": "obed-steak-s-pec-enou-zeleninou",
+        "title": "Steak s pečenou zeleninou",
+        "ingredient": "... (2)",
+        "index": 0
+      },
+      {
+        "id": "obed-steak-s-pec-enou-zeleninou",
+        "title": "Steak s pečenou zeleninou",
+        "ingredient": "... (1)",
+        "index": 1
+      },
+      {
+        "id": "obed-steak-s-pec-enou-zeleninou",
+        "title": "Steak s pečenou zeleninou",
+        "ingredient": "........... (..)",
+        "index": 3
+      },
+      {
+        "id": "obed-steak-s-pec-enou-zeleninou",
+        "title": "Steak s pečenou zeleninou",
+        "ingredient": ".... (1)",
+        "index": 5
+      },
+      {
+        "id": "obed-steak-s-pec-enou-zeleninou",
+        "title": "Steak s pečenou zeleninou",
+        "ingredient": "... (1)",
+        "index": 6
+      },
+      {
+        "id": "obed-steak-s-pec-enou-zeleninou",
+        "title": "Steak s pečenou zeleninou",
+        "ingredient": "................ (..)",
+        "index": 7
+      },
+      {
+        "id": "obed-steak-s-pec-enou-zeleninou",
+        "title": "Steak s pečenou zeleninou",
+        "ingredient": "........ (4)",
+        "index": 8
+      },
+      {
+        "id": "obed-steak-s-pec-enou-zeleninou",
+        "title": "Steak s pečenou zeleninou",
+        "ingredient": ".......... (1)",
+        "index": 9
+      },
+      {
+        "id": "obed-s-ala-t-z-tekvice-fety-a-c-ervenej-repy",
+        "title": "Šalát z tekvice, fety a červenej repy",
+        "ingredient": "......... (...)",
+        "index": 1
+      },
+      {
+        "id": "obed-s-ala-t-z-tekvice-fety-a-c-ervenej-repy",
+        "title": "Šalát z tekvice, fety a červenej repy",
+        "ingredient": "...... (0)",
+        "index": 2
+      },
+      {
+        "id": "obed-s-ala-t-z-tekvice-fety-a-c-ervenej-repy",
+        "title": "Šalát z tekvice, fety a červenej repy",
+        "ingredient": "......... (1)",
+        "index": 5
+      },
+      {
+        "id": "obed-s-ala-t-z-tekvice-fety-a-c-ervenej-repy",
+        "title": "Šalát z tekvice, fety a červenej repy",
+        "ingredient": ".. (..)",
+        "index": 6
+      },
+      {
+        "id": "obed-s-pena-tovo-brokolicove-cestoviny-s-pestom",
+        "title": "Špenátovo brokolicové cestoviny s pestom",
+        "ingredient": "...... (...e)",
+        "index": 1
+      },
+      {
+        "id": "obed-s-pena-tovo-brokolicove-cestoviny-s-pestom",
+        "title": "Špenátovo brokolicové cestoviny s pestom",
+        "ingredient": ".......... (..)",
+        "index": 5
+      },
+      {
+        "id": "obed-s-pena-tovo-brokolicove-cestoviny-s-pestom",
+        "title": "Špenátovo brokolicové cestoviny s pestom",
+        "ingredient": "........ (6)",
+        "index": 6
+      },
+      {
+        "id": "obed-s-pena-tovo-brokolicove-cestoviny-s-pestom",
+        "title": "Špenátovo brokolicové cestoviny s pestom",
+        "ingredient": "......... (..)",
+        "index": 7
+      },
+      {
+        "id": "obed-tofu-buddha-bowl",
+        "title": "Tofu Buddha bowl",
+        "ingredient": "...... (1)",
+        "index": 3
+      },
+      {
+        "id": "obed-tofu-buddha-bowl",
+        "title": "Tofu Buddha bowl",
+        "ingredient": "....... (...e)",
+        "index": 4
+      },
+      {
+        "id": "obed-tofu-buddha-bowl",
+        "title": "Tofu Buddha bowl",
+        "ingredient": ".......... (..)",
+        "index": 6
+      },
+      {
+        "id": "obed-tofu-buddha-bowl",
+        "title": "Tofu Buddha bowl",
+        "ingredient": "............... (..)",
+        "index": 7
+      },
+      {
+        "id": "obed-tofu-buddha-bowl",
+        "title": "Tofu Buddha bowl",
+        "ingredient": "..... (..)",
+        "index": 8
+      },
+      {
+        "id": "obed-tofu-buddha-bowl",
+        "title": "Tofu Buddha bowl",
+        "ingredient": "... (..)",
+        "index": 9
+      },
+      {
+        "id": "obed-u-dena-ryba-s-letnou-zeleninou",
+        "title": "Údená ryba s letnou zeleninou",
+        "ingredient": ".......... (..)",
+        "index": 1
+      },
+      {
+        "id": "obed-u-dena-ryba-s-letnou-zeleninou",
+        "title": "Údená ryba s letnou zeleninou",
+        "ingredient": ".................... (..g)",
+        "index": 2
+      },
+      {
+        "id": "obed-u-dena-ryba-s-letnou-zeleninou",
+        "title": "Údená ryba s letnou zeleninou",
+        "ingredient": "...... (..)",
+        "index": 6
+      },
+      {
+        "id": "obed-u-dena-ryba-s-letnou-zeleninou",
+        "title": "Údená ryba s letnou zeleninou",
+        "ingredient": ".. (.....a)",
+        "index": 7
+      },
+      {
+        "id": "obed-u-dena-ryba-s-letnou-zeleninou",
+        "title": "Údená ryba s letnou zeleninou",
+        "ingredient": "....... (..)",
+        "index": 8
+      },
+      {
+        "id": "obed-vega-nsky-burger-z-bata-tov",
+        "title": "Vegánsky burger z batátov",
+        "ingredient": "...... (.g)",
+        "index": 2
+      },
+      {
+        "id": "obed-vega-nsky-burger-z-bata-tov",
+        "title": "Vegánsky burger z batátov",
+        "ingredient": "...... (..)",
+        "index": 7
+      },
+      {
+        "id": "obed-vega-nsky-burger-z-bata-tov",
+        "title": "Vegánsky burger z batátov",
+        "ingredient": "........ (..)",
+        "index": 10
+      },
+      {
+        "id": "obed-vega-nsky-s-ala-t-s-ryz-ovy-mi-rezancami",
+        "title": "Vegánsky šalát s ryžovými rezancami",
+        "ingredient": "................. (1)",
+        "index": 2
+      },
+      {
+        "id": "obed-vega-nsky-s-ala-t-s-ryz-ovy-mi-rezancami",
+        "title": "Vegánsky šalát s ryžovými rezancami",
+        "ingredient": "........... (1)",
+        "index": 4
+      },
+      {
+        "id": "obed-vega-nsky-s-ala-t-s-ryz-ovy-mi-rezancami",
+        "title": "Vegánsky šalát s ryžovými rezancami",
+        "ingredient": "........ (..)",
+        "index": 7
+      },
+      {
+        "id": "obed-vega-nsky-s-ala-t-s-ryz-ovy-mi-rezancami",
+        "title": "Vegánsky šalát s ryžovými rezancami",
+        "ingredient": ".......... (.g)",
+        "index": 8
+      },
+      {
+        "id": "obed-vega-nsky-s-ala-t-s-ryz-ovy-mi-rezancami",
+        "title": "Vegánsky šalát s ryžovými rezancami",
+        "ingredient": "............ (..)",
+        "index": 11
+      },
+      {
+        "id": "obed-vega-nsky-wrap-s-bata-tmi-a-humusom",
+        "title": "Vegánsky wrap s batátmi a humusom",
+        "ingredient": "........................ (1)",
+        "index": 1
+      },
+      {
+        "id": "obed-vega-nsky-wrap-s-bata-tmi-a-humusom",
+        "title": "Vegánsky wrap s batátmi a humusom",
+        "ingredient": "......... (..)",
+        "index": 3
+      },
+      {
+        "id": "obed-vega-nsky-wrap-s-bata-tmi-a-humusom",
+        "title": "Vegánsky wrap s batátmi a humusom",
+        "ingredient": "........... (..)",
+        "index": 4
+      },
+      {
+        "id": "obed-vega-nsky-wrap-s-bata-tmi-a-humusom",
+        "title": "Vegánsky wrap s batátmi a humusom",
+        "ingredient": "...... (.....i)",
+        "index": 5
+      },
+      {
+        "id": "obed-vega-nsky-wrap-s-bata-tmi-a-humusom",
+        "title": "Vegánsky wrap s batátmi a humusom",
+        "ingredient": "....... (1)",
+        "index": 6
+      },
+      {
+        "id": "obed-vega-nsky-wrap-s-bata-tmi-a-humusom",
+        "title": "Vegánsky wrap s batátmi a humusom",
+        "ingredient": "........ (....y)",
+        "index": 7
+      },
+      {
+        "id": "obed-vega-nsky-wrap-s-bata-tmi-a-humusom",
+        "title": "Vegánsky wrap s batátmi a humusom",
+        "ingredient": "......... (....y)",
+        "index": 8
+      },
+      {
+        "id": "obed-vega-nsky-wrap-s-bata-tmi-a-humusom",
+        "title": "Vegánsky wrap s batátmi a humusom",
+        "ingredient": ".... (..g)",
+        "index": 9
+      },
+      {
+        "id": "obed-zdrave-bolon-ske-s-pagety",
+        "title": "Zdravé boloňské špagety",
+        "ingredient": "............ (2)",
+        "index": 0
+      },
+      {
+        "id": "obed-zdrave-bolon-ske-s-pagety",
+        "title": "Zdravé boloňské špagety",
+        "ingredient": "............. (1)",
+        "index": 1
+      },
+      {
+        "id": "obed-zdrave-bolon-ske-s-pagety",
+        "title": "Zdravé boloňské špagety",
+        "ingredient": ".... (..)",
+        "index": 3
+      },
+      {
+        "id": "obed-zdrave-bolon-ske-s-pagety",
+        "title": "Zdravé boloňské špagety",
+        "ingredient": "......... (.....)",
+        "index": 5
+      },
+      {
+        "id": "obed-zdrave-bolon-ske-s-pagety",
+        "title": "Zdravé boloňské špagety",
+        "ingredient": ".................... (..g)",
+        "index": 8
+      },
+      {
+        "id": "obed-zdrave-zeleninove-muffiny",
+        "title": "Zdravé zeleninové muffiny",
+        "ingredient": "............... (...y)",
+        "index": 0
+      },
+      {
+        "id": "obed-zdrave-zeleninove-muffiny",
+        "title": "Zdravé zeleninové muffiny",
+        "ingredient": "......... (4)",
+        "index": 1
+      },
+      {
+        "id": "obed-zdrave-zeleninove-muffiny",
+        "title": "Zdravé zeleninové muffiny",
+        "ingredient": "................... (½)",
+        "index": 2
+      },
+      {
+        "id": "obed-zdrave-zeleninove-muffiny",
+        "title": "Zdravé zeleninové muffiny",
+        "ingredient": "................... (1)",
+        "index": 3
+      },
+      {
+        "id": "obed-zdrave-zeleninove-muffiny",
+        "title": "Zdravé zeleninové muffiny",
+        "ingredient": "............. (..)",
+        "index": 6
+      },
+      {
+        "id": "obed-zelene-kari-s-krevetami",
+        "title": "Zelené kari s krevetami",
+        "ingredient": "............ (1)",
+        "index": 2
+      },
+      {
+        "id": "obed-zelene-kari-s-krevetami",
+        "title": "Zelené kari s krevetami",
+        "ingredient": "......... (.0)",
+        "index": 4
+      },
+      {
+        "id": "obed-zelene-kari-s-krevetami",
+        "title": "Zelené kari s krevetami",
+        "ingredient": "............... (1)",
+        "index": 5
+      },
+      {
+        "id": "obed-zelene-kari-s-krevetami",
+        "title": "Zelené kari s krevetami",
+        "ingredient": "...... (1)",
+        "index": 6
+      },
+      {
+        "id": "obed-zelene-kari-s-krevetami",
+        "title": "Zelené kari s krevetami",
+        "ingredient": "........ (...)",
+        "index": 8
+      },
+      {
+        "id": "obed-zelene-kari-s-krevetami",
+        "title": "Zelené kari s krevetami",
+        "ingredient": "...... (1)",
+        "index": 9
+      },
+      {
+        "id": "obed-zelene-kari-s-krevetami",
+        "title": "Zelené kari s krevetami",
+        "ingredient": ".......... (.......o)",
+        "index": 10
+      },
+      {
+        "id": "obed-hubova-polievka",
+        "title": "Hubová polievka",
+        "ingredient": "...... (..)",
+        "index": 0
+      },
+      {
+        "id": "obed-hubova-polievka",
+        "title": "Hubová polievka",
+        "ingredient": "............ (.g)",
+        "index": 2
+      },
+      {
+        "id": "obed-hubova-polievka",
+        "title": "Hubová polievka",
+        "ingredient": "........ (.....y)",
+        "index": 3
+      },
+      {
+        "id": "obed-hubova-polievka",
+        "title": "Hubová polievka",
+        "ingredient": ".b (..)",
+        "index": 4
+      },
+      {
+        "id": "obed-hubova-polievka",
+        "title": "Hubová polievka",
+        "ingredient": "...... (1)",
+        "index": 5
+      },
+      {
+        "id": "obed-hubova-polievka",
+        "title": "Hubová polievka",
+        "ingredient": "............................. (..)",
+        "index": 6
+      },
+      {
+        "id": "obed-hubova-polievka",
+        "title": "Hubová polievka",
+        "ingredient": "........... (.g)",
+        "index": 7
+      },
+      {
+        "id": "obed-hubova-polievka",
+        "title": "Hubová polievka",
+        "ingredient": "...... (..g)",
+        "index": 9
+      },
+      {
+        "id": "obed-hubova-polievka",
+        "title": "Hubová polievka",
+        "ingredient": "......... (..)",
+        "index": 11
+      },
+      {
+        "id": "obed-kuracia-polievka-na-mexicky-s-ty-l",
+        "title": "Kuracia polievka na mexický štýl",
+        "ingredient": "............ (..g)",
+        "index": 0
+      },
+      {
+        "id": "obed-kuracia-polievka-na-mexicky-s-ty-l",
+        "title": "Kuracia polievka na mexický štýl",
+        "ingredient": "...................... (..)",
+        "index": 1
+      },
+      {
+        "id": "obed-kuracia-polievka-na-mexicky-s-ty-l",
+        "title": "Kuracia polievka na mexický štýl",
+        "ingredient": "............... (..g)",
+        "index": 4
+      },
+      {
+        "id": "obed-kuracia-polievka-na-mexicky-s-ty-l",
+        "title": "Kuracia polievka na mexický štýl",
+        "ingredient": "........ (...)",
+        "index": 7
+      },
+      {
+        "id": "obed-kuracia-polievka-na-mexicky-s-ty-l",
+        "title": "Kuracia polievka na mexický štýl",
+        "ingredient": "........ (..)",
+        "index": 11
+      },
+      {
+        "id": "obed-kuracia-polievka-na-s-ty-l-pho",
+        "title": "Kuracia polievka na štýl pho",
+        "ingredient": "...... (..g)",
+        "index": 0
+      },
+      {
+        "id": "obed-kuracia-polievka-na-s-ty-l-pho",
+        "title": "Kuracia polievka na štýl pho",
+        "ingredient": ".... (..g)",
+        "index": 1
+      },
+      {
+        "id": "obed-kuracia-polievka-na-s-ty-l-pho",
+        "title": "Kuracia polievka na štýl pho",
+        "ingredient": ".r (1)",
+        "index": 2
+      },
+      {
+        "id": "obed-kuracia-polievka-na-s-ty-l-pho",
+        "title": "Kuracia polievka na štýl pho",
+        "ingredient": "........ (....y)",
+        "index": 3
+      },
+      {
+        "id": "obed-kuracia-polievka-na-s-ty-l-pho",
+        "title": "Kuracia polievka na štýl pho",
+        "ingredient": "........... (1)",
+        "index": 5
+      },
+      {
+        "id": "obed-kuracia-polievka-na-s-ty-l-pho",
+        "title": "Kuracia polievka na štýl pho",
+        "ingredient": "........... (..g)",
+        "index": 6
+      },
+      {
+        "id": "obed-kuracia-polievka-na-s-ty-l-pho",
+        "title": "Kuracia polievka na štýl pho",
+        "ingredient": "....... (3)",
+        "index": 7
+      },
+      {
+        "id": "obed-kuracia-polievka-na-s-ty-l-pho",
+        "title": "Kuracia polievka na štýl pho",
+        "ingredient": "............ (1)",
+        "index": 8
+      },
+      {
+        "id": "obed-miso-polievka-s-jac-men-om",
+        "title": "Miso polievka s jačmeňom",
+        "ingredient": ".......... (..)",
+        "index": 1
+      },
+      {
+        "id": "obed-miso-polievka-s-jac-men-om",
+        "title": "Miso polievka s jačmeňom",
+        "ingredient": "........ (...)",
+        "index": 2
+      },
+      {
+        "id": "obed-miso-polievka-s-jac-men-om",
+        "title": "Miso polievka s jačmeňom",
+        "ingredient": "....... (..)",
+        "index": 3
+      },
+      {
+        "id": "obed-miso-polievka-s-jac-men-om",
+        "title": "Miso polievka s jačmeňom",
+        "ingredient": "............... (..)",
+        "index": 5
+      },
+      {
+        "id": "obed-miso-polievka-s-jac-men-om",
+        "title": "Miso polievka s jačmeňom",
+        "ingredient": "... (..g)",
+        "index": 6
+      },
+      {
+        "id": "obed-miso-polievka-s-jac-men-om",
+        "title": "Miso polievka s jačmeňom",
+        "ingredient": "...... (..)",
+        "index": 7
+      },
+      {
+        "id": "obed-miso-polievka-s-jac-men-om",
+        "title": "Miso polievka s jačmeňom",
+        "ingredient": "............ (..)",
+        "index": 8
+      },
+      {
+        "id": "obed-paradajkova-polievka-s-fazul-ou",
+        "title": "Paradajková polievka s fazuľou",
+        "ingredient": "............... (..g)",
+        "index": 1
+      },
+      {
+        "id": "obed-polievka-z-tekvice-a-bata-tov",
+        "title": "Polievka z tekvice a batátov",
+        "ingredient": ".......... (1)",
+        "index": 3
+      },
+      {
+        "id": "obed-polievka-z-tekvice-a-bata-tov",
+        "title": "Polievka z tekvice a batátov",
+        "ingredient": "........................ (..g)",
+        "index": 6
+      },
+      {
+        "id": "obed-polievka-z-tekvice-a-bata-tov",
+        "title": "Polievka z tekvice a batátov",
+        "ingredient": ".. (..)",
+        "index": 8
+      },
+      {
+        "id": "obed-polievka-z-tekvice-a-bata-tov",
+        "title": "Polievka z tekvice a batátov",
+        "ingredient": ".............. (..)",
+        "index": 10
+      },
+      {
+        "id": "obed-s-os-ovicova-kari-polievka",
+        "title": "Šošovicová kari polievka",
+        "ingredient": "............ (..)",
+        "index": 3
+      },
+      {
+        "id": "obed-s-os-ovicova-kari-polievka",
+        "title": "Šošovicová kari polievka",
+        "ingredient": "...... (...)",
+        "index": 6
+      },
+      {
+        "id": "obed-vega-nska-s-os-ovicova-polievka",
+        "title": "Vegánska šošovicová polievka",
+        "ingredient": "..................................., (...e)",
+        "index": 0
+      },
+      {
+        "id": "obed-vega-nska-s-os-ovicova-polievka",
+        "title": "Vegánska šošovicová polievka",
+        "ingredient": "............. (1)",
+        "index": 2
+      },
+      {
+        "id": "obed-vega-nska-s-os-ovicova-polievka",
+        "title": "Vegánska šošovicová polievka",
+        "ingredient": "............ (4)",
+        "index": 3
+      },
+      {
+        "id": "obed-vega-nska-s-os-ovicova-polievka",
+        "title": "Vegánska šošovicová polievka",
+        "ingredient": "........ (...)",
+        "index": 5
+      },
+      {
+        "id": "obed-vega-nska-s-os-ovicova-polievka",
+        "title": "Vegánska šošovicová polievka",
+        "ingredient": "................ (....y)",
+        "index": 7
+      },
+      {
+        "id": "obed-vy-var-na-a-zijsky-s-ty-l",
+        "title": "Vývar na ázijský štýl",
+        "ingredient": "..... (1)",
+        "index": 1
+      },
+      {
+        "id": "obed-vy-var-na-a-zijsky-s-ty-l",
+        "title": "Vývar na ázijský štýl",
+        "ingredient": ".......... (..g)",
+        "index": 2
+      },
+      {
+        "id": "obed-vy-var-na-a-zijsky-s-ty-l",
+        "title": "Vývar na ázijský štýl",
+        "ingredient": "......, (..)",
+        "index": 4
+      },
+      {
+        "id": "obed-vy-var-na-a-zijsky-s-ty-l",
+        "title": "Vývar na ázijský štýl",
+        "ingredient": "................. (..)",
+        "index": 5
+      },
+      {
+        "id": "obed-vy-var-na-a-zijsky-s-ty-l",
+        "title": "Vývar na ázijský štýl",
+        "ingredient": "...................... (1)",
+        "index": 7
+      },
+      {
+        "id": "obed-vy-var-na-a-zijsky-s-ty-l",
+        "title": "Vývar na ázijský štýl",
+        "ingredient": "................. (..l)",
+        "index": 8
+      },
+      {
+        "id": "ranajky-acai-miska",
+        "title": "Acai miska",
+        "ingredient": "............. (...y)",
+        "index": 3
+      },
+      {
+        "id": "ranajky-avoka-dovy-toast-s-fetou",
+        "title": "Avokádový toast s fetou",
+        "ingredient": ".. (..)",
+        "index": 2
+      },
+      {
+        "id": "ranajky-avoka-dovy-toast-s-fetou",
+        "title": "Avokádový toast s fetou",
+        "ingredient": "....... (2)",
+        "index": 4
+      },
+      {
+        "id": "ranajky-bana-novo-ovsene-lievance",
+        "title": "Banánovo ovsené lievance",
+        "ingredient": "........ (..)",
+        "index": 1
+      },
+      {
+        "id": "ranajky-bana-novo-ovsene-lievance",
+        "title": "Banánovo ovsené lievance",
+        "ingredient": ".................. (...y)",
+        "index": 2
+      },
+      {
+        "id": "ranajky-bana-novo-ovsene-lievance",
+        "title": "Banánovo ovsené lievance",
+        "ingredient": "... (..)",
+        "index": 4
+      },
+      {
+        "id": "ranajky-bana-novo-ovsene-lievance",
+        "title": "Banánovo ovsené lievance",
+        "ingredient": "....... (..)",
+        "index": 7
+      },
+      {
+        "id": "ranajky-bana-novo-ovsene-lievance",
+        "title": "Banánovo ovsené lievance",
+        "ingredient": "....... (..)",
+        "index": 8
+      },
+      {
+        "id": "ranajky-bana-novy-chlieb",
+        "title": "Banánový chlieb",
+        "ingredient": ".............. (..)",
+        "index": 0
+      },
+      {
+        "id": "ranajky-bana-novy-chlieb",
+        "title": "Banánový chlieb",
+        "ingredient": "......... (...)",
+        "index": 1
+      },
+      {
+        "id": "ranajky-bana-novy-chlieb",
+        "title": "Banánový chlieb",
+        "ingredient": "....... (.....y)",
+        "index": 4
+      },
+      {
+        "id": "ranajky-bana-novy-chlieb",
+        "title": "Banánový chlieb",
+        "ingredient": "... (.....y)",
+        "index": 5
+      },
+      {
+        "id": "ranajky-bana-novy-chlieb",
+        "title": "Banánový chlieb",
+        "ingredient": "......... (..g)",
+        "index": 7
+      },
+      {
+        "id": "ranajky-bylinkove-vaji-c-ka-s-kyslou-kapustou",
+        "title": "Bylinkové vajíčka s kyslou kapustou",
+        "ingredient": "..... (..)",
+        "index": 1
+      },
+      {
+        "id": "ranajky-bylinkove-vaji-c-ka-s-kyslou-kapustou",
+        "title": "Bylinkové vajíčka s kyslou kapustou",
+        "ingredient": ".......... (..)",
+        "index": 3
+      },
+      {
+        "id": "ranajky-bylinkove-vaji-c-ka-s-kyslou-kapustou",
+        "title": "Bylinkové vajíčka s kyslou kapustou",
+        "ingredient": "..... (..)",
+        "index": 4
+      },
+      {
+        "id": "ranajky-bylinkove-vaji-c-ka-s-kyslou-kapustou",
+        "title": "Bylinkové vajíčka s kyslou kapustou",
+        "ingredient": "....... (.g)",
+        "index": 5
+      },
+      {
+        "id": "ranajky-bylinkove-vaji-c-ka-s-kyslou-kapustou",
+        "title": "Bylinkové vajíčka s kyslou kapustou",
+        "ingredient": "............. (8)",
+        "index": 10
+      },
+      {
+        "id": "ranajky-bylinkove-vaji-c-ka-s-kyslou-kapustou",
+        "title": "Bylinkové vajíčka s kyslou kapustou",
+        "ingredient": "................ (.....i)",
+        "index": 11
+      },
+      {
+        "id": "ranajky-c-ili-stratene-vaji-c-ka",
+        "title": "Čili stratené vajíčka",
+        "ingredient": "...... (2)",
+        "index": 0
+      },
+      {
+        "id": "ranajky-c-ili-stratene-vaji-c-ka",
+        "title": "Čili stratené vajíčka",
+        "ingredient": "...... (..)",
+        "index": 1
+      },
+      {
+        "id": "ranajky-c-ili-stratene-vaji-c-ka",
+        "title": "Čili stratené vajíčka",
+        "ingredient": "....... (.....y)",
+        "index": 2
+      },
+      {
+        "id": "ranajky-c-ili-stratene-vaji-c-ka",
+        "title": "Čili stratené vajíčka",
+        "ingredient": "................. (....)",
+        "index": 4
+      },
+      {
+        "id": "ranajky-c-ili-stratene-vaji-c-ka",
+        "title": "Čili stratené vajíčka",
+        "ingredient": ".......... (.....)",
+        "index": 6
+      },
+      {
+        "id": "ranajky-c-ili-stratene-vaji-c-ka",
+        "title": "Čili stratené vajíčka",
+        "ingredient": ".................. (.......o)",
+        "index": 7
+      },
+      {
+        "id": "ranajky-c-okola-dova-ran-ajkova-miska",
+        "title": "Čokoládová raňajková miska",
+        "ingredient": "............... (..)",
+        "index": 1
+      },
+      {
+        "id": "ranajky-c-okola-dova-ran-ajkova-miska",
+        "title": "Čokoládová raňajková miska",
+        "ingredient": "... (..)",
+        "index": 2
+      },
+      {
+        "id": "ranajky-c-okola-dova-ran-ajkova-miska",
+        "title": "Čokoládová raňajková miska",
+        "ingredient": "............. (..)",
+        "index": 3
+      },
+      {
+        "id": "ranajky-jahodovy-chia-puding",
+        "title": "Jahodový chia puding",
+        "ingredient": "..... (..)",
+        "index": 1
+      },
+      {
+        "id": "ranajky-jahodovy-chia-puding",
+        "title": "Jahodový chia puding",
+        "ingredient": "..................... (..)",
+        "index": 6
+      },
+      {
+        "id": "ranajky-kokosovo-poha-nkova-overnight-kas-a",
+        "title": "Kokosovo pohánková overnight kaša",
+        "ingredient": "............. (..)",
+        "index": 0
+      },
+      {
+        "id": "ranajky-kokosovo-poha-nkova-overnight-kas-a",
+        "title": "Kokosovo pohánková overnight kaša",
+        "ingredient": "... (..g)",
+        "index": 2
+      },
+      {
+        "id": "ranajky-kokosovo-poha-nkova-overnight-kas-a",
+        "title": "Kokosovo pohánková overnight kaša",
+        "ingredient": "................ (...)",
+        "index": 7
+      },
+      {
+        "id": "ranajky-kokosovo-poha-nkova-overnight-kas-a",
+        "title": "Kokosovo pohánková overnight kaša",
+        "ingredient": "........ (...)",
+        "index": 9
+      },
+      {
+        "id": "ranajky-kokosovo-poha-nkova-overnight-kas-a",
+        "title": "Kokosovo pohánková overnight kaša",
+        "ingredient": "..... (...)",
+        "index": 10
+      },
+      {
+        "id": "ranajky-kokosovo-poha-nkova-overnight-kas-a",
+        "title": "Kokosovo pohánková overnight kaša",
+        "ingredient": ".............. (.......))",
+        "index": 11
+      },
+      {
+        "id": "ranajky-omeleta-s-kyslou-kapustou",
+        "title": "Omeleta s kyslou kapustou",
+        "ingredient": "...... (4)",
+        "index": 0
+      },
+      {
+        "id": "ranajky-omeleta-s-kyslou-kapustou",
+        "title": "Omeleta s kyslou kapustou",
+        "ingredient": "................. (4)",
+        "index": 5
+      },
+      {
+        "id": "ranajky-ovsena-mrkvova-kas-a",
+        "title": "Ovsená mrkvová kaša",
+        "ingredient": "... (..)",
+        "index": 1
+      },
+      {
+        "id": "ranajky-ovsena-mrkvova-kas-a",
+        "title": "Ovsená mrkvová kaša",
+        "ingredient": "............ (..)",
+        "index": 2
+      },
+      {
+        "id": "ranajky-ovsena-mrkvova-kas-a",
+        "title": "Ovsená mrkvová kaša",
+        "ingredient": ".. (..)",
+        "index": 3
+      },
+      {
+        "id": "ranajky-ovsena-mrkvova-kas-a",
+        "title": "Ovsená mrkvová kaša",
+        "ingredient": ".............. (..)",
+        "index": 5
+      },
+      {
+        "id": "ranajky-ovsena-mrkvova-kas-a",
+        "title": "Ovsená mrkvová kaša",
+        "ingredient": ".......... (..)",
+        "index": 6
+      },
+      {
+        "id": "ranajky-ovsena-mrkvova-kas-a",
+        "title": "Ovsená mrkvová kaša",
+        "ingredient": "........... (..)",
+        "index": 7
+      },
+      {
+        "id": "ranajky-ovsena-mrkvova-kas-a",
+        "title": "Ovsená mrkvová kaša",
+        "ingredient": "..... (..)",
+        "index": 8
+      },
+      {
+        "id": "ranajky-ovsena-mrkvova-kas-a",
+        "title": "Ovsená mrkvová kaša",
+        "ingredient": "............ (...y)",
+        "index": 9
+      },
+      {
+        "id": "ranajky-ovsena-mrkvova-kas-a",
+        "title": "Ovsená mrkvová kaša",
+        "ingredient": "............... (..)",
+        "index": 10
+      },
+      {
+        "id": "ranajky-ovsena-mrkvova-kas-a",
+        "title": "Ovsená mrkvová kaša",
+        "ingredient": "..... (...y)",
+        "index": 12
+      },
+      {
+        "id": "ranajky-ovseny-chia-puding",
+        "title": "Ovsený chia puding",
+        "ingredient": ".............. (1)",
+        "index": 0
+      },
+      {
+        "id": "ranajky-ovseny-chia-puding",
+        "title": "Ovsený chia puding",
+        "ingredient": ".......... (...)",
+        "index": 1
+      },
+      {
+        "id": "ranajky-ovseny-chia-puding",
+        "title": "Ovsený chia puding",
+        "ingredient": ".......... (..)",
+        "index": 4
+      },
+      {
+        "id": "ranajky-ovseny-chia-puding",
+        "title": "Ovsený chia puding",
+        "ingredient": ".............. (..)",
+        "index": 5
+      },
+      {
+        "id": "ranajky-ovseny-chia-puding",
+        "title": "Ovsený chia puding",
+        "ingredient": "........ (....y)",
+        "index": 6
+      },
+      {
+        "id": "ranajky-ovseny-overnight-s-c-uc-oriedkami",
+        "title": "Ovsený overnight s čučoriedkami",
+        "ingredient": "........ (....y)",
+        "index": 0
+      },
+      {
+        "id": "ranajky-ovseny-overnight-s-c-uc-oriedkami",
+        "title": "Ovsený overnight s čučoriedkami",
+        "ingredient": ".................. (...)",
+        "index": 2
+      },
+      {
+        "id": "ranajky-ovseny-overnight-s-c-uc-oriedkami",
+        "title": "Ovsený overnight s čučoriedkami",
+        "ingredient": ".............. (..g)",
+        "index": 3
+      },
+      {
+        "id": "ranajky-ovseny-overnight-s-c-uc-oriedkami",
+        "title": "Ovsený overnight s čučoriedkami",
+        "ingredient": ".............. (..)",
+        "index": 6
+      },
+      {
+        "id": "ranajky-ovseny-overnight-s-c-uc-oriedkami",
+        "title": "Ovsený overnight s čučoriedkami",
+        "ingredient": "................. (..)",
+        "index": 7
+      },
+      {
+        "id": "ranajky-praz-enica-s-kozi-m-syrom",
+        "title": "Praženica s kozím syrom",
+        "ingredient": "... (2)",
+        "index": 0
+      },
+      {
+        "id": "ranajky-praz-enica-s-kozi-m-syrom",
+        "title": "Praženica s kozím syrom",
+        "ingredient": ".b (.g)",
+        "index": 2
+      },
+      {
+        "id": "ranajky-praz-enica-s-kozi-m-syrom",
+        "title": "Praženica s kozím syrom",
+        "ingredient": "...... (..)",
+        "index": 3
+      },
+      {
+        "id": "ranajky-praz-enica-z-tofu",
+        "title": "Praženica z tofu",
+        "ingredient": "............ (..g)",
+        "index": 0
+      },
+      {
+        "id": "ranajky-praz-enica-z-tofu",
+        "title": "Praženica z tofu",
+        "ingredient": "................. (½)",
+        "index": 3
+      },
+      {
+        "id": "ranajky-praz-enica-z-tofu",
+        "title": "Praženica z tofu",
+        "ingredient": "..... (..)",
+        "index": 6
+      },
+      {
+        "id": "ranajky-praz-enica-z-tofu",
+        "title": "Praženica z tofu",
+        "ingredient": ".......... (...y)",
+        "index": 7
+      },
+      {
+        "id": "ranajky-praz-enica-z-tofu",
+        "title": "Praženica z tofu",
+        "ingredient": "... (....)",
+        "index": 9
+      },
+      {
+        "id": "ranajky-protei-nova-kas-a-s-c-uc-oriedkami",
+        "title": "Proteínová kaša s čučoriedkami",
+        "ingredient": ".. (...)",
+        "index": 1
+      },
+      {
+        "id": "ranajky-protei-nova-kas-a-s-c-uc-oriedkami",
+        "title": "Proteínová kaša s čučoriedkami",
+        "ingredient": "......... (..g)",
+        "index": 4
+      },
+      {
+        "id": "ranajky-protei-nova-kas-a-s-c-uc-oriedkami",
+        "title": "Proteínová kaša s čučoriedkami",
+        "ingredient": "....... (..)",
+        "index": 5
+      },
+      {
+        "id": "ranajky-protei-nova-kas-a-s-c-uc-oriedkami",
+        "title": "Proteínová kaša s čučoriedkami",
+        "ingredient": "........ (...)",
+        "index": 7
+      },
+      {
+        "id": "ranajky-protei-nova-kas-a-s-c-uc-oriedkami",
+        "title": "Proteínová kaša s čučoriedkami",
+        "ingredient": "........ (..)",
+        "index": 8
+      },
+      {
+        "id": "ranajky-protei-nova-kas-a-s-c-uc-oriedkami",
+        "title": "Proteínová kaša s čučoriedkami",
+        "ingredient": "....... (..)",
+        "index": 10
+      },
+      {
+        "id": "ranajky-sezamovy-losos-na-raz-nom-chlebe",
+        "title": "Sezamový losos na ražnom chlebe",
+        "ingredient": "....... (..g)",
+        "index": 0
+      },
+      {
+        "id": "ranajky-sezamovy-losos-na-raz-nom-chlebe",
+        "title": "Sezamový losos na ražnom chlebe",
+        "ingredient": "..... (..)",
+        "index": 1
+      },
+      {
+        "id": "ranajky-sezamovy-losos-na-raz-nom-chlebe",
+        "title": "Sezamový losos na ražnom chlebe",
+        "ingredient": "....... (....)",
+        "index": 2
+      },
+      {
+        "id": "ranajky-sezamovy-losos-na-raz-nom-chlebe",
+        "title": "Sezamový losos na ražnom chlebe",
+        "ingredient": "................. (..)",
+        "index": 4
+      },
+      {
+        "id": "ranajky-sezamovy-losos-na-raz-nom-chlebe",
+        "title": "Sezamový losos na ražnom chlebe",
+        "ingredient": ".ľ (.....i)",
+        "index": 7
+      },
+      {
+        "id": "ranajky-sladka-kre-mova-kas-a-s-quinoou",
+        "title": "Sladká krémová kaša s quinoou",
+        "ingredient": "... (..)",
+        "index": 1
+      },
+      {
+        "id": "ranajky-sladka-kre-mova-kas-a-s-quinoou",
+        "title": "Sladká krémová kaša s quinoou",
+        "ingredient": ".......... (..)",
+        "index": 2
+      },
+      {
+        "id": "ranajky-sladka-kre-mova-kas-a-s-quinoou",
+        "title": "Sladká krémová kaša s quinoou",
+        "ingredient": "................ (...)",
+        "index": 6
+      },
+      {
+        "id": "ranajky-sladka-kre-mova-kas-a-s-quinoou",
+        "title": "Sladká krémová kaša s quinoou",
+        "ingredient": "....... (...y)",
+        "index": 7
+      },
+      {
+        "id": "ranajky-sladka-kre-mova-kas-a-s-quinoou",
+        "title": "Sladká krémová kaša s quinoou",
+        "ingredient": "....... (1)",
+        "index": 9
+      },
+      {
+        "id": "ranajky-sladka-kre-mova-kas-a-s-quinoou",
+        "title": "Sladká krémová kaša s quinoou",
+        "ingredient": "......... (...y)",
+        "index": 10
+      },
+      {
+        "id": "ranajky-slana-palacinka-s-rukolou-a-s-unkou",
+        "title": "Slaná palacinka s rukolou a šunkou",
+        "ingredient": ".. (..)",
+        "index": 0
+      },
+      {
+        "id": "ranajky-slana-palacinka-s-rukolou-a-s-unkou",
+        "title": "Slaná palacinka s rukolou a šunkou",
+        "ingredient": ".................. (..)",
+        "index": 2
+      },
+      {
+        "id": "ranajky-slana-palacinka-s-rukolou-a-s-unkou",
+        "title": "Slaná palacinka s rukolou a šunkou",
+        "ingredient": ".. (..)",
+        "index": 3
+      },
+      {
+        "id": "ranajky-slana-palacinka-s-rukolou-a-s-unkou",
+        "title": "Slaná palacinka s rukolou a šunkou",
+        "ingredient": "... (...y)",
+        "index": 4
+      },
+      {
+        "id": "ranajky-slana-palacinka-s-rukolou-a-s-unkou",
+        "title": "Slaná palacinka s rukolou a šunkou",
+        "ingredient": "............ (..)",
+        "index": 5
+      },
+      {
+        "id": "ranajky-slana-palacinka-s-rukolou-a-s-unkou",
+        "title": "Slaná palacinka s rukolou a šunkou",
+        "ingredient": "...... (.....i)",
+        "index": 7
+      },
+      {
+        "id": "ranajky-s-paldova-placka-s-ricottou",
+        "title": "Špaldová placka s ricottou",
+        "ingredient": "...... (1)",
+        "index": 3
+      },
+      {
+        "id": "ranajky-s-paldova-placka-s-ricottou",
+        "title": "Špaldová placka s ricottou",
+        "ingredient": "....... (4)",
+        "index": 4
+      },
+      {
+        "id": "ranajky-s-paldova-placka-s-ricottou",
+        "title": "Špaldová placka s ricottou",
+        "ingredient": "....... (..)",
+        "index": 5
+      },
+      {
+        "id": "ranajky-s-paldova-placka-s-ricottou",
+        "title": "Špaldová placka s ricottou",
+        "ingredient": ".. (..)",
+        "index": 6
+      },
+      {
+        "id": "ranajky-s-paldova-placka-s-ricottou",
+        "title": "Špaldová placka s ricottou",
+        "ingredient": "........ (..)",
+        "index": 7
+      },
+      {
+        "id": "ranajky-s-paldova-placka-s-ricottou",
+        "title": "Špaldová placka s ricottou",
+        "ingredient": "......... (.......o)",
+        "index": 8
+      },
+      {
+        "id": "ranajky-s-paldova-placka-s-ricottou",
+        "title": "Špaldová placka s ricottou",
+        "ingredient": "...... (..)",
+        "index": 9
+      },
+      {
+        "id": "ranajky-toasty-s-vaji-c-kom-hubami-a-avoka-dom",
+        "title": "Toasty s vajíčkom, hubami a avokádom",
+        "ingredient": "... (2)",
+        "index": 0
+      },
+      {
+        "id": "ranajky-toasty-s-vaji-c-kom-hubami-a-avoka-dom",
+        "title": "Toasty s vajíčkom, hubami a avokádom",
+        "ingredient": "..... (..)",
+        "index": 6
+      },
+      {
+        "id": "ranajky-toasty-s-vaji-c-kom-hubami-a-avoka-dom",
+        "title": "Toasty s vajíčkom, hubami a avokádom",
+        "ingredient": "........... (..)",
+        "index": 7
+      },
+      {
+        "id": "ranajky-toasty-s-vaji-c-kom-hubami-a-avoka-dom",
+        "title": "Toasty s vajíčkom, hubami a avokádom",
+        "ingredient": "....... (..)",
+        "index": 8
+      },
+      {
+        "id": "ranajky-vega-nske-palacinky",
+        "title": "Vegánske palacinky",
+        "ingredient": "....... (..)",
+        "index": 1
+      },
+      {
+        "id": "ranajky-vega-nske-palacinky",
+        "title": "Vegánske palacinky",
+        "ingredient": ".............................. (..)",
+        "index": 3
+      },
+      {
+        "id": "ranajky-vega-nske-palacinky",
+        "title": "Vegánske palacinky",
+        "ingredient": "............... (..)",
+        "index": 4
+      },
+      {
+        "id": "ranajky-vega-nske-palacinky",
+        "title": "Vegánske palacinky",
+        "ingredient": ".......................... (2)",
+        "index": 7
+      },
+      {
+        "id": "ranajky-vega-nske-palacinky",
+        "title": "Vegánske palacinky",
+        "ingredient": ".... (..)",
+        "index": 8
+      },
+      {
+        "id": "smoothie-bana-novo-medove-smoothie",
+        "title": "Banánovo medové smoothie",
+        "ingredient": "........ (....y)",
+        "index": 0
+      },
+      {
+        "id": "smoothie-bana-novo-medove-smoothie",
+        "title": "Banánovo medové smoothie",
+        "ingredient": ".. (...)",
+        "index": 1
+      },
+      {
+        "id": "smoothie-bana-novo-medove-smoothie",
+        "title": "Banánovo medové smoothie",
+        "ingredient": ".......... (..)",
+        "index": 3
+      },
+      {
+        "id": "smoothie-bana-novo-medove-smoothie",
+        "title": "Banánovo medové smoothie",
+        "ingredient": ".......... (..)",
+        "index": 4
+      },
+      {
+        "id": "smoothie-bana-novo-medove-smoothie",
+        "title": "Banánovo medové smoothie",
+        "ingredient": "...... (..)",
+        "index": 5
+      },
+      {
+        "id": "smoothie-bana-novo-medove-smoothie",
+        "title": "Banánovo medové smoothie",
+        "ingredient": "... (.....y)",
+        "index": 6
+      },
+      {
+        "id": "smoothie-bana-novo-medove-smoothie",
+        "title": "Banánovo medové smoothie",
+        "ingredient": ".d (...a)",
+        "index": 8
+      },
+      {
+        "id": "smoothie-c-okola-dove-smoothie",
+        "title": "Čokoládové smoothie",
+        "ingredient": ".................. (1)",
+        "index": 0
+      },
+      {
+        "id": "smoothie-c-okola-dove-smoothie",
+        "title": "Čokoládové smoothie",
+        "ingredient": ".............. (..)",
+        "index": 1
+      },
+      {
+        "id": "smoothie-c-okola-dove-smoothie",
+        "title": "Čokoládové smoothie",
+        "ingredient": "......... (..)",
+        "index": 2
+      },
+      {
+        "id": "smoothie-c-okola-dove-smoothie",
+        "title": "Čokoládové smoothie",
+        "ingredient": "...... (...e)",
+        "index": 3
+      },
+      {
+        "id": "smoothie-c-okola-dove-smoothie",
+        "title": "Čokoládové smoothie",
+        "ingredient": "...... (1)",
+        "index": 4
+      },
+      {
+        "id": "smoothie-c-okola-dove-smoothie",
+        "title": "Čokoládové smoothie",
+        "ingredient": ".d (...a)",
+        "index": 5
+      },
+      {
+        "id": "smoothie-c-okola-dove-smoothie",
+        "title": "Čokoládové smoothie",
+        "ingredient": "........ (....y)",
+        "index": 6
+      },
+      {
+        "id": "smoothie-kokosovo-c-uc-oriedkovy-smoothie-s-datlami",
+        "title": "Kokosovo čučoriedkový smoothie s datlami",
+        "ingredient": "............... (..)",
+        "index": 1
+      },
+      {
+        "id": "smoothie-kokosovo-c-uc-oriedkovy-smoothie-s-datlami",
+        "title": "Kokosovo čučoriedkový smoothie s datlami",
+        "ingredient": "....... (...)",
+        "index": 2
+      },
+      {
+        "id": "smoothie-kokosovo-c-uc-oriedkovy-smoothie-s-datlami",
+        "title": "Kokosovo čučoriedkový smoothie s datlami",
+        "ingredient": "............. (1)",
+        "index": 5
+      },
+      {
+        "id": "smoothie-kokosovo-c-uc-oriedkovy-smoothie-s-datlami",
+        "title": "Kokosovo čučoriedkový smoothie s datlami",
+        "ingredient": "... (8)",
+        "index": 6
+      },
+      {
+        "id": "smoothie-kokosovo-c-uc-oriedkovy-smoothie-s-datlami",
+        "title": "Kokosovo čučoriedkový smoothie s datlami",
+        "ingredient": ".d (....y)",
+        "index": 7
+      },
+      {
+        "id": "smoothie-kokosovo-ovocny-protei-novy-smoothie",
+        "title": "Kokosovo ovocný proteínový smoothie",
+        "ingredient": "............. (1)",
+        "index": 2
+      },
+      {
+        "id": "smoothie-kokosovo-ovocny-protei-novy-smoothie",
+        "title": "Kokosovo ovocný proteínový smoothie",
+        "ingredient": "... (..g)",
+        "index": 3
+      },
+      {
+        "id": "smoothie-kokosovo-ovocny-protei-novy-smoothie",
+        "title": "Kokosovo ovocný proteínový smoothie",
+        "ingredient": "... (.g)",
+        "index": 5
+      },
+      {
+        "id": "smoothie-kokosovo-ovocny-protei-novy-smoothie",
+        "title": "Kokosovo ovocný proteínový smoothie",
+        "ingredient": "........ (.g)",
+        "index": 7
+      },
+      {
+        "id": "smoothie-snickers-smoothie",
+        "title": "Snickers smoothie",
+        "ingredient": ".. (....)",
+        "index": 0
+      },
+      {
+        "id": "smoothie-snickers-smoothie",
+        "title": "Snickers smoothie",
+        "ingredient": ".. (...y)",
+        "index": 2
+      },
+      {
+        "id": "smoothie-snickers-smoothie",
+        "title": "Snickers smoothie",
+        "ingredient": ".... (..)",
+        "index": 7
+      },
+      {
+        "id": "smoothie-snickers-smoothie",
+        "title": "Snickers smoothie",
+        "ingredient": "............ (..)",
+        "index": 9
+      },
+      {
+        "id": "smoothie-tropicky-smoothie",
+        "title": "Tropický smoothie",
+        "ingredient": "......... (..)",
+        "index": 2
+      },
+      {
+        "id": "smoothie-tropicky-smoothie",
+        "title": "Tropický smoothie",
+        "ingredient": ".................. (..)",
+        "index": 5
+      },
+      {
+        "id": "smoothie-tropicky-smoothie",
+        "title": "Tropický smoothie",
+        "ingredient": "................. (1)",
+        "index": 7
+      },
+      {
+        "id": "smoothie-tropicky-smoothie",
+        "title": "Tropický smoothie",
+        "ingredient": "............. (1)",
+        "index": 8
+      },
+      {
+        "id": "smoothie-zelene-smoothie-s-protei-nom",
+        "title": "Zelené smoothie s proteínom",
+        "ingredient": ".. (...)",
+        "index": 0
+      },
+      {
+        "id": "smoothie-zelene-smoothie-s-protei-nom",
+        "title": "Zelené smoothie s proteínom",
+        "ingredient": "........ (..)",
+        "index": 1
+      },
+      {
+        "id": "smoothie-zelene-smoothie-s-protei-nom",
+        "title": "Zelené smoothie s proteínom",
+        "ingredient": "...... (..)",
+        "index": 5
+      },
+      {
+        "id": "smoothie-zelene-smoothie-s-protei-nom",
+        "title": "Zelené smoothie s proteínom",
+        "ingredient": "........ (..)",
+        "index": 6
+      },
+      {
+        "id": "smoothie-zelene-smoothie-s-protei-nom",
+        "title": "Zelené smoothie s proteínom",
+        "ingredient": "....... (3)",
+        "index": 9
+      },
+      {
+        "id": "snack-bana-novo-ovsene-lievance",
+        "title": "Banánovo ovsené lievance",
+        "ingredient": "........ (..)",
+        "index": 1
+      },
+      {
+        "id": "snack-bana-novo-ovsene-lievance",
+        "title": "Banánovo ovsené lievance",
+        "ingredient": ".................. (...y)",
+        "index": 2
+      },
+      {
+        "id": "snack-bana-novo-ovsene-lievance",
+        "title": "Banánovo ovsené lievance",
+        "ingredient": "... (..)",
+        "index": 4
+      },
+      {
+        "id": "snack-bana-novo-ovsene-lievance",
+        "title": "Banánovo ovsené lievance",
+        "ingredient": "....... (..)",
+        "index": 7
+      },
+      {
+        "id": "snack-bana-novo-ovsene-lievance",
+        "title": "Banánovo ovsené lievance",
+        "ingredient": "....... (..)",
+        "index": 8
+      },
+      {
+        "id": "snack-bana-novy-chlieb",
+        "title": "Banánový chlieb",
+        "ingredient": ".............. (..)",
+        "index": 0
+      },
+      {
+        "id": "snack-bana-novy-chlieb",
+        "title": "Banánový chlieb",
+        "ingredient": "......... (...)",
+        "index": 1
+      },
+      {
+        "id": "snack-bana-novy-chlieb",
+        "title": "Banánový chlieb",
+        "ingredient": "....... (.....y)",
+        "index": 4
+      },
+      {
+        "id": "snack-bana-novy-chlieb",
+        "title": "Banánový chlieb",
+        "ingredient": "... (.....y)",
+        "index": 5
+      },
+      {
+        "id": "snack-bana-novy-chlieb",
+        "title": "Banánový chlieb",
+        "ingredient": "......... (..g)",
+        "index": 7
+      },
+      {
+        "id": "snack-citro-novo-kokosove-gulic-ky",
+        "title": "Citrónovo kokosové guličky",
+        "ingredient": "........... (..)",
+        "index": 0
+      },
+      {
+        "id": "snack-citro-novo-kokosove-gulic-ky",
+        "title": "Citrónovo kokosové guličky",
+        "ingredient": "........ (..)",
+        "index": 3
+      },
+      {
+        "id": "snack-citro-novo-kokosove-gulic-ky",
+        "title": "Citrónovo kokosové guličky",
+        "ingredient": ".......... (..)",
+        "index": 5
+      },
+      {
+        "id": "snack-c-okola-dove-snickers-datle",
+        "title": "Čokoládové snickers datle",
+        "ingredient": "........... (...y)",
+        "index": 2
+      },
+      {
+        "id": "snack-c-okola-dove-snickers-datle",
+        "title": "Čokoládové snickers datle",
+        "ingredient": "........ (..)",
+        "index": 4
+      },
+      {
+        "id": "snack-datlovy-kola-c-z-pracli-kov",
+        "title": "Datlový koláč z praclíkov",
+        "ingredient": ".. (..)",
+        "index": 2
+      },
+      {
+        "id": "snack-datlovy-kola-c-z-pracli-kov",
+        "title": "Datlový koláč z praclíkov",
+        "ingredient": "......... (..)",
+        "index": 4
+      },
+      {
+        "id": "snack-datlovy-kola-c-z-pracli-kov",
+        "title": "Datlový koláč z praclíkov",
+        "ingredient": "........ (..g)",
+        "index": 5
+      },
+      {
+        "id": "snack-datlovy-kola-c-z-pracli-kov",
+        "title": "Datlový koláč z praclíkov",
+        "ingredient": "............ (1)",
+        "index": 10
+      },
+      {
+        "id": "snack-doma-ca-c-okola-dova-zmrzlina",
+        "title": "Domáca čokoládová zmrzlina",
+        "ingredient": "........... (.g)",
+        "index": 4
+      },
+      {
+        "id": "snack-jahodovy-chia-puding",
+        "title": "Jahodový chia puding",
+        "ingredient": "..... (..)",
+        "index": 1
+      },
+      {
+        "id": "snack-jahodovy-chia-puding",
+        "title": "Jahodový chia puding",
+        "ingredient": ".......... (1)",
+        "index": 3
+      },
+      {
+        "id": "snack-mrkvove-muffiny-so-semienkami",
+        "title": "Mrkvové muffiny so semienkami",
+        "ingredient": ".............. (1)",
+        "index": 1
+      },
+      {
+        "id": "snack-mrkvove-muffiny-so-semienkami",
+        "title": "Mrkvové muffiny so semienkami",
+        "ingredient": "...... (3)",
+        "index": 3
+      },
+      {
+        "id": "snack-mrkvove-muffiny-so-semienkami",
+        "title": "Mrkvové muffiny so semienkami",
+        "ingredient": ".......... (2)",
+        "index": 5
+      },
+      {
+        "id": "snack-mrkvove-muffiny-so-semienkami",
+        "title": "Mrkvové muffiny so semienkami",
+        "ingredient": "..... (..)",
+        "index": 6
+      },
+      {
+        "id": "snack-mrkvove-muffiny-so-semienkami",
+        "title": "Mrkvové muffiny so semienkami",
+        "ingredient": "........ (..)",
+        "index": 8
+      },
+      {
+        "id": "snack-mrkvove-muffiny-so-semienkami",
+        "title": "Mrkvové muffiny so semienkami",
+        "ingredient": "............... (..)",
+        "index": 11
+      },
+      {
+        "id": "snack-ovsene-gulic-ky-s-aras-idovy-m-maslom",
+        "title": "Ovsené guličky s arašidovým maslom",
+        "ingredient": "........ (..)",
+        "index": 1
+      },
+      {
+        "id": "snack-ovsene-gulic-ky-s-aras-idovy-m-maslom",
+        "title": "Ovsené guličky s arašidovým maslom",
+        "ingredient": "........ (..)",
+        "index": 2
+      },
+      {
+        "id": "snack-ovsene-sus-ienky-s-jablkovy-m-pyre",
+        "title": "Ovsené sušienky s jablkovým pyré",
+        "ingredient": "............. (..)",
+        "index": 1
+      },
+      {
+        "id": "snack-ovsene-sus-ienky-s-jablkovy-m-pyre",
+        "title": "Ovsené sušienky s jablkovým pyré",
+        "ingredient": ".. (..g)",
+        "index": 5
+      },
+      {
+        "id": "snack-ovsene-sus-ienky-s-jablkovy-m-pyre",
+        "title": "Ovsené sušienky s jablkovým pyré",
+        "ingredient": "........ (.g)",
+        "index": 7
+      },
+      {
+        "id": "snack-ovsene-sus-ienky-s-jablkovy-m-pyre",
+        "title": "Ovsené sušienky s jablkovým pyré",
+        "ingredient": "......... (..)",
+        "index": 9
+      },
+      {
+        "id": "snack-ovseny-chia-puding",
+        "title": "Ovsený chia puding",
+        "ingredient": ".............. (1)",
+        "index": 0
+      },
+      {
+        "id": "snack-ovseny-chia-puding",
+        "title": "Ovsený chia puding",
+        "ingredient": ".......... (...)",
+        "index": 1
+      },
+      {
+        "id": "snack-ovseny-chia-puding",
+        "title": "Ovsený chia puding",
+        "ingredient": ".......... (..)",
+        "index": 4
+      },
+      {
+        "id": "snack-ovseny-chia-puding",
+        "title": "Ovsený chia puding",
+        "ingredient": ".............. (..)",
+        "index": 5
+      },
+      {
+        "id": "snack-ovseny-chia-puding",
+        "title": "Ovsený chia puding",
+        "ingredient": "........ (....y)",
+        "index": 6
+      },
+      {
+        "id": "snack-palacinky-s-lesny-mi-plodmi",
+        "title": "Palacinky s lesnými plodmi",
+        "ingredient": "................ (....y)",
+        "index": 1
+      },
+      {
+        "id": "snack-palacinky-s-lesny-mi-plodmi",
+        "title": "Palacinky s lesnými plodmi",
+        "ingredient": ".. (1)",
+        "index": 3
+      },
+      {
+        "id": "snack-palacinky-s-lesny-mi-plodmi",
+        "title": "Palacinky s lesnými plodmi",
+        "ingredient": "............ (2)",
+        "index": 4
+      },
+      {
+        "id": "snack-palacinky-s-lesny-mi-plodmi",
+        "title": "Palacinky s lesnými plodmi",
+        "ingredient": "................ (..)",
+        "index": 9
+      },
+      {
+        "id": "snack-protei-novo-datlove-gulic-ky",
+        "title": "Proteínovo datlové guličky",
+        "ingredient": "........... (1)",
+        "index": 1
+      },
+      {
+        "id": "snack-protei-novo-datlove-gulic-ky",
+        "title": "Proteínovo datlové guličky",
+        "ingredient": "................. (3)",
+        "index": 4
+      },
+      {
+        "id": "snack-protei-novo-datlove-gulic-ky",
+        "title": "Proteínovo datlové guličky",
+        "ingredient": "...... (2)",
+        "index": 5
+      },
+      {
+        "id": "snack-protei-novo-datlove-gulic-ky",
+        "title": "Proteínovo datlové guličky",
+        "ingredient": "............ (..)",
+        "index": 6
+      },
+      {
+        "id": "snack-zdrave-ma-tove-gulic-ky",
+        "title": "Zdravé mätové guličky",
+        "ingredient": "... (..)",
+        "index": 1
+      },
+      {
+        "id": "snack-zdrave-ma-tove-gulic-ky",
+        "title": "Zdravé mätové guličky",
+        "ingredient": "........ (..)",
+        "index": 2
+      },
+      {
+        "id": "snack-zdrave-ma-tove-gulic-ky",
+        "title": "Zdravé mätové guličky",
+        "ingredient": ".. (..)",
+        "index": 4
+      },
+      {
+        "id": "snack-zdrave-ma-tove-gulic-ky",
+        "title": "Zdravé mätové guličky",
+        "ingredient": "............ (1)",
+        "index": 7
+      },
+      {
+        "id": "snack-zdrave-mrkvove-lievance",
+        "title": "Zdravé mrkvové lievance",
+        "ingredient": "... (..l)",
+        "index": 0
+      },
+      {
+        "id": "snack-zdrave-mrkvove-lievance",
+        "title": "Zdravé mrkvové lievance",
+        "ingredient": "........ (..)",
+        "index": 1
+      },
+      {
+        "id": "snack-zdrave-mrkvove-lievance",
+        "title": "Zdravé mrkvové lievance",
+        "ingredient": "................ (1)",
+        "index": 2
+      },
+      {
+        "id": "snack-zdrave-mrkvove-lievance",
+        "title": "Zdravé mrkvové lievance",
+        "ingredient": "...................... (..)",
+        "index": 3
+      },
+      {
+        "id": "snack-zdrave-mrkvove-lievance",
+        "title": "Zdravé mrkvové lievance",
+        "ingredient": "........ (..)",
+        "index": 7
+      },
+      {
+        "id": "ranajky-ranajkova-prazenica-z-tofu",
+        "title": "Raňajková praženica z tofu",
+        "ingredient": "......................................... (..)",
+        "index": 0
+      },
+      {
+        "id": "ranajky-ranajkova-prazenica-z-tofu",
+        "title": "Raňajková praženica z tofu",
+        "ingredient": ".................................................. (.....i)",
+        "index": 1
+      },
+      {
+        "id": "ranajky-platok-z-batatov-a-slaniny",
+        "title": "Plátok z batátov a slaniny",
+        "ingredient": ".................................................. (1)",
+        "index": 0
+      },
+      {
+        "id": "ranajky-healthy-carrot-cake-pancakes",
+        "title": "Healthy Carrot Cake Pancakes",
+        "ingredient": "............................................ (1)",
+        "index": 0
+      },
+      {
+        "id": "ranajky-healthy-vegan-tofu-scramble-gf-ve",
+        "title": "Healthy Vegan Tofu Scramble (GF, VE)",
+        "ingredient": ".............................................. (..)",
+        "index": 0
+      },
+      {
+        "id": "ranajky-healthy-vegan-tofu-scramble-gf-ve",
+        "title": "Healthy Vegan Tofu Scramble (GF, VE)",
+        "ingredient": ".............................. (.....i)",
+        "index": 1
+      },
+      {
+        "id": "obed-wraps-rye-mountain-bread-turkey",
+        "title": "Wraps - Rye Mountain Bread (Turkey)",
+        "ingredient": ".............. (....)",
+        "index": 0
+      },
+      {
+        "id": "obed-sweet-potato-fibre-salad",
+        "title": "Sweet Potato Fibre Salad",
+        "ingredient": "........................................................... (..)",
+        "index": 0
+      },
+      {
+        "id": "obed-sweet-potato-fibre-salad",
+        "title": "Sweet Potato Fibre Salad",
+        "ingredient": "......................... (..)",
+        "index": 1
+      },
+      {
+        "id": "obed-wraps-rye-mountain-bread-ham",
+        "title": "Wraps - Rye Mountain Bread (Ham)",
+        "ingredient": "............................... (..)",
+        "index": 1
+      },
+      {
+        "id": "obed-wraps-rye-mountain-bread-chicken",
+        "title": "Wraps - Rye Mountain Bread (Chicken)",
+        "ingredient": "................. (..g)",
+        "index": 0
+      },
+      {
+        "id": "obed-wraps-rye-mountain-bread-chicken",
+        "title": "Wraps - Rye Mountain Bread (Chicken)",
+        "ingredient": "................................... (.g)",
+        "index": 1
+      },
+      {
+        "id": "obed-zdrave-bolonske-spagety",
+        "title": "Zdravé boloňské špagety",
+        "ingredient": "... (..)",
+        "index": 2
+      },
+      {
+        "id": "obed-zdrave-bolonske-spagety",
+        "title": "Zdravé boloňské špagety",
+        "ingredient": "... (.....)",
+        "index": 3
+      },
+      {
+        "id": "obed-zdrave-bolonske-spagety",
+        "title": "Zdravé boloňské špagety",
+        "ingredient": "...... (..)",
+        "index": 5
+      },
+      {
+        "id": "obed-hovadzie-bourguignon",
+        "title": "Hovädzie bourguignon",
+        "ingredient": ".............................................................. (.g)",
+        "index": 0
+      },
+      {
+        "id": "obed-deconstructed-burger-bowl-v1",
+        "title": "Deconstructed Burger Bowl (v1)",
+        "ingredient": "..................................................... (..)",
+        "index": 0
+      },
+      {
+        "id": "obed-chicken-teriyaki-soba-noodle-salad",
+        "title": "Chicken Teriyaki Soba Noodle Salad",
+        "ingredient": "............................ (.....)",
+        "index": 1
+      },
+      {
+        "id": "obed-summer-salmon-salad",
+        "title": "Summer Salmon Salad",
+        "ingredient": "...... (..g)",
+        "index": 0
+      },
+      {
+        "id": "obed-summer-salmon-salad",
+        "title": "Summer Salmon Salad",
+        "ingredient": "....... (..g)",
+        "index": 1
+      },
+      {
+        "id": "obed-summer-salmon-salad",
+        "title": "Summer Salmon Salad",
+        "ingredient": "........ (..g)",
+        "index": 2
+      },
+      {
+        "id": "obed-summer-salmon-salad",
+        "title": "Summer Salmon Salad",
+        "ingredient": "... (..)",
+        "index": 3
+      },
+      {
+        "id": "obed-summer-salmon-salad",
+        "title": "Summer Salmon Salad",
+        "ingredient": "...... (..)",
+        "index": 5
+      },
+      {
+        "id": "obed-zucchini-vegan-vegetable-fritters-and-salad",
+        "title": "Zucchini Vegan Vegetable Fritters and Salad",
+        "ingredient": "............................ (..)",
+        "index": 1
+      },
+      {
+        "id": "obed-healthy-superfood-fibre-bowl",
+        "title": "Healthy Superfood Fibre Bowl",
+        "ingredient": "......................................................... (..)",
+        "index": 0
+      },
+      {
+        "id": "obed-healthy-superfood-fibre-bowl",
+        "title": "Healthy Superfood Fibre Bowl",
+        "ingredient": "...................... (..)",
+        "index": 1
+      },
+      {
+        "id": "obed-crunchy-vegan-tofu-salad",
+        "title": "Crunchy Vegan Tofu Salad",
+        "ingredient": "........................................ (.....)",
+        "index": 1
+      },
+      {
+        "id": "obed-marinated-asian-garlic-tofu-stir-fry",
+        "title": "Marinated Asian-Garlic Tofu Stir Fry",
+        "ingredient": ".......... (.....)",
+        "index": 0
+      },
+      {
+        "id": "obed-marinated-asian-garlic-tofu-stir-fry",
+        "title": "Marinated Asian-Garlic Tofu Stir Fry",
+        "ingredient": "........................................ (.....)",
+        "index": 1
+      },
+      {
+        "id": "obed-marinated-asian-garlic-tofu-stir-fry",
+        "title": "Marinated Asian-Garlic Tofu Stir Fry",
+        "ingredient": "....................... (..)",
+        "index": 2
+      },
+      {
+        "id": "obed-pumpkin-feta-and-beetroot-salad-v",
+        "title": "Pumpkin, Feta and Beetroot Salad (V)",
+        "ingredient": "............................ (..)",
+        "index": 1
+      },
+      {
+        "id": "obed-quick-snack-ideas-list",
+        "title": "Quick Snack Ideas List:",
+        "ingredient": "................ (..)",
+        "index": 0
+      },
+      {
+        "id": "obed-quick-snack-ideas-list",
+        "title": "Quick Snack Ideas List:",
+        "ingredient": ".................. (.g)",
+        "index": 1
+      },
+      {
+        "id": "obed-quick-snack-ideas-list",
+        "title": "Quick Snack Ideas List:",
+        "ingredient": ".................. (2)",
+        "index": 2
+      },
+      {
+        "id": "obed-quick-snack-ideas-list",
+        "title": "Quick Snack Ideas List:",
+        "ingredient": "............. (1)",
+        "index": 7
+      },
+      {
+        "id": "obed-quick-snack-ideas-list",
+        "title": "Quick Snack Ideas List:",
+        "ingredient": "........... (1)",
+        "index": 8
+      },
+      {
+        "id": "obed-quick-snack-ideas-list",
+        "title": "Quick Snack Ideas List:",
+        "ingredient": "............. (1)",
+        "index": 9
+      },
+      {
+        "id": "obed-quick-snack-ideas-list",
+        "title": "Quick Snack Ideas List:",
+        "ingredient": "................... (1)",
+        "index": 10
+      },
+      {
+        "id": "obed-quick-snack-ideas-list",
+        "title": "Quick Snack Ideas List:",
+        "ingredient": "........... (2)",
+        "index": 11
+      },
+      {
+        "id": "snack-hummus-zelenina",
+        "title": "Hummus so zeleninou",
+        "ingredient": "... (..)",
+        "index": 1
+      },
+      {
+        "id": "snack-hummus-zelenina",
+        "title": "Hummus so zeleninou",
+        "ingredient": "........ (..)",
+        "index": 2
+      },
+      {
+        "id": "snack-hummus-zelenina",
+        "title": "Hummus so zeleninou",
+        "ingredient": "... (..)",
+        "index": 5
+      },
+      {
+        "id": "snack-edamame-morska-sol",
+        "title": "Edamame s morskou soľou",
+        "ingredient": "...... (..)",
+        "index": 1
+      },
+      {
+        "id": "snack-edamame-morska-sol",
+        "title": "Edamame s morskou soľou",
+        "ingredient": "........ (..)",
+        "index": 2
+      },
+      {
+        "id": "snack-ovocny-chia-puding",
+        "title": "Ovocný chia puding",
+        "ingredient": "........ (..)",
+        "index": 3
+      },
+      {
+        "id": "snack-pecene-cícerove-chrumky",
+        "title": "Pečené cícerové chrumky",
+        "ingredient": "............... (..g)",
+        "index": 0
+      },
+      {
+        "id": "snack-pecene-cícerove-chrumky",
+        "title": "Pečené cícerové chrumky",
+        "ingredient": ".. (...)",
+        "index": 4
+      },
+      {
+        "id": "snack-ryžove-kolace-avokado",
+        "title": "Ryžové koláče s avokádom",
+        "ingredient": "........ (..)",
+        "index": 0
+      },
+      {
+        "id": "snack-ryžove-kolace-avokado",
+        "title": "Ryžové koláče s avokádom",
+        "ingredient": "........ (..)",
+        "index": 2
+      },
+      {
+        "id": "snack-ryžove-kolace-avokado",
+        "title": "Ryžové koláče s avokádom",
+        "ingredient": "........ (..)",
+        "index": 3
+      },
+      {
+        "id": "snack-ovocny-sorbet",
+        "title": "Domáci ovocný sorbet",
+        "ingredient": "....... (..l)",
+        "index": 2
+      },
+      {
+        "id": "snack-slnecnicove-gule",
+        "title": "Slnečnicové energetické guľky",
+        "ingredient": "........... (..g)",
+        "index": 0
+      },
+      {
+        "id": "snack-slnecnicove-gule",
+        "title": "Slnečnicové energetické guľky",
+        "ingredient": ".......... (..)",
+        "index": 3
+      },
+      {
+        "id": "snack-tekvicove-semienka-mix",
+        "title": "Pražené tekvicové semienka s korením",
+        "ingredient": ".......... (..g)",
+        "index": 0
+      },
+      {
+        "id": "snack-tekvicove-semienka-mix",
+        "title": "Pražené tekvicové semienka s korením",
+        "ingredient": "......... (..)",
+        "index": 3
+      },
+      {
+        "id": "snack-tekvicove-semienka-mix",
+        "title": "Pražené tekvicové semienka s korením",
+        "ingredient": "...... (..)",
+        "index": 4
+      }
+    ],
+    "brokenWords": [],
+    "measurementErrors": [],
+    "grammarErrors": [
+      {
+        "id": "obed-bbg-kura-s-mango-salsou",
+        "title": "BBG kura s mango salsou",
+        "text": ".............j...",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "obed-bbg-kura-s-mango-salsou",
+        "title": "BBG kura s mango salsou",
+        "text": "..........................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "obed-bata-tovy-kola-c-z-mlete-ho-ma-sa",
+        "title": "Batátový koláč z mletého mäsa",
+        "text": ".......................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "obed-bata-tovy-kola-c-z-mlete-ho-ma-sa",
+        "title": "Batátový koláč z mletého mäsa",
+        "text": "...............................................................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "obed-bata-tovy-kola-c-z-mlete-ho-ma-sa",
+        "title": "Batátový koláč z mletého mäsa",
+        "text": "............................................",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "obed-bata-tovy-kola-c-z-mlete-ho-ma-sa",
+        "title": "Batátový koláč z mletého mäsa",
+        "text": "........................................",
+        "type": "step",
+        "stepIndex": 3
+      },
+      {
+        "id": "obed-bata-tovy-s-ala-t-s-ryz-ou-a-s-os-ovicou",
+        "title": "Batátový šalát s ryžou a šošovicou",
+        "text": ".......................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "obed-bata-tovy-s-ala-t-s-ryz-ou-a-s-os-ovicou",
+        "title": "Batátový šalát s ryžou a šošovicou",
+        "text": "...............",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "obed-bata-tovy-s-ala-t-s-ryz-ou-a-s-os-ovicou",
+        "title": "Batátový šalát s ryžou a šošovicou",
+        "text": ".................................",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "obed-bata-tovy-s-ala-t-s-ryz-ou-a-s-os-ovicou",
+        "title": "Batátový šalát s ryžou a šošovicou",
+        "text": "...................",
+        "type": "step",
+        "stepIndex": 3
+      },
+      {
+        "id": "obed-falafel-wrap",
+        "title": "Falafel wrap",
+        "text": "............é...",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "obed-grilovany-mexicky-s-ala-t",
+        "title": "Grilovaný mexický šalát",
+        "text": "..................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "obed-grilovany-mexicky-s-ala-t",
+        "title": "Grilovaný mexický šalát",
+        "text": "...................................................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "obed-grilovany-mexicky-s-ala-t",
+        "title": "Grilovaný mexický šalát",
+        "text": "...............",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "obed-grilovany-mexicky-s-ala-t",
+        "title": "Grilovaný mexický šalát",
+        "text": ".....................",
+        "type": "step",
+        "stepIndex": 3
+      },
+      {
+        "id": "obed-grilovany-mexicky-s-ala-t",
+        "title": "Grilovaný mexický šalát",
+        "text": "...............................................",
+        "type": "step",
+        "stepIndex": 4
+      },
+      {
+        "id": "obed-grilovany-sendvic-s-hova-dzi-m-ma-som",
+        "title": "Grilovaný sendvič s hovädzím mäsom",
+        "text": "...............",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "obed-grilovany-sendvic-s-hova-dzi-m-ma-som",
+        "title": "Grilovaný sendvič s hovädzím mäsom",
+        "text": "...............................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "obed-hova-dzie-na-zelenine",
+        "title": "Hovädzie na zelenine",
+        "text": "....a...",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "obed-hova-dzie-na-zelenine",
+        "title": "Hovädzie na zelenine",
+        "text": ".......o...",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "obed-hova-dzie-na-zelenine",
+        "title": "Hovädzie na zelenine",
+        "text": ".........",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "obed-hova-dzie-na-zelenine",
+        "title": "Hovädzie na zelenine",
+        "text": "..........",
+        "type": "step",
+        "stepIndex": 3
+      },
+      {
+        "id": "obed-hova-dzie-na-zelenine",
+        "title": "Hovädzie na zelenine",
+        "text": "...............",
+        "type": "step",
+        "stepIndex": 4
+      },
+      {
+        "id": "obed-hova-dzie-na-zelenine",
+        "title": "Hovädzie na zelenine",
+        "text": ".....................",
+        "type": "step",
+        "stepIndex": 5
+      },
+      {
+        "id": "obed-hova-dzie-na-zelenine",
+        "title": "Hovädzie na zelenine",
+        "text": ".........................",
+        "type": "step",
+        "stepIndex": 6
+      },
+      {
+        "id": "obed-hova-dzie-na-zelenine",
+        "title": "Hovädzie na zelenine",
+        "text": "..............",
+        "type": "step",
+        "stepIndex": 7
+      },
+      {
+        "id": "obed-hova-dzie-s-tekvicovou-kas-ou",
+        "title": "Hovädzie s tekvicovou kašou",
+        "text": "..................................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "obed-hova-dzie-s-tekvicovou-kas-ou",
+        "title": "Hovädzie s tekvicovou kašou",
+        "text": "......................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "obed-hova-dzie-s-tekvicovou-kas-ou",
+        "title": "Hovädzie s tekvicovou kašou",
+        "text": "............",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "obed-kuracia-sezamova-panvic-ka",
+        "title": "Kuracia sezamová panvička",
+        "text": "........",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "obed-kuracia-sezamova-panvic-ka",
+        "title": "Kuracia sezamová panvička",
+        "text": "................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "obed-kuracia-sezamova-panvic-ka",
+        "title": "Kuracia sezamová panvička",
+        "text": "...........................",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "obed-kuracia-sezamova-panvic-ka",
+        "title": "Kuracia sezamová panvička",
+        "text": "...........................",
+        "type": "step",
+        "stepIndex": 3
+      },
+      {
+        "id": "obed-kuracia-sezamova-panvic-ka",
+        "title": "Kuracia sezamová panvička",
+        "text": "............................",
+        "type": "step",
+        "stepIndex": 4
+      },
+      {
+        "id": "obed-mexicke-tortilly",
+        "title": "Mexické tortilly",
+        "text": "....................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "obed-mexicke-tortilly",
+        "title": "Mexické tortilly",
+        "text": "......................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "obed-placky-s-ricottou-cukinou-a-bata-tmi",
+        "title": "Placky s ricottou, cukinou a batátmi",
+        "text": "........................................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "obed-placky-s-ricottou-cukinou-a-bata-tmi",
+        "title": "Placky s ricottou, cukinou a batátmi",
+        "text": "............e...",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "obed-placky-s-ricottou-cukinou-a-bata-tmi",
+        "title": "Placky s ricottou, cukinou a batátmi",
+        "text": "........................",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "obed-plnene-sladke-zemiaky",
+        "title": "Plnené sladké zemiaky",
+        "text": "........................................................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "obed-plnene-sladke-zemiaky",
+        "title": "Plnené sladké zemiaky",
+        "text": "..................................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "obed-plnene-sladke-zemiaky",
+        "title": "Plnené sladké zemiaky",
+        "text": "...................................................",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "obed-plnene-sladke-zemiaky",
+        "title": "Plnené sladké zemiaky",
+        "text": "................................................",
+        "type": "step",
+        "stepIndex": 3
+      },
+      {
+        "id": "obed-poke-miska-s-kuraci-m-ma-som",
+        "title": "Poke miska s kuracím mäsom",
+        "text": "..........................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "obed-poke-miska-s-kuraci-m-ma-som",
+        "title": "Poke miska s kuracím mäsom",
+        "text": "..............................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "obed-poke-miska-s-kuraci-m-ma-som",
+        "title": "Poke miska s kuracím mäsom",
+        "text": "...........",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "obed-poke-miska-s-kuraci-m-ma-som",
+        "title": "Poke miska s kuracím mäsom",
+        "text": ".................................",
+        "type": "step",
+        "stepIndex": 3
+      },
+      {
+        "id": "obed-slany-kola-c-z-bata-tov-a-slaniny",
+        "title": "Slaný koláč z batátov a slaniny",
+        "text": ".............ú...",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "obed-slany-kola-c-z-bata-tov-a-slaniny",
+        "title": "Slaný koláč z batátov a slaniny",
+        "text": "...................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "obed-slany-kola-c-z-tekvice-a-fety",
+        "title": "Slaný koláč z tekvice a fety",
+        "text": ".............ň...",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "obed-slany-kola-c-z-tekvice-a-fety",
+        "title": "Slaný koláč z tekvice a fety",
+        "text": "......................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "obed-slany-kola-c-z-tekvice-a-fety",
+        "title": "Slaný koláč z tekvice a fety",
+        "text": ".........................................",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "obed-slany-kola-c-z-tekvice-a-fety",
+        "title": "Slaný koláč z tekvice a fety",
+        "text": ".............................................................",
+        "type": "step",
+        "stepIndex": 3
+      },
+      {
+        "id": "obed-slany-kola-c-z-tekvice-a-fety",
+        "title": "Slaný koláč z tekvice a fety",
+        "text": "...............",
+        "type": "step",
+        "stepIndex": 4
+      },
+      {
+        "id": "obed-steak-s-pec-enou-zeleninou",
+        "title": "Steak s pečenou zeleninou",
+        "text": "................................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "obed-steak-s-pec-enou-zeleninou",
+        "title": "Steak s pečenou zeleninou",
+        "text": "................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "obed-steak-s-pec-enou-zeleninou",
+        "title": "Steak s pečenou zeleninou",
+        "text": ".............................................................",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "obed-steak-s-pec-enou-zeleninou",
+        "title": "Steak s pečenou zeleninou",
+        "text": "...........................",
+        "type": "step",
+        "stepIndex": 3
+      },
+      {
+        "id": "obed-s-ala-t-z-tekvice-fety-a-c-ervenej-repy",
+        "title": "Šalát z tekvice, fety a červenej repy",
+        "text": "..........................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "obed-s-ala-t-z-tekvice-fety-a-c-ervenej-repy",
+        "title": "Šalát z tekvice, fety a červenej repy",
+        "text": ".......................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "obed-s-ala-t-z-tekvice-fety-a-c-ervenej-repy",
+        "title": "Šalát z tekvice, fety a červenej repy",
+        "text": ".............",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "obed-s-ala-t-z-tekvice-fety-a-c-ervenej-repy",
+        "title": "Šalát z tekvice, fety a červenej repy",
+        "text": "......................",
+        "type": "step",
+        "stepIndex": 3
+      },
+      {
+        "id": "obed-s-ala-t-z-tekvice-fety-a-c-ervenej-repy",
+        "title": "Šalát z tekvice, fety a červenej repy",
+        "text": ".....................",
+        "type": "step",
+        "stepIndex": 4
+      },
+      {
+        "id": "obed-s-pena-tovo-brokolicove-cestoviny-s-pestom",
+        "title": "Špenátovo brokolicové cestoviny s pestom",
+        "text": "............................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "obed-s-pena-tovo-brokolicove-cestoviny-s-pestom",
+        "title": "Špenátovo brokolicové cestoviny s pestom",
+        "text": "........",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "obed-s-pena-tovo-brokolicove-cestoviny-s-pestom",
+        "title": "Špenátovo brokolicové cestoviny s pestom",
+        "text": ".............",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "obed-s-pena-tovo-brokolicove-cestoviny-s-pestom",
+        "title": "Špenátovo brokolicové cestoviny s pestom",
+        "text": "..........................",
+        "type": "step",
+        "stepIndex": 3
+      },
+      {
+        "id": "obed-s-pena-tovo-brokolicove-cestoviny-s-pestom",
+        "title": "Špenátovo brokolicové cestoviny s pestom",
+        "text": "..........................",
+        "type": "step",
+        "stepIndex": 4
+      },
+      {
+        "id": "obed-tofu-buddha-bowl",
+        "title": "Tofu Buddha bowl",
+        "text": ".................................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "obed-tofu-buddha-bowl",
+        "title": "Tofu Buddha bowl",
+        "text": "......................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "obed-tofu-buddha-bowl",
+        "title": "Tofu Buddha bowl",
+        "text": "............................",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "obed-u-dena-ryba-s-letnou-zeleninou",
+        "title": "Údená ryba s letnou zeleninou",
+        "text": ".............",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "obed-u-dena-ryba-s-letnou-zeleninou",
+        "title": "Údená ryba s letnou zeleninou",
+        "text": "..........................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "obed-u-dena-ryba-s-letnou-zeleninou",
+        "title": "Údená ryba s letnou zeleninou",
+        "text": "..................................",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "obed-u-dena-ryba-s-letnou-zeleninou",
+        "title": "Údená ryba s letnou zeleninou",
+        "text": "............................",
+        "type": "step",
+        "stepIndex": 3
+      },
+      {
+        "id": "obed-u-dena-ryba-s-letnou-zeleninou",
+        "title": "Údená ryba s letnou zeleninou",
+        "text": "...........................",
+        "type": "step",
+        "stepIndex": 4
+      },
+      {
+        "id": "obed-u-dena-ryba-s-letnou-zeleninou",
+        "title": "Údená ryba s letnou zeleninou",
+        "text": "........................",
+        "type": "step",
+        "stepIndex": 5
+      },
+      {
+        "id": "obed-vega-nsky-burger-z-bata-tov",
+        "title": "Vegánsky burger z batátov",
+        "text": "..................................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "obed-vega-nsky-burger-z-bata-tov",
+        "title": "Vegánsky burger z batátov",
+        "text": "......................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "obed-vega-nsky-burger-z-bata-tov",
+        "title": "Vegánsky burger z batátov",
+        "text": ".............................",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "obed-vega-nsky-burger-z-bata-tov",
+        "title": "Vegánsky burger z batátov",
+        "text": "............",
+        "type": "step",
+        "stepIndex": 3
+      },
+      {
+        "id": "obed-vega-nsky-burger-z-bata-tov",
+        "title": "Vegánsky burger z batátov",
+        "text": "........................................",
+        "type": "step",
+        "stepIndex": 4
+      },
+      {
+        "id": "obed-vega-nsky-burger-z-bata-tov",
+        "title": "Vegánsky burger z batátov",
+        "text": "..............",
+        "type": "step",
+        "stepIndex": 5
+      },
+      {
+        "id": "obed-vega-nsky-s-ala-t-s-ryz-ovy-mi-rezancami",
+        "title": "Vegánsky šalát s ryžovými rezancami",
+        "text": ".....................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "obed-vega-nsky-s-ala-t-s-ryz-ovy-mi-rezancami",
+        "title": "Vegánsky šalát s ryžovými rezancami",
+        "text": "............................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "obed-vega-nsky-s-ala-t-s-ryz-ovy-mi-rezancami",
+        "title": "Vegánsky šalát s ryžovými rezancami",
+        "text": "...............",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "obed-vega-nsky-s-ala-t-s-ryz-ovy-mi-rezancami",
+        "title": "Vegánsky šalát s ryžovými rezancami",
+        "text": "...........................",
+        "type": "step",
+        "stepIndex": 3
+      },
+      {
+        "id": "obed-vega-nsky-wrap-s-bata-tmi-a-humusom",
+        "title": "Vegánsky wrap s batátmi a humusom",
+        "text": "..................................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "obed-vega-nsky-wrap-s-bata-tmi-a-humusom",
+        "title": "Vegánsky wrap s batátmi a humusom",
+        "text": ".............j...",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "obed-vega-nsky-wrap-s-bata-tmi-a-humusom",
+        "title": "Vegánsky wrap s batátmi a humusom",
+        "text": "................",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "obed-vega-nsky-wrap-s-bata-tmi-a-humusom",
+        "title": "Vegánsky wrap s batátmi a humusom",
+        "text": "............................",
+        "type": "step",
+        "stepIndex": 3
+      },
+      {
+        "id": "obed-vega-nsky-wrap-s-bata-tmi-a-humusom",
+        "title": "Vegánsky wrap s batátmi a humusom",
+        "text": ".......................",
+        "type": "step",
+        "stepIndex": 4
+      },
+      {
+        "id": "obed-zdrave-bolon-ske-s-pagety",
+        "title": "Zdravé boloňské špagety",
+        "text": "......................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "obed-zdrave-bolon-ske-s-pagety",
+        "title": "Zdravé boloňské špagety",
+        "text": "............................)...",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "obed-zdrave-bolon-ske-s-pagety",
+        "title": "Zdravé boloňské špagety",
+        "text": ".................",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "obed-zdrave-zeleninove-muffiny",
+        "title": "Zdravé zeleninové muffiny",
+        "text": "..........................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "obed-zdrave-zeleninove-muffiny",
+        "title": "Zdravé zeleninové muffiny",
+        "text": ".......................................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "obed-zdrave-zeleninove-muffiny",
+        "title": "Zdravé zeleninové muffiny",
+        "text": "................................",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "obed-zdrave-zeleninove-muffiny",
+        "title": "Zdravé zeleninové muffiny",
+        "text": ".........",
+        "type": "step",
+        "stepIndex": 3
+      },
+      {
+        "id": "obed-zdrave-zeleninove-muffiny",
+        "title": "Zdravé zeleninové muffiny",
+        "text": "..................",
+        "type": "step",
+        "stepIndex": 4
+      },
+      {
+        "id": "obed-zelene-kari-s-krevetami",
+        "title": "Zelené kari s krevetami",
+        "text": "........",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "obed-zelene-kari-s-krevetami",
+        "title": "Zelené kari s krevetami",
+        "text": "..........",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "obed-zelene-kari-s-krevetami",
+        "title": "Zelené kari s krevetami",
+        "text": "...................................",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "obed-zelene-kari-s-krevetami",
+        "title": "Zelené kari s krevetami",
+        "text": "..............",
+        "type": "step",
+        "stepIndex": 3
+      },
+      {
+        "id": "obed-zelene-kari-s-krevetami",
+        "title": "Zelené kari s krevetami",
+        "text": ".............",
+        "type": "step",
+        "stepIndex": 4
+      },
+      {
+        "id": "obed-zelene-kari-s-krevetami",
+        "title": "Zelené kari s krevetami",
+        "text": ".............",
+        "type": "step",
+        "stepIndex": 5
+      },
+      {
+        "id": "obed-hubova-polievka",
+        "title": "Hubová polievka",
+        "text": "................................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "obed-hubova-polievka",
+        "title": "Hubová polievka",
+        "text": ".............",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "obed-hubova-polievka",
+        "title": "Hubová polievka",
+        "text": "..............",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "obed-hubova-polievka",
+        "title": "Hubová polievka",
+        "text": ".........................a...",
+        "type": "step",
+        "stepIndex": 3
+      },
+      {
+        "id": "obed-kuracia-polievka-na-mexicky-s-ty-l",
+        "title": "Kuracia polievka na mexický štýl",
+        "text": "....................................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "obed-kuracia-polievka-na-mexicky-s-ty-l",
+        "title": "Kuracia polievka na mexický štýl",
+        "text": "....................................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "obed-kuracia-polievka-na-s-ty-l-pho",
+        "title": "Kuracia polievka na štýl pho",
+        "text": "...........................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "obed-kuracia-polievka-na-s-ty-l-pho",
+        "title": "Kuracia polievka na štýl pho",
+        "text": "................................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "obed-kuracia-polievka-na-s-ty-l-pho",
+        "title": "Kuracia polievka na štýl pho",
+        "text": "................................",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "obed-kuracia-polievka-na-s-ty-l-pho",
+        "title": "Kuracia polievka na štýl pho",
+        "text": ".........................",
+        "type": "step",
+        "stepIndex": 3
+      },
+      {
+        "id": "obed-miso-polievka-s-jac-men-om",
+        "title": "Miso polievka s jačmeňom",
+        "text": ".............",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "obed-miso-polievka-s-jac-men-om",
+        "title": "Miso polievka s jačmeňom",
+        "text": "........",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "obed-paradajkova-polievka-s-fazul-ou",
+        "title": "Paradajková polievka s fazuľou",
+        "text": ".............",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "obed-paradajkova-polievka-s-fazul-ou",
+        "title": "Paradajková polievka s fazuľou",
+        "text": "................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "obed-paradajkova-polievka-s-fazul-ou",
+        "title": "Paradajková polievka s fazuľou",
+        "text": ".......",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "obed-paradajkova-polievka-s-fazul-ou",
+        "title": "Paradajková polievka s fazuľou",
+        "text": "...................",
+        "type": "step",
+        "stepIndex": 3
+      },
+      {
+        "id": "obed-polievka-z-tekvice-a-bata-tov",
+        "title": "Polievka z tekvice a batátov",
+        "text": "..................................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "obed-polievka-z-tekvice-a-bata-tov",
+        "title": "Polievka z tekvice a batátov",
+        "text": ".................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "obed-polievka-z-tekvice-a-bata-tov",
+        "title": "Polievka z tekvice a batátov",
+        "text": "..............",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "obed-polievka-z-tekvice-a-bata-tov",
+        "title": "Polievka z tekvice a batátov",
+        "text": "...............",
+        "type": "step",
+        "stepIndex": 3
+      },
+      {
+        "id": "obed-polievka-z-tekvice-a-bata-tov",
+        "title": "Polievka z tekvice a batátov",
+        "text": "................",
+        "type": "step",
+        "stepIndex": 4
+      },
+      {
+        "id": "obed-polievka-z-tekvice-a-bata-tov",
+        "title": "Polievka z tekvice a batátov",
+        "text": "...............",
+        "type": "step",
+        "stepIndex": 5
+      },
+      {
+        "id": "obed-s-os-ovicova-kari-polievka",
+        "title": "Šošovicová kari polievka",
+        "text": "............................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "obed-s-os-ovicova-kari-polievka",
+        "title": "Šošovicová kari polievka",
+        "text": ".........",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "obed-s-os-ovicova-kari-polievka",
+        "title": "Šošovicová kari polievka",
+        "text": "...............................",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "obed-s-os-ovicova-kari-polievka",
+        "title": "Šošovicová kari polievka",
+        "text": "...........",
+        "type": "step",
+        "stepIndex": 3
+      },
+      {
+        "id": "obed-vega-nska-s-os-ovicova-polievka",
+        "title": "Vegánska šošovicová polievka",
+        "text": "...............................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "obed-vega-nska-s-os-ovicova-polievka",
+        "title": "Vegánska šošovicová polievka",
+        "text": "......................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "obed-vega-nska-s-os-ovicova-polievka",
+        "title": "Vegánska šošovicová polievka",
+        "text": ".........................................",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "obed-vega-nska-s-os-ovicova-polievka",
+        "title": "Vegánska šošovicová polievka",
+        "text": "......................................u...",
+        "type": "step",
+        "stepIndex": 3
+      },
+      {
+        "id": "obed-vy-var-na-a-zijsky-s-ty-l",
+        "title": "Vývar na ázijský štýl",
+        "text": "................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "obed-vy-var-na-a-zijsky-s-ty-l",
+        "title": "Vývar na ázijský štýl",
+        "text": "............................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "obed-vy-var-na-a-zijsky-s-ty-l",
+        "title": "Vývar na ázijský štýl",
+        "text": "..............",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "obed-vy-var-na-a-zijsky-s-ty-l",
+        "title": "Vývar na ázijský štýl",
+        "text": ".............j...",
+        "type": "step",
+        "stepIndex": 3
+      },
+      {
+        "id": "obed-vy-var-na-a-zijsky-s-ty-l",
+        "title": "Vývar na ázijský štýl",
+        "text": "..........................",
+        "type": "step",
+        "stepIndex": 4
+      },
+      {
+        "id": "ranajky-acai-miska",
+        "title": "Acai miska",
+        "text": "...........................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "ranajky-acai-miska",
+        "title": "Acai miska",
+        "text": "............i...",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "ranajky-avoka-dovy-toast-s-fetou",
+        "title": "Avokádový toast s fetou",
+        "text": "...................................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "ranajky-avoka-dovy-toast-s-fetou",
+        "title": "Avokádový toast s fetou",
+        "text": "................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "ranajky-avoka-dovy-toast-s-fetou",
+        "title": "Avokádový toast s fetou",
+        "text": "............a...",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "ranajky-avoka-dovy-toast-s-fetou",
+        "title": "Avokádový toast s fetou",
+        "text": "...................",
+        "type": "step",
+        "stepIndex": 3
+      },
+      {
+        "id": "ranajky-bana-novo-ovsene-lievance",
+        "title": "Banánovo ovsené lievance",
+        "text": "..............",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "ranajky-bana-novy-chlieb",
+        "title": "Banánový chlieb",
+        "text": "...................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "ranajky-bana-novy-chlieb",
+        "title": "Banánový chlieb",
+        "text": "...............................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "ranajky-bana-novy-chlieb",
+        "title": "Banánový chlieb",
+        "text": "........................í...",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "ranajky-bana-novy-chlieb",
+        "title": "Banánový chlieb",
+        "text": "..........................",
+        "type": "step",
+        "stepIndex": 3
+      },
+      {
+        "id": "ranajky-bylinkove-vaji-c-ka-s-kyslou-kapustou",
+        "title": "Bylinkové vajíčka s kyslou kapustou",
+        "text": ".................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "ranajky-bylinkove-vaji-c-ka-s-kyslou-kapustou",
+        "title": "Bylinkové vajíčka s kyslou kapustou",
+        "text": "................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "ranajky-bylinkove-vaji-c-ka-s-kyslou-kapustou",
+        "title": "Bylinkové vajíčka s kyslou kapustou",
+        "text": ".......................",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "ranajky-bylinkove-vaji-c-ka-s-kyslou-kapustou",
+        "title": "Bylinkové vajíčka s kyslou kapustou",
+        "text": ".......................",
+        "type": "step",
+        "stepIndex": 3
+      },
+      {
+        "id": "ranajky-c-ili-stratene-vaji-c-ka",
+        "title": "Čili stratené vajíčka",
+        "text": ".............................................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "ranajky-c-ili-stratene-vaji-c-ka",
+        "title": "Čili stratené vajíčka",
+        "text": ".............................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "ranajky-c-ili-stratene-vaji-c-ka",
+        "title": "Čili stratené vajíčka",
+        "text": "...........",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "ranajky-c-ili-stratene-vaji-c-ka",
+        "title": "Čili stratené vajíčka",
+        "text": "...................",
+        "type": "step",
+        "stepIndex": 3
+      },
+      {
+        "id": "ranajky-c-okola-dova-ran-ajkova-miska",
+        "title": "Čokoládová raňajková miska",
+        "text": ".........................................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "ranajky-c-okola-dova-ran-ajkova-miska",
+        "title": "Čokoládová raňajková miska",
+        "text": "............é...",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "ranajky-jahodovy-chia-puding",
+        "title": "Jahodový chia puding",
+        "text": ".....................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "ranajky-jahodovy-chia-puding",
+        "title": "Jahodový chia puding",
+        "text": "..........................................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "ranajky-kokosovo-poha-nkova-overnight-kas-a",
+        "title": "Kokosovo pohánková overnight kaša",
+        "text": ".............................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "ranajky-kokosovo-poha-nkova-overnight-kas-a",
+        "title": "Kokosovo pohánková overnight kaša",
+        "text": ".....................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "ranajky-kokosovo-poha-nkova-overnight-kas-a",
+        "title": "Kokosovo pohánková overnight kaša",
+        "text": "...........",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "ranajky-kokosovo-poha-nkova-overnight-kas-a",
+        "title": "Kokosovo pohánková overnight kaša",
+        "text": ".........",
+        "type": "step",
+        "stepIndex": 3
+      },
+      {
+        "id": "ranajky-omeleta-s-kyslou-kapustou",
+        "title": "Omeleta s kyslou kapustou",
+        "text": "...........................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "ranajky-omeleta-s-kyslou-kapustou",
+        "title": "Omeleta s kyslou kapustou",
+        "text": "......................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "ranajky-omeleta-s-kyslou-kapustou",
+        "title": "Omeleta s kyslou kapustou",
+        "text": ".......................",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "ranajky-ovsena-mrkvova-kas-a",
+        "title": "Ovsená mrkvová kaša",
+        "text": "..................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "ranajky-ovsena-mrkvova-kas-a",
+        "title": "Ovsená mrkvová kaša",
+        "text": "...............",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "ranajky-ovsena-mrkvova-kas-a",
+        "title": "Ovsená mrkvová kaša",
+        "text": "..........................",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "ranajky-ovsena-mrkvova-kas-a",
+        "title": "Ovsená mrkvová kaša",
+        "text": "................................",
+        "type": "step",
+        "stepIndex": 3
+      },
+      {
+        "id": "ranajky-ovsena-mrkvova-kas-a",
+        "title": "Ovsená mrkvová kaša",
+        "text": "...................",
+        "type": "step",
+        "stepIndex": 4
+      },
+      {
+        "id": "ranajky-ovseny-chia-puding",
+        "title": "Ovsený chia puding",
+        "text": ".......................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "ranajky-ovseny-chia-puding",
+        "title": "Ovsený chia puding",
+        "text": "...........................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "ranajky-ovseny-overnight-s-c-uc-oriedkami",
+        "title": "Ovsený overnight s čučoriedkami",
+        "text": "..............",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "ranajky-ovseny-overnight-s-c-uc-oriedkami",
+        "title": "Ovsený overnight s čučoriedkami",
+        "text": ".........................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "ranajky-ovseny-overnight-s-c-uc-oriedkami",
+        "title": "Ovsený overnight s čučoriedkami",
+        "text": "..........................................",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "ranajky-praz-enica-s-kozi-m-syrom",
+        "title": "Praženica s kozím syrom",
+        "text": "..............",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "ranajky-praz-enica-s-kozi-m-syrom",
+        "title": "Praženica s kozím syrom",
+        "text": "......................................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "ranajky-praz-enica-s-kozi-m-syrom",
+        "title": "Praženica s kozím syrom",
+        "text": ".................................",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "ranajky-praz-enica-s-kozi-m-syrom",
+        "title": "Praženica s kozím syrom",
+        "text": "............",
+        "type": "step",
+        "stepIndex": 3
+      },
+      {
+        "id": "ranajky-praz-enica-z-tofu",
+        "title": "Praženica z tofu",
+        "text": ".............",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "ranajky-praz-enica-z-tofu",
+        "title": "Praženica z tofu",
+        "text": ".............................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "ranajky-praz-enica-z-tofu",
+        "title": "Praženica z tofu",
+        "text": ".................",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "ranajky-praz-enica-z-tofu",
+        "title": "Praženica z tofu",
+        "text": "..............",
+        "type": "step",
+        "stepIndex": 3
+      },
+      {
+        "id": "ranajky-praz-enica-z-tofu",
+        "title": "Praženica z tofu",
+        "text": "..............",
+        "type": "step",
+        "stepIndex": 4
+      },
+      {
+        "id": "ranajky-praz-enica-z-tofu",
+        "title": "Praženica z tofu",
+        "text": "..............................................................",
+        "type": "step",
+        "stepIndex": 5
+      },
+      {
+        "id": "ranajky-protei-nova-kas-a-s-c-uc-oriedkami",
+        "title": "Proteínová kaša s čučoriedkami",
+        "text": "..................................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "ranajky-protei-nova-kas-a-s-c-uc-oriedkami",
+        "title": "Proteínová kaša s čučoriedkami",
+        "text": "...................................................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "ranajky-protei-nova-kas-a-s-c-uc-oriedkami",
+        "title": "Proteínová kaša s čučoriedkami",
+        "text": "................",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "ranajky-protei-nova-kas-a-s-c-uc-oriedkami",
+        "title": "Proteínová kaša s čučoriedkami",
+        "text": ".....................................",
+        "type": "step",
+        "stepIndex": 3
+      },
+      {
+        "id": "ranajky-sezamovy-losos-na-raz-nom-chlebe",
+        "title": "Sezamový losos na ražnom chlebe",
+        "text": "..................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "ranajky-sezamovy-losos-na-raz-nom-chlebe",
+        "title": "Sezamový losos na ražnom chlebe",
+        "text": ".............",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "ranajky-sezamovy-losos-na-raz-nom-chlebe",
+        "title": "Sezamový losos na ražnom chlebe",
+        "text": "....................",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "ranajky-sladka-kre-mova-kas-a-s-quinoou",
+        "title": "Sladká krémová kaša s quinoou",
+        "text": ".....................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "ranajky-sladka-kre-mova-kas-a-s-quinoou",
+        "title": "Sladká krémová kaša s quinoou",
+        "text": "...........................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "ranajky-sladka-kre-mova-kas-a-s-quinoou",
+        "title": "Sladká krémová kaša s quinoou",
+        "text": ".......................",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "ranajky-sladka-kre-mova-kas-a-s-quinoou",
+        "title": "Sladká krémová kaša s quinoou",
+        "text": "...................................",
+        "type": "step",
+        "stepIndex": 3
+      },
+      {
+        "id": "ranajky-slana-palacinka-s-rukolou-a-s-unkou",
+        "title": "Slaná palacinka s rukolou a šunkou",
+        "text": "....................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "ranajky-slana-palacinka-s-rukolou-a-s-unkou",
+        "title": "Slaná palacinka s rukolou a šunkou",
+        "text": "................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "ranajky-slana-palacinka-s-rukolou-a-s-unkou",
+        "title": "Slaná palacinka s rukolou a šunkou",
+        "text": "....................................",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "ranajky-slana-palacinka-s-rukolou-a-s-unkou",
+        "title": "Slaná palacinka s rukolou a šunkou",
+        "text": ".......................................................",
+        "type": "step",
+        "stepIndex": 3
+      },
+      {
+        "id": "ranajky-slana-palacinka-s-rukolou-a-s-unkou",
+        "title": "Slaná palacinka s rukolou a šunkou",
+        "text": "..............................",
+        "type": "step",
+        "stepIndex": 4
+      },
+      {
+        "id": "ranajky-s-paldova-placka-s-ricottou",
+        "title": "Špaldová placka s ricottou",
+        "text": "......................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "ranajky-s-paldova-placka-s-ricottou",
+        "title": "Špaldová placka s ricottou",
+        "text": ".......................................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "ranajky-s-paldova-placka-s-ricottou",
+        "title": "Špaldová placka s ricottou",
+        "text": "...................",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "ranajky-s-paldova-placka-s-ricottou",
+        "title": "Špaldová placka s ricottou",
+        "text": "...................",
+        "type": "step",
+        "stepIndex": 3
+      },
+      {
+        "id": "ranajky-toasty-s-vaji-c-kom-hubami-a-avoka-dom",
+        "title": "Toasty s vajíčkom, hubami a avokádom",
+        "text": "....................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "ranajky-toasty-s-vaji-c-kom-hubami-a-avoka-dom",
+        "title": "Toasty s vajíčkom, hubami a avokádom",
+        "text": ".................................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "ranajky-toasty-s-vaji-c-kom-hubami-a-avoka-dom",
+        "title": "Toasty s vajíčkom, hubami a avokádom",
+        "text": "...........................................",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "ranajky-toasty-s-vaji-c-kom-hubami-a-avoka-dom",
+        "title": "Toasty s vajíčkom, hubami a avokádom",
+        "text": "......................",
+        "type": "step",
+        "stepIndex": 3
+      },
+      {
+        "id": "ranajky-vega-nske-palacinky",
+        "title": "Vegánske palacinky",
+        "text": "...................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "ranajky-vega-nske-palacinky",
+        "title": "Vegánske palacinky",
+        "text": "............................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "ranajky-vega-nske-palacinky",
+        "title": "Vegánske palacinky",
+        "text": "...............",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "ranajky-vega-nske-palacinky",
+        "title": "Vegánske palacinky",
+        "text": ".........................................................",
+        "type": "step",
+        "stepIndex": 3
+      },
+      {
+        "id": "ranajky-vega-nske-palacinky",
+        "title": "Vegánske palacinky",
+        "text": "...................",
+        "type": "step",
+        "stepIndex": 4
+      },
+      {
+        "id": "smoothie-bana-novo-medove-smoothie",
+        "title": "Banánovo medové smoothie",
+        "text": "...........",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "smoothie-c-okola-dove-smoothie",
+        "title": "Čokoládové smoothie",
+        "text": "...........",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "smoothie-kokosovo-ovocny-protei-novy-smoothie",
+        "title": "Kokosovo ovocný proteínový smoothie",
+        "text": ".................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "smoothie-kokosovo-ovocny-protei-novy-smoothie",
+        "title": "Kokosovo ovocný proteínový smoothie",
+        "text": "................................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "smoothie-kokosovo-ovocny-protei-novy-smoothie",
+        "title": "Kokosovo ovocný proteínový smoothie",
+        "text": "..................",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "smoothie-tropicky-smoothie",
+        "title": "Tropický smoothie",
+        "text": "....................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "smoothie-tropicky-smoothie",
+        "title": "Tropický smoothie",
+        "text": "...............",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "smoothie-zelene-smoothie-s-protei-nom",
+        "title": "Zelené smoothie s proteínom",
+        "text": ".............",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "snack-bana-novo-ovsene-lievance",
+        "title": "Banánovo ovsené lievance",
+        "text": "..............",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "snack-bana-novy-chlieb",
+        "title": "Banánový chlieb",
+        "text": "...................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "snack-bana-novy-chlieb",
+        "title": "Banánový chlieb",
+        "text": "...............................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "snack-bana-novy-chlieb",
+        "title": "Banánový chlieb",
+        "text": "........................í...",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "snack-bana-novy-chlieb",
+        "title": "Banánový chlieb",
+        "text": "..........................",
+        "type": "step",
+        "stepIndex": 3
+      },
+      {
+        "id": "snack-citro-novo-kokosove-gulic-ky",
+        "title": "Citrónovo kokosové guličky",
+        "text": "....................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "snack-citro-novo-kokosove-gulic-ky",
+        "title": "Citrónovo kokosové guličky",
+        "text": "............................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "snack-c-okola-dove-snickers-datle",
+        "title": "Čokoládové snickers datle",
+        "text": ".................................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "snack-c-okola-dove-snickers-datle",
+        "title": "Čokoládové snickers datle",
+        "text": "......................................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "snack-datlovy-kola-c-z-pracli-kov",
+        "title": "Datlový koláč z praclíkov",
+        "text": "........................................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "snack-datlovy-kola-c-z-pracli-kov",
+        "title": "Datlový koláč z praclíkov",
+        "text": ".............",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "snack-datlovy-kola-c-z-pracli-kov",
+        "title": "Datlový koláč z praclíkov",
+        "text": "...............................................",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "snack-datlovy-kola-c-z-pracli-kov",
+        "title": "Datlový koláč z praclíkov",
+        "text": "..............................",
+        "type": "step",
+        "stepIndex": 3
+      },
+      {
+        "id": "snack-doma-ca-c-okola-dova-zmrzlina",
+        "title": "Domáca čokoládová zmrzlina",
+        "text": "................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "snack-jahodovy-chia-puding",
+        "title": "Jahodový chia puding",
+        "text": ".....................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "snack-jahodovy-chia-puding",
+        "title": "Jahodový chia puding",
+        "text": "..........................................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "snack-mrkvove-muffiny-so-semienkami",
+        "title": "Mrkvové muffiny so semienkami",
+        "text": "................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "snack-mrkvove-muffiny-so-semienkami",
+        "title": "Mrkvové muffiny so semienkami",
+        "text": "..............................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "snack-mrkvove-muffiny-so-semienkami",
+        "title": "Mrkvové muffiny so semienkami",
+        "text": ".................................................",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "snack-mrkvove-muffiny-so-semienkami",
+        "title": "Mrkvové muffiny so semienkami",
+        "text": "..............................................",
+        "type": "step",
+        "stepIndex": 3
+      },
+      {
+        "id": "snack-ovsene-gulic-ky-s-aras-idovy-m-maslom",
+        "title": "Ovsené guličky s arašidovým maslom",
+        "text": "..............",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "snack-ovsene-gulic-ky-s-aras-idovy-m-maslom",
+        "title": "Ovsené guličky s arašidovým maslom",
+        "text": "...............",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "snack-ovsene-sus-ienky-s-jablkovy-m-pyre",
+        "title": "Ovsené sušienky s jablkovým pyré",
+        "text": "............................................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "snack-ovsene-sus-ienky-s-jablkovy-m-pyre",
+        "title": "Ovsené sušienky s jablkovým pyré",
+        "text": "......................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "snack-ovseny-chia-puding",
+        "title": "Ovsený chia puding",
+        "text": ".......................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "snack-ovseny-chia-puding",
+        "title": "Ovsený chia puding",
+        "text": "...........................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "snack-palacinky-s-lesny-mi-plodmi",
+        "title": "Palacinky s lesnými plodmi",
+        "text": "..............",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "snack-palacinky-s-lesny-mi-plodmi",
+        "title": "Palacinky s lesnými plodmi",
+        "text": "............................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "snack-palacinky-s-lesny-mi-plodmi",
+        "title": "Palacinky s lesnými plodmi",
+        "text": "................",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "snack-palacinky-s-lesny-mi-plodmi",
+        "title": "Palacinky s lesnými plodmi",
+        "text": "....................................",
+        "type": "step",
+        "stepIndex": 3
+      },
+      {
+        "id": "snack-palacinky-s-lesny-mi-plodmi",
+        "title": "Palacinky s lesnými plodmi",
+        "text": "...................................",
+        "type": "step",
+        "stepIndex": 4
+      },
+      {
+        "id": "snack-protei-novo-datlove-gulic-ky",
+        "title": "Proteínovo datlové guličky",
+        "text": "..................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "snack-protei-novo-datlove-gulic-ky",
+        "title": "Proteínovo datlové guličky",
+        "text": "........................",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "snack-protei-novo-datlove-gulic-ky",
+        "title": "Proteínovo datlové guličky",
+        "text": "...............",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "snack-protei-novo-datlove-gulic-ky",
+        "title": "Proteínovo datlové guličky",
+        "text": "............................",
+        "type": "step",
+        "stepIndex": 3
+      },
+      {
+        "id": "snack-zdrave-ma-tove-gulic-ky",
+        "title": "Zdravé mätové guličky",
+        "text": "....................",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "snack-zdrave-ma-tove-gulic-ky",
+        "title": "Zdravé mätové guličky",
+        "text": "..............",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "snack-zdrave-mrkvove-lievance",
+        "title": "Zdravé mrkvové lievance",
+        "text": "........................á...",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "snack-zdrave-mrkvove-lievance",
+        "title": "Zdravé mrkvové lievance",
+        "text": "............",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "snack-zdrave-mrkvove-lievance",
+        "title": "Zdravé mrkvové lievance",
+        "text": "....................................",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "snack-zdrave-mrkvove-lievance",
+        "title": "Zdravé mrkvové lievance",
+        "text": "...............",
+        "type": "step",
+        "stepIndex": 3
+      },
+      {
+        "id": "snack-hummus-zelenina",
+        "title": "Hummus so zeleninou",
+        "text": "..............",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "snack-hummus-zelenina",
+        "title": "Hummus so zeleninou",
+        "text": "............",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "snack-edamame-morska-sol",
+        "title": "Edamame s morskou soľou",
+        "text": "...........",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "snack-edamame-morska-sol",
+        "title": "Edamame s morskou soľou",
+        "text": ".............",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "snack-ovocny-chia-puding",
+        "title": "Ovocný chia puding",
+        "text": "..............",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "snack-ovocny-chia-puding",
+        "title": "Ovocný chia puding",
+        "text": "............",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "snack-ovocny-chia-puding",
+        "title": "Ovocný chia puding",
+        "text": "........",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "snack-pecene-cícerove-chrumky",
+        "title": "Pečené cícerové chrumky",
+        "text": ".......",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "snack-pecene-cícerove-chrumky",
+        "title": "Pečené cícerové chrumky",
+        "text": "..........",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "snack-pecene-cícerove-chrumky",
+        "title": "Pečené cícerové chrumky",
+        "text": "...........",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "snack-ryžove-kolace-avokado",
+        "title": "Ryžové koláče s avokádom",
+        "text": "..............",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "snack-ryžove-kolace-avokado",
+        "title": "Ryžové koláče s avokádom",
+        "text": "...........",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "snack-ovocny-sorbet",
+        "title": "Domáci ovocný sorbet",
+        "text": ".........",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "snack-ovocny-sorbet",
+        "title": "Domáci ovocný sorbet",
+        "text": "...........",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "snack-ovocny-sorbet",
+        "title": "Domáci ovocný sorbet",
+        "text": "......",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "snack-slnecnicove-gule",
+        "title": "Slnečnicové energetické guľky",
+        "text": "..........",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "snack-slnecnicove-gule",
+        "title": "Slnečnicové energetické guľky",
+        "text": "............",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "snack-slnecnicove-gule",
+        "title": "Slnečnicové energetické guľky",
+        "text": ".............",
+        "type": "step",
+        "stepIndex": 2
+      },
+      {
+        "id": "snack-tekvicove-semienka-mix",
+        "title": "Pražené tekvicové semienka s korením",
+        "text": ".......",
+        "type": "step",
+        "stepIndex": 0
+      },
+      {
+        "id": "snack-tekvicove-semienka-mix",
+        "title": "Pražené tekvicové semienka s korením",
+        "text": ".........",
+        "type": "step",
+        "stepIndex": 1
+      },
+      {
+        "id": "snack-tekvicove-semienka-mix",
+        "title": "Pražené tekvicové semienka s korením",
+        "text": "..........",
+        "type": "step",
+        "stepIndex": 2
+      }
+    ],
+    "contentErrors": []
+  }
+}

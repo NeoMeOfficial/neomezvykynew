@@ -69,10 +69,22 @@ export function PaywallModal({
             primary: false,
           },
         ];
+      default:
+        return [
+          {
+            tier: 'neome_plus' as const,
+            icon: Crown,
+            name: 'NeoMe+',
+            price: `€14.90/mesiac`,
+            description: 'Neobmedzený obsah + ukladanie údajov',
+            color: colors.accent,
+            primary: true,
+          },
+        ];
     }
   };
 
-  const options = getUpgradeOptions();
+  const options = getUpgradeOptions() || [];
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

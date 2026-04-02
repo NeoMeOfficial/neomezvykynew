@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { ArrowLeft, Play, Pause, RotateCcw, Airplay, Clock } from 'lucide-react';
 import { colors, glassCard } from '../../theme/warmDusk';
 import { exercises } from '../../data/exercises';
+import FavoriteButton from '../../components/v2/favorites/FavoriteButton';
 
 export default function ExercisePlayer() {
   const navigate = useNavigate();
@@ -102,13 +103,20 @@ export default function ExercisePlayer() {
             </div>
           </div>
           
-          <button 
-            onClick={handleAirplay}
-            className="w-10 h-10 rounded-full flex items-center justify-center active:scale-95 transition-transform"
-            style={{ background: 'rgba(255,255,255,0.5)', backdropFilter: 'blur(4px)' }}
-          >
-            <Airplay size={16} className="text-[#8B7560]" />
-          </button>
+          <div className="flex items-center gap-2">
+            <FavoriteButton 
+              itemId={exercise.id} 
+              itemType="exercise" 
+              size="md"
+            />
+            <button 
+              onClick={handleAirplay}
+              className="w-10 h-10 rounded-full flex items-center justify-center active:scale-95 transition-transform"
+              style={{ background: 'rgba(255,255,255,0.5)', backdropFilter: 'blur(4px)' }}
+            >
+              <Airplay size={16} className="text-[#8B7560]" />
+            </button>
+          </div>
         </div>
       </div>
 

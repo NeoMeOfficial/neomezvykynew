@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Filter, Dumbbell } from 'lucide-react';
 import { colors, glassCard } from '../../theme/warmDusk';
@@ -19,7 +19,7 @@ const programs: Program[] = [
     name: 'Postpartum',
     level: 1,
     weeks: 8,
-    description: 'Program je vhodný pre ženy, ktoré potrebujú spevniť brušný korzet, vyriešiť diastázu či inkontinenciu, mesiace aj roky po pôrode.',
+    description: 'Ak potrebuješ spevniť brušný korzet, vyriešiť diastázu či inkontinenciu',
     detailedDescription: `Program je vhodný pre ženy, ktoré potrebujú spevniť brušný korzet, vyriešiť diastázu či inkontinenciu, mesiace aj roky po pôrode.
 
 🎯 **Čo obsahuje:**
@@ -43,8 +43,25 @@ Vhodné pre mamičky bez ohľadu na to, či si po pôrode týždne, mesiace či 
     id: 'bodyforming',
     name: 'BodyForming',
     level: 2,
-    weeks: 8,
-    description: 'Formovanie postavy s dôrazom na problémové partie — brucho, stehná, zadok.',
+    weeks: 6,
+    description: 'Ak chceš začať spevňovať celé telo a cvičiť s vlastnou váhou.',
+    detailedDescription: `Program je vhodný pre ženy, ktoré začínajú so spevňovaním celého tela a netrpia diastázou.
+
+🎯 **Čo obsahuje:**
+• 6 týždňov - 18 posilňovacích cvičení - 12 strečingov
+• 15 minútové cvičenia - Level 2
+• Spevňovanie celého tela s vlastnou váhou
+
+💪 **Na čo sa zameriavame:**
+• Posilnenie celého tela bez pomôcok
+• Rozvoj základnej sily a stability
+• Zlepšenie držania tela a celkovej kondície
+• Postupné zvyšovanie intenzity
+
+🏠 **Čo budeš potrebovať:**
+• Karimatku • Krátku aj dlhú rezistenčnú gumu
+
+Ideálne pre ženy, ktoré si chcú vytvoriť základ pre pokročilejšie cvičenie a začínajú svoju fitness cestu.`,
     image: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&h=500&fit=crop',
   },
   {
@@ -52,15 +69,49 @@ Vhodné pre mamičky bez ohľadu na to, či si po pôrode týždne, mesiace či 
     name: 'ElasticBands',
     level: 3,
     weeks: 6,
-    description: 'Intenzívne cvičenia s rezistenčnými gumami pre celé telo.',
+    description: 'Ak túžiš po vyformovanej postave a chceš cvičiť s dynamickým odporom elastických gúm',
+    detailedDescription: `Program je vhodný pre ženy, ktoré chcú vyformovať postavu a zvýšiť intenzitu cvičenia s použitím dynamického odporu elastických gúm.
+
+🎯 **Čo obsahuje:**
+• 6 týždňov - pokročilé posilňovanie s gumami
+• 15 minútové cvičenia - Level 3
+• Formovanie postavy s dynamickým odporom
+
+💪 **Na čo sa zameriavame:**
+• Vyformovanie a definícia svalov
+• Zvýšenie intenzity tréningov
+• Využitie variabilného odporu gúm
+• Cielené formovanie problémových partií
+
+🏠 **Čo budeš potrebovať:**
+• Karimatku • Elastické gummy (rôzne odpory)
+
+Pre ženy, ktoré už majú základnú kondíciu a chcú posunúť svoje tréningy na vyššiu úroveň.`,
     image: 'https://images.unsplash.com/photo-1598289431512-b97b0917affc?w=800&h=500&fit=crop',
   },
   {
     id: 'strong-sexy',
     name: 'Strong&Sexy',
     level: 4,
-    weeks: 8,
-    description: 'Pokročilý program pre ženy, ktoré chcú silné a sexy telo.',
+    weeks: 6,
+    description: 'Ak snívaš o silnom, vyformovanom a funkčnom sexy tele, vyskúšaj cvičenie s jednoručkami',
+    detailedDescription: `Program je vhodný pre ženy, ktoré chcú posunúť svoje hranice, získať silnejšie a vyformovanejšie telo a začať cvičiť s jednoručkami.
+
+🎯 **Čo obsahuje:**
+• 6 týždňov - pokročilé posilňovanie s jednoručkami
+• 15 minútové cvičenia - Level 4
+• Maximálne využitie funkčnej sily
+
+💪 **Na čo sa zameriavame:**
+• Budovanie skutočnej funkčnej sily
+• Definícia a formovanie svalovej hmoty
+• Pokročilé pohybové vzory
+• Maximálna výkonnosť a sebavedomie
+
+🏠 **Čo budeš potrebovať:**
+• Karimatku • Jednoručky (odporúčané 2-8 kg)
+
+Pre pokročilé ženy, ktoré chcú dosiahnuť maximálne výsledky a pracovať na silnom, sexy tele.`,
     image: 'https://images.unsplash.com/photo-1550345332-09e3ac987658?w=800&h=500&fit=crop',
   },
 ];
@@ -78,13 +129,18 @@ export default function TeloPrograms() {
     return selectedLevels.includes(p.level);
   });
 
-  const handleProgramClick = (programId: string) => {
-    // Navigate to dedicated landing pages for specific programs
-    if (programId === 'postpartum') {
-      navigate('/program/postpartum/info');
-    } else {
-      navigate(`/program/${programId}`);
+  // Auto-navigate to program detail if only one program in filter
+  useEffect(() => {
+    if (filteredPrograms.length === 1 && activeFilter !== 0) {
+      // If only one program and not "Všetko" filter, go directly to detail page
+      const program = filteredPrograms[0];
+      navigate(`/program/${program.id}/info`);
     }
+  }, [filteredPrograms, activeFilter, navigate]);
+
+  const handleProgramClick = (programId: string) => {
+    // All programs use the same beautiful info page design
+    navigate(`/program/${programId}/info`);
   };
 
   return (
@@ -106,10 +162,23 @@ export default function TeloPrograms() {
       </div>
 
       {/* Intro text */}
-      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20">
-        <p className="text-[13px] leading-relaxed text-center" style={{ color: '#6B4C3B' }}>
-          Vyber si jeden zo 4 programov podľa svojej aktuálnej úrovne a nechaj sa ním viesť až do konca – práve vtedy prichádzajú tie najkrajšie výsledky. <strong>Každý deň jedno 15 minútové cvičenie</strong> na budovanie nielen sily, ale aj nového návyku.
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-5 shadow-sm border border-white/20">
+        <p className="text-[13px] leading-relaxed text-center mb-4" style={{ color: '#6B4C3B' }}>
+          Začni tým, že si vyberieš jeden zo 4 programov podľa svojej aktuálnej úrovne a nechaj sa ním viesť až do konca – práve vtedy prichádzajú tie najlepšie výsledky. <strong>Každý deň jedno 15 minútové cvičenie</strong> na budovanie nielen sily, ale aj nového návyku.
         </p>
+        
+        {/* Contact CTA */}
+        <div className="flex items-center justify-center gap-2 flex-wrap">
+          <span className="text-[13px]" style={{ color: '#6B4C3B' }}>
+            Nevieš, ktorý program je pre teba ten pravý?
+          </span>
+          <button 
+            onClick={() => navigate('/spravy')}
+            className="bg-[#6B4C3B] text-white px-4 py-1.5 rounded-full text-[12px] font-medium hover:bg-[#5A3D31] transition-all shadow-sm"
+          >
+            Napíš mi
+          </button>
+        </div>
       </div>
 
       {/* Nordic Filter Tabs */}
@@ -135,15 +204,13 @@ export default function TeloPrograms() {
         {filteredPrograms.map((p) => (
           <div
             key={p.id}
-            className={`bg-white/30 backdrop-blur-xl rounded-2xl shadow-sm border border-white/20 overflow-hidden cursor-pointer active:scale-[0.98] transition-transform hover:shadow-md ${
-              p.id === 'postpartum' && activeFilter === 1 && filteredPrograms.length === 1 ? 'min-h-[320px]' : ''
-            }`}
+            className="bg-white/30 backdrop-blur-xl rounded-2xl shadow-sm border border-white/20 overflow-hidden cursor-pointer active:scale-[0.98] transition-transform hover:shadow-md"
             onClick={() => handleProgramClick(p.id)}
           >
             <div className="relative h-36">
               <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
             </div>
-            <div className={`${p.id === 'postpartum' && activeFilter === 1 && filteredPrograms.length === 1 ? 'p-5' : 'p-4'}`}>
+            <div className="p-4">
               <p className="text-[15px] font-semibold" style={{ color: '#2E2218' }}>{p.name}</p>
               <div className="flex items-center gap-2 mt-1.5 mb-2">
                 <span 
@@ -160,13 +227,7 @@ export default function TeloPrograms() {
                 </span>
               </div>
               <div className="text-[12px] leading-relaxed" style={{ color: '#6B4C3B' }}>
-                {p.id === 'postpartum' && activeFilter === 1 && filteredPrograms.length === 1 ? (
-                  <div className="space-y-2 whitespace-pre-line">
-                    {p.detailedDescription}
-                  </div>
-                ) : (
-                  <p className="line-clamp-2">{p.description}</p>
-                )}
+                <p className="line-clamp-2">{p.description}</p>
               </div>
             </div>
           </div>

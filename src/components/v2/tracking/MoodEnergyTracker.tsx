@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useAuthContext } from '../../../contexts/AuthContext';
+import { useSupabaseAuth } from '../../../contexts/SupabaseAuthContext';
 import { useAchievements } from '../../../hooks/useAchievements';
 import { colors, glassCard } from '../../theme/warmDusk';
 
@@ -26,7 +26,7 @@ const energyEmojis = {
 };
 
 export default function MoodEnergyTracker() {
-  const { user } = useAuthContext();
+  const { user } = useSupabaseAuth();
   const { addActivity } = useAchievements();
   const [data, setData] = useState<MoodEnergyData>({
     date: new Date().toISOString().split('T')[0],

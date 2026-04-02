@@ -16,7 +16,10 @@ export function useWorkoutHistory() {
 
   // Load workout history from localStorage
   useEffect(() => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      console.log('🎯 WorkoutHistory: No user ID, skipping load');
+      return;
+    }
 
     const historyKey = `neome_workout_history_${user.id}`;
     const streakKey = `neome_workout_streak_${user.id}`;

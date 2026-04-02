@@ -278,7 +278,7 @@ export default function Profil() {
       {/* Edit Profile Modal */}
       {showEditProfile && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="w-full max-w-sm bg-white/30 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-white/20">
+          <div className="w-full max-w-sm bg-white/95 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-white/40">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold" style={{ color: '#2E2218' }}>
@@ -300,7 +300,7 @@ export default function Profil() {
                   <input 
                     type="text" 
                     defaultValue={user?.user_metadata?.firstName || ''}
-                    className="w-full p-3 rounded-xl text-sm outline-none bg-white/20 border border-white/35 focus:border-gray-300 focus:bg-white text-gray-800"
+                    className="w-full p-3 rounded-xl text-sm outline-none bg-white/60 border border-gray-200 focus:border-gray-400 focus:bg-white text-gray-800"
                     placeholder="Tvoje meno"
                   />
                 </div>
@@ -312,7 +312,7 @@ export default function Profil() {
                   <input 
                     type="text" 
                     defaultValue={user?.user_metadata?.lastName || ''}
-                    className="w-full p-3 rounded-xl text-sm outline-none bg-white/20 border border-white/35 focus:border-gray-300 focus:bg-white text-gray-800"
+                    className="w-full p-3 rounded-xl text-sm outline-none bg-white/60 border border-gray-200 focus:border-gray-400 focus:bg-white text-gray-800"
                     placeholder="Tvoje priezvisko"
                   />
                 </div>
@@ -321,7 +321,7 @@ export default function Profil() {
               <div className="flex gap-3 pt-2">
                 <button 
                   onClick={() => setShowEditProfile(false)}
-                  className="flex-1 py-3 rounded-xl text-sm font-semibold transition-all active:scale-95 bg-white/25 hover:bg-gray-200 text-gray-700"
+                  className="flex-1 py-3 rounded-xl text-sm font-semibold transition-all active:scale-95 bg-white/60 hover:bg-gray-200 text-gray-700 border border-gray-200"
                 >
                   Zrušiť
                 </button>

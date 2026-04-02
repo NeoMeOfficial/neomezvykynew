@@ -18,7 +18,12 @@ export default function Welcome() {
       <div className="absolute bottom-0 left-0 right-0 z-10 p-6 pb-safe">
         {/* CTA Button - Always at bottom of screen */}
         <button
-          onClick={() => navigate('/domov-new')}
+          onClick={() => {
+            // Set demo session and go directly to app
+            localStorage.setItem('demo_session', 'active');
+            localStorage.setItem('demo_user', JSON.stringify({ id: 'demo', email: 'demo@test.com' }));
+            navigate('/domov-new');
+          }}
           className="w-full bg-white/30 backdrop-blur-xl rounded-2xl py-4 text-lg font-semibold text-[#2E2218] transition-all active:scale-95 shadow-xl"
         >
           Vstúpiť

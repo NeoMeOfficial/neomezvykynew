@@ -284,7 +284,12 @@ function StravaSection({ showMealBanner }: { showMealBanner: boolean }) {
                 if (!recipe) return null;
                 const adjustedCal = Math.round(recipe.calories * meal.portionMultiplier);
                 return (
-                  <div key={meal.type} className="flex items-center gap-3 p-2.5 rounded-xl" style={innerGlass}>
+                  <div 
+                    key={meal.type} 
+                    className="flex items-center gap-3 p-2.5 rounded-xl cursor-pointer hover:bg-white/20 transition-colors" 
+                    style={innerGlass}
+                    onClick={() => navigate(`/recept/${recipe.id}`)}
+                  >
                     <img src={recipe.image} alt={recipe.title} className="w-11 h-11 rounded-lg object-cover shrink-0" />
                     <div className="flex-1 min-w-0">
                       <p className="text-[11px] font-medium" style={{ color: colors.textTertiary }}>{meal.label}</p>
@@ -303,7 +308,11 @@ function StravaSection({ showMealBanner }: { showMealBanner: boolean }) {
           </>
         ) : (
           <>
-            <div className="flex items-center gap-3 p-3 rounded-2xl" style={innerGlass}>
+            <div 
+              className="flex items-center gap-3 p-3 rounded-2xl cursor-pointer hover:bg-white/20 transition-colors" 
+              style={innerGlass}
+              onClick={() => navigate('/recept/avokadove-toasty-s-vajickom')}
+            >
               <img src="https://images.unsplash.com/photo-1525351484163-7529414344d8?w=200&h=200&fit=crop" alt="Avokádový toast" className="w-14 h-14 rounded-xl object-cover shrink-0" />
               <div className="flex-1">
                 <p className="text-[13px] font-medium" style={{ color: colors.textPrimary }}>Avokádový toast s vajíčkom</p>

@@ -11,7 +11,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
-import { getFertilityDates, getOvulationDay } from '../utils';
+import { getFertilityDates, getOvulationDay, getCurrentCycleDay } from '../utils';
 
 interface NextDatesInfoProps {
   lastPeriodStart: string | null;
@@ -81,13 +81,15 @@ export function NextDatesInfo({
   today.setHours(0, 0, 0, 0);
   const daysUntilNextPeriod = nextPeriodDate ? differenceInDays(nextPeriodDate, today) : null;
 
-  // Calculate current cycle day (1-based)
-  const currentCycleDay = startDate ? differenceInDays(today, startDate) + 1 : null;
+  // Calculate current cycle day using unified logic
+  const currentCycleDay = startDate && lastPeriodStart ? getCurrentCycleDay(lastPeriodStart, today, cycleLength) : null;
   
   // Determine if user is in menstruation phase
-  const isInMenstruationPhase = currentPhase === 'Menštruácia';
-  const isCurrentlyBleeding = isInMenstruationPhase && currentCycleDay !== null && currentCycleDay >= 1;
-  const isBleedingProlonged = isCurrentlyBleeding && currentCycleDay !== null && currentCycleDay > periodLength;
+  // Use safe period length - normal menstruation is max 7 days
+  const safePeriodLength = Math.min(periodLength, 7);
+  const isInMenstruationPhase = currentCycleDay !== null && currentCycleDay >= 1 && currentCycleDay <= safePeriodLength;
+  const isCurrentlyBleeding = isInMenstruationPhase;
+  const isBleedingProlonged = isCurrentlyBleeding && currentCycleDay !== null && currentCycleDay > safePeriodLength;
   
   // State for period end popover
   const [showPeriodEndPopover, setShowPeriodEndPopover] = useState(false);
@@ -375,7 +377,7 @@ export function NextDatesInfo({
                   🩸 Práve máš menštruáciu
                 </p>
                 <p className="text-white text-xl font-bold mt-1">
-                  Deň {currentCycleDay} {currentCycleDay <= periodLength ? `z ${periodLength}` : ''}
+                  Deň {currentCycleDay} z {safePeriodLength}
                 </p>
                 {isBleedingProlonged && (
                   <p className="text-white/90 text-xs mt-1">

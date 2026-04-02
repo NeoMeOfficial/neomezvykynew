@@ -40,6 +40,46 @@ export function useAuth() {
   }, []);
 
   useEffect(() => {
+    // Check for demo session first
+    const demoSession = localStorage.getItem('demo_session');
+    const demoUserData = localStorage.getItem('demo_user');
+    
+    if (demoSession === 'active' && demoUserData) {
+      try {
+        const demoUser = JSON.parse(demoUserData);
+        console.log('🎯 Demo Mode: Using demo user session');
+        setState({
+          user: {
+            id: demoUser.id,
+            email: demoUser.email,
+            created_at: demoUser.createdAt,
+            updated_at: demoUser.createdAt,
+            app_metadata: {},
+            user_metadata: {},
+            aud: 'demo',
+            email_confirmed_at: demoUser.createdAt,
+            confirmed_at: demoUser.createdAt,
+            role: 'authenticated'
+          }, // Demo user object
+          profile: {
+            id: demoUser.id,
+            email: demoUser.email,
+            full_name: `${demoUser.firstName} ${demoUser.lastName}`,
+            avatar_url: null,
+            language: 'sk',
+            role: 'user'
+          },
+          session: null, // No real session in demo mode
+          loading: false,
+          isAdmin: false,
+          isCoach: false,
+        });
+        return;
+      } catch (error) {
+        console.error('❌ Failed to parse demo user data:', error);
+      }
+    }
+
     // Add timeout for auth initialization
     const authTimeout = setTimeout(() => {
       console.warn('Supabase auth timeout - continuing without auth');

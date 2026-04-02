@@ -4,7 +4,7 @@ import WeeklyCalendarStrip, { getWeekDays } from '../../components/v2/home/Weekl
 import TodayOverview from '../../components/v2/home/TodayOverview';
 import HabitTracker from '../../components/v2/home/HabitTracker';
 import ReflectionSection from '../../components/v2/home/ReflectionSection';
-import { useAuthContext } from '../../contexts/AuthContext';
+import { useSupabaseAuth } from '../../contexts/SupabaseAuthContext';
 import WaterIntakeWidget from '../../components/v2/tracking/WaterIntakeWidget';
 import MoodEnergyTracker from '../../components/v2/tracking/MoodEnergyTracker';
 import FavoritesShortcut from '../../components/v2/favorites/FavoritesShortcut';
@@ -58,7 +58,7 @@ function SectionDivider({ label }) {
 
 // Custom Water Intake as a Habit-like Component
 function WaterHabitCard() {
-  const { user } = useAuthContext();
+  const { user } = useSupabaseAuth();
   const [waterData, setWaterData] = React.useState({ glasses: 0, goal: 8 }); // 8 glasses = 2L
   const [justCompleted, setJustCompleted] = React.useState(false);
   const [isEditing, setIsEditing] = React.useState(false);
@@ -186,7 +186,7 @@ function WaterHabitCard() {
 
 // Custom Enhanced Navyky Card with Water Intake
 function EnhancedNavykyCard() {
-  const { user } = useAuthContext();
+  const { user } = useSupabaseAuth();
   const [showAddHabitModal, setShowAddHabitModal] = useState(false);
   const [habits, setHabits] = useState<any[]>([]);
 
@@ -293,33 +293,56 @@ const HABIT_CATEGORIES = [
   { id: 'productivity', name: 'Produktivita', color: '#8B7D6B', icon: '📈' }
 ];
 
-export default function DomovNew() {
+// Error Boundary Component
+class DomovErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean}> {
+  constructor(props: {children: React.ReactNode}) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    console.error('❌ DomovNew component error:', error);
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, errorInfo: any) {
+    console.error('❌ DomovNew error details:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen flex items-center justify-center p-4" style={{ background: colors.bgGradient }}>
+          <div className="bg-white/90 rounded-3xl p-8 max-w-md w-full text-center">
+            <h2 className="text-xl font-bold mb-4" style={{ color: colors.textPrimary }}>
+              Demo Načítanie...
+            </h2>
+            <p className="text-sm mb-4" style={{ color: colors.textSecondary }}>
+              Aplikácia sa pripravuje. Prosím počkajte.
+            </p>
+            <button 
+              onClick={() => window.location.reload()}
+              className="px-6 py-2 rounded-xl text-white font-semibold"
+              style={{ backgroundColor: colors.telo }}
+            >
+              Obnoviť
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
+function DomovNewContent() {
   const days = getWeekDays();
   const todayIdx = days.findIndex((d) => d.isToday);
   const [selectedDay, setSelectedDay] = useState(todayIdx >= 0 ? todayIdx : 0);
   const { stats } = useWorkoutHistory();
 
-  // Override parent container styles
-  React.useEffect(() => {
-    const mainElement = document.querySelector('main');
-    if (mainElement) {
-      mainElement.style.maxWidth = 'none';
-      mainElement.style.paddingLeft = '0';
-      mainElement.style.paddingRight = '0';
-      mainElement.style.marginLeft = '0';
-      mainElement.style.marginRight = '0';
-    }
-    
-    return () => {
-      if (mainElement) {
-        mainElement.style.maxWidth = '';
-        mainElement.style.paddingLeft = '';
-        mainElement.style.paddingRight = '';
-        mainElement.style.marginLeft = '';
-        mainElement.style.marginRight = '';
-      }
-    };
-  }, []);
+  // No longer need to override parent styles since AppLayout is fixed
 
   return (
     <div 
@@ -426,4 +449,8 @@ export default function DomovNew() {
       </div>
     </div>
   );
+}
+
+export default function DomovNew() {
+  return <DomovNewContent />;
 }

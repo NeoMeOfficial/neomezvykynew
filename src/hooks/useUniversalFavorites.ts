@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useAuthContext } from '../contexts/AuthContext';
+import { useFavorites } from './useUserData';
+import { useSupabaseAuth } from '../contexts/SupabaseAuthContext';
 
 export type ContentType = 'recipe' | 'workout' | 'meditation' | 'article' | 'program';
 
@@ -17,63 +18,77 @@ interface FavoriteItem {
 }
 
 export function useUniversalFavorites() {
-  const { user } = useAuthContext();
-  const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const { user } = useSupabaseAuth();
+  const { favorites: userFavorites, toggleFavorite: toggleSupabaseFavorite, isFavorite: isSupabaseFavorite, loading } = useFavorites();
+  const [localFavorites, setLocalFavorites] = useState<FavoriteItem[]>([]);
 
-  // Load user's favorites from localStorage on mount
+  // Load additional metadata from localStorage for display purposes
   useEffect(() => {
     if (!user?.id) return;
     
-    const storageKey = `neome_favorites_${user.id}`;
+    const storageKey = `neome_favorites_metadata_${user.id}`;
     const stored = localStorage.getItem(storageKey);
     
     if (stored) {
       try {
         const parsed = JSON.parse(stored);
-        setFavorites(parsed);
+        setLocalFavorites(parsed);
       } catch (e) {
-        console.error('Failed to parse favorites from localStorage', e);
-        setFavorites([]);
+        console.error('Failed to parse favorites metadata from localStorage', e);
+        setLocalFavorites([]);
       }
     }
   }, [user?.id]);
 
-  // Save favorites to localStorage whenever it changes
-  useEffect(() => {
+  // Save favorites metadata to localStorage for rich display
+  const saveMetadataToLocal = (item: FavoriteItem) => {
     if (!user?.id) return;
     
-    const storageKey = `neome_favorites_${user.id}`;
-    localStorage.setItem(storageKey, JSON.stringify(favorites));
-  }, [favorites, user?.id]);
+    setLocalFavorites(prev => {
+      const existing = prev.find(f => f.id === item.id && f.type === item.type);
+      if (existing) return prev;
+      
+      const updated = [item, ...prev];
+      const storageKey = `neome_favorites_metadata_${user.id}`;
+      localStorage.setItem(storageKey, JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const removeMetadataFromLocal = (itemId: string | number, type: ContentType) => {
+    if (!user?.id) return;
+    
+    setLocalFavorites(prev => {
+      const updated = prev.filter(f => !(f.id === itemId && f.type === type));
+      const storageKey = `neome_favorites_metadata_${user.id}`;
+      localStorage.setItem(storageKey, JSON.stringify(updated));
+      return updated;
+    });
+  };
 
   const addToFavorites = async (item: Omit<FavoriteItem, 'addedAt'>) => {
-    if (!user?.id || isLoading) return;
-    
-    setIsLoading(true);
+    if (!user?.id || loading) return;
     
     const favoriteItem: FavoriteItem = {
       ...item,
       addedAt: new Date().toISOString(),
     };
     
-    setFavorites(prev => {
-      // Check if already exists
-      const exists = prev.find(f => f.id === item.id && f.type === item.type);
-      if (exists) return prev;
-      
-      return [favoriteItem, ...prev];
-    });
-    
-    setIsLoading(false);
+    // Add to Supabase
+    const success = await toggleSupabaseFavorite(item.type as any, String(item.id));
+    if (success) {
+      saveMetadataToLocal(favoriteItem);
+    }
   };
 
   const removeFromFavorites = async (itemId: string | number, type: ContentType) => {
-    if (!user?.id || isLoading) return;
+    if (!user?.id || loading) return;
     
-    setIsLoading(true);
-    setFavorites(prev => prev.filter(f => !(f.id === itemId && f.type === type)));
-    setIsLoading(false);
+    // Remove from Supabase
+    const success = await toggleSupabaseFavorite(type as any, String(itemId));
+    if (success) {
+      removeMetadataFromLocal(itemId, type);
+    }
   };
 
   const toggleFavorite = async (item: Omit<FavoriteItem, 'addedAt'>) => {
@@ -88,26 +103,32 @@ export function useUniversalFavorites() {
   };
 
   const isFavorite = (itemId: string | number, type: ContentType): boolean => {
-    return favorites.some(f => f.id === itemId && f.type === type);
+    // Check Supabase first
+    const isSupabaseFav = isSupabaseFavorite(type as any, String(itemId));
+    if (isSupabaseFav) return true;
+    
+    // Fallback to local metadata
+    return localFavorites.some(f => f.id === itemId && f.type === type);
   };
 
   const getFavoritesByType = (type: ContentType) => {
-    return favorites.filter(f => f.type === type);
+    return localFavorites.filter(f => f.type === type && isFavorite(f.id, f.type));
   };
 
   const getFavoritesByCategory = (category: string, type?: ContentType) => {
-    let filtered = favorites;
+    let filtered = localFavorites.filter(f => isFavorite(f.id, f.type));
     if (type) {
       filtered = filtered.filter(f => f.type === type);
     }
     return filtered.filter(f => f.category === category);
   };
 
-  const getAllFavorites = () => favorites;
+  const getAllFavorites = () => localFavorites.filter(f => isFavorite(f.id, f.type));
 
   const getFavoriteCounts = () => {
+    const activeFavorites = getAllFavorites();
     const counts = {
-      total: favorites.length,
+      total: activeFavorites.length,
       recipe: 0,
       workout: 0,
       meditation: 0,
@@ -115,7 +136,7 @@ export function useUniversalFavorites() {
       program: 0,
     };
     
-    favorites.forEach(fav => {
+    activeFavorites.forEach(fav => {
       counts[fav.type]++;
     });
     
@@ -131,6 +152,6 @@ export function useUniversalFavorites() {
     getFavoritesByType,
     getFavoritesByCategory,
     getFavoriteCounts,
-    isLoading,
+    isLoading: loading,
   };
 }

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useAuthContext } from '../../../contexts/AuthContext';
+import { useSupabaseAuth } from '../../../contexts/SupabaseAuthContext';
+import { useUserHabits } from '../../../hooks/useUserData';
 import { useAchievements } from '../../../hooks/useAchievements';
 import { useBuddySystem } from '../../../hooks/useBuddySystem';
 import { colors, glassCard } from '../../theme/warmDusk';
@@ -11,86 +12,64 @@ interface WaterIntakeData {
 }
 
 export default function WaterIntakeWidget() {
-  const { user } = useAuthContext();
+  const { user } = useSupabaseAuth();
+  const { habits, updateHabitProgress, loading: habitsLoading } = useUserHabits();
   const { addActivity } = useAchievements();
   const { notifyBuddy } = useBuddySystem();
-  const [waterData, setWaterData] = useState<WaterIntakeData>({
-    date: new Date().toISOString().split('T')[0],
-    glasses: 0,
-    goal: 8
-  });
-
-  const [isLoading, setIsLoading] = useState(false);
+  
+  const [isUpdating, setIsUpdating] = useState(false);
   const [goalMetToday, setGoalMetToday] = useState(false);
 
-  // Load today's water intake data
-  useEffect(() => {
-    if (!user?.id) return;
-    
-    const loadWaterData = async () => {
-      const today = new Date().toISOString().split('T')[0];
-      
-      // For now, use localStorage until backend is ready
-      const storageKey = `water_intake_${user.id}_${today}`;
-      const saved = localStorage.getItem(storageKey);
-      
-      if (saved) {
-        const parsedData = JSON.parse(saved);
-        setWaterData(parsedData);
-        setGoalMetToday(parsedData.glasses >= parsedData.goal);
-      } else {
-        setWaterData({
-          date: today,
-          glasses: 0,
-          goal: 8
-        });
-        setGoalMetToday(false);
-      }
-    };
+  // Get today's water habit
+  const waterHabit = habits.find(h => h.habit_type === 'water');
+  const glasses = waterHabit?.current_count || 0;
+  const goal = waterHabit?.target_count || 8;
+  const isGoalMet = glasses >= goal;
 
-    loadWaterData();
-  }, [user?.id]);
+  // Check if goal was just met
+  useEffect(() => {
+    if (waterHabit?.completed && !goalMetToday) {
+      setGoalMetToday(true);
+    }
+  }, [waterHabit?.completed]);
 
   const addGlasses = async (count: number) => {
-    if (!user?.id || isLoading) return;
+    if (!user?.id || isUpdating || habitsLoading) return;
     
-    setIsLoading(true);
-    const prevGlasses = waterData.glasses;
-    const newGlasses = Math.max(0, waterData.glasses + count);
-    const newData = { ...waterData, glasses: newGlasses };
+    setIsUpdating(true);
+    const prevGlasses = glasses;
+    const success = await updateHabitProgress('water', count);
     
-    // Save to localStorage (replace with API call later)
-    const storageKey = `water_intake_${user.id}_${waterData.date}`;
-    localStorage.setItem(storageKey, JSON.stringify(newData));
-    
-    setWaterData(newData);
+    if (success) {
+      const newGlasses = Math.max(0, prevGlasses + count);
+      
+      // Check if user just reached their goal for the first time today
+      const reachedGoal = newGlasses >= goal;
+      const wasUnderGoal = prevGlasses < goal;
+      
+      if (reachedGoal && wasUnderGoal && !goalMetToday) {
+        setGoalMetToday(true);
+        // Award achievement points for reaching daily water goal
+        await addActivity('water_goal_met', { 
+          glasses: newGlasses, 
+          goal: goal,
+          date: new Date().toISOString().split('T')[0]
+        });
 
-    // Check if user just reached their goal for the first time today
-    const reachedGoal = newGlasses >= waterData.goal;
-    const wasUnderGoal = prevGlasses < waterData.goal;
-    
-    if (reachedGoal && wasUnderGoal && !goalMetToday) {
-      setGoalMetToday(true);
-      // Award achievement points for reaching daily water goal
-      await addActivity('water_goal_met', { 
-        glasses: newGlasses, 
-        goal: waterData.goal,
-        date: waterData.date
-      });
-
-      // Notify buddies about water goal achievement
-      await notifyBuddy(
-        'water_goal',
-        `dosiahla denný cieľ pitného režimu (${newGlasses} pohárov)! 💧`,
-        { glasses: newGlasses, goal: waterData.goal }
-      );
+        // Notify buddies about water goal achievement
+        await notifyBuddy(
+          'water_goal',
+          `dosiahla denný cieľ pitného režimu (${newGlasses} pohárov)! 💧`,
+          { glasses: newGlasses, goal: goal }
+        );
+      }
     }
     
-    setIsLoading(false);
+    setIsUpdating(false);
   };
 
-  const progressPercentage = Math.min(100, (waterData.glasses / waterData.goal) * 100);
-  const isGoalMet = waterData.glasses >= waterData.goal;
+  const progressPercentage = Math.min(100, (glasses / goal) * 100);
+  const isLoading = isUpdating || habitsLoading;
 
   return (
     <div className="bg-white/30 backdrop-blur-[40px] border border-white/20 rounded-2xl p-4 space-y-4">
@@ -98,7 +77,7 @@ export default function WaterIntakeWidget() {
         <div>
           <h3 className="text-[#6B4C3B] text-lg font-semibold mb-1">Pitný režim</h3>
           <p className="text-[#8B7560] text-sm">
-            {waterData.glasses} z {waterData.goal} pohárov (250ml)
+            {glasses} z {goal} pohárov (250ml)
           </p>
         </div>
         <div className="relative w-16 h-16">
@@ -165,7 +144,7 @@ export default function WaterIntakeWidget() {
         </button>
         <button
           onClick={() => addGlasses(-1)}
-          disabled={isLoading || waterData.glasses === 0}
+          disabled={isLoading || glasses === 0}
           className="bg-[#8B7560] text-white rounded-xl py-2 px-3 font-medium text-sm hover:bg-[#7A6451] transition-colors disabled:opacity-50"
         >
           -1
@@ -183,9 +162,9 @@ export default function WaterIntakeWidget() {
 
       {/* Daily Summary */}
       <div className="text-center text-xs text-[#8B7560] space-y-1">
-        <p>Dnes si vypila {(waterData.glasses * 250)}ml vody</p>
-        {waterData.glasses < waterData.goal && (
-          <p>Zostáva ešte {(waterData.goal - waterData.glasses) * 250}ml</p>
+        <p>Dnes si vypila {(glasses * 250)}ml vody</p>
+        {glasses < goal && (
+          <p>Zostáva ešte {(goal - glasses) * 250}ml</p>
         )}
       </div>
     </div>

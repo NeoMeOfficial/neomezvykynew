@@ -7,9 +7,15 @@ import {
   UserPlus, CreditCard, Eye, Ban, Plus, X, Trash2,
   Edit3, Play, Pause, Upload, MessageSquare, Flag,
   Calendar, ChevronDown, ChevronUp, Copy, Send, Music,
-  BookOpen, GripVertical, Video, Image as ImageIcon
+  BookOpen, GripVertical, Video, Image as ImageIcon,
+  Layers, FolderOpen, Bell, Settings, LogOut
 } from 'lucide-react';
 import { colors } from '../../theme/warmDusk';
+import ContentManager from '../../components/admin/ContentManager';
+import DesktopAdminLayout from '../../components/admin/DesktopAdminLayout';
+import DesktopSidebar from '../../components/admin/DesktopSidebar';
+import DesktopOverview from '../../components/admin/DesktopOverview';
+import DesktopDataTable, { UserTable } from '../../components/admin/DesktopDataTable';
 
 // ═══════════════════════════════════════════
 // TYPES
@@ -54,7 +60,7 @@ interface AdminReferral {
   amount: number; status: 'pending' | 'approved' | 'cancelled'; date: string;
 }
 
-type Tab = 'overview' | 'programs' | 'exercises' | 'recipes' | 'meditations' | 'community' | 'messages' | 'users' | 'referrals';
+type Tab = 'overview' | 'content' | 'programs' | 'exercises' | 'recipes' | 'meditations' | 'community' | 'messages' | 'users' | 'referrals';
 const DAYS = ['Po', 'Ut', 'St', 'Št', 'Pi', 'So', 'Ne'];
 const DAYS_FULL = ['Pondelok', 'Utorok', 'Streda', 'Štvrtok', 'Piatok', 'Sobota', 'Nedeľa'];
 
@@ -211,6 +217,16 @@ export default function AdminDashboard() {
   const [tab, setTab] = useState<Tab>('overview');
   const [search, setSearch] = useState('');
   const [modal, setModal] = useState<string | null>(null);
+  const [isDesktop, setIsDesktop] = useState(false);
+  const [manualDesktopMode, setManualDesktopMode] = useState(() => {
+    try {
+      const saved = localStorage.getItem('neome_admin_desktop_mode');
+      return saved ? JSON.parse(saved) : null; // null = auto, true = force desktop, false = force mobile
+    } catch {
+      return null;
+    }
+  });
+  const [showToggle, setShowToggle] = useState(true);
 
   // Data state
   const [users, setUsers] = useState<AdminUser[]>(() => load('neome_admin_users', INIT_USERS));
@@ -243,9 +259,68 @@ export default function AdminDashboard() {
   useEffect(() => { save('neome_admin_posts', posts); }, [posts]);
   useEffect(() => { save('neome_admin_messages', messages); }, [messages]);
   useEffect(() => { save('neome_admin_referrals', referrals); }, [referrals]);
+  
+  // Desktop/mobile detection with manual override
+  useEffect(() => {
+    const checkScreenSize = () => {
+      const isWideScreen = window.innerWidth >= 768;
+      setIsDesktop(isWideScreen);
+    };
+    
+    // Initial check
+    checkScreenSize();
+    
+    // Add resize listener
+    window.addEventListener('resize', checkScreenSize);
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
+
+  // Toggle manual desktop mode
+  const toggleDesktopMode = (mode: boolean | null) => {
+    console.log('Toggle desktop mode:', mode);
+    setManualDesktopMode(mode);
+    localStorage.setItem('neome_admin_desktop_mode', JSON.stringify(mode));
+    
+    // Force re-render
+    window.location.reload();
+  };
+
+  // Determine final layout mode
+  const getLayoutMode = () => {
+    if (manualDesktopMode !== null) {
+      return manualDesktopMode; // Manual override
+    }
+    return isDesktop; // Auto-detect
+  };
 
   const resetForm = () => setForm({});
   const formatDate = (d: string) => new Date(d).toLocaleDateString('sk-SK', { day: 'numeric', month: 'short' });
+
+  // Desktop-specific handlers
+  const handleDesktopNavigate = (newTab: string) => {
+    setTab(newTab as Tab);
+    setSearch('');
+  };
+
+  const handleUserEdit = (user: AdminUser) => {
+    setModal('edit-user');
+    setForm({
+      name: user.name,
+      email: user.email,
+      plan: user.plan,
+      program: user.program || ''
+    });
+  };
+
+  const handleUserView = (user: AdminUser) => {
+    alert(`Viewing user: ${user.name} (${user.email})`);
+  };
+
+  const handleUserDelete = (user: AdminUser) => {
+    if (confirm(`Delete user ${user.name}?`)) {
+      setUsers(prev => prev.filter(u => u.id !== user.id));
+    }
+  };
 
   // Stats
   const activeUsers = users.filter(u => u.status === 'active').length;
@@ -260,8 +335,23 @@ export default function AdminDashboard() {
     switch (s) { case 'active': case 'approved': case 'published': return colors.strava; case 'trial': case 'pending': return colors.accent; case 'cancelled': case 'removed': return colors.periodka; case 'flagged': return '#e53e3e'; default: return colors.textTertiary; }
   };
 
+  // Prepare desktop stats
+  const desktopStats = {
+    users: { total: users.length, active: activeUsers, trial: trialUsers },
+    revenue: { mrr: mrr.toFixed(0), growth: '+12% this month' },
+    referrals: { total: referrals.length, pending: pendingRefs },
+    content: { exercises: exercises.length, recipes: 108 }
+  };
+
+  const desktopActions = {
+    pendingReferrals: pendingRefs,
+    flaggedPosts: flaggedPosts,
+    unreadMessages: unreadMessages
+  };
+
   const TABS: { id: Tab; label: string; icon: any; badge?: number }[] = [
     { id: 'overview', label: 'Prehľad', icon: BarChart3 },
+    { id: 'content', label: 'Obsah', icon: FolderOpen },
     { id: 'programs', label: 'Programy', icon: Calendar },
     { id: 'exercises', label: 'Cvičenia', icon: Dumbbell },
     { id: 'recipes', label: 'Recepty', icon: Utensils },
@@ -1010,10 +1100,208 @@ export default function AdminDashboard() {
   };
 
   // ═══════════════════════════════════════════
+  // DESKTOP RENDER FUNCTIONS
+  // ═══════════════════════════════════════════
+  const renderDesktopUsers = () => (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold" style={{ color: colors.textPrimary }}>User Management</h2>
+        <button onClick={() => { resetForm(); setModal('add-user'); }} className="px-4 py-2 rounded-xl text-sm font-medium text-white" style={{ backgroundColor: colors.telo }}>
+          <UserPlus className="w-4 h-4 mr-2 inline" />
+          Add User
+        </button>
+      </div>
+      <UserTable 
+        users={users}
+        onEdit={handleUserEdit}
+        onView={handleUserView}
+        onDelete={handleUserDelete}
+      />
+    </div>
+  );
+
+  const renderDesktopContent = () => {
+    switch (tab) {
+      case 'overview':
+        return <DesktopOverview stats={desktopStats} actions={desktopActions} onNavigate={handleDesktopNavigate} />;
+      case 'content':
+        return <ContentManager />;
+      case 'users':
+        return renderDesktopUsers();
+      case 'programs':
+        return renderPrograms();
+      case 'exercises':
+        return renderExercises();
+      case 'recipes':
+        return renderRecipes();
+      case 'meditations':
+        return renderMeditations();
+      case 'community':
+        return renderCommunity();
+      case 'messages':
+        return renderMessages();
+      case 'referrals':
+        return renderReferrals();
+      default:
+        return <div>Content for {tab}</div>;
+    }
+  };
+
+  const renderDesktopSidebar = () => (
+    <DesktopSidebar 
+      activeTab={tab}
+      onTabChange={setTab}
+      badges={{
+        community: flaggedPosts || 0,
+        messages: unreadMessages || 0,
+        referrals: pendingRefs || 0
+      }}
+    />
+  );
+
+  const renderDesktopHeader = () => (
+    <>
+      <div className="flex items-center gap-4">
+        <h1 className="text-xl font-bold" style={{ color: colors.textPrimary }}>
+          {TABS.find(t => t.id === tab)?.label || 'Dashboard'}
+        </h1>
+      </div>
+      <div className="flex items-center gap-3">
+        {/* Layout Toggle */}
+        <div className="flex items-center gap-1 bg-white/20 rounded-lg p-1">
+          <button
+            onClick={() => toggleDesktopMode(false)}
+            className={`px-2 py-1 rounded text-xs font-medium transition-all ${
+              manualDesktopMode === false ? 'bg-white text-gray-800' : 'text-gray-600 hover:text-gray-800'
+            }`}
+          >
+            📱 Mobile
+          </button>
+          <button
+            onClick={() => toggleDesktopMode(null)}
+            className={`px-2 py-1 rounded text-xs font-medium transition-all ${
+              manualDesktopMode === null ? 'bg-white text-gray-800' : 'text-gray-600 hover:text-gray-800'
+            }`}
+          >
+            🔄 Auto
+          </button>
+          <button
+            onClick={() => toggleDesktopMode(true)}
+            className={`px-2 py-1 rounded text-xs font-medium transition-all ${
+              manualDesktopMode === true ? 'bg-white text-gray-800' : 'text-gray-600 hover:text-gray-800'
+            }`}
+          >
+            🖥️ Desktop
+          </button>
+        </div>
+        
+        <button className="p-2 rounded-lg hover:bg-white/20 transition-all">
+          <Bell className="w-5 h-5" style={{ color: colors.textSecondary }} />
+        </button>
+        <button className="p-2 rounded-lg hover:bg-white/20 transition-all">
+          <Settings className="w-5 h-5" style={{ color: colors.textSecondary }} />
+        </button>
+        <button onClick={() => navigate('/domov')} className="p-2 rounded-lg hover:bg-white/20 transition-all">
+          <LogOut className="w-5 h-5" style={{ color: colors.periodka }} />
+        </button>
+      </div>
+    </>
+  );
+
+  // ═══════════════════════════════════════════
   // RENDER
   // ═══════════════════════════════════════════
+  
+  // Determine layout mode
+  const currentWidth = window.innerWidth;
+  const finalLayoutMode = getLayoutMode();
+  const shouldUseDesktop = finalLayoutMode;
+  
+  // Global toggle that's always rendered regardless of mode
+  const renderGlobalToggle = () => (
+    <div style={{
+      position: 'fixed',
+      top: '10px',
+      right: '10px',
+      zIndex: 9999,
+      backgroundColor: '#000',
+      color: '#fff',
+      padding: '10px',
+      borderRadius: '8px',
+      fontFamily: 'monospace',
+      fontSize: '12px'
+    }}>
+      <div style={{ marginBottom: '5px' }}>ADMIN LAYOUT:</div>
+      <div style={{ display: 'flex', gap: '5px' }}>
+        <button
+          onClick={() => toggleDesktopMode(false)}
+          style={{
+            padding: '5px 8px',
+            border: 'none',
+            borderRadius: '4px',
+            fontSize: '10px',
+            cursor: 'pointer',
+            backgroundColor: manualDesktopMode === false ? '#f39c12' : '#555',
+            color: '#fff'
+          }}
+        >
+          📱 MOBILE
+        </button>
+        <button
+          onClick={() => toggleDesktopMode(null)}
+          style={{
+            padding: '5px 8px',
+            border: 'none',
+            borderRadius: '4px',
+            fontSize: '10px',
+            cursor: 'pointer',
+            backgroundColor: manualDesktopMode === null ? '#3498db' : '#555',
+            color: '#fff'
+          }}
+        >
+          🔄 AUTO
+        </button>
+        <button
+          onClick={() => toggleDesktopMode(true)}
+          style={{
+            padding: '5px 8px',
+            border: 'none',
+            borderRadius: '4px',
+            fontSize: '10px',
+            cursor: 'pointer',
+            backgroundColor: manualDesktopMode === true ? '#27ae60' : '#555',
+            color: '#fff'
+          }}
+        >
+          🖥️ DESKTOP
+        </button>
+      </div>
+      <div style={{ fontSize: '10px', marginTop: '5px', color: '#999' }}>
+        Width: {currentWidth}px | Mode: {shouldUseDesktop ? 'Desktop' : 'Mobile'}
+      </div>
+    </div>
+  );
+  
+  // Desktop Layout
+  if (shouldUseDesktop) {
+    return (
+      <div>
+        {renderGlobalToggle()}
+        <DesktopAdminLayout
+          sidebar={renderDesktopSidebar()}
+          header={renderDesktopHeader()}
+          content={renderDesktopContent()}
+        />
+        {renderModals()}
+      </div>
+    );
+  }
+
+  // Mobile Layout (original)
   return (
     <div className="min-h-screen pb-24" style={{ background: colors.bgGradient }}>
+      {renderGlobalToggle()}
+
       {/* Header */}
       <div className="p-4 pt-12 flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -1025,7 +1313,36 @@ export default function AdminDashboard() {
             <p className="text-xs" style={{ color: colors.textSecondary }}>NeoMe CMS</p>
           </div>
         </div>
-        <ShieldCheck className="w-5 h-5" style={{ color: colors.accent }} />
+        <div className="flex items-center gap-2">
+          {/* Layout Toggle */}
+          <div className="flex items-center gap-1 bg-white/20 rounded-lg p-1">
+            <button
+              onClick={() => toggleDesktopMode(false)}
+              className={`px-2 py-1 rounded text-xs font-medium transition-all ${
+                manualDesktopMode === false ? 'bg-white text-gray-800' : 'text-gray-600 hover:text-gray-800'
+              }`}
+            >
+              📱
+            </button>
+            <button
+              onClick={() => toggleDesktopMode(null)}
+              className={`px-2 py-1 rounded text-xs font-medium transition-all ${
+                manualDesktopMode === null ? 'bg-white text-gray-800' : 'text-gray-600 hover:text-gray-800'
+              }`}
+            >
+              🔄
+            </button>
+            <button
+              onClick={() => toggleDesktopMode(true)}
+              className={`px-2 py-1 rounded text-xs font-medium transition-all ${
+                manualDesktopMode === true ? 'bg-white text-gray-800' : 'text-gray-600 hover:text-gray-800'
+              }`}
+            >
+              🖥️
+            </button>
+          </div>
+          <ShieldCheck className="w-5 h-5" style={{ color: colors.accent }} />
+        </div>
       </div>
 
       {/* Tabs — scrollable */}
@@ -1042,6 +1359,7 @@ export default function AdminDashboard() {
       {/* Content */}
       <div className="px-4 space-y-4">
         {tab === 'overview' && renderOverview()}
+        {tab === 'content' && <ContentManager />}
         {tab === 'programs' && renderPrograms()}
         {tab === 'exercises' && renderExercises()}
         {tab === 'recipes' && renderRecipes()}

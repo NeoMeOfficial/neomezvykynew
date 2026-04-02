@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Play, Calendar, ChevronDown, ChevronUp, AlertTriangle, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Play, Calendar, ChevronDown, ChevronUp, AlertTriangle, RotateCcw, Video } from 'lucide-react';
 import GlassCard from '../../components/v2/GlassCard';
 import { colors } from '../../theme/warmDusk';
 
@@ -12,6 +12,7 @@ interface Exercise {
   videoUrl: string;
   thumbnail: string;
   description: string;
+  hasDemo?: boolean;
   instructions?: string[];
   tips?: string[];
 }
@@ -57,7 +58,8 @@ const programData: Record<string, ProgramData> = {
             type: 'core', 
             videoUrl: 'https://www.youtube.com/watch?v=VQiGJRBkkSQ&t=66s', 
             thumbnail: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&h=300&fit=crop', 
-            description: '🎥 DEMO: Základné dychové techniky pre aktiváciu hlbokého stabilizačného systému',
+            description: 'Základné dychové techniky pre aktiváciu hlbokého stabilizačného systému',
+            hasDemo: true,
             instructions: [
               'Ľahni si na chrbát, nohy zohnú v kolenách',
               'Polož jednu ruku na hruď, druhú na brucho',
@@ -189,8 +191,8 @@ const programData: Record<string, ProgramData> = {
   'bodyforming': {
     id: 'bodyforming',
     name: 'BodyForming', 
-    description: 'Formovanie postavy s dôrazom na problémové partie — brucho, stehná, zadok.',
-    totalWeeks: 8,
+    description: 'Program je vhodný pre ženy, ktoré začínajú so spevňovaním celého tela a netrpia diastázou.',
+    totalWeeks: 6,
     currentWeek: 1,
     currentDay: 1,
     startDate: '2026-02-27',
@@ -198,20 +200,71 @@ const programData: Record<string, ProgramData> = {
     weekPlans: [
       {
         week: 1,
-        title: 'Týždeň 1: Začíname formovať',
+        title: 'Týždeň 1: Základy posilňovania',
         exercises: [
-          { id: 'b1-1', name: 'Full body warm-up', duration: '8 min', type: 'cardio', videoUrl: '', thumbnail: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=300&fit=crop', description: 'Celotělové rozhriatie a príprava na tréning' },
-          { id: 'b1-2', name: 'Dolná časť tela - základy', duration: '20 min', type: 'strength', videoUrl: '', thumbnail: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=300&fit=crop', description: 'Squaty, výpady, deadlifty pre formovanie zadku a stehien' },
-          { id: 'b1-3', name: 'Abdominals sculpting', duration: '15 min', type: 'core', videoUrl: '', thumbnail: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=300&fit=crop', description: 'Cielené cviky pre formovanie brucha' },
-        ]
-      },
-      {
-        week: 2,
-        title: 'Týždeň 2: Intenzifikácia',
-        exercises: [
-          { id: 'b2-1', name: 'HIIT tréning', duration: '25 min', type: 'cardio', videoUrl: '', thumbnail: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=300&fit=crop', description: 'Vysokointenzívny interval pre spaľovanie tukov' },
-          { id: 'b2-2', name: 'Targeted sculpting', duration: '18 min', type: 'strength', videoUrl: '', thumbnail: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=300&fit=crop', description: 'Cielené formovanie problémových partií' },
-          { id: 'b2-3', name: 'Cardio finisher', duration: '10 min', type: 'cardio', videoUrl: '', thumbnail: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=300&fit=crop', description: 'Intenzívne dokončenie tréningu' },
+          { 
+            id: 'b1-1', 
+            name: 'Celotělové rozhriatie', 
+            duration: '8 min', 
+            type: 'cardio', 
+            videoUrl: '', 
+            thumbnail: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=300&fit=crop', 
+            description: 'Príprava tela na tréning a aktivácia svalov',
+            instructions: [
+              'Začni krokom na mieste 2 minúty',
+              'Krúženie ramien dopredu a dozadu',
+              'Výpady s rotáciou trupu',
+              'Drep s natiahnutím rúk nad hlavu',
+              'Dokončí jemným strečingom'
+            ],
+            tips: [
+              'Rozcvička je kľúčová pre predchádzanie zranení',
+              'Postupne zvyšuj intenzitu',
+              'Nezabúdaj na správne dýchanie'
+            ]
+          },
+          { 
+            id: 'b1-2', 
+            name: 'Posilnenie dolnej časti tela', 
+            duration: '15 min', 
+            type: 'strength', 
+            videoUrl: '', 
+            thumbnail: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=300&fit=crop', 
+            description: 'Základné cviky pre formovanie zadku a stehien s vlastnou váhou',
+            instructions: [
+              'Drepov s vlastnou váhou 3x12',
+              'Výpadov striedavo 3x10 na nohu',
+              'Zdvíhanie panvy vľaku 3x15',
+              'Stranové výpady 2x8 na stranu',
+              'Wall sit 3x30 sekúnd'
+            ],
+            tips: [
+              'Sústreď sa na správnu techniku',
+              'Kolená by nemali presahovať špičky chodidiel',
+              'Medzi sériami odpočiň 45-60 sekúnd'
+            ]
+          },
+          { 
+            id: 'b1-3', 
+            name: 'Core a brušné svaly', 
+            duration: '12 min', 
+            type: 'core', 
+            videoUrl: '', 
+            thumbnail: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=300&fit=crop', 
+            description: 'Posilnenie brušných svalov a core stability',
+            instructions: [
+              'Plank 3x30 sekúnd',
+              'Dead bug 3x8 na stranu',
+              'Modified bicycle crunches 3x12',
+              'Side plank 2x20 sekúnd na stranu',
+              'Bird dog 3x6 na stranu'
+            ],
+            tips: [
+              'Kvalita pred kvantitou',
+              'Aktivuj hlboké brušné svaly',
+              'Nepridržuj dych počas cvičenia'
+            ]
+          },
         ]
       },
     ]
@@ -219,7 +272,7 @@ const programData: Record<string, ProgramData> = {
   'elastic-bands': {
     id: 'elastic-bands',
     name: 'ElasticBands',
-    description: 'Intenzívne cvičenia s rezistenčnými gumami pre celé telo.',
+    description: 'Program je vhodný pre ženy, ktoré chcú vyformovať postavu a zvýšiť intenzitu cvičenia s použitím dynamického odporu elastických gúm.',
     totalWeeks: 6,
     currentWeek: 1,
     currentDay: 1,
@@ -228,11 +281,71 @@ const programData: Record<string, ProgramData> = {
     weekPlans: [
       {
         week: 1,
-        title: 'Týždeň 1: Úvod do resistance tréning',
+        title: 'Týždeň 1: Úvod do elastických gúm',
         exercises: [
-          { id: 'e1-1', name: 'Resistance warm-up', duration: '10 min', type: 'cardio', videoUrl: '', thumbnail: 'https://images.unsplash.com/photo-1598289431512-b97b0917affc?w=400&h=300&fit=crop', description: 'Rozcvička s ľahkými gumami' },
-          { id: 'e1-2', name: 'Upper body resistance', duration: '20 min', type: 'strength', videoUrl: '', thumbnail: 'https://images.unsplash.com/photo-1598289431512-b97b0917affc?w=400&h=300&fit=crop', description: 'Posilnenie hornej časti tela s gumami' },
-          { id: 'e1-3', name: 'Lower body power', duration: '15 min', type: 'strength', videoUrl: '', thumbnail: 'https://images.unsplash.com/photo-1598289431512-b97b0917affc?w=400&h=300&fit=crop', description: 'Silové cviky pre dolnú časť s resistance' },
+          { 
+            id: 'e1-1', 
+            name: 'Rozcvička s gumami', 
+            duration: '10 min', 
+            type: 'cardio', 
+            videoUrl: '', 
+            thumbnail: 'https://images.unsplash.com/photo-1598289431512-b97b0917affc?w=400&h=300&fit=crop', 
+            description: 'Dynamické rozhriatie s použitím ľahkého odporu gúm',
+            instructions: [
+              'Začni s ľahkou gumou okolo zápästí',
+              'Krúženie ramien s odporom 10x',
+              'Laterálne zdvíhanie rúk 15x',
+              'Gumy okolo stehien - bočné kroky 2x10',
+              'Aktivácia core s gumou 8x'
+            ],
+            tips: [
+              'Začni vždy s najľahšou gumou',
+              'Pohyby vykonávaj kontrolovane',
+              'Guma má byť pod napätím počas celého pohybu'
+            ]
+          },
+          { 
+            id: 'e1-2', 
+            name: 'Horná časť tela s odporom', 
+            duration: '15 min', 
+            type: 'strength', 
+            videoUrl: '', 
+            thumbnail: 'https://images.unsplash.com/photo-1598289431512-b97b0917affc?w=400&h=300&fit=crop', 
+            description: 'Formovanie ramien, rúk a chrbta pomocou elastických gúm',
+            instructions: [
+              'Rows s gumou (ťahanie k hrudi) 3x12',
+              'Chest press s gumou 3x10',
+              'Lateral raises 3x12',
+              'Biceps curls 3x15',
+              'Triceps extensions 3x10'
+            ],
+            tips: [
+              'Guma musí byť správne zakotvená',
+              'Udržuj napätie v gume počas celého pohybu',
+              'Kontroluj návratný pohyb'
+            ]
+          },
+          { 
+            id: 'e1-3', 
+            name: 'Dolná časť s dynamickým odporom', 
+            duration: '10 min', 
+            type: 'strength', 
+            videoUrl: '', 
+            thumbnail: 'https://images.unsplash.com/photo-1598289431512-b97b0917affc?w=400&h=300&fit=crop', 
+            description: 'Intenzívne formovanie zadku a stehien s gumami',
+            instructions: [
+              'Squaty s gumou okolo stehien 3x15',
+              'Bočné kroky s gumou 3x12 na stranu',
+              'Glute bridges s gumou 3x15',
+              'Clamshells s gumou 2x12 na stranu',
+              'Monster walks 2x10 krokov'
+            ],
+            tips: [
+              'Guma má byť pod napätím aj v spodnej pozícii',
+              'Kolená tlač smerom von proti odporu',
+              'Aktivuj gluteálne svaly počas každého pohybu'
+            ]
+          },
         ]
       },
     ]
@@ -240,8 +353,8 @@ const programData: Record<string, ProgramData> = {
   'strong-sexy': {
     id: 'strong-sexy',
     name: 'Strong&Sexy',
-    description: 'Pokročilý program pre ženy, ktoré chcú silné a sexy telo.',
-    totalWeeks: 8,
+    description: 'Program je vhodný pre ženy, ktoré chcú posunúť svoje hranice, získať silnejšie a vyformovanejšie telo a začať cvičiť s jednoručkami.',
+    totalWeeks: 6,
     currentWeek: 1,
     currentDay: 1,
     startDate: '2026-02-15',
@@ -249,11 +362,71 @@ const programData: Record<string, ProgramData> = {
     weekPlans: [
       {
         week: 1,
-        title: 'Týždeň 1: Strength foundation',
+        title: 'Týždeň 1: Sila a formovanie',
         exercises: [
-          { id: 's1-1', name: 'Power warm-up', duration: '12 min', type: 'cardio', videoUrl: '', thumbnail: 'https://images.unsplash.com/photo-1550345332-09e3ac987658?w=400&h=300&fit=crop', description: 'Dynamické rozcvičenie pre pokročilé' },
-          { id: 's1-2', name: 'Heavy compound movements', duration: '25 min', type: 'strength', videoUrl: '', thumbnail: 'https://images.unsplash.com/photo-1550345332-09e3ac987658?w=400&h=300&fit=crop', description: 'Zložené pohyby s vyššou záťažou' },
-          { id: 's1-3', name: 'Sexy sculpt finisher', duration: '18 min', type: 'strength', videoUrl: '', thumbnail: 'https://images.unsplash.com/photo-1550345332-09e3ac987658?w=400&h=300&fit=crop', description: 'Dokončovacie cviky pre sexy krivky' },
+          { 
+            id: 's1-1', 
+            name: 'Power warm-up s jednoručkami', 
+            duration: '12 min', 
+            type: 'cardio', 
+            videoUrl: '', 
+            thumbnail: 'https://images.unsplash.com/photo-1550345332-09e3ac987658?w=400&h=300&fit=crop', 
+            description: 'Dynamické rozcvičenie s ľahkými jednoručkami',
+            instructions: [
+              'Arm circles s 1-2kg jednoručkami 2x10',
+              'Shoulder shrugs s jednoručkami 15x',
+              'Walking lunges s jednoručkami 2x8',
+              'Overhead press s ľahkými váhami 10x',
+              'Deadlifts s jednoručkami pre rozcvičku 8x'
+            ],
+            tips: [
+              'Začni s ľahšími váhami pre rozcvičku',
+              'Sústreď sa na aktiváciu celého tela',
+              'Priprav kĺby na záťaž s váhami'
+            ]
+          },
+          { 
+            id: 's1-2', 
+            name: 'Zložené pohyby s jednoručkami', 
+            duration: '20 min', 
+            type: 'strength', 
+            videoUrl: '', 
+            thumbnail: 'https://images.unsplash.com/photo-1550345332-09e3ac987658?w=400&h=300&fit=crop', 
+            description: 'Hlavné silové cviky s jednoručkami pre celé telo',
+            instructions: [
+              'Goblet squats s jednoručkou 4x12',
+              'Dumbbell rows 4x10 na ruku',
+              'Romanian deadlifts 4x10',
+              'Overhead press 3x8',
+              'Reverse lunges s jednoručkami 3x10 na nohu'
+            ],
+            tips: [
+              'Vyber váhy, s ktorými dokončíš poslednú sériu správne',
+              'Medzi sériami odpočiň 60-90 sekúnd',
+              'Kontroluj pohyb dole aj hore'
+            ]
+          },
+          { 
+            id: 's1-3', 
+            name: 'Sexy sculpting finisher', 
+            duration: '13 min', 
+            type: 'strength', 
+            videoUrl: '', 
+            thumbnail: 'https://images.unsplash.com/photo-1550345332-09e3ac987658?w=400&h=300&fit=crop', 
+            description: 'Cielené formovanie pre sexy krivky a definíciu',
+            instructions: [
+              'Single arm chest press vľaku 3x8 na ruku',
+              'Glute bridges s jednoručkou 3x15',
+              'Lateral raises super-slow 3x8',
+              'Bulgarian split squats s jednoručkou 2x8 na nohu',
+              'Plank to downward dog 2x8'
+            ],
+            tips: [
+              'Sústreď sa na kvalitu pohybu',
+              'Pomalé tempo pre maximálne napätie',
+              'Cíť svaly, na ktoré sa zameriavame'
+            ]
+          },
         ]
       },
     ]
@@ -364,6 +537,29 @@ export default function ProgramDetail() {
         <h2 className="text-lg font-bold mb-3" style={{ color: '#2E2218' }}>
           Vitaj v programe {program.name}! 
         </h2>
+        
+        {/* Intro Video Section - Only for Postpartum program */}
+        {program.id === 'postpartum' && (
+          <div className="mb-6">
+            <div className="bg-white/40 rounded-2xl p-4 mb-4">
+              <h3 className="text-sm font-semibold mb-3" style={{ color: '#2E2218' }}>
+                Úvodné video od Gabi
+              </h3>
+              {/* Video placeholder - will be replaced with actual video upload */}
+              <div className="relative bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl aspect-video flex items-center justify-center mb-3">
+                <div className="text-center">
+                  <Video className="w-8 h-8 mx-auto mb-2" style={{ color: colors.telo }} />
+                  <p className="text-xs text-gray-600">Video bude nahraté Gabi</p>
+                  <p className="text-xs text-gray-500">Úvod do programu a motivácia</p>
+                </div>
+              </div>
+              <p className="text-xs" style={{ color: '#6B4C3B' }}>
+                V tomto videu ti Gabi vysvetlí, čo ťa v programe čaká a ako ho správne absolvovať.
+              </p>
+            </div>
+          </div>
+        )}
+        
         <p className="text-sm mb-4" style={{ color: '#6B4C3B' }}>
           {program.description}
         </p>
@@ -431,9 +627,17 @@ export default function ProgramDetail() {
               <p className="text-sm font-medium text-gray-800">
                 {todaysExercise.name}
               </p>
-              <p className="text-xs mt-0.5 text-gray-600">
-                {todaysExercise.duration} • {todaysExercise.description}
-              </p>
+              <div className="text-xs mt-0.5 text-gray-600 flex items-center gap-1">
+                <span>{todaysExercise.duration}</span>
+                <span>•</span>
+                {todaysExercise.hasDemo && (
+                  <>
+                    <Video className="w-3 h-3" style={{ color: colors.telo }} />
+                    <span>DEMO •</span>
+                  </>
+                )}
+                <span>{todaysExercise.description}</span>
+              </div>
             </div>
           </button>
         </div>

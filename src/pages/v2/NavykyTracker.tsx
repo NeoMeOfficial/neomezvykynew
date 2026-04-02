@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Droplets, Moon, BookOpen, Dumbbell, Apple, Plus, Check, ArrowLeft } from 'lucide-react';
+import { Droplets, Moon, BookOpen, Dumbbell, Apple, Plus, Check, ArrowLeft, GlassWater } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../contexts/AuthContext';
 import { useSubscription } from '../../contexts/SimpleSubscriptionContext';
@@ -169,7 +169,7 @@ export default function NavykyTracker() {
       <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20">
         <div className="flex items-center gap-2 mb-4">
           <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(122, 158, 120, 0.14)` }}>
-            <Droplets className="w-4 h-4" style={{ color: '#7A9E78' }} strokeWidth={1.5} />
+            <GlassWater className="w-4 h-4" style={{ color: '#7A9E78' }} strokeWidth={1.5} />
           </div>
           <h2 className="text-sm font-medium" style={{ color: '#2E2218' }}>Pitný režim</h2>
         </div>
@@ -181,7 +181,7 @@ export default function NavykyTracker() {
                 i < 6 ? 'bg-[#7A9E78]/10 border-2 border-[#7A9E78]' : 'border-2 border-white/35'
               }`}
             >
-              {i < 6 && <Droplets className="w-3.5 h-3.5" style={{ color: '#7A9E78' }} strokeWidth={1.5} />}
+              {i < 6 && <GlassWater className="w-3.5 h-3.5" style={{ color: '#7A9E78' }} strokeWidth={1.5} />}
             </div>
           ))}
         </div>

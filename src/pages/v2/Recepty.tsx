@@ -7,34 +7,52 @@ import { PaywallModal } from '../../components/v2/paywall/PaywallModal';
 import { useUniversalFavorites } from '../../hooks/useUniversalFavorites';
 import FavoriteButton from '../../components/v2/favorites/FavoriteButton';
 import { colors } from '../../theme/warmDusk';
+import { recipes as recipeDatabase } from '../../data/recipes';
 
 const categoryNames = ['Raňajky', 'Hlavné jedlá a polievky', 'Dobrotky', 'Smoothie & Nápoje', 'Snacky'];
 const FAVORITES_KEY = 'Obľúbené';
 
-const recipes: Record<string, { id: number; title: string; time: string; kcal: number; img: string }[]> = {
-  'Raňajky': [
-    { id: 1, title: 'Proteínová kaša s ovocím', time: '15 min', kcal: 320, img: 'https://images.unsplash.com/photo-1517673400267-0251440c45dc?w=800&h=500&fit=crop' },
-    { id: 2, title: 'Avokádový toast s vajíčkom', time: '10 min', kcal: 280, img: 'https://images.unsplash.com/photo-1541519227354-08fa5d50c44d?w=800&h=500&fit=crop' },
-    { id: 6, title: 'Lievance s čučoriedkami', time: '20 min', kcal: 350, img: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=800&h=500&fit=crop' },
-  ],
-  'Hlavné jedlá a polievky': [
-    { id: 3, title: 'Grécky šalát s fetou', time: '15 min', kcal: 250, img: 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=800&h=500&fit=crop' },
-    { id: 4, title: 'Lososové filé s quinoou', time: '25 min', kcal: 450, img: 'https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=800&h=500&fit=crop' },
-    { id: 7, title: 'Krémová brokolicová polievka', time: '30 min', kcal: 210, img: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=800&h=500&fit=crop' },
-  ],
-  'Dobrotky': [
-    { id: 8, title: 'Proteínové guľky', time: '15 min', kcal: 180, img: 'https://images.unsplash.com/photo-1604329760661-e71dc83f8f26?w=800&h=500&fit=crop' },
-    { id: 9, title: 'Banánový chlieb', time: '45 min', kcal: 290, img: 'https://images.unsplash.com/photo-1585478259715-876acc5be8eb?w=800&h=500&fit=crop' },
-  ],
-  'Smoothie & Nápoje': [
-    { id: 5, title: 'Zelené smoothie', time: '5 min', kcal: 180, img: 'https://images.unsplash.com/photo-1638176066666-ffb2f013c7dd?w=800&h=500&fit=crop' },
-    { id: 10, title: 'Tropical mango smoothie', time: '5 min', kcal: 210, img: 'https://images.unsplash.com/photo-1623065422902-30a2d299bbe4?w=800&h=500&fit=crop' },
-  ],
-  'Snacky': [
-    { id: 11, title: 'Hummus s mrkvou', time: '10 min', kcal: 150, img: 'https://images.unsplash.com/photo-1577805947697-89e18249d767?w=800&h=500&fit=crop' },
-    { id: 12, title: 'Ořechový mix s brusnicami', time: '2 min', kcal: 200, img: 'https://images.unsplash.com/photo-1599599810769-bcde5a160d32?w=800&h=500&fit=crop' },
-  ],
+// Map UI categories to database categories
+const categoryMapping: Record<string, string> = {
+  'Raňajky': 'ranajky',
+  'Hlavné jedlá a polievky': 'obed', // and vecera
+  'Dobrotky': 'snack',
+  'Smoothie & Nápoje': 'smoothie',
+  'Snacky': 'snack',
 };
+
+// Function to get recipes by UI category
+const getRecipesByCategory = (uiCategory: string) => {
+  if (uiCategory === 'Hlavné jedlá a polievky') {
+    // Combine lunch and dinner for this category
+    return recipeDatabase.filter(r => r.category === 'obed' || r.category === 'vecera');
+  }
+  
+  const dbCategory = categoryMapping[uiCategory];
+  if (!dbCategory) return [];
+  
+  return recipeDatabase.filter(r => r.category === dbCategory);
+};
+
+// Convert database recipes to UI format
+const convertToUIFormat = (dbRecipes: typeof recipeDatabase) => {
+  return dbRecipes.map((recipe, index) => ({
+    id: index + 1, // Simple ID for UI
+    title: recipe.title,
+    time: `${recipe.prepTime} min`,
+    kcal: recipe.calories,
+    img: recipe.image || `https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=800&h=500&fit=crop`,
+    originalId: recipe.id // Keep original ID for detailed view
+  }));
+};
+
+// Generate recipes object from database
+const recipes: Record<string, { id: number; title: string; time: string; kcal: number; img: string; originalId: string }[]> = 
+  categoryNames.reduce((acc, category) => {
+    const dbRecipes = getRecipesByCategory(category);
+    acc[category] = convertToUIFormat(dbRecipes);
+    return acc;
+  }, {} as Record<string, any>);
 
 export default function Recepty() {
   const [searchParams] = useSearchParams();
@@ -149,7 +167,7 @@ export default function Recepty() {
           return (
             <div key={r.id} className="bg-white/30 backdrop-blur-xl rounded-2xl shadow-sm border border-white/20 overflow-hidden">
               <button
-                onClick={() => navigate(`/recept/${r.id}`)}
+                onClick={() => navigate(`/recept/${r.originalId}`)}
                 className="relative w-full h-52 block active:scale-[0.98] transition-transform text-left"
               >
                 <img src={r.img} alt={r.title} className="absolute inset-0 w-full h-full object-cover" />

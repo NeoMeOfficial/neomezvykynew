@@ -1,40 +1,39 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Clock, Flame, Users, Heart, Plus, Check } from 'lucide-react';
+import { ArrowLeft, Clock, Flame, Users, Heart, Plus, Check, FileText, Eye } from 'lucide-react';
 import GlassCard from '../../components/v2/GlassCard';
 import { RecipePromoBanner } from '../../components/v2/RecipePromoBanner';
 import { colors } from '../../theme/warmDusk';
 import { useFavorites } from '../../hooks/useFavorites';
 import { useSubscription } from '../../contexts/SimpleSubscriptionContext';
+import { recipes as recipeDatabase } from '../../data/recipes';
+import { Document, Page } from 'react-pdf';
 
-const ingredients = [
-  'Ovsené vločky 80g',
-  'Proteínový prášok 30g',
-  'Banán 1ks',
-  'Čučoriedky 50g',
-  'Mandľové mlieko 200ml',
-  'Med 1 lyžička',
-  'Chia semienka 10g',
-];
+// Helper function to get recipe by ID
+const getRecipeById = (recipeId: string) => {
+  return recipeDatabase.find(recipe => recipe.id === recipeId);
+};
 
-const steps = [
-  'Ovsené vločky zalejte mandľovým mliekom a nechajte 5 minút.',
-  'Pridajte proteínový prášok a dobre premiešajte.',
-  'Nakrájajte banán na kolieska.',
-  'Ozdobte čučoriedkami, banánom a chia semienkami.',
-  'Pokvapkajte medom a podávajte.',
-];
-
-// Mock recipe data - in real app this would come from API
-const mockRecipe = {
-  id: 1,
-  title: 'Proteínová kaša s ovocím',
+// Fallback recipe if none found
+const fallbackRecipe = {
+  id: 'fallback',
+  title: 'Recept nenájdený',
   image: 'https://images.unsplash.com/photo-1517673400267-0251440c45dc?w=800&h=500&fit=crop',
-  time: '15 min',
-  kcal: 320,
+  prepTime: 15,
+  calories: 320,
   servings: 1,
-  category: 'Raňajky',
-  description: 'Výživná ranná kaša s vysokým obsahom bielkovín.',
+  category: 'ranajky',
+  description: 'Recept sa nenašiel v databáze.',
+  ingredients: [{ name: 'Recept nenájdený', amount: '' }],
+  steps: ['Recept sa nenašiel.'],
+  allergens: [],
+  dietary: [],
+  tags: [],
+  difficulty: 'easy' as const,
+  protein: 0,
+  carbs: 0,
+  fat: 0,
+  fiber: 0
 };
 
 export default function RecipeDetail() {
@@ -42,12 +41,27 @@ export default function RecipeDetail() {
   const { id } = useParams();
   const { toggleFavorite, isFavorite } = useFavorites();
   const { canUseMealPlanner } = useSubscription();
-  const [checked, setChecked] = useState<boolean[]>(new Array(ingredients.length).fill(false));
+  
+  // Load recipe from database using ID from URL
+  const recipe = getRecipeById(id || '') || fallbackRecipe;
+  const [checked, setChecked] = useState<boolean[]>(new Array(recipe.ingredients.length).fill(false));
   const [addedToMealPlan, setAddedToMealPlan] = useState(false);
   const [showPromoBanner, setShowPromoBanner] = useState(false);
+  
+  // PDF viewer state
+  const [viewMode, setViewMode] = useState<'database' | 'pdf'>('database');
+  const [numPages, setNumPages] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(1);
 
-  const recipe = mockRecipe; // In real app, fetch by ID
+  // Update checked state when recipe changes
+  useEffect(() => {
+    setChecked(new Array(recipe.ingredients.length).fill(false));
+  }, [recipe.ingredients.length]);
+
   const isRecipeFavorite = isFavorite(recipe.id);
+  
+  // Check if recipe has PDF available
+  const hasPDF = recipe.pdfPath && recipe.pdfPath !== '';
 
   // Track recipe views and show banner every 10th view
   useEffect(() => {
@@ -73,8 +87,8 @@ export default function RecipeDetail() {
       id: recipe.id,
       title: recipe.title,
       image: recipe.image,
-      time: recipe.time,
-      kcal: recipe.kcal,
+      time: `${recipe.prepTime} min`,
+      kcal: recipe.calories,
       category: recipe.category,
     });
   };
@@ -99,6 +113,11 @@ export default function RecipeDetail() {
     }, 3000);
   };
 
+  const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
+    setNumPages(numPages);
+    setCurrentPage(1);
+  };
+
   return (
     <div className="w-full min-h-screen px-3 py-6 pb-28 space-y-6">
       {/* Nordic Header */}
@@ -112,7 +131,7 @@ export default function RecipeDetail() {
               {recipe.title}
             </h1>
             <p className="text-sm font-medium" style={{ color: '#6B4C3B' }}>
-              {recipe.category} • {recipe.time} • {recipe.kcal} kcal
+              {recipe.category} • {recipe.prepTime} min • {recipe.calories} kcal
             </p>
           </div>
           <button
@@ -127,6 +146,34 @@ export default function RecipeDetail() {
             />
           </button>
         </div>
+        
+        {/* PDF/Database toggle */}
+        {hasPDF && (
+          <div className="flex gap-2">
+            <button
+              onClick={() => setViewMode('database')}
+              className={`flex-1 py-2 px-3 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-1.5 ${
+                viewMode === 'database'
+                  ? 'bg-[#6B4C3B] text-white'
+                  : 'bg-white/25 text-gray-600 hover:bg-white/40'
+              }`}
+            >
+              <Eye size={14} />
+              Prehľad
+            </button>
+            <button
+              onClick={() => setViewMode('pdf')}
+              className={`flex-1 py-2 px-3 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-1.5 ${
+                viewMode === 'pdf'
+                  ? 'bg-[#6B4C3B] text-white'
+                  : 'bg-white/25 text-gray-600 hover:bg-white/40'
+              }`}
+            >
+              <FileText size={14} />
+              PDF Recept
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Hero Image */}
@@ -137,6 +184,73 @@ export default function RecipeDetail() {
           className="w-full h-56 object-cover"
         />
       </div>
+
+      {/* PDF Viewer */}
+      {hasPDF && viewMode === 'pdf' && (
+        <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(107, 76, 59, 0.14)` }}>
+              <FileText className="w-4 h-4" style={{ color: '#6B4C3B' }} />
+            </div>
+            <h2 className="text-[14px] font-semibold" style={{ color: '#2E2218' }}>Originálny recept</h2>
+            {numPages > 1 && (
+              <span className="text-xs text-gray-500">
+                Stránka {currentPage} z {numPages}
+              </span>
+            )}
+          </div>
+          
+          <div className="pdf-container bg-white rounded-xl overflow-hidden">
+            <Document
+              file={recipe.pdfPath}
+              onLoadSuccess={onDocumentLoadSuccess}
+              loading={
+                <div className="flex items-center justify-center py-8">
+                  <div className="text-sm text-gray-500">Načítavam PDF...</div>
+                </div>
+              }
+              error={
+                <div className="flex items-center justify-center py-8">
+                  <div className="text-sm text-red-500">Chyba pri načítaní PDF</div>
+                </div>
+              }
+            >
+              <Page 
+                pageNumber={currentPage}
+                width={Math.min(350, window.innerWidth - 60)}
+                renderAnnotationLayer={false}
+                renderTextLayer={false}
+              />
+            </Document>
+          </div>
+          
+          {numPages > 1 && (
+            <div className="flex items-center justify-center gap-3 mt-4">
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage <= 1}
+                className="px-3 py-1 rounded-lg bg-[#6B4C3B] text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                ←
+              </button>
+              <span className="text-sm text-gray-600">
+                {currentPage} / {numPages}
+              </span>
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, numPages))}
+                disabled={currentPage >= numPages}
+                className="px-3 py-1 rounded-lg bg-[#6B4C3B] text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                →
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Database Content - only show when viewMode is 'database' */}
+      {viewMode === 'database' && (
+        <>
       {/* Recipe Info */}
       <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
         <p className="text-sm leading-relaxed mb-4" style={{ color: '#6B4C3B' }}>
@@ -153,8 +267,8 @@ export default function RecipeDetail() {
         {/* Meta pills */}
         <div className="flex gap-2 flex-wrap">
           {[
-            { icon: Clock, label: recipe.time },
-            { icon: Flame, label: `${recipe.kcal} kcal` },
+            { icon: Clock, label: `${recipe.prepTime} min` },
+            { icon: Flame, label: `${recipe.calories} kcal` },
             { icon: Users, label: `${recipe.servings} porcia` },
           ].map((m) => (
             <span
@@ -203,7 +317,7 @@ export default function RecipeDetail() {
         </div>
 
         <div className="space-y-3">
-          {ingredients.map((ing, i) => (
+          {recipe.ingredients.map((ing, i) => (
             <label key={i} className="flex items-center gap-3 cursor-pointer p-2 -m-2 rounded-xl hover:bg-white/20" onClick={() => toggle(i)}>
               <div
                 className="w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all active:scale-95 flex-shrink-0"
@@ -215,7 +329,7 @@ export default function RecipeDetail() {
                 {checked[i] && <span className="text-xs font-bold text-white">✓</span>}
               </div>
               <span className={`text-sm ${checked[i] ? 'line-through' : ''}`} style={{ color: checked[i] ? colors.textTertiary : colors.textPrimary }}>
-                {ing}
+                {ing.amount} {ing.name}
               </span>
             </label>
           ))}
@@ -232,7 +346,7 @@ export default function RecipeDetail() {
         </div>
         
         <div className="space-y-4">
-          {steps.map((s, i) => (
+          {recipe.steps.map((s, i) => (
             <div key={i} className="flex gap-3">
               <span className="w-6 h-6 rounded-full bg-[#6B4C3B] text-white text-xs flex items-center justify-center flex-shrink-0 font-semibold">
                 {i + 1}
@@ -256,9 +370,9 @@ export default function RecipeDetail() {
         
         <div className="grid grid-cols-3 gap-3">
           {[
-            { label: 'Bielkoviny', value: '28g' },
-            { label: 'Sacharidy', value: '42g' },
-            { label: 'Tuky', value: '8g' },
+            { label: 'Bielkoviny', value: `${recipe.protein}g` },
+            { label: 'Sacharidy', value: `${recipe.carbs}g` },
+            { label: 'Tuky', value: `${recipe.fat}g` },
           ].map((n) => (
             <div 
               key={n.label} 
@@ -274,6 +388,8 @@ export default function RecipeDetail() {
           ))}
         </div>
       </div>
+      </>
+      )}
 
       {/* Recipe Promo Banner - appears every 10th recipe view */}
       {showPromoBanner && (
