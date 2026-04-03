@@ -1,73 +1,80 @@
-# Welcome to your Lovable project
+# NeoMe Wellness App
 
-## Project info
+Slovak women's fitness & wellness platform built with React + TypeScript + Tailwind.
 
-**URL**: https://lovable.dev/projects/8f5ec486-5e74-4be9-a384-08a198192b7a
+## 🚀 Quick Start
 
-## How can I edit this code?
-
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/8f5ec486-5e74-4be9-a384-08a198192b7a) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+```bash
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## 📱 Live Demo
+- **Production:** https://neome-wellness-app.netlify.app
+- **Admin Panel:** https://neome-wellness-app.netlify.app/admin
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 🏗️ Architecture
 
-**Use GitHub Codespaces**
+**Entry Point:** `src/main.tsx` → `AppV2.tsx` (NOT App.tsx)
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+**Core Sections:**
+- **Telo** - 4-tier exercise programs (Postpartum → BodyForming → ElasticBands → Strong&Sexy)
+- **Strava** - 23 curated recipes with zero-error guarantee  
+- **Myseľ** - 17 targeted meditations for women/mothers
+- **Periodka** - Smart menstrual cycle tracking with phase-aware recommendations
 
-## What technologies are used for this project?
+## 🎨 Design System
 
-This project is built with:
+**Colors (Warm Dusk Theme):**
+```typescript
+telo: '#6B4C3B'      // Brown - Exercise
+strava: '#7A9E78'    // Green - Nutrition  
+mysel: '#A8848B'     // Mauve - Meditation
+periodka: '#C27A6E'  // Coral - Period tracking
+accent: '#B8864A'    // Gold - Accents
+```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+**UI Patterns:**
+- Glassmorphism: `bg-white/40 backdrop-blur-lg`
+- Mobile-first responsive design
+- Nordic minimalism - "less is more"
 
-## How can I deploy this project?
+## 💡 Key Features (Phase 3 Complete)
 
-Simply open [Lovable](https://lovable.dev/projects/8f5ec486-5e74-4be9-a384-08a198192b7a) and click on Share -> Publish.
+✅ **Smart Period Tracking** - 6 core symptoms, cycle visualization, phase-aware content
+✅ **Progressive Exercise Programs** - 4 levels with equipment scaling  
+✅ **Zero-Error Recipe Database** - 23 professional recipes (Spoonacular API)
+✅ **Targeted Meditations** - 17 mother-focused 5-minute sessions
+✅ **Gamified Engagement** - Streaks, badges, buddy system, favorites
+✅ **Flexible Paywall** - Content limits with subscription upsells
 
-## Can I connect a custom domain to my Lovable project?
+## 🔧 Technical Stack
 
-Yes, you can!
+- **Frontend:** React 18 + TypeScript + Vite
+- **Styling:** Tailwind CSS + Glassmorphism
+- **State:** React Context + localStorage (no Redux)
+- **Deployment:** Netlify auto-deploy
+- **Auth:** Demo mode (production auth TBD)
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## 📁 Key Files
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+- **`AppV2.tsx`** - Main app router and layout
+- **`utils/periodCalculations.ts`** - Menstrual cycle algorithms  
+- **`data/`** - All content (recipes, exercises, meditations)
+- **`hooks/usePaywall.ts`** - Monetization logic
+- **`components/v2/`** - Nordic design system components
+
+## 🎯 Business Model
+
+- **Free Tier:** Limited content access
+- **Subscription:** €14.90/month (pending approval)
+- **Referral System:** €14 credits per successful referral
+- **Target Users:** Slovak mothers & working women
+
+## 📚 Full Context
+
+For complete business logic, design decisions, and 6 months of development insights, see **`PROJECT_CONTEXT.md`** in parent directory.
+
+---
+
+**Status:** Production ready, awaiting backend integration
