@@ -9,14 +9,15 @@ import FavoriteButton from '../../components/v2/favorites/FavoriteButton';
 import { colors } from '../../theme/warmDusk';
 import { recipes as recipeDatabase } from '../../data/recipes';
 
-const categoryNames = ['Raňajky', 'Hlavné jedlá a polievky', 'Dobrotky', 'Smoothie & Nápoje', 'Snacky'];
+const categoryNames = ['Raňajky', 'Hlavné jedlá a polievky', 'Hlavné jedlá', 'Dezerty', 'Smoothie & Nápoje', 'Snacky'];
 const FAVORITES_KEY = 'Obľúbené';
 
 // Map UI categories to database categories
 const categoryMapping: Record<string, string> = {
   'Raňajky': 'ranajky',
-  'Hlavné jedlá a polievky': 'obed', // and vecera
-  'Dobrotky': 'snack',
+  'Hlavné jedlá a polievky': 'obed', // and vecera — legacy
+  'Hlavné jedlá': 'main_meal',
+  'Dezerty': 'dessert',
   'Smoothie & Nápoje': 'smoothie',
   'Snacky': 'snack',
 };
@@ -24,13 +25,12 @@ const categoryMapping: Record<string, string> = {
 // Function to get recipes by UI category
 const getRecipesByCategory = (uiCategory: string) => {
   if (uiCategory === 'Hlavné jedlá a polievky') {
-    // Combine lunch and dinner for this category
     return recipeDatabase.filter(r => r.category === 'obed' || r.category === 'vecera');
   }
-  
+
   const dbCategory = categoryMapping[uiCategory];
   if (!dbCategory) return [];
-  
+
   return recipeDatabase.filter(r => r.category === dbCategory);
 };
 

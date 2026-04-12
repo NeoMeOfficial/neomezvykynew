@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import GreetingHeader from '../../components/v2/home/GreetingHeader';
 import WeeklyCalendarStrip, { getWeekDays } from '../../components/v2/home/WeeklyCalendarStrip';
 import TodayOverview from '../../components/v2/home/TodayOverview';
@@ -14,7 +15,9 @@ import WorkoutDemoShortcut from '../../components/v2/workouts/WorkoutDemoShortcu
 import BuddyShortcut from '../../components/v2/buddy/BuddyShortcut';
 import AddHabitModal from '../../components/v2/habits/AddHabitModal';
 import { useWorkoutHistory } from '../../hooks/useWorkoutHistory';
-import { Leaf, Droplets, MessageCircle } from 'lucide-react';
+import { useMealPlan } from '../../features/nutrition/useMealPlan';
+import { recipes } from '../../data/recipes';
+import { Leaf, Droplets, MessageCircle, UtensilsCrossed, Clock, ChevronRight } from 'lucide-react';
 import { colors, glassCard } from '../../theme/warmDusk';
 
 // Nordic Card Wrapper - Enhanced layered effect, no borders
@@ -293,6 +296,115 @@ const HABIT_CATEGORIES = [
   { id: 'productivity', name: 'Produktivita', color: '#8B7D6B', icon: '📈' }
 ];
 
+// ─── Today Meals Card ─────────────────────────────────────────────────────────
+function formatShortDate(dateStr: string): string {
+  const d = new Date(dateStr + 'T00:00:00');
+  const months = ['jan', 'feb', 'mar', 'apr', 'máj', 'jún', 'júl', 'aug', 'sep', 'okt', 'nov', 'dec'];
+  return `${d.getDate()}. ${months[d.getMonth()]}`;
+}
+
+function TodayMealsCard() {
+  const navigate = useNavigate();
+  const { plan, todayPlan } = useMealPlan();
+
+  // Plan exists — find today's meals or the next upcoming day
+  if (plan) {
+    const todayStr = new Date().toISOString().split('T')[0];
+    const displayDay = todayPlan ?? plan.days.find((d) => d.date >= todayStr) ?? plan.days[0];
+    const isToday = !!todayPlan;
+
+    if (displayDay) {
+      return (
+        <div className="bg-white rounded-3xl px-4 py-5 space-y-3" style={{ boxShadow: '0 12px 48px rgba(107,76,59,0.08)' }}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-xl flex items-center justify-center" style={{ background: 'rgba(122,158,120,0.14)' }}>
+                <UtensilsCrossed className="w-3.5 h-3.5" style={{ color: '#7A9E78' }} />
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold" style={{ color: '#2E2218' }}>
+                  {isToday ? 'Dnešný jedálniček' : 'Blížiaci sa jedálniček'}
+                </h3>
+                {!isToday && (
+                  <p className="text-[10px]" style={{ color: '#A0907E' }}>od {formatShortDate(displayDay.date)}</p>
+                )}
+              </div>
+            </div>
+            <span className="text-xs font-medium" style={{ color: '#7A9E78' }}>{displayDay.totalCalories} kcal</span>
+          </div>
+
+          <div className="space-y-2">
+            {displayDay.meals.map((meal, i) => {
+              const recipe = recipes.find((r) => r.id === meal.options[meal.selected]);
+              if (!recipe) return null;
+              const kcal = Math.round(recipe.calories * meal.portionMultiplier);
+              return (
+                <div key={i} className="flex items-center gap-3 p-2.5 rounded-xl" style={{ background: 'rgba(122,158,120,0.06)' }}>
+                  <div>
+                    <p className="text-[10px] font-medium uppercase tracking-wide" style={{ color: '#A0907E' }}>{meal.label}</p>
+                    <p className="text-xs font-medium leading-snug mt-0.5" style={{ color: '#2E2218' }}>{recipe.title}</p>
+                  </div>
+                  <span className="ml-auto text-[10px] shrink-0" style={{ color: '#8B7560' }}>{kcal} kcal</span>
+                </div>
+              );
+            })}
+          </div>
+
+          <button
+            onClick={() => navigate('/jedalnicek')}
+            className="flex items-center justify-center gap-1.5 w-full py-2.5 rounded-xl text-xs font-medium transition-all active:scale-[0.98]"
+            style={{ background: 'rgba(122,158,120,0.12)', color: '#7A9E78' }}
+          >
+            Otvoriť celý jedálniček
+            <ChevronRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      );
+    }
+  }
+
+  // No plan — show date-seeded sample recipe
+  const today = new Date().toISOString().split('T')[0];
+  const seed = today.split('-').reduce((acc, p) => acc + parseInt(p, 10), 0);
+  const sampleRecipe = recipes[seed % recipes.length];
+
+  if (!sampleRecipe) return null;
+
+  return (
+    <div className="bg-white rounded-3xl px-4 py-5 space-y-3" style={{ boxShadow: '0 12px 48px rgba(107,76,59,0.08)' }}>
+      <div className="flex items-center gap-2 mb-1">
+        <div className="w-7 h-7 rounded-xl flex items-center justify-center" style={{ background: 'rgba(184,134,74,0.12)' }}>
+          <UtensilsCrossed className="w-3.5 h-3.5" style={{ color: '#B8864A' }} />
+        </div>
+        <h3 className="text-sm font-semibold" style={{ color: '#2E2218' }}>Recept dňa</h3>
+      </div>
+
+      <div className="relative rounded-xl overflow-hidden h-32">
+        <img src={sampleRecipe.image} alt={sampleRecipe.title} className="w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+        <div className="absolute bottom-2 left-3 right-3">
+          <p className="text-white text-sm font-semibold leading-tight">{sampleRecipe.title}</p>
+          <div className="flex items-center gap-3 mt-0.5">
+            <span className="text-white/80 text-[10px] flex items-center gap-1">
+              <Clock className="w-2.5 h-2.5" />{sampleRecipe.prepTime} min
+            </span>
+            <span className="text-white/80 text-[10px]">{sampleRecipe.calories} kcal</span>
+          </div>
+        </div>
+      </div>
+
+      <button
+        onClick={() => navigate('/jedalnicek')}
+        className="flex items-center justify-center gap-1.5 w-full py-2.5 rounded-xl text-xs font-medium transition-all active:scale-[0.98]"
+        style={{ background: 'rgba(184,134,74,0.1)', color: '#B8864A' }}
+      >
+        Vytvoriť jedálniček
+        <ChevronRight className="w-3.5 h-3.5" />
+      </button>
+    </div>
+  );
+}
+
 // Error Boundary Component
 class DomovErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean}> {
   constructor(props: {children: React.ReactNode}) {
@@ -366,6 +478,9 @@ function DomovNewContent() {
         </NordicCard>
 
         <SectionDivider label="DNES" />
+
+        {/* Meal plan / recipe of the day */}
+        <TodayMealsCard />
 
         {/* Today Overview - Priority Card */}
         <NordicCard className="px-4 py-6" priority="priority">

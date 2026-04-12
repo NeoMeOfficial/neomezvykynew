@@ -3,23 +3,36 @@
 
 const fs = require('fs');
 const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env.local') });
 
-// Your Spoonacular API key
-const SPOONACULAR_API_KEY = 'a1702279d5a144b88af0e35214379fdf';
+const SPOONACULAR_API_KEY = process.env.VITE_SPOONACULAR_API_KEY || process.env.SPOONACULAR_API_KEY;
+const DEEPL_API_KEY = process.env.VITE_DEEPL_API_KEY || process.env.DEEPL_API_KEY;
+
+if (!SPOONACULAR_API_KEY) {
+  console.error('❌ VITE_SPOONACULAR_API_KEY not found in .env.local');
+  process.exit(1);
+}
+if (!DEEPL_API_KEY) {
+  console.error('❌ VITE_DEEPL_API_KEY not found in .env.local');
+  process.exit(1);
+}
 const API_BASE = 'https://api.spoonacular.com';
+const DEEPL_BASE = 'https://api-free.deepl.com/v2/translate';
 
-// Google Translate API (free alternative: use MyMemory API)
-async function translateText(text, targetLang = 'sk') {
+async function translateText(text, targetLang = 'SK') {
+  if (!text || !text.trim()) return text;
   try {
-    // Using MyMemory API (free translation service)
-    const response = await fetch(
-      `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|${targetLang}`
-    );
+    const response = await fetch(DEEPL_BASE, {
+      method: 'POST',
+      headers: { 'Authorization': `DeepL-Auth-Key ${DEEPL_API_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: [text], target_lang: targetLang, source_lang: 'EN' }),
+    });
+    if (!response.ok) throw new Error(`DeepL ${response.status}`);
     const data = await response.json();
-    return data.responseData?.translatedText || text;
+    return data.translations?.[0]?.text || text;
   } catch (error) {
-    console.warn('Translation failed for:', text.substring(0, 50), error.message);
-    return text; // Return original if translation fails
+    console.warn('Translation failed:', text.substring(0, 50), error.message);
+    return text;
   }
 }
 
@@ -94,23 +107,25 @@ async function convertToLocalFormat(spoonacularRecipe, category) {
       }
     }
 
-    // Process instructions
+    // Process instructions — prefer structured analyzedInstructions
     let steps = [];
-    if (detailedRecipe.instructions) {
-      // Extract steps from instructions text
-      const instructionText = detailedRecipe.instructions
-        .replace(/<[^>]*>/g, '') // Remove HTML tags
-        .split(/\d+\.|\n/) // Split by numbers or newlines
-        .filter(step => step.trim().length > 20) // Filter meaningful steps
-        .slice(0, 6); // Limit to 6 steps
-
-      for (const step of instructionText) {
-        const translatedStep = await translateText(step.trim());
-        if (translatedStep.trim().length > 10) {
-          steps.push(translatedStep);
-        }
-        await new Promise(resolve => setTimeout(resolve, 150));
-      }
+    const rawSteps = [];
+    if (detailedRecipe.analyzedInstructions?.length > 0) {
+      detailedRecipe.analyzedInstructions[0].steps?.forEach(s => {
+        if (s.step?.trim().length > 10) rawSteps.push(s.step.trim());
+      });
+    } else if (detailedRecipe.instructions) {
+      detailedRecipe.instructions
+        .replace(/<[^>]*>/g, '')
+        .split(/(?:\d+\.\s+|\n+)/)
+        .map(s => s.trim())
+        .filter(s => s.length > 20)
+        .forEach(s => rawSteps.push(s));
+    }
+    for (const step of rawSteps.slice(0, 6)) {
+      const translated = await translateText(step);
+      if (translated.trim().length > 10) steps.push(translated);
+      await new Promise(resolve => setTimeout(resolve, 80));
     }
 
     // Extract dietary info
@@ -167,14 +182,10 @@ async function populateDatabase() {
   
   const allRecipes = [];
   
-  // Define categories to fetch
+  // Fill gaps for 6-week plan: need ~30 dinners, ~15 smoothies
   const categories = [
-    { type: 'breakfast', count: 25 },
-    { type: 'lunch', count: 20 },
-    { type: 'dinner', count: 20 },
-    { type: 'snack', count: 15 },
-    { type: 'dessert', count: 10 },
-    { type: 'beverage', count: 10 }
+    { type: 'dinner', count: 30 },
+    { type: 'beverage', count: 15 },
   ];
 
   // Fetch and convert recipes for each category
@@ -197,10 +208,26 @@ async function populateDatabase() {
     console.log(`📊 ${type} complete: ${allRecipes.filter(r => r.category === (type === 'breakfast' ? 'ranajky' : type === 'lunch' ? 'obed' : type === 'dinner' ? 'vecera' : type === 'beverage' ? 'smoothie' : 'snack')).length} recipes`);
   }
 
-  // Generate the new recipes.ts file
-  const recipesFileContent = `// Auto-generated recipes from Spoonacular API
-// Generated on: ${new Date().toISOString()}
-// Total recipes: ${allRecipes.length}
+  // Load existing recipes and merge (avoid duplicates by id)
+  const recipesPath = path.join(__dirname, 'src', 'data', 'recipes.ts');
+  const backupPath = path.join(__dirname, 'src', 'data', `recipes-backup-${Date.now()}.ts`);
+
+  let existingRecipes = [];
+  if (fs.existsSync(recipesPath)) {
+    fs.copyFileSync(recipesPath, backupPath);
+    console.log(`\n💾 Backed up existing recipes to: ${backupPath}`);
+    const existingContent = fs.readFileSync(recipesPath, 'utf8');
+    const existingMatch = existingContent.match(/export const recipes: Recipe\[\] = (\[[\s\S]+\]);/);
+    if (existingMatch) existingRecipes = JSON.parse(existingMatch[1]);
+  }
+
+  const existingIds = new Set(existingRecipes.map(r => r.id));
+  const newUnique = allRecipes.filter(r => !existingIds.has(r.id));
+  const merged = [...existingRecipes, ...newUnique];
+  console.log(`\n📦 Existing: ${existingRecipes.length} | New: ${newUnique.length} | Total: ${merged.length}`);
+
+  const recipesFileContent = `// Expanded recipe database — last updated ${new Date().toISOString()}
+// Total recipes: ${merged.length}
 
 export interface Recipe {
   id: string;
@@ -221,39 +248,22 @@ export interface Recipe {
   tags: string[];
   image: string;
   difficulty: 'easy' | 'medium';
+  pdfPath?: string;
 }
 
-export const recipes: Recipe[] = ${JSON.stringify(allRecipes, null, 2)};
+export const recipes: Recipe[] = ${JSON.stringify(merged, null, 2)};
 `;
 
-  // Backup existing recipes
-  const recipesPath = path.join(__dirname, 'src', 'data', 'recipes.ts');
-  const backupPath = path.join(__dirname, 'src', 'data', `recipes-backup-${Date.now()}.ts`);
-  
-  if (fs.existsSync(recipesPath)) {
-    fs.copyFileSync(recipesPath, backupPath);
-    console.log(`\n💾 Backed up existing recipes to: ${backupPath}`);
-  }
-
-  // Write new recipes file
+  // Write merged file
   fs.writeFileSync(recipesPath, recipesFileContent);
   
-  console.log(`\n🎉 SUCCESS! Generated ${allRecipes.length} recipes`);
-  console.log(`📄 New recipes file: ${recipesPath}`);
-  console.log(`💾 Backup file: ${backupPath}`);
-  
-  // Summary by category
-  const summary = {};
-  allRecipes.forEach(recipe => {
-    summary[recipe.category] = (summary[recipe.category] || 0) + 1;
-  });
-  
-  console.log('\n📊 Recipe Summary:');
-  Object.entries(summary).forEach(([category, count]) => {
-    console.log(`   ${category}: ${count} recipes`);
-  });
+  console.log(`\n🎉 SUCCESS! Database now has ${merged.length} recipes`);
+  console.log(`📄 File: ${recipesPath}`);
 
-  console.log('\n✨ Your local database is now populated with professional Spoonacular recipes!');
+  const summary = {};
+  merged.forEach(r => { summary[r.category] = (summary[r.category] || 0) + 1; });
+  console.log('\n📊 Recipe Summary:');
+  Object.entries(summary).forEach(([cat, n]) => console.log(`   ${cat}: ${n}`));
 }
 
 // Run the script

@@ -1,0 +1,72 @@
+# Dependencies & build output
+node_modules/
+dist/
+dist-ssr/
+.git/
+
+# Lock files & data exports
+*.lock
+*.csv
+*.xlsx
+
+# Maintenance & migration scripts (not app code)
+*.cjs
+*.mjs
+better-translation-examples.js
+clean-api-only.js
+controlled-expansion.cjs
+debug-strava-clicks.js
+deepl-retranslate.cjs
+diagnose-ocr-errors.js
+expand-api-recipes.js
+export-recipes-to-excel.cjs
+final-merge.cjs
+fix-nordic-pass2.mjs
+fix-nordic.mjs
+fix-ocr-recipes.js
+fix-snacks-portions.mjs
+fix_precise_recipe_images.js
+fix_recipe_images.js
+intelligent-ocr-cleanup.js
+massive-expansion.cjs
+merge-databases.cjs
+mobile-server.cjs
+patch-steps.cjs
+populate-spoonacular-recipes.cjs
+quick-test-spoonacular.cjs
+repair-recipes.cjs
+safe-recipe-cleanup.js
+show-excel-content.cjs
+simple-merge.cjs
+simple-verify.cjs
+test-meal-plans.mjs
+translate-and-populate.cjs
+translate-brand-doc.cjs
+update_ranajky_pdfs.cjs
+update_recipe_images.js
+verify-recipes.cjs
+
+# Python dev servers
+*.py
+
+# Large data directories
+recipe-sources/
+database/
+
+# Infrastructure & deployment (not app code)
+supabase/
+supabase-email-templates/
+supabase-schema/
+netlify/
+admin-panel/
+program-admin/
+
+# Testing artifacts
+testing/
+
+# Generated reports
+ocr-error-report.json
+*.txt
+
+# Nutrition plan source doc
+gabi-nutrition-plan-full.txt

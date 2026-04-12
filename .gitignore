@@ -7,6 +7,7 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependencies & build output
 node_modules
 dist
 dist-ssr
@@ -22,3 +23,62 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Lock files & data exports
+*.csv
+*.xlsx
+
+# Maintenance & migration scripts (not app code)
+*.cjs
+*.mjs
+better-translation-examples.js
+clean-api-only.js
+debug-strava-clicks.js
+diagnose-ocr-errors.js
+expand-api-recipes.js
+export-recipes-to-excel.js
+fix-ocr-recipes.js
+fix_precise_recipe_images.js
+fix_recipe_images.js
+intelligent-ocr-cleanup.js
+mobile-server.js
+ocr-error-report.json
+quick-test-spoonacular.js
+repair-recipes.js
+safe-recipe-cleanup.js
+simple-verify.js
+test-meal-plans.js
+translate-and-populate.js
+translate-brand-doc.js
+update_ranajky_pdfs.js
+update_recipe_images.js
+verify-recipes.js
+
+# Python dev servers
+*.py
+
+# Large data & asset directories
+recipe-sources/
+database/
+
+# Infrastructure & deployment
+supabase/
+supabase-email-templates/
+supabase-schema/
+netlify/
+
+# Admin tooling (standalone HTML tools, not part of app)
+admin-panel/
+program-admin/
+
+# Testing artifacts
+testing/
+
+# Source data
+gabi-nutrition-plan-full.txt
+spoonacular-recipes-*.csv
+spoonacular-recipes-*.xlsx
+.env
+src/data/recipes-backup-*.ts
+generate-recipe-images.cjs
+merge-neome-recipes.cjs

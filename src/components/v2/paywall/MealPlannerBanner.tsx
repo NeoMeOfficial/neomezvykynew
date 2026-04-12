@@ -1,8 +1,5 @@
-import { Button } from "../../ui/button";
-import { Badge } from "../../ui/badge";
-import { Sparkles, ChefHat } from "lucide-react";
+import { ChefHat, Sparkles, Tag } from "lucide-react";
 import { colors, glassCard } from "../../../theme/warmDusk";
-import { SUBSCRIPTION_PLANS } from "../../../data/subscription";
 
 interface MealPlannerBannerProps {
   onPurchase: () => void;
@@ -11,93 +8,69 @@ interface MealPlannerBannerProps {
 
 export function MealPlannerBanner({ onPurchase, className = "" }: MealPlannerBannerProps) {
   return (
-    <div 
-      className={`p-6 mb-6 rounded-3xl ${className}`}
+    <div
+      className={`p-5 mb-4 rounded-3xl ${className}`}
       style={{
         ...glassCard,
         background: `linear-gradient(135deg, ${colors.periodka}08, ${colors.accent}08)`,
       }}
     >
       {/* Header */}
-      <div className="flex items-start gap-4 mb-4">
-        {/* Icon */}
-        <div 
-          className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
+      <div className="flex items-start gap-3 mb-3">
+        <div
+          className="w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0"
           style={{ backgroundColor: `${colors.periodka}20` }}
         >
-          <ChefHat size={24} style={{ color: colors.periodka }} />
+          <ChefHat size={22} style={{ color: colors.periodka }} />
         </div>
-
         <div className="flex-1">
-          {/* Title */}
-          <h3 
-            className="text-lg font-semibold mb-1"
-            style={{ color: colors.textPrimary }}
-          >
-            Personalizované jedálničky
+          <h3 className="text-base font-semibold mb-0.5" style={{ color: colors.textPrimary }}>
+            Personalizovaný jedálniček
           </h3>
-          
-          {/* Badge */}
-          <Badge 
-            className="px-3 py-1 text-xs font-medium border-0 mb-2"
-            style={{ 
-              backgroundColor: `${colors.periodka}20`,
-              color: colors.periodka,
-            }}
-          >
-            <Sparkles size={12} className="mr-1" />
-            Prémiová funkcia
-          </Badge>
+          <p className="text-xs" style={{ color: colors.textSecondary }}>
+            7-dňový plán na mieru — jednorazový nákup
+          </p>
         </div>
       </div>
 
-      {/* Description */}
-      <p 
-        className="text-sm mb-4 leading-relaxed"
-        style={{ color: colors.textSecondary }}
-      >
-        Vytváraj si neobmedzené jedálničky prispôsobené tvojím cieľom, preferenciám a alergénam. 
-        S predplatným máš prístup k všetkým funkciám NeoMe.
-      </p>
-
-      {/* Features list */}
+      {/* Features */}
       <ul className="text-xs mb-4 space-y-1" style={{ color: colors.textSecondary }}>
-        <li>• Prispôsobené tvojím alergénam a diéte</li>
-        <li>• 108+ overených receptov od výživových expertov</li>
-        <li>• Kompletný nákupný zoznam</li>
-        <li>• Kalórie a makroživiny pre každé jedlo</li>
+        <li>• 7-dňový plán prispôsobený tvojim cieľom a alergénam</li>
+        <li>• Porcie prepočítané na tvoje kalorické ciele</li>
+        <li>• Denný prehľad makroživín (bielkoviny / sacharidy / tuky)</li>
+        <li>• Zámiena jedál — 2 možnosti pre každý slot</li>
+        <li>• Export do PDF na tlač / zdieľanie</li>
       </ul>
 
-      {/* CTA */}
-      <div className="flex items-center gap-3">
-        <Button 
-          onClick={onPurchase}
-          className="flex-1 font-medium tracking-wide border-0 shadow-lg"
-          style={{
-            backgroundColor: colors.periodka,
-            color: 'white',
-            boxShadow: `0 4px 16px ${colors.periodka}30`,
-          }}
-        >
-          <Sparkles size={16} className="mr-2" />
-          Získať predplatné €14.90
-        </Button>
-        
-        <div className="text-right">
-          <div 
-            className="text-xs font-medium"
-            style={{ color: colors.textSecondary }}
-          >
-            mesačne
-          </div>
-          <div 
-            className="text-xs"
-            style={{ color: colors.textTertiary }}
-          >
-            neobmedzene
-          </div>
-        </div>
+      {/* Discount badge */}
+      <div
+        className="flex items-center gap-2 px-3 py-2 rounded-xl mb-3"
+        style={{ background: 'rgba(184,134,74,0.10)' }}
+      >
+        <Tag size={13} style={{ color: '#B8864A' }} />
+        <span className="text-xs font-medium" style={{ color: '#B8864A' }}>
+          Zľava €30 dostupná — uplatniteľná priamo v appke
+        </span>
       </div>
+
+      {/* CTA */}
+      <button
+        onClick={onPurchase}
+        className="w-full py-3.5 rounded-2xl font-semibold text-sm tracking-wide transition-all active:scale-[0.98]"
+        style={{
+          backgroundColor: colors.periodka,
+          color: 'white',
+          boxShadow: `0 4px 16px ${colors.periodka}30`,
+        }}
+      >
+        <span className="flex items-center justify-center gap-2">
+          <Sparkles size={15} />
+          Získať jedálniček — €79
+        </span>
+      </button>
+      <p className="text-center text-[10px] mt-2" style={{ color: colors.textTertiary }}>
+        alebo €49 so zľavovým kódom
+      </p>
     </div>
   );
 }

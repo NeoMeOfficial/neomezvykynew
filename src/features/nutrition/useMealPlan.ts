@@ -8,7 +8,14 @@ const STORAGE_KEY = 'neome-meal-plan';
 function loadPlan(): MealPlan | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as MealPlan) : null;
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as MealPlan;
+    // Version guard: old 7-day plans lack totalDays or weeks — clear them
+    if (parsed.totalDays !== 42 || !parsed.weeks || parsed.weeks.length !== 6) {
+      localStorage.removeItem(STORAGE_KEY);
+      return null;
+    }
+    return parsed;
   } catch {
     return null;
   }
@@ -38,12 +45,31 @@ function recalculateDayTotals(day: DayPlan): DayPlan {
   return { ...day, totalCalories, totalProtein, totalCarbs, totalFat };
 }
 
+function getTodayDayIndex(plan: MealPlan): number {
+  const todayStr = new Date().toISOString().split('T')[0];
+  const idx = plan.days.findIndex((d) => d.date === todayStr);
+  return idx >= 0 ? idx : 0;
+}
+
+function getWeekForDay(dayIndex: number): number {
+  return Math.floor(dayIndex / 7);
+}
+
 export function useMealPlan() {
-  const [plan, setPlan] = useState<MealPlan | null>(loadPlan);
+  const initialPlan = loadPlan();
+  const initialDayIndex = initialPlan ? getTodayDayIndex(initialPlan) : 0;
+  const initialWeek = getWeekForDay(initialDayIndex);
+
+  const [plan, setPlan] = useState<MealPlan | null>(initialPlan);
+  const [activeDay, setActiveDay] = useState<number>(initialDayIndex);
+  const [activeWeek, setActiveWeek] = useState<number>(initialWeek);
 
   const generatePlan = useCallback((profile: NutritionProfile, startDate?: Date) => {
     const newPlan = generateMealPlan(profile, startDate);
     setPlan(newPlan);
+    const todayIdx = getTodayDayIndex(newPlan);
+    setActiveDay(todayIdx);
+    setActiveWeek(getWeekForDay(todayIdx));
   }, []);
 
   const swapMeal = useCallback((dayIndex: number, mealIndex: number) => {
@@ -58,7 +84,6 @@ export function useMealPlan() {
       const recipeId = meal.options[meal.selected];
       const recipe = recipes.find((r) => r.id === recipeId);
       if (recipe) {
-        // Keep same target calories (use the original portionMultiplier * old recipe calories)
         const oldRecipeId = meal.options[meal.selected === 0 ? 1 : 0];
         const oldRecipe = recipes.find((r) => r.id === oldRecipeId);
         if (oldRecipe) {
@@ -74,11 +99,30 @@ export function useMealPlan() {
     });
   }, []);
 
+  const handleWeekChange = useCallback((weekIndex: number) => {
+    setActiveWeek(weekIndex);
+    // Move active day to Monday of selected week if current day is not in that week
+    const weekStart = weekIndex * 7;
+    const weekEnd = weekStart + 6;
+    if (activeDay < weekStart || activeDay > weekEnd) {
+      setActiveDay(weekStart);
+    }
+  }, [activeDay]);
+
   const todayPlan = useMemo<DayPlan | null>(() => {
     if (!plan) return null;
     const todayStr = new Date().toISOString().split('T')[0];
     return plan.days.find((d) => d.date === todayStr) ?? null;
   }, [plan]);
 
-  return { plan, generatePlan, swapMeal, todayPlan };
+  return {
+    plan,
+    generatePlan,
+    swapMeal,
+    todayPlan,
+    activeDay,
+    activeWeek,
+    setActiveDay,
+    setActiveWeek: handleWeekChange,
+  };
 }

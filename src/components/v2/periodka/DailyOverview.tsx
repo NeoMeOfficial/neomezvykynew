@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Clock, Utensils, Activity, Brain, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { Clock, Utensils, Activity, Brain, ChevronLeft, ChevronRight, X, Wind, BookOpen, Sparkles } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, addDays, subDays, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek } from 'date-fns';
 import { sk } from 'date-fns/locale';
 import GlassCard from '../GlassCard';
@@ -7,7 +7,9 @@ import { useCycleData } from '../../../features/cycle/useCycleData';
 import {
   getPhaseRanges, getPhaseByDay, getCurrentCycleDay, isFertilityDate
 } from '../../../features/cycle/utils';
-import type { PhaseKey } from '../../../features/cycle/types';
+import type { PhaseKey, PhaseRange } from '../../../features/cycle/types';
+import { generateNutrition, generateMovement } from '../../../lib/cycleTipsGenerator';
+import { generateMindset } from '../../../lib/myselGenerator';
 import { colors } from '../../../theme/warmDusk';
 
 // Symptom interfaces and data
@@ -790,24 +792,56 @@ function DailyOverview() {
   );
 }
 
-// How to Feel Better Section - moved to separate component
-function HowToFeelBetterSection({ phase, lastPeriodStart }: { phase: { key: PhaseKey }, lastPeriodStart: Date | null }) {
-  return lastPeriodStart ? (
-    <div className="space-y-6">
-      {/* How to Feel Better Section */}
-      {lastPeriodStart && (
-        <div className="space-y-4">
-          <div className="flex items-center gap-3 px-1">
-            <span className="text-2xl">✨</span>
-            <h2 className="text-lg font-semibold" style={{ color: colors.textPrimary }}>
-              Ako sa môžeš cítiť lepšie?
-            </h2>
-          </div>
+// How to Feel Better Section - driven by generators for daily variation
+interface HowToFeelBetterProps {
+  phase: { key: PhaseKey };
+  lastPeriodStart: Date | null;
+  currentDay?: number;
+  subphase?: string | null;
+  phaseRanges?: PhaseRange[];
+}
 
-        {/* Nutrition */}
+function HowToFeelBetterSection({ phase, lastPeriodStart, currentDay = 1, subphase = null, phaseRanges = [] }: HowToFeelBetterProps) {
+  const [breathingOpen, setBreathingOpen] = useState(false);
+
+  const nutrition = useMemo(
+    () => generateNutrition(currentDay, phase.key, subphase),
+    [currentDay, phase.key, subphase]
+  );
+  const movement = useMemo(
+    () => generateMovement(currentDay, phase.key, subphase, phaseRanges),
+    [currentDay, phase.key, subphase, phaseRanges]
+  );
+  const mindset = useMemo(
+    () => generateMindset(currentDay, phase.key, subphase),
+    [currentDay, phase.key, subphase]
+  );
+
+  if (!lastPeriodStart) return null;
+
+  // Parse movement bullet lines
+  const movementLines = movement
+    .split('\n')
+    .filter(Boolean)
+    .map(l => l.replace(/^- /, ''));
+
+  // Parse nutrition paragraphs
+  const nutritionParagraphs = nutrition.split('\n\n').filter(Boolean);
+
+  return (
+    <div className="space-y-6">
+      <div className="space-y-4">
+        <div className="flex items-center gap-3 px-1">
+          <span className="text-2xl">✨</span>
+          <h2 className="text-lg font-semibold" style={{ color: colors.textPrimary }}>
+            Ako sa môžeš cítiť lepšie?
+          </h2>
+        </div>
+
+        {/* Strava (Nutrition) */}
         <GlassCard>
           <div className="flex items-start gap-4">
-            <div 
+            <div
               className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
               style={{ backgroundColor: `${colors.strava}20` }}
             >
@@ -818,21 +852,18 @@ function HowToFeelBetterSection({ phase, lastPeriodStart }: { phase: { key: Phas
                 Strava
               </h3>
               <div className="space-y-2">
-                {NUTRITION_TIPS[phase.key].slice(0, 2).map((tip, index) => (
-                  <div key={index} className="flex items-start gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-gray-400 flex-shrink-0 mt-2" />
-                    <p className="text-sm text-gray-700 leading-relaxed">{tip}</p>
-                  </div>
+                {nutritionParagraphs.map((para, i) => (
+                  <p key={i} className="text-sm text-gray-700 leading-relaxed">{para}</p>
                 ))}
               </div>
             </div>
           </div>
         </GlassCard>
 
-        {/* Movement */}
+        {/* Pohyb (Movement) */}
         <GlassCard>
           <div className="flex items-start gap-4">
-            <div 
+            <div
               className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
               style={{ backgroundColor: `${colors.telo}20` }}
             >
@@ -843,10 +874,10 @@ function HowToFeelBetterSection({ phase, lastPeriodStart }: { phase: { key: Phas
                 Pohyb
               </h3>
               <div className="space-y-2">
-                {MOVEMENT_TIPS[phase.key].slice(0, 2).map((tip, index) => (
-                  <div key={index} className="flex items-start gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-gray-400 flex-shrink-0 mt-2" />
-                    <p className="text-sm text-gray-700 leading-relaxed">{tip}</p>
+                {movementLines.map((line, i) => (
+                  <div key={i} className="flex items-start gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-2" style={{ backgroundColor: colors.telo }} />
+                    <p className="text-sm text-gray-700 leading-relaxed">{line}</p>
                   </div>
                 ))}
               </div>
@@ -854,10 +885,10 @@ function HowToFeelBetterSection({ phase, lastPeriodStart }: { phase: { key: Phas
           </div>
         </GlassCard>
 
-        {/* Mindset */}
+        {/* Myseľ (Mindset) */}
         <GlassCard>
           <div className="flex items-start gap-4">
-            <div 
+            <div
               className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
               style={{ backgroundColor: `${colors.mysel}20` }}
             >
@@ -867,21 +898,56 @@ function HowToFeelBetterSection({ phase, lastPeriodStart }: { phase: { key: Phas
               <h3 className="font-semibold text-base mb-3" style={{ color: colors.mysel }}>
                 Myseľ
               </h3>
-              <div className="space-y-2">
-                {MINDSET_TIPS[phase.key].slice(0, 2).map((tip, index) => (
-                  <div key={index} className="flex items-start gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-gray-400 flex-shrink-0 mt-2" />
-                    <p className="text-sm text-gray-700 leading-relaxed">{tip}</p>
-                  </div>
-                ))}
+
+              {/* Affirmation */}
+              <div className="mb-3 p-3 rounded-xl" style={{ backgroundColor: `${colors.mysel}15` }}>
+                <div className="flex items-center gap-2 mb-1">
+                  <Sparkles className="w-3.5 h-3.5" style={{ color: colors.mysel }} />
+                  <span className="text-xs font-medium uppercase tracking-wide" style={{ color: colors.mysel }}>Mantra dňa</span>
+                </div>
+                <p className="text-sm font-medium italic leading-relaxed" style={{ color: colors.textPrimary }}>
+                  „{mindset.affirmation}"
+                </p>
               </div>
+
+              {/* Reframe */}
+              <div className="mb-3">
+                <p className="text-sm text-gray-700 leading-relaxed">{mindset.reframe}</p>
+              </div>
+
+              {/* Journal prompt */}
+              <div className="flex items-start gap-2 mb-3">
+                <BookOpen className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: colors.mysel }} />
+                <div>
+                  <span className="text-xs font-medium uppercase tracking-wide block mb-0.5" style={{ color: colors.mysel }}>Žurnál</span>
+                  <p className="text-sm text-gray-700 leading-relaxed">{mindset.journalPrompt}</p>
+                </div>
+              </div>
+
+              {/* Breathing — collapsible */}
+              <button
+                onClick={() => setBreathingOpen(o => !o)}
+                className="flex items-center gap-2 w-full text-left"
+              >
+                <Wind className="w-4 h-4 flex-shrink-0" style={{ color: colors.mysel }} />
+                <span className="text-xs font-medium uppercase tracking-wide" style={{ color: colors.mysel }}>
+                  {mindset.breathing.name}
+                </span>
+                <span className="ml-auto text-xs" style={{ color: colors.textSecondary }}>
+                  {breathingOpen ? '▲' : '▼'}
+                </span>
+              </button>
+              {breathingOpen && (
+                <div className="mt-2 pl-6">
+                  <p className="text-sm text-gray-600 leading-relaxed">{mindset.breathing.steps}</p>
+                </div>
+              )}
             </div>
           </div>
         </GlassCard>
       </div>
-      )}
     </div>
-  ) : null;
+  );
 }
 
 // Export both components

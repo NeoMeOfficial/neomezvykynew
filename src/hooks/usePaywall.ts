@@ -20,6 +20,8 @@ export function usePaywall() {
     limitType: 'content',
   });
 
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
+
   const closePaywall = useCallback(() => {
     setPaywallState(prev => ({ ...prev, isOpen: false }));
   }, []);
@@ -61,17 +63,25 @@ export function usePaywall() {
     });
   }, []);
 
-  // Handle upgrade action (mock for now)
-  const handleUpgrade = useCallback((selectedTier: 'neome_plus' | 'program_bundle' | 'meal_planner_tokens') => {
-    // In real app, this would redirect to Stripe checkout
-    console.log(`Upgrading to: ${selectedTier}`);
-    
-    // Mock: close paywall and show success message
+  const openCheckout = useCallback(() => {
     closePaywall();
-    
-    // TODO: Implement actual Stripe integration
-    alert(`Presmerovanie na platbu pre ${selectedTier}... (Mock)`);
+    setCheckoutOpen(true);
   }, [closePaywall]);
+
+  const closeCheckout = useCallback(() => {
+    setCheckoutOpen(false);
+  }, []);
+
+  // Handle upgrade action
+  const handleUpgrade = useCallback((selectedTier: 'neome_plus' | 'program_bundle' | 'meal_planner_tokens') => {
+    if (selectedTier === 'meal_planner_tokens') {
+      openCheckout();
+      return;
+    }
+    // For other tiers: placeholder (Stripe not yet wired)
+    closePaywall();
+    console.log(`Upgrading to: ${selectedTier}`);
+  }, [closePaywall, openCheckout]);
 
   // Check if user needs to see data save warning
   const shouldShowDataSaveWarning = useCallback((): boolean => {
@@ -109,5 +119,10 @@ export function usePaywall() {
     // Actions
     closePaywall,
     handleUpgrade,
+
+    // Checkout
+    checkoutOpen,
+    openCheckout,
+    closeCheckout,
   };
 }

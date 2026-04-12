@@ -1,5 +1,7 @@
-import { createContext, useContext, type ReactNode } from 'react';
+import { createContext, useContext, useState, type ReactNode } from 'react';
 import type { Subscription, SubscriptionTier, SubscriptionLimits } from '../types/subscription';
+
+const MEAL_PLANNER_KEY = 'neome_meal_planner_purchased';
 
 interface SubscriptionContextType {
   subscription: Subscription;
@@ -10,6 +12,7 @@ interface SubscriptionContextType {
   getRemainingCount: (contentType: 'exercises' | 'recipes' | 'meditations' | 'stretches') => Promise<number | null>;
   canUseMealPlanner: boolean;
   mealPlannerTokens: number;
+  purchaseMealPlanner: () => void;
   checkContentAccess: (contentType: 'recipes' | 'exercises' | 'meditations' | 'stretches') => Promise<{
     canAccess: boolean;
     usedCount: number;
@@ -22,11 +25,19 @@ interface SubscriptionContextType {
 const SubscriptionContext = createContext<SubscriptionContextType | null>(null);
 
 export function SubscriptionProvider({ children }: { children: ReactNode }) {
-  // Simple mock data without any async calls
+  const [mealPlannerPurchased, setMealPlannerPurchased] = useState<boolean>(() => {
+    return localStorage.getItem(MEAL_PLANNER_KEY) === 'true';
+  });
+
+  const purchaseMealPlanner = () => {
+    localStorage.setItem(MEAL_PLANNER_KEY, 'true');
+    setMealPlannerPurchased(true);
+  };
+
   const subscription: Subscription = {
     tier: 'premium',
     active: true,
-    mealPlannerTokens: 100,
+    mealPlannerTokens: mealPlannerPurchased ? 100 : 0,
   };
 
   const limits: SubscriptionLimits = {
@@ -36,7 +47,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     maxStretches: 999,
     canSaveData: true,
     hasPrograms: true,
-    hasMealPlanner: true,
+    hasMealPlanner: mealPlannerPurchased,
   };
 
   const contextValue: SubscriptionContextType = {
@@ -46,8 +57,9 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     loading: false,
     canAccess: () => true,
     getRemainingCount: async () => 999,
-    canUseMealPlanner: true,
-    mealPlannerTokens: 100,
+    canUseMealPlanner: mealPlannerPurchased,
+    mealPlannerTokens: mealPlannerPurchased ? 100 : 0,
+    purchaseMealPlanner,
     checkContentAccess: async () => ({
       canAccess: true,
       usedCount: 0,

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Potvrď svoju emailovú adresu — NeoMe</title>
+</head>
+<body style="margin:0;padding:0;background-color:#F0E6DA;font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+
+  <!-- Outer wrapper -->
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#F0E6DA;padding:40px 16px;">
+    <tr>
+      <td align="center">
+
+        <!-- Card -->
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;background-color:rgba(255,255,255,0.85);border-radius:24px;border:1px solid rgba(255,255,255,0.5);box-shadow:0 8px 32px rgba(0,0,0,0.06),0 2px 4px rgba(0,0,0,0.02);overflow:hidden;">
+
+          <!-- Top accent bar -->
+          <tr>
+            <td style="height:4px;background:linear-gradient(90deg,#6B4C3B,#B8864A,#7A9E78,#A8848B,#C27A6E);"></td>
+          </tr>
+
+          <!-- Logo / Brand -->
+          <tr>
+            <td align="center" style="padding:36px 32px 8px;">
+              <div style="font-size:28px;font-weight:700;color:#2E2218;letter-spacing:1px;">
+                Neo<span style="color:#B8864A;">Me</span>
+              </div>
+              <div style="font-size:12px;color:#8B7560;letter-spacing:2px;text-transform:uppercase;margin-top:4px;">
+                Tvoja cesta k lepšiemu ja
+              </div>
+            </td>
+          </tr>
+
+          <!-- Divider -->
+          <tr>
+            <td style="padding:16px 32px 0;">
+              <div style="height:1px;background:linear-gradient(90deg,transparent,#D0BCA8,transparent);"></div>
+            </td>
+          </tr>
+
+          <!-- Greeting -->
+          <tr>
+            <td style="padding:24px 32px 0;text-align:center;">
+              <div style="font-size:20px;font-weight:600;color:#2E2218;">
+                Vitaj v NeoMe! 👋
+              </div>
+            </td>
+          </tr>
+
+          <!-- Body text -->
+          <tr>
+            <td style="padding:16px 32px 0;text-align:center;">
+              <p style="margin:0;font-size:15px;line-height:1.6;color:#8B7560;">
+                Ďakujeme za registráciu. Pre aktiváciu tvojho účtu prosím potvrď svoju emailovú adresu kliknutím na tlačidlo nižšie.
+              </p>
+            </td>
+          </tr>
+
+          <!-- CTA Button -->
+          <tr>
+            <td align="center" style="padding:28px 32px;">
+              <a href="{{ .ConfirmationURL }}"
+                 target="_blank"
+                 style="display:inline-block;background:#B8864A;color:#FFFFFF;font-size:15px;font-weight:600;letter-spacing:0.5px;text-decoration:none;padding:14px 40px;border-radius:50px;box-shadow:0 4px 16px rgba(184,134,74,0.3);">
+                Potvrdiť email
+              </a>
+            </td>
+          </tr>
+
+          <!-- Secondary text -->
+          <tr>
+            <td style="padding:0 32px 8px;text-align:center;">
+              <p style="margin:0;font-size:13px;line-height:1.5;color:#A0907E;">
+                Ak tlačidlo nefunguje, skopíruj a vlož tento odkaz do prehliadača:
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:0 32px 24px;text-align:center;word-break:break-all;">
+              <a href="{{ .ConfirmationURL }}" style="font-size:12px;color:#B8864A;text-decoration:underline;">
+                {{ .ConfirmationURL }}
+              </a>
+            </td>
+          </tr>
+
+          <!-- Divider -->
+          <tr>
+            <td style="padding:0 32px;">
+              <div style="height:1px;background:linear-gradient(90deg,transparent,#D0BCA8,transparent);"></div>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding:20px 32px 28px;text-align:center;">
+              <p style="margin:0;font-size:12px;color:#A0907E;line-height:1.5;">
+                Tento email ti bol odoslaný, pretože si sa zaregistroval/a na
+                <span style="color:#B8864A;font-weight:500;">NeoMe</span>.<br>
+                Ak si sa neregistroval/a, tento email môžeš ignorovať.
+              </p>
+              <p style="margin:12px 0 0;font-size:11px;color:#A0907E;">
+                © 2026 NeoMe · neome.com.au
+              </p>
+            </td>
+          </tr>
+
+        </table>
+        <!-- /Card -->
+
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>

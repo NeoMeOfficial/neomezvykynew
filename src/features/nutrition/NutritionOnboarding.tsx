@@ -7,12 +7,13 @@ const PRIMARY = '#6B4C3B';
 const ACCENT = '#B8864A';
 const MUTED = '#777';
 const MUTED_LIGHT = '#888';
-const TOTAL_STEPS = 7;
+const TOTAL_STEPS = 8;
 
 type Goal = 'lose' | 'maintain' | 'gain';
 type Activity = 'sedentary' | 'light' | 'moderate' | 'active';
 type Diet = 'normal' | 'vegetarian' | 'vegan';
 type Allergy = 'gluten' | 'dairy' | 'nuts' | 'eggs' | 'soy';
+type FavMeal = 'ranajky' | 'obed' | 'vecera' | 'snack';
 
 const ACTIVITY_MULTIPLIER: Record<Activity, number> = {
   sedentary: 1.2,
@@ -212,6 +213,11 @@ export default function NutritionOnboarding({
   const [meals, setMeals] = useState<3 | 4 | 5 | null>(null);
   const [diet, setDiet] = useState<Diet>('normal');
   const [allergies, setAllergies] = useState<Set<Allergy>>(new Set());
+  const [favMeal, setFavMeal] = useState<FavMeal>('obed');
+  const [likedIngredients, setLikedIngredients] = useState<string[]>([]);
+  const [dislikedIngredients, setDislikedIngredients] = useState<string[]>([]);
+  const [likedInput, setLikedInput] = useState('');
+  const [dislikedInput, setDislikedInput] = useState('');
   const [startDate, setStartDate] = useState<Date | null>(null);
   const mondays = getNextMondays(4);
 
@@ -221,9 +227,10 @@ export default function NutritionOnboarding({
       case 2: return weight !== '' && height !== '' && age !== '';
       case 3: return activity !== null;
       case 4: return meals !== null;
-      case 5: return true;
-      case 6: return true;
-      case 7: return startDate !== null;
+      case 5: return true; // diet / allergies
+      case 6: return true; // preferences (liked / disliked / fav meal)
+      case 7: return true; // summary
+      case 8: return startDate !== null;
       default: return false;
     }
   };
@@ -255,11 +262,24 @@ export default function NutritionOnboarding({
       mealsPerDay: meals!,
       dietType: diet === 'normal' ? 'standard' : diet,
       allergies: Array.from(allergies),
+      likedIngredients,
+      dislikedIngredients,
+      favouriteMealOfDay: favMeal,
       dailyCalories: cal,
       dailyProtein: macros.protein,
       dailyCarbs: macros.carbs,
       dailyFat: macros.fat,
     }, startDate!);
+  };
+
+  const addIngredient = (list: string[], setList: (v: string[]) => void, input: string, setInput: (v: string) => void) => {
+    const val = input.trim().replace(/,+$/, '');
+    if (val && !list.includes(val)) setList([...list, val]);
+    setInput('');
+  };
+
+  const removeIngredient = (list: string[], setList: (v: string[]) => void, item: string) => {
+    setList(list.filter((i) => i !== item));
   };
 
   const toggleAllergy = (a: Allergy) => {
@@ -429,7 +449,100 @@ export default function NutritionOnboarding({
     </>
   );
 
-  const renderStep6 = () => {
+  const renderStep6 = () => (
+    <>
+      <div style={s.title}>Tvoje preferencie</div>
+
+      {/* Favourite meal of day */}
+      <div style={{ fontSize: 12, color: MUTED, marginBottom: 10 }}>Obľúbené jedlo dňa</div>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 24 }}>
+        {([
+          { key: 'ranajky' as const, label: 'Raňajky', emoji: '☕' },
+          { key: 'obed' as const, label: 'Obed', emoji: '🍽️' },
+          { key: 'vecera' as const, label: 'Večera', emoji: '🌙' },
+          { key: 'snack' as const, label: 'Snack', emoji: '🍎' },
+        ]).map((o) => (
+          <button
+            key={o.key}
+            onClick={() => setFavMeal(o.key)}
+            style={{ ...s.chip, ...(favMeal === o.key ? s.chipSelected : {}) }}
+          >
+            {o.emoji} {o.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Liked ingredients */}
+      <div style={{ fontSize: 12, color: MUTED, marginBottom: 6 }}>Čo ti chutí? (voliteľné)</div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
+        {likedIngredients.map((item) => (
+          <button
+            key={item}
+            onClick={() => removeIngredient(likedIngredients, setLikedIngredients, item)}
+            style={{ ...s.chip, ...s.chipSelected, fontSize: 11 }}
+          >
+            {item} ×
+          </button>
+        ))}
+      </div>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
+        <input
+          style={{ ...s.input, flex: 1 }}
+          value={likedInput}
+          onChange={(e) => setLikedInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ',') {
+              e.preventDefault();
+              addIngredient(likedIngredients, setLikedIngredients, likedInput, setLikedInput);
+            }
+          }}
+          placeholder="napr. kura, ryža, avokádo"
+        />
+        <button
+          onClick={() => addIngredient(likedIngredients, setLikedIngredients, likedInput, setLikedInput)}
+          style={{ ...s.chip, flexShrink: 0 }}
+        >
+          +
+        </button>
+      </div>
+
+      {/* Disliked ingredients */}
+      <div style={{ fontSize: 12, color: MUTED, marginBottom: 6 }}>Čo vynechať? (voliteľné)</div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
+        {dislikedIngredients.map((item) => (
+          <button
+            key={item}
+            onClick={() => removeIngredient(dislikedIngredients, setDislikedIngredients, item)}
+            style={{ ...s.chip, background: 'rgba(184,134,74,0.08)', borderColor: '#B8864A', color: PRIMARY, fontSize: 11 }}
+          >
+            {item} ×
+          </button>
+        ))}
+      </div>
+      <div style={{ display: 'flex', gap: 8 }}>
+        <input
+          style={{ ...s.input, flex: 1 }}
+          value={dislikedInput}
+          onChange={(e) => setDislikedInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ',') {
+              e.preventDefault();
+              addIngredient(dislikedIngredients, setDislikedIngredients, dislikedInput, setDislikedInput);
+            }
+          }}
+          placeholder="napr. cibuľa, brokolica"
+        />
+        <button
+          onClick={() => addIngredient(dislikedIngredients, setDislikedIngredients, dislikedInput, setDislikedInput)}
+          style={{ ...s.chip, flexShrink: 0 }}
+        >
+          +
+        </button>
+      </div>
+    </>
+  );
+
+  const renderStep7 = () => {
     const cal = calcCalories();
     const macros = calcMacros(cal);
     return (
@@ -460,7 +573,7 @@ export default function NutritionOnboarding({
     );
   };
 
-  const renderStep7 = () => (
+  const renderStep8 = () => (
     <>
       <div style={s.title}>Kedy chceš začať?</div>
       <div style={{ fontSize: 12, color: MUTED, marginBottom: 16 }}>
@@ -489,7 +602,7 @@ export default function NutritionOnboarding({
     </>
   );
 
-  const steps = [renderStep1, renderStep2, renderStep3, renderStep4, renderStep5, renderStep6, renderStep7];
+  const steps = [renderStep1, renderStep2, renderStep3, renderStep4, renderStep5, renderStep6, renderStep7, renderStep8];
 
   return (
     <div style={s.wrap}>
@@ -514,7 +627,7 @@ export default function NutritionOnboarding({
 
       {/* CTA — always visible at bottom */}
       <div style={s.footer}>
-        {step < 7 ? (
+        {step < 8 ? (
           <button
             style={{ ...s.nextBtn, opacity: canNext() ? 1 : 0.4, width: '100%' }}
             disabled={!canNext()}

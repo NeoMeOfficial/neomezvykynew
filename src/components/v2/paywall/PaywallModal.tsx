@@ -53,9 +53,9 @@ export function PaywallModal({
           {
             tier: 'meal_planner_tokens' as const,
             icon: Sparkles,
-            name: 'Jedálničky',
-            price: `€14.90/mesiac`,
-            description: '1 token = 1 personalizovaný jedálniček',
+            name: '6-týždňový jedálniček',
+            price: `€79 jednorazovo`,
+            description: 'Kompletný plán na mieru · alebo €49 so zľavovým kódom',
             color: colors.periodka,
             primary: true,
           },

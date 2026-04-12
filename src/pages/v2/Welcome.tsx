@@ -15,7 +15,7 @@ export default function Welcome() {
       />
       
       {/* Content - Button fixed at bottom */}
-      <div className="absolute bottom-0 left-0 right-0 z-10 p-6 pb-safe">
+      <div className="absolute bottom-0 left-0 right-0 z-10 p-6 pb-10">
         {/* CTA Button - Always at bottom of screen */}
         <button
           onClick={() => {

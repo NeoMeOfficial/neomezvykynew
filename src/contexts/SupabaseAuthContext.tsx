@@ -29,9 +29,31 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Demo mode - no Supabase initialization
-    console.log('🎯 Demo Mode: Supabase disabled, using local state only');
-    setLoading(false);
+    if (!isSupabaseConfigured()) {
+      console.log('🎯 Demo Mode: Supabase not configured, using localStorage fallback');
+      setLoading(false);
+      return;
+    }
+
+    // Real Supabase auth initialization
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      if (session?.user) loadUserProfile(session.user.id);
+      setLoading(false);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        loadUserProfile(session.user.id);
+      } else {
+        setProfile(null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const loadUserProfile = async (userId: string) => {

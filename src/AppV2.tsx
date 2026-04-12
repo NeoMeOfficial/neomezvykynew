@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-// import { SupabaseAuthProvider, useSupabaseAuth } from './contexts/SupabaseAuthContext';
+import { SupabaseAuthProvider } from './contexts/SupabaseAuthContext';
 import { SubscriptionProvider } from './contexts/SubscriptionContext';
 import { SubscriptionProvider as SimpleSubscriptionProvider } from './contexts/SimpleSubscriptionContext';
 import AppLayout from './layouts/v2/AppLayout';
@@ -106,14 +106,24 @@ function LoadingSpinner() {
   );
 }
 
-/* Disabled auth guard - always allow access */
+/* Auth guard — enforces login when Supabase is configured, open in demo mode */
 function RequireAuth({ children }: { children: React.ReactNode }) {
-  // Always allow access - no auth checks
+  const supabaseConfigured = !!(import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY);
+  if (!supabaseConfigured) {
+    // Demo mode: always allow access
+    return <>{children}</>;
+  }
+  // With real Supabase: check for active session via localStorage key set by Supabase SDK
+  const hasSession = !!localStorage.getItem('sb-' + new URL(import.meta.env.VITE_SUPABASE_URL).hostname.split('.')[0] + '-auth-token');
+  if (!hasSession) {
+    return <Navigate to="/auth" replace />;
+  }
   return <>{children}</>;
 }
 
 export default function AppV2() {
   return (
+    <SupabaseAuthProvider>
     <SimpleSubscriptionProvider>
       <BrowserRouter>
         <Suspense fallback={<LoadingSpinner />}>
@@ -121,9 +131,9 @@ export default function AppV2() {
             {/* Public routes */}
             <Route path="/auth-demo" element={<AuthDemo />} />
             <Route path="/auth-real" element={<AuthReal />} />
-            <Route path="/auth" element={<Navigate to="/auth-demo" replace />} />
-            <Route path="/register" element={<Navigate to="/auth-demo" replace />} />
-            <Route path="/login" element={<Navigate to="/auth-demo" replace />} />
+            <Route path="/auth" element={<AuthReal />} />
+            <Route path="/register" element={<AuthReal />} />
+            <Route path="/login" element={<AuthReal />} />
             <Route path="/design" element={<DesignShowcase />} />
             <Route path="/design2" element={<DesignShowcase2 />} />
             <Route path="/design3" element={<DesignShowcase3 />} />
@@ -199,5 +209,6 @@ export default function AppV2() {
           </Suspense>
       </BrowserRouter>
     </SimpleSubscriptionProvider>
+    </SupabaseAuthProvider>
   );
 }

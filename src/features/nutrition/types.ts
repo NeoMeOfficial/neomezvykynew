@@ -11,6 +11,10 @@ export interface NutritionProfile {
   dailyProtein: number;
   dailyCarbs: number;
   dailyFat: number;
+  // Preference fields
+  likedIngredients: string[];
+  dislikedIngredients: string[];
+  favouriteMealOfDay: 'ranajky' | 'obed' | 'vecera' | 'snack';
 }
 
 export interface MealSlot {
@@ -30,8 +34,19 @@ export interface DayPlan {
   totalFat: number;
 }
 
+export interface WeekMeta {
+  weekNumber: number;  // 1–6
+  startDate: string;   // YYYY-MM-DD (Monday)
+  endDate: string;     // YYYY-MM-DD (Sunday)
+  dayIndices: [number, number, number, number, number, number, number];
+}
+
 export interface MealPlan {
   generatedAt: string;
   profileHash: string;
-  days: DayPlan[];
+  profile: NutritionProfile;
+  days: DayPlan[];     // 42 items for a 6-week plan
+  weeks: WeekMeta[];   // exactly 6
+  totalDays: 42;
+  endDate: string;     // YYYY-MM-DD
 }

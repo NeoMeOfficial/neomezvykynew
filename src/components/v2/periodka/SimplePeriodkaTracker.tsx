@@ -5,7 +5,7 @@ import { format } from 'date-fns';
 import GlassCard from '../GlassCard';
 import DailyOverview, { HowToFeelBetterSection } from './DailyOverview';
 import { useCycleData } from '../../../features/cycle/useCycleData';
-import { getPhaseRanges, getPhaseByDay, getCurrentCycleDay } from '../../../features/cycle/utils';
+import { getPhaseRanges, getPhaseByDay, getCurrentCycleDay, getSubphase } from '../../../features/cycle/utils';
 // import { usePaywall } from '../../../hooks/useSubscriptionStatus';
 // import PaywallModal from '../subscription/PaywallModal';
 import { colors } from '../../../theme/warmDusk';
@@ -127,16 +127,19 @@ export default function SimplePeriodkaTracker() {
     ? new Date(cycleData.lastPeriodStart + 'T00:00:00') 
     : null;
     
-  // Calculate current phase for "How to Feel Better" section
-  const currentPhase = useMemo(() => {
-    if (!lastPeriodStart) return { key: 'follicular' as const };
-    
+  // Calculate current phase, day, subphase and ranges for "How to Feel Better" section
+  const { currentPhase, currentDay, subphase, phaseRanges } = useMemo(() => {
+    if (!lastPeriodStart) {
+      return { currentPhase: { key: 'follicular' as const }, currentDay: 1, subphase: null, phaseRanges: [] };
+    }
     try {
       const ranges = getPhaseRanges(cycleData.cycleLength || 28, cycleData.periodLength || 5);
-      const currentDay = getCurrentCycleDay(cycleData.lastPeriodStart!, today, cycleData.cycleLength || 28);
-      return getPhaseByDay(currentDay, ranges, cycleData.cycleLength || 28);
+      const day = getCurrentCycleDay(cycleData.lastPeriodStart!, today, cycleData.cycleLength || 28);
+      const phase = getPhaseByDay(day, ranges, cycleData.cycleLength || 28);
+      const { subphase: sub } = getSubphase(day, cycleData.cycleLength || 28, cycleData.periodLength || 5);
+      return { currentPhase: phase, currentDay: day, subphase: sub, phaseRanges: ranges };
     } catch {
-      return { key: 'follicular' as const };
+      return { currentPhase: { key: 'follicular' as const }, currentDay: 1, subphase: null, phaseRanges: [] };
     }
   }, [lastPeriodStart, cycleData, today]);
   
@@ -482,9 +485,12 @@ export default function SimplePeriodkaTracker() {
       </div>
 
       {/* How to Feel Better Section - moved here for better UX flow */}
-      <HowToFeelBetterSection 
-        phase={currentPhase} 
-        lastPeriodStart={lastPeriodStart} 
+      <HowToFeelBetterSection
+        phase={currentPhase}
+        lastPeriodStart={lastPeriodStart}
+        currentDay={currentDay}
+        subphase={subphase}
+        phaseRanges={phaseRanges}
       />
 
       {/* Symptom Intensity Slider */}

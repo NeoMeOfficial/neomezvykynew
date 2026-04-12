@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useCommunityPosts } from '../../hooks/useCommunityPosts';
+import { useSupabaseAuth } from '../../contexts/SupabaseAuthContext';
 import {
   Heart,
   MessageCircle,
@@ -146,10 +148,10 @@ export default function Komunita() {
   const [composerType, setComposerType] = useState<'post' | 'question'>('post');
   const [composerPhoto, setComposerPhoto] = useState<string | null>(null);
 
-  // Feed state
-  const [posts, setPosts] = useState<Post[]>(initialPosts);
-  const [likedIds, setLikedIds] = useState<Set<number>>(new Set());
-  const [nextId, setNextId] = useState(6);
+  // Feed state — backed by Supabase when configured, localStorage seed otherwise
+  const { user } = useSupabaseAuth();
+  const { posts, likedIds, submitPost: submitPostToBackend, toggleLike: toggleLikeBackend } = useCommunityPosts();
+  const [nextId, setNextId] = useState(6); // kept for legacy comment IDs only
   
   // Comments and following state
   const [expandedComments, setExpandedComments] = useState<Set<number>>(new Set());
@@ -180,45 +182,17 @@ export default function Komunita() {
 
   const handleSubmitPost = useCallback(() => {
     if (!composerText.trim()) return;
-    const newPost: Post = {
-      id: nextId,
-      type: composerType,
-      author: 'Katka',
-      text: composerText.trim(),
-      likes: 0,
-      comments: 0,
-      time: 'práve teraz',
-    };
-    if (composerPhoto) (newPost as any).photo = composerPhoto;
-    setPosts((prev) => [newPost, ...prev]);
-    setNextId((n) => n + 1);
+    const authorName = user?.user_metadata?.first_name || user?.email?.split('@')[0] || 'Ty';
+    submitPostToBackend(composerText.trim(), composerType, authorName, user?.id);
     setComposerText('');
     setComposerPhoto(null);
     setComposerExpanded(false);
     setComposerType('post');
-  }, [composerText, composerType, composerPhoto, nextId]);
+  }, [composerText, composerType, composerPhoto, user, submitPostToBackend]);
 
-  const toggleLike = useCallback((id: number) => {
-    const isCurrentlyLiked = likedIds.has(id);
-    
-    setLikedIds((prev) => {
-      const next = new Set(prev);
-      if (isCurrentlyLiked) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
-    
-    setPosts((prev) =>
-      prev.map((p) =>
-        p.id === id
-          ? { ...p, likes: isCurrentlyLiked ? p.likes - 1 : p.likes + 1 }
-          : p
-      )
-    );
-  }, [likedIds]);
+  const toggleLike = useCallback((id: string | number) => {
+    toggleLikeBackend(String(id), user?.id);
+  }, [user, toggleLikeBackend]);
 
   const handleReport = useCallback((postId: number) => {
     const existing = JSON.parse(localStorage.getItem('neome-reports') || '[]');
