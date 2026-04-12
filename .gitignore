@@ -64,7 +64,6 @@ database/
 # Infrastructure & deployment
 supabase/
 supabase-email-templates/
-supabase-schema/
 netlify/
 
 # Admin tooling (standalone HTML tools, not part of app)

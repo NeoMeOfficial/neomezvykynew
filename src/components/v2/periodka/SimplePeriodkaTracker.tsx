@@ -1,13 +1,12 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Settings, X } from 'lucide-react';
-import { format } from 'date-fns';
+import { ArrowLeft, Settings, X, Droplets, Check, Pencil } from 'lucide-react';
+import { format, addDays, differenceInDays } from 'date-fns';
+import { sk } from 'date-fns/locale';
 import GlassCard from '../GlassCard';
 import DailyOverview, { HowToFeelBetterSection } from './DailyOverview';
-import { useCycleData } from '../../../features/cycle/useCycleData';
+import { useCycleData, calculateAverageCycleLength } from '../../../features/cycle/useCycleData';
 import { getPhaseRanges, getPhaseByDay, getCurrentCycleDay, getSubphase } from '../../../features/cycle/utils';
-// import { usePaywall } from '../../../hooks/useSubscriptionStatus';
-// import PaywallModal from '../subscription/PaywallModal';
 import { colors } from '../../../theme/warmDusk';
 
 const SYMPTOMS = [
@@ -116,12 +115,63 @@ function SymptomSlider({ symptom, value, onChange, onClose, onDelete }: SymptomS
 
 export default function SimplePeriodkaTracker() {
   const navigate = useNavigate();
-  const { cycleData } = useCycleData();
+  const { cycleData, updateCycleData, addPeriodToHistory } = useCycleData();
   // Removed paywall for daily engagement - basic symptom tracking should be free
 
   const today = useMemo(() => new Date(), []);
   const todayStr = format(today, 'yyyy-MM-dd');
-  
+
+  // ── Prediction engine ────────────────────────────────────────────────────
+  const prediction = useMemo(() => {
+    if (!cycleData.lastPeriodStart) return null;
+
+    const history = cycleData.history || [];
+    const avg = calculateAverageCycleLength(history);
+    // Use learned average only after ≥3 complete cycles
+    const usingHistory = avg !== null && avg.cycleCount >= 3;
+    const effectiveLength = usingHistory ? avg!.average : (cycleData.cycleLength || 28);
+
+    const anchor = new Date(cycleData.lastPeriodStart + 'T00:00:00');
+    const nextDate = addDays(anchor, effectiveLength);
+    const daysUntil = differenceInDays(nextDate, today);
+
+    return { nextDate, daysUntil, usingHistory, cycleCount: avg?.cycleCount ?? 0 };
+  }, [cycleData.lastPeriodStart, cycleData.history, cycleData.cycleLength, today]);
+
+  // ── Period started today button ──────────────────────────────────────────
+  const periodAlreadyLoggedToday = cycleData.lastPeriodStart === todayStr;
+  const [periodJustLogged, setPeriodJustLogged] = useState(false);
+  const [showFixIt, setShowFixIt] = useState(false);
+  const [fixItDate, setFixItDate] = useState('');
+
+  // 48-hour fix-it window
+  const canFixIt = useMemo(() => {
+    const ts = localStorage.getItem('neome-period-logged-at');
+    return ts ? (Date.now() - parseInt(ts)) < 48 * 60 * 60 * 1000 : false;
+  }, [periodJustLogged, periodAlreadyLoggedToday]);
+
+  const handleLogPeriodToday = useCallback(() => {
+    addPeriodToHistory(todayStr);
+    updateCycleData({ lastPeriodStart: todayStr });
+    localStorage.setItem('neome-period-logged-at', Date.now().toString());
+    setPeriodJustLogged(true);
+    setTimeout(() => setPeriodJustLogged(false), 3000);
+  }, [todayStr, updateCycleData, addPeriodToHistory]);
+
+  const handleFixDate = useCallback(() => {
+    if (!fixItDate) return;
+    // Update history: replace the most recent entry with the corrected date
+    const history = [...(cycleData.history || [])];
+    if (history.length > 0) {
+      history[0] = { ...history[0], startDate: fixItDate };
+    } else {
+      history.push({ startDate: fixItDate });
+    }
+    updateCycleData({ lastPeriodStart: fixItDate, history });
+    setShowFixIt(false);
+    setFixItDate('');
+  }, [fixItDate, cycleData.history, updateCycleData]);
+
   // Get cycle data for HowToFeelBetterSection
   const lastPeriodStart = cycleData.lastPeriodStart 
     ? new Date(cycleData.lastPeriodStart + 'T00:00:00') 
@@ -354,6 +404,141 @@ export default function SimplePeriodkaTracker() {
           </button>
         </div>
       </div>
+
+      {/* ── Predictive banner ── */}
+      {prediction && !periodAlreadyLoggedToday && prediction.daysUntil >= 0 && prediction.daysUntil <= 7 && (
+        <div
+          className="w-full rounded-2xl px-4 py-3"
+          style={{
+            background: prediction.daysUntil <= 2
+              ? `linear-gradient(135deg, ${colors.periodka}18 0%, ${colors.periodka}08 100%)`
+              : 'rgba(255,255,255,0.3)',
+            border: `1px solid ${colors.periodka}${prediction.daysUntil <= 2 ? '40' : '20'}`,
+          }}
+        >
+          <p className="text-sm text-center font-medium" style={{ color: colors.periodka }}>
+            🌸 Orientačne —{' '}
+            {prediction.daysUntil === 0
+              ? 'menštruácia sa očakáva dnes'
+              : prediction.daysUntil === 1
+              ? 'menštruácia sa očakáva zajtra'
+              : `menštruácia sa očakáva o ${prediction.daysUntil} dni`}
+          </p>
+          <p className="text-xs text-center mt-0.5" style={{ color: colors.textSecondary }}>
+            {prediction.usingHistory
+              ? `Na základe tvojich posledných ${prediction.cycleCount} cyklov`
+              : 'Na základe tebou zadanej dĺžky cyklu'}
+          </p>
+        </div>
+      )}
+
+      {/* Late period notice */}
+      {prediction && !periodAlreadyLoggedToday && prediction.daysUntil < 0 && (
+        <div
+          className="w-full rounded-2xl px-4 py-3"
+          style={{ background: 'rgba(255,255,255,0.3)', border: `1px solid ${colors.periodka}20` }}
+        >
+          <p className="text-sm text-center" style={{ color: colors.textSecondary }}>
+            Orientačne — menštruácia sa očakávala pred {Math.abs(prediction.daysUntil)} dňami
+          </p>
+        </div>
+      )}
+
+      {/* ── One-tap log button ── */}
+      {!periodAlreadyLoggedToday && (
+        <div className="space-y-2">
+          <button
+            onClick={handleLogPeriodToday}
+            className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl transition-all active:scale-[0.98]"
+            style={{
+              background: periodJustLogged
+                ? 'rgba(122,158,120,0.15)'
+                : `linear-gradient(135deg, ${colors.periodka}22 0%, ${colors.periodka}11 100%)`,
+              border: `1.5px solid ${periodJustLogged ? '#7A9E78' : colors.periodka}55`,
+            }}
+          >
+            {periodJustLogged ? (
+              <>
+                <Check className="w-5 h-5" style={{ color: '#7A9E78' }} />
+                <span className="font-semibold text-sm" style={{ color: '#7A9E78' }}>
+                  Zaznamenaná! Cyklus sledujeme ďalej 🌸
+                </span>
+              </>
+            ) : (
+              <>
+                <Droplets className="w-5 h-5" style={{ color: colors.periodka }} />
+                <span className="font-semibold text-sm" style={{ color: colors.periodka }}>
+                  Dnes mi začala menštruácia
+                </span>
+              </>
+            )}
+          </button>
+        </div>
+      )}
+
+      {/* ── Already logged today ── */}
+      {periodAlreadyLoggedToday && (
+        <div className="space-y-2">
+          <div
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl"
+            style={{ background: 'rgba(194,122,110,0.08)', border: '1px solid rgba(194,122,110,0.2)' }}
+          >
+            <Check className="w-4 h-4" style={{ color: colors.periodka }} />
+            <span className="text-sm font-medium" style={{ color: colors.periodka }}>
+              Menštruácia zaznamenaná na dnes
+            </span>
+          </div>
+
+          {/* Fix-it link — 48h window */}
+          {canFixIt && !showFixIt && (
+            <button
+              onClick={() => { setShowFixIt(true); setFixItDate(cycleData.lastPeriodStart || todayStr); }}
+              className="w-full flex items-center justify-center gap-1.5 py-2"
+            >
+              <Pencil className="w-3.5 h-3.5" style={{ color: colors.textSecondary }} />
+              <span className="text-xs underline" style={{ color: colors.textSecondary }}>
+                Nebol to presne dnes? Opraviť dátum
+              </span>
+            </button>
+          )}
+
+          {/* Fix-it inline date picker */}
+          {showFixIt && (
+            <div
+              className="rounded-2xl p-4 space-y-3"
+              style={{ background: 'rgba(255,255,255,0.5)', border: '1px solid rgba(194,122,110,0.2)' }}
+            >
+              <p className="text-sm font-medium" style={{ color: colors.textPrimary }}>
+                Kedy skutočne začala menštruácia?
+              </p>
+              <input
+                type="date"
+                value={fixItDate}
+                onChange={(e) => setFixItDate(e.target.value)}
+                max={todayStr}
+                className="w-full p-2.5 rounded-xl text-sm outline-none"
+                style={{ background: 'rgba(255,255,255,0.7)', color: colors.textPrimary }}
+              />
+              <div className="flex gap-2">
+                <button
+                  onClick={handleFixDate}
+                  className="flex-1 py-2.5 rounded-xl text-sm font-medium"
+                  style={{ background: colors.periodka, color: 'white' }}
+                >
+                  Uložiť
+                </button>
+                <button
+                  onClick={() => setShowFixIt(false)}
+                  className="px-4 py-2.5 rounded-xl text-sm"
+                  style={{ background: 'rgba(0,0,0,0.06)', color: colors.textSecondary }}
+                >
+                  Zrušiť
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Daily Overview */}
       <DailyOverview />
