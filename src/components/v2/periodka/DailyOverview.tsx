@@ -5,7 +5,7 @@ import { sk } from 'date-fns/locale';
 import GlassCard from '../GlassCard';
 import { useCycleData } from '../../../features/cycle/useCycleData';
 import {
-  getPhaseRanges, getPhaseByDay, getCurrentCycleDay, isFertilityDate
+  getPhaseRanges, getPhaseByDay, getCurrentCycleDay, isFertilityDate, getSubphase
 } from '../../../features/cycle/utils';
 import type { PhaseKey, PhaseRange } from '../../../features/cycle/types';
 import { generateNutrition, generateMovement } from '../../../lib/cycleTipsGenerator';
@@ -75,16 +75,30 @@ const PHASE_NAMES: Record<PhaseKey | 'fertility', string> = {
 const PHASE_DESCRIPTIONS: Record<PhaseKey, string> = {
   menstrual: 'Tvoje telo sa regeneruje a obnovuje. Hladiny estrogénu a progesterónu sú nízke, čo môže spôsobiť únavu a potrebu odpočinku.',
   follicular: 'Energia sa postupne vracia! Estrogén stúpa, čo zlepšuje náladu a motiváciu. Ideálny čas na nové výzvy a projekty.',
-  ovulation: 'Si na vrchole svojej energie! Estrogén dosahuje maximum, cítiš sa sebavedomejšie a sociálnejšie. Najlepší čas na dôležité stretnutia.',
+  ovulation: 'Vrchol energie a sebavedomia. Estrogén je na maximum, telo uvoľňuje vajíčko. Cítiš sa sociálnejšia, komunikatívnejšia a plná sily.',
   luteal: 'Telo sa pripravuje na ďalší cyklus. Progesterón stúpa, môžeš cítiť potrebu spomalenia a starostlivosti o seba.',
+};
+
+// Subphase-specific descriptions for luteal phase
+const LUTEAL_DESCRIPTIONS: Record<'early' | 'late', { short: string; long: string; name: string }> = {
+  early: {
+    name: 'Skorá luteálna fáza',
+    short: 'Progesterón stúpa a telo sa upokojuje. Cítiš sa vyrovnanejšie, môže sa zlepšiť spánok aj trávenie.',
+    long: 'Žlté teliesko (corpus luteum) produkuje progesterón, ktorý dosahuje vrchol zhruba 7 dní po ovulácii. Telo sa pripravuje na možné tehotenstvo — môžeš sa cítiť pokojnejšie a introvertnejšie. Ideálny čas na starostlivosť o seba, oddych a príjemné rutiny.',
+  },
+  late: {
+    name: 'Neskorá luteálna fáza',
+    short: 'Progesterón aj estrogén klesajú. Môžeš pociťovať podráždenosť, únavu alebo nafúknutie — typické príznaky PMS.',
+    long: 'Ak nedošlo k oplodneniu, žlté teliesko sa rozpadá a hladiny progesterónu aj estrogénu rýchlo klesajú. Telo sa pripravuje na menštruáciu. Podráždenosť, plačlivosť, nafúknutie alebo chuť na sladké sú normálna reakcia na hormonálny pokles — nie slabosť.',
+  },
 };
 
 // Short phase explanations for legend clicks with important hormone names
 const PHASE_EXPLANATIONS: Record<PhaseKey | 'fertility', string> = {
   menstrual: 'Estrogén a progesterón sú na najnižšej úrovni, preto máš menštruáciu. Tvoje telo začína pripravovať nové vajíčko na ďalší cyklus. Dopraj si oddych a jemné pohyby.',
   follicular: 'Estrogén postupne rastie a dodáva ti energiu. Vajíčko dozrieva a ty sa cítiš čoraz lepšie. Ideálny čas na nové projekty a aktívny pohyb.',
-  ovulation: 'Estrogén dosahuje vrchol a vajíčko sa uvoľňuje. Si plná energie, sebavedomia a sociálnosti. Najlepší čas na dôležité rozhodnutia a stretnutia.',
-  luteal: 'Progesterón dominuje a upokojuje ťa, pripravuje telo na možnú menštruáciu. Môžeš cítiť potrebu pokoja a starostlivosti o seba.',
+  ovulation: 'Estrogén dosiahol najvyšší bod a telo uvoľňuje vajíčko. LH hormón prudko stúpne a spustí ovuláciu — zvyčajne okolo 14. dňa cyklu. Môžeš si všimnúť zmenu výtoku (priezračnejší, elastickejší) a zvýšenú telesnú teplotu. Toto je tvoje prirodzené okno najvyššej energie.',
+  luteal: 'Pozri subphase popis nižšie.', // Nahradené v renderingu subphase logikou
   fertility: 'Plodné dni začínajú 5 dní pred ovuláciou a trvajú až deň po nej. Šanca na otehotnenie je najvyššia. Spermie môžu v tele prežiť až 5 dní, vajíčko 24 hodín.',
 };
 
@@ -172,6 +186,24 @@ function DayDetailModal({ date, phaseInfo, symptoms, onClose, cycleData }: DayDe
     
     const formattedDate = format(date, 'EEEE, d. MMMM yyyy', { locale: sk });
     const { phase, isFertile } = phaseInfo || { phase: 'follicular' as PhaseKey, isFertile: false };
+
+    // Luteal subphase for this specific date
+    const modalLutealSubphase = useMemo((): 'early' | 'late' => {
+      if (phase !== 'luteal' || !cycleData?.lastPeriodStart) return 'early';
+      try {
+        const dayForDate = getCurrentCycleDay(cycleData.lastPeriodStart, date, cycleData.cycleLength || 28);
+        const { subphase } = getSubphase(dayForDate, cycleData.cycleLength || 28, cycleData.periodLength || 5);
+        return subphase === 'late' ? 'late' : 'early';
+      } catch { return 'early'; }
+    }, [phase, date, cycleData]);
+
+    const modalPhaseName = phase === 'luteal'
+      ? LUTEAL_DESCRIPTIONS[modalLutealSubphase].name
+      : (PHASE_NAMES[phase] || 'Neznáma fáza');
+
+    const modalPhaseExplanation = phase === 'luteal'
+      ? LUTEAL_DESCRIPTIONS[modalLutealSubphase].long
+      : PHASE_EXPLANATIONS[phase];
     
     console.log('✅ Date formatted:', formattedDate, 'Phase:', phase);
   
@@ -249,7 +281,7 @@ function DayDetailModal({ date, phaseInfo, symptoms, onClose, cycleData }: DayDe
                 style={{ backgroundColor: PHASE_COLORS[phase] }}
               />
               <div className="flex flex-col">
-                <h4 className="font-semibold text-gray-800 text-base">{PHASE_NAMES[phase] || 'Neznáma fáza'}</h4>
+                <h4 className="font-semibold text-gray-800 text-base">{modalPhaseName}</h4>
                 {phaseName && (
                   <p className="text-sm text-gray-600 font-medium">
                     {phaseName}
@@ -267,7 +299,7 @@ function DayDetailModal({ date, phaseInfo, symptoms, onClose, cycleData }: DayDe
               )}
             </div>
             <p className="text-sm text-gray-600 leading-relaxed">
-              {PHASE_EXPLANATIONS[phase]}
+              {modalPhaseExplanation}
             </p>
           </div>
           
@@ -538,7 +570,7 @@ function CycleCalendar({ currentDay, cycleLength, periodLength, phase, lastPerio
             ) : phase.key === 'menstrual' ? (
               `Menštruácia ${currentDay} z ${periodLength} dní`
             ) : (
-              `${phase.name} · ${currentDay}. deň cyklu`
+              `${displayPhaseName} · ${currentDay}. deň cyklu`
             )}
           </div>
           
@@ -546,7 +578,7 @@ function CycleCalendar({ currentDay, cycleLength, periodLength, phase, lastPerio
           {lastPeriodStart && (
             <div className="px-4 pb-2">
               <p className="text-sm text-gray-700 leading-relaxed text-center">
-                {PHASE_DESCRIPTIONS[phase.key]}
+                {displayPhaseDescription}
               </p>
             </div>
           )}
@@ -764,7 +796,27 @@ function DailyOverview() {
       }
     }, [currentDay, ranges, cycleLength]);
 
+    // Luteal subphase: early+mid = skorá, late = neskorá
+    const lutealSubphase = useMemo((): 'early' | 'late' => {
+      if (phase.key !== 'luteal') return 'early';
+      try {
+        const { subphase } = getSubphase(currentDay, cycleLength || 28, periodLength || 5);
+        return subphase === 'late' ? 'late' : 'early';
+      } catch {
+        return 'early';
+      }
+    }, [phase.key, currentDay, cycleLength, periodLength]);
+
     const phaseColor = PHASE_COLORS[phase.key] || PHASE_COLORS.follicular;
+
+    // Display name and short description (subphase-aware for luteal)
+    const displayPhaseName = phase.key === 'luteal'
+      ? LUTEAL_DESCRIPTIONS[lutealSubphase].name
+      : PHASE_NAMES[phase.key];
+
+    const displayPhaseDescription = phase.key === 'luteal'
+      ? LUTEAL_DESCRIPTIONS[lutealSubphase].short
+      : PHASE_DESCRIPTIONS[phase.key];
 
     return (
     <div className="space-y-6">
