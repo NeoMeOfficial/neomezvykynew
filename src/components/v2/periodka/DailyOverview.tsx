@@ -373,14 +373,16 @@ function DayDetailModal({ date, phaseInfo, symptoms, onClose, cycleData }: DayDe
 interface CycleCalendarProps {
   currentDay: number;
   cycleLength: number;
-  periodLength: number;  // Added periodLength
+  periodLength: number;
   phase: { key: PhaseKey; name: string };
-  lastPeriodStart: Date | null;  // Can be null if no data
+  lastPeriodStart: Date | null;
   ranges: ReturnType<typeof getPhaseRanges>;
   today: Date;
+  displayPhaseName: string;
+  displayPhaseDescription: string;
 }
 
-function CycleCalendar({ currentDay, cycleLength, periodLength, phase, lastPeriodStart, ranges, today }: CycleCalendarProps) {
+function CycleCalendar({ currentDay, cycleLength, periodLength, phase, lastPeriodStart, ranges, today, displayPhaseName, displayPhaseDescription }: CycleCalendarProps) {
   const [currentMonth, setCurrentMonth] = useState(today);
   const [selectedPhase, setSelectedPhase] = useState<PhaseKey | 'fertility' | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -816,14 +818,16 @@ function DailyOverview() {
 
       {/* Main Calendar Card */}
       <GlassCard className="overflow-hidden">
-        <CycleCalendar 
-          currentDay={currentDay} 
+        <CycleCalendar
+          currentDay={currentDay}
           cycleLength={cycleLength}
           periodLength={periodLength}
           phase={phase}
           lastPeriodStart={lastPeriodStart}
           ranges={ranges}
           today={today}
+          displayPhaseName={displayPhaseName}
+          displayPhaseDescription={displayPhaseDescription}
         />
       </GlassCard>
     </div>
