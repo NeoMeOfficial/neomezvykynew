@@ -161,7 +161,7 @@ export default function JedalnicekPlanner() {
           <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: 'rgba(122,158,120,0.14)' }}>
             <UtensilsCrossed className="w-4 h-4" style={{ color: '#7A9E78' }} />
           </div>
-          <h1 className="text-base font-semibold" style={{ color: '#2E2218' }}>Jedálniček</h1>
+          <h1 className="text-[26px] font-medium leading-tight" style={{ color: '#2E2218', fontFamily: '"Bodoni Moda", Georgia, serif' }}>Jedálniček</h1>
         </div>
         <button
           onClick={() => exportMealPlanPDF(plan)}

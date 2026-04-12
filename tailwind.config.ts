@@ -117,10 +117,12 @@ export default {
 				}
 			},
 			fontFamily: {
-				'heading': ['Raleway', 'sans-serif'],
-				'body': ['Raleway', 'sans-serif'],
-				'caveat': ['Caveat', 'cursive'],
-				'lufga': ['"Plus Jakarta Sans"', 'sans-serif'],
+				// Display/editorial serif — matches NeoMe website headlines
+				'display': ['"Bodoni Moda"', 'Georgia', 'serif'],
+				// Body/UI sans — matches NeoMe website body text
+				'sans': ['"DM Sans"', 'system-ui', 'sans-serif'],
+				// Aliases kept for any legacy references
+				'lufga': ['"DM Sans"', 'system-ui', 'sans-serif'],
 			},
 			fontSize: {
 				// Optimized for readability - minimum 16px for body text on mobile

@@ -378,7 +378,7 @@ export default function SimplePeriodkaTracker() {
   return (
     <div className="w-full min-h-screen px-3 py-6 pb-28 space-y-6" style={{ background: colors.bgGradient }}>
       {/* Header */}
-      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20">
+      <div className="rounded-[20px] p-4" style={{ background: 'rgba(255,255,255,0.22)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid rgba(255,255,255,0.30)', boxShadow: '0 4px 24px rgba(46,34,24,0.07)' }}>
         <div className="flex items-center justify-between">
           <button
             onClick={() => navigate('/domov-new')}
@@ -394,7 +394,7 @@ export default function SimplePeriodkaTracker() {
             >
               <div className="text-lg">🌸</div>
             </div>
-            <h1 className="text-2xl font-bold" style={{ color: colors.periodka }}>
+            <h1 className="text-[26px] font-medium leading-tight" style={{ color: colors.periodka, fontFamily: '"Bodoni Moda", Georgia, serif' }}>
               Periodka
             </h1>
           </div>

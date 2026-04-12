@@ -75,10 +75,10 @@ export default function GreetingHeader() {
   return (
     <div className="flex items-start justify-between">
       <div>
-        <h1 className="text-xl font-bold" style={{ color: colors.textPrimary }}>
+        <h1 className="text-[28px] font-display font-medium leading-tight tracking-tight" style={{ color: colors.textPrimary, fontFamily: '"Bodoni Moda", Georgia, serif' }}>
           {greetingText}
         </h1>
-        <p className="text-[13px] mt-0.5" style={{ color: colors.textSecondary }}>
+        <p className="text-[13px] mt-1 font-light" style={{ color: colors.textSecondary }}>
           {getSubline()}
         </p>
       </div>

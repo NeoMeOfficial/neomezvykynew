@@ -1,7 +1,14 @@
 /**
  * NeoMe — Warm Dusk Design System
  * Single source of truth for all design tokens.
+ * Fonts align with NeoMe-WEB: Bodoni Moda (display) + DM Sans (body).
  */
+
+/** Font families — mirror NeoMe website */
+export const fonts = {
+  display: '"Bodoni Moda", Georgia, serif',
+  sans: '"DM Sans", system-ui, sans-serif',
+} as const;
 
 export const colors = {
   // Section accent colors
@@ -27,14 +34,14 @@ export const colors = {
   phaseLuteal: '#B8864A',
 } as const;
 
-/** Frosted glass card style — the primary card treatment */
+/** Frosted glass card — matches NeoMe website glass recipe */
 export const glassCard: React.CSSProperties = {
-  background: 'rgba(255,255,255,0.28)',
-  backdropFilter: 'blur(40px)',
-  WebkitBackdropFilter: 'blur(40px)',
-  border: '1px solid rgba(255,255,255,0.35)',
-  borderRadius: 24,
-  boxShadow: '0 8px 32px rgba(0,0,0,0.06), 0 2px 4px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.4)',
+  background: 'rgba(255,255,255,0.22)',
+  backdropFilter: 'blur(24px)',
+  WebkitBackdropFilter: 'blur(24px)',
+  border: '1px solid rgba(255,255,255,0.30)',
+  borderRadius: 20,
+  boxShadow: '0 4px 24px rgba(46,34,24,0.07), 0 1px 4px rgba(46,34,24,0.04), inset 0 1px 0 rgba(255,255,255,0.45)',
 };
 
 /** Inner frosted element (cards within cards) */

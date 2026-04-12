@@ -6,7 +6,7 @@ import { colors } from '../../theme/warmDusk';
 export default function AppLayout() {
   return (
     <div 
-      className="min-h-screen font-lufga relative w-full overflow-x-hidden" 
+      className="min-h-screen font-sans relative w-full overflow-x-hidden"
       style={{ background: 'linear-gradient(to bottom, #FAF7F2, #F5F1E8)' }}
     >
       

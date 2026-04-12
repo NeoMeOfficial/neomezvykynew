@@ -29,12 +29,14 @@ function NordicCard({ children, className = "", priority = "standard" }) {
   };
 
   return (
-    <div 
-      className={`bg-white rounded-3xl border-0 transition-all duration-300 hover:-translate-y-1 hover:scale-[1.01] ${className}`}
-      style={{ 
+    <div
+      className={`rounded-[20px] transition-all duration-300 ${className}`}
+      style={{
+        background: 'rgba(255,255,255,0.22)',
+        backdropFilter: 'blur(24px)',
+        WebkitBackdropFilter: 'blur(24px)',
+        border: '1px solid rgba(255,255,255,0.30)',
         boxShadow: shadows[priority],
-        backdropFilter: 'blur(20px)',
-        border: 'none'
       }}
     >
       {children}
@@ -49,12 +51,12 @@ function SectionDivider({ label }) {
   }
   
   return (
-    <div className="flex items-center gap-4 my-12">
-      <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(168, 132, 139, 0.2), transparent)' }} />
-      <span className="text-[10px] font-medium tracking-[0.3em] uppercase px-3" style={{ color: '#A89B8C' }}>
+    <div className="flex items-center gap-4 my-10">
+      <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(184,134,74,0.25), transparent)' }} />
+      <span className="text-[10px] tracking-[0.35em] uppercase px-3 font-light" style={{ color: '#B8864A', fontFamily: '"DM Sans", system-ui, sans-serif' }}>
         {label}
       </span>
-      <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(168, 132, 139, 0.2), transparent)' }} />
+      <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(184,134,74,0.25), transparent)' }} />
     </div>
   );
 }

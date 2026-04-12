@@ -155,7 +155,7 @@ export default function TeloPrograms() {
             <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(107, 76, 59, 0.14)` }}>
               <Dumbbell className="w-4 h-4" style={{ color: '#6B4C3B' }} />
             </div>
-            <h1 className="text-[16px] font-semibold" style={{ color: '#2E2218' }}>Programy</h1>
+            <h1 className="text-[26px] font-medium leading-tight" style={{ color: '#2E2218', fontFamily: '"Bodoni Moda", Georgia, serif' }}>Programy</h1>
           </div>
         </div>
 

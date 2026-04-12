@@ -135,7 +135,7 @@ export default function Mysel() {
             <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(168, 132, 139, 0.14)` }}>
               <Brain className="w-4 h-4" style={{ color: '#A8848B' }} />
             </div>
-            <h1 className="text-[16px] font-semibold" style={{ color: '#2E2218' }}>Myseľ</h1>
+            <h1 className="text-[26px] font-medium leading-tight" style={{ color: '#2E2218', fontFamily: '"Bodoni Moda", Georgia, serif' }}>Myseľ</h1>
           </div>
         </div>
       </div>
