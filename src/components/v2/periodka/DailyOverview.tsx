@@ -28,6 +28,9 @@ const SYMPTOMS = [
   { emoji: '😊', label: 'Nálada', type: 'mood' },
   { emoji: '😴', label: 'Spánok', type: 'sleep' },
   { emoji: '🤕', label: 'Bolesť hlavy', type: 'headache' },
+  { emoji: '🫃', label: 'Nafúknutie', type: 'bloating' },
+  { emoji: '🍫', label: 'Apetít', type: 'appetite' },
+  { emoji: '✨', label: 'Pleť', type: 'skin' },
 ];
 
 const INTENSITY_LABELS = {
@@ -38,6 +41,9 @@ const INTENSITY_LABELS = {
   headache: ['Žiadna', 'Slabá', 'Mierná', 'Normálna', 'Silná', 'Veľmi silná'],
   mood: ['Žiadna', 'Slabá', 'Mierná', 'Normálna', 'Silná', 'Veľmi silná'],
   sleep: ['Žiadny', 'Slabý', 'Mierny', 'Normálny', 'Silný', 'Veľmi silný'],
+  bloating: ['Žiadne', 'Slabé', 'Mierné', 'Normálne', 'Silné', 'Veľmi silné'],
+  appetite: ['Žiadny', 'Slabý', 'Mierny', 'Normálny', 'Silný', 'Veľmi silný'],
+  skin: ['Žiadne', 'Slabé', 'Mierné', 'Normálne', 'Silné', 'Veľmi silné'],
 };
 
 // Load symptom data from localStorage
@@ -98,7 +104,7 @@ const PHASE_EXPLANATIONS: Record<PhaseKey | 'fertility', string> = {
   menstrual: 'Estrogén a progesterón sú na najnižšej úrovni, preto máš menštruáciu. Tvoje telo začína pripravovať nové vajíčko na ďalší cyklus. Dopraj si oddych a jemné pohyby.',
   follicular: 'Estrogén postupne rastie a dodáva ti energiu. Vajíčko dozrieva a ty sa cítiš čoraz lepšie. Ideálny čas na nové projekty a aktívny pohyb.',
   ovulation: 'Estrogén dosiahol najvyšší bod a telo uvoľňuje vajíčko. LH hormón prudko stúpne a spustí ovuláciu — zvyčajne okolo 14. dňa cyklu. Môžeš si všimnúť zmenu výtoku (priezračnejší, elastickejší) a zvýšenú telesnú teplotu. Toto je tvoje prirodzené okno najvyššej energie.',
-  luteal: 'Pozri subphase popis nižšie.', // Nahradené v renderingu subphase logikou
+  luteal: 'Progesterón je na vzostupe a telo sa pripravuje na ďalší cyklus. Môžeš pociťovať zmeny nálady, chute alebo únavu — to je normálne. Dbaj na dostatok spánku a výživu bohatú na horčík.',
   fertility: 'Plodné dni začínajú 5 dní pred ovuláciou a trvajú až deň po nej. Šanca na otehotnenie je najvyššia. Spermie môžu v tele prežiť až 5 dní, vajíčko 24 hodín.',
 };
 
@@ -181,48 +187,33 @@ interface DayDetailModalProps {
 }
 
 function DayDetailModal({ date, phaseInfo, symptoms, onClose, cycleData }: DayDetailModalProps) {
-  try {
-    console.log('🔥 DEBUG: DayDetailModal opening for:', date, phaseInfo, cycleData);
-    
-    const formattedDate = format(date, 'EEEE, d. MMMM yyyy', { locale: sk });
-    const { phase, isFertile } = phaseInfo || { phase: 'follicular' as PhaseKey, isFertile: false };
+  const { phase, isFertile } = phaseInfo || { phase: 'follicular' as PhaseKey, isFertile: false };
 
-    // Luteal subphase for this specific date
-    const modalLutealSubphase = useMemo((): 'early' | 'late' => {
-      if (phase !== 'luteal' || !cycleData?.lastPeriodStart) return 'early';
-      try {
-        const dayForDate = getCurrentCycleDay(cycleData.lastPeriodStart, date, cycleData.cycleLength || 28);
-        const { subphase } = getSubphase(dayForDate, cycleData.cycleLength || 28, cycleData.periodLength || 5);
-        return subphase === 'late' ? 'late' : 'early';
-      } catch { return 'early'; }
-    }, [phase, date, cycleData]);
-
-    const modalPhaseName = phase === 'luteal'
-      ? LUTEAL_DESCRIPTIONS[modalLutealSubphase].name
-      : (PHASE_NAMES[phase] || 'Neznáma fáza');
-
-    const modalPhaseExplanation = phase === 'luteal'
-      ? LUTEAL_DESCRIPTIONS[modalLutealSubphase].long
-      : PHASE_EXPLANATIONS[phase];
-    
-    console.log('✅ Date formatted:', formattedDate, 'Phase:', phase);
-  
-  // Calculate cycle day and phase day for this specific date
-  const { cycleDay, phaseDay, phaseName } = useMemo(() => {
-    console.log('🔍 DEBUG: Calculating phase day for date:', date, 'cycleData:', cycleData, 'phase:', phase);
-    
-    // Early return for missing data
-    if (!cycleData?.lastPeriodStart) {
-      console.log('❌ No lastPeriodStart, returning nulls');
-      return { cycleDay: null, phaseDay: null, phaseName: null };
-    }
-    
+  // Luteal subphase for this specific date
+  const modalLutealSubphase = useMemo((): 'early' | 'late' => {
+    if (phase !== 'luteal' || !cycleData?.lastPeriodStart) return 'early';
     try {
-      // Skip phase day calculation for now - just show basic info
+      const dayForDate = getCurrentCycleDay(cycleData.lastPeriodStart, date, cycleData.cycleLength || 28);
+      const { subphase } = getSubphase(dayForDate, cycleData.cycleLength || 28, cycleData.periodLength || 5);
+      return subphase === 'late' ? 'late' : 'early';
+    } catch { return 'early'; }
+  }, [phase, date, cycleData]);
+
+  const modalPhaseName = phase === 'luteal'
+    ? LUTEAL_DESCRIPTIONS[modalLutealSubphase].name
+    : (PHASE_NAMES[phase] || 'Neznáma fáza');
+
+  const modalPhaseExplanation = phase === 'luteal'
+    ? LUTEAL_DESCRIPTIONS[modalLutealSubphase].long
+    : PHASE_EXPLANATIONS[phase];
+
+  // Calculate cycle day for this specific date
+  const { cycleDay, phaseName } = useMemo(() => {
+    if (!cycleData?.lastPeriodStart) {
+      return { cycleDay: null, phaseName: null };
+    }
+    try {
       const calculatedCycleDay = getCurrentCycleDay(cycleData.lastPeriodStart, date, cycleData.cycleLength || 28);
-      console.log('✅ Calculated cycle day:', calculatedCycleDay);
-      
-      // Simple phase name without complex calculations
       let currentPhaseName = '';
       if (phase === 'menstrual') {
         currentPhaseName = `${calculatedCycleDay}. deň menštruácie`;
@@ -233,27 +224,22 @@ function DayDetailModal({ date, phaseInfo, symptoms, onClose, cycleData }: DayDe
       } else if (phase === 'luteal') {
         currentPhaseName = `Luteálna fáza`;
       }
-      
-      console.log('✅ Generated phase name:', currentPhaseName);
-      
-      return { 
-        cycleDay: calculatedCycleDay, 
-        phaseDay: null, // Simplified - no complex phase day calculation
-        phaseName: currentPhaseName
-      };
-    } catch (error) {
-      console.error('❌ Error calculating phase info:', error);
-      return { cycleDay: null, phaseDay: null, phaseName: null };
+      return { cycleDay: calculatedCycleDay, phaseName: currentPhaseName };
+    } catch {
+      return { cycleDay: null, phaseName: null };
     }
   }, [date, cycleData, phase]);
+
+  const formattedDate = format(date, 'EEEE, d. MMMM yyyy', { locale: sk });
   
+  try { // render guard — does not wrap any hooks
   return (
-    <div 
+    <div
       className="fixed inset-0 z-[9999] bg-black/60"
       onClick={onClose}
     >
       <div className="absolute inset-2 sm:inset-8">
-        <div 
+        <div
           className="bg-white rounded-2xl shadow-2xl border border-gray-200 w-full h-full flex flex-col"
           onClick={(e) => e.stopPropagation()}
         >

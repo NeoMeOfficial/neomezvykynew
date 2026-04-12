@@ -17,6 +17,9 @@ const SYMPTOMS = [
   { emoji: '😊', label: 'Nálada', type: 'mood' },
   { emoji: '😴', label: 'Spánok', type: 'sleep' },
   { emoji: '🤕', label: 'Bolesť hlavy', type: 'headache' },
+  { emoji: '🫃', label: 'Nafúknutie', type: 'bloating' },
+  { emoji: '🍫', label: 'Apetít', type: 'appetite' },
+  { emoji: '✨', label: 'Pleť', type: 'skin' },
 ];
 
 const INTENSITY_LABELS = {
