@@ -88,26 +88,7 @@ export default function Strava() {
   const selectedDay = plan?.days[activeDay] ?? null;
 
   if (showOnboarding) {
-    return (
-      <div className="w-full min-h-screen px-3 py-6 pb-28 space-y-6" style={{ background: colors.bgGradient }}>
-        <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20">
-          <div className="flex items-center gap-3 mb-4">
-            <button onClick={() => setShowOnboarding(false)} className="p-1">
-              <ArrowLeft className="w-5 h-5 text-[#8B7560]" strokeWidth={1.5} />
-            </button>
-            <div className="flex items-center gap-2 flex-1">
-              <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(122, 158, 120, 0.14)` }}>
-                <UtensilsCrossed className="w-4 h-4" style={{ color: '#7A9E78' }} />
-              </div>
-              <h1 className="text-[16px] font-semibold" style={{ color: '#2E2218' }}>Nastavenie jedálnička</h1>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20">
-          <NutritionOnboarding onComplete={handleOnboardingComplete} />
-        </div>
-      </div>
-    );
+    return <NutritionOnboarding onComplete={handleOnboardingComplete} onCancel={() => setShowOnboarding(false)} />;
   }
 
   return (

@@ -316,7 +316,7 @@ function HabitCard({
         {/* Info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <p className={`text-sm font-medium ${isComplete ? 'text-[#A0907E] line-through' : 'text-[#2E2218]'}`}>
+            <p className={`text-sm font-medium ${isComplete ? 'text-[#A0907E]' : 'text-[#2E2218]'}`}>
               {habit.name}
             </p>
             {streak > 0 && (
@@ -566,7 +566,6 @@ export default function HabitTracker({
             )}
             <h3 className="text-[14px] font-semibold" style={{
               color: allDone ? colors.textTertiary : colors.textPrimary,
-              ...(allDone ? { textDecoration: 'line-through' } : {}),
             }}>
               Návyky
             </h3>

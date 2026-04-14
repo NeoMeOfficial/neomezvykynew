@@ -1,7 +1,7 @@
 # Knižnica tipov — Periodka
 ## Schválená verzia (po revízii Gabi)
 
-Celkovo 84 tipov (4 fázy × 3 kategórie × 7 tipov).  
+Celkovo 105 tipov (5 fáz × 3 kategórie × 7 tipov).  
 Všetky tipy sú schválené a pripravené na použitie v aplikácii.
 
 ---
@@ -168,27 +168,83 @@ Všetky tipy sú schválené a pripravené na použitie v aplikácii.
 
 5. Zameraj sa na to, čo chceš dosiahnuť — pracovný projekt, osobný cieľ, tvorivý zámer. Teraz máš na to silu.
 
-6. Dopraj si dostatok spánku, ak sa ti dá, aj napriek vysokej energii — telo v noci spracováva hormonálne zmeny a spánok je stále základ.
+6. Dopraj si dostatok spánku, aj napriek vysokej energii — telo v noci spracováva hormonálne zmeny a spánok je stále základ.
 
 7. Naplánuj si najnáročnejšie úlohy týždňa práve na tieto dni — dôležité rozhovory, pracovné stretnutia, nové projekty. Tvoja prirodzená energia je teraz tvojím najsilnejším nástrojom.
 
 ---
 
-## 🟣 LUTEÁLNA FÁZA (Dni 17–28)
+## 🟣 SKORÁ LUTEÁLNA FÁZA (Dni ~17–22) — progesterón stúpa
 
 ### Strava
 
-1. Komplexné sacharidy — ovsené vločky, sladké zemiaky, quinoa — stabilizujú hladinu cukru a prirodzene zvyšujú serotonín, hormón dobrej nálady.
+1. Progesterón stúpa a s ním rastie aj chuť do jedla — je to normálne. Zaraď komplexné sacharidy ako bataty, quinoa a ovsené vločky, ktoré zasýtia a udržia energiu stabilnú.
 
-2. Horčík znižuje príznaky PMS — nájdeš ho v tmavej čokoláde (min. 70 %), špenáte, mandliach a avokáde.
+2. Horčík je tvojím najlepším spojencom v tejto fáze — pomáha telu spracovať progesterón a znižuje prvé príznaky PMS. Nájdeš ho v mandliach, tmavej čokoláde a listovej zelenine.
 
-3. Vápnik z mliečnych výrobkov alebo fortifikovaných rastlinných nápojov zmierňuje kŕče, nadúvanie a výkyvy nálad pred menštruáciou.
+3. Teplé, výdatné jedlá sa hodia viac než ľahké šaláty — telo sa prirodzene orientuje na zahriate a výživnejšie pokrmy. Polievky, dusené jedlá a pečená zelenina sú ideálne.
 
-4. Obmedz soľ, kávu a alkohol — všetky tri zhoršujú zadržiavanie vody, podráždenosť a úzkosť v luteálnej fáze.
+4. Dostatok bielkovín — vajcia, strukoviny, ryby — stabilizuje hladinu cukru v krvi a pomáha predísť intenzívnym chutiam na sladké neskôr v cykle.
 
-5. Malé, pravidelné jedlá udržia hladinu cukru stabilnú a zredukujú intenzívne chute na sladké.
+5. Fermentované potraviny — kefír, jogurt, kyslá kapusta — podporujú črevný mikrobióm, ktorý hrá kľúčovú úlohu v regulácii progesterónu a nálady.
 
-6. Tryptofán z morčacieho mäsa, vajíčok a orechov podporuje tvorbu serotonínu — prirodzeného stabilizátora nálady.
+6. Obmedz nadmernú konzumáciu kofeínu — progesterón je prirodzene upokojujúci hormón a kofeín môže narúšať jeho efekt a zhoršovať spánok, ktorý je teraz dôležitejší.
+
+7. Vitamín B6 z banánov, morčacieho mäsa a cíceru podporuje produkciu progesterónu a pomáha zvládať prvé výkyvy nálady.
+
+---
+
+### Pohyb
+
+1. Energia ešte dovoľuje stredne intenzívny pohyb — využi to, ale nepretláčaj sa na maximum ako v ovulačnej fáze.
+
+2. Silový tréning s mierne nižšími váhami je stále vhodný — regenerácia sa spomaľuje, takže si daj viac času na oddych medzi sériami.
+
+3. Pilates a jóga sú v tejto fáze obzvlášť príjemné — spájajú silu s uvoľnením a odrážajú pomalšie tempo, ku ktorému sa telo prirodzene obracia.
+
+4. Ak si bežkyňa alebo cyklistka, pokračuj — ale tempo zníž o 10–15 %. Telo pracuje ťažšie pri rovnakej záťaži kvôli vyššej telesnej teplote a progesterónu.
+
+5. Aktivity v prírode — prechádzky v lese, pohyb pri vode — majú silný upokojujúci efekt a dobre ladia s introvertnou náladou tejto fázy.
+
+6. Dbaj na strečing a regeneráciu viac než inokedy — svaly sa zotavujú pomalšie a kvalitné zahriatie aj ochladenie predíde stuhnutosti a bolestiam.
+
+7. Počúvaj telo — ak sa ráno cítiš unavená, je to signál na ľahší deň. Jeden deň odpočinku teraz je múdrejší ako dva dni núteného výkonu.
+
+---
+
+### Myseľ
+
+1. Toto je prirodzený čas na spomalenie a zameranie sa na svoje vnútro — energia sa presúva z vonkajšieho sveta smerom k tebe samej. Nie je to problém, je to fáza.
+
+2. Kreativita sa mení z generovania nových nápadov na dokončovanie a uzatváranie — ideálny čas na finišovanie projektov, nie na začínanie nových.
+
+3. Ak si v predchádzajúcich fázach stanovila ciele, teraz je čas na realistické zhodnotenie — čo sa darí, čo nie, bez sebakritizy.
+
+4. Sociálna energia klesá — je normálne preferovať menšie spoločnosti alebo čas sama. Nenuť sa na spoločenské akcie, ak na ne nemáš chuť.
+
+5. Telesné vnemy sú intenzívnejšie — vnímaš viac detailov, citlivosť je vyššia. Využi to v práci, kde je dôležitá pozornosť a precíznosť.
+
+6. Spánok je v tejto fáze kľúčový — progesterón ho prirodzene podporuje, ale môžeš zažiť živé sny. Vytvor si upokojujúcu večernú rutinu.
+
+7. Naplánuj si čas len pre seba — nie na produktivitu, ale na nabitie. Kniha, kúpeľ, hudba. Telo a myseľ to budú potrebovať čoraz viac.
+
+---
+
+## 🟣 NESKORÁ LUTEÁLNA FÁZA (Dni ~23–28) — všetky hormóny klesajú
+
+### Strava
+
+1. Komplexné sacharidy — ovsené vločky, sladké zemiaky, quinoa — stabilizujú hladinu cukru a prirodzene zvyšujú serotonín, hormón dobrej nálady, ktorého hladina teraz klesá.
+
+2. Horčík zmierňuje príznaky PMS — nájdeš ho v tmavej čokoláde (min. 70 %), špenáte, mandliach a avokáde. Väčšina žien ho má v tejto fáze prirodzene málo.
+
+3. Vápnik z mliečnych výrobkov alebo fortifikovaných rastlinných nápojov zmierňuje kŕče, nafukovanie a výkyvy nálad pred menštruáciou.
+
+4. Obmedz soľ, kávu a alkohol — všetky tri zhoršujú zadržiavanie vody, podráždenosť a úzkosť v tejto fáze výrazne.
+
+5. Malé, pravidelné jedlá udržia hladinu cukru stabilnú a zredukujú intenzívne chute na sladké — namiesto troch veľkých jedál skús päť menších.
+
+6. Tryptofán z morčacieho mäsa, vajíčok a orechov podporuje tvorbu serotonínu — prirodzeného stabilizátora nálady, ktorého hladina teraz klesá.
 
 7. Ak ťa premáhajú chute na čokoládu, daj si tmavú — telo žiada horčík, nie je to slabosť vôle.
 
@@ -196,37 +252,37 @@ Všetky tipy sú schválené a pripravené na použitie v aplikácii.
 
 ### Pohyb
 
-1. Zníž intenzitu a uži si pohyb pre potešenie, nie výkon — jóga, pilates a prechádzky sú teraz ideálne.
+1. Zníž intenzitu výrazne a uži si pohyb pre potešenie, nie výkon — jóga, pilates a prechádzky sú teraz ideálne.
 
-2. Jóga alebo jemný pilates pomáhajú zmierniť napätie v tele a upokojujú nervový systém pred menštruáciou.
+2. Yin jóga alebo restoratívna jóga — kde polohy držíš dlhšie — sú výnimočne účinné na uvoľnenie napätia v panvovej oblasti.
 
-3. Krátka prechádzka po jedle pomáha stabilizovať hladinu cukru v krvi a zmierňuje nadúvanie, ktoré je v tejto fáze časté.
+3. Krátka prechádzka po jedle pomáha stabilizovať hladinu cukru v krvi a zmierňuje nafukovanie, ktoré je v tejto fáze časté.
 
-4. Ak sa necítiš na cvičenie, kratší a miernejší pohyb je stále lepší ako nič — 20-minútová prechádzka robí zázraky.
+4. Ak sa necítiš na cvičenie, kratší a miernejší pohyb je stále lepší ako nič — 20-minútová prechádzka robí skutočné zázraky.
 
-5. Beh alebo cyklistika v miernom tempe sú v poriadku — počúvaj telo a spomaľ, keď to vyžaduje.
+5. Beh alebo cyklistika v miernom tempe sú v poriadku — počúvaj telo a spomaľ, keď to vyžaduje. Rytmický pohyb navyše pomáha regulovať náladu.
 
-6. Vyhni sa silovému tréningu s maximálnymi váhami — regenerácia je pomalšia a riziko zranenia vyššie.
+6. Vyhni sa silovému tréningu s maximálnymi váhami — regenerácia je pomalšia, zápal v tele je vyšší a riziko zranenia tiež.
 
-7. Pohyb vonku v prírode znižuje kortizol, ktorý je v luteálnej fáze prirodzene vyšší — aj 15 minút venku pomôže.
+7. Pohyb vonku v prírode znižuje kortizol, ktorý je v tejto fáze prirodzene vyšší — aj 15 minút vonku má preukázateľný vplyv na náladu.
 
 ---
 
 ### Myseľ
 
-1. Luteálna fáza je čas introvertnosti — je normálne chcieť byť viac doma a menej medzi ľuďmi. Rešpektuj to bez viny.
+1. Je normálne chcieť byť viac doma a menej medzi ľuďmi — telo aj myseľ sa sťahujú dovnútra. Rešpektuj to bez viny.
 
-2. Emócie sú intenzívnejšie — to, čo cítiš, je reálne. Skús to pomenovať bez súdenia: „Som podráždená, pretože som unavená."
+2. Emócie sú najintenzívnejšie v celom cykle — to, čo cítiš, je reálne. Skús to pomenovať bez súdenia: „Som podráždená, pretože som unavená."
 
-3. Denník je najmocnejší nástroj tejto fázy — zapisuj si, čo ťa trápi, čo ti chýba, čo potrebuješ.
+3. Denník je najmocnejší nástroj tejto fázy — zapisuj si, čo ťa trápi, čo ti chýba, čo potrebuješ. Uvidíš, ako sa vzorce opakujú každý mesiac.
 
 4. Nastav hranice — povedz nie záväzkom, ktoré ťa vyčerpávajú. Toto nie je sebeckosť, je to starostlivosť o seba.
 
 5. Ak máš pocit, že toho je priveľa, skús si vytvoriť malý priestor len pre seba — čo i len päť minút ticha, keď idú deti spať.
 
-6. Ak cítiš úzkosť alebo smútok, pomôže malý rituál — čaj, kniha, hudba, krátka meditácia. Kotviaca rutina upokojuje. Dopraj si ju aspoň na pár minút pred spánkom.
+6. Ak cítiš úzkosť alebo smútok, pomôže malý rituál — čaj, kniha, hudba, krátka meditácia. Kotviaca rutina upokojuje, dopraj si ju aspoň na pár minút pred spánkom.
 
-7. Pamätaj: o niekoľko dní sa všetko zmení. Luteálna nálada nie je trvalá pravda o tebe — je to fáza, ktorá prejde.
+7. Pamätaj: o niekoľko dní sa všetko zmení. Nálada luteálnej fázy nie je trvalá pravda o tebe — je to fáza, ktorá prejde.
 
 ---
 

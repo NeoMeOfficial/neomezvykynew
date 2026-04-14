@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Users, Gift, BarChart3, Euro, Dumbbell, Utensils, Music, Flag, MessageSquare,
   Calendar, FolderOpen, Bell, Settings, LogOut, Shield, ChevronRight, Plus,
-  Eye, Trash2, Edit3, TrendingUp, Activity
+  Eye, Trash2, Edit3, TrendingUp, Activity, Send, ArrowLeft
 } from 'lucide-react';
 import { colors } from '../../theme/warmDusk';
 import ContentManager from '../../components/admin/ContentManager';
+import { useAdminMessages } from '../../hooks/useMessages';
 
 // Simple Card component
 const Card = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
@@ -26,6 +27,197 @@ const navigationItems = [
   { id: 'users', label: 'Users', icon: Users, description: 'Account Management' },
   { id: 'referrals', label: 'Referrals', icon: Gift, description: 'Reward Program' },
 ] as const;
+
+// ── MessagesTab: standalone component so hooks are called at the top level ────
+function MessagesTab() {
+  const {
+    conversations, loading, sending,
+    selectedUserId, setSelectedUserId,
+    thread, sendReply, totalUnread,
+  } = useAdminMessages();
+  const [reply, setReply] = React.useState('');
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [thread]);
+
+  const formatTime = (iso: string) => {
+    const d = new Date(iso);
+    const diff = Math.floor((Date.now() - d.getTime()) / 86_400_000);
+    if (diff === 0) return d.toLocaleTimeString('sk-SK', { hour: '2-digit', minute: '2-digit' });
+    if (diff === 1) return 'Včera';
+    return d.toLocaleDateString('sk-SK', { day: 'numeric', month: 'short' });
+  };
+
+  const Card = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
+    <div className={`bg-white/40 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-lg ${className}`}>{children}</div>
+  );
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold" style={{ color: colors.textPrimary }}>
+          Messages
+          {totalUnread > 0 && (
+            <span className="ml-3 px-2 py-0.5 text-sm rounded-full text-white" style={{ background: colors.periodka }}>
+              {totalUnread} new
+            </span>
+          )}
+        </h2>
+      </div>
+
+      <div className="grid grid-cols-3 gap-6" style={{ height: '600px' }}>
+        {/* Conversation list */}
+        <Card className="overflow-hidden flex flex-col !p-0">
+          <div className="px-4 py-3 border-b border-white/20">
+            <h3 className="font-semibold text-sm" style={{ color: colors.textPrimary }}>Conversations</h3>
+          </div>
+          <div className="flex-1 overflow-y-auto">
+            {loading ? (
+              <p className="text-sm p-4" style={{ color: colors.textSecondary }}>Loading…</p>
+            ) : conversations.length === 0 ? (
+              <div className="p-6 text-center">
+                <MessageSquare className="w-8 h-8 mx-auto mb-2" style={{ color: colors.textSecondary }} />
+                <p className="text-sm" style={{ color: colors.textSecondary }}>No messages yet</p>
+              </div>
+            ) : (
+              conversations.map((conv) => (
+                <button
+                  key={conv.user_id}
+                  onClick={() => setSelectedUserId(conv.user_id)}
+                  className="w-full text-left px-4 py-3 border-b border-white/10 hover:bg-white/20 transition-all"
+                  style={selectedUserId === conv.user_id ? { background: 'rgba(184,134,74,0.12)' } : {}}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+                      style={{ background: `linear-gradient(135deg, ${colors.telo}, ${colors.accent})` }}>
+                      U
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-medium truncate" style={{ color: colors.textPrimary }}>
+                          {conv.user_id === 'demo' ? 'Demo User' : conv.user_id.slice(0, 8) + '…'}
+                        </span>
+                        <span className="text-[10px] flex-shrink-0" style={{ color: colors.textTertiary }}>
+                          {formatTime(conv.last_time)}
+                        </span>
+                      </div>
+                      <p className="text-xs truncate mt-0.5" style={{ color: colors.textSecondary }}>
+                        {conv.last_message}
+                      </p>
+                    </div>
+                    {conv.unread > 0 && (
+                      <span className="w-5 h-5 rounded-full text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0"
+                        style={{ background: colors.periodka }}>
+                        {conv.unread}
+                      </span>
+                    )}
+                  </div>
+                </button>
+              ))
+            )}
+          </div>
+        </Card>
+
+        {/* Thread + composer */}
+        <Card className="col-span-2 overflow-hidden flex flex-col !p-0">
+          {!selectedUserId ? (
+            <div className="flex-1 flex items-center justify-center">
+              <div className="text-center">
+                <MessageSquare className="w-10 h-10 mx-auto mb-3" style={{ color: colors.textSecondary }} />
+                <p className="text-sm" style={{ color: colors.textSecondary }}>Select a conversation to reply</p>
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* Thread header */}
+              <div className="px-5 py-3 border-b border-white/20 flex items-center gap-3">
+                <button onClick={() => setSelectedUserId(null)} className="p-1 hover:bg-white/20 rounded-lg">
+                  <ArrowLeft className="w-4 h-4" style={{ color: colors.textSecondary }} />
+                </button>
+                <div className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold"
+                  style={{ background: `linear-gradient(135deg, ${colors.telo}, ${colors.accent})` }}>
+                  U
+                </div>
+                <span className="text-sm font-medium" style={{ color: colors.textPrimary }}>
+                  {selectedUserId === 'demo' ? 'Demo User' : selectedUserId.slice(0, 8) + '…'}
+                </span>
+              </div>
+
+              {/* Messages */}
+              <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3">
+                {thread.map((msg) => {
+                  const isGabi = msg.is_from_admin;
+                  return (
+                    <div key={msg.id} className={`flex ${isGabi ? 'justify-end' : 'justify-start'}`}>
+                      <div className="max-w-[70%]">
+                        <div
+                          className="px-4 py-2.5 text-sm leading-relaxed"
+                          style={{
+                            borderRadius: isGabi ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
+                            background: isGabi ? colors.accent : 'rgba(255,255,255,0.75)',
+                            color: isGabi ? '#fff' : colors.textPrimary,
+                          }}
+                        >
+                          {msg.body}
+                        </div>
+                        <p className={`text-[10px] mt-1 px-1 ${isGabi ? 'text-right' : 'text-left'}`}
+                          style={{ color: colors.textTertiary }}>
+                          {isGabi ? 'Gabi · ' : 'User · '}{formatTime(msg.created_at)}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+                <div ref={bottomRef} />
+              </div>
+
+              {/* Reply composer */}
+              <div className="px-5 py-3 border-t border-white/20 flex items-end gap-2">
+                <textarea
+                  value={reply}
+                  onChange={e => setReply(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      if (reply.trim() && !sending) {
+                        sendReply(selectedUserId, reply.trim());
+                        setReply('');
+                      }
+                    }
+                  }}
+                  placeholder="Reply as Gabi…"
+                  rows={2}
+                  className="flex-1 px-3 py-2 text-sm resize-none rounded-xl outline-none"
+                  style={{
+                    background: 'rgba(255,255,255,0.50)',
+                    border: '1px solid rgba(255,255,255,0.60)',
+                    color: colors.textPrimary,
+                  }}
+                />
+                <button
+                  onClick={() => {
+                    if (reply.trim() && !sending) {
+                      sendReply(selectedUserId, reply.trim());
+                      setReply('');
+                    }
+                  }}
+                  disabled={!reply.trim() || sending}
+                  className="px-4 py-2 rounded-xl text-sm font-medium text-white flex items-center gap-2 transition-opacity"
+                  style={{ background: reply.trim() ? colors.accent : 'rgba(184,134,74,0.35)' }}
+                >
+                  <Send className="w-3.5 h-3.5" />
+                  Send
+                </button>
+              </div>
+            </>
+          )}
+        </Card>
+      </div>
+    </div>
+  );
+}
 
 export default function AdminNew() {
   const navigate = useNavigate();
@@ -937,6 +1129,8 @@ export default function AdminNew() {
     </div>
   );
 
+  const renderMessages = () => <MessagesTab />;
+
   const renderContent = () => {
     switch (activeTab) {
       case 'overview':
@@ -953,6 +1147,8 @@ export default function AdminNew() {
         return renderMeditations();
       case 'community':
         return renderCommunity();
+      case 'messages':
+        return renderMessages();
       case 'users':
         return renderUsers();
       default:

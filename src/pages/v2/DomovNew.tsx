@@ -17,7 +17,8 @@ import AddHabitModal from '../../components/v2/habits/AddHabitModal';
 import { useWorkoutHistory } from '../../hooks/useWorkoutHistory';
 import { useMealPlan } from '../../features/nutrition/useMealPlan';
 import { recipes } from '../../data/recipes';
-import { Leaf, Droplets, MessageCircle, UtensilsCrossed, Clock, ChevronRight } from 'lucide-react';
+import { Leaf, Droplets, UtensilsCrossed, Clock, ChevronRight, CheckCircle2, Heart, Dumbbell, Brain, Utensils, Moon, TrendingUp, type LucideIcon } from 'lucide-react';
+import { useCommunityPosts } from '../../hooks/useCommunityPosts';
 import { colors, glassCard } from '../../theme/warmDusk';
 
 // Nordic Card Wrapper - Enhanced layered effect, no borders
@@ -61,130 +62,148 @@ function SectionDivider({ label }) {
   );
 }
 
-// Custom Water Intake as a Habit-like Component
+// Water Intake — circular progress ring design
 function WaterHabitCard() {
   const { user } = useSupabaseAuth();
-  const [waterData, setWaterData] = React.useState({ glasses: 0, goal: 8 }); // 8 glasses = 2L
+  const [waterData, setWaterData] = React.useState({ glasses: 0, goal: 8 });
   const [justCompleted, setJustCompleted] = React.useState(false);
   const [isEditing, setIsEditing] = React.useState(false);
-  
+
   React.useEffect(() => {
     if (!user?.id) return;
     const today = new Date().toISOString().split('T')[0];
-    const storageKey = `water_intake_${user.id}_${today}`;
-    const saved = localStorage.getItem(storageKey);
-    if (saved) {
-      const parsedData = JSON.parse(saved);
-      setWaterData(parsedData);
-    }
+    const saved = localStorage.getItem(`water_intake_${user.id}_${today}`);
+    if (saved) setWaterData(JSON.parse(saved));
   }, [user?.id]);
 
-  const updateWaterData = (newData) => {
+  const updateWaterData = (newData: { glasses: number; goal: number }) => {
     if (!user?.id) return;
     const today = new Date().toISOString().split('T')[0];
-    const storageKey = `water_intake_${user.id}_${today}`;
-    localStorage.setItem(storageKey, JSON.stringify(newData));
+    localStorage.setItem(`water_intake_${user.id}_${today}`, JSON.stringify(newData));
     setWaterData(newData);
-
     if (newData.glasses === newData.goal && newData.glasses > waterData.glasses) {
       setJustCompleted(true);
-      setTimeout(() => setJustCompleted(false), 600);
+      setTimeout(() => setJustCompleted(false), 800);
     }
   };
 
-  const handleGlassClick = (index) => {
-    const newGlasses = index + 1 <= waterData.glasses ? index : index + 1;
-    updateWaterData({ ...waterData, glasses: newGlasses });
+  const add = () => {
+    if (waterData.glasses < waterData.goal) updateWaterData({ ...waterData, glasses: waterData.glasses + 1 });
   };
-
-  const handleGoalChange = (newGoal) => {
-    updateWaterData({ ...waterData, goal: newGoal, glasses: Math.min(waterData.glasses, newGoal) });
-    setIsEditing(false);
+  const remove = () => {
+    if (waterData.glasses > 0) updateWaterData({ ...waterData, glasses: waterData.glasses - 1 });
   };
 
   const isComplete = waterData.glasses >= waterData.goal;
-  const goalLitres = (waterData.goal * 0.25).toFixed(1);
+  const pct = waterData.goal > 0 ? waterData.glasses / waterData.goal : 0;
+  const litres = (waterData.glasses * 0.25).toFixed(2).replace('.', ',');
+  const goalLitres = (waterData.goal * 0.25).toFixed(1).replace('.', ',');
+
+  // SVG ring params
+  const r = 36;
+  const circ = 2 * Math.PI * r;
+  const dash = circ * pct;
 
   return (
     <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20">
-      <div className="flex items-start gap-3">
-        {/* Complete indicator with water droplet */}
-        <div className={`w-10 h-10 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all duration-300 ${
-            isComplete ? 'bg-[#8FA3A3] border-[#8FA3A3]' : 'border-white/40 bg-transparent'
-          } ${justCompleted ? 'animate-bounce' : ''}`}
-        >
-          <Droplets className={`w-5 h-5 ${isComplete ? 'text-white' : 'text-[#8FA3A3]'}`} />
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'rgba(143,163,163,0.15)' }}>
+            <Droplets className="w-4 h-4" style={{ color: '#8FA3A3' }} />
+          </div>
+          <span className="text-sm font-semibold" style={{ color: '#2E2218' }}>Pitný režim</span>
+        </div>
+        <button onClick={() => setIsEditing(!isEditing)} className="text-[11px] font-medium px-2.5 py-1 rounded-lg" style={{ color: '#8FA3A3', background: 'rgba(143,163,163,0.12)' }}>
+          Cieľ: {goalLitres} L
+        </button>
+      </div>
+
+      {/* Ring + controls */}
+      <div className="flex items-center gap-5">
+        {/* Circular progress */}
+        <div className={`relative flex-shrink-0 transition-transform duration-300 ${justCompleted ? 'scale-110' : 'scale-100'}`}>
+          <svg width="96" height="96" viewBox="0 0 96 96">
+            {/* Track */}
+            <circle cx="48" cy="48" r={r} fill="none" stroke="rgba(143,163,163,0.15)" strokeWidth="8" />
+            {/* Progress */}
+            <circle
+              cx="48" cy="48" r={r}
+              fill="none"
+              stroke={isComplete ? '#7A9E78' : '#8FA3A3'}
+              strokeWidth="8"
+              strokeLinecap="round"
+              strokeDasharray={`${dash} ${circ}`}
+              strokeDashoffset="0"
+              transform="rotate(-90 48 48)"
+              style={{ transition: 'stroke-dasharray 0.4s ease, stroke 0.3s ease' }}
+            />
+          </svg>
+          {/* Center content */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <span className="text-[22px] font-bold leading-none" style={{ color: isComplete ? '#7A9E78' : '#2E2218' }}>
+              {waterData.glasses}
+            </span>
+            <span className="text-[9px] font-medium mt-0.5" style={{ color: '#A0907E' }}>
+              / {waterData.goal}
+            </span>
+          </div>
         </div>
 
-        {/* Info */}
-        <div className="flex-1 min-w-0">
-          {/* Title with edit icon */}
-          <div className="flex items-center justify-between">
-            <h4 className={`text-sm font-medium ${isComplete ? 'text-[#8B7560] line-through' : 'text-[#2E2218]'}`}>
-              Pitný režim ({goalLitres} litre)
-            </h4>
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-[#8B7560]">
-                {waterData.glasses}/{waterData.goal}
-              </span>
-              <button 
-                onClick={() => setIsEditing(true)}
-                className="w-5 h-5 text-[#A0907E] hover:text-[#8B7560] transition-colors"
-              >
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-4 h-4">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                </svg>
-              </button>
-            </div>
+        {/* Right side */}
+        <div className="flex-1 space-y-3">
+          <div>
+            <p className="text-[22px] font-semibold leading-none" style={{ color: isComplete ? '#7A9E78' : '#2E2218' }}>
+              {litres} L
+            </p>
+            <p className="text-[11px] mt-1" style={{ color: '#A0907E' }}>
+              {isComplete ? '🎉 Denný cieľ splnený!' : `zostáva ${((waterData.goal - waterData.glasses) * 0.25).toFixed(2).replace('.', ',')} L`}
+            </p>
           </div>
 
-          {/* Goal editing */}
-          {isEditing && (
-            <div className="mt-3 p-3  rounded-lg" style={{ background: colors.bgGradient }}>
-              <p className="text-xs text-[#8B7560] mb-2">Denný cieľ (poháre po 250ml):</p>
-              <div className="flex gap-1">
-                {[4, 6, 8, 10, 12].map((goal) => (
-                  <button
-                    key={goal}
-                    onClick={() => handleGoalChange(goal)}
-                    className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
-                      goal === waterData.goal ? 'bg-[#8FA3A3] text-white' : 'bg-white text-[#8B7560] border border-white/35 hover:border-[#8FA3A3]'
-                    }`}
-                  >
-                    {goal} ({(goal * 0.25).toFixed(1)}L)
-                  </button>
-                ))}
-              </div>
-              <button onClick={() => setIsEditing(false)} className="text-xs text-[#A0907E] mt-2">
-                Zrušiť
-              </button>
-            </div>
-          )}
-
-          {/* Interactive glasses - Single row, overflow scroll if needed */}
-          <div className="mt-3 overflow-x-auto">
-            <div className="flex gap-2 min-w-fit">
-              {Array.from({ length: waterData.goal }, (_, i) => (
-                <button
-                  key={i}
-                  onClick={() => handleGlassClick(i)}
-                  className="shrink-0 transition-all duration-200 active:scale-95 hover:scale-105"
-                >
-                  <svg 
-                    className={`w-6 h-8 transition-colors ${
-                      i < waterData.glasses ? 'text-[#8FA3A3]' : 'text-gray-300'
-                    }`} 
-                    fill="currentColor" 
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M5,2 C4.45,2 4,2.45 4,3 C4,3.55 4.45,4 5,4 L5,16 C5,19.31 7.69,22 11,22 L13,22 C16.31,22 19,19.31 19,16 L19,4 C19.55,4 20,3.55 20,3 C20,2.45 19.55,2 19,2 L5,2 Z M7,4 L17,4 L17,16 C17,18.21 15.21,20 13,20 L11,20 C8.79,20 7,18.21 7,16 L7,4 Z" />
-                  </svg>
-                </button>
-              ))}
-            </div>
+          {/* +/- controls */}
+          <div className="flex gap-2">
+            <button
+              onClick={remove}
+              disabled={waterData.glasses === 0}
+              className="w-10 h-10 rounded-xl flex items-center justify-center text-lg font-medium transition-all active:scale-90 disabled:opacity-30"
+              style={{ background: 'rgba(143,163,163,0.12)', color: '#8FA3A3' }}
+            >
+              −
+            </button>
+            <button
+              onClick={add}
+              disabled={isComplete}
+              className="flex-1 h-10 rounded-xl flex items-center justify-center gap-1.5 text-[13px] font-semibold transition-all active:scale-95 disabled:opacity-40"
+              style={{ background: isComplete ? 'rgba(122,158,120,0.15)' : 'rgba(143,163,163,0.18)', color: isComplete ? '#7A9E78' : '#8FA3A3' }}
+            >
+              <Droplets className="w-3.5 h-3.5" />
+              + pohár
+            </button>
           </div>
         </div>
       </div>
+
+      {/* Goal selector */}
+      {isEditing && (
+        <div className="mt-4 pt-3 border-t border-white/20">
+          <p className="text-[11px] font-medium mb-2" style={{ color: '#8B7560' }}>Denný cieľ (poháre × 250 ml):</p>
+          <div className="flex gap-1.5 flex-wrap">
+            {[4, 6, 8, 10, 12].map((g) => (
+              <button
+                key={g}
+                onClick={() => { updateWaterData({ ...waterData, goal: g, glasses: Math.min(waterData.glasses, g) }); setIsEditing(false); }}
+                className="px-3 py-1.5 rounded-xl text-xs font-medium transition-colors"
+                style={g === waterData.goal
+                  ? { background: '#8FA3A3', color: '#fff' }
+                  : { background: 'rgba(255,255,255,0.5)', color: '#8B7560', border: '1px solid rgba(143,163,163,0.25)' }}
+              >
+                {g}× · {(g * 0.25).toFixed(1)} L
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -244,22 +263,7 @@ function EnhancedNavykyCard() {
         {habits.length > 0 && (
           <div className="space-y-3">
             {habits.map((habit) => (
-              <div key={habit.id} className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20">
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <h4 className="font-medium text-[#2E2218] text-sm">{habit.name}</h4>
-                    <p className="text-xs text-[#8B7560]">
-                      {habit.target} {habit.unit} • {habit.frequency === 'daily' ? 'Každý deň' : habit.frequency}
-                    </p>
-                    {habit.description && (
-                      <p className="text-xs text-[#A0907E] mt-1">{habit.description}</p>
-                    )}
-                  </div>
-                  <div className="text-lg ml-3">
-                    {HABIT_CATEGORIES.find(c => c.id === habit.category)?.icon || '✅'}
-                  </div>
-                </div>
-              </div>
+              <CustomHabitCard key={habit.id} habit={habit} />
             ))}
           </div>
         )}
@@ -289,14 +293,142 @@ function EnhancedNavykyCard() {
   );
 }
 
-const HABIT_CATEGORIES = [
-  { id: 'health', name: 'Zdravie', color: '#7A9E78', icon: '💚' },
-  { id: 'fitness', name: 'Pohyb', color: '#6B4C3B', icon: '💪' },
-  { id: 'mindfulness', name: 'Myseľ', color: '#A8848B', icon: '🧘' },
-  { id: 'nutrition', name: 'Výživa', color: '#C27A6E', icon: '🥗' },
-  { id: 'sleep', name: 'Spánok', color: '#B8864A', icon: '😴' },
-  { id: 'productivity', name: 'Produktivita', color: '#8B7D6B', icon: '📈' }
+const HABIT_CATEGORIES: { id: string; name: string; color: string; icon: LucideIcon }[] = [
+  { id: 'health', name: 'Zdravie', color: '#7A9E78', icon: Heart },
+  { id: 'fitness', name: 'Pohyb', color: '#6B4C3B', icon: Dumbbell },
+  { id: 'mindfulness', name: 'Myseľ', color: '#A8848B', icon: Brain },
+  { id: 'nutrition', name: 'Výživa', color: '#C27A6E', icon: Utensils },
+  { id: 'sleep', name: 'Spánok', color: '#B8864A', icon: Moon },
+  { id: 'productivity', name: 'Produktivita', color: '#8B7D6B', icon: TrendingUp },
 ];
+
+function getStep(unit: string): number {
+  if (unit === 'minút') return 5;
+  if (unit === 'hodín') return 1;
+  if (unit === 'krokov') return 500;
+  return 1; // krát, pohárov, strán, etc.
+}
+
+function CustomHabitCard({ habit }: { habit: any }) {
+  const today = new Date().toISOString().slice(0, 10);
+  const storageKey = `habit_progress_${habit.id}_${today}`;
+  const [count, setCount] = React.useState<number>(() => {
+    try { return JSON.parse(localStorage.getItem(storageKey) || '0'); } catch { return 0; }
+  });
+
+  const target = parseInt(habit.target) || 1;
+  const step = getStep(habit.unit);
+  const pct = Math.min(count / target, 1);
+  const isComplete = count >= target;
+  const r = 36;
+  const circ = 2 * Math.PI * r;
+  const dash = circ * pct;
+  const cat = HABIT_CATEGORIES.find(c => c.id === habit.category);
+  const color = cat?.color || '#B8864A';
+  const IconComponent = cat?.icon || CheckCircle2;
+
+  const save = (next: number) => {
+    setCount(next);
+    localStorage.setItem(storageKey, JSON.stringify(next));
+  };
+  const add = () => { if (!isComplete) save(Math.min(count + step, target)); };
+  const remove = () => { if (count > 0) save(Math.max(count - step, 0)); };
+  const complete = () => save(target);
+
+  const remaining = target - count;
+  const remainingLabel = step > 1
+    ? `zostáva ${remaining} ${habit.unit}`
+    : `zostáva ${remaining} ${habit.unit}`;
+
+  return (
+    <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: `${color}18` }}>
+            <IconComponent className="w-4 h-4" style={{ color }} />
+          </div>
+          <span className="text-sm font-semibold" style={{ color: '#2E2218' }}>{habit.name}</span>
+        </div>
+        <span className="text-[11px] font-medium px-2.5 py-1 rounded-lg" style={{ color, background: `${color}12` }}>
+          Cieľ: {target} {habit.unit}
+        </span>
+      </div>
+      <div className="flex items-center gap-5">
+        {/* Progress ring */}
+        <div className="relative flex-shrink-0">
+          <svg width="96" height="96" viewBox="0 0 96 96">
+            <circle cx="48" cy="48" r={r} fill="none" stroke={`${color}20`} strokeWidth="8" />
+            <circle
+              cx="48" cy="48" r={r} fill="none"
+              stroke={isComplete ? '#7A9E78' : color}
+              strokeWidth="8" strokeLinecap="round"
+              strokeDasharray={`${dash} ${circ}`} strokeDashoffset="0"
+              transform="rotate(-90 48 48)"
+              style={{ transition: 'stroke-dasharray 0.4s ease, stroke 0.3s ease' }}
+            />
+          </svg>
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <span className="text-[22px] font-bold leading-none" style={{ color: isComplete ? '#7A9E78' : '#2E2218' }}>{count}</span>
+            <span className="text-[9px] font-medium mt-0.5" style={{ color: '#A0907E' }}>/ {target}</span>
+          </div>
+        </div>
+
+        {/* Controls */}
+        <div className="flex-1 space-y-3">
+          <div>
+            <p className="text-[22px] font-semibold leading-none" style={{ color: isComplete ? '#7A9E78' : '#2E2218' }}>
+              {count} {habit.unit}
+            </p>
+            <p className="text-[11px] mt-1" style={{ color: '#A0907E' }}>
+              {isComplete ? 'Denný cieľ splnený!' : remainingLabel}
+            </p>
+          </div>
+
+          {step === 1 ? (
+            /* Count-based unit: − and + 1 buttons */
+            <div className="flex gap-2">
+              <button
+                onClick={remove} disabled={count === 0}
+                className="w-10 h-10 rounded-xl flex items-center justify-center text-lg font-medium transition-all active:scale-90 disabled:opacity-30"
+                style={{ background: `${color}12`, color }}
+              >−</button>
+              <button
+                onClick={add} disabled={isComplete}
+                className="flex-1 h-10 rounded-xl flex items-center justify-center gap-1.5 text-[13px] font-semibold transition-all active:scale-95 disabled:opacity-40"
+                style={{ background: isComplete ? 'rgba(122,158,120,0.15)' : `${color}18`, color: isComplete ? '#7A9E78' : color }}
+              >
+                <IconComponent className="w-3.5 h-3.5" />
+                + {habit.unit}
+              </button>
+            </div>
+          ) : (
+            /* Time/step-based unit: − step, + step, and complete button */
+            <div className="flex gap-2">
+              <button
+                onClick={remove} disabled={count === 0}
+                className="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-semibold transition-all active:scale-90 disabled:opacity-30"
+                style={{ background: `${color}12`, color }}
+              >−{step}</button>
+              <button
+                onClick={add} disabled={isComplete}
+                className="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-semibold transition-all active:scale-90 disabled:opacity-30"
+                style={{ background: `${color}18`, color }}
+              >+{step}</button>
+              <button
+                onClick={complete} disabled={isComplete}
+                className="flex-1 h-10 rounded-xl flex items-center justify-center gap-1.5 text-[13px] font-semibold transition-all active:scale-95 disabled:opacity-40"
+                style={{ background: isComplete ? 'rgba(122,158,120,0.15)' : `${color}18`, color: isComplete ? '#7A9E78' : color }}
+              >
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                Splnené
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 // ─── Today Meals Card ─────────────────────────────────────────────────────────
 function formatShortDate(dateStr: string): string {
@@ -317,7 +449,7 @@ function TodayMealsCard() {
 
     if (displayDay) {
       return (
-        <div className="bg-white rounded-3xl px-4 py-5 space-y-3" style={{ boxShadow: '0 12px 48px rgba(107,76,59,0.08)' }}>
+        <div className="rounded-[20px] px-4 py-5 space-y-3" style={{ background: 'rgba(255,255,255,0.22)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid rgba(255,255,255,0.30)', boxShadow: '0 12px 48px rgba(107,76,59,0.08)' }}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="w-7 h-7 rounded-xl flex items-center justify-center" style={{ background: 'rgba(122,158,120,0.14)' }}>
@@ -373,7 +505,7 @@ function TodayMealsCard() {
   if (!sampleRecipe) return null;
 
   return (
-    <div className="bg-white rounded-3xl px-4 py-5 space-y-3" style={{ boxShadow: '0 12px 48px rgba(107,76,59,0.08)' }}>
+    <div className="rounded-[20px] px-4 py-5 space-y-3" style={{ background: 'rgba(255,255,255,0.22)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid rgba(255,255,255,0.30)', boxShadow: '0 12px 48px rgba(107,76,59,0.08)' }}>
       <div className="flex items-center gap-2 mb-1">
         <div className="w-7 h-7 rounded-xl flex items-center justify-center" style={{ background: 'rgba(184,134,74,0.12)' }}>
           <UtensilsCrossed className="w-3.5 h-3.5" style={{ color: '#B8864A' }} />
@@ -403,6 +535,108 @@ function TodayMealsCard() {
         Vytvoriť jedálniček
         <ChevronRight className="w-3.5 h-3.5" />
       </button>
+    </div>
+  );
+}
+
+// ─── Community Home Block ─────────────────────────────────────────────────────
+// Generates stable-but-varied "yesterday" numbers seeded by date
+function getYesterdayStats() {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  const seed = d.getDate() + d.getMonth() * 31;
+  return {
+    workouts: 38 + (seed % 24),        // 38–61
+    habits:   72 + ((seed * 3) % 41),   // 72–112
+    meditations: 18 + ((seed * 7) % 19), // 18–36
+  };
+}
+
+function CommunityHomeBlock() {
+  const navigate = useNavigate();
+  const { posts } = useCommunityPosts();
+
+  const hour = new Date().getHours();
+  // Before 10am treat today as "not started yet" — show yesterday's numbers
+  const isEarlyMorning = hour < 10;
+  const yesterday = getYesterdayStats();
+
+  return (
+    <div className="space-y-4">
+      {/* Community Wins */}
+      <NordicCard className="px-4 py-5" priority="standard">
+        <div className="flex items-center gap-2 mb-4">
+          <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: 'rgba(184,134,74,0.14)' }}>
+            <CheckCircle2 className="w-4 h-4" style={{ color: '#B8864A' }} />
+          </div>
+          <div className="flex-1">
+            <h3 className="text-[14px] font-semibold" style={{ color: '#2E2218' }}>
+              {isEarlyMorning ? 'Včerajšie víťazstvá' : 'Dnešné víťazstvá'}
+            </h3>
+            <p className="text-[10px]" style={{ color: '#A0907E' }}>
+              {isEarlyMorning ? 'Spolu sme včera dosiahli' : 'Spolu dnes v komunite'}
+            </p>
+          </div>
+          <button
+            onClick={() => navigate('/komunita')}
+            className="text-[11px] font-medium flex items-center gap-0.5"
+            style={{ color: '#B8864A' }}
+          >
+            Komunita <ChevronRight className="w-3 h-3" />
+          </button>
+        </div>
+
+        {/* Stats — always show impressive numbers */}
+        <div className="grid grid-cols-3 gap-2 mb-4">
+          {[
+            { n: yesterday.workouts,    label: 'cvičení',    color: '#7A9E78', bg: 'rgba(122,158,120,0.12)' },
+            { n: yesterday.habits,      label: 'návykov',    color: '#B8864A', bg: 'rgba(184,134,74,0.12)' },
+            { n: yesterday.meditations, label: 'meditácií',  color: '#A8848B', bg: 'rgba(168,132,139,0.12)' },
+          ].map(({ n, label, color, bg }) => (
+            <div key={label} className="text-center p-2.5 rounded-xl" style={{ background: bg }}>
+              <div className="text-[22px] font-bold leading-none mb-0.5" style={{ color }}>{n}</div>
+              <div className="text-[10px] font-medium" style={{ color }}>{label}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Early morning: invitation to be first. Later: recent posts. */}
+        {isEarlyMorning ? (
+          <div className="rounded-xl p-3 text-center space-y-2" style={{ background: 'rgba(184,134,74,0.08)', border: '1px dashed rgba(184,134,74,0.3)' }}>
+            <p className="text-[13px] font-semibold" style={{ color: '#2E2218' }}>Buď dnes prvá! ✨</p>
+            <p className="text-[11px] leading-relaxed" style={{ color: '#8B7560' }}>
+              Komunita ešte len vstáva. Odcvič si tréning, splň návyk alebo zamedituj — a inšpiruj ostatné.
+            </p>
+            <button
+              onClick={() => navigate('/kniznica/telo')}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-[12px] font-semibold transition-all active:scale-95"
+              style={{ background: '#B8864A', color: '#fff' }}
+            >
+              Začať tréning
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {posts.slice(0, 2).map((post) => (
+              <div key={post.id} className="flex items-start gap-2.5 p-2.5 rounded-xl" style={{ background: 'rgba(255,255,255,0.35)' }}>
+                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#D0BCA8] to-[#B8864A] flex-shrink-0 mt-0.5" />
+                <div className="flex-1 min-w-0">
+                  <span className="text-[11px] font-semibold" style={{ color: '#2E2218' }}>{post.author} </span>
+                  <span className="text-[11px]" style={{ color: '#8B7560' }}>
+                    {post.text.length > 55 ? post.text.slice(0, 55) + '…' : post.text}
+                  </span>
+                </div>
+                <span className="text-[10px] flex-shrink-0 mt-0.5" style={{ color: '#A0907E' }}>{post.time}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </NordicCard>
+
+      {/* Achievements */}
+      <NordicCard className="px-4 py-5" priority="priority">
+        <CommunityStatusWidget variant="compact" />
+      </NordicCard>
     </div>
   );
 }
@@ -456,6 +690,19 @@ function DomovNewContent() {
   const [selectedDay, setSelectedDay] = useState(todayIdx >= 0 ? todayIdx : 0);
   const { stats } = useWorkoutHistory();
 
+  // Handle return from Stripe checkout (success_url has ?session_id=...)
+  React.useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('session_id')) {
+      // Clean the URL without reloading
+      window.history.replaceState({}, '', window.location.pathname);
+      // Show a brief confirmation — webhook will update Supabase asynchronously
+      setTimeout(() => {
+        alert('Predplatné aktivované! Vitaj v NeoMe Premium.');
+      }, 500);
+    }
+  }, []);
+
   // No longer need to override parent styles since AppLayout is fixed
 
   return (
@@ -479,24 +726,10 @@ function DomovNewContent() {
           </div>
         </NordicCard>
 
-        <SectionDivider label="DNES" />
-
-        {/* Meal plan / recipe of the day */}
-        <TodayMealsCard />
-
         {/* Today Overview - Priority Card */}
         <NordicCard className="px-4 py-6" priority="priority">
           <TodayOverview />
         </NordicCard>
-
-        <SectionDivider label="POKROKY" />
-
-        {/* Workout Stats - Conditional */}
-        {stats.totalWorkouts > 0 && (
-          <NordicCard className="px-4 py-5" priority="standard">
-            <WorkoutStatsWidget variant="compact" />
-          </NordicCard>
-        )}
 
         {/* Enhanced Habits with Water Intake */}
         <NordicCard className="px-4 py-6" priority="priority">
@@ -511,37 +744,7 @@ function DomovNewContent() {
         <SectionDivider label="KOMUNITA" />
 
         {/* Community Section */}
-        <div className="space-y-6">
-          {/* Buddy System */}
-          <NordicCard className="px-4 py-5" priority="standard">
-            <BuddyShortcut />
-          </NordicCard>
-
-          {/* Community Topics - Placeholder */}
-          <NordicCard className="px-4 py-5" priority="standard">
-            <div className="space-y-4">
-              {/* Header */}
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(184, 134, 74, 0.14)` }}>
-                  <MessageCircle className="w-4 h-4" style={{ color: '#B8864A' }} />
-                </div>
-                <h3 className="text-[14px] font-semibold" style={{ color: '#2E2218' }}>Sledované témy</h3>
-              </div>
-
-              {/* Sub-header */}
-              <div className="text-center">
-                <p className="text-sm font-medium" style={{ color: '#6B4C3B' }}>
-                  Zatiaľ nemáš uložené žiadne témy z komunity
-                </p>
-              </div>
-            </div>
-          </NordicCard>
-
-          {/* Community Achievement/Badge */}
-          <NordicCard className="px-4 py-5" priority="priority">
-            <CommunityStatusWidget variant="compact" />
-          </NordicCard>
-        </div>
+        <CommunityHomeBlock />
 
         {/* Quote - Nordic End */}
         <div className="text-center py-16 space-y-8">

@@ -15,6 +15,17 @@ type Diet = 'normal' | 'vegetarian' | 'vegan';
 type Allergy = 'gluten' | 'dairy' | 'nuts' | 'eggs' | 'soy';
 type FavMeal = 'ranajky' | 'obed' | 'vecera' | 'snack';
 
+const INGREDIENT_SUGGESTIONS = [
+  'Kura', 'Hovädzie', 'Losos', 'Tuniak', 'Krevety', 'Vajcia', 'Tofu', 'Tempeh',
+  'Ryža', 'Quinoa', 'Ovsené vločky', 'Batáty', 'Zemiaky', 'Celozrnná pasta',
+  'Avokádo', 'Brokolica', 'Špenát', 'Mrkva', 'Paradajky', 'Uhorka',
+  'Paprika', 'Cibuľa', 'Cesnak', 'Cícer', 'Šošovica', 'Čierne fazule',
+  'Banán', 'Jablko', 'Jahody', 'Borůvky', 'Pomaranč', 'Mango',
+  'Olivový olej', 'Mandle', 'Vlašské orechy', 'Kešu', 'Arašidové maslo',
+  'Grécky jogurt', 'Tvaroh', 'Feta', 'Mozzarella', 'Sójové mlieko', 'Ovos',
+  'Hummus', 'Tahini', 'Pesto', 'Sriracha', 'Sójová omáčka',
+];
+
 const ACTIVITY_MULTIPLIER: Record<Activity, number> = {
   sedentary: 1.2,
   light: 1.375,
@@ -34,14 +45,15 @@ const ALLERGY_LABELS: { key: Allergy; label: string }[] = [
 /* ─── styles ─── */
 const s: Record<string, CSSProperties> = {
   wrap: {
-    height: '100dvh',
+    position: 'fixed',
+    inset: 0,
     display: 'flex',
     flexDirection: 'column',
     background: 'linear-gradient(to bottom, #FAF7F2, #F5F1E8)',
     fontFamily: 'Lufga, sans-serif',
     color: PRIMARY,
-    position: 'relative',
     overflow: 'hidden',
+    zIndex: 60,
   },
   progressBar: {
     height: 3,
@@ -201,8 +213,10 @@ function formatDate(d: Date): string {
 
 export default function NutritionOnboarding({
   onComplete,
+  onCancel,
 }: {
   onComplete: (profile: NutritionProfile, startDate: Date) => void;
+  onCancel?: () => void;
 }) {
   const [step, setStep] = useState(1);
   const [goal, setGoal] = useState<Goal | null>(null);
@@ -210,6 +224,7 @@ export default function NutritionOnboarding({
   const [height, setHeight] = useState('');
   const [age, setAge] = useState('');
   const [activity, setActivity] = useState<Activity | null>(null);
+  const [dailySteps, setDailySteps] = useState('');
   const [meals, setMeals] = useState<3 | 4 | 5 | null>(null);
   const [diet, setDiet] = useState<Diet>('normal');
   const [allergies, setAllergies] = useState<Set<Allergy>>(new Set());
@@ -363,26 +378,38 @@ export default function NutritionOnboarding({
   const renderStep3 = () => (
     <>
       <div style={s.title}>Ako aktívna si?</div>
+      <div style={{ fontSize: 11, color: '#B8864A', marginBottom: 14, padding: '8px 12px', background: 'rgba(184,134,74,0.08)', borderRadius: 10 }}>
+        Buď k sebe úprimná — väčšina ľudí si aktivitu nadhodnocuje. Vybrat presne je základ dobrého plánu.
+      </div>
       {([
-        { key: 'sedentary', emoji: '🛋️', title: 'Sedavý', desc: 'Prevažne sedím, minimum pohybu' },
-        { key: 'light', emoji: '🚶‍♀️', title: 'Mierne aktívna', desc: 'Cvičím 1-2x týždenne' },
-        { key: 'moderate', emoji: '🏃‍♀️', title: 'Stredne aktívna', desc: 'Cvičím 3-4x týždenne' },
-        { key: 'active', emoji: '⚡', title: 'Veľmi aktívna', desc: 'Cvičím 5+ krát týždenne' },
+        { key: 'sedentary', title: 'Sedavý životný štýl', desc: 'Väčšinou sedím — kancelária, auto, málo krokov. Menej ako 5 000 krokov denne.' },
+        { key: 'light', title: 'Mierne aktívna', desc: 'Prechádzky, 1–2× týždenne ľahké cvičenie (joga, pilates). Sem-tam sa zahýbem.' },
+        { key: 'moderate', title: 'Stredne aktívna', desc: 'Pravidelné cvičenie 3–4× týždenne aspoň 30 min. Aktívny každodenný život.' },
+        { key: 'active', title: 'Veľmi aktívna', desc: '5+ intenzívnych tréningov týždenne alebo fyzicky náročná práca každý deň.' },
       ] as const).map((o) => (
         <GlassCard
           key={o.key}
           onClick={() => setActivity(o.key)}
           style={{ ...s.optionCard, ...(activity === o.key ? selectedBorder : {}) }}
         >
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <span style={s.emoji}>{o.emoji}</span>
-            <div>
-              <div style={s.optionTitle}>{o.title}</div>
-              <div style={s.optionDesc}>{o.desc}</div>
-            </div>
+          <div>
+            <div style={s.optionTitle}>{o.title}</div>
+            <div style={s.optionDesc}>{o.desc}</div>
           </div>
         </GlassCard>
       ))}
+      {/* Daily steps optional */}
+      <div style={{ marginTop: 16 }}>
+        <div style={{ fontSize: 12, color: MUTED, marginBottom: 6 }}>Denné kroky (voliteľné — ak ich poznáš)</div>
+        <input
+          style={{ ...s.input }}
+          type="number"
+          inputMode="numeric"
+          value={dailySteps}
+          onChange={(e) => setDailySteps(e.target.value)}
+          placeholder="napr. 7 500"
+        />
+      </div>
     </>
   );
 
@@ -449,98 +476,99 @@ export default function NutritionOnboarding({
     </>
   );
 
-  const renderStep6 = () => (
-    <>
-      <div style={s.title}>Tvoje preferencie</div>
+  const renderStep6 = () => {
+    const likedMatches = likedInput.trim().length >= 1
+      ? INGREDIENT_SUGGESTIONS.filter(s =>
+          s.toLowerCase().startsWith(likedInput.toLowerCase()) && !likedIngredients.includes(s)
+        ).slice(0, 6)
+      : [];
 
-      {/* Favourite meal of day */}
-      <div style={{ fontSize: 12, color: MUTED, marginBottom: 10 }}>Obľúbené jedlo dňa</div>
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 24 }}>
-        {([
-          { key: 'ranajky' as const, label: 'Raňajky', emoji: '☕' },
-          { key: 'obed' as const, label: 'Obed', emoji: '🍽️' },
-          { key: 'vecera' as const, label: 'Večera', emoji: '🌙' },
-          { key: 'snack' as const, label: 'Snack', emoji: '🍎' },
-        ]).map((o) => (
-          <button
-            key={o.key}
-            onClick={() => setFavMeal(o.key)}
-            style={{ ...s.chip, ...(favMeal === o.key ? s.chipSelected : {}) }}
-          >
-            {o.emoji} {o.label}
-          </button>
-        ))}
-      </div>
+    const dislikedMatches = dislikedInput.trim().length >= 1
+      ? INGREDIENT_SUGGESTIONS.filter(s =>
+          s.toLowerCase().startsWith(dislikedInput.toLowerCase()) && !dislikedIngredients.includes(s)
+        ).slice(0, 6)
+      : [];
 
-      {/* Liked ingredients */}
-      <div style={{ fontSize: 12, color: MUTED, marginBottom: 6 }}>Čo ti chutí? (voliteľné)</div>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
-        {likedIngredients.map((item) => (
-          <button
-            key={item}
-            onClick={() => removeIngredient(likedIngredients, setLikedIngredients, item)}
-            style={{ ...s.chip, ...s.chipSelected, fontSize: 11 }}
-          >
-            {item} ×
-          </button>
-        ))}
-      </div>
-      <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
-        <input
-          style={{ ...s.input, flex: 1 }}
-          value={likedInput}
-          onChange={(e) => setLikedInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ',') {
-              e.preventDefault();
-              addIngredient(likedIngredients, setLikedIngredients, likedInput, setLikedInput);
-            }
-          }}
-          placeholder="napr. kura, ryža, avokádo"
-        />
-        <button
-          onClick={() => addIngredient(likedIngredients, setLikedIngredients, likedInput, setLikedInput)}
-          style={{ ...s.chip, flexShrink: 0 }}
-        >
-          +
-        </button>
-      </div>
+    return (
+      <>
+        <div style={s.title}>Tvoje preferencie</div>
 
-      {/* Disliked ingredients */}
-      <div style={{ fontSize: 12, color: MUTED, marginBottom: 6 }}>Čo vynechať? (voliteľné)</div>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
-        {dislikedIngredients.map((item) => (
-          <button
-            key={item}
-            onClick={() => removeIngredient(dislikedIngredients, setDislikedIngredients, item)}
-            style={{ ...s.chip, background: 'rgba(184,134,74,0.08)', borderColor: '#B8864A', color: PRIMARY, fontSize: 11 }}
-          >
-            {item} ×
-          </button>
-        ))}
-      </div>
-      <div style={{ display: 'flex', gap: 8 }}>
-        <input
-          style={{ ...s.input, flex: 1 }}
-          value={dislikedInput}
-          onChange={(e) => setDislikedInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ',') {
-              e.preventDefault();
-              addIngredient(dislikedIngredients, setDislikedIngredients, dislikedInput, setDislikedInput);
-            }
-          }}
-          placeholder="napr. cibuľa, brokolica"
-        />
-        <button
-          onClick={() => addIngredient(dislikedIngredients, setDislikedIngredients, dislikedInput, setDislikedInput)}
-          style={{ ...s.chip, flexShrink: 0 }}
-        >
-          +
-        </button>
-      </div>
-    </>
-  );
+        {/* Favourite meal of day */}
+        <div style={{ fontSize: 12, color: MUTED, marginBottom: 10 }}>Obľúbené jedlo dňa</div>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 24 }}>
+          {([
+            { key: 'ranajky' as const, label: 'Raňajky', emoji: '☕' },
+            { key: 'obed' as const, label: 'Obed', emoji: '🍽️' },
+            { key: 'vecera' as const, label: 'Večera', emoji: '🌙' },
+            { key: 'snack' as const, label: 'Snack', emoji: '🍎' },
+          ]).map((o) => (
+            <button key={o.key} onClick={() => setFavMeal(o.key)} style={{ ...s.chip, ...(favMeal === o.key ? s.chipSelected : {}) }}>
+              {o.emoji} {o.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Liked ingredients — autocomplete */}
+        <div style={{ fontSize: 12, color: MUTED, marginBottom: 6 }}>Čo ti chutí? (voliteľné)</div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
+          {likedIngredients.map((item) => (
+            <button key={item} onClick={() => removeIngredient(likedIngredients, setLikedIngredients, item)}
+              style={{ ...s.chip, ...s.chipSelected, fontSize: 11 }}>
+              {item} ×
+            </button>
+          ))}
+        </div>
+        <div style={{ position: 'relative', marginBottom: 8 }}>
+          <input
+            style={{ ...s.input }}
+            value={likedInput}
+            onChange={(e) => setLikedInput(e.target.value)}
+            placeholder="Začni písať... napr. Kura"
+          />
+          {likedMatches.length > 0 && (
+            <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#fff', borderRadius: 10, boxShadow: '0 4px 16px rgba(0,0,0,0.10)', zIndex: 10, overflow: 'hidden', marginTop: 4 }}>
+              {likedMatches.map(match => (
+                <button key={match} onClick={() => { addIngredient(likedIngredients, setLikedIngredients, match, setLikedInput); }}
+                  style={{ display: 'block', width: '100%', textAlign: 'left', padding: '10px 14px', fontSize: 13, color: PRIMARY, background: 'none', border: 'none', cursor: 'pointer', borderBottom: '1px solid rgba(0,0,0,0.04)' }}>
+                  {match}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+        <div style={{ marginBottom: 24 }} />
+
+        {/* Disliked ingredients — autocomplete */}
+        <div style={{ fontSize: 12, color: MUTED, marginBottom: 6 }}>Čo vynechať? (voliteľné)</div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
+          {dislikedIngredients.map((item) => (
+            <button key={item} onClick={() => removeIngredient(dislikedIngredients, setDislikedIngredients, item)}
+              style={{ ...s.chip, background: 'rgba(184,134,74,0.08)', borderColor: '#B8864A', color: PRIMARY, fontSize: 11 }}>
+              {item} ×
+            </button>
+          ))}
+        </div>
+        <div style={{ position: 'relative' }}>
+          <input
+            style={{ ...s.input }}
+            value={dislikedInput}
+            onChange={(e) => setDislikedInput(e.target.value)}
+            placeholder="Začni písať... napr. Cibuľa"
+          />
+          {dislikedMatches.length > 0 && (
+            <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#fff', borderRadius: 10, boxShadow: '0 4px 16px rgba(0,0,0,0.10)', zIndex: 10, overflow: 'hidden', marginTop: 4 }}>
+              {dislikedMatches.map(match => (
+                <button key={match} onClick={() => { addIngredient(dislikedIngredients, setDislikedIngredients, match, setDislikedInput); }}
+                  style={{ display: 'block', width: '100%', textAlign: 'left', padding: '10px 14px', fontSize: 13, color: PRIMARY, background: 'none', border: 'none', cursor: 'pointer', borderBottom: '1px solid rgba(0,0,0,0.04)' }}>
+                  {match}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </>
+    );
+  };
 
   const renderStep7 = () => {
     const cal = calcCalories();
@@ -613,20 +641,15 @@ export default function NutritionOnboarding({
 
       {/* header with back */}
       <div style={s.header}>
-        {step > 1 && (
-          <button style={s.backBtn} onClick={() => setStep((p) => p - 1)} aria-label="Späť">
-            ←
-          </button>
-        )}
+        {step > 1 ? (
+          <button style={s.backBtn} onClick={() => setStep((p) => p - 1)} aria-label="Späť">←</button>
+        ) : onCancel ? (
+          <button style={s.backBtn} onClick={onCancel} aria-label="Zatvoriť">←</button>
+        ) : null}
       </div>
 
-      {/* body — scrollable */}
-      <div style={s.body}>
-        {steps[step - 1]()}
-      </div>
-
-      {/* CTA — always visible at bottom */}
-      <div style={s.footer}>
+      {/* CTA — always visible at top */}
+      <div style={{ ...s.footer, paddingBottom: 12, paddingTop: 8 }}>
         {step < 8 ? (
           <button
             style={{ ...s.nextBtn, opacity: canNext() ? 1 : 0.4, width: '100%' }}
@@ -640,6 +663,11 @@ export default function NutritionOnboarding({
             Vygenerovať jedálniček
           </button>
         )}
+      </div>
+
+      {/* body — scrollable */}
+      <div style={s.body}>
+        {steps[step - 1]()}
       </div>
     </div>
   );

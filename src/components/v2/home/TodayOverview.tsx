@@ -12,11 +12,9 @@ import { getPhaseRanges, getPhaseByDay, getCurrentCycleDay, getNextPeriodDate } 
 import { suggestForDay } from '../../../features/cycle/suggestions';
 import { differenceInDays } from 'date-fns';
 import type { PhaseKey } from '../../../features/cycle/types';
-import { useUserProgram, usePromotionalOffers, useLoginCounter } from '../../../hooks/useUserProgram';
+import { useUserProgram, usePromotionalOffers } from '../../../hooks/useUserProgram';
 import { PromotionalBanner } from './PromotionalBanner';
-import MealPlanBanners from './MealPlanBanners';
-import { useSubscription } from '../../../contexts/SimpleSubscriptionContext';
-import { getRecommendedExercise, type Exercise } from '../../../data/exercises';
+import { getRecommendedExercise } from '../../../data/exercises';
 
 const PHASE_NAMES: Record<PhaseKey, string> = {
   menstrual: 'Menštruácia', follicular: 'Folikulárna fáza', ovulation: 'Ovulácia', luteal: 'Luteálna fáza',
@@ -141,8 +139,7 @@ function TeloSection({ showPromoBanner }: { showPromoBanner: boolean }) {
   const displayTitle = hasProgram && userProgram ? userProgram.name : recommendedExercise.name;
   const displayDuration = hasProgram && userProgram?.todaysExercise ? 
     userProgram.todaysExercise.duration : recommendedExercise.duration;
-  const displayDescription = hasProgram && userProgram?.todaysExercise ? 
-    userProgram.todaysExercise.description : PHASE_DESCRIPTIONS[phase.key];
+  const displayDescription = PHASE_DESCRIPTIONS[phase.key];
 
   return (
     <>
@@ -243,99 +240,68 @@ function TeloSection({ showPromoBanner }: { showPromoBanner: boolean }) {
 }
 
 /* ── Strava ────────────────────────────────── */
-function StravaSection({ showMealBanner }: { showMealBanner: boolean }) {
+function StravaSection() {
   const navigate = useNavigate();
   const { todayPlan } = useMealPlan();
-  const { canUseMealPlanner } = useSubscription();
   const hasRealPlan = todayPlan && todayPlan.meals.length > 0;
 
-  const handleCardClick = () => {
-    if (hasRealPlan) {
-      navigate('/jedalnicek');
-    } else {
-      navigate('/kniznica/strava');
-    }
-  };
+  const todayStr = new Date().toISOString().split('T')[0];
+  const seed = todayStr.split('-').reduce((acc, p) => acc + parseInt(p, 10), 0);
+  const sampleRecipe = recipesData[seed % recipesData.length];
 
   const handleCtaClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (hasRealPlan) {
-      navigate('/jedalnicek');
-    } else {
-      navigate('/recepty');
-    }
-  };
-
-  const handleMealBannerClick = () => {
     navigate('/jedalnicek');
   };
 
   return (
-    <>
-      <GlassCard className="!p-4 cursor-pointer active:scale-[0.98] transition-transform" onClick={handleCardClick}>
-        <SectionHeader icon={UtensilsCrossed} label="Strava" color={colors.strava} />
-        
-        {hasRealPlan ? (
-          <>
-            <p className="text-[11px] font-medium mb-2" style={{ color: colors.textTertiary }}>Dnešný jedálniček</p>
-            <div className="space-y-2">
-              {todayPlan!.meals.map((meal) => {
-                const recipe = recipesData.find((r) => r.id === meal.options[meal.selected]);
-                if (!recipe) return null;
-                const adjustedCal = Math.round(recipe.calories * meal.portionMultiplier);
-                return (
-                  <div 
-                    key={meal.type} 
-                    className="flex items-center gap-3 p-2.5 rounded-xl cursor-pointer hover:bg-white/20 transition-colors" 
-                    style={innerGlass}
-                    onClick={() => navigate(`/recept/${recipe.id}`)}
-                  >
-                    <img src={recipe.image} alt={recipe.title} className="w-11 h-11 rounded-lg object-cover shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[11px] font-medium" style={{ color: colors.textTertiary }}>{meal.label}</p>
-                      <p className="text-[13px] font-medium truncate" style={{ color: colors.textPrimary }}>{recipe.title}</p>
-                    </div>
-                    <span className="text-[11px] shrink-0" style={{ color: colors.textTertiary }}>{adjustedCal} kcal</span>
-                  </div>
-                );
-              })}
-            </div>
-            <CtaLink 
-              label="Celý jedálniček" 
-              color={colors.strava} 
-              onClick={handleCtaClick} 
-            />
-          </>
-        ) : (
-          <>
-            <div 
-              className="flex items-center gap-3 p-3 rounded-2xl cursor-pointer hover:bg-white/20 transition-colors" 
-              style={innerGlass}
-              onClick={() => navigate('/recept/avokadove-toasty-s-vajickom')}
-            >
-              <img src="https://images.unsplash.com/photo-1525351484163-7529414344d8?w=200&h=200&fit=crop" alt="Avokádový toast" className="w-14 h-14 rounded-xl object-cover shrink-0" />
-              <div className="flex-1">
-                <p className="text-[13px] font-medium" style={{ color: colors.textPrimary }}>Avokádový toast s vajíčkom</p>
-                <p className="text-[11px] mt-0.5" style={{ color: colors.textTertiary }}>280 kcal · 10 min</p>
-              </div>
-            </div>
-            <CtaLink 
-              label="Viac receptov" 
-              color={colors.strava} 
-              onClick={handleCtaClick} 
-            />
-          </>
-        )}
-      </GlassCard>
+    <GlassCard className="!p-4 cursor-pointer active:scale-[0.98] transition-transform" onClick={() => navigate('/jedalnicek')}>
+      <SectionHeader icon={UtensilsCrossed} label="Strava" color={colors.strava} />
 
-      {/* Rotating meal planner banners for users without meal planner */}
-      {!canUseMealPlanner && !hasRealPlan && showMealBanner && (
-        <MealPlanBanners
-          variant={((Math.floor(Date.now() / (1000 * 60 * 60 * 24)) % 4) + 1) as 1 | 2 | 3 | 4}
-          onPurchase={handleMealBannerClick}
-        />
+      {hasRealPlan && (
+        <>
+          <p className="text-[11px] font-medium mb-2" style={{ color: colors.textTertiary }}>Dnešný jedálniček</p>
+          <div className="space-y-2 mb-3">
+            {todayPlan!.meals.map((meal) => {
+              const recipe = recipesData.find((r) => r.id === meal.options[meal.selected]);
+              if (!recipe) return null;
+              const adjustedCal = Math.round(recipe.calories * meal.portionMultiplier);
+              return (
+                <div
+                  key={meal.type}
+                  className="flex items-center gap-3 p-2.5 rounded-xl"
+                  style={innerGlass}
+                >
+                  <img src={recipe.image} alt={recipe.title} className="w-11 h-11 rounded-lg object-cover shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[11px] font-medium" style={{ color: colors.textTertiary }}>{meal.label}</p>
+                    <p className="text-[13px] font-medium truncate" style={{ color: colors.textPrimary }}>{recipe.title}</p>
+                  </div>
+                  <span className="text-[11px] shrink-0" style={{ color: colors.textTertiary }}>{adjustedCal} kcal</span>
+                </div>
+              );
+            })}
+          </div>
+        </>
       )}
-    </>
+
+      {sampleRecipe && (
+        <>
+          <p className="text-[11px] font-medium mb-2" style={{ color: colors.textTertiary }}>Recept dňa</p>
+          <div className="flex items-center gap-3 p-3 rounded-2xl" style={innerGlass}>
+            <img src={sampleRecipe.image} alt={sampleRecipe.title} className="w-14 h-14 rounded-xl object-cover shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className="text-[13px] font-medium truncate" style={{ color: colors.textPrimary }}>{sampleRecipe.title}</p>
+              <p className="text-[11px] mt-0.5" style={{ color: colors.textTertiary }}>
+                {sampleRecipe.calories} kcal · {sampleRecipe.prepTime} min
+              </p>
+            </div>
+          </div>
+        </>
+      )}
+
+      <CtaLink label="Jedálniček" color={colors.strava} onClick={handleCtaClick} />
+    </GlassCard>
   );
 }
 
@@ -421,13 +387,14 @@ function PeriodkaSection() {
   const cycleLength = cycleData.cycleLength || 28;
   const periodLength = cycleData.periodLength || 5;
   const today = new Date();
-  const currentDay = cycleData.lastPeriodStart ? getCurrentCycleDay(cycleData.lastPeriodStart, today, cycleLength) : 14;
+  const hasData = !!cycleData.lastPeriodStart;
+  const currentDay = hasData ? getCurrentCycleDay(cycleData.lastPeriodStart!, today, cycleLength) : 14;
   const ranges = getPhaseRanges(cycleLength, periodLength);
   const phase = getPhaseByDay(currentDay, ranges, cycleLength);
   const suggestion = suggestForDay(currentDay, ranges, cycleLength);
   const phaseColor = PHASE_COLORS[phase.key];
-  const daysUntilPeriod = cycleData.lastPeriodStart
-    ? Math.max(0, differenceInDays(getNextPeriodDate(cycleData.lastPeriodStart, today), cycleLength))
+  const daysUntilPeriod = hasData
+    ? Math.max(0, differenceInDays(getNextPeriodDate(cycleData.lastPeriodStart!, cycleLength), today))
     : cycleLength - currentDay;
 
   const handleClick = () => {
@@ -438,67 +405,60 @@ function PeriodkaSection() {
     <GlassCard className="!p-4 cursor-pointer active:scale-[0.98] transition-transform" onClick={handleClick}>
       <SectionHeader icon={Heart} label="Periodka" color={colors.periodka} />
 
-      <div className="rounded-2xl p-3" style={innerGlass}>
-        {/* Phase name + message */}
-        <p className="text-[14px] font-semibold" style={{ color: colors.textPrimary }}>{PHASE_NAMES[phase.key]}</p>
-        <p className="text-[12px] mt-0.5 mb-3" style={{ color: colors.textSecondary }}>{PHASE_MESSAGES[phase.key]}</p>
-
-        {/* Phase bar */}
-        <div className="flex gap-1.5 mb-3">
-          {([
-            { key: 'menstrual' as PhaseKey, c: colors.periodka, label: 'Menštruácia' },
-            { key: 'follicular' as PhaseKey, c: colors.strava, label: 'Folikulárna' },
-            { key: 'ovulation' as PhaseKey, c: colors.mysel, label: 'Ovulácia' },
-            { key: 'luteal' as PhaseKey, c: colors.accent, label: 'Luteálna' },
-          ]).map((p) => {
-            const phaseOrder = ['menstrual', 'follicular', 'ovulation', 'luteal'];
-            const isPast = phaseOrder.indexOf(p.key) <= phaseOrder.indexOf(phase.key);
-            return (
-              <div key={p.key} className="flex-1 flex flex-col items-center gap-1">
-                <div className="h-2 w-full rounded-full" style={{
-                  background: isPast ? `linear-gradient(90deg, ${p.c}, ${p.c}BB)` : 'rgba(0,0,0,0.05)',
-                  boxShadow: isPast ? `0 2px 8px ${p.c}25` : 'none',
-                }} />
-                <span className="text-[9px] font-medium" style={{ color: isPast ? p.c : colors.textTertiary }}>{p.label}</span>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Energy + days until period */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 flex-1">
-            <span className="text-[11px] font-medium" style={{ color: colors.textSecondary }}>Energia</span>
-            <div className="flex-1 h-1.5 rounded-full bg-black/5 overflow-hidden">
-              <div className="h-full rounded-full transition-all" style={{ width: `${suggestion.energy}%`, background: phaseColor }} />
-            </div>
-            <span className="text-[11px] font-medium" style={{ color: colors.textSecondary }}>{suggestion.energy}%</span>
+      {!hasData ? (
+        /* ── Empty state: no cycle data entered yet ── */
+        <div className="rounded-2xl p-4 text-center space-y-3" style={innerGlass}>
+          <div className="w-12 h-12 rounded-full mx-auto flex items-center justify-center" style={{ background: `${colors.periodka}18` }}>
+            <Heart size={22} style={{ color: colors.periodka }} strokeWidth={1.5} />
           </div>
-          <p className="text-[11px] ml-4" style={{ color: colors.textSecondary }}>
-            Ďalšia o <span className="font-bold" style={{ color: colors.textPrimary }}>{daysUntilPeriod} dní</span>
-          </p>
+          <div>
+            <p className="text-[14px] font-semibold mb-1" style={{ color: colors.textPrimary }}>Nastav si cyklus</p>
+            <p className="text-[12px] leading-relaxed" style={{ color: colors.textSecondary }}>
+              Zadaj dátum poslednej menštruácie a my ti povieme, v akej fáze si práve teraz.
+            </p>
+          </div>
+          <div
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-[12px] font-medium"
+            style={{ background: `${colors.periodka}18`, color: colors.periodka }}
+          >
+            <Sparkles size={12} />
+            Nastaviť teraz
+          </div>
         </div>
-      </div>
+      ) : (
+        /* ── Active state: cycle data exists ── */
+        <div className="rounded-2xl p-3" style={innerGlass}>
+          {/* Phase name + message */}
+          <p className="text-[14px] font-semibold" style={{ color: colors.textPrimary }}>{PHASE_NAMES[phase.key]}</p>
+          <p className="text-[12px] mt-0.5 mb-2" style={{ color: colors.textSecondary }}>{PHASE_MESSAGES[phase.key]}</p>
+
+          {/* Energy + days until period */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 flex-1">
+              <span className="text-[11px] font-medium" style={{ color: colors.textSecondary }}>Energia</span>
+              <div className="flex-1 h-1.5 rounded-full bg-black/5 overflow-hidden">
+                <div className="h-full rounded-full transition-all" style={{ width: `${suggestion.energy}%`, background: phaseColor }} />
+              </div>
+              <span className="text-[11px] font-medium" style={{ color: colors.textSecondary }}>{suggestion.energy}%</span>
+            </div>
+            <p className="text-[11px] ml-4" style={{ color: colors.textSecondary }}>
+              Ďalšia o <span className="font-bold" style={{ color: colors.textPrimary }}>{daysUntilPeriod} dní</span>
+            </p>
+          </div>
+        </div>
+      )}
     </GlassCard>
   );
 }
 
 /* ── Main ──────────────────────────────────── */
-export default function TodayOverview({ hideHeader = false }: { hideHeader?: boolean }) {
-  const { hasProgram } = useUserProgram();
-  const { canUseMealPlanner } = useSubscription();
-  const { shouldShowBanner } = useLoginCounter();
-  
-  // Banner logic: occasional promo for meal planner
-  const shouldShowProgramBanner = false; // Removed first screen cards
-  // Show meal banner occasionally (30% chance daily for non-subscribers)
-  const shouldShowMealBanner = !canUseMealPlanner && 
-    Math.floor(Date.now() / (1000 * 60 * 60 * 24)) % 10 < 3;
+export default function TodayOverview() {
+  const shouldShowProgramBanner = false;
 
   return (
     <div className="space-y-3">
       <TeloSection showPromoBanner={shouldShowProgramBanner} />
-      <StravaSection showMealBanner={shouldShowMealBanner} />
+      <StravaSection />
       <MyselSection />
       <PeriodkaSection />
     </div>

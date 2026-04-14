@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PlayCircle, ArrowLeft, Pause, Clock, User } from 'lucide-react';
+import { PlayCircle, ArrowLeft, Pause, Clock, User, Heart } from 'lucide-react';
 import GlassCard from '../../components/v2/GlassCard';
 import AudioPlayer from '../../components/v2/AudioPlayer';
 import FavoriteButton from '../../components/v2/favorites/FavoriteButton';
-import CompleteWorkoutButton from '../../components/v2/workouts/CompleteWorkoutButton';
 import { colors } from '../../theme/warmDusk';
 
 const categories = [
@@ -140,7 +139,7 @@ export default function Meditacie() {
             <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(168, 132, 139, 0.14)` }}>
               <PlayCircle className="w-4 h-4" style={{ color: '#A8848B' }} />
             </div>
-            <h1 className="text-[16px] font-semibold" style={{ color: '#2E2218' }}>Meditácie</h1>
+            <h1 className="text-[22px] font-medium leading-tight" style={{ color: '#2E2218', fontFamily: '"Bodoni Moda", Georgia, serif' }}>Meditácie</h1>
           </div>
         </div>
       </div>
@@ -201,18 +200,6 @@ export default function Meditacie() {
             </span>
           </div>
           
-          {/* Complete meditation button */}
-          <div className="mt-4">
-            <CompleteWorkoutButton
-              workoutId={featured.id}
-              workoutTitle={featured.title}
-              workoutType="mysel"
-              duration={featured.duration}
-              metadata={{ instructor: featured.instructor, category: featured.category }}
-              variant="secondary"
-              size="sm"
-            />
-          </div>
         </div>
       </div>
 
@@ -259,84 +246,75 @@ export default function Meditacie() {
         </div>
       </div>
 
+      {/* Favourites hint */}
+      <div className="bg-white/20 backdrop-blur-sm rounded-xl px-3 py-2 flex items-center gap-2 border border-white/20">
+        <Heart size={11} style={{ color: '#A8848B' }} />
+        <p className="text-[11px]" style={{ color: '#8B7560' }}>
+          Obľúbené meditácie nájdeš v <span className="font-medium" style={{ color: '#A8848B' }}>Obľúbené</span> v Knižnici
+        </p>
+      </div>
+
       {/* Filtered Session List */}
       <div className="space-y-3">
         {filteredSessions.map((session) => (
-          <div 
-            key={session.id} 
+          <div
+            key={session.id}
             className="bg-white/30 backdrop-blur-xl rounded-2xl shadow-sm border border-white/20 overflow-hidden"
           >
-            <button
-              onClick={() => handlePlayMeditation(session)}
-              className="w-full active:scale-[0.98] transition-transform text-left"
-            >
-            <div className="flex items-center gap-3 p-4">
-              <div className="relative w-16 h-16 flex-shrink-0 rounded-xl overflow-hidden">
-                <img 
-                  src={session.thumbnail} 
-                  alt={session.title} 
+            <div className="flex items-center gap-3 p-3">
+              {/* Thumbnail — tappable */}
+              <button
+                onClick={() => handlePlayMeditation(session)}
+                className="relative w-14 h-14 flex-shrink-0 rounded-xl overflow-hidden active:scale-95 transition-transform"
+              >
+                <img
+                  src={session.thumbnail}
+                  alt={session.title}
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
                   {playingId === session.id ? (
-                    <Pause size={16} className="text-white" fill="white" />
+                    <Pause size={14} className="text-white" fill="white" />
                   ) : (
-                    <PlayCircle size={16} className="text-white" fill="white" strokeWidth={0} />
+                    <PlayCircle size={14} className="text-white" fill="white" strokeWidth={0} />
                   )}
                 </div>
-              </div>
-              
-              <div className="flex-1">
-                <h4 className="text-sm font-semibold text-gray-800">
+              </button>
+
+              {/* Info — tappable */}
+              <button
+                onClick={() => handlePlayMeditation(session)}
+                className="flex-1 text-left min-w-0"
+              >
+                <h4 className="text-[13px] font-semibold text-gray-800 leading-snug">
                   {session.title}
                 </h4>
-                <p className="text-xs mt-0.5 text-gray-600 line-clamp-2">
-                  {session.description}
-                </p>
-                <div className="flex items-center gap-3 mt-2">
-                  <span className="text-xs flex items-center gap-1 text-gray-500">
-                    <Clock size={12} />
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-[11px] flex items-center gap-0.5 text-gray-500">
+                    <Clock size={10} />
                     {session.duration} min
                   </span>
-                  <span className="text-xs flex items-center gap-1 text-gray-500">
-                    <User size={12} />
-                    {session.instructor}
-                  </span>
+                  <span className="text-gray-300">·</span>
+                  <span className="text-[11px] text-gray-500">{session.instructor}</span>
                   {playingId === session.id && (
-                    <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-[#A8848B] text-white">
-                      Hrá
-                    </span>
+                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-[#A8848B] text-white">Hrá</span>
                   )}
                 </div>
-              </div>
-              
-              <div className="flex flex-col gap-2">
-                {/* Favorite Button */}
-                <FavoriteButton
-                  itemId={session.id}
-                  type="meditation"
-                  title={session.title}
-                  image={session.thumbnail}
-                  duration={`${session.duration} min`}
-                  category={session.category}
-                  metadata={{ instructor: session.instructor }}
-                  size="sm"
-                  variant="minimal"
-                />
-                
-                {/* Complete meditation button */}
-                <CompleteWorkoutButton
-                  workoutId={session.id}
-                  workoutTitle={session.title}
-                  workoutType="mysel"
-                  duration={session.duration}
-                  metadata={{ instructor: session.instructor, category: session.category }}
-                  variant="secondary"
-                  size="sm"
-                />
-              </div>
+              </button>
+
+              {/* Actions — stacked vertically, compact */}
+              <FavoriteButton
+                itemId={session.id}
+                type="meditation"
+                title={session.title}
+                image={session.thumbnail}
+                duration={`${session.duration} min`}
+                category={session.category}
+                metadata={{ instructor: session.instructor }}
+                size="sm"
+                variant="minimal"
+              />
             </div>
-            </button>
           </div>
         ))}
       </div>

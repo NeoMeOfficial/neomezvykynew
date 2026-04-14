@@ -79,14 +79,18 @@ export default function CompleteWorkoutButton({
     lg: 'px-8 py-4 text-lg'
   };
 
+  const isMeditation = workoutType === 'mysel';
+  const completedBg = isMeditation ? 'rgba(168,132,139,0.15)' : 'rgba(122,158,120,0.15)';
+  const completedTextColor = isMeditation ? '#A8848B' : '#7A9E78';
+
   const variantClasses = {
-    primary: justCompleted 
-      ? 'bg-green-500 text-white border-green-600' 
+    primary: justCompleted
+      ? 'text-white border-0'
       : 'bg-[#7A9E78] text-white border-[#6B8B68] hover:bg-[#6B8B68]',
     secondary: justCompleted
-      ? 'bg-green-100 text-green-800 border-green-300'
+      ? 'border-0'
       : 'bg-white/30 text-[#6B4C3B] border-white/40 hover:bg-white/50',
-    success: 'bg-green-500 text-white border-green-600'
+    success: 'text-white border-0'
   };
 
   const currentVariant = justCompleted ? 'success' : variant;
@@ -96,11 +100,12 @@ export default function CompleteWorkoutButton({
       <button
         disabled={true}
         className={`
-          ${sizeClasses[size]} ${variantClasses.success}
-          rounded-xl font-semibold border backdrop-blur-[20px]
+          ${sizeClasses[size]}
+          rounded-xl font-semibold backdrop-blur-[20px]
           transition-all duration-300 flex items-center justify-center gap-2
           opacity-90 cursor-not-allowed
         `}
+        style={{ background: completedBg, color: completedTextColor }}
       >
         <Check size={size === 'lg' ? 24 : size === 'md' ? 20 : 16} />
         <span>Dokončené!</span>
@@ -131,7 +136,7 @@ export default function CompleteWorkoutButton({
       ) : (
         <>
           <Check size={size === 'lg' ? 24 : size === 'md' ? 20 : 16} />
-          <span>Dokončiť cvičenie</span>
+          <span>{isMeditation ? 'Dokončiť meditáciu' : 'Dokončiť cvičenie'}</span>
           <Clock size={size === 'lg' ? 20 : size === 'md' ? 16 : 14} className="opacity-70" />
         </>
       )}

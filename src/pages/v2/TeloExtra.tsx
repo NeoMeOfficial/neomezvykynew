@@ -387,7 +387,7 @@ export default function TeloExtra() {
             <ArrowLeft className="w-5 h-5" style={{ color: colors.textPrimary }} strokeWidth={1.5} />
           </button>
           <div>
-            <h1 className="text-xl font-semibold" style={{ color: colors.textPrimary }}>Extra cvičenia</h1>
+            <h1 className="text-[22px] font-medium leading-tight" style={{ color: colors.textPrimary, fontFamily: '"Bodoni Moda", Georgia, serif' }}>Extra cvičenia</h1>
           </div>
         </div>
 

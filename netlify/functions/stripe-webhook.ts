@@ -84,7 +84,7 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription) {
   }
 
   const { error } = await supabase
-    .from('user_profiles')
+    .from('profiles')
     .update({
       subscription_status: subscriptionStatus,
       subscription_id: subscription.id,
@@ -105,7 +105,7 @@ async function handleSubscriptionCanceled(subscription: Stripe.Subscription) {
   if (!userId) return;
 
   const { error } = await supabase
-    .from('user_profiles')
+    .from('profiles')
     .update({
       subscription_status: 'free',
       subscription_id: null,

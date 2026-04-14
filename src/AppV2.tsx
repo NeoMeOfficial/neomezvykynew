@@ -56,6 +56,7 @@ const WorkoutHistory = lazy(() => import('./pages/v2/WorkoutHistory'));
 const WorkoutDemo = lazy(() => import('./pages/v2/WorkoutDemo'));
 const BuddySystem = lazy(() => import('./pages/v2/BuddySystem'));
 const DesignShowcase = lazy(() => import('./pages/v2/DesignShowcase'));
+const DesignSystemPage = lazy(() => import('./pages/v2/DesignSystem'));
 const DesignShowcase2 = lazy(() => import('./pages/v2/DesignShowcase2'));
 const DesignShowcase3 = lazy(() => import('./pages/v2/DesignShowcase3'));
 const HomepageDesign1 = lazy(() => import('./pages/v2/HomepageDesign1'));
@@ -110,10 +111,8 @@ function LoadingSpinner() {
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const supabaseConfigured = !!(import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY);
   if (!supabaseConfigured) {
-    // Demo mode: always allow access
     return <>{children}</>;
   }
-  // With real Supabase: check for active session via localStorage key set by Supabase SDK
   const hasSession = !!localStorage.getItem('sb-' + new URL(import.meta.env.VITE_SUPABASE_URL).hostname.split('.')[0] + '-auth-token');
   if (!hasSession) {
     return <Navigate to="/auth" replace />;
@@ -135,6 +134,7 @@ export default function AppV2() {
             <Route path="/register" element={<AuthReal />} />
             <Route path="/login" element={<AuthReal />} />
             <Route path="/design" element={<DesignShowcase />} />
+            <Route path="/design-system" element={<DesignSystemPage />} />
             <Route path="/design2" element={<DesignShowcase2 />} />
             <Route path="/design3" element={<DesignShowcase3 />} />
             <Route path="/homepage1" element={<HomepageDesign1 />} />
@@ -187,11 +187,10 @@ export default function AppV2() {
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/admin/dashboard" element={<Navigate to="/admin" replace />} />
               <Route path="/admin/referrals" element={<AdminReferrals />} />
-              <Route path="/recepty" element={<ReceptySpoonacular />} />
-              <Route path="/recepty/:id" element={<RecipeDetailSpoonacular />} />
-              {/* Old routes for backup */}
-              <Route path="/recepty-old" element={<Recepty />} />
+              <Route path="/recepty" element={<Recepty />} />
               <Route path="/recept/:id" element={<RecipeDetail />} />
+              <Route path="/recepty-spoonacular" element={<ReceptySpoonacular />} />
+              <Route path="/recepty-spoonacular/:id" element={<RecipeDetailSpoonacular />} />
               <Route path="/meditacie" element={<Meditacie />} />
               <Route path="/meditacia/:meditationId" element={<MeditationPlayer />} />
               <Route path="/exercise-player" element={<ExercisePlayer />} />

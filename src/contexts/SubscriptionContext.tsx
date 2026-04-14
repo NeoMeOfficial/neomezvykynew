@@ -1,17 +1,24 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { useSupabaseAuth } from './SupabaseAuthContext';
-import { 
-  SubscriptionData, 
-  SubscriptionStatus,
+import {
+  SubscriptionData,
   isSubscriptionActive,
   isTrialActive,
   getDaysUntilExpiration,
+  createCheckoutSession,
   createCheckoutSessionMock,
+  createPortalSession,
   createPortalSessionMock,
   SUBSCRIPTION_PLANS,
   stripePromise
 } from '../lib/stripe';
 import { supabase } from '../lib/supabase';
+
+// True when a real Stripe publishable key is configured
+const isStripeConfigured = () =>
+  !!(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY &&
+     (import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY.startsWith('pk_test_') ||
+      import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY.startsWith('pk_live_')));
 
 interface SubscriptionContextType {
   subscription: SubscriptionData | null;
@@ -101,40 +108,35 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
 
     setIsLoading(true);
     try {
-      // For development: Use mock checkout
-      const sessionId = await createCheckoutSessionMock(priceId, user.id, profile.email);
-      
-      if (sessionId === 'demo_session_success') {
-        // Demo successful subscription
-        const newSubscription: SubscriptionData = {
-          id: 'sub_' + Date.now(),
-          status: 'trialing',
-          current_period_start: Date.now() / 1000,
-          current_period_end: (Date.now() + (30 * 24 * 60 * 60 * 1000)) / 1000,
-          trial_end: (Date.now() + (7 * 24 * 60 * 60 * 1000)) / 1000,
-          cancel_at_period_end: false,
-          customer_id: 'cus_' + user.id
-        };
-        
-        // Update subscription state
-        setSubscription(newSubscription);
-        
-        // Update user profile
-        await updateProfile({
-          subscription_status: 'trial',
-          subscription_id: newSubscription.id,
-          trial_end_date: new Date(newSubscription.trial_end! * 1000).toISOString()
-        });
-        
-        return;
+      if (isStripeConfigured()) {
+        // Live Stripe checkout — redirect to Stripe-hosted page
+        const sessionId = await createCheckoutSession(priceId, user.id, profile.email);
+        const stripe = await stripePromise;
+        if (stripe) {
+          await stripe.redirectToCheckout({ sessionId });
+        }
+      } else {
+        // Demo/dev mode mock
+        const sessionId = await createCheckoutSessionMock(priceId, user.id, profile.email);
+        if (sessionId === 'demo_session_success') {
+          const trialEnd = (Date.now() + (7 * 24 * 60 * 60 * 1000)) / 1000;
+          const newSubscription: SubscriptionData = {
+            id: 'sub_' + Date.now(),
+            status: 'trialing',
+            current_period_start: Date.now() / 1000,
+            current_period_end: (Date.now() + (30 * 24 * 60 * 60 * 1000)) / 1000,
+            trial_end: trialEnd,
+            cancel_at_period_end: false,
+            customer_id: 'cus_' + user.id
+          };
+          setSubscription(newSubscription);
+          await updateProfile({
+            subscription_status: 'trial',
+            subscription_id: newSubscription.id,
+            trial_end_date: new Date(trialEnd * 1000).toISOString()
+          });
+        }
       }
-
-      // TODO: For production, redirect to Stripe Checkout
-      // const stripe = await stripePromise;
-      // if (stripe) {
-      //   await stripe.redirectToCheckout({ sessionId });
-      // }
-
     } catch (error) {
       console.error('Error starting checkout:', error);
       throw error;
@@ -150,18 +152,15 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
 
     setIsLoading(true);
     try {
-      // For development: Use mock portal
-      const portalResult = await createPortalSessionMock(subscription.customer_id);
-      
-      if (portalResult === 'demo_portal_access') {
-        // Demo portal - show success notification
-        alert('🎯 Demo Mode: Billing portal accessed! In production, this would redirect to Stripe Customer Portal for payment method management, invoice history, and subscription changes.');
-        return;
+      if (isStripeConfigured()) {
+        // Live Stripe portal — redirect to billing portal
+        const portalUrl = await createPortalSession(subscription.customer_id);
+        window.location.href = portalUrl;
+      } else {
+        // Demo mode
+        await createPortalSessionMock(subscription.customer_id);
+        alert('Demo: v produkcii by si bola presmerovaná na Stripe billing portál.');
       }
-
-      // TODO: For production, redirect to Stripe portal
-      // window.location.href = portalUrl;
-
     } catch (error) {
       console.error('Error accessing billing portal:', error);
       throw error;
@@ -177,20 +176,20 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
 
     setIsLoading(true);
     try {
-      // For development: Mock cancellation
-      const canceledSubscription = {
-        ...subscription,
-        cancel_at_period_end: true
-      };
-      
+      if (isStripeConfigured()) {
+        // Live: cancel via Netlify function
+        await fetch('/.netlify/functions/cancel-subscription', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ subscriptionId: subscription.id, userId: user.id })
+        });
+      }
+      // Update local state regardless (webhook will confirm via Supabase)
+      const canceledSubscription = { ...subscription, cancel_at_period_end: true };
       setSubscription(canceledSubscription);
-      localStorage.setItem(`subscription_${user.id}`, JSON.stringify(canceledSubscription));
-      
-      // TODO: For production, call actual API
-      // await fetch(`/api/subscription/${subscription.id}/cancel`, {
-      //   method: 'POST'
-      // });
-
+      if (!isStripeConfigured()) {
+        localStorage.setItem(`subscription_${user.id}`, JSON.stringify(canceledSubscription));
+      }
     } catch (error) {
       console.error('Error canceling subscription:', error);
       throw error;

@@ -1,8 +1,7 @@
 import React from 'react';
 import { PhaseRange } from './types';
 import { getSubphase } from './utils';
-import { generateNutrition, generateMovement } from '@/lib/cycleTipsGenerator';
-import { useCycleTips } from '@/hooks/useCycleTips';
+import { getCycleTipByDay } from '@/data/cycleTips';
 
 interface PhaseOverviewProps {
   phaseRanges: PhaseRange[];
@@ -13,27 +12,24 @@ interface PhaseOverviewProps {
   className?: string;
 }
 
-export function PhaseOverview({ 
-  phaseRanges, 
-  currentPhase, 
+export function PhaseOverview({
+  phaseRanges,
+  currentPhase,
   currentDay,
   cycleLength,
   periodLength,
-  className = "" 
+  className = ""
 }: PhaseOverviewProps) {
-  // Get phase and subphase for current day
   const { phase, subphase } = getSubphase(currentDay, cycleLength, periodLength);
-  
-  // Generate nutrition and movement from MASTER documents
-  const nutritionText = generateNutrition(currentDay, phase, subphase);
-  const movementText = generateMovement(currentDay, phase, subphase, phaseRanges);
-  
-  // Fetch mind text from database (only generic texts come from DB)
-  const { data: tips } = useCycleTips(currentDay, cycleLength, periodLength, phaseRanges);
-  
-  // Parse movement text into bullet points
-  const movementLines = movementText.split('\n').filter(line => line.trim());
-  
+
+  // Day within the current phase (1-based) — used to rotate through the 7 tips
+  const phaseStart = currentPhase?.start ?? 1;
+  const dayInPhase = Math.max(1, currentDay - phaseStart + 1);
+
+  const stravaText = getCycleTipByDay(phase, subphase, 'strava', dayInPhase);
+  const pohybText  = getCycleTipByDay(phase, subphase, 'pohyb',  dayInPhase);
+  const myselText  = getCycleTipByDay(phase, subphase, 'mysel',  dayInPhase);
+
   return (
     <div className={`space-y-6 ${className}`}>
       {/* Strava */}
@@ -44,13 +40,9 @@ export function PhaseOverview({
             Strava
           </h3>
         </div>
-        <div className="space-y-2">
-          {nutritionText.split('\n\n').map((paragraph, index) => (
-            <p key={index} className="text-sm leading-relaxed" style={{ color: '#955F6A' }}>
-              {paragraph}
-            </p>
-          ))}
-        </div>
+        <p className="text-sm leading-relaxed" style={{ color: '#955F6A' }}>
+          {stravaText}
+        </p>
       </div>
 
       {/* Pohyb */}
@@ -61,16 +53,9 @@ export function PhaseOverview({
             Pohyb
           </h3>
         </div>
-        <div className="space-y-2">
-          {movementLines.map((line, index) => (
-            <div key={index} className="flex items-start gap-3">
-              <div className="w-1.5 h-1.5 rounded-full bg-rose-300 mt-2 flex-shrink-0"></div>
-              <p className="text-sm" style={{ color: '#955F6A' }}>
-                {line}
-              </p>
-            </div>
-          ))}
-        </div>
+        <p className="text-sm leading-relaxed" style={{ color: '#955F6A' }}>
+          {pohybText}
+        </p>
       </div>
 
       {/* Myseľ */}
@@ -81,17 +66,9 @@ export function PhaseOverview({
             Myseľ
           </h3>
         </div>
-        <div className="space-y-2">
-          {tips?.mind ? (
-            <p className="text-sm leading-relaxed" style={{ color: '#955F6A' }}>
-              {tips.mind}
-            </p>
-          ) : (
-            <p className="text-sm leading-relaxed" style={{ color: '#955F6A' }}>
-              Dnes si dopraj čas na seba. Počúvaj svoje telo a rešpektuj jeho potreby.
-            </p>
-          )}
-        </div>
+        <p className="text-sm leading-relaxed" style={{ color: '#955F6A' }}>
+          {myselText}
+        </p>
       </div>
     </div>
   );

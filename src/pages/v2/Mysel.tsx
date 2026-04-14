@@ -1,18 +1,19 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Play, Plus, Check, Clock, Footprints, Droplets, BookOpen, Pause, Heart, Lightbulb, ArrowRight, Brain } from 'lucide-react';
-import GlassCard from '../../components/v2/GlassCard';
+import { ArrowLeft, Play, Plus, Check, BookOpen, Heart, Lightbulb, ArrowRight, Brain } from 'lucide-react';
+import FavoriteButton from '../../components/v2/favorites/FavoriteButton';
 import { colors } from '../../theme/warmDusk';
 
 const tabs = ['Mindfulness', 'Meditácie', 'Zamyslenia'] as const;
-const categories = ['Stres', 'Vďačnosť', 'Večer'];
+const meditationCategories = ['Všetko', 'Stres', 'Vďačnosť', 'Večer'];
+const meditationDurations = ['Všetko', '5 min', '10 min', '15 min', '20 min+'];
 
 const meditations = [
-  { id: '1', title: 'Uvoľnenie stresu', duration: '10 min', cat: 'Stres', audioUrl: '/audio/stress-relief.mp3' },
-  { id: '2', title: 'Vďačnosť pred spaním', duration: '15 min', cat: 'Vďačnosť', audioUrl: '/audio/gratitude-sleep.mp3' },
-  { id: '3', title: 'Pokojná noc', duration: '20 min', cat: 'Večer', audioUrl: '/audio/peaceful-night.mp3' },
-  { id: '4', title: 'Dýchanie 4-7-8', duration: '5 min', cat: 'Stres', audioUrl: '/audio/breathing-478.mp3' },
-  { id: '5', title: 'Ráno s vďačnosťou', duration: '10 min', cat: 'Vďačnosť', audioUrl: '/audio/morning-gratitude.mp3' },
+  { id: '1', title: 'Uvoľnenie stresu', duration: '10 min', durationMin: 10, cat: 'Stres', audioUrl: '/audio/stress-relief.mp3', thumbnail: 'https://images.unsplash.com/photo-1499728603263-13726abce5ca?w=300&h=200&fit=crop' },
+  { id: '2', title: 'Vďačnosť pred spaním', duration: '15 min', durationMin: 15, cat: 'Vďačnosť', audioUrl: '/audio/gratitude-sleep.mp3', thumbnail: 'https://images.unsplash.com/photo-1515894203077-9cd36514e75c?w=300&h=200&fit=crop' },
+  { id: '3', title: 'Pokojná noc', duration: '20 min', durationMin: 20, cat: 'Večer', audioUrl: '/audio/peaceful-night.mp3', thumbnail: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=300&h=200&fit=crop' },
+  { id: '4', title: 'Dýchanie 4-7-8', duration: '5 min', durationMin: 5, cat: 'Stres', audioUrl: '/audio/breathing-478.mp3', thumbnail: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=300&h=200&fit=crop' },
+  { id: '5', title: 'Ráno s vďačnosťou', duration: '10 min', durationMin: 10, cat: 'Vďačnosť', audioUrl: '/audio/morning-gratitude.mp3', thumbnail: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300&h=200&fit=crop' },
 ];
 
 // Mindfulness cards - daily wisdom and prompts
@@ -67,24 +68,62 @@ const journalPrompts = [
   'Ako môžem byť k sebe zajtra láskavejšia?',
 ];
 
-const habits = [
-  { icon: Footprints, label: 'Kroky', target: '8 000', color: '#6B4C3B', weekDone: [true, true, true, false, true, false, false] },
-  { icon: Droplets, label: 'Voda', target: '8 pohárov', color: '#7A9E78', weekDone: [true, true, false, true, true, false, false] },
-  { icon: Clock, label: 'Cvičenie', target: '30 min', color: '#7A9E78', weekDone: [true, false, true, true, false, false, false] },
-];
-
 const reflections = [
   { date: '15. feb', preview: 'Dnes som zvládla ranný beh a cítila som sa skvele...' },
   { date: '14. feb', preview: 'Som vďačná za krásny deň s rodinou...' },
   { date: '13. feb', preview: 'Podarilo sa mi dokončiť projekt v práci...' },
 ];
 
+function MeditationRow({ m, onPlay }: { m: typeof meditations[0]; onPlay: (m: typeof meditations[0]) => void }) {
+  return (
+    <div className="bg-white/30 backdrop-blur-xl rounded-2xl shadow-sm border border-white/20 overflow-hidden">
+      <div className="flex items-center gap-3 p-3">
+        <button
+          onClick={() => onPlay(m)}
+          className="relative w-14 h-14 flex-shrink-0 rounded-xl overflow-hidden active:scale-95 transition-transform"
+        >
+          <img src={m.thumbnail} alt={m.title} className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+            <Play size={14} className="text-white" fill="white" strokeWidth={0} />
+          </div>
+        </button>
+        <button onClick={() => onPlay(m)} className="flex-1 text-left min-w-0">
+          <p className="text-[13px] font-semibold leading-snug" style={{ color: '#2E2218' }}>{m.title}</p>
+          <p className="text-[11px] mt-0.5" style={{ color: '#8B7560' }}>{m.duration} · {m.cat}</p>
+        </button>
+        <FavoriteButton
+          itemId={m.id}
+          type="meditation"
+          title={m.title}
+          image={m.thumbnail}
+          duration={m.duration}
+          category={m.cat}
+          metadata={{}}
+          size="sm"
+          variant="minimal"
+        />
+      </div>
+    </div>
+  );
+}
+
 export default function Mysel() {
   const navigate = useNavigate();
   const [tab, setTab] = useState<typeof tabs[number]>('Meditácie');
-  const [catFilter, setCatFilter] = useState<string | null>(null);
-  const [playingId, setPlayingId] = useState<string | null>(null);
+  const [catFilter, setCatFilter] = useState<string>('Všetko');
+  const [durFilter, setDurFilter] = useState<string>('Všetko');
+  const [showFavourites, setShowFavourites] = useState(false);
   const [completedCards, setCompletedCards] = useState<Set<number>>(new Set());
+
+  // Load favourites from localStorage
+  const favouriteIds: string[] = (() => {
+    try {
+      const raw = localStorage.getItem('neome-favorites');
+      if (!raw) return [];
+      const all = JSON.parse(raw);
+      return all.filter((f: any) => f.type === 'meditation').map((f: any) => f.itemId);
+    } catch { return []; }
+  })();
 
   const handleMindfulnessCardAction = (cardId: number, cardType: string) => {
     switch(cardType) {
@@ -107,15 +146,8 @@ export default function Mysel() {
     }
   };
 
-  const handlePlayMeditation = (meditationId: string) => {
-    if (playingId === meditationId) {
-      setPlayingId(null);
-      alert('Meditácia pozastavená');
-    } else {
-      setPlayingId(meditationId);
-      const meditation = meditations.find(m => m.id === meditationId);
-      alert(`Spúšťa sa "${meditation?.title}" - ${meditation?.duration}`);
-    }
+  const handlePlayMeditation = (m: typeof meditations[0]) => {
+    navigate('/meditation-player', { state: { session: { ...m, instructor: 'NeoMe' } } });
   };
 
   const openJournalWithPrompt = () => {
@@ -235,77 +267,91 @@ export default function Mysel() {
       {/* Enhanced Meditácie */}
       {tab === 'Meditácie' && (
         <div className="space-y-4">
-          {/* Header section */}
+          {/* Header */}
           <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-medium" style={{ color: '#6B4C3B' }}>
-                Nájdi pokoj v tichosti
-              </p>
-              <button 
-                onClick={() => navigate('/meditacie')} 
-                className="text-xs font-medium flex items-center gap-1 text-[#A8848B]"
-              >
-                Všetky meditácie
-                <ArrowRight size={12} />
+              <p className="text-sm font-medium" style={{ color: '#6B4C3B' }}>Nájdi pokoj v tichosti</p>
+              <button onClick={() => navigate('/meditacie')} className="text-xs font-medium flex items-center gap-1 text-[#A8848B]">
+                Všetky meditácie <ArrowRight size={12} />
               </button>
             </div>
           </div>
-          
-          {/* Categories */}
-          <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
+
+          {/* Filters */}
+          <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30 space-y-3">
+            {/* Favourites toggle + Category */}
             <div className="flex gap-2 overflow-x-auto scrollbar-hide">
-              {categories.map((c) => (
-                <button 
-                  key={c} 
-                  onClick={() => setCatFilter(catFilter === c ? null : c)}
-                  className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${
-                    catFilter === c 
-                      ? 'bg-[#A8848B] text-white' 
-                      : 'bg-white/20 text-gray-600 hover:bg-white/25'
+              <button
+                onClick={() => setShowFavourites(!showFavourites)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap transition-all flex items-center gap-1 ${
+                  showFavourites ? 'bg-[#A8848B] text-white' : 'bg-white/20 text-gray-600'
+                }`}
+              >
+                <Heart size={10} fill={showFavourites ? 'white' : 'none'} />
+                Obľúbené
+              </button>
+              {meditationCategories.map((c) => (
+                <button
+                  key={c}
+                  onClick={() => { setCatFilter(c); setShowFavourites(false); }}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap transition-all ${
+                    !showFavourites && catFilter === c ? 'bg-[#A8848B] text-white' : 'bg-white/20 text-gray-600'
                   }`}
                 >
                   {c}
                 </button>
               ))}
             </div>
-          </div>
-          
-          {/* Meditations list */}
-          <div className="space-y-3">
-            {meditations
-              .filter((m) => !catFilter || m.cat === catFilter)
-              .map((m) => (
-                <div
-                  key={m.id} 
-                  className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20 cursor-pointer hover:shadow-md active:scale-[0.98] transition-all"
-                  onClick={() => handlePlayMeditation(m.id)}
+            {/* Duration filter */}
+            <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+              {meditationDurations.map((d) => (
+                <button
+                  key={d}
+                  onClick={() => setDurFilter(d)}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap transition-all ${
+                    durFilter === d ? 'bg-[#A8848B]/80 text-white' : 'bg-white/20 text-gray-600'
+                  }`}
                 >
-                  <div className="flex items-center gap-3">
-                    <div 
-                      className="w-10 h-10 rounded-full flex items-center justify-center"
-                      style={{ backgroundColor: 'rgba(168, 132, 139, 0.14)' }}
-                    >
-                      {playingId === m.id ? (
-                        <Pause size={16} className="text-[#A8848B]" fill="#A8848B" />
-                      ) : (
-                        <Play size={16} className="text-[#A8848B]" fill="#A8848B" />
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium" style={{ color: '#2E2218' }}>
-                        {m.title}
-                      </p>
-                      <p className="text-xs mt-0.5" style={{ color: '#6B4C3B' }}>
-                        {m.duration} · {m.cat}
-                      </p>
-                    </div>
-                    {playingId === m.id && (
-                      <div className="w-3 h-3 rounded-full animate-pulse bg-[#A8848B]" />
-                    )}
-                  </div>
-                </div>
+                  {d}
+                </button>
               ))}
+            </div>
           </div>
+
+          {/* Favourites section */}
+          {showFavourites && (
+            <div className="space-y-3">
+              {favouriteIds.length === 0 ? (
+                <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-6 border border-white/20 text-center">
+                  <Heart size={28} className="mx-auto mb-2" style={{ color: '#A8848B' }} />
+                  <p className="text-sm font-medium mb-1" style={{ color: '#2E2218' }}>Žiadne obľúbené</p>
+                  <p className="text-xs" style={{ color: '#8B7560' }}>Ťukni na srdce pri meditácii a uloží sa sem</p>
+                </div>
+              ) : (
+                meditations.filter(m => favouriteIds.includes(m.id)).map((m) => (
+                  <MeditationRow key={m.id} m={m} onPlay={handlePlayMeditation} />
+                ))
+              )}
+            </div>
+          )}
+
+          {/* Filtered meditations list */}
+          {!showFavourites && (
+            <div className="space-y-3">
+              {meditations
+                .filter((m) => catFilter === 'Všetko' || m.cat === catFilter)
+                .filter((m) => {
+                  if (durFilter === 'Všetko') return true;
+                  if (durFilter === '5 min') return m.durationMin <= 5;
+                  if (durFilter === '10 min') return m.durationMin <= 10;
+                  if (durFilter === '15 min') return m.durationMin <= 15;
+                  return m.durationMin > 15;
+                })
+                .map((m) => (
+                  <MeditationRow key={m.id} m={m} onPlay={handlePlayMeditation} />
+                ))}
+            </div>
+          )}
         </div>
       )}
 

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Pencil, Flame } from 'lucide-react';
 import GlassCard from '../../components/v2/GlassCard';
 import EmptyStateHabits from '../../components/v2/EmptyStateHabits';
 import { colors, glassCard } from '../../theme/warmDusk';
@@ -29,12 +29,13 @@ export default function NavykyHistory() {
   }, []);
 
   return (
-    <div className="min-h-screen space-y-4 pb-8" style={{ background: colors.bgGradient }}>
-      <div className="flex items-center gap-3">
+    <div className="min-h-screen px-4 pt-5 pb-8 space-y-4" style={{ background: colors.bgGradient }}>
+      {/* Header */}
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/20 flex items-center gap-3">
         <button onClick={() => navigate('/kniznica')} className="p-1">
           <ArrowLeft className="w-5 h-5 text-[#2E2218]" strokeWidth={1.5} />
         </button>
-        <h1 className="text-xl font-semibold text-[#2E2218]">Návyky</h1>
+        <h1 className="text-[22px] font-medium leading-tight text-[#2E2218]" style={{ fontFamily: '"Bodoni Moda", Georgia, serif' }}>Denník návykov</h1>
       </div>
 
       {habits.length === 0 ? (
@@ -50,9 +51,19 @@ export default function NavykyHistory() {
               <div className="flex items-center gap-2 mb-3">
                 {habit.icon && <span className="text-lg">{habit.icon}</span>}
                 <p className="text-[15px] font-semibold text-[#2E2218]">{habit.name || habit.label || `Návyk ${idx + 1}`}</p>
-                {streak > 0 && (
-                  <span className="ml-auto text-[12px] font-medium text-[#B8864A]">🔥 {streak} dní</span>
-                )}
+                <div className="ml-auto flex items-center gap-2">
+                  {streak > 0 && (
+                    <span className="text-[12px] font-medium text-[#B8864A] flex items-center gap-0.5"><Flame size={11} /> {streak} dní</span>
+                  )}
+                  <button
+                    onClick={() => navigate('/navyky')}
+                    className="w-7 h-7 rounded-lg flex items-center justify-center"
+                    style={{ background: 'rgba(184,134,74,0.1)' }}
+                    title="Upraviť návyk"
+                  >
+                    <Pencil size={12} style={{ color: '#B8864A' }} />
+                  </button>
+                </div>
               </div>
               {/* Heatmap grid - last 30 days */}
               <div className="grid grid-cols-10 gap-1">

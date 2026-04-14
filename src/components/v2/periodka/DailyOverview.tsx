@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Clock, Utensils, Activity, Brain, ChevronLeft, ChevronRight, X, Wind, BookOpen, Sparkles } from 'lucide-react';
+import { Clock, Utensils, Activity, Brain, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, addDays, subDays, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek } from 'date-fns';
 import { sk } from 'date-fns/locale';
 import GlassCard from '../GlassCard';
@@ -8,8 +8,7 @@ import {
   getPhaseRanges, getPhaseByDay, getCurrentCycleDay, isFertilityDate, getSubphase
 } from '../../../features/cycle/utils';
 import type { PhaseKey, PhaseRange } from '../../../features/cycle/types';
-import { generateNutrition, generateMovement } from '../../../lib/cycleTipsGenerator';
-import { generateMindset } from '../../../lib/myselGenerator';
+import { getCycleTipByDay } from '../../../data/cycleTips';
 import { colors } from '../../../theme/warmDusk';
 
 // Symptom interfaces and data
@@ -108,74 +107,6 @@ const PHASE_EXPLANATIONS: Record<PhaseKey | 'fertility', string> = {
   fertility: 'Plodné dni začínajú 5 dní pred ovuláciou a trvajú až deň po nej. Šanca na otehotnenie je najvyššia. Spermie môžu v tele prežiť až 5 dní, vajíčko 24 hodín.',
 };
 
-const NUTRITION_TIPS: Record<PhaseKey, string[]> = {
-  menstrual: [
-    'Dopraj si železo z listovej zeleniny a červeného mäsa',
-    'Omega-3 z rýb zmierňuje kŕče a zápal',
-    'Teplé nápoje a polievky ukľudňujú',
-  ],
-  follicular: [
-    'Čerstvé ovocie a zelenina podporujú rastúcu energiu',
-    'Celozrnné potraviny pre stabilnú hladinu cukru',
-    'Ľahké proteíny ako kuracie mäso a ryby',
-  ],
-  ovulation: [
-    'Antioxidanty z bobúľ chránia pred zápalmi',
-    'Vláknina podporuje trávenie v tomto období',
-    'Zdravé tuky z orechov a avokáda',
-  ],
-  luteal: [
-    'Zložité sacharidy stabilizujú náladu',
-    'Vápnik a horčík z orechodov a semienok',
-    'Limituj kofeín a alkohol pre lepší spánok',
-  ],
-};
-
-const MOVEMENT_TIPS: Record<PhaseKey, string[]> = {
-  menstrual: [
-    'Jemná jóga a strečing uvoľňujú napätie',
-    'Prechádzky na čerstvom vzduchu',
-    'Dychové cvičenia pre relaxáciu',
-  ],
-  follicular: [
-    'Silový tréning pre rastúcu energiu',
-    'Kardio cvičenia podporujú dobrú náladu',
-    'Nové športové aktivity',
-  ],
-  ovulation: [
-    'Intenzívne HIIT tréningy',
-    'Výzvy a súťaživé športy',
-    'Tanec a dynamické pohyby',
-  ],
-  luteal: [
-    'Pilates pre posilnenie jadra',
-    'Jemné cvičenia s odporom',
-    'Relaxačné aktivity ako plavanie',
-  ],
-};
-
-const MINDSET_TIPS: Record<PhaseKey, string[]> = {
-  menstrual: [
-    'Dopraj si odpočinok bez pocitu viny',
-    'Meditácia a mindfulness praktiky',
-    'Žurnálovanie pocitov a myšlienok',
-  ],
-  follicular: [
-    'Plánovanie nových projektov a cieľov',
-    'Sociálne aktivity s priateľkami',
-    'Kreativita a učenie sa nového',
-  ],
-  ovulation: [
-    'Dôležité rozhovory a prezentácie',
-    'Networking a nové kontakty',
-    'Sebavedomé rozhodnutia',
-  ],
-  luteal: [
-    'Sústredenie na seba a sebapéču',
-    'Dokončovanie rozpracovaných úloh',
-    'Príprava na ďalší cyklus',
-  ],
-};
 
 // Day Detail Modal Component
 interface DayDetailModalProps {
@@ -380,9 +311,10 @@ interface CycleCalendarProps {
   today: Date;
   displayPhaseName: string;
   displayPhaseDescription: string;
+  history: { startDate: string; endDate?: string }[];
 }
 
-function CycleCalendar({ currentDay, cycleLength, periodLength, phase, lastPeriodStart, ranges, today, displayPhaseName, displayPhaseDescription }: CycleCalendarProps) {
+function CycleCalendar({ currentDay, cycleLength, periodLength, phase, lastPeriodStart, ranges, today, displayPhaseName, displayPhaseDescription, history }: CycleCalendarProps) {
   const [currentMonth, setCurrentMonth] = useState(today);
   const [selectedPhase, setSelectedPhase] = useState<PhaseKey | 'fertility' | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -406,41 +338,64 @@ function CycleCalendar({ currentDay, cycleLength, periodLength, phase, lastPerio
     );
   }
   
-  // Helper function to get phase info including fertility overlap
+  // Helper function to get phase info using actual period history for past dates
   const getPhaseInfo = (date: Date): { phase: PhaseKey; isFertile: boolean } => {
     try {
       if (!lastPeriodStart) {
         return { phase: 'follicular', isFertile: false };
       }
-      
-      // lastPeriodStart is already a Date object
-      const periodStartDate = lastPeriodStart;
-      
-      // Calculate days difference from period start
-      const daysDiff = Math.floor((date.getTime() - periodStartDate.getTime()) / (1000 * 60 * 60 * 24));
-      
-      // Calculate cycle day (1-based, handles past and future dates)
-      let cycleDay;
-      if (daysDiff >= 0) {
-        cycleDay = (daysDiff % cycleLength) + 1;
-      } else {
-        const absDaysDiff = Math.abs(daysDiff);
-        const remainder = absDaysDiff % cycleLength;
-        cycleDay = remainder === 0 ? cycleLength : cycleLength - remainder + 1;
+
+      // Build sorted list of all known period starts (ascending), including lastPeriodStart
+      const allStarts: Date[] = [lastPeriodStart];
+      if (history && history.length > 0) {
+        history.forEach(entry => {
+          if (entry.startDate) {
+            const d = new Date(entry.startDate + 'T00:00:00');
+            // Avoid duplicates
+            if (!allStarts.some(s => s.getTime() === d.getTime())) {
+              allStarts.push(d);
+            }
+          }
+        });
       }
-      
-      // Get basic phase for this cycle day
+      allStarts.sort((a, b) => a.getTime() - b.getTime());
+
+      // Find the most recent period start that is <= date (the cycle this date belongs to)
+      const dateMs = date.getTime();
+      let relevantStart: Date | null = null;
+      for (let i = allStarts.length - 1; i >= 0; i--) {
+        if (allStarts[i].getTime() <= dateMs) {
+          relevantStart = allStarts[i];
+          break;
+        }
+      }
+
+      let cycleDay: number;
+      let periodStartStr: string;
+
+      if (relevantStart) {
+        // Use actual history: calculate day from the correct cycle start
+        const daysDiff = Math.floor((dateMs - relevantStart.getTime()) / (1000 * 60 * 60 * 24));
+        cycleDay = daysDiff + 1; // 1-based
+        // If beyond current cycle length (shouldn't happen with good history, but handle gracefully)
+        if (cycleDay > cycleLength) {
+          cycleDay = ((cycleDay - 1) % cycleLength) + 1;
+        }
+        periodStartStr = format(relevantStart, 'yyyy-MM-dd');
+      } else {
+        // Date is before all known period starts — project backwards using modulo
+        const earliest = allStarts[0];
+        const daysDiff = Math.floor((earliest.getTime() - dateMs) / (1000 * 60 * 60 * 24));
+        const remainder = daysDiff % cycleLength;
+        cycleDay = remainder === 0 ? 1 : cycleLength - remainder + 1;
+        periodStartStr = format(lastPeriodStart, 'yyyy-MM-dd');
+      }
+
       const phaseResult = getPhaseByDay(cycleDay, ranges, cycleLength);
       const basicPhase = phaseResult?.key || 'follicular';
-      
-      // Check if this day is fertile
-      const lastPeriodStartString = format(lastPeriodStart, 'yyyy-MM-dd');
-      const isFertile = isFertilityDate(date, lastPeriodStartString, cycleLength);
-      
-      return {
-        phase: basicPhase,
-        isFertile: isFertile
-      };
+      const isFertile = isFertilityDate(date, periodStartStr, cycleLength);
+
+      return { phase: basicPhase, isFertile };
     } catch (error) {
       console.error('Error in getPhaseInfo:', error);
       return { phase: 'follicular', isFertile: false };
@@ -828,6 +783,7 @@ function DailyOverview() {
           today={today}
           displayPhaseName={displayPhaseName}
           displayPhaseDescription={displayPhaseDescription}
+          history={cycleData.history || []}
         />
       </GlassCard>
     </div>
@@ -844,31 +800,22 @@ interface HowToFeelBetterProps {
 }
 
 function HowToFeelBetterSection({ phase, lastPeriodStart, currentDay = 1, subphase = null, phaseRanges = [] }: HowToFeelBetterProps) {
-  const [breathingOpen, setBreathingOpen] = useState(false);
+  const dayInPhase = Math.max(1, currentDay - (phase.start ?? 1) + 1);
 
-  const nutrition = useMemo(
-    () => generateNutrition(currentDay, phase.key, subphase),
-    [currentDay, phase.key, subphase]
+  const stravaText = useMemo(
+    () => getCycleTipByDay(phase.key, subphase, 'strava', dayInPhase),
+    [phase.key, subphase, dayInPhase]
   );
-  const movement = useMemo(
-    () => generateMovement(currentDay, phase.key, subphase, phaseRanges),
-    [currentDay, phase.key, subphase, phaseRanges]
+  const pohybText = useMemo(
+    () => getCycleTipByDay(phase.key, subphase, 'pohyb', dayInPhase),
+    [phase.key, subphase, dayInPhase]
   );
-  const mindset = useMemo(
-    () => generateMindset(currentDay, phase.key, subphase),
-    [currentDay, phase.key, subphase]
+  const myselText = useMemo(
+    () => getCycleTipByDay(phase.key, subphase, 'mysel', dayInPhase),
+    [phase.key, subphase, dayInPhase]
   );
 
   if (!lastPeriodStart) return null;
-
-  // Parse movement bullet lines
-  const movementLines = movement
-    .split('\n')
-    .filter(Boolean)
-    .map(l => l.replace(/^- /, ''));
-
-  // Parse nutrition paragraphs
-  const nutritionParagraphs = nutrition.split('\n\n').filter(Boolean);
 
   return (
     <div className="space-y-6">
@@ -893,11 +840,7 @@ function HowToFeelBetterSection({ phase, lastPeriodStart, currentDay = 1, subpha
               <h3 className="font-semibold text-base mb-3" style={{ color: colors.strava }}>
                 Strava
               </h3>
-              <div className="space-y-2">
-                {nutritionParagraphs.map((para, i) => (
-                  <p key={i} className="text-sm text-gray-700 leading-relaxed">{para}</p>
-                ))}
-              </div>
+              <p className="text-sm text-gray-700 leading-relaxed">{stravaText}</p>
             </div>
           </div>
         </GlassCard>
@@ -915,14 +858,7 @@ function HowToFeelBetterSection({ phase, lastPeriodStart, currentDay = 1, subpha
               <h3 className="font-semibold text-base mb-3" style={{ color: colors.telo }}>
                 Pohyb
               </h3>
-              <div className="space-y-2">
-                {movementLines.map((line, i) => (
-                  <div key={i} className="flex items-start gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-2" style={{ backgroundColor: colors.telo }} />
-                    <p className="text-sm text-gray-700 leading-relaxed">{line}</p>
-                  </div>
-                ))}
-              </div>
+              <p className="text-sm text-gray-700 leading-relaxed">{pohybText}</p>
             </div>
           </div>
         </GlassCard>
@@ -941,49 +877,7 @@ function HowToFeelBetterSection({ phase, lastPeriodStart, currentDay = 1, subpha
                 Myseľ
               </h3>
 
-              {/* Affirmation */}
-              <div className="mb-3 p-3 rounded-xl" style={{ backgroundColor: `${colors.mysel}15` }}>
-                <div className="flex items-center gap-2 mb-1">
-                  <Sparkles className="w-3.5 h-3.5" style={{ color: colors.mysel }} />
-                  <span className="text-xs font-medium uppercase tracking-wide" style={{ color: colors.mysel }}>Mantra dňa</span>
-                </div>
-                <p className="text-sm font-medium italic leading-relaxed" style={{ color: colors.textPrimary }}>
-                  „{mindset.affirmation}"
-                </p>
-              </div>
-
-              {/* Reframe */}
-              <div className="mb-3">
-                <p className="text-sm text-gray-700 leading-relaxed">{mindset.reframe}</p>
-              </div>
-
-              {/* Journal prompt */}
-              <div className="flex items-start gap-2 mb-3">
-                <BookOpen className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: colors.mysel }} />
-                <div>
-                  <span className="text-xs font-medium uppercase tracking-wide block mb-0.5" style={{ color: colors.mysel }}>Žurnál</span>
-                  <p className="text-sm text-gray-700 leading-relaxed">{mindset.journalPrompt}</p>
-                </div>
-              </div>
-
-              {/* Breathing — collapsible */}
-              <button
-                onClick={() => setBreathingOpen(o => !o)}
-                className="flex items-center gap-2 w-full text-left"
-              >
-                <Wind className="w-4 h-4 flex-shrink-0" style={{ color: colors.mysel }} />
-                <span className="text-xs font-medium uppercase tracking-wide" style={{ color: colors.mysel }}>
-                  {mindset.breathing.name}
-                </span>
-                <span className="ml-auto text-xs" style={{ color: colors.textSecondary }}>
-                  {breathingOpen ? '▲' : '▼'}
-                </span>
-              </button>
-              {breathingOpen && (
-                <div className="mt-2 pl-6">
-                  <p className="text-sm text-gray-600 leading-relaxed">{mindset.breathing.steps}</p>
-                </div>
-              )}
+              <p className="text-sm text-gray-700 leading-relaxed">{myselText}</p>
             </div>
           </div>
         </GlassCard>

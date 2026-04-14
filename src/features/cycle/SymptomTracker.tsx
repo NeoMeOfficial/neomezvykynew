@@ -209,25 +209,24 @@ export function SymptomTracker({
     setHasChanges(true);
   };
 
-  const renderSymptomBadge = (symptom: Symptom) => (
-    <Badge
-      key={symptom.id}
-      variant={selectedSymptoms.includes(symptom.id) ? "default" : "outline"}
-      className={`cursor-pointer select-none text-xs py-1 px-2.5 transition-all duration-200 ${
-        selectedSymptoms.includes(symptom.id)
-          ? 'bg-primary text-primary-foreground shadow-sm'
-          : 'hover:bg-muted'
-      }`}
-      onClick={() => toggleSymptom(symptom.id)}
-      style={{
-        backgroundColor: selectedSymptoms.includes(symptom.id) ? undefined : '#FBF8F9',
-        color: selectedSymptoms.includes(symptom.id) ? undefined : '#955F6A'
-      }}
-    >
-      <span className="mr-1.5">{symptom.icon}</span>
-      {symptom.name}
-    </Badge>
-  );
+  const renderSymptomChip = (symptom: Symptom) => {
+    const isSelected = selectedSymptoms.includes(symptom.id);
+    return (
+      <button
+        key={symptom.id}
+        onClick={() => toggleSymptom(symptom.id)}
+        className="flex flex-col items-center justify-center gap-0.5 py-2 px-1 rounded-xl transition-all duration-150 active:scale-95 select-none"
+        style={{
+          backgroundColor: isSelected ? '#C27A6E20' : 'white',
+          border: `1px solid ${isSelected ? '#C27A6E' : '#E5D4D7'}`,
+          color: isSelected ? '#C27A6E' : '#955F6A',
+        }}
+      >
+        <span className="text-base leading-none">{symptom.icon}</span>
+        <span className="text-[10px] font-medium leading-tight text-center">{symptom.name}</span>
+      </button>
+    );
+  };
 
   const topSymptoms = getTopSymptoms();
 
@@ -239,26 +238,22 @@ export function SymptomTracker({
           Zaznač si, ako sa dnes naozaj cítiš
         </h4>
 
-        {/* Top Symptoms + Custom Button */}
-        <div className="flex flex-wrap gap-2">
-          {topSymptoms.map(renderSymptomBadge)}
-          {!isAddingCustom && (
-            <Badge
-              variant="outline"
-              className="cursor-pointer select-none text-xs py-1 px-2.5 transition-all duration-200 hover:bg-muted border-dashed"
-              onClick={() => setIsAddingCustom(true)}
-              style={{
-                backgroundColor: 'transparent',
-                color: '#955F6A',
-                borderColor: '#B8929A'
-              }}
-              data-tour="custom-symptom"
-            >
-              <span className="mr-1.5">+</span>
-              Zadaj vlastný
-            </Badge>
-          )}
+        {/* Top Symptoms — 3-column compact grid */}
+        <div className="grid grid-cols-3 gap-2">
+          {topSymptoms.map(renderSymptomChip)}
         </div>
+
+        {/* Custom symptom button */}
+        {!isAddingCustom && (
+          <button
+            onClick={() => setIsAddingCustom(true)}
+            className="w-full py-1.5 rounded-xl text-xs border border-dashed transition-colors"
+            style={{ borderColor: '#B8929A', color: '#955F6A', backgroundColor: 'transparent' }}
+            data-tour="custom-symptom"
+          >
+            + Zadaj vlastný príznak
+          </button>
+        )}
 
         {/* Custom Symptom Input */}
         {isAddingCustom && (
@@ -342,8 +337,8 @@ export function SymptomTracker({
                 <h5 className="text-xs font-medium uppercase tracking-wide" style={{ color: '#B8929A' }}>
                   {category}
                 </h5>
-                <div className="flex flex-wrap gap-2">
-                  {symptoms.map(renderSymptomBadge)}
+                <div className="grid grid-cols-3 gap-2">
+                  {symptoms.map(renderSymptomChip)}
                 </div>
               </div>
             ))}
@@ -354,8 +349,8 @@ export function SymptomTracker({
                 <h5 className="text-xs font-medium uppercase tracking-wide" style={{ color: '#B8929A' }}>
                   Vlastné príznaky
                 </h5>
-                <div className="flex flex-wrap gap-2">
-                  {customSymptoms.map(renderSymptomBadge)}
+                <div className="grid grid-cols-3 gap-2">
+                  {customSymptoms.map(renderSymptomChip)}
                 </div>
               </div>
             )}

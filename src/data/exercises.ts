@@ -9,9 +9,12 @@ export interface Exercise {
   phase: 'menstrual' | 'follicular' | 'ovulation' | 'luteal' | 'all';
   intensity: 'low' | 'medium' | 'high';
   route: string;
+  /** YouTube video ID (e.g. "v7AYKMP6rOE") or full video URL. When set, renders an embedded player. */
+  videoUrl?: string;
 }
 
 // Stretching exercises - ideal for luteal/menstrual phases
+// videoUrl: YouTube video ID — replace with licensed content before production launch
 const stretchExercises: Exercise[] = [
   {
     id: 'stretch-1',
@@ -23,7 +26,8 @@ const stretchExercises: Exercise[] = [
     category: 'stretch',
     phase: 'all',
     intensity: 'low',
-    route: '/stretch/0'
+    route: '/stretch/0',
+    videoUrl: 'jZ6ZQXB1F7g',
   },
   {
     id: 'stretch-2',
@@ -35,7 +39,8 @@ const stretchExercises: Exercise[] = [
     category: 'stretch',
     phase: 'luteal',
     intensity: 'low',
-    route: '/stretch/1'
+    route: '/stretch/1',
+    videoUrl: 'jZ6ZQXB1F7g',
   },
   {
     id: 'stretch-3',
@@ -47,7 +52,8 @@ const stretchExercises: Exercise[] = [
     category: 'stretch',
     phase: 'menstrual',
     intensity: 'low',
-    route: '/stretch/4'
+    route: '/stretch/4',
+    videoUrl: 'jZ6ZQXB1F7g',
   },
   {
     id: 'stretch-4',
@@ -59,7 +65,8 @@ const stretchExercises: Exercise[] = [
     category: 'stretch',
     phase: 'all',
     intensity: 'low',
-    route: '/stretch/3'
+    route: '/stretch/3',
+    videoUrl: 'jZ6ZQXB1F7g',
   }
 ];
 
@@ -75,7 +82,8 @@ const strengthExercises: Exercise[] = [
     category: 'strength',
     phase: 'follicular',
     intensity: 'high',
-    route: '/exercise/extra/0'
+    route: '/exercise/extra/0',
+    videoUrl: 'jZ6ZQXB1F7g',
   },
   {
     id: 'strength-2',
@@ -87,7 +95,8 @@ const strengthExercises: Exercise[] = [
     category: 'strength',
     phase: 'ovulation',
     intensity: 'high',
-    route: '/exercise/extra/1'
+    route: '/exercise/extra/1',
+    videoUrl: 'jZ6ZQXB1F7g',
   },
   {
     id: 'strength-3',
@@ -99,7 +108,8 @@ const strengthExercises: Exercise[] = [
     category: 'strength',
     phase: 'follicular',
     intensity: 'medium',
-    route: '/exercise/extra/2'
+    route: '/exercise/extra/2',
+    videoUrl: 'jZ6ZQXB1F7g',
   },
   {
     id: 'strength-4',
@@ -111,7 +121,8 @@ const strengthExercises: Exercise[] = [
     category: 'strength',
     phase: 'ovulation',
     intensity: 'medium',
-    route: '/exercise/extra/4'
+    route: '/exercise/extra/4',
+    videoUrl: 'jZ6ZQXB1F7g',
   },
   {
     id: 'strength-5',
@@ -123,7 +134,8 @@ const strengthExercises: Exercise[] = [
     category: 'strength',
     phase: 'follicular',
     intensity: 'high',
-    route: '/exercise/extra/6'
+    route: '/exercise/extra/6',
+    videoUrl: 'jZ6ZQXB1F7g',
   }
 ];
 

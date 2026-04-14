@@ -21,7 +21,7 @@ export default function Welcome() {
           onClick={() => {
             // Set demo session and go directly to app
             localStorage.setItem('demo_session', 'active');
-            localStorage.setItem('demo_user', JSON.stringify({ id: 'demo', email: 'demo@test.com' }));
+            localStorage.setItem('demo_user', JSON.stringify({ id: 'demo', email: 'demo@test.com', firstName: 'Hosť', lastName: '' }));
             navigate('/domov-new');
           }}
           className="w-full bg-white/30 backdrop-blur-xl rounded-2xl py-4 text-lg font-semibold text-[#2E2218] transition-all active:scale-95 shadow-xl"

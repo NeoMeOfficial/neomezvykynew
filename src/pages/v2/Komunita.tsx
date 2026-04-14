@@ -20,10 +20,9 @@ import {
   Shirt,
   Watch,
 } from 'lucide-react';
-import GlassCard from '../../components/v2/GlassCard';
 import BreadcrumbBack from '../../components/v2/BreadcrumbBack';
 import { colors } from '../../theme/warmDusk';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { partnerDiscounts, getAvailableDiscounts, getNextDiscount, getCategoryIcon, getCategoryColor } from '../../data/partnerDiscounts';
 import { useAchievements } from '../../hooks/useAchievements';
 
@@ -122,7 +121,6 @@ const initialPosts: Post[] = [
 // Challenges removed per feedback
 
 export default function Komunita() {
-  const navigate = useNavigate();
   const location = useLocation();
 
   // Tab state - check if coming from home with discount focus
@@ -276,10 +274,8 @@ export default function Komunita() {
         </div>
       )}
 
-      {/* Breadcrumb Back Button - only show if not coming from main nav */}
-      {referrer !== '/domov-new' && (
-        <BreadcrumbBack to={referrer} label={getBackLabel()} />
-      )}
+      {/* Breadcrumb Back Button */}
+      <BreadcrumbBack to={referrer} label={getBackLabel()} />
 
       {/* Nordic Header */}
       <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20 text-center">
@@ -327,72 +323,97 @@ export default function Komunita() {
       {/* Posts Tab Content */}
       {activeTab === 'posts' && (
         <>
-          {/* Daily Achievements */}
+          {/* ── 1. TODAY'S WINS ───────────────────────────────────── */}
           <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
-        <div className="flex items-center gap-2 mb-4">
-          <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(184, 134, 74, 0.14)` }}>
-            <CheckCircle2 className="w-4 h-4" style={{ color: '#B8864A' }} />
-          </div>
-          <h3 className="text-[14px] font-semibold" style={{ color: '#2E2218' }}>Dnešné úspechy</h3>
-        </div>
-        
-        <div className="text-center mb-4">
-          <p className="text-sm font-medium" style={{ color: '#6B4C3B' }}>
-            Spolu dnes dosiahnuté v komunite
-          </p>
-        </div>
-        
-        <div className="grid grid-cols-3 gap-3">
-          <div className="text-center p-3 rounded-xl" style={{ background: 'rgba(122, 158, 120, 0.1)' }}>
-            <div className="text-2xl font-bold text-[#2E2218] mb-1">47</div>
-            <div className="text-[10px] text-[#7A9E78] font-medium leading-tight">
-              cvičilo
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(184, 134, 74, 0.14)` }}>
+                <CheckCircle2 className="w-4 h-4" style={{ color: '#B8864A' }} />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-[14px] font-semibold" style={{ color: '#2E2218' }}>Dnešné víťazstvá</h3>
+                <p className="text-[10px]" style={{ color: '#A0907E' }}>Spolu dnes v komunite</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2 mb-4">
+              <div className="text-center p-3 rounded-xl" style={{ background: 'rgba(122,158,120,0.12)' }}>
+                <div className="text-[28px] font-bold leading-none mb-1" style={{ color: '#7A9E78' }}>47</div>
+                <div className="text-[10px] font-medium leading-tight" style={{ color: '#7A9E78' }}>cvičení</div>
+              </div>
+              <div className="text-center p-3 rounded-xl" style={{ background: 'rgba(184,134,74,0.12)' }}>
+                <div className="text-[28px] font-bold leading-none mb-1" style={{ color: '#B8864A' }}>89</div>
+                <div className="text-[10px] font-medium leading-tight" style={{ color: '#B8864A' }}>návykov</div>
+              </div>
+              <div className="text-center p-3 rounded-xl" style={{ background: 'rgba(168,132,139,0.12)' }}>
+                <div className="text-[28px] font-bold leading-none mb-1" style={{ color: '#A8848B' }}>23</div>
+                <div className="text-[10px] font-medium leading-tight" style={{ color: '#A8848B' }}>meditácií</div>
+              </div>
+            </div>
+
+            {/* Recent wins — top posts as mini activity items */}
+            <div className="space-y-2">
+              {posts.slice(0, 3).map((post) => (
+                <div key={`win-${post.id}`} className="flex items-start gap-2.5 p-2.5 rounded-xl" style={{ background: 'rgba(255,255,255,0.35)' }}>
+                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#D0BCA8] to-[#B8864A] flex-shrink-0 mt-0.5" />
+                  <div className="flex-1 min-w-0">
+                    <span className="text-[11px] font-semibold" style={{ color: '#2E2218' }}>{post.author} </span>
+                    <span className="text-[11px]" style={{ color: '#8B7560' }}>{post.text.length > 60 ? post.text.slice(0, 60) + '…' : post.text}</span>
+                  </div>
+                  <span className="text-[10px] flex-shrink-0 mt-0.5" style={{ color: '#A0907E' }}>{post.time}</span>
+                </div>
+              ))}
             </div>
           </div>
-          <div className="text-center p-3 rounded-xl" style={{ background: 'rgba(184, 134, 74, 0.1)' }}>
-            <div className="text-2xl font-bold text-[#2E2218] mb-1">89</div>
-            <div className="text-[10px] text-[#B8864A] font-medium leading-tight">
-              návykov
+
+          {/* ── 2. FOLLOWED THREADS — always visible ─────────────── */}
+          <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(107,76,59,0.14)` }}>
+                <CheckCircle2 className="w-4 h-4" style={{ color: '#6B4C3B' }} />
+              </div>
+              <h3 className="text-[14px] font-semibold" style={{ color: '#2E2218' }}>
+                Sledované vlákna {followedPosts.size > 0 ? `(${followedPosts.size})` : ''}
+              </h3>
             </div>
+
+            {followedPosts.size > 0 ? (
+              <div className="space-y-3">
+                {posts
+                  .filter(post => followedPosts.has(Number(post.id)))
+                  .slice(0, 3)
+                  .map(post => (
+                    <div
+                      key={`followed-${post.id}`}
+                      className="flex items-start gap-3 p-3 bg-white/20 rounded-xl border border-white/30 cursor-pointer"
+                      onClick={() => toggleComments(Number(post.id))}
+                    >
+                      <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#D0BCA8] to-[#D4B8A0] flex-shrink-0 mt-0.5" />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-xs font-medium" style={{ color: '#2E2218' }}>{post.author}</span>
+                          <span className="text-xs" style={{ color: '#A0907E' }}>{post.time}</span>
+                        </div>
+                        <p className="text-xs leading-relaxed line-clamp-2" style={{ color: '#2E2218' }}>{post.text}</p>
+                      </div>
+                      <button onClick={(e) => { e.stopPropagation(); toggleFollow(Number(post.id)); }} className="text-[10px] font-medium flex-shrink-0" style={{ color: '#6B4C3B' }}>
+                        Zrušiť
+                      </button>
+                    </div>
+                  ))}
+                {followedPosts.size > 3 && (
+                  <p className="text-xs text-center py-1" style={{ color: '#A0907E' }}>+ {followedPosts.size - 3} ďalších sledovaných</p>
+                )}
+              </div>
+            ) : (
+              <div className="text-center py-4 space-y-1">
+                <p className="text-[13px] font-medium" style={{ color: '#6B4C3B' }}>Žiadne sledované vlákna</p>
+                <p className="text-[11px]" style={{ color: '#A0907E' }}>Klikni na „Sledovať" pri príspevku a nájdeš ho tu</p>
+              </div>
+            )}
           </div>
-          <div className="text-center p-3 rounded-xl" style={{ background: 'rgba(168, 132, 139, 0.1)' }}>
-            <div className="text-2xl font-bold text-[#2E2218] mb-1">23</div>
-            <div className="text-[10px] text-[#A8848B] font-medium leading-tight">
-              meditácií
-            </div>
-          </div>
-        </div>
-      </div>
 
-      {/* Buddy System */}
-      <GlassCard className="!p-4">
-        <div className="space-y-4">
-          {/* Header */}
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(184, 134, 74, 0.14)` }}>
-              <UserPlus className="w-4 h-4" style={{ color: '#B8864A' }} />
-            </div>
-            <h3 className="text-[14px] font-semibold" style={{ color: '#2E2218' }}>Buddy System</h3>
-          </div>
-
-          {/* Description */}
-          <p className="text-[12px]" style={{ color: '#A89B8C' }}>
-            Pripoj sa s kamarátkami a motivujte sa
-          </p>
-
-          {/* CTA Button */}
-          <button
-            onClick={() => navigate('/buddy-system')}
-            className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl text-[13px] font-medium transition-all"
-            style={{ backgroundColor: 'rgba(184, 134, 74, 0.14)', color: '#B8864A' }}
-          >
-            Nájsť buddy
-          </button>
-        </div>
-      </GlassCard>
-
-      {/* Post Composer */}
-      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
+          {/* ── 3. POST COMPOSER ──────────────────────────────────── */}
+          <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
         {!composerExpanded ? (
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#B8864A] to-[#D0BCA8] flex-shrink-0" />

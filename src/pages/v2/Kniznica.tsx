@@ -18,7 +18,7 @@ export default function Kniznica() {
     <div className="w-full min-h-screen px-3 py-6 pb-28 space-y-6">
       {/* Nordic Header */}
       <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20 text-center">
-        <h1 className="text-2xl font-bold mb-2" style={{ color: '#2E2218' }}>Knižnica</h1>
+        <h1 className="text-[28px] font-medium leading-tight mb-2" style={{ color: '#2E2218', fontFamily: '"Bodoni Moda", Georgia, serif' }}>Knižnica</h1>
         <p className="text-sm font-medium" style={{ color: '#6B4C3B' }}>
           Výber kategórií pre tvoju cestu k lepšiemu zdraviu
         </p>
@@ -36,7 +36,7 @@ export default function Kniznica() {
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
               <div className="absolute bottom-5 left-5 flex items-center gap-2">
                 <div className="w-1 h-8 rounded-full" style={{ background: s.color }} />
-                <span className="text-2xl font-bold text-white">{s.label}</span>
+                <span className="text-[26px] font-medium text-white" style={{ fontFamily: '"Bodoni Moda", Georgia, serif' }}>{s.label}</span>
               </div>
             </button>
           </div>

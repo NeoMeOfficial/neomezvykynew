@@ -24,7 +24,8 @@ export default function DennikHistory() {
       const entries: DiaryEntry[] = JSON.parse(raw);
       const groups: Record<string, DiaryEntry[]> = {};
       for (const e of entries) {
-        const date = e.date || (e.timestamp ? e.timestamp.slice(0, 10) : (e.createdAt ? e.createdAt.slice(0, 10) : 'Neznámy dátum'));
+        const raw = e.date || e.timestamp || e.createdAt || '';
+        const date = raw.length >= 10 ? raw.slice(0, 10) : (raw || 'Neznámy dátum');
         if (!groups[date]) groups[date] = [];
         groups[date].push(e);
       }
@@ -37,12 +38,12 @@ export default function DennikHistory() {
   const sortedDates = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
 
   return (
-    <div className="min-h-screen space-y-4 pb-8" style={{ background: colors.bgGradient }}>
-      <div className="flex items-center gap-3">
+    <div className="min-h-screen px-4 pt-5 pb-8 space-y-4" style={{ background: colors.bgGradient }}>
+      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/20 flex items-center gap-3">
         <button onClick={() => navigate('/kniznica')} className="p-1">
           <ArrowLeft className="w-5 h-5 text-[#2E2218]" strokeWidth={1.5} />
         </button>
-        <h1 className="text-xl font-semibold text-[#2E2218]">Osobný denník</h1>
+        <h1 className="text-[22px] font-medium leading-tight text-[#2E2218]" style={{ fontFamily: '"Bodoni Moda", Georgia, serif' }}>Osobný denník</h1>
       </div>
 
       {sortedDates.length === 0 ? (
@@ -56,8 +57,9 @@ export default function DennikHistory() {
                 <div key={i}>
                   {i > 0 && <div className="border-t border-[#D0BCA8] my-2" />}
                   <p className="text-[12px] text-[#888] mb-1">
-                    {entry.timestamp ? new Date(entry.timestamp).toLocaleTimeString('sk-SK', { hour: '2-digit', minute: '2-digit' }) :
-                     entry.createdAt ? new Date(entry.createdAt).toLocaleTimeString('sk-SK', { hour: '2-digit', minute: '2-digit' }) : ''}
+                    {(entry.date || entry.timestamp || entry.createdAt)
+                      ? new Date(entry.date || entry.timestamp || entry.createdAt!).toLocaleTimeString('sk-SK', { hour: '2-digit', minute: '2-digit' })
+                      : ''}
                   </p>
                   <p className="text-[13px] text-[#8B7560] leading-relaxed whitespace-pre-wrap">
                     {entry.text || entry.content || ''}

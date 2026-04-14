@@ -57,6 +57,7 @@ export function calculateAverageCycleLength(history: PeriodLog[]): { average: nu
   };
 }
 import { getDerivedState } from './utils';
+import { syncToSupabase, loadFromSupabase } from '../supabaseSync';
 
 const STORAGE_KEY = 'cycle_data';
 
@@ -87,28 +88,47 @@ export function useCycleData(accessCode?: string) {
     return accessCode ? `${STORAGE_KEY}_${accessCode}` : STORAGE_KEY;
   }, [accessCode]);
 
-  // Load data from storage (instant, synchronous)
+  // Load data from storage — instant from localStorage, then hydrate from Supabase if available
   const loadCycleData = useCallback(() => {
+    // Step 1: load localStorage immediately for instant render
     try {
       const storageKey = getStorageKey();
       const stored = localStorage.getItem(storageKey);
-      
       if (stored) {
         const parsed = JSON.parse(stored);
         const merged = {
           ...defaultCycleData,
           ...parsed,
-          customSettings: {
-            ...defaultCustomSettings,
-            ...parsed.customSettings
-          }
+          customSettings: { ...defaultCustomSettings, ...parsed.customSettings }
         };
         setCycleData(merged);
       }
     } catch (error) {
-      console.error('Failed to load cycle data:', error);
+      console.error('Failed to load cycle data from localStorage:', error);
     }
-    // No loading state - instant render
+
+    // Step 2: hydrate from Supabase in the background (fresher data wins)
+    loadFromSupabase<CycleData>('cycle_data').then(remoteData => {
+      if (!remoteData) return;
+      const merged = {
+        ...defaultCycleData,
+        ...remoteData,
+        customSettings: { ...defaultCustomSettings, ...remoteData.customSettings }
+      };
+      // Only update if remote data is more complete (has lastPeriodStart or more history)
+      setCycleData(current => {
+        const remoteHistoryLen = merged.history?.length ?? 0;
+        const localHistoryLen = current.history?.length ?? 0;
+        if (merged.lastPeriodStart && remoteHistoryLen >= localHistoryLen) {
+          // Persist the fresher remote data to localStorage too
+          try {
+            localStorage.setItem(getStorageKey(), JSON.stringify(merged));
+          } catch (_) { /* ignore */ }
+          return merged;
+        }
+        return current;
+      });
+    }).catch(err => console.warn('Failed to hydrate cycle data from Supabase:', err));
   }, [getStorageKey]);
 
   // Save data to storage with debouncing
@@ -121,11 +141,14 @@ export function useCycleData(accessCode?: string) {
       try {
         const storageKey = getStorageKey();
         localStorage.setItem(storageKey, JSON.stringify(data));
-        
+
         // Dispatch custom event for cross-tab sync
         window.dispatchEvent(new CustomEvent('cycleDataChanged', {
           detail: { accessCode, data }
         }));
+
+        // Sync to Supabase (fire-and-forget, non-blocking)
+        syncToSupabase('cycle_data', data);
       } catch (error) {
         console.error('Failed to save cycle data:', error);
       }
@@ -157,16 +180,25 @@ export function useCycleData(accessCode?: string) {
     updateCycleData({ periodLength: Math.max(2, Math.min(10, length)) });
   }, [updateCycleData]);
 
-  // Add period to history
+  // Add period to history + silently apply learned cycle length after ≥3 cycles
   const addPeriodToHistory = useCallback((startDate: string, endDate?: string) => {
     setCycleData(current => {
       const history = current.history || [];
       const newEntry = { startDate, endDate };
+      const updatedHistory = [...history, newEntry].sort((a, b) =>
+        new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
+      );
+
+      // Auto-calibrate cycle length from learned history (≥3 complete cycles)
+      const avgResult = calculateAverageCycleLength(updatedHistory);
+      const learnedCycleLength = (avgResult && avgResult.cycleCount >= 3)
+        ? avgResult.average
+        : current.cycleLength;
+
       const updated = {
         ...current,
-        history: [...history, newEntry].sort((a, b) => 
-          new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
-        )
+        history: updatedHistory,
+        cycleLength: learnedCycleLength
       };
       saveCycleData(updated);
       return updated;

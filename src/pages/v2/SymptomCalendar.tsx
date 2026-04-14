@@ -64,7 +64,7 @@ export default function SymptomCalendar() {
         <button onClick={() => navigate('/kniznica')} className="p-1">
           <ArrowLeft className="w-5 h-5 text-[#2E2218]" strokeWidth={1.5} />
         </button>
-        <h1 className="text-xl font-semibold text-[#2E2218]">Symptómy</h1>
+        <h1 className="text-[22px] font-medium leading-tight text-[#2E2218]" style={{ fontFamily: '"Bodoni Moda", Georgia, serif' }}>Symptómy</h1>
       </div>
 
       <GlassCard>

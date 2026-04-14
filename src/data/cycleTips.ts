@@ -1,8 +1,8 @@
-// Cycle tip library — 84 tips across 4 phases × 3 categories × 7 tips
-// STATUS: Approved by Gabi. Ready for production.
+// Cycle tip library — 105 tips across 5 phases × 3 categories × 7 tips
+// STATUS: Approved by Gabi. Last updated: April 2026.
 // Source of truth: docs/content/cycle-tips-review.md
 
-export type CyclePhase = 'menstrual' | 'follicular' | 'ovulatory' | 'luteal';
+export type CyclePhase = 'menstrual' | 'follicular' | 'ovulatory' | 'luteal' | 'lutealEarly' | 'lutealLate';
 export type TipCategory = 'strava' | 'pohyb' | 'mysel';
 
 export interface CycleTip {
@@ -128,6 +128,64 @@ export const cycleTips: CycleTip[] = [
   { id: 'lut-mys-5', phase: 'luteal', category: 'mysel', text: 'Ak máš pocit, že toho je priveľa, skús si vytvoriť malý priestor len pre seba — čo i len päť minút ticha, keď idú deti spať.' },
   { id: 'lut-mys-6', phase: 'luteal', category: 'mysel', text: 'Ak cítiš úzkosť alebo smútok, pomôže malý rituál — čaj, kniha, hudba, krátka meditácia. Kotviaca rutina upokojuje. Dopraj si ju aspoň na pár minút pred spánkom.' },
   { id: 'lut-mys-7', phase: 'luteal', category: 'mysel', text: 'Pamätaj: o niekoľko dní sa všetko zmení. Luteálna nálada nie je trvalá pravda o tebe — je to fáza, ktorá prejde.' },
+
+  // ─── SKORÁ LUTEÁLNA FÁZA — progesterón stúpa ────────────────────────────
+
+  // Strava
+  { id: 'lut-e-str-1', phase: 'lutealEarly', category: 'strava', text: 'Progesterón stúpa a s ním rastie aj chuť do jedla — je to normálne. Zaraď komplexné sacharidy ako bataty, quinoa a ovsené vločky, ktoré zasýtia a udržia energiu stabilnú.' },
+  { id: 'lut-e-str-2', phase: 'lutealEarly', category: 'strava', text: 'Horčík je tvojím najlepším spojencom v tejto fáze — pomáha telu spracovať progesterón a znižuje prvé príznaky PMS. Nájdeš ho v mandliach, tmavej čokoláde a listovej zelenine.' },
+  { id: 'lut-e-str-3', phase: 'lutealEarly', category: 'strava', text: 'Teplé, výdatné jedlá sa hodia viac než ľahké šaláty — telo sa prirodzene orientuje na zahriate a výživnejšie pokrmy. Polievky, dusené jedlá a pečená zelenina sú ideálne.' },
+  { id: 'lut-e-str-4', phase: 'lutealEarly', category: 'strava', text: 'Dostatok bielkovín — vajcia, strukoviny, ryby — stabilizuje hladinu cukru v krvi a pomáha predísť intenzívnym chutiam na sladké neskôr v cykle.' },
+  { id: 'lut-e-str-5', phase: 'lutealEarly', category: 'strava', text: 'Fermentované potraviny — kefír, jogurt, kyslá kapusta — podporujú črevný mikrobióm, ktorý hrá kľúčovú úlohu v regulácii progesterónu a nálady.' },
+  { id: 'lut-e-str-6', phase: 'lutealEarly', category: 'strava', text: 'Obmedz nadmernú konzumáciu kofeínu — progesterón je prirodzene upokojujúci hormón a kofeín môže narúšať jeho efekt a zhoršovať spánok, ktorý je teraz dôležitejší.' },
+  { id: 'lut-e-str-7', phase: 'lutealEarly', category: 'strava', text: 'Vitamín B6 z banánov, morčacieho mäsa a cíceru podporuje produkciu progesterónu a pomáha zvládať prvé výkyvy nálady.' },
+
+  // Pohyb
+  { id: 'lut-e-poh-1', phase: 'lutealEarly', category: 'pohyb', text: 'Energia ešte dovoľuje stredne intenzívny pohyb — využi to, ale nepretláčaj sa na maximum ako v ovulačnej fáze.' },
+  { id: 'lut-e-poh-2', phase: 'lutealEarly', category: 'pohyb', text: 'Silový tréning s mierne nižšími váhami je stále vhodný — regenerácia sa spomaľuje, takže si daj viac času na oddych medzi sériami.' },
+  { id: 'lut-e-poh-3', phase: 'lutealEarly', category: 'pohyb', text: 'Pilates a jóga sú v tejto fáze obzvlášť príjemné — spájajú silu s uvoľnením a odrážajú pomalšie tempo, ku ktorému sa telo prirodzene obracia.' },
+  { id: 'lut-e-poh-4', phase: 'lutealEarly', category: 'pohyb', text: 'Ak si bežkyňa alebo cyklistka, pokračuj — ale tempo zníž o 10–15 %. Telo pracuje ťažšie pri rovnakej záťaži kvôli vyššej telesnej teplote a progesterónu.' },
+  { id: 'lut-e-poh-5', phase: 'lutealEarly', category: 'pohyb', text: 'Aktivity v prírode — prechádzky v lese, pohyb pri vode — majú silný upokojujúci efekt a dobre ladia s introvertnou náladou tejto fázy.' },
+  { id: 'lut-e-poh-6', phase: 'lutealEarly', category: 'pohyb', text: 'Dbaj na strečing a regeneráciu viac než inokedy — svaly sa zotavujú pomalšie a kvalitné zahriatie aj ochladenie predíde stuhnutosti a bolestiam.' },
+  { id: 'lut-e-poh-7', phase: 'lutealEarly', category: 'pohyb', text: 'Počúvaj telo — ak sa ráno cítiš unavená, je to signál na ľahší deň. Jeden deň odpočinku teraz je múdrejší ako dva dni núteného výkonu.' },
+
+  // Myseľ
+  { id: 'lut-e-mys-1', phase: 'lutealEarly', category: 'mysel', text: 'Toto je prirodzený čas na spomalenie a zameranie sa na svoje vnútro — energia sa presúva z vonkajšieho sveta smerom k tebe samej. Nie je to problém, je to fáza.' },
+  { id: 'lut-e-mys-2', phase: 'lutealEarly', category: 'mysel', text: 'Kreativita sa mení z generovania nových nápadov na dokončovanie a uzatváranie — ideálny čas na finišovanie projektov, nie na začínanie nových.' },
+  { id: 'lut-e-mys-3', phase: 'lutealEarly', category: 'mysel', text: 'Ak si v predchádzajúcich fázach stanovila ciele, teraz je čas na realistické zhodnotenie — čo sa darí, čo nie, bez sebakritizy.' },
+  { id: 'lut-e-mys-4', phase: 'lutealEarly', category: 'mysel', text: 'Sociálna energia klesá — je normálne preferovať menšie spoločnosti alebo čas sama. Nenuť sa na spoločenské akcie, ak na ne nemáš chuť.' },
+  { id: 'lut-e-mys-5', phase: 'lutealEarly', category: 'mysel', text: 'Telesné vnemy sú intenzívnejšie — vnímaš viac detailov, citlivosť je vyššia. Využi to v práci, kde je dôležitá pozornosť a precíznosť.' },
+  { id: 'lut-e-mys-6', phase: 'lutealEarly', category: 'mysel', text: 'Spánok je v tejto fáze kľúčový — progesterón ho prirodzene podporuje, ale môžeš zažiť živé sny. Vytvor si upokojujúcu večernú rutinu.' },
+  { id: 'lut-e-mys-7', phase: 'lutealEarly', category: 'mysel', text: 'Naplánuj si čas len pre seba — nie na produktivitu, ale na nabitie. Kniha, kúpeľ, hudba. Telo a myseľ to budú potrebovať čoraz viac.' },
+
+  // ─── NESKORÁ LUTEÁLNA FÁZA — všetky hormóny klesajú ────────────────────
+
+  // Strava
+  { id: 'lut-l-str-1', phase: 'lutealLate', category: 'strava', text: 'Komplexné sacharidy — ovsené vločky, sladké zemiaky, quinoa — stabilizujú hladinu cukru a prirodzene zvyšujú serotonín, hormón dobrej nálady, ktorého hladina teraz klesá.' },
+  { id: 'lut-l-str-2', phase: 'lutealLate', category: 'strava', text: 'Horčík zmierňuje príznaky PMS — nájdeš ho v tmavej čokoláde (min. 70 %), špenáte, mandliach a avokáde. Väčšina žien ho má v tejto fáze prirodzene málo.' },
+  { id: 'lut-l-str-3', phase: 'lutealLate', category: 'strava', text: 'Vápnik z mliečnych výrobkov alebo fortifikovaných rastlinných nápojov zmierňuje kŕče, nafukovanie a výkyvy nálad pred menštruáciou.' },
+  { id: 'lut-l-str-4', phase: 'lutealLate', category: 'strava', text: 'Obmedz soľ, kávu a alkohol — všetky tri zhoršujú zadržiavanie vody, podráždenosť a úzkosť v tejto fáze výrazne.' },
+  { id: 'lut-l-str-5', phase: 'lutealLate', category: 'strava', text: 'Malé, pravidelné jedlá udržia hladinu cukru stabilnú a zredukujú intenzívne chute na sladké — namiesto troch veľkých jedál skús päť menších.' },
+  { id: 'lut-l-str-6', phase: 'lutealLate', category: 'strava', text: 'Tryptofán z morčacieho mäsa, vajíčok a orechov podporuje tvorbu serotonínu — prirodzeného stabilizátora nálady, ktorého hladina teraz klesá.' },
+  { id: 'lut-l-str-7', phase: 'lutealLate', category: 'strava', text: 'Ak ťa premáhajú chute na čokoládu, daj si tmavú — telo žiada horčík, nie je to slabosť vôle.' },
+
+  // Pohyb
+  { id: 'lut-l-poh-1', phase: 'lutealLate', category: 'pohyb', text: 'Zníž intenzitu výrazne a uži si pohyb pre potešenie, nie výkon — jóga, pilates a prechádzky sú teraz ideálne.' },
+  { id: 'lut-l-poh-2', phase: 'lutealLate', category: 'pohyb', text: 'Yin jóga alebo restoratívna jóga — kde polohy držíš dlhšie — sú výnimočne účinné na uvoľnenie napätia v panvovej oblasti.' },
+  { id: 'lut-l-poh-3', phase: 'lutealLate', category: 'pohyb', text: 'Krátka prechádzka po jedle pomáha stabilizovať hladinu cukru v krvi a zmierňuje nafukovanie, ktoré je v tejto fáze časté.' },
+  { id: 'lut-l-poh-4', phase: 'lutealLate', category: 'pohyb', text: 'Ak sa necítiš na cvičenie, kratší a miernejší pohyb je stále lepší ako nič — 20-minútová prechádzka robí skutočné zázraky.' },
+  { id: 'lut-l-poh-5', phase: 'lutealLate', category: 'pohyb', text: 'Beh alebo cyklistika v miernom tempe sú v poriadku — počúvaj telo a spomaľ, keď to vyžaduje. Rytmický pohyb navyše pomáha regulovať náladu.' },
+  { id: 'lut-l-poh-6', phase: 'lutealLate', category: 'pohyb', text: 'Vyhni sa silovému tréningu s maximálnymi váhami — regenerácia je pomalšia, zápal v tele je vyšší a riziko zranenia tiež.' },
+  { id: 'lut-l-poh-7', phase: 'lutealLate', category: 'pohyb', text: 'Pohyb vonku v prírode znižuje kortizol, ktorý je v tejto fáze prirodzene vyšší — aj 15 minút vonku má preukázateľný vplyv na náladu.' },
+
+  // Myseľ
+  { id: 'lut-l-mys-1', phase: 'lutealLate', category: 'mysel', text: 'Je normálne chcieť byť viac doma a menej medzi ľuďmi — telo aj myseľ sa sťahujú dovnútra. Rešpektuj to bez viny.' },
+  { id: 'lut-l-mys-2', phase: 'lutealLate', category: 'mysel', text: 'Emócie sú najintenzívnejšie v celom cykle — to, čo cítiš, je reálne. Skús to pomenovať bez súdenia: „Som podráždená, pretože som unavená."' },
+  { id: 'lut-l-mys-3', phase: 'lutealLate', category: 'mysel', text: 'Denník je najmocnejší nástroj tejto fázy — zapisuj si, čo ťa trápi, čo ti chýba, čo potrebuješ. Uvidíš, ako sa vzorce opakujú každý mesiac.' },
+  { id: 'lut-l-mys-4', phase: 'lutealLate', category: 'mysel', text: 'Nastav hranice — povedz nie záväzkom, ktoré ťa vyčerpávajú. Toto nie je sebeckosť, je to starostlivosť o seba.' },
+  { id: 'lut-l-mys-5', phase: 'lutealLate', category: 'mysel', text: 'Ak máš pocit, že toho je priveľa, skús si vytvoriť malý priestor len pre seba — čo i len päť minút ticha, keď idú deti spať.' },
+  { id: 'lut-l-mys-6', phase: 'lutealLate', category: 'mysel', text: 'Ak cítiš úzkosť alebo smútok, pomôže malý rituál — čaj, kniha, hudba, krátka meditácia. Kotviaca rutina upokojuje, dopraj si ju aspoň na pár minút pred spánkom.' },
+  { id: 'lut-l-mys-7', phase: 'lutealLate', category: 'mysel', text: 'Pamätaj: o niekoľko dní sa všetko zmení. Nálada luteálnej fázy nie je trvalá pravda o tebe — je to fáza, ktorá prejde.' },
 ];
 
 // Pre-set symptom list (awaiting Gabi confirmation)
@@ -153,6 +211,31 @@ export const presetSymptoms: string[] = [
   'Zvýšená citlivosť na bolesť',
   'Ťažkosti so sústredením',
 ];
+
+// Helper: resolve phase+subphase from cycle utils to CyclePhase key
+export function resolveCyclePhase(phase: string, subphase: string | null): CyclePhase {
+  if (phase === 'menstrual') return 'menstrual';
+  if (phase === 'follicular') return 'follicular';
+  if (phase === 'ovulation') return 'ovulatory';
+  if (phase === 'luteal') {
+    return subphase === 'late' ? 'lutealLate' : 'lutealEarly';
+  }
+  return 'menstrual';
+}
+
+// Helper: get tip for phase+subphase+category based on day-in-phase (rotates through 7 tips)
+export function getCycleTipByDay(
+  phase: string,
+  subphase: string | null,
+  category: TipCategory,
+  dayInPhase: number
+): string {
+  const cyclePhase = resolveCyclePhase(phase, subphase);
+  const tips = cycleTips.filter((t) => t.phase === cyclePhase && t.category === category);
+  if (tips.length === 0) return '';
+  const index = Math.max(0, (dayInPhase - 1) % tips.length);
+  return tips[index].text;
+}
 
 // Helper: get tips for a given phase and category
 export function getTipsForPhaseAndCategory(

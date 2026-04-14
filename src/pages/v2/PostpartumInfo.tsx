@@ -530,15 +530,17 @@ export default function PostpartumInfo() {
   // Information view for users with NeoMe subscription
   return (
     <div className="min-h-screen pb-20" style={{ background: colors.bgGradient }}>
-      <div className="p-5 space-y-8">
+      <div className="px-3 py-6 space-y-6">
         {/* Header */}
-        <div className="flex items-center gap-3 pt-8">
-          <button onClick={() => navigate('/kniznica/telo/programy')} className="p-1">
-            <ArrowLeft className="w-5 h-5" style={{ color: colors.textPrimary }} strokeWidth={1.5} />
-          </button>
-          <div>
-            <h1 className="text-xl font-semibold" style={{ color: colors.textPrimary }}>{currentProgram.name} Program</h1>
-            <p className="text-sm" style={{ color: colors.textSecondary }}>Level {currentProgram.level} • {currentProgram.weeks} týždňov</p>
+        <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
+          <div className="flex items-center gap-3">
+            <button onClick={() => navigate('/kniznica/telo/programy')} className="p-1">
+              <ArrowLeft className="w-5 h-5" style={{ color: colors.textSecondary }} strokeWidth={1.5} />
+            </button>
+            <div>
+              <h1 className="text-[18px] font-medium" style={{ color: colors.textPrimary, fontFamily: '"Bodoni Moda", Georgia, serif' }}>{currentProgram.name}</h1>
+              <p className="text-xs" style={{ color: colors.textSecondary }}>Level {currentProgram.level} · {currentProgram.weeks} týždňov</p>
+            </div>
           </div>
         </div>
 
@@ -617,12 +619,11 @@ export default function PostpartumInfo() {
             </h3>
             <div className="space-y-2">
               {currentProgram.phases.map((phase, index) => (
-                <div key={index} className="flex items-center gap-3">
-                  <div className="text-lg">{phase.icon}</div>
-                  <div className="flex-1">
-                    <span className="text-xs" style={{ color: colors.textSecondary }}>{phase.weeks}</span>
-                    <span className="font-medium ml-2" style={{ color: colors.textPrimary }}>{phase.title}</span>
+                <div key={index} className="flex items-center py-2 px-3 rounded-lg" style={{ backgroundColor: `${colors.telo}04` }}>
+                  <div className="flex items-center" style={{ width: '90px' }}>
+                    <span className="text-sm font-medium" style={{ color: colors.textPrimary }}>{phase.weeks}</span>
                   </div>
+                  <span className="text-sm" style={{ color: colors.textSecondary }}>{phase.title}</span>
                 </div>
               ))}
             </div>

@@ -126,10 +126,8 @@ export function useCommunityPosts() {
 
       if (isLiked) {
         await supabase.from('community_likes').delete().match({ user_id: userId, post_id: postId });
-        await supabase.rpc('decrement_post_likes', { post_id: postId });
       } else {
         await supabase.from('community_likes').insert({ user_id: userId, post_id: postId });
-        await supabase.rpc('increment_post_likes', { post_id: postId });
       }
     },
     [likedIds]

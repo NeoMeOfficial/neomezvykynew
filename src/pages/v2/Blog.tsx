@@ -71,7 +71,7 @@ export default function Blog() {
               <ArrowLeft className="w-5 h-5 text-[#8B7560]" strokeWidth={1.5} />
             </button>
             <div className="flex-1">
-              <h1 className="text-[18px] font-bold" style={{ color: colors.textPrimary }}>
+              <h1 className="text-[22px] font-medium leading-tight" style={{ color: colors.textPrimary, fontFamily: '"Bodoni Moda", Georgia, serif' }}>
                 NeoMe Blog
               </h1>
               <p className="text-[12px]" style={{ color: colors.textSecondary }}>

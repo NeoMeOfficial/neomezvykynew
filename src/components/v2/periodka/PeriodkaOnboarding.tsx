@@ -8,7 +8,6 @@ import { sk } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import GlassCard from '../GlassCard';
 import { useCycleData } from '../../../features/cycle/useCycleData';
-import { colors, glassCard } from '../../theme/warmDusk';
 
 const WEEKDAYS = ['Po', 'Ut', 'St', 'Št', 'Pi', 'So', 'Ne'];
 
@@ -50,7 +49,7 @@ export default function PeriodkaOnboarding() {
   return (
     <div className="h-[100dvh] flex flex-col items-center px-5 pt-8" style={{ background: '#F5F3F0' }}>
       {/* Step dots */}
-      <div className="flex gap-2 mb-6">
+      <div className="flex gap-2 mb-4">
         {[0, 1, 2].map(i => (
           <div
             key={i}
@@ -58,6 +57,27 @@ export default function PeriodkaOnboarding() {
             style={{ background: i === step ? '#6B4C3B' : '#D0BCA8' }}
           />
         ))}
+      </div>
+
+      {/* Navigation — always visible at top */}
+      <div className="w-full max-w-md mb-4 space-y-2 flex-shrink-0">
+        <button
+          disabled={!canNext}
+          onClick={() => step < 2 ? setStep(step + 1) : handleFinish()}
+          className="w-full py-3 rounded-2xl text-[14px] font-semibold text-white transition-opacity"
+          style={{ background: '#6B4C3B', opacity: canNext ? 1 : 0.4 }}
+        >
+          {step < 2 ? 'Ďalej' : 'Dokončiť'}
+        </button>
+
+        {step > 0 && (
+          <button
+            onClick={() => setStep(step - 1)}
+            className="w-full py-2 text-[14px] text-[#6B4C3B] font-medium"
+          >
+            Späť
+          </button>
+        )}
       </div>
 
       <GlassCard className="w-full max-w-md flex-1 overflow-y-auto">
@@ -182,26 +202,6 @@ export default function PeriodkaOnboarding() {
         )}
       </GlassCard>
 
-      {/* Navigation — always at bottom */}
-      <div className="w-full max-w-md mt-4 pb-[max(16px,env(safe-area-inset-bottom))] space-y-2 flex-shrink-0">
-        <button
-          disabled={!canNext}
-          onClick={() => step < 2 ? setStep(step + 1) : handleFinish()}
-          className="w-full py-3 rounded-2xl text-[14px] font-semibold text-white transition-opacity"
-          style={{ background: '#6B4C3B', opacity: canNext ? 1 : 0.4 }}
-        >
-          {step < 2 ? 'Ďalej' : 'Dokončiť'}
-        </button>
-
-        {step > 0 && (
-          <button
-            onClick={() => setStep(step - 1)}
-            className="w-full py-2 text-[14px] text-[#6B4C3B] font-medium"
-          >
-            Späť
-          </button>
-        )}
-      </div>
     </div>
   );
 }

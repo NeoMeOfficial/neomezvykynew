@@ -23,7 +23,7 @@ export default function Telo() {
             <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(107, 76, 59, 0.14)` }}>
               <Dumbbell className="w-4 h-4" style={{ color: '#6B4C3B' }} />
             </div>
-            <h1 className="text-[16px] font-semibold" style={{ color: '#2E2218' }}>Telo</h1>
+            <h1 className="text-[22px] font-medium leading-tight" style={{ color: '#2E2218', fontFamily: '"Bodoni Moda", Georgia, serif' }}>Telo</h1>
           </div>
         </div>
       </div>
@@ -45,7 +45,7 @@ export default function Telo() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
               <div className="absolute bottom-5 left-5">
-                <span className="text-2xl font-bold text-white">{c.label}</span>
+                <span className="text-[26px] font-medium text-white" style={{ fontFamily: '"Bodoni Moda", Georgia, serif' }}>{c.label}</span>
               </div>
             </button>
           </div>

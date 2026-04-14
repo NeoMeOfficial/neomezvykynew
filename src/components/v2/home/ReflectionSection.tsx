@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { BookOpen, Send, Check, Pencil } from 'lucide-react';
+import { BookOpen, Send, Check, Pencil, Lock } from 'lucide-react';
 import GlassCard from '../GlassCard';
-import { colors, iconContainer, innerGlass, sectionLabel as sectionLabelStyle } from '../../../theme/warmDusk';
+import { colors, iconContainer, innerGlass } from '../../../theme/warmDusk';
+import { useSubscription } from '../../../contexts/SimpleSubscriptionContext';
 
 /* ── Section Header (matches TodayOverview style) ──────────── */
 function SectionHeader({ icon: Icon, label, color }: { icon: typeof BookOpen; label: string; color: string }) {
@@ -58,8 +59,11 @@ function updateEntries(entries: DiaryEntry[]) {
 }
 
 export default function ReflectionSection() {
+  const { tier } = useSubscription();
+  const isPremium = tier !== 'free';
   const [reflection, setReflection] = useState('');
   const [saved, setSaved] = useState(false);
+  const [showPaywallMsg, setShowPaywallMsg] = useState(false);
   const [todayEntries, setTodayEntries] = useState<DiaryEntry[]>([]);
   const [editing, setEditing] = useState(false);
   const [currentPromptIndex, setCurrentPromptIndex] = useState(0);
@@ -78,6 +82,12 @@ export default function ReflectionSection() {
 
   const handleSave = () => {
     if (!reflection.trim()) return;
+    if (!isPremium) {
+      // Free users: don't save, show paywall message
+      setShowPaywallMsg(true);
+      setTimeout(() => setShowPaywallMsg(false), 6000);
+      return;
+    }
     const entry = saveEntry(reflection.trim());
     setTodayEntries((prev) => [...prev, entry]);
     setReflection('');
@@ -103,7 +113,6 @@ export default function ReflectionSection() {
           )}
           <h3 className="text-[14px] font-semibold" style={{
             color: isDone ? colors.textTertiary : colors.textPrimary,
-            ...(isDone ? { textDecoration: 'line-through' } : {}),
           }}>
             Reflexia
           </h3>
@@ -166,6 +175,21 @@ export default function ReflectionSection() {
           >
             {saved ? '✓ Uložené' : <><Send size={12} /> Uložiť zápis</>}
           </button>
+
+          {/* Paywall message for free users */}
+          {showPaywallMsg && (
+            <div className="mt-2 rounded-xl p-3" style={{ background: `${colors.accent}10`, border: `1px solid ${colors.accent}30` }}>
+              <div className="flex items-start gap-2">
+                <Lock size={14} style={{ color: colors.accent }} className="mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-[12px] font-semibold mb-1" style={{ color: colors.accent }}>Reflexia nebola uložená</p>
+                  <p className="text-[11px] leading-relaxed" style={{ color: colors.textSecondary }}>
+                    Pravidelné písanie reflexií preukázateľne znižuje stres a zvyšuje emocionálnu inteligenciu. Aktivuj NeoMe predplatné a každú reflexiu si uchovaj navždy.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Show previous entries while editing */}
           {todayEntries.length > 0 && (

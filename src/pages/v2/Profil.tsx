@@ -46,7 +46,7 @@ export default function Profil() {
         alert('Nastavenie jazyka bude dostupné v budúcej verzii');
         break;
       case 'help':
-        navigate('/profil/pomoc');
+        navigate('/spravy');
         break;
       default:
         break;

@@ -6,7 +6,7 @@ export const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_
 // Subscription plans
 export const SUBSCRIPTION_PLANS = {
   premium: {
-    priceId: 'price_demo_neome_premium_monthly', // Demo price ID
+    priceId: 'price_1TM4KREpPqBqxo4m0Swf5F88',
     price: 14.90,
     currency: 'EUR',
     interval: 'month',
@@ -77,7 +77,7 @@ export async function createCheckoutSession(priceId: string, userId: string, ema
 // Create customer portal session
 export async function createPortalSession(customerId: string) {
   try {
-    const response = await fetch('/api/create-portal-session', {
+    const response = await fetch('/.netlify/functions/create-portal-session', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

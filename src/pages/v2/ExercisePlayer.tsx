@@ -50,8 +50,29 @@ export default function ExercisePlayer() {
     setIsPlaying(false);
   };
 
-  const handleAirplay = () => {
-    alert(`AirPlay aktivovaný pre ${exercise.name}`);
+  const handleAirplay = async () => {
+    const videoUrl = exercise.videoUrl
+      ? `https://youtu.be/${exercise.videoUrl}`
+      : window.location.href;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: exercise.name,
+          text: `${exercise.name} – NeoMe`,
+          url: videoUrl,
+        });
+      } catch {
+        // User dismissed the share sheet — no action needed
+      }
+    } else {
+      // Fallback for non-iOS: copy link to clipboard
+      try {
+        await navigator.clipboard.writeText(videoUrl);
+      } catch {
+        window.open(videoUrl, '_blank');
+      }
+    }
   };
 
   const formatDuration = (duration: string): string => {
@@ -123,45 +144,52 @@ export default function ExercisePlayer() {
       {/* Video Player */}
       <div className="bg-white/30 backdrop-blur-xl rounded-2xl overflow-hidden shadow-sm border border-white/20">
         <div className="relative aspect-video bg-black rounded-t-2xl overflow-hidden">
-          <img 
-            src={exercise.thumb} 
-            alt={exercise.name} 
-            className="w-full h-full object-cover" 
-          />
-          
-          {/* Video overlay */}
-          <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-            <button
-              onClick={handlePlayPause}
-              className="w-16 h-16 rounded-full flex items-center justify-center active:scale-95 transition-transform"
-              style={{ 
-                backgroundColor: 'rgba(255,255,255,0.9)',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-              }}
-            >
-              {isPlaying ? (
-                <Pause className="w-7 h-7" style={{ color: colors.telo }} />
-              ) : (
-                <Play className="w-7 h-7 ml-1" style={{ color: colors.telo }} fill={colors.telo} strokeWidth={0} />
-              )}
-            </button>
-          </div>
-          
-          {/* Progress bar */}
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/20">
-            <div 
-              className="h-full bg-white transition-all duration-300"
-              style={{ width: `${progress}%` }}
+          {exercise.videoUrl ? (
+            /* Real YouTube embed */
+            <iframe
+              src={`https://www.youtube.com/embed/${exercise.videoUrl}?rel=0&modestbranding=1&playsinline=1`}
+              title={exercise.name}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+              className="w-full h-full border-0"
             />
-          </div>
-          
-          {/* Duration badge */}
-          <div className="absolute top-3 right-3 bg-black/60 text-white text-[11px] px-2 py-1 rounded-full backdrop-blur-sm">
-            {formatDuration(exercise.duration)}
-          </div>
+          ) : (
+            /* Fallback: thumbnail + fake progress (no video URL yet) */
+            <>
+              <img
+                src={exercise.thumb}
+                alt={exercise.name}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                <button
+                  onClick={handlePlayPause}
+                  className="w-16 h-16 rounded-full flex items-center justify-center active:scale-95 transition-transform"
+                  style={{ backgroundColor: 'rgba(255,255,255,0.9)', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}
+                >
+                  {isPlaying ? (
+                    <Pause className="w-7 h-7" style={{ color: colors.telo }} />
+                  ) : (
+                    <Play className="w-7 h-7 ml-1" style={{ color: colors.telo }} fill={colors.telo} strokeWidth={0} />
+                  )}
+                </button>
+              </div>
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/20">
+                <div className="h-full bg-white transition-all duration-300" style={{ width: `${progress}%` }} />
+              </div>
+            </>
+          )}
+
+          {/* Duration badge — only for fallback mode */}
+          {!exercise.videoUrl && (
+            <div className="absolute top-3 right-3 bg-black/60 text-white text-[11px] px-2 py-1 rounded-full backdrop-blur-sm">
+              {formatDuration(exercise.duration)}
+            </div>
+          )}
         </div>
-        
-        {/* Controls */}
+
+        {/* Controls — only shown in fallback (no video URL) */}
+        {!exercise.videoUrl && (
         <div className="p-4">
           <div className="flex items-center justify-between mb-4">
             <button
@@ -171,15 +199,15 @@ export default function ExercisePlayer() {
               <RotateCcw className="w-4 h-4" strokeWidth={1.5} />
               Reštart
             </button>
-            
             <div className="text-center">
-              <div className="text-[12px] text-[#8B7560]">
-                {Math.round(progress)}% dokončené
-              </div>
+              <div className="text-[12px] text-[#8B7560]">{Math.round(progress)}% dokončené</div>
             </div>
           </div>
-          
-          {/* Exercise info tags */}
+        </div>
+        )}
+
+        {/* Exercise info tags */}
+        <div className="p-4 pt-0">
           <div className="flex items-center gap-2 flex-wrap">
             <span 
               className="text-[11px] px-2 py-1 rounded-full font-medium"

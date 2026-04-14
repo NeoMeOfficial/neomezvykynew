@@ -54,7 +54,7 @@ export default function Oblubene() {
               <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(194, 122, 110, 0.14)` }}>
                 <Heart className="w-4 h-4" style={{ color: '#C27A6E' }} />
               </div>
-              <h1 className="text-[16px] font-semibold" style={{ color: '#2E2218' }}>Obľúbené</h1>
+              <h1 className="text-[22px] font-medium leading-tight" style={{ color: '#2E2218', fontFamily: '"Bodoni Moda", Georgia, serif' }}>Obľúbené</h1>
             </div>
           </div>
 
@@ -102,7 +102,7 @@ export default function Oblubene() {
             <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(194, 122, 110, 0.14)` }}>
               <Heart className="w-4 h-4" style={{ color: '#C27A6E' }} />
             </div>
-            <h1 className="text-[16px] font-semibold" style={{ color: '#2E2218' }}>Obľúbené</h1>
+            <h1 className="text-[22px] font-medium leading-tight" style={{ color: '#2E2218', fontFamily: '"Bodoni Moda", Georgia, serif' }}>Obľúbené</h1>
           </div>
         </div>
 

@@ -229,35 +229,31 @@ export default function AuthDemo() {
           </div>
         </div>
 
-        {/* Features Preview */}
-        <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-6 shadow-sm border border-white/20">
-          <h3 className="text-lg font-bold mb-4" style={{ color: colors.textPrimary }}>
-            Čo môžete testovať
+        {/* Inspiring message */}
+        <div className="rounded-2xl p-6 shadow-sm border border-white/20" style={{ background: 'rgba(255,255,255,0.28)', backdropFilter: 'blur(20px)' }}>
+          <p className="text-[10px] tracking-[0.35em] uppercase font-medium mb-4" style={{ color: colors.accent }}>
+            Pre ženy, ktoré sa rozhodli
+          </p>
+          <h3 className="text-[22px] font-medium leading-snug mb-4" style={{ color: colors.textPrimary, fontFamily: '"Bodoni Moda", Georgia, serif' }}>
+            Tvoje telo.<br />Tvoj rytmus.<br />Tvoja cesta.
           </h3>
-          <div className="space-y-3">
-            <div className="flex items-center gap-3">
-              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: colors.telo }}></div>
-              <span className="text-sm" style={{ color: colors.textSecondary }}>
-                Kompletný fitness program s 4 úrovňami náročnosti
-              </span>
+          <p className="text-[13px] leading-relaxed" style={{ color: '#6B4C3B' }}>
+            NeoMe ťa sprevádza každým dňom — od rána až po večer. Pohyb prispôsobený tvojmu cyklu, výživa bez kompromisov, a komunita žien, ktoré chápu.
+          </p>
+          <div className="flex gap-4 mt-5 pt-4 border-t border-white/20">
+            <div className="flex-1 text-center">
+              <p className="text-[18px] font-semibold" style={{ color: colors.textPrimary }}>2 400+</p>
+              <p className="text-[10px] mt-0.5" style={{ color: colors.textSecondary }}>žien v komunite</p>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: colors.strava }}></div>
-              <span className="text-sm" style={{ color: colors.textSecondary }}>
-                108 receptov s ingredienciami z bežných obchodov
-              </span>
+            <div className="w-px" style={{ background: 'rgba(184,134,74,0.2)' }} />
+            <div className="flex-1 text-center">
+              <p className="text-[18px] font-semibold" style={{ color: colors.textPrimary }}>105</p>
+              <p className="text-[10px] mt-0.5" style={{ color: colors.textSecondary }}>receptov</p>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: colors.mysel }}></div>
-              <span className="text-sm" style={{ color: colors.textSecondary }}>
-                Sledovanie menštruačného cyklu a symptómov
-              </span>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: colors.accent }}></div>
-              <span className="text-sm" style={{ color: colors.textSecondary }}>
-                Komunita, buddy systém a system odmeňovania
-              </span>
+            <div className="w-px" style={{ background: 'rgba(184,134,74,0.2)' }} />
+            <div className="flex-1 text-center">
+              <p className="text-[18px] font-semibold" style={{ color: colors.textPrimary }}>4</p>
+              <p className="text-[10px] mt-0.5" style={{ color: colors.textSecondary }}>fázy cyklu</p>
             </div>
           </div>
         </div>
