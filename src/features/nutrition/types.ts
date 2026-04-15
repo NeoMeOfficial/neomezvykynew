@@ -7,10 +7,16 @@ export interface NutritionProfile {
   weight: number;
   height: number;
   age: number;
+  // Body measurements (optional)
+  waistCm?: number;
+  breastCm?: number;
+  hipCm?: number;
   dailyCalories: number;
   dailyProtein: number;
   dailyCarbs: number;
   dailyFat: number;
+  dailyFiber: number;
+  proteinPerKg: number;  // e.g. 1.8 or 2.2
   // Preference fields
   likedIngredients: string[];
   dislikedIngredients: string[];
