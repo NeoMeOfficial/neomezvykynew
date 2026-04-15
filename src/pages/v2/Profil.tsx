@@ -248,7 +248,7 @@ export default function Profil() {
             <span className="text-[13px] font-bold" style={{ color: '#2E2218' }}>0</span>
           </div>
           <button
-            onClick={() => navigate('/buddy-system', { state: { from: '/profil' } })}
+            onClick={() => navigate('/referral')}
             className="w-full py-2 px-3 rounded-lg text-[12px] font-medium text-white transition-all active:scale-95"
             style={{ backgroundColor: '#B8864A' }}
           >

@@ -42,6 +42,7 @@ const PostpartumInfo = lazy(() => import('./pages/v2/PostpartumInfo'));
 const MealPlanBannerShowcase = lazy(() => import('./pages/v2/MealPlanBannerShowcase'));
 const ReferralLanding = lazy(() => import('./pages/v2/ReferralLanding'));
 const ReferralCenter = lazy(() => import('./components/v2/referral/ReferralCenter'));
+const ReferralPage = lazy(() => import('./pages/v2/ReferralPage'));
 const AdminDashboard = lazy(() => import('./pages/v2/AdminDashboard'));
 const AdminNew = lazy(() => import('./pages/v2/AdminNew'));
 const AdminReferrals = lazy(() => import('./pages/v2/AdminReferrals'));
@@ -183,7 +184,8 @@ export default function AppV2() {
               <Route path="/buddy-system" element={<BuddySystem />} />
               <Route path="/profil" element={<Profil />} />
               <Route path="/profil/predplatne" element={<SubscriptionManagement />} />
-              <Route path="/referral" element={<ReferralCenter />} />
+              <Route path="/referral" element={<ReferralPage />} />
+              <Route path="/referral-center" element={<ReferralCenter />} />
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/admin/dashboard" element={<Navigate to="/admin" replace />} />
               <Route path="/admin/referrals" element={<AdminReferrals />} />

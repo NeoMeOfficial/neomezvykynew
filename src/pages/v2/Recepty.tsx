@@ -9,45 +9,39 @@ import FavoriteButton from '../../components/v2/favorites/FavoriteButton';
 import { colors } from '../../theme/warmDusk';
 import { recipes as recipeDatabase, getRecipeImage } from '../../data/recipes';
 
-const categoryNames = ['Raňajky', 'Hlavné jedlá a polievky', 'Hlavné jedlá', 'Dezerty', 'Smoothie & Nápoje', 'Snacky'];
+const categoryNames = ['Raňajky', 'Obedy', 'Večere', 'Snacky', 'Smoothie & Nápoje'];
 const FAVORITES_KEY = 'Obľúbené';
 
 // Map UI categories to database categories
 const categoryMapping: Record<string, string> = {
   'Raňajky': 'ranajky',
-  'Hlavné jedlá a polievky': 'obed', // and vecera — legacy
-  'Hlavné jedlá': 'main_meal',
-  'Dezerty': 'dessert',
-  'Smoothie & Nápoje': 'smoothie',
+  'Obedy': 'obed',
+  'Večere': 'vecera',
   'Snacky': 'snack',
+  'Smoothie & Nápoje': 'smoothie',
 };
 
 // Function to get recipes by UI category
 const getRecipesByCategory = (uiCategory: string) => {
-  if (uiCategory === 'Hlavné jedlá a polievky') {
-    return recipeDatabase.filter(r => r.category === 'obed' || r.category === 'vecera');
-  }
-
   const dbCategory = categoryMapping[uiCategory];
   if (!dbCategory) return [];
-
   return recipeDatabase.filter(r => r.category === dbCategory);
 };
 
 // Convert database recipes to UI format
 const convertToUIFormat = (dbRecipes: typeof recipeDatabase) => {
-  return dbRecipes.map((recipe, index) => ({
-    id: index + 1, // Simple ID for UI
+  return dbRecipes.map((recipe) => ({
+    id: recipe.id,
     title: recipe.title,
     time: `${recipe.prepTime} min`,
     kcal: recipe.calories,
     img: getRecipeImage(recipe.title, recipe.category),
-    originalId: recipe.id // Keep original ID for detailed view
+    originalId: recipe.id
   }));
 };
 
 // Generate recipes object from database
-const recipes: Record<string, { id: number; title: string; time: string; kcal: number; img: string; originalId: string }[]> = 
+const recipes: Record<string, { id: string; title: string; time: string; kcal: number; img: string; originalId: string }[]> =
   categoryNames.reduce((acc, category) => {
     const dbRecipes = getRecipesByCategory(category);
     acc[category] = convertToUIFormat(dbRecipes);
