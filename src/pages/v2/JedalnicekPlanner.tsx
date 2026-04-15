@@ -11,7 +11,7 @@ import NutritionOnboarding from '../../features/nutrition/NutritionOnboarding';
 import { useMealPlan } from '../../features/nutrition/useMealPlan';
 import { WeekDayNavigator } from '../../features/nutrition/WeekDayNavigator';
 import { exportMealPlanPDF } from '../../features/nutrition/exportMealPlanPDF';
-import { recipes } from '../../data/recipes';
+import { recipes, getRecipeImage } from '../../data/recipes';
 import { colors } from '../../theme/warmDusk';
 import type { NutritionProfile, MealSlot } from '../../features/nutrition/types';
 
@@ -54,7 +54,7 @@ function DualMealCard({ meal, mealIdx, dayIndex, showSwap, onSwap }: DualMealCar
         {recipe ? (
           <div className="flex items-start gap-3">
             <img
-              src={recipe.image}
+              src={getRecipeImage(recipe.title, recipe.category)}
               alt={recipe.title}
               className="w-16 h-16 rounded-xl object-cover shrink-0"
               onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
@@ -107,7 +107,7 @@ function DualMealCard({ meal, mealIdx, dayIndex, showSwap, onSwap }: DualMealCar
               {recipe ? (
                 <>
                   <img
-                    src={recipe.image}
+                    src={getRecipeImage(recipe.title, recipe.category)}
                     alt={recipe.title}
                     className="w-full h-20 rounded-lg object-cover mb-2"
                     onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}

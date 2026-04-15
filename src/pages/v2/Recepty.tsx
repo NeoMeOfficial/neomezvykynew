@@ -7,7 +7,7 @@ import { PaywallModal } from '../../components/v2/paywall/PaywallModal';
 import { useUniversalFavorites } from '../../hooks/useUniversalFavorites';
 import FavoriteButton from '../../components/v2/favorites/FavoriteButton';
 import { colors } from '../../theme/warmDusk';
-import { recipes as recipeDatabase } from '../../data/recipes';
+import { recipes as recipeDatabase, getRecipeImage } from '../../data/recipes';
 
 const categoryNames = ['Raňajky', 'Hlavné jedlá a polievky', 'Hlavné jedlá', 'Dezerty', 'Smoothie & Nápoje', 'Snacky'];
 const FAVORITES_KEY = 'Obľúbené';
@@ -41,7 +41,7 @@ const convertToUIFormat = (dbRecipes: typeof recipeDatabase) => {
     title: recipe.title,
     time: `${recipe.prepTime} min`,
     kcal: recipe.calories,
-    img: recipe.image || `https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=800&h=500&fit=crop`,
+    img: getRecipeImage(recipe.title, recipe.category),
     originalId: recipe.id // Keep original ID for detailed view
   }));
 };

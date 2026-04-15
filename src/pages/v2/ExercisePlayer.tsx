@@ -147,7 +147,7 @@ export default function ExercisePlayer() {
           {exercise.videoUrl ? (
             /* Real YouTube embed */
             <iframe
-              src={`https://www.youtube.com/embed/${exercise.videoUrl}?rel=0&modestbranding=1&playsinline=1`}
+              src={`https://www.youtube.com/embed/${exercise.videoUrl}?rel=0&modestbranding=1&playsinline=1&iv_load_policy=3&showinfo=0`}
               title={exercise.name}
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowFullScreen

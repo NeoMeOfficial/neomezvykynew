@@ -6753,3 +6753,91 @@ export const recipes: Recipe[] = [
     "difficulty": "medium"
   }
 ];
+
+/**
+ * Returns a food-appropriate Unsplash image URL for a recipe based on its
+ * title keywords and category. Use this at render time instead of recipe.image
+ * to show visually relevant photos.
+ */
+export function getRecipeImage(title: string, category: string): string {
+  const t = title.toLowerCase();
+
+  // ── Smoothies ──────────────────────────────────────────────
+  if (category === 'smoothie' || t.includes('smoothie')) return 'https://images.unsplash.com/photo-1638176066666-ffb2f013c7dd?w=600&q=80';
+
+  // ── Breakfast specifics ────────────────────────────────────
+  if (t.includes('acai')) return 'https://images.unsplash.com/photo-1590301157890-4810ed352733?w=600&q=80';
+  if (t.includes('avokád') && (t.includes('toast') || t.includes('prípitok') || t.includes('chlieb'))) return 'https://images.unsplash.com/photo-1541519227354-08fa5d50c820?w=600&q=80';
+  if (t.includes('chia')) return 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&q=80';
+  if (t.includes('kaša') || t.includes('ovsený') || t.includes('ovsená') || t.includes('quinoa')) return 'https://images.unsplash.com/photo-1614961233913-a5113a4a34ed?w=600&q=80';
+  if (t.includes('vajíčk') || t.includes('praženica') || t.includes('omeleta') || t.includes('stratené') || t.includes('frittata') || t.includes('bylinkové')) return 'https://images.unsplash.com/photo-1525351484163-7529414344d8?w=600&q=80';
+  if (t.includes('lievance') || t.includes('palacinky') || t.includes('palacinka') || t.includes('placka') || t.includes('placky')) return 'https://images.unsplash.com/photo-1506084868230-bb9d95c24759?w=600&q=80';
+  if (t.includes('banánový chlieb') || t.includes('banánovo') && t.includes('chlieb')) return 'https://images.unsplash.com/photo-1549931319-a545dcf3bc7b?w=600&q=80';
+  if (t.includes('toast') || (t.includes('chlieb') && !t.includes('boloň'))) return 'https://images.unsplash.com/photo-1484723091739-30990591f462?w=600&q=80';
+  if (t.includes('losos') && (t.includes('chlieb') || t.includes('chlebe') || t.includes('toast') || t.includes('ražnom'))) return 'https://images.unsplash.com/photo-1499689629534-a03a93cde20f?w=600&q=80';
+
+  // ── Soups ──────────────────────────────────────────────────
+  if (t.includes('polievka') || t.includes('vývar')) {
+    if (t.includes('paradajk')) return 'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=600&q=80';
+    if (t.includes('kari') || t.includes('šošovic')) return 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=600&q=80';
+    if (t.includes('kuraci') || t.includes('kura')) return 'https://images.unsplash.com/photo-1603105037880-880cd4edfb0d?w=600&q=80';
+    if (t.includes('hub')) return 'https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?w=600&q=80';
+    if (t.includes('miso') || t.includes('ázij')) return 'https://images.unsplash.com/photo-1547592180-85f173990554?w=600&q=80';
+    if (t.includes('tekvic') || t.includes('batát')) return 'https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?w=600&q=80';
+    return 'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=600&q=80';
+  }
+
+  // ── Fish & seafood ─────────────────────────────────────────
+  if (t.includes('losos') || t.includes('ryba') || t.includes('údená') || t.includes('krevet')) return 'https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=600&q=80';
+
+  // ── Chicken ────────────────────────────────────────────────
+  if (t.includes('kura') || t.includes('kurací') || t.includes('kuracia') || t.includes('kuraci')) return 'https://images.unsplash.com/photo-1598103442097-8b74394b95c7?w=600&q=80';
+
+  // ── Beef / pork / steak ────────────────────────────────────
+  if (t.includes('hovädzie') || t.includes('hovädzím') || t.includes('bravčové') || t.includes('steak') || t.includes('mleté') || t.includes('mletého')) return 'https://images.unsplash.com/photo-1546069901-d5bfd2cbfb1f?w=600&q=80';
+
+  // ── Pasta ──────────────────────────────────────────────────
+  if (t.includes('cestoviny') || t.includes('špagets') || t.includes('boloňsk') || t.includes('pesto') || t.includes('rezance') || t.includes('soba')) return 'https://images.unsplash.com/photo-1473093295043-cdd812d0e601?w=600&q=80';
+
+  // ── Tacos / wraps / rolls ──────────────────────────────────
+  if (t.includes('taco') || t.includes('tortill') || t.includes('zábal') || t.includes('obaly') || t.includes('rolky') || t.includes('wrap')) return 'https://images.unsplash.com/photo-1551326844-4df70f978d18?w=600&q=80';
+
+  // ── Burgers ────────────────────────────────────────────────
+  if (t.includes('burger') || t.includes('hamburgery') || t.includes('hamburger')) return 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&q=80';
+
+  // ── Vegan / tofu / falafel / tempeh ───────────────────────
+  if (t.includes('tofu') || t.includes('tempeh') || t.includes('falafel') || t.includes('vegánsk') || t.includes('vegánske')) return 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600&q=80';
+
+  // ── Salads ─────────────────────────────────────────────────
+  if (t.includes('šalát') || t.includes('salát')) {
+    if (t.includes('tekvic') || t.includes('rep') ) return 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=600&q=80';
+    if (t.includes('mexick') || t.includes('grilovan')) return 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=600&q=80';
+    return 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600&q=80';
+  }
+
+  // ── Bowls / poke ───────────────────────────────────────────
+  if (t.includes('poke') || t.includes('buddha') || (t.includes('miska') && !t.includes('polievka'))) return 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&q=80';
+
+  // ── Sweet potato / batát ───────────────────────────────────
+  if (t.includes('batát') || t.includes('sladký zemiak') || t.includes('sladkých zemiak')) return 'https://images.unsplash.com/photo-1596097635121-14b38c5d7a96?w=600&q=80';
+
+  // ── Curry ──────────────────────────────────────────────────
+  if (t.includes('kari')) return 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=600&q=80';
+
+  // ── Snacks ─────────────────────────────────────────────────
+  if (category === 'snack') {
+    if (t.includes('guličky') || t.includes('datlové') || t.includes('mätové')) return 'https://images.unsplash.com/photo-1604152135912-04a022e23696?w=600&q=80';
+    if (t.includes('lievance') || t.includes('mrkvové')) return 'https://images.unsplash.com/photo-1506084868230-bb9d95c24759?w=600&q=80';
+    return 'https://images.unsplash.com/photo-1505252585461-04db1eb84625?w=600&q=80';
+  }
+
+  // ── Category fallbacks ─────────────────────────────────────
+  const fallbacks: Record<string, string> = {
+    ranajky: 'https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=600&q=80',
+    obed:    'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=80',
+    vecera:  'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&q=80',
+    smoothie:'https://images.unsplash.com/photo-1638176066666-ffb2f013c7dd?w=600&q=80',
+    snack:   'https://images.unsplash.com/photo-1505252585461-04db1eb84625?w=600&q=80',
+  };
+  return fallbacks[category] ?? fallbacks.obed;
+}

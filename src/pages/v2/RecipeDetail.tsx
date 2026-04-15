@@ -6,7 +6,7 @@ import { RecipePromoBanner } from '../../components/v2/RecipePromoBanner';
 import { colors } from '../../theme/warmDusk';
 import { useFavorites } from '../../hooks/useFavorites';
 import { useSubscription } from '../../contexts/SimpleSubscriptionContext';
-import { recipes as recipeDatabase } from '../../data/recipes';
+import { recipes as recipeDatabase, getRecipeImage } from '../../data/recipes';
 import { Document, Page } from 'react-pdf';
 
 // Helper function to get recipe by ID
@@ -86,7 +86,7 @@ export default function RecipeDetail() {
     toggleFavorite({
       id: recipe.id,
       title: recipe.title,
-      image: recipe.image,
+      image: getRecipeImage(recipe.title, recipe.category),
       time: `${recipe.prepTime} min`,
       kcal: recipe.calories,
       category: recipe.category,

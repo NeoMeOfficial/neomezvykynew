@@ -600,7 +600,7 @@ function CommunityHomeBlock() {
           ))}
         </div>
 
-        {/* Early morning: invitation to be first. Later: recent posts. */}
+        {/* Early morning: invitation to be first. Later: top engaging posts. */}
         {isEarlyMorning ? (
           <div className="rounded-xl p-3 text-center space-y-2" style={{ background: 'rgba(184,134,74,0.08)', border: '1px dashed rgba(184,134,74,0.3)' }}>
             <p className="text-[13px] font-semibold" style={{ color: '#2E2218' }}>Buď dnes prvá! ✨</p>
@@ -617,18 +617,31 @@ function CommunityHomeBlock() {
           </div>
         ) : (
           <div className="space-y-2">
-            {posts.slice(0, 2).map((post) => (
-              <div key={post.id} className="flex items-start gap-2.5 p-2.5 rounded-xl" style={{ background: 'rgba(255,255,255,0.35)' }}>
-                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#D0BCA8] to-[#B8864A] flex-shrink-0 mt-0.5" />
-                <div className="flex-1 min-w-0">
-                  <span className="text-[11px] font-semibold" style={{ color: '#2E2218' }}>{post.author} </span>
-                  <span className="text-[11px]" style={{ color: '#8B7560' }}>
-                    {post.text.length > 55 ? post.text.slice(0, 55) + '…' : post.text}
-                  </span>
+            {(() => {
+              // Score = likes×2 + comments. Prefer posts from last 4h; fall back to all-time top.
+              const fourHoursAgo = Date.now() - 4 * 60 * 60 * 1000;
+              const score = (p: typeof posts[0]) => p.likes * 2 + p.comments;
+              const recent = posts.filter(p =>
+                p.created_at ? new Date(p.created_at).getTime() > fourHoursAgo : false
+              );
+              const pool = recent.length >= 2 ? recent : posts;
+              const top = [...pool].sort((a, b) => score(b) - score(a)).slice(0, 2);
+              return top.map((post) => (
+                <div key={post.id} className="flex items-start gap-2.5 p-2.5 rounded-xl" style={{ background: 'rgba(255,255,255,0.35)' }}>
+                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#D0BCA8] to-[#B8864A] flex-shrink-0 mt-0.5" />
+                  <div className="flex-1 min-w-0">
+                    <span className="text-[11px] font-semibold" style={{ color: '#2E2218' }}>{post.author} </span>
+                    <span className="text-[11px]" style={{ color: '#8B7560' }}>
+                      {post.text.length > 55 ? post.text.slice(0, 55) + '…' : post.text}
+                    </span>
+                  </div>
+                  <div className="flex flex-col items-end gap-0.5 flex-shrink-0">
+                    <span className="text-[10px]" style={{ color: '#A0907E' }}>{post.time}</span>
+                    <span className="text-[10px]" style={{ color: '#B8864A' }}>♥ {post.likes}</span>
+                  </div>
                 </div>
-                <span className="text-[10px] flex-shrink-0 mt-0.5" style={{ color: '#A0907E' }}>{post.time}</span>
-              </div>
-            ))}
+              ));
+            })()}
           </div>
         )}
       </NordicCard>
