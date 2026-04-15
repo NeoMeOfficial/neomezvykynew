@@ -2,21 +2,32 @@ export interface NutritionProfile {
   goal: 'lose' | 'maintain' | 'gain';
   activityLevel: 'sedentary' | 'light' | 'moderate' | 'active';
   mealsPerDay: 3 | 4 | 5;
+  selectedMeals: string[];   // e.g. ['ranajky','obed','vecera']
   allergies: string[];
-  dietType: 'standard' | 'vegetarian' | 'vegan';
+  dietType: 'standard' | 'vegetarian' | 'semi-vegetarian' | 'vegan';
   weight: number;
   height: number;
   age: number;
+  birthDate?: string;        // ISO date string YYYY-MM-DD
   // Body measurements (optional)
   waistCm?: number;
   breastCm?: number;
   hipCm?: number;
+  // Activity detail (optional, for future use)
+  regularDay?: 'sedentary_work' | 'on_feet' | 'with_kids';
+  dailyStepsRange?: '<5000' | '5000-10000' | '>10000';
+  sports?: string[];
+  sportsFrequency?: number;
+  // Health context
+  isBreastfeeding?: boolean;
+  breastfeedingFrequency?: number;
+  isPregnant?: boolean;
   dailyCalories: number;
   dailyProtein: number;
   dailyCarbs: number;
   dailyFat: number;
   dailyFiber: number;
-  proteinPerKg: number;  // e.g. 1.8 or 2.2
+  proteinPerKg: number;      // e.g. 1.8 or 2.2
   // Preference fields
   likedIngredients: string[];
   dislikedIngredients: string[];
