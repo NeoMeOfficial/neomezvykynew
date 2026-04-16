@@ -2459,7 +2459,7 @@ export default function AdminNew() {
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50">
       {/* Success Indicator */}
       <div className="fixed top-4 right-4 z-50 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg">
-        ✅ New Admin Panel Working!
+        ✅ v3 — Updated!
       </div>
 
       {/* Desktop Layout */}
