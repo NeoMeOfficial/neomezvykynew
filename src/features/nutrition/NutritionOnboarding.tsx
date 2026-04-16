@@ -15,7 +15,7 @@ type RegularDay = 'sedentary_work' | 'on_feet' | 'with_kids';
 type StepsRange = '<5000' | '5000-10000' | '>10000';
 type DietType = 'standard' | 'semi-vegetarian' | 'vegetarian';
 type FavMeal = 'ranajky' | 'obed' | 'vecera' | 'snack';
-type Allergy = 'gluten' | 'dairy' | 'nuts' | 'eggs' | 'soy';
+type Allergy = 'gluten' | 'dairy' | 'eggs' | 'fish' | 'shellfish' | 'nuts' | 'peanuts' | 'soy' | 'celery' | 'mustard' | 'sesame' | 'sulfites' | 'lupin' | 'molluscs';
 
 /* ─── step → section mapping ─── */
 // 12 internal steps mapping to 7 user-visible sections
@@ -50,20 +50,40 @@ const MEAL_OPTIONS: { key: string; label: string; emoji: string; pct: number }[]
 ];
 
 const ALLERGY_LABELS: { key: Allergy; label: string }[] = [
-  { key: 'gluten', label: 'Lepok' },
-  { key: 'dairy', label: 'Mliečne' },
-  { key: 'nuts', label: 'Orechy' },
+  { key: 'gluten', label: 'Lepok (pšenica, raž, jačmeň)' },
+  { key: 'dairy', label: 'Mlieko / laktóza' },
   { key: 'eggs', label: 'Vajcia' },
+  { key: 'fish', label: 'Ryby' },
+  { key: 'shellfish', label: 'Kôrovce' },
+  { key: 'nuts', label: 'Orechy (mandle, vlašské...)' },
+  { key: 'peanuts', label: 'Arašidy' },
   { key: 'soy', label: 'Sója' },
+  { key: 'celery', label: 'Zeler' },
+  { key: 'mustard', label: 'Horčica' },
+  { key: 'sesame', label: 'Sezam' },
+  { key: 'sulfites', label: 'Siričitany' },
+  { key: 'lupin', label: 'Vlčí bôb' },
+  { key: 'molluscs', label: 'Mäkkýše' },
 ];
 
 const INGREDIENT_SUGGESTIONS = [
-  'Kura', 'Hovädzie', 'Losos', 'Tuniak', 'Krevety', 'Vajcia', 'Tofu',
-  'Ryža', 'Quinoa', 'Ovsené vločky', 'Batáty', 'Zemiaky', 'Celozrnná pasta',
-  'Avokádo', 'Brokolica', 'Špenát', 'Mrkva', 'Paradajky', 'Uhorka', 'Paprika',
-  'Cícer', 'Šošovica', 'Čierne fazule', 'Banán', 'Jablko', 'Jahody', 'Mango',
-  'Olivový olej', 'Mandle', 'Vlašské orechy', 'Kešu', 'Arašidové maslo',
-  'Grécky jogurt', 'Tvaroh', 'Feta', 'Hummus',
+  // Mäso & ryby
+  'Kuracie prsia', 'Kuracie stehná', 'Hovädzie mäso', 'Mleté kuracie mäso', 'Losos', 'Tuniak', 'Treska', 'Krevety',
+  // Rastlinné bielkoviny
+  'Vajcia', 'Tofu', 'Tempeh', 'Cícer', 'Šošovica', 'Červená šošovica', 'Čierne fazule', 'Edamame',
+  // Mliečne
+  'Grécky jogurt', 'Tvaroh', 'Cottage cheese', 'Feta', 'Mozzarella',
+  // Obilniny
+  'Ovsené vločky', 'Ryža', 'Celozrnná ryža', 'Quinoa', 'Celozrnný chlieb', 'Celozrnná pasta', 'Batáty', 'Zemiaky',
+  // Zelenina
+  'Avokádo', 'Brokolica', 'Špenát', 'Kel', 'Cuketa', 'Paprika', 'Paradajky', 'Uhorka', 'Mrkva',
+  'Cibuľa', 'Cesnak', 'Červená cibuľa', 'Šampiňóny', 'Karfiol', 'Ružičkový kel',
+  // Ovocie
+  'Banán', 'Jablko', 'Jahody', 'Čučoriedky', 'Maliny', 'Pomaranč', 'Mango',
+  // Tuky & orechy
+  'Olivový olej', 'Mandle', 'Vlašské orechy', 'Kešu', 'Arašidové maslo', 'Mandľové maslo',
+  // Ostatné
+  'Hummus', 'Tahini',
 ];
 
 /* ─── helpers ─── */
@@ -100,13 +120,27 @@ function deriveActivityLevel(
 }
 
 const ACTIVITY_MULTIPLIER = { sedentary: 1.2, light: 1.375, moderate: 1.55, active: 1.725 };
-const GOAL_OFFSET: Record<Goal, number> = { lose: -300, maintain: 0, gain: 250 };
+const MIN_CALORIES = 1500;
 
 function calcNutrition(w: number, h: number, age: number, activity: string, goal: Goal, isBreastfeeding: boolean) {
   const bmr = 10 * w + 6.25 * h - 5 * age - 161;
-  const tdee = bmr * (ACTIVITY_MULTIPLIER[activity as keyof typeof ACTIVITY_MULTIPLIER] ?? 1.2);
+  const tdeeRaw = Math.round(bmr * (ACTIVITY_MULTIPLIER[activity as keyof typeof ACTIVITY_MULTIPLIER] ?? 1.2));
   const bfBonus = isBreastfeeding ? 330 : 0;
-  const targetCal = Math.round(tdee + GOAL_OFFSET[goal] + bfBonus);
+
+  // Smart deficit: sedentary → max 200 kcal deficit, others → 300 kcal
+  let deficit = 0;
+  let targetCal: number;
+  if (goal === 'maintain') {
+    targetCal = tdeeRaw + bfBonus;
+  } else if (goal === 'gain') {
+    targetCal = tdeeRaw + 250 + bfBonus;
+  } else {
+    deficit = activity === 'sedentary' ? 200 : 300;
+    targetCal = Math.max(MIN_CALORIES, tdeeRaw - deficit + bfBonus);
+    // Recalculate actual deficit after floor
+    deficit = tdeeRaw - (targetCal - bfBonus);
+  }
+
   const proteinPerKg = age >= 38 ? 2.2 : 1.8;
   const proteinG = Math.round(w * proteinPerKg);
   const fatCal = Math.round(targetCal * 0.27);
@@ -116,7 +150,7 @@ function calcNutrition(w: number, h: number, age: number, activity: string, goal
   const fiberG = age >= 38 ? 30 : 25;
   const proteinPct = Math.round((proteinG * 4 / targetCal) * 100);
   const carbPct = Math.round((carbCal / targetCal) * 100);
-  return { targetCal, proteinG, carbG, fatG, fiberG, proteinPerKg, proteinPct, carbPct };
+  return { tdee: tdeeRaw, targetCal, deficit, proteinG, carbG, fatG, fiberG, proteinPerKg, proteinPct, carbPct };
 }
 
 function getWaistRisk(cm: number): { label: string; color: string; desc: string } {
@@ -205,7 +239,7 @@ export default function NutritionOnboarding({
   const [goal, setGoal] = useState<Goal | null>(null);
 
   // S2 — Physical params
-  const [birthDate, setBirthDate] = useState('');
+  const [age, setAge] = useState('');
   const [weight, setWeight] = useState('');
   const [height, setHeight] = useState('');
   const [waist, setWaist] = useState('');
@@ -220,13 +254,15 @@ export default function NutritionOnboarding({
   const [sportsFrequency, setSportsFrequency] = useState<number | null>(null);
 
   // S4 — Meal prefs (3 parts)
-  const [selectedMeals, setSelectedMeals] = useState<string[]>(['ranajky', 'obed', 'vecera']);
+  const [selectedMeals, setSelectedMeals] = useState<string[]>([]);
   const [likedIngredients, setLikedIngredients] = useState<string[]>([]);
   const [dislikedIngredients, setDislikedIngredients] = useState<string[]>([]);
   const [likedInput, setLikedInput] = useState('');
   const [dislikedInput, setDislikedInput] = useState('');
   const [dietType, setDietType] = useState<DietType>('standard');
   const [allergies, setAllergies] = useState<Set<Allergy>>(new Set());
+  const [customAllergyInput, setCustomAllergyInput] = useState('');
+  const [customAllergies, setCustomAllergies] = useState<string[]>([]);
 
   // S5 — Extra info
   const [isBreastfeeding, setIsBreastfeeding] = useState<boolean | null>(null);
@@ -250,16 +286,16 @@ export default function NutritionOnboarding({
   const getNutrition = () => {
     const w = parseFloat(weight) || 60;
     const h = parseFloat(height) || 165;
-    const age = birthDate ? calcAge(birthDate) : 25;
+    const a = parseInt(age) || 25;
     const allSports = sportsOther.trim() ? [...sports, sportsOther.trim()] : sports;
     const activity = deriveActivityLevel(regularDay, stepsRange, allSports.length, sportsFrequency ?? 0);
-    return calcNutrition(w, h, age, activity, goal ?? 'maintain', isBreastfeeding === true);
+    return calcNutrition(w, h, a, activity, goal ?? 'maintain', isBreastfeeding === true);
   };
 
   const canNext = (): boolean => {
     switch (step) {
       case 1: return goal !== null;
-      case 2: return birthDate !== '' && weight !== '' && height !== '';
+      case 2: return age !== '' && weight !== '' && height !== '';
       case 3: return regularDay !== null;
       case 4: return stepsRange !== null;
       case 5: return true; // sports optional
@@ -276,17 +312,16 @@ export default function NutritionOnboarding({
 
   const handleComplete = () => {
     const n = getNutrition();
-    const age = birthDate ? calcAge(birthDate) : 25;
+    const a = parseInt(age) || 25;
     const allSports = sportsOther.trim() ? [...sports, sportsOther.trim()] : sports;
     const activity = deriveActivityLevel(regularDay, stepsRange, allSports.length, sportsFrequency ?? 0);
     const mealsPerDay = Math.min(5, Math.max(3, selectedMeals.length)) as 3 | 4 | 5;
     const favMeal: FavMeal = selectedMeals.includes('obed') ? 'obed' : selectedMeals[0] as FavMeal || 'obed';
     onComplete({
       goal: goal!,
-      birthDate,
       weight: parseFloat(weight),
       height: parseFloat(height),
-      age,
+      age: a,
       waistCm: waist ? parseFloat(waist) : undefined,
       breastCm: breast ? parseFloat(breast) : undefined,
       hipCm: hip ? parseFloat(hip) : undefined,
@@ -298,7 +333,7 @@ export default function NutritionOnboarding({
       mealsPerDay,
       selectedMeals,
       dietType: dietType === 'standard' ? 'standard' : dietType,
-      allergies: Array.from(allergies),
+      allergies: [...Array.from(allergies), ...customAllergies],
       likedIngredients,
       dislikedIngredients,
       favouriteMealOfDay: favMeal,
@@ -343,15 +378,13 @@ export default function NutritionOnboarding({
   const renderStep2 = () => {
     const waistNum = parseFloat(waist);
     const waistRisk = waist && waistNum > 0 ? getWaistRisk(waistNum) : null;
-    const agePreview = birthDate ? calcAge(birthDate) : null;
     return (
       <>
         <div style={s.title}>Fyzické parametre</div>
         <GlassCard style={{ padding: '18px 16px', marginBottom: 12 }}>
           <div style={s.inputGroup}>
-            <label style={s.label}>Dátum narodenia *</label>
-            <input style={s.input} type="date" value={birthDate} onChange={e => setBirthDate(e.target.value)} max={new Date().toISOString().split('T')[0]} />
-            {agePreview !== null && <div style={{ fontSize: 11, color: ACCENT, marginTop: 4 }}>{agePreview} rokov</div>}
+            <label style={s.label}>Vek *</label>
+            <input style={s.input} type="number" inputMode="numeric" value={age} onChange={e => setAge(e.target.value)} placeholder="28" />
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             <div style={s.inputGroup}>
@@ -384,7 +417,7 @@ export default function NutritionOnboarding({
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             <div style={s.inputGroup}>
-              <label style={s.labelOpt}>Obvod prsníkov (cm)</label>
+              <label style={s.labelOpt}>Obvod prs (cm)</label>
               <input style={s.input} type="number" inputMode="decimal" value={breast} onChange={e => setBreast(e.target.value)} placeholder="napr. 95" />
             </div>
             <div style={s.inputGroup}>
@@ -478,6 +511,9 @@ export default function NutritionOnboarding({
     return (
       <>
         <div style={s.title}>Koľkokrát týždenne cvičíš?</div>
+        <div style={{ fontSize: 12, color: MUTED_LIGHT, marginBottom: 14, lineHeight: 1.5 }}>
+          Celkový počet tréningov týždenne — bez ohľadu na typ aktivity. Napr. beh 3× + posilňovňa 2× = 5×/týždeň.
+        </div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
           {[1, 2, 3, 4, 5, 6, 7].map(n => (
             <button key={n} onClick={() => setSportsFrequency(n)}
@@ -592,12 +628,33 @@ export default function NutritionOnboarding({
         </div>
 
         <div style={{ fontSize: 12, color: MUTED, marginBottom: 8, fontWeight: 500 }}>Alergie a intolerancie</div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 14 }}>
           {ALLERGY_LABELS.map(a => (
             <button key={a.key} onClick={() => toggleAllergy(a.key)}
               style={{ ...s.chip, ...(allergies.has(a.key) ? s.chipSel : {}) }}>{a.label}</button>
           ))}
         </div>
+        {/* Custom allergies */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 6 }}>
+          {customAllergies.map(item => (
+            <button key={item} onClick={() => setCustomAllergies(l => l.filter(x => x !== item))}
+              style={{ ...s.chip, background: 'rgba(194,122,110,0.10)', borderColor: '#C27A6E', color: PRIMARY, fontSize: 11 }}>{item} ×</button>
+          ))}
+        </div>
+        <input
+          style={s.input}
+          value={customAllergyInput}
+          onChange={e => setCustomAllergyInput(e.target.value)}
+          onKeyDown={e => {
+            if ((e.key === 'Enter' || e.key === ',') && customAllergyInput.trim()) {
+              e.preventDefault();
+              const val = customAllergyInput.trim();
+              if (!customAllergies.includes(val)) setCustomAllergies(l => [...l, val]);
+              setCustomAllergyInput('');
+            }
+          }}
+          placeholder="Iná alergia — napíš a stlač Enter"
+        />
       </>
     );
   };
@@ -608,7 +665,7 @@ export default function NutritionOnboarding({
       <div style={s.title}>Typ jedálnička</div>
       {([
         { key: 'standard' as const, emoji: '🍗', title: 'Univerzálny', desc: 'Všetky potraviny vrátane mäsa a rýb.' },
-        { key: 'semi-vegetarian' as const, emoji: '🐟', title: 'Semi-vegetariánsky', desc: 'Prevažne rastlinná strava, príležitostne ryby a vajcia.' },
+        { key: 'semi-vegetarian' as const, emoji: '🐟', title: 'Semi-vegetariánsky', desc: 'Prevažne rastlinná strava a ryby. Chudé mäso cca 3× týždenne.' },
         { key: 'vegetarian' as const, emoji: '🥚', title: 'Vegetariánsky', desc: 'Bez mäsa a rýb, vajcia a mliečne produkty sú OK.' },
       ]).map(o => (
         <GlassCard key={o.key} onClick={() => setDietType(o.key)} style={{ ...s.optionCard, ...(dietType === o.key ? selBorder : {}) }}>
@@ -676,72 +733,80 @@ export default function NutritionOnboarding({
 
   // S6 — Summary
   const renderStep11 = () => {
-    const age = birthDate ? calcAge(birthDate) : 25;
     const n = getNutrition();
-    const isPeri = age >= 38;
+    const goalLabels: Record<Goal, string> = {
+      lose: 'chudnutie',
+      maintain: 'udržanie váhy',
+      gain: 'naberanie svalov',
+    };
+    const goalLabel = goalLabels[goal ?? 'maintain'];
+
     return (
       <>
         <div style={s.title}>Tvoj výživový plán</div>
 
-        {isPeri && (
-          <div style={{ marginBottom: 12, padding: '10px 14px', borderRadius: 12, background: 'rgba(184,134,74,0.10)', border: '1px solid rgba(184,134,74,0.25)' }}>
-            <div style={{ fontSize: 12, fontWeight: 600, color: ACCENT, marginBottom: 2 }}>🌿 Perimenopauza (38+)</div>
-            <div style={{ fontSize: 11, color: MUTED, lineHeight: 1.5 }}>Plán upravený podľa Dr. Stacy Sims — vyšší proteín pre zachovanie svalov pri poklese estrogénu.</div>
-          </div>
-        )}
-        {isBreastfeeding && (
-          <div style={{ marginBottom: 12, padding: '10px 14px', borderRadius: 12, background: `${GREEN}12`, border: `1px solid ${GREEN}30` }}>
-            <div style={{ fontSize: 12, fontWeight: 600, color: GREEN, marginBottom: 2 }}>🤱 Kojenie</div>
-            <div style={{ fontSize: 11, color: MUTED, lineHeight: 1.5 }}>+330 kcal pridaných k dennému príjmu pre laktáciu.</div>
-          </div>
-        )}
+        {/* TDEE + calorie goal card */}
+        <GlassCard style={{ padding: '20px 18px', marginBottom: 10 }}>
+          <div style={{ fontSize: 12, color: MUTED, marginBottom: 4 }}>Tvoj denný energetický výdaj</div>
+          <div style={{ fontSize: 36, fontWeight: 700, color: PRIMARY, lineHeight: 1 }}>{n.tdee} kcal</div>
 
-        <GlassCard style={{ padding: '24px 18px' }}>
-          <div style={{ textAlign: 'center', marginBottom: 16 }}>
-            <div style={{ fontSize: 48, fontWeight: 700, color: PRIMARY, lineHeight: 1 }}>{n.targetCal}</div>
-            <div style={{ fontSize: 12, color: MUTED, marginTop: 4 }}>kcal denne</div>
-          </div>
-
-          {/* Protein */}
-          <div style={{ marginBottom: 10, padding: '12px 14px', borderRadius: 12, background: 'rgba(107,76,59,0.07)', border: '1px solid rgba(107,76,59,0.15)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-              <div>
-                <div style={{ fontSize: 11, fontWeight: 600, color: MUTED, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 2 }}>Proteín</div>
-                <div style={{ fontSize: 22, fontWeight: 700, color: PRIMARY }}>{n.proteinG}g</div>
-                <div style={{ fontSize: 11, color: MUTED, marginTop: 1 }}>{n.proteinPerKg} g/kg · {n.proteinPct}% kalórií</div>
+          {goal === 'lose' && (
+            <div style={{ marginTop: 12, padding: '10px 12px', borderRadius: 10, background: 'rgba(107,76,59,0.06)', border: '1px solid rgba(107,76,59,0.12)' }}>
+              <div style={{ fontSize: 12, color: MUTED, marginBottom: 2 }}>Na dosiahnutie cieľa ({goalLabel}) odporúčam</div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                <div style={{ fontSize: 28, fontWeight: 700, color: PRIMARY }}>{n.targetCal} kcal</div>
+                <div style={{ fontSize: 12, color: MUTED_LIGHT }}>– {n.deficit} kcal/deň</div>
               </div>
-              <div style={{ fontSize: 10, color: PRIMARY, background: 'rgba(107,76,59,0.10)', padding: '3px 8px', borderRadius: 20, fontWeight: 600 }}>Stacy Sims</div>
+              {n.targetCal === 1500 && (
+                <div style={{ fontSize: 11, color: ACCENT, marginTop: 4 }}>Minimálny odporúčaný príjem pre ženy.</div>
+              )}
             </div>
+          )}
+          {goal !== 'lose' && (
+            <div style={{ marginTop: 12, padding: '10px 12px', borderRadius: 10, background: 'rgba(107,76,59,0.06)', border: '1px solid rgba(107,76,59,0.12)' }}>
+              <div style={{ fontSize: 12, color: MUTED, marginBottom: 2 }}>Odporúčaný denný príjem ({goalLabel})</div>
+              <div style={{ fontSize: 28, fontWeight: 700, color: PRIMARY }}>{n.targetCal} kcal</div>
+            </div>
+          )}
+          {isBreastfeeding && (
+            <div style={{ marginTop: 8, fontSize: 11, color: GREEN }}>🤱 +330 kcal zahrnuté pre laktáciu</div>
+          )}
+        </GlassCard>
+
+        {/* Macros */}
+        <GlassCard style={{ padding: '18px' }}>
+          <div style={{ fontSize: 12, fontWeight: 600, color: PRIMARY, marginBottom: 12 }}>Makronutrienty</div>
+
+          <div style={{ marginBottom: 8, padding: '10px 12px', borderRadius: 10, background: 'rgba(107,76,59,0.06)', border: '1px solid rgba(107,76,59,0.12)' }}>
+            <div style={{ fontSize: 11, color: MUTED, marginBottom: 1 }}>PROTEÍN</div>
+            <div style={{ fontSize: 20, fontWeight: 700, color: PRIMARY }}>{n.proteinG}g</div>
+            <div style={{ fontSize: 11, color: MUTED_LIGHT }}>{n.proteinPerKg} g/kg · {n.proteinPct}% kalórií</div>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 8 }}>
             {[
-              { label: 'Sacharidy', value: `${n.carbG}g`, sub: `${n.carbPct}%`, color: ACCENT },
-              { label: 'Tuky', value: `${n.fatG}g`, sub: '27%', color: '#7A9E78' },
+              { label: 'SACHARIDY', value: `${n.carbG}g`, sub: `${n.carbPct}% kalórií`, color: ACCENT },
+              { label: 'TUKY', value: `${n.fatG}g`, sub: '27% kalórií', color: GREEN },
             ].map(m => (
-              <div key={m.label} style={{ padding: '12px 14px', borderRadius: 12, background: `${m.color}10`, border: `1px solid ${m.color}25` }}>
-                <div style={{ fontSize: 11, fontWeight: 600, color: MUTED, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 2 }}>{m.label}</div>
+              <div key={m.label} style={{ padding: '10px 12px', borderRadius: 10, background: `${m.color}10`, border: `1px solid ${m.color}25` }}>
+                <div style={{ fontSize: 11, color: MUTED, marginBottom: 1 }}>{m.label}</div>
                 <div style={{ fontSize: 20, fontWeight: 700, color: PRIMARY }}>{m.value}</div>
-                <div style={{ fontSize: 10, color: MUTED }}>{m.sub} kalórií</div>
+                <div style={{ fontSize: 10, color: MUTED_LIGHT }}>{m.sub}</div>
               </div>
             ))}
           </div>
 
-          <div style={{ padding: '10px 14px', borderRadius: 12, background: `${GREEN}10`, border: `1px solid ${GREEN}25` }}>
+          <div style={{ padding: '10px 12px', borderRadius: 10, background: `${GREEN}10`, border: `1px solid ${GREEN}25` }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
-                <div style={{ fontSize: 11, fontWeight: 600, color: MUTED, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 1 }}>Vláknina</div>
-                <div style={{ fontSize: 18, fontWeight: 700, color: PRIMARY }}>{n.fiberG}g denne</div>
-                <div style={{ fontSize: 10, color: MUTED }}>Črevný mikrobióm · stabilita glukózy</div>
+                <div style={{ fontSize: 11, color: MUTED, marginBottom: 1 }}>VLÁKNINA</div>
+                <div style={{ fontSize: 20, fontWeight: 700, color: PRIMARY }}>{n.fiberG}g denne</div>
+                <div style={{ fontSize: 10, color: MUTED_LIGHT }}>Črevný mikrobióm · stabilita glukózy</div>
               </div>
               <div style={{ fontSize: 10, color: GREEN, background: `${GREEN}15`, padding: '3px 8px', borderRadius: 20, fontWeight: 600 }}>4. makro</div>
             </div>
           </div>
         </GlassCard>
-
-        <div style={{ fontSize: 11, color: MUTED_LIGHT, padding: '8px 2px 0', lineHeight: 1.6 }}>
-          Výpočet: Mifflin-St Jeor (BMR) + protokol Dr. Stacy Sims (proteín).
-        </div>
       </>
     );
   };
