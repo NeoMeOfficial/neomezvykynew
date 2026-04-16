@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Clock, Flame, Lock, Heart } from 'lucide-react';
 import { useSubscription } from '../../contexts/SimpleSubscriptionContext';
@@ -8,6 +8,7 @@ import { useUniversalFavorites } from '../../hooks/useUniversalFavorites';
 import FavoriteButton from '../../components/v2/favorites/FavoriteButton';
 import { colors } from '../../theme/warmDusk';
 import { recipes as recipeDatabase, getRecipeImage } from '../../data/recipes';
+import { supabase } from '../../lib/supabase';
 
 const categoryNames = ['Raňajky', 'Obedy', 'Večere', 'Snacky', 'Smoothie & Nápoje'];
 const FAVORITES_KEY = 'Obľúbené';
@@ -48,28 +49,52 @@ const recipes: Record<string, { id: string; title: string; time: string; kcal: n
     return acc;
   }, {} as Record<string, any>);
 
+type UIRecipe = { id: string; title: string; time: string; kcal: number; img: string; originalId: string };
+
 export default function Recepty() {
   const [searchParams] = useSearchParams();
   const catParam = searchParams.get('cat') || categoryNames[0];
-  
+
   // Check if showing favorites
   const showingFavorites = catParam === FAVORITES_KEY;
   const defaultActive = showingFavorites ? -1 : Math.max(0, categoryNames.indexOf(catParam));
-  
+
   const [active, setActive] = useState(defaultActive);
   const [warningMessage, setWarningMessage] = useState<string | null>(null);
+  const [liveRecipes, setLiveRecipes] = useState<Record<string, UIRecipe[]> | null>(null);
+  const fetchedRef = useRef(false);
   const navigate = useNavigate();
   
   const { limits } = useSubscription();
   const { paywallState, showContentPaywall, closePaywall, handleUpgrade, getContentWarning } = usePaywall();
   const { getFavoritesByType } = useUniversalFavorites();
 
+  // Fetch from Supabase once; fall back to static data if empty
+  useEffect(() => {
+    if (fetchedRef.current) return;
+    fetchedRef.current = true;
+    supabase.from('recipes').select('id,title,category,prep_time,calories,image').eq('active', true)
+      .then(({ data }) => {
+        if (!data || data.length === 0) return;
+        const mapped: Record<string, UIRecipe[]> = {};
+        categoryNames.forEach(cat => {
+          const dbCat = categoryMapping[cat];
+          mapped[cat] = data
+            .filter(r => r.category === dbCat)
+            .map(r => ({ id: r.id, title: r.title, time: `${r.prep_time} min`, kcal: r.calories, img: r.image || getRecipeImage(r.title, r.category), originalId: r.id }));
+        });
+        setLiveRecipes(mapped);
+      });
+  }, []);
+
+  const effectiveRecipes = liveRecipes ?? recipes;
+
   // Get recipes based on active tab
   const favRecipes = getFavoritesByType('recipe');
-  const allRecipes = showingFavorites ? 
+  const allRecipes = showingFavorites ?
     favRecipes.map(f => ({ id: f.id, title: f.title, time: f.duration || '15 min', kcal: f.kcal || 250, img: f.image || '', originalId: f.id })) :
-    recipes[categoryNames[active]] || [];
-  
+    effectiveRecipes[categoryNames[active]] || [];
+
   // Apply content limits for free users (but not for favorites)
   const currentRecipes = useMemo(() => {
     if (showingFavorites) return allRecipes; // No limits on favorites

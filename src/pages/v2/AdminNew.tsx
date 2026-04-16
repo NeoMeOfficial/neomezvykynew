@@ -1177,6 +1177,884 @@ interface AdminAnalytics {
   recentUsers: { email: string; full_name: string | null; created_at: string }[];
 }
 
+// ═══════════════════════════════════════════
+// SHARED ADMIN CRUD HELPERS
+// ═══════════════════════════════════════════
+async function adminFetch(type: string) {
+  const res = await fetch(`/.netlify/functions/admin-content?type=${type}`);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error);
+  return data.items ?? [];
+}
+async function adminUpsert(type: string, item: Record<string, unknown>) {
+  const res = await fetch('/.netlify/functions/admin-content', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ type, action: 'upsert', data: item }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error);
+  return data.item;
+}
+async function adminDelete(type: string, id: string) {
+  const res = await fetch('/.netlify/functions/admin-content', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ type, action: 'delete', id }),
+  });
+  if (!res.ok) { const d = await res.json(); throw new Error(d.error); }
+}
+async function adminSeed(type: string, items: Record<string, unknown>[]) {
+  const res = await fetch('/.netlify/functions/admin-content', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ type, action: 'seed', items }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error);
+  return data.seeded;
+}
+
+const AdminCard = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
+  <div className={`bg-white/40 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-lg ${className}`}>{children}</div>
+);
+
+// ═══════════════════════════════════════════
+// RECIPES TAB — Supabase CRUD
+// ═══════════════════════════════════════════
+interface RecipeRow {
+  id: string; title: string; category: string; description: string;
+  prep_time: number; servings: number; calories: number;
+  protein: number; carbs: number; fat: number; fiber: number;
+  ingredients: { name: string; amount: string }[];
+  steps: string[]; allergens: string[]; dietary: string[]; tags: string[];
+  image: string; difficulty: string; pdf_path: string; active: boolean;
+}
+
+function RecipesTab() {
+  const [items, setItems] = useState<RecipeRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [editId, setEditId] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [seeding, setSeeding] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [form, setForm] = useState<Partial<RecipeRow>>({ category: 'ranajky', difficulty: 'easy', active: true });
+  // Multi-line text fields
+  const [ingText, setIngText] = useState('');
+  const [stepsText, setStepsText] = useState('');
+  const [allerText, setAllerText] = useState('');
+  const [tagsText, setTagsText] = useState('');
+
+  const load = async () => {
+    setLoading(true); setError(null);
+    try { setItems(await adminFetch('recipes')); } catch (e: any) { setError(e.message); }
+    setLoading(false);
+  };
+  useEffect(() => { load(); }, []);
+
+  const openAdd = () => {
+    setForm({ category: 'ranajky', difficulty: 'easy', active: true });
+    setIngText(''); setStepsText(''); setAllerText(''); setTagsText('');
+    setEditId(null); setShowForm(true); setError(null);
+  };
+  const openEdit = (r: RecipeRow) => {
+    setForm({ ...r });
+    setIngText((r.ingredients ?? []).map(i => `${i.name}: ${i.amount}`).join('\n'));
+    setStepsText((r.steps ?? []).join('\n'));
+    setAllerText((r.allergens ?? []).join(', '));
+    setTagsText((r.tags ?? []).join(', '));
+    setEditId(r.id); setShowForm(true); setError(null);
+  };
+  const closeForm = () => { setShowForm(false); setEditId(null); setError(null); };
+
+  const generateId = (title: string, cat: string) =>
+    `${cat}-${title.toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '-').slice(0, 40)}-${Date.now()}`;
+
+  const parseIngredients = (text: string) =>
+    text.split('\n').filter(Boolean).map(line => {
+      const idx = line.indexOf(':');
+      return idx > -1 ? { name: line.slice(0, idx).trim(), amount: line.slice(idx + 1).trim() } : { name: line.trim(), amount: '' };
+    });
+
+  const save = async () => {
+    if (!form.title) return;
+    setSaving(true); setError(null);
+    try {
+      const payload: RecipeRow = {
+        id: editId ?? generateId(form.title!, form.category ?? 'ranajky'),
+        title: form.title!,
+        category: form.category ?? 'ranajky',
+        description: form.description ?? '',
+        prep_time: Number(form.prep_time) || 15,
+        servings: Number(form.servings) || 2,
+        calories: Number(form.calories) || 0,
+        protein: Number(form.protein) || 0,
+        carbs: Number(form.carbs) || 0,
+        fat: Number(form.fat) || 0,
+        fiber: Number(form.fiber) || 0,
+        ingredients: parseIngredients(ingText),
+        steps: stepsText.split('\n').filter(Boolean),
+        allergens: allerText.split(',').map(s => s.trim()).filter(Boolean),
+        dietary: form.dietary ?? [],
+        tags: tagsText.split(',').map(s => s.trim()).filter(Boolean),
+        image: form.image ?? '',
+        difficulty: form.difficulty ?? 'easy',
+        pdf_path: form.pdf_path ?? '',
+        active: form.active ?? true,
+      };
+      await adminUpsert('recipes', payload as unknown as Record<string, unknown>);
+      await load(); closeForm();
+    } catch (e: any) { setError(e.message); }
+    setSaving(false);
+  };
+
+  const remove = async (id: string) => {
+    if (!confirm('Naozaj chceš vymazať tento recept?')) return;
+    try { await adminDelete('recipes', id); setItems(p => p.filter(r => r.id !== id)); } catch (e: any) { alert(e.message); }
+  };
+
+  const toggleActive = async (r: RecipeRow) => {
+    try {
+      await adminUpsert('recipes', { ...r, active: !r.active } as unknown as Record<string, unknown>);
+      setItems(p => p.map(x => x.id === r.id ? { ...x, active: !r.active } : x));
+    } catch (e: any) { alert(e.message); }
+  };
+
+  // Seed with static data from src/data/recipes.ts
+  const seedFromStatic = async () => {
+    setSeeding(true); setError(null);
+    try {
+      const { recipes: staticRecipes } = await import('../../data/recipes');
+      const payload = staticRecipes.map((r: any) => ({
+        id: r.id, title: r.title, category: r.category, description: r.description ?? '',
+        prep_time: r.prepTime, servings: r.servings, calories: r.calories,
+        protein: r.protein, carbs: r.carbs, fat: r.fat, fiber: r.fiber,
+        ingredients: r.ingredients ?? [], steps: r.steps ?? [],
+        allergens: r.allergens ?? [], dietary: r.dietary ?? [], tags: r.tags ?? [],
+        image: r.image ?? '', difficulty: r.difficulty ?? 'easy', pdf_path: r.pdfPath ?? '',
+        active: true,
+      }));
+      const count = await adminSeed('recipes', payload);
+      alert(`✅ Importovaných ${count} receptov`);
+      await load();
+    } catch (e: any) { setError(e.message); }
+    setSeeding(false);
+  };
+
+  const CATS = ['ranajky', 'obed', 'vecera', 'snack', 'smoothie'];
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold" style={{ color: colors.textPrimary }}>Recipe Database</h2>
+        <div className="flex gap-2">
+          {items.length === 0 && !loading && (
+            <button onClick={seedFromStatic} disabled={seeding} className="px-4 py-2 rounded-xl text-sm font-medium" style={{ backgroundColor: `${colors.accent}20`, color: colors.accent }}>
+              {seeding ? '⟳ Importujem...' : '⬆ Import statických receptov'}
+            </button>
+          )}
+          <button onClick={openAdd} className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white" style={{ backgroundColor: colors.strava }}>
+            <Plus className="w-4 h-4" />Nový recept
+          </button>
+        </div>
+      </div>
+
+      {error && <div className="px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-600"><AlertTriangle className="w-4 h-4 inline mr-2" />{error}</div>}
+
+      {showForm && (
+        <AdminCard>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-semibold text-lg" style={{ color: colors.textPrimary }}>{editId ? 'Upraviť recept' : 'Nový recept'}</h3>
+            <button onClick={closeForm}><X className="w-4 h-4" style={{ color: colors.textSecondary }} /></button>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="col-span-2">
+              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Názov *</label>
+              <input value={form.title ?? ''} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }} />
+            </div>
+            <div>
+              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Kategória</label>
+              <select value={form.category ?? 'ranajky'} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }}>
+                {CATS.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Obtiažnosť</label>
+              <select value={form.difficulty ?? 'easy'} onChange={e => setForm(f => ({ ...f, difficulty: e.target.value }))} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }}>
+                <option value="easy">Jednoduchý</option>
+                <option value="medium">Stredný</option>
+              </select>
+            </div>
+            {[['prep_time','Čas prípravy (min)'],['servings','Porcie'],['calories','Kalórie'],['protein','Bielkoviny (g)'],['carbs','Sacharidy (g)'],['fat','Tuky (g)']].map(([field, label]) => (
+              <div key={field}>
+                <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>{label}</label>
+                <input type="number" value={(form as any)[field] ?? ''} onChange={e => setForm(f => ({ ...f, [field]: e.target.value }))} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }} />
+              </div>
+            ))}
+            <div className="col-span-2">
+              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>URL obrázka</label>
+              <input value={form.image ?? ''} onChange={e => setForm(f => ({ ...f, image: e.target.value }))} placeholder="https://..." className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }} />
+            </div>
+            <div className="col-span-2">
+              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Popis</label>
+              <textarea value={form.description ?? ''} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} rows={2} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none resize-none" style={{ color: colors.textPrimary }} />
+            </div>
+            <div className="col-span-2">
+              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Ingrediencie (jeden na riadok, formát "Názov: Množstvo")</label>
+              <textarea value={ingText} onChange={e => setIngText(e.target.value)} rows={5} placeholder="Avokádo: 1 ks&#10;Vajíčko: 2 ks" className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none resize-none font-mono" style={{ color: colors.textPrimary }} />
+            </div>
+            <div className="col-span-2">
+              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Postup (jeden krok na riadok)</label>
+              <textarea value={stepsText} onChange={e => setStepsText(e.target.value)} rows={4} placeholder="Nakrájaj avokádo..." className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none resize-none" style={{ color: colors.textPrimary }} />
+            </div>
+            <div>
+              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Alergény (čiarkou oddelené)</label>
+              <input value={allerText} onChange={e => setAllerText(e.target.value)} placeholder="dairy, gluten" className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }} />
+            </div>
+            <div>
+              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Tagy (čiarkou oddelené)</label>
+              <input value={tagsText} onChange={e => setTagsText(e.target.value)} placeholder="postpartum, proteín" className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }} />
+            </div>
+            <div className="flex items-center gap-2">
+              <button onClick={() => setForm(f => ({ ...f, active: !f.active }))}>
+                {form.active ? <CheckSquare className="w-5 h-5" style={{ color: colors.strava }} /> : <Square className="w-5 h-5" style={{ color: colors.textSecondary }} />}
+              </button>
+              <span className="text-sm" style={{ color: colors.textPrimary }}>Aktívny</span>
+            </div>
+          </div>
+          {error && <div className="mt-3 text-sm text-red-600"><AlertTriangle className="w-4 h-4 inline mr-1" />{error}</div>}
+          <div className="flex justify-end gap-3 mt-4">
+            <button onClick={closeForm} className="px-4 py-2 rounded-xl text-sm" style={{ backgroundColor: 'rgba(255,255,255,0.3)', color: colors.textPrimary }}>Zrušiť</button>
+            <button onClick={save} disabled={saving} className="px-4 py-2 rounded-xl text-sm text-white flex items-center gap-2" style={{ backgroundColor: saving ? `${colors.strava}80` : colors.strava }}>
+              {saving && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}Uložiť
+            </button>
+          </div>
+        </AdminCard>
+      )}
+
+      <AdminCard>
+        {loading ? <div className="py-8 text-center text-sm" style={{ color: colors.textSecondary }}>Načítavam...</div> : (
+          <>
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-sm font-medium" style={{ color: colors.textSecondary }}>{items.length} receptov</span>
+            </div>
+            <div className="space-y-2">
+              {items.length === 0 && <p className="py-6 text-center text-sm" style={{ color: colors.textSecondary }}>Žiadne recepty. Pridaj prvý alebo importuj statické.</p>}
+              {items.map(r => (
+                <div key={r.id} className="flex items-center justify-between p-3 rounded-xl bg-white/20 border border-white/20">
+                  <div className="flex items-center gap-3">
+                    {r.image && <img src={r.image} alt="" className="w-10 h-10 rounded-lg object-cover" />}
+                    <div>
+                      <div className="text-sm font-medium" style={{ color: colors.textPrimary }}>{r.title}</div>
+                      <div className="text-xs flex gap-2" style={{ color: colors.textSecondary }}>
+                        <span className="px-1.5 py-0.5 rounded-full" style={{ backgroundColor: `${colors.strava}20`, color: colors.strava }}>{r.category}</span>
+                        <span>{r.calories} kcal</span>
+                        <span>{r.prep_time} min</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <button onClick={() => toggleActive(r)} title={r.active ? 'Deaktivácia' : 'Aktivácia'}>
+                      {r.active ? <CheckSquare className="w-4 h-4" style={{ color: colors.strava }} /> : <Square className="w-4 h-4" style={{ color: colors.textSecondary }} />}
+                    </button>
+                    <button onClick={() => openEdit(r)} className="p-1.5 rounded-lg hover:bg-white/20"><Edit3 className="w-3.5 h-3.5" style={{ color: colors.textSecondary }} /></button>
+                    <button onClick={() => remove(r.id)} className="p-1.5 rounded-lg hover:bg-white/20"><Trash2 className="w-3.5 h-3.5" style={{ color: colors.periodka }} /></button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+      </AdminCard>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════
+// EXERCISES TAB — Supabase CRUD
+// ═══════════════════════════════════════════
+interface ExerciseRow {
+  id: string; content_type: 'exercise' | 'stretch'; name: string;
+  duration: string; category: string; body: string; equip: string;
+  level: number | null; diastasis_safe: boolean; thumb: string;
+  description: string; video_url: string; active: boolean;
+}
+
+function ExercisesTab() {
+  const [items, setItems] = useState<ExerciseRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [editId, setEditId] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [seeding, setSeeding] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [form, setForm] = useState<Partial<ExerciseRow>>({ content_type: 'exercise', duration: '15 min', active: true, diastasis_safe: true });
+
+  const load = async () => {
+    setLoading(true); setError(null);
+    try { setItems(await adminFetch('exercises')); } catch (e: any) { setError(e.message); }
+    setLoading(false);
+  };
+  useEffect(() => { load(); }, []);
+
+  const openAdd = () => { setForm({ content_type: 'exercise', duration: '15 min', active: true, diastasis_safe: true }); setEditId(null); setShowForm(true); setError(null); };
+  const openEdit = (r: ExerciseRow) => { setForm({ ...r }); setEditId(r.id); setShowForm(true); setError(null); };
+  const closeForm = () => { setShowForm(false); setEditId(null); setError(null); };
+
+  const save = async () => {
+    if (!form.name) return;
+    setSaving(true); setError(null);
+    try {
+      const payload: ExerciseRow = {
+        id: editId ?? `${form.content_type}-${Date.now()}`,
+        content_type: form.content_type ?? 'exercise',
+        name: form.name!,
+        duration: form.duration ?? '15 min',
+        category: form.category ?? '',
+        body: form.body ?? '',
+        equip: form.equip ?? 'Bez pomôcok',
+        level: form.content_type === 'exercise' ? (Number(form.level) || null) : null,
+        diastasis_safe: form.content_type === 'exercise' ? (form.diastasis_safe ?? true) : true,
+        thumb: form.thumb ?? '',
+        description: form.description ?? '',
+        video_url: form.video_url ?? '',
+        active: form.active ?? true,
+      };
+      await adminUpsert('exercises', payload as unknown as Record<string, unknown>);
+      await load(); closeForm();
+    } catch (e: any) { setError(e.message); }
+    setSaving(false);
+  };
+
+  const remove = async (id: string) => {
+    if (!confirm('Naozaj?')) return;
+    try { await adminDelete('exercises', id); setItems(p => p.filter(r => r.id !== id)); } catch (e: any) { alert(e.message); }
+  };
+
+  const toggleActive = async (r: ExerciseRow) => {
+    try {
+      await adminUpsert('exercises', { ...r, active: !r.active } as unknown as Record<string, unknown>);
+      setItems(p => p.map(x => x.id === r.id ? { ...x, active: !r.active } : x));
+    } catch (e: any) { alert(e.message); }
+  };
+
+  const seedFromStatic = async () => {
+    setSeeding(true); setError(null);
+    try {
+      const { TeloExtraStaticData } = await import('../../data/teloExtraData').catch(() => ({ TeloExtraStaticData: [] }));
+      const { TeloStrecingStaticData } = await import('../../data/teloStrecingData').catch(() => ({ TeloStrecingStaticData: [] }));
+      // If no separate data files exist, note to user they can add manually
+      if (TeloExtraStaticData.length === 0 && TeloStrecingStaticData.length === 0) {
+        alert('Statické dáta cvičení nie sú v samostatnom súbore. Pridaj cvičenia manuálne.');
+        setSeeding(false); return;
+      }
+      const payload = [
+        ...TeloExtraStaticData.map((e: any) => ({ ...e, content_type: 'exercise' })),
+        ...TeloStrecingStaticData.map((s: any) => ({ ...s, content_type: 'stretch' })),
+      ];
+      const count = await adminSeed('exercises', payload);
+      alert(`✅ Importovaných ${count} cvičení`);
+      await load();
+    } catch (e: any) { setError(e.message); }
+    setSeeding(false);
+  };
+
+  const exercises = items.filter(i => i.content_type === 'exercise');
+  const stretches = items.filter(i => i.content_type === 'stretch');
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold" style={{ color: colors.textPrimary }}>Exercise Library</h2>
+        <div className="flex gap-2">
+          <button onClick={seedFromStatic} disabled={seeding} className="px-4 py-2 rounded-xl text-sm font-medium" style={{ backgroundColor: `${colors.accent}20`, color: colors.accent }}>
+            {seeding ? '⟳ ...' : '⬆ Import'}
+          </button>
+          <button onClick={openAdd} className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white" style={{ backgroundColor: colors.telo }}>
+            <Plus className="w-4 h-4" />Nové cvičenie
+          </button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-4">
+        {[['Celkovo', items.length, colors.textPrimary], ['Silové', exercises.length, colors.telo], ['Strečing', stretches.length, colors.mysel]].map(([label, val, col]) => (
+          <AdminCard key={label as string}><div className="text-center"><div className="text-2xl font-bold" style={{ color: col as string }}>{val as number}</div><div className="text-sm" style={{ color: colors.textSecondary }}>{label as string}</div></div></AdminCard>
+        ))}
+      </div>
+
+      {error && <div className="px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-600"><AlertTriangle className="w-4 h-4 inline mr-2" />{error}</div>}
+
+      {showForm && (
+        <AdminCard>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-semibold text-lg" style={{ color: colors.textPrimary }}>{editId ? 'Upraviť cvičenie' : 'Nové cvičenie'}</h3>
+            <button onClick={closeForm}><X className="w-4 h-4" style={{ color: colors.textSecondary }} /></button>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Typ</label>
+              <select value={form.content_type ?? 'exercise'} onChange={e => setForm(f => ({ ...f, content_type: e.target.value as 'exercise' | 'stretch' }))} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }}>
+                <option value="exercise">Silové cvičenie</option>
+                <option value="stretch">Strečing</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Názov *</label>
+              <input value={form.name ?? ''} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }} />
+            </div>
+            <div>
+              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Dĺžka</label>
+              <select value={form.duration ?? '15 min'} onChange={e => setForm(f => ({ ...f, duration: e.target.value }))} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }}>
+                <option value="5 min">5 min</option>
+                <option value="15 min">15 min</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Partie tela</label>
+              <input value={form.body ?? ''} onChange={e => setForm(f => ({ ...f, body: e.target.value }))} placeholder="Celé telo / Core / Nohy..." className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }} />
+            </div>
+            <div>
+              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Pomôcky</label>
+              <select value={form.equip ?? 'Bez pomôcok'} onChange={e => setForm(f => ({ ...f, equip: e.target.value }))} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }}>
+                <option>Bez pomôcok</option>
+                <option>S gumou</option>
+                <option>S činkami</option>
+              </select>
+            </div>
+            {form.content_type === 'exercise' && (
+              <div>
+                <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Level (1-4)</label>
+                <select value={form.level ?? 1} onChange={e => setForm(f => ({ ...f, level: Number(e.target.value) }))} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }}>
+                  {[1,2,3,4].map(l => <option key={l} value={l}>{l}</option>)}
+                </select>
+              </div>
+            )}
+            <div className="col-span-2">
+              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>URL náhľadového obrázka</label>
+              <input value={form.thumb ?? ''} onChange={e => setForm(f => ({ ...f, thumb: e.target.value }))} placeholder="https://..." className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }} />
+            </div>
+            <div className="col-span-2">
+              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Video URL</label>
+              <input value={form.video_url ?? ''} onChange={e => setForm(f => ({ ...f, video_url: e.target.value }))} placeholder="https://..." className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }} />
+            </div>
+            <div className="col-span-2">
+              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Popis</label>
+              <textarea value={form.description ?? ''} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} rows={2} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none resize-none" style={{ color: colors.textPrimary }} />
+            </div>
+            <div className="flex items-center gap-2">
+              <button onClick={() => setForm(f => ({ ...f, active: !f.active }))}>
+                {form.active ? <CheckSquare className="w-5 h-5" style={{ color: colors.strava }} /> : <Square className="w-5 h-5" style={{ color: colors.textSecondary }} />}
+              </button>
+              <span className="text-sm" style={{ color: colors.textPrimary }}>Aktívne</span>
+            </div>
+            {form.content_type === 'exercise' && (
+              <div className="flex items-center gap-2">
+                <button onClick={() => setForm(f => ({ ...f, diastasis_safe: !f.diastasis_safe }))}>
+                  {form.diastasis_safe ? <CheckSquare className="w-5 h-5" style={{ color: colors.strava }} /> : <Square className="w-5 h-5" style={{ color: colors.textSecondary }} />}
+                </button>
+                <span className="text-sm" style={{ color: colors.textPrimary }}>Bezpečné pri diastáze</span>
+              </div>
+            )}
+          </div>
+          {error && <div className="mt-3 text-sm text-red-600">{error}</div>}
+          <div className="flex justify-end gap-3 mt-4">
+            <button onClick={closeForm} className="px-4 py-2 rounded-xl text-sm" style={{ backgroundColor: 'rgba(255,255,255,0.3)', color: colors.textPrimary }}>Zrušiť</button>
+            <button onClick={save} disabled={saving} className="px-4 py-2 rounded-xl text-sm text-white flex items-center gap-2" style={{ backgroundColor: colors.telo }}>
+              {saving && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}Uložiť
+            </button>
+          </div>
+        </AdminCard>
+      )}
+
+      <AdminCard>
+        {loading ? <div className="py-8 text-center text-sm" style={{ color: colors.textSecondary }}>Načítavam...</div> : (
+          <div className="space-y-2">
+            {items.length === 0 && <p className="py-6 text-center text-sm" style={{ color: colors.textSecondary }}>Žiadne cvičenia. Pridaj prvé.</p>}
+            {items.map(r => (
+              <div key={r.id} className="flex items-center justify-between p-3 rounded-xl bg-white/20 border border-white/20">
+                <div className="flex items-center gap-3">
+                  {r.thumb && <img src={r.thumb} alt="" className="w-10 h-10 rounded-lg object-cover" />}
+                  <div>
+                    <div className="text-sm font-medium" style={{ color: colors.textPrimary }}>{r.name}</div>
+                    <div className="text-xs flex gap-2" style={{ color: colors.textSecondary }}>
+                      <span className="px-1.5 py-0.5 rounded-full" style={{ backgroundColor: `${r.content_type === 'exercise' ? colors.telo : colors.mysel}20`, color: r.content_type === 'exercise' ? colors.telo : colors.mysel }}>
+                        {r.content_type === 'exercise' ? 'Silové' : 'Strečing'}
+                      </span>
+                      <span>{r.duration}</span>
+                      {r.body && <span>{r.body}</span>}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1">
+                  <button onClick={() => toggleActive(r)}>{r.active ? <CheckSquare className="w-4 h-4" style={{ color: colors.strava }} /> : <Square className="w-4 h-4" style={{ color: colors.textSecondary }} />}</button>
+                  <button onClick={() => openEdit(r)} className="p-1.5 rounded-lg hover:bg-white/20"><Edit3 className="w-3.5 h-3.5" style={{ color: colors.textSecondary }} /></button>
+                  <button onClick={() => remove(r.id)} className="p-1.5 rounded-lg hover:bg-white/20"><Trash2 className="w-3.5 h-3.5" style={{ color: colors.periodka }} /></button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </AdminCard>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════
+// MEDITATIONS TAB — Supabase CRUD
+// ═══════════════════════════════════════════
+interface MeditationRow {
+  id: string; title: string; duration: string; description: string;
+  audio_url: string; image: string; category: string;
+  featured: boolean; active: boolean;
+}
+
+function MeditationsTab() {
+  const [items, setItems] = useState<MeditationRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [editId, setEditId] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [seeding, setSeeding] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [form, setForm] = useState<Partial<MeditationRow>>({ duration: '5 min', category: 'Stres', active: true, featured: false });
+
+  const load = async () => {
+    setLoading(true); setError(null);
+    try { setItems(await adminFetch('meditations')); } catch (e: any) { setError(e.message); }
+    setLoading(false);
+  };
+  useEffect(() => { load(); }, []);
+
+  const openAdd = () => { setForm({ duration: '5 min', category: 'Stres', active: true, featured: false }); setEditId(null); setShowForm(true); setError(null); };
+  const openEdit = (r: MeditationRow) => { setForm({ ...r }); setEditId(r.id); setShowForm(true); setError(null); };
+  const closeForm = () => { setShowForm(false); setEditId(null); setError(null); };
+
+  const save = async () => {
+    if (!form.title) return;
+    setSaving(true); setError(null);
+    try {
+      const payload: MeditationRow = {
+        id: editId ?? `med-${Date.now()}`,
+        title: form.title!,
+        duration: form.duration ?? '5 min',
+        description: form.description ?? '',
+        audio_url: form.audio_url ?? '',
+        image: form.image ?? '',
+        category: form.category ?? 'Stres',
+        featured: form.featured ?? false,
+        active: form.active ?? true,
+      };
+      await adminUpsert('meditations', payload as unknown as Record<string, unknown>);
+      await load(); closeForm();
+    } catch (e: any) { setError(e.message); }
+    setSaving(false);
+  };
+
+  const remove = async (id: string) => {
+    if (!confirm('Naozaj?')) return;
+    try { await adminDelete('meditations', id); setItems(p => p.filter(r => r.id !== id)); } catch (e: any) { alert(e.message); }
+  };
+
+  const toggleActive = async (r: MeditationRow) => {
+    try {
+      await adminUpsert('meditations', { ...r, active: !r.active } as unknown as Record<string, unknown>);
+      setItems(p => p.map(x => x.id === r.id ? { ...x, active: !r.active } : x));
+    } catch (e: any) { alert(e.message); }
+  };
+
+  const seedFromStatic = async () => {
+    setSeeding(true); setError(null);
+    try {
+      // Import inline meditations from MyselNew — they're hardcoded there
+      // We provide the static seed here directly
+      const staticMeds: MeditationRow[] = [
+        { id: 'med-1', category: 'Stres', title: 'Nájdenie vnútorného pokoja uprostred chaosu', duration: '5 min', description: 'Naučte sa nájsť pokojné miesto vo svojej mysli aj v najrušnejších dňoch', audio_url: '/audio/inner-peace-chaos.mp3', image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop', featured: false, active: true },
+        { id: 'med-2', category: 'Mindfulness', title: 'Učenie sa byť prítomná pri každodenných úlohách', duration: '5 min', description: 'Transformujte bežné činnosti na príležitosti pre mindfulness', audio_url: '/audio/present-daily-tasks.mp3', image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=300&fit=crop', featured: false, active: true },
+        { id: 'med-3', category: 'Materstvo', title: 'Objavovanie trpezlivosti vo výchovnom procese', duration: '5 min', description: 'Kultivujte trpezlivosť a porozumenie v náročných výchovných momentoch', audio_url: '/audio/patience-parenting.mp3', image: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=400&h=300&fit=crop', featured: false, active: true },
+        { id: 'med-4', category: 'Mindfulness', title: 'Nájdenie radosti v malých veciach', duration: '5 min', description: 'Objavte krásu v jednoduchých, každodenných momentoch', audio_url: '/audio/joy-small-things.mp3', image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop', featured: false, active: true },
+        { id: 'med-5', category: 'Emócie', title: 'Udržiavanie emocionálnej rovnováhy', duration: '5 min', description: 'Technika na stabilizovanie emócií a nájdenie vnútornej harmónie', audio_url: '/audio/emotional-balance.mp3', image: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=400&h=300&fit=crop', featured: false, active: true },
+        { id: 'med-6', category: 'Ja', title: 'Vytváranie času pre seba', duration: '5 min', description: 'Naučte sa prioritizovať svoju pohodu a vytvoriť priestor pre seba', audio_url: '/audio/time-for-self.mp3', image: 'https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=400&h=300&fit=crop', featured: false, active: true },
+        { id: 'med-7', category: 'Materstvo', title: 'Posilňovanie väzby s dieťaťom', duration: '5 min', description: 'Meditácia zameraná na prehĺbenie lásky a spojenia s vaším dieťaťom', audio_url: '/audio/bond-with-child.mp3', image: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=400&h=300&fit=crop', featured: false, active: true },
+        { id: 'med-8', category: 'Materstvo', title: 'Prijímanie nepredvídateľnosti materstva', duration: '5 min', description: 'Naučte sa flexibilne reagovať na neočakávané situácie v materstve', audio_url: '/audio/accept-unpredictability.mp3', image: 'https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=400&h=300&fit=crop', featured: false, active: true },
+        { id: 'med-9', category: 'Emócie', title: 'Naučiť sa odpúšťať sebe a iným', duration: '5 min', description: 'Oslobodenie sa od viny a rozhorčenia cez praktiku odpúštania', audio_url: '/audio/forgiveness-practice.mp3', image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=300&fit=crop', featured: false, active: true },
+        { id: 'med-10', category: 'Emócie', title: 'Rozvíjanie empatie a porozumenia', duration: '5 min', description: 'Prehĺbenie schopnosti porozumieť sebe aj ostatným s láskavosťou', audio_url: '/audio/empathy-understanding.mp3', image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop', featured: false, active: true },
+        { id: 'med-11', category: 'Stres', title: 'Prekonávanie stresu a úzkosti', duration: '5 min', description: 'Efektívne techniky na zvládanie stresu a upokojenie anxióznych myšlienok', audio_url: '/audio/overcome-stress-anxiety.mp3', image: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&h=300&fit=crop', featured: false, active: true },
+        { id: 'med-12', category: 'Ja', title: 'Budovanie sebadôvery a sebaúcty', duration: '5 min', description: 'Posilnenie vnútornej sily a pozitívneho vzťahu k sebe', audio_url: '/audio/self-confidence-esteem.mp3', image: 'https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?w=400&h=300&fit=crop', featured: false, active: true },
+        { id: 'med-13', category: 'Ja', title: 'Nájdenie rovnováhy medzi kariérou a osobným životom', duration: '5 min', description: 'Harmonizácia pracovných a osobných priorít s múdrosťou', audio_url: '/audio/work-life-balance.mp3', image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop', featured: false, active: true },
+        { id: 'med-14', category: 'Ja', title: 'Učenie sa hovoriť „nie" bez pocitu viny', duration: '5 min', description: 'Nastavenie zdravých hraníc a sebapéča bez pocitov viny', audio_url: '/audio/saying-no-guilt.mp3', image: 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=400&h=300&fit=crop', featured: false, active: true },
+        { id: 'med-15', category: 'Ja', title: 'Rozvíjanie kreativity a hľadanie inšpirácie', duration: '5 min', description: 'Prebudenie tvorivého ducha a otvorenie sa novým možnostiam', audio_url: '/audio/creativity-inspiration.mp3', image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=300&fit=crop', featured: false, active: true },
+        { id: 'med-16', category: 'Emócie', title: 'Zvládanie pocitu osamelosti a izolácie', duration: '5 min', description: 'Nájdenie spojenia a zmyslu aj v momentoch osamelosti', audio_url: '/audio/loneliness-isolation.mp3', image: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=400&h=300&fit=crop', featured: false, active: true },
+        { id: 'med-17', category: 'Mindfulness', title: 'Udržiavanie pozitívneho myslenia', duration: '5 min', description: 'Kultivovanie optimizmu a vďačnosti v každodennom živote', audio_url: '/audio/positive-thinking.mp3', image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop', featured: false, active: true },
+      ];
+      const count = await adminSeed('meditations', staticMeds as unknown as Record<string, unknown>[]);
+      alert(`✅ Importovaných ${count} meditácií`);
+      await load();
+    } catch (e: any) { setError(e.message); }
+    setSeeding(false);
+  };
+
+  const CATS = ['Stres', 'Mindfulness', 'Materstvo', 'Emócie', 'Ja'];
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold" style={{ color: colors.textPrimary }}>Meditation Content</h2>
+        <div className="flex gap-2">
+          {items.length === 0 && !loading && (
+            <button onClick={seedFromStatic} disabled={seeding} className="px-4 py-2 rounded-xl text-sm font-medium" style={{ backgroundColor: `${colors.accent}20`, color: colors.accent }}>
+              {seeding ? '⟳ Importujem...' : '⬆ Import 17 meditácií'}
+            </button>
+          )}
+          <button onClick={openAdd} className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white" style={{ backgroundColor: colors.mysel }}>
+            <Plus className="w-4 h-4" />Nová meditácia
+          </button>
+        </div>
+      </div>
+
+      {error && <div className="px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-600"><AlertTriangle className="w-4 h-4 inline mr-2" />{error}</div>}
+
+      {showForm && (
+        <AdminCard>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-semibold text-lg" style={{ color: colors.textPrimary }}>{editId ? 'Upraviť meditáciu' : 'Nová meditácia'}</h3>
+            <button onClick={closeForm}><X className="w-4 h-4" style={{ color: colors.textSecondary }} /></button>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="col-span-2">
+              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Názov *</label>
+              <input value={form.title ?? ''} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }} />
+            </div>
+            <div>
+              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Kategória</label>
+              <select value={form.category ?? 'Stres'} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }}>
+                {CATS.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Dĺžka</label>
+              <select value={form.duration ?? '5 min'} onChange={e => setForm(f => ({ ...f, duration: e.target.value }))} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }}>
+                <option value="5 min">5 min</option>
+                <option value="10 min">10 min</option>
+                <option value="15 min">15 min</option>
+                <option value="20 min">20 min</option>
+              </select>
+            </div>
+            <div className="col-span-2">
+              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Popis</label>
+              <textarea value={form.description ?? ''} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} rows={2} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none resize-none" style={{ color: colors.textPrimary }} />
+            </div>
+            <div className="col-span-2">
+              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Audio URL</label>
+              <input value={form.audio_url ?? ''} onChange={e => setForm(f => ({ ...f, audio_url: e.target.value }))} placeholder="/audio/file.mp3 alebo https://..." className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }} />
+            </div>
+            <div className="col-span-2">
+              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>URL obrázka</label>
+              <input value={form.image ?? ''} onChange={e => setForm(f => ({ ...f, image: e.target.value }))} placeholder="https://..." className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }} />
+            </div>
+            <div className="flex items-center gap-2">
+              <button onClick={() => setForm(f => ({ ...f, active: !f.active }))}>
+                {form.active ? <CheckSquare className="w-5 h-5" style={{ color: colors.strava }} /> : <Square className="w-5 h-5" style={{ color: colors.textSecondary }} />}
+              </button>
+              <span className="text-sm" style={{ color: colors.textPrimary }}>Aktívna</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <button onClick={() => setForm(f => ({ ...f, featured: !f.featured }))}>
+                {form.featured ? <CheckSquare className="w-5 h-5" style={{ color: colors.accent }} /> : <Square className="w-5 h-5" style={{ color: colors.textSecondary }} />}
+              </button>
+              <span className="text-sm" style={{ color: colors.textPrimary }}>Odporúčaná</span>
+            </div>
+          </div>
+          {error && <div className="mt-3 text-sm text-red-600">{error}</div>}
+          <div className="flex justify-end gap-3 mt-4">
+            <button onClick={closeForm} className="px-4 py-2 rounded-xl text-sm" style={{ backgroundColor: 'rgba(255,255,255,0.3)', color: colors.textPrimary }}>Zrušiť</button>
+            <button onClick={save} disabled={saving} className="px-4 py-2 rounded-xl text-sm text-white flex items-center gap-2" style={{ backgroundColor: colors.mysel }}>
+              {saving && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}Uložiť
+            </button>
+          </div>
+        </AdminCard>
+      )}
+
+      <AdminCard>
+        {loading ? <div className="py-8 text-center text-sm" style={{ color: colors.textSecondary }}>Načítavam...</div> : (
+          <div className="space-y-2">
+            {items.length === 0 && <p className="py-6 text-center text-sm" style={{ color: colors.textSecondary }}>Žiadne meditácie. Importuj existujúce alebo pridaj novú.</p>}
+            {items.map(r => (
+              <div key={r.id} className="flex items-center justify-between p-3 rounded-xl bg-white/20 border border-white/20">
+                <div className="flex items-center gap-3">
+                  {r.image && <img src={r.image} alt="" className="w-10 h-10 rounded-lg object-cover" />}
+                  <div>
+                    <div className="text-sm font-medium" style={{ color: colors.textPrimary }}>{r.title}</div>
+                    <div className="text-xs flex gap-2" style={{ color: colors.textSecondary }}>
+                      <span className="px-1.5 py-0.5 rounded-full" style={{ backgroundColor: `${colors.mysel}20`, color: colors.mysel }}>{r.category}</span>
+                      <span>{r.duration}</span>
+                      {r.featured && <span className="px-1.5 py-0.5 rounded-full" style={{ backgroundColor: `${colors.accent}20`, color: colors.accent }}>⭐ Featured</span>}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1">
+                  <button onClick={() => toggleActive(r)}>{r.active ? <CheckSquare className="w-4 h-4" style={{ color: colors.strava }} /> : <Square className="w-4 h-4" style={{ color: colors.textSecondary }} />}</button>
+                  <button onClick={() => openEdit(r)} className="p-1.5 rounded-lg hover:bg-white/20"><Edit3 className="w-3.5 h-3.5" style={{ color: colors.textSecondary }} /></button>
+                  <button onClick={() => remove(r.id)} className="p-1.5 rounded-lg hover:bg-white/20"><Trash2 className="w-3.5 h-3.5" style={{ color: colors.periodka }} /></button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </AdminCard>
+    </div>
+  );
+}
+
+// ─── ProgramsTab ─────────────────────────────────────────────────────────────
+function ProgramsTab() {
+  type ProgItem = { id: string; name: string; level: number; weeks: number; description: string; detailed_description: string; image: string; schedule: any[]; active: boolean };
+  const empty: ProgItem = { id: '', name: '', level: 1, weeks: 8, description: '', detailed_description: '', image: '', schedule: [], active: true };
+  const [items, setItems] = useState<ProgItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [seeding, setSeeding] = useState(false);
+  const [editing, setEditing] = useState<ProgItem | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const staticPrograms = [
+    { id: 'postpartum', name: 'Postpartum', level: 1, weeks: 8, description: 'Ak potrebuješ spevniť brušný korzet, vyriešiť diastázu či inkontinenciu', detailed_description: '', image: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&h=500&fit=crop', schedule: [], active: true },
+    { id: 'bodyforming', name: 'BodyForming', level: 2, weeks: 6, description: 'Ak chceš začať spevňovať celé telo a cvičiť s vlastnou váhou.', detailed_description: '', image: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&h=500&fit=crop', schedule: [], active: true },
+    { id: 'shapeforming', name: 'ShapeForming', level: 3, weeks: 6, description: 'Ak chceš formovať postavu a cvičiť s gumami.', detailed_description: '', image: 'https://images.unsplash.com/photo-1598289431512-b97b0917affc?w=800&h=500&fit=crop', schedule: [], active: true },
+    { id: 'strong-sexy', name: 'Strong&Sexy', level: 4, weeks: 6, description: 'Ak snívaš o silnom, vyformovanom a funkčnom sexy tele.', detailed_description: '', image: 'https://images.unsplash.com/photo-1550345332-09e3ac987658?w=800&h=500&fit=crop', schedule: [], active: true },
+  ];
+
+  const load = async () => {
+    setLoading(true);
+    try {
+      const res = await adminFetch('programmes');
+      setItems(res.items ?? []);
+    } catch (e: any) { setError(e.message); }
+    setLoading(false);
+  };
+
+  useEffect(() => { load(); }, []);
+
+  const save = async () => {
+    if (!editing) return;
+    setSaving(true); setError(null);
+    try {
+      await adminUpsert('programmes', editing);
+      await load();
+      setEditing(null);
+    } catch (e: any) { setError(e.message); }
+    setSaving(false);
+  };
+
+  const remove = async (id: string) => {
+    if (!confirm('Zmazať program?')) return;
+    try {
+      await adminDelete('programmes', id);
+      setItems(p => p.filter(x => x.id !== id));
+    } catch (e: any) { alert(e.message); }
+  };
+
+  const seedFromStatic = async () => {
+    setSeeding(true); setError(null);
+    try {
+      const count = await adminSeed('programmes', staticPrograms);
+      alert(`✅ Importovaných ${count} programov`);
+      await load();
+    } catch (e: any) { setError(e.message); }
+    setSeeding(false);
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold" style={{ color: colors.textPrimary }}>Fitness Programy</h2>
+        <div className="flex gap-2">
+          <button onClick={seedFromStatic} disabled={seeding} className="px-3 py-2 rounded-xl text-sm font-medium border border-white/40 bg-white/20" style={{ color: colors.textSecondary }}>
+            {seeding ? 'Importujem…' : 'Import statických dát'}
+          </button>
+          <button onClick={() => setEditing({ ...empty, id: `prog-${Date.now()}` })} className="px-4 py-2 rounded-xl text-sm font-medium text-white" style={{ backgroundColor: colors.telo }}>
+            <Plus className="w-4 h-4 mr-2 inline" />Nový program
+          </button>
+        </div>
+      </div>
+
+      {error && <div className="p-3 rounded-xl bg-red-50 text-red-600 text-sm">{error}</div>}
+
+      {/* Edit form */}
+      {editing && (
+        <AdminCard title={editing.name || 'Nový program'}>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="col-span-2">
+              <label className="text-xs font-medium mb-1 block" style={{ color: colors.textSecondary }}>Názov</label>
+              <input value={editing.name} onChange={e => setEditing(p => p && ({ ...p, name: e.target.value }))} className="w-full px-3 py-2 rounded-lg bg-white/40 border border-white/40 text-sm" />
+            </div>
+            <div>
+              <label className="text-xs font-medium mb-1 block" style={{ color: colors.textSecondary }}>Level (1-4)</label>
+              <input type="number" min={1} max={4} value={editing.level} onChange={e => setEditing(p => p && ({ ...p, level: Number(e.target.value) }))} className="w-full px-3 py-2 rounded-lg bg-white/40 border border-white/40 text-sm" />
+            </div>
+            <div>
+              <label className="text-xs font-medium mb-1 block" style={{ color: colors.textSecondary }}>Týždne</label>
+              <input type="number" min={1} value={editing.weeks} onChange={e => setEditing(p => p && ({ ...p, weeks: Number(e.target.value) }))} className="w-full px-3 py-2 rounded-lg bg-white/40 border border-white/40 text-sm" />
+            </div>
+            <div className="col-span-2">
+              <label className="text-xs font-medium mb-1 block" style={{ color: colors.textSecondary }}>Krátky popis</label>
+              <textarea rows={2} value={editing.description} onChange={e => setEditing(p => p && ({ ...p, description: e.target.value }))} className="w-full px-3 py-2 rounded-lg bg-white/40 border border-white/40 text-sm resize-none" />
+            </div>
+            <div className="col-span-2">
+              <label className="text-xs font-medium mb-1 block" style={{ color: colors.textSecondary }}>Detailný popis</label>
+              <textarea rows={4} value={editing.detailed_description} onChange={e => setEditing(p => p && ({ ...p, detailed_description: e.target.value }))} className="w-full px-3 py-2 rounded-lg bg-white/40 border border-white/40 text-sm resize-none" />
+            </div>
+            <div className="col-span-2">
+              <label className="text-xs font-medium mb-1 block" style={{ color: colors.textSecondary }}>Obrázok (URL)</label>
+              <input value={editing.image} onChange={e => setEditing(p => p && ({ ...p, image: e.target.value }))} className="w-full px-3 py-2 rounded-lg bg-white/40 border border-white/40 text-sm" />
+            </div>
+            <div className="col-span-2 flex items-center gap-2">
+              <input type="checkbox" checked={editing.active} onChange={e => setEditing(p => p && ({ ...p, active: e.target.checked }))} className="w-4 h-4" />
+              <label className="text-sm" style={{ color: colors.textSecondary }}>Aktívny (viditeľný v aplikácii)</label>
+            </div>
+          </div>
+          <div className="flex gap-2 mt-4">
+            <button onClick={save} disabled={saving} className="px-4 py-2 rounded-xl text-sm font-medium text-white" style={{ backgroundColor: colors.telo }}>
+              {saving ? 'Ukladám…' : 'Uložiť'}
+            </button>
+            <button onClick={() => setEditing(null)} className="px-4 py-2 rounded-xl text-sm font-medium border border-white/40 bg-white/20" style={{ color: colors.textSecondary }}>
+              Zrušiť
+            </button>
+          </div>
+        </AdminCard>
+      )}
+
+      {/* List */}
+      <AdminCard title={`Programy (${items.length})`}>
+        {loading ? <div className="py-8 text-center text-sm" style={{ color: colors.textSecondary }}>Načítavam…</div>
+          : items.length === 0 ? (
+            <div className="py-8 text-center">
+              <p className="text-sm mb-3" style={{ color: colors.textSecondary }}>Žiadne programy. Importuj statické dáta alebo pridaj nový.</p>
+              <button onClick={seedFromStatic} disabled={seeding} className="px-4 py-2 rounded-xl text-sm font-medium text-white" style={{ backgroundColor: colors.telo }}>
+                {seeding ? 'Importujem…' : 'Import statických dát'}
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {items.map(r => (
+                <div key={r.id} className="flex items-center justify-between p-3 rounded-xl bg-white/20 border border-white/20">
+                  <div className="flex items-center gap-3">
+                    {r.image && <img src={r.image} className="w-12 h-12 rounded-lg object-cover" />}
+                    <div>
+                      <div className="font-medium text-sm" style={{ color: colors.textPrimary }}>{r.name}</div>
+                      <div className="text-xs" style={{ color: colors.textSecondary }}>Level {r.level} • {r.weeks} týždňov • {r.active ? 'Aktívny' : 'Neaktívny'}</div>
+                    </div>
+                  </div>
+                  <div className="flex gap-1">
+                    <button onClick={() => setEditing(r)} className="p-1.5 rounded-lg hover:bg-white/20"><Pencil className="w-3.5 h-3.5" style={{ color: colors.accent }} /></button>
+                    <button onClick={() => remove(r.id)} className="p-1.5 rounded-lg hover:bg-white/20"><Trash2 className="w-3.5 h-3.5" style={{ color: colors.periodka }} /></button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+      </AdminCard>
+    </div>
+  );
+}
+
 export default function AdminNew() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<string>('overview');
@@ -1404,551 +2282,6 @@ export default function AdminNew() {
   );
   };
 
-  const renderExercises = () => (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold" style={{ color: colors.textPrimary }}>Exercise Library</h2>
-        <button className="px-4 py-2 rounded-xl text-sm font-medium text-white" style={{ backgroundColor: colors.telo }}>
-          <Plus className="w-4 h-4 mr-2 inline" />Add Exercise
-        </button>
-      </div>
-      
-      {/* Exercise Stats */}
-      <div className="grid grid-cols-4 gap-4">
-        <Card>
-          <div className="text-center">
-            <div className="text-2xl font-bold" style={{ color: colors.textPrimary }}>23</div>
-            <div className="text-sm" style={{ color: colors.textSecondary }}>Total Exercises</div>
-          </div>
-        </Card>
-        <Card>
-          <div className="text-center">
-            <div className="text-2xl font-bold" style={{ color: colors.strava }}>15</div>
-            <div className="text-sm" style={{ color: colors.textSecondary }}>Strengthening</div>
-          </div>
-        </Card>
-        <Card>
-          <div className="text-center">
-            <div className="text-2xl font-bold" style={{ color: colors.mysel }}>8</div>
-            <div className="text-sm" style={{ color: colors.textSecondary }}>Stretching</div>
-          </div>
-        </Card>
-        <Card>
-          <div className="text-center">
-            <div className="text-2xl font-bold" style={{ color: colors.periodka }}>12</div>
-            <div className="text-sm" style={{ color: colors.textSecondary }}>Diastasis Safe</div>
-          </div>
-        </Card>
-      </div>
-
-      {/* Exercise Management */}
-      <Card>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold" style={{ color: colors.textPrimary }}>Exercise Database</h3>
-            <div className="flex gap-2">
-              <select className="px-3 py-2 rounded-lg bg-white/30 border border-white/30 text-sm">
-                <option>All Categories</option>
-                <option>Strengthening</option>
-                <option>Stretching</option>
-                <option>Cardio</option>
-              </select>
-              <select className="px-3 py-2 rounded-lg bg-white/30 border border-white/30 text-sm">
-                <option>All Levels</option>
-                <option>Level 1</option>
-                <option>Level 2</option>
-                <option>Level 3</option>
-                <option>Level 4</option>
-              </select>
-            </div>
-          </div>
-          
-          <div className="space-y-3">
-            {[
-              { name: 'Core Breathing', category: 'Strengthening', level: 1, duration: '5 min', equipment: 'None', diastasisSafe: true },
-              { name: 'Pelvic Floor Activation', category: 'Strengthening', level: 1, duration: '10 min', equipment: 'None', diastasisSafe: true },
-              { name: 'Modified Plank', category: 'Strengthening', level: 2, duration: '15 min', equipment: 'Mat', diastasisSafe: false },
-              { name: 'Hip Flexor Stretch', category: 'Stretching', level: 1, duration: '5 min', equipment: 'None', diastasisSafe: true },
-            ].map((exercise, i) => (
-              <div key={i} className="flex items-center justify-between p-4 rounded-xl bg-white/20 border border-white/20">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-lg bg-white/30 flex items-center justify-center">
-                    <Dumbbell className="w-6 h-6" style={{ color: colors.telo }} />
-                  </div>
-                  <div>
-                    <div className="font-medium" style={{ color: colors.textPrimary }}>{exercise.name}</div>
-                    <div className="text-sm flex items-center gap-2" style={{ color: colors.textSecondary }}>
-                      <span>{exercise.category}</span>
-                      <span>•</span>
-                      <span>Level {exercise.level}</span>
-                      <span>•</span>
-                      <span>{exercise.duration}</span>
-                      {exercise.diastasisSafe && (
-                        <>
-                          <span>•</span>
-                          <span className="text-xs px-2 py-1 rounded-full bg-green-500/20 text-green-600">Diastasis Safe</span>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button className="p-2 rounded-lg hover:bg-white/20 transition-all">
-                    <Eye className="w-4 h-4" style={{ color: colors.textSecondary }} />
-                  </button>
-                  <button className="p-2 rounded-lg hover:bg-white/20 transition-all">
-                    <Edit3 className="w-4 h-4" style={{ color: colors.textSecondary }} />
-                  </button>
-                  <button className="p-2 rounded-lg hover:bg-white/20 transition-all">
-                    <Trash2 className="w-4 h-4" style={{ color: colors.periodka }} />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </Card>
-    </div>
-  );
-
-  // Programme Schedule Builder state
-  const [schedPrograms, setSchedPrograms] = useState<Array<{
-    id: string; name: string; description: string; totalWeeks: number; level: number;
-    weeks: Array<{ title: string; days: Array<{ videoUrl: string; message: string; isRest: boolean }> }>;
-  }>>(() => loadLS('neome-admin-programs', [
-    { id: 'postpartum', name: 'Postpartum Recovery', description: 'Jemné cvičenia po pôrode', totalWeeks: 8, level: 1,
-      weeks: Array.from({ length: 8 }, (_, w) => ({ title: `Týždeň ${w + 1}`, days: Array.from({ length: 7 }, (_, d) => ({ videoUrl: '', message: '', isRest: d === 6 })) })) },
-    { id: 'bodyforming', name: 'BodyForming', description: 'Formovanie celého tela', totalWeeks: 12, level: 2,
-      weeks: Array.from({ length: 12 }, (_, w) => ({ title: `Týždeň ${w + 1}`, days: Array.from({ length: 7 }, (_, d) => ({ videoUrl: '', message: '', isRest: d === 5 || d === 6 })) })) },
-    { id: 'elasticbands', name: 'Elastic Bands', description: 'Tréning s odporovými gumami', totalWeeks: 10, level: 3,
-      weeks: Array.from({ length: 10 }, (_, w) => ({ title: `Týždeň ${w + 1}`, days: Array.from({ length: 7 }, (_, d) => ({ videoUrl: '', message: '', isRest: d === 6 })) })) },
-    { id: 'strongsexy', name: 'Strong & Sexy', description: 'Intenzívny silový program', totalWeeks: 16, level: 4,
-      weeks: Array.from({ length: 16 }, (_, w) => ({ title: `Týždeň ${w + 1}`, days: Array.from({ length: 7 }, (_, d) => ({ videoUrl: '', message: '', isRest: d === 6 })) })) },
-  ]));
-  const [selectedProgId, setSelectedProgId] = useState<string | null>(null);
-  const [selectedWeekIdx, setSelectedWeekIdx] = useState(0);
-  const [selectedDayIdx, setSelectedDayIdx] = useState<number | null>(null);
-
-  const DAYS_SHORT = ['Po', 'Ut', 'St', 'Št', 'Pi', 'So', 'Ne'];
-
-  const updateDay = (progId: string, weekIdx: number, dayIdx: number, patch: Partial<{ videoUrl: string; message: string; isRest: boolean }>) => {
-    setSchedPrograms(prev => prev.map(p => {
-      if (p.id !== progId) return p;
-      const weeks = p.weeks.map((w, wi) => {
-        if (wi !== weekIdx) return w;
-        return { ...w, days: w.days.map((d, di) => di === dayIdx ? { ...d, ...patch } : d) };
-      });
-      return { ...p, weeks };
-    }));
-  };
-
-  // Persist schedule programs
-  useEffect(() => { saveLS('neome-admin-programs', schedPrograms); }, [schedPrograms]);
-
-  const selectedProg = schedPrograms.find(p => p.id === selectedProgId);
-  const selectedWeek = selectedProg?.weeks[selectedWeekIdx];
-  const selectedDay = selectedWeekIdx !== undefined && selectedDayIdx !== null ? selectedWeek?.days[selectedDayIdx] : null;
-
-  const renderPrograms = () => (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold" style={{ color: colors.textPrimary }}>Programme Schedule Builder</h2>
-      </div>
-
-      {/* Program Stats */}
-      <div className="grid grid-cols-4 gap-4">
-        <Card>
-          <div className="text-center">
-            <div className="text-2xl font-bold" style={{ color: colors.textPrimary }}>{schedPrograms.length}</div>
-            <div className="text-sm" style={{ color: colors.textSecondary }}>Celkovo programov</div>
-          </div>
-        </Card>
-        <Card>
-          <div className="text-center">
-            <div className="text-2xl font-bold" style={{ color: colors.strava }}>89</div>
-            <div className="text-sm" style={{ color: colors.textSecondary }}>Aktívne používateľky</div>
-          </div>
-        </Card>
-        <Card>
-          <div className="text-center">
-            <div className="text-2xl font-bold" style={{ color: colors.mysel }}>67%</div>
-            <div className="text-sm" style={{ color: colors.textSecondary }}>Dokončenosť</div>
-          </div>
-        </Card>
-        <Card>
-          <div className="text-center">
-            <div className="text-2xl font-bold" style={{ color: colors.accent }}>4.8</div>
-            <div className="text-sm" style={{ color: colors.textSecondary }}>Priemerné hodnotenie</div>
-          </div>
-        </Card>
-      </div>
-
-      {/* Program picker */}
-      <div className="flex gap-3 flex-wrap">
-        {schedPrograms.map(p => (
-          <button key={p.id} onClick={() => { setSelectedProgId(p.id); setSelectedWeekIdx(0); setSelectedDayIdx(null); }}
-            className="px-4 py-2 rounded-xl text-sm font-medium transition-all"
-            style={selectedProgId === p.id ? { backgroundColor: colors.telo, color: '#fff' } : { backgroundColor: 'rgba(255,255,255,0.4)', color: colors.textPrimary, border: '1px solid rgba(255,255,255,0.3)' }}>
-            Level {p.level} — {p.name}
-          </button>
-        ))}
-      </div>
-
-      {selectedProg && (
-        <div className="grid grid-cols-3 gap-6">
-          {/* Week selector + day grid */}
-          <div className="col-span-2 space-y-4">
-            {/* Week tabs */}
-            <Card className="!p-3">
-              <div className="flex gap-1 flex-wrap">
-                {selectedProg.weeks.map((w, wi) => (
-                  <button key={wi} onClick={() => { setSelectedWeekIdx(wi); setSelectedDayIdx(null); }}
-                    className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
-                    style={selectedWeekIdx === wi ? { backgroundColor: colors.accent, color: '#fff' } : { backgroundColor: 'rgba(255,255,255,0.3)', color: colors.textPrimary }}>
-                    T{wi + 1}
-                  </button>
-                ))}
-              </div>
-            </Card>
-
-            {/* Day grid */}
-            {selectedWeek && (
-              <Card>
-                <h3 className="font-semibold mb-4" style={{ color: colors.textPrimary }}>{selectedWeek.title} — {selectedProg.name}</h3>
-                <div className="grid grid-cols-7 gap-2">
-                  {DAYS_SHORT.map((d, di) => {
-                    const day = selectedWeek.days[di];
-                    const hasVideo = day?.videoUrl;
-                    const hasMsg = day?.message;
-                    const isRest = day?.isRest;
-                    const isSelected = selectedDayIdx === di;
-                    return (
-                      <button key={di} onClick={() => setSelectedDayIdx(isSelected ? null : di)}
-                        className="aspect-square rounded-xl flex flex-col items-center justify-center gap-1 text-sm font-medium transition-all border-2"
-                        style={{
-                          backgroundColor: isRest ? 'rgba(160,144,126,0.12)' : isSelected ? `${colors.telo}15` : 'rgba(255,255,255,0.4)',
-                          borderColor: isSelected ? colors.telo : 'rgba(255,255,255,0.3)',
-                          color: isRest ? colors.textSecondary : colors.textPrimary,
-                        }}>
-                        <span className="text-xs font-semibold">{d}</span>
-                        {isRest && <span className="text-[9px]" style={{ color: colors.textTertiary }}>Odpočinok</span>}
-                        <div className="flex gap-1">
-                          {hasVideo && <Play className="w-2.5 h-2.5" style={{ color: colors.accent }} />}
-                          {hasMsg && <Mail className="w-2.5 h-2.5" style={{ color: colors.strava }} />}
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-                <p className="text-xs mt-3" style={{ color: colors.textTertiary }}>
-                  Klikni na deň pre úpravu. <Play className="w-3 h-3 inline" style={{ color: colors.accent }} /> = video, <Mail className="w-3 h-3 inline" style={{ color: colors.strava }} /> = správa
-                </p>
-              </Card>
-            )}
-          </div>
-
-          {/* Day detail panel */}
-          <div>
-            {selectedDayIdx !== null && selectedDay && selectedProgId ? (
-              <Card>
-                <h3 className="font-semibold mb-4" style={{ color: colors.textPrimary }}>
-                  {selectedWeek?.title} — {DAYS_SHORT[selectedDayIdx]}
-                </h3>
-                <div className="space-y-4">
-                  {/* Rest day toggle */}
-                  <label className="flex items-center gap-3 cursor-pointer p-3 rounded-xl bg-white/20">
-                    <button onClick={() => updateDay(selectedProgId, selectedWeekIdx, selectedDayIdx, { isRest: !selectedDay.isRest })} className="p-0.5">
-                      {selectedDay.isRest ? <CheckSquare className="w-5 h-5" style={{ color: colors.telo }} /> : <Square className="w-5 h-5" style={{ color: colors.textSecondary }} />}
-                    </button>
-                    <div>
-                      <div className="text-sm font-medium" style={{ color: colors.textPrimary }}>Deň odpočinku</div>
-                      <div className="text-xs" style={{ color: colors.textSecondary }}>Žiadne cvičenie tento deň</div>
-                    </div>
-                  </label>
-
-                  {/* Video URL */}
-                  <div>
-                    <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Video URL / Cloudflare Stream ID</label>
-                    <input
-                      value={selectedDay.videoUrl}
-                      onChange={e => updateDay(selectedProgId, selectedWeekIdx, selectedDayIdx, { videoUrl: e.target.value })}
-                      placeholder="https://... alebo stream ID"
-                      className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none"
-                      style={{ color: colors.textPrimary }}
-                      disabled={selectedDay.isRest}
-                    />
-                    {selectedDay.videoUrl && (
-                      <div className="mt-1 flex items-center gap-1 text-xs" style={{ color: colors.accent }}>
-                        <Play className="w-3 h-3" />Video nastavené
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Day message */}
-                  <div>
-                    <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Správa pre tento deň (voliteľné)</label>
-                    <textarea
-                      value={selectedDay.message}
-                      onChange={e => updateDay(selectedProgId, selectedWeekIdx, selectedDayIdx, { message: e.target.value })}
-                      placeholder="Motivačná správa pre používateľky..."
-                      rows={4}
-                      className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none resize-none"
-                      style={{ color: colors.textPrimary }}
-                    />
-                    {selectedDay.message && (
-                      <div className="mt-1 flex items-center gap-1 text-xs" style={{ color: colors.strava }}>
-                        <Mail className="w-3 h-3" />Správa nastavená
-                      </div>
-                    )}
-                  </div>
-
-                  <button
-                    onClick={() => setSelectedDayIdx(null)}
-                    className="w-full py-2 rounded-xl text-sm font-medium text-white"
-                    style={{ backgroundColor: colors.telo }}>
-                    Uložiť a zavrieť
-                  </button>
-                </div>
-              </Card>
-            ) : (
-              <Card>
-                <div className="text-center py-8">
-                  <Calendar className="w-10 h-10 mx-auto mb-3" style={{ color: colors.textSecondary }} />
-                  <p className="text-sm" style={{ color: colors.textSecondary }}>Vyber deň v gride pre úpravu detailov.</p>
-                </div>
-              </Card>
-            )}
-          </div>
-        </div>
-      )}
-
-      {!selectedProg && (
-        <Card>
-          <div className="text-center py-10">
-            <Calendar className="w-12 h-12 mx-auto mb-4" style={{ color: colors.textSecondary }} />
-            <p className="text-sm" style={{ color: colors.textSecondary }}>Vyber program vyššie na editáciu rozvrhu.</p>
-          </div>
-        </Card>
-      )}
-    </div>
-  );
-
-  const renderRecipes = () => (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold" style={{ color: colors.textPrimary }}>Recipe Database</h2>
-        <button className="px-4 py-2 rounded-xl text-sm font-medium text-white" style={{ backgroundColor: colors.strava }}>
-          <Plus className="w-4 h-4 mr-2 inline" />Add Recipe
-        </button>
-      </div>
-
-      {/* Recipe Stats */}
-      <div className="grid grid-cols-4 gap-4">
-        <Card>
-          <div className="text-center">
-            <div className="text-2xl font-bold" style={{ color: colors.textPrimary }}>108</div>
-            <div className="text-sm" style={{ color: colors.textSecondary }}>Total Recipes</div>
-          </div>
-        </Card>
-        <Card>
-          <div className="text-center">
-            <div className="text-2xl font-bold" style={{ color: colors.strava }}>34</div>
-            <div className="text-sm" style={{ color: colors.textSecondary }}>Breakfast</div>
-          </div>
-        </Card>
-        <Card>
-          <div className="text-center">
-            <div className="text-2xl font-bold" style={{ color: colors.accent }}>54</div>
-            <div className="text-sm" style={{ color: colors.textSecondary }}>Lunch/Dinner</div>
-          </div>
-        </Card>
-        <Card>
-          <div className="text-center">
-            <div className="text-2xl font-bold" style={{ color: colors.mysel }}>20</div>
-            <div className="text-sm" style={{ color: colors.textSecondary }}>Snacks</div>
-          </div>
-        </Card>
-      </div>
-
-      {/* Recipe Management */}
-      <Card>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold" style={{ color: colors.textPrimary }}>Recipe Management</h3>
-            <div className="flex gap-2">
-              <select className="px-3 py-2 rounded-lg bg-white/30 border border-white/30 text-sm">
-                <option>All Categories</option>
-                <option>Breakfast</option>
-                <option>Lunch</option>
-                <option>Dinner</option>
-                <option>Snacks</option>
-              </select>
-              <select className="px-3 py-2 rounded-lg bg-white/30 border border-white/30 text-sm">
-                <option>All Allergens</option>
-                <option>Dairy-Free</option>
-                <option>Gluten-Free</option>
-                <option>Nut-Free</option>
-                <option>Vegetarian</option>
-              </select>
-            </div>
-          </div>
-          
-          <div className="space-y-3">
-            {[
-              { name: 'Avokádové toasty s vajíčkom', category: 'Breakfast', time: '15 min', calories: 340, allergens: ['Gluten'], rating: 4.8 },
-              { name: 'Quinoa šalát s kuracím mäsom', category: 'Lunch', time: '25 min', calories: 420, allergens: [], rating: 4.6 },
-              { name: 'Lososové curry s ryžou', category: 'Dinner', time: '30 min', calories: 380, allergens: ['Fish'], rating: 4.9 },
-              { name: 'Energetické guľôčky', category: 'Snack', time: '10 min', calories: 120, allergens: ['Nuts'], rating: 4.7 },
-            ].map((recipe, i) => (
-              <div key={i} className="flex items-center justify-between p-4 rounded-xl bg-white/20 border border-white/20">
-                <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-lg bg-white/30 flex items-center justify-center">
-                    <Utensils className="w-6 h-6" style={{ color: colors.strava }} />
-                  </div>
-                  <div>
-                    <div className="font-medium" style={{ color: colors.textPrimary }}>{recipe.name}</div>
-                    <div className="text-sm flex items-center gap-2" style={{ color: colors.textSecondary }}>
-                      <span>{recipe.category}</span>
-                      <span>•</span>
-                      <span>{recipe.time}</span>
-                      <span>•</span>
-                      <span>{recipe.calories} kcal</span>
-                      <span>•</span>
-                      <span>⭐ {recipe.rating}</span>
-                    </div>
-                    <div className="flex items-center gap-1 mt-1">
-                      {recipe.allergens.map((allergen, j) => (
-                        <span key={j} className="text-xs px-2 py-1 rounded-full bg-orange-500/20 text-orange-600">
-                          {allergen}
-                        </span>
-                      ))}
-                      {recipe.allergens.length === 0 && (
-                        <span className="text-xs px-2 py-1 rounded-full bg-green-500/20 text-green-600">Allergen-Free</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button className="p-2 rounded-lg hover:bg-white/20 transition-all">
-                    <Eye className="w-4 h-4" style={{ color: colors.textSecondary }} />
-                  </button>
-                  <button className="p-2 rounded-lg hover:bg-white/20 transition-all">
-                    <Edit3 className="w-4 h-4" style={{ color: colors.textSecondary }} />
-                  </button>
-                  <button className="p-2 rounded-lg hover:bg-white/20 transition-all">
-                    <Trash2 className="w-4 h-4" style={{ color: colors.periodka }} />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </Card>
-    </div>
-  );
-
-  const renderMeditations = () => (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold" style={{ color: colors.textPrimary }}>Meditation Content</h2>
-        <button className="px-4 py-2 rounded-xl text-sm font-medium text-white" style={{ backgroundColor: colors.mysel }}>
-          <Plus className="w-4 h-4 mr-2 inline" />Add Meditation
-        </button>
-      </div>
-
-      {/* Meditation Stats */}
-      <div className="grid grid-cols-4 gap-4">
-        <Card>
-          <div className="text-center">
-            <div className="text-2xl font-bold" style={{ color: colors.textPrimary }}>15</div>
-            <div className="text-sm" style={{ color: colors.textSecondary }}>Total Sessions</div>
-          </div>
-        </Card>
-        <Card>
-          <div className="text-center">
-            <div className="text-2xl font-bold" style={{ color: colors.mysel }}>5</div>
-            <div className="text-sm" style={{ color: colors.textSecondary }}>Stress Relief</div>
-          </div>
-        </Card>
-        <Card>
-          <div className="text-center">
-            <div className="text-2xl font-bold" style={{ color: colors.accent }}>6</div>
-            <div className="text-sm" style={{ color: colors.textSecondary }}>Sleep</div>
-          </div>
-        </Card>
-        <Card>
-          <div className="text-center">
-            <div className="text-2xl font-bold" style={{ color: colors.strava }}>4</div>
-            <div className="text-sm" style={{ color: colors.textSecondary }}>Focus</div>
-          </div>
-        </Card>
-      </div>
-
-      {/* Meditation Management */}
-      <Card>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold" style={{ color: colors.textPrimary }}>Audio Library</h3>
-            <div className="flex gap-2">
-              <select className="px-3 py-2 rounded-lg bg-white/30 border border-white/30 text-sm">
-                <option>All Categories</option>
-                <option>Stress Relief</option>
-                <option>Sleep</option>
-                <option>Focus</option>
-                <option>Breathing</option>
-              </select>
-              <select className="px-3 py-2 rounded-lg bg-white/30 border border-white/30 text-sm">
-                <option>All Durations</option>
-                <option>5-10 min</option>
-                <option>10-20 min</option>
-                <option>20+ min</option>
-              </select>
-            </div>
-          </div>
-          
-          <div className="space-y-3">
-            {[
-              { name: 'Evening Wind Down', category: 'Sleep', duration: '15 min', plays: 234, rating: 4.9 },
-              { name: 'Morning Mindfulness', category: 'Focus', duration: '10 min', plays: 189, rating: 4.7 },
-              { name: 'Stress Release', category: 'Stress Relief', duration: '12 min', plays: 156, rating: 4.8 },
-              { name: 'Deep Breathing', category: 'Breathing', duration: '8 min', plays: 298, rating: 4.6 },
-            ].map((meditation, i) => (
-              <div key={i} className="flex items-center justify-between p-4 rounded-xl bg-white/20 border border-white/20">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-lg bg-white/30 flex items-center justify-center">
-                    <Music className="w-6 h-6" style={{ color: colors.mysel }} />
-                  </div>
-                  <div>
-                    <div className="font-medium" style={{ color: colors.textPrimary }}>{meditation.name}</div>
-                    <div className="text-sm flex items-center gap-2" style={{ color: colors.textSecondary }}>
-                      <span>{meditation.category}</span>
-                      <span>•</span>
-                      <span>{meditation.duration}</span>
-                      <span>•</span>
-                      <span>{meditation.plays} plays</span>
-                      <span>•</span>
-                      <span>⭐ {meditation.rating}</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button className="p-2 rounded-lg hover:bg-white/20 transition-all">
-                    <Eye className="w-4 h-4" style={{ color: colors.textSecondary }} />
-                  </button>
-                  <button className="p-2 rounded-lg hover:bg-white/20 transition-all">
-                    <Edit3 className="w-4 h-4" style={{ color: colors.textSecondary }} />
-                  </button>
-                  <button className="p-2 rounded-lg hover:bg-white/20 transition-all">
-                    <Trash2 className="w-4 h-4" style={{ color: colors.periodka }} />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </Card>
-    </div>
-  );
 
   const renderCommunity = () => (
     <div className="space-y-6">
@@ -2098,13 +2431,13 @@ export default function AdminNew() {
       case 'content':
         return <ContentManager />;
       case 'programs':
-        return renderPrograms();
+        return <ProgramsTab />;
       case 'exercises':
-        return renderExercises();
+        return <ExercisesTab />;
       case 'recipes':
-        return renderRecipes();
+        return <RecipesTab />;
       case 'meditations':
-        return renderMeditations();
+        return <MeditationsTab />;
       case 'community':
         return <CommunityModerationTab />;
       case 'messages':
