@@ -1346,11 +1346,9 @@ function RecipesTab() {
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold" style={{ color: colors.textPrimary }}>Recipe Database</h2>
         <div className="flex gap-2">
-          {items.length === 0 && !loading && (
-            <button onClick={seedFromStatic} disabled={seeding} className="px-4 py-2 rounded-xl text-sm font-medium text-white" style={{ backgroundColor: colors.accent }}>
-              {seeding ? '⟳ Importujem...' : '⬆ Import statických receptov'}
-            </button>
-          )}
+          <button onClick={seedFromStatic} disabled={seeding} className="px-4 py-2 rounded-xl text-sm font-medium text-white" style={{ backgroundColor: colors.accent }}>
+            {seeding ? '⟳ Importujem...' : '⬆ Import statických receptov'}
+          </button>
           <button onClick={openAdd} className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white" style={{ backgroundColor: colors.strava }}>
             <Plus className="w-4 h-4" />Nový recept
           </button>
