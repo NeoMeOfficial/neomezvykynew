@@ -1347,7 +1347,7 @@ function RecipesTab() {
         <h2 className="text-2xl font-bold" style={{ color: colors.textPrimary }}>Recipe Database</h2>
         <div className="flex gap-2">
           {items.length === 0 && !loading && (
-            <button onClick={seedFromStatic} disabled={seeding} className="px-4 py-2 rounded-xl text-sm font-medium" style={{ backgroundColor: `${colors.accent}20`, color: colors.accent }}>
+            <button onClick={seedFromStatic} disabled={seeding} className="px-4 py-2 rounded-xl text-sm font-medium text-white" style={{ backgroundColor: colors.accent }}>
               {seeding ? '⟳ Importujem...' : '⬆ Import statických receptov'}
             </button>
           )}
@@ -1565,7 +1565,7 @@ function ExercisesTab() {
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold" style={{ color: colors.textPrimary }}>Exercise Library</h2>
         <div className="flex gap-2">
-          <button onClick={seedFromStatic} disabled={seeding} className="px-4 py-2 rounded-xl text-sm font-medium" style={{ backgroundColor: `${colors.accent}20`, color: colors.accent }}>
+          <button onClick={seedFromStatic} disabled={seeding} className="px-4 py-2 rounded-xl text-sm font-medium border-2 text-white" style={{ backgroundColor: colors.accent, borderColor: colors.accent }}>
             {seeding ? '⟳ ...' : '⬆ Import'}
           </button>
           <button onClick={openAdd} className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white" style={{ backgroundColor: colors.telo }}>
@@ -1799,7 +1799,7 @@ function MeditationsTab() {
         <h2 className="text-2xl font-bold" style={{ color: colors.textPrimary }}>Meditation Content</h2>
         <div className="flex gap-2">
           {items.length === 0 && !loading && (
-            <button onClick={seedFromStatic} disabled={seeding} className="px-4 py-2 rounded-xl text-sm font-medium" style={{ backgroundColor: `${colors.accent}20`, color: colors.accent }}>
+            <button onClick={seedFromStatic} disabled={seeding} className="px-4 py-2 rounded-xl text-sm font-medium text-white" style={{ backgroundColor: colors.accent }}>
               {seeding ? '⟳ Importujem...' : '⬆ Import 17 meditácií'}
             </button>
           )}
@@ -1966,8 +1966,8 @@ function ProgramsTab() {
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold" style={{ color: colors.textPrimary }}>Fitness Programy</h2>
         <div className="flex gap-2">
-          <button onClick={seedFromStatic} disabled={seeding} className="px-3 py-2 rounded-xl text-sm font-medium border border-white/40 bg-white/20" style={{ color: colors.textSecondary }}>
-            {seeding ? 'Importujem…' : 'Import statických dát'}
+          <button onClick={seedFromStatic} disabled={seeding} className="px-3 py-2 rounded-xl text-sm font-medium text-white" style={{ backgroundColor: colors.accent }}>
+            {seeding ? 'Importujem…' : '⬆ Import statických dát'}
           </button>
           <button onClick={() => setEditing({ ...empty, id: `prog-${Date.now()}` })} className="px-4 py-2 rounded-xl text-sm font-medium text-white" style={{ backgroundColor: colors.telo }}>
             <Plus className="w-4 h-4 mr-2 inline" />Nový program
