@@ -60,23 +60,23 @@ export default function Recepty() {
   const [warningMessage, setWarningMessage] = useState<string | null>(null);
   const navigate = useNavigate();
   
-  const { getRemainingCount, limits } = useSubscription();
+  const { limits } = useSubscription();
   const { paywallState, showContentPaywall, closePaywall, handleUpgrade, getContentWarning } = usePaywall();
   const { getFavoritesByType } = useUniversalFavorites();
 
   // Get recipes based on active tab
   const favRecipes = getFavoritesByType('recipe');
   const allRecipes = showingFavorites ? 
-    favRecipes.map(f => ({ id: f.id, title: f.title, time: f.duration || '15 min', kcal: f.kcal || 250, img: f.image || '' })) :
+    favRecipes.map(f => ({ id: f.id, title: f.title, time: f.duration || '15 min', kcal: f.kcal || 250, img: f.image || '', originalId: f.id })) :
     recipes[categoryNames[active]] || [];
   
   // Apply content limits for free users (but not for favorites)
   const currentRecipes = useMemo(() => {
     if (showingFavorites) return allRecipes; // No limits on favorites
-    const maxRecipes = limits.maxRecipes;
+    const maxRecipes = limits.max_recipes;
     if (maxRecipes === -1) return allRecipes; // unlimited
     return allRecipes.slice(0, maxRecipes);
-  }, [allRecipes, limits.maxRecipes, showingFavorites]);
+  }, [allRecipes, limits.max_recipes, showingFavorites]);
 
   const hasMoreRecipes = !showingFavorites && (allRecipes.length > currentRecipes.length);
 
