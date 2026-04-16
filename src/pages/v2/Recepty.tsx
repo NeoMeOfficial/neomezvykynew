@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Clock, Flame, Lock, Heart } from 'lucide-react';
 import { useSubscription } from '../../contexts/SimpleSubscriptionContext';
@@ -7,82 +7,101 @@ import { PaywallModal } from '../../components/v2/paywall/PaywallModal';
 import { useUniversalFavorites } from '../../hooks/useUniversalFavorites';
 import FavoriteButton from '../../components/v2/favorites/FavoriteButton';
 import { colors } from '../../theme/warmDusk';
-import { recipes as recipeDatabase } from '../../data/recipes';
+import { recipes as recipeDatabase, getRecipeImage } from '../../data/recipes';
+import { supabase } from '../../lib/supabase';
 
-const categoryNames = ['Raňajky', 'Hlavné jedlá a polievky', 'Hlavné jedlá', 'Dezerty', 'Smoothie & Nápoje', 'Snacky'];
+const categoryNames = ['Raňajky', 'Obedy', 'Večere', 'Snacky', 'Smoothie & Nápoje'];
 const FAVORITES_KEY = 'Obľúbené';
 
 // Map UI categories to database categories
 const categoryMapping: Record<string, string> = {
   'Raňajky': 'ranajky',
-  'Hlavné jedlá a polievky': 'obed', // and vecera — legacy
-  'Hlavné jedlá': 'main_meal',
-  'Dezerty': 'dessert',
-  'Smoothie & Nápoje': 'smoothie',
+  'Obedy': 'obed',
+  'Večere': 'vecera',
   'Snacky': 'snack',
+  'Smoothie & Nápoje': 'smoothie',
 };
 
 // Function to get recipes by UI category
 const getRecipesByCategory = (uiCategory: string) => {
-  if (uiCategory === 'Hlavné jedlá a polievky') {
-    return recipeDatabase.filter(r => r.category === 'obed' || r.category === 'vecera');
-  }
-
   const dbCategory = categoryMapping[uiCategory];
   if (!dbCategory) return [];
-
   return recipeDatabase.filter(r => r.category === dbCategory);
 };
 
 // Convert database recipes to UI format
 const convertToUIFormat = (dbRecipes: typeof recipeDatabase) => {
-  return dbRecipes.map((recipe, index) => ({
-    id: index + 1, // Simple ID for UI
+  return dbRecipes.map((recipe) => ({
+    id: recipe.id,
     title: recipe.title,
     time: `${recipe.prepTime} min`,
     kcal: recipe.calories,
-    img: recipe.image || `https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=800&h=500&fit=crop`,
-    originalId: recipe.id // Keep original ID for detailed view
+    img: getRecipeImage(recipe.title, recipe.category),
+    originalId: recipe.id
   }));
 };
 
 // Generate recipes object from database
-const recipes: Record<string, { id: number; title: string; time: string; kcal: number; img: string; originalId: string }[]> = 
+const recipes: Record<string, { id: string; title: string; time: string; kcal: number; img: string; originalId: string }[]> =
   categoryNames.reduce((acc, category) => {
     const dbRecipes = getRecipesByCategory(category);
     acc[category] = convertToUIFormat(dbRecipes);
     return acc;
   }, {} as Record<string, any>);
 
+type UIRecipe = { id: string; title: string; time: string; kcal: number; img: string; originalId: string };
+
 export default function Recepty() {
   const [searchParams] = useSearchParams();
   const catParam = searchParams.get('cat') || categoryNames[0];
-  
+
   // Check if showing favorites
   const showingFavorites = catParam === FAVORITES_KEY;
   const defaultActive = showingFavorites ? -1 : Math.max(0, categoryNames.indexOf(catParam));
-  
+
   const [active, setActive] = useState(defaultActive);
   const [warningMessage, setWarningMessage] = useState<string | null>(null);
+  const [liveRecipes, setLiveRecipes] = useState<Record<string, UIRecipe[]> | null>(null);
+  const fetchedRef = useRef(false);
   const navigate = useNavigate();
   
-  const { getRemainingCount, limits } = useSubscription();
+  const { limits } = useSubscription();
   const { paywallState, showContentPaywall, closePaywall, handleUpgrade, getContentWarning } = usePaywall();
   const { getFavoritesByType } = useUniversalFavorites();
 
+  // Fetch from Supabase once; fall back to static data if empty
+  useEffect(() => {
+    if (fetchedRef.current) return;
+    fetchedRef.current = true;
+    supabase.from('recipes').select('id,title,category,prep_time,calories,image').eq('active', true)
+      .then(({ data }) => {
+        if (!data || data.length === 0) return;
+        const mapped: Record<string, UIRecipe[]> = {};
+        categoryNames.forEach(cat => {
+          const dbCat = categoryMapping[cat];
+          mapped[cat] = data
+            .filter(r => r.category === dbCat)
+            .map(r => ({ id: r.id, title: r.title, time: `${r.prep_time} min`, kcal: r.calories, img: r.image || getRecipeImage(r.title, r.category), originalId: r.id }));
+        });
+        setLiveRecipes(mapped);
+      });
+  }, []);
+
+  const effectiveRecipes = liveRecipes ?? recipes;
+
   // Get recipes based on active tab
   const favRecipes = getFavoritesByType('recipe');
-  const allRecipes = showingFavorites ? 
-    favRecipes.map(f => ({ id: f.id, title: f.title, time: f.duration || '15 min', kcal: f.kcal || 250, img: f.image || '' })) :
-    recipes[categoryNames[active]] || [];
-  
+  const allRecipes = showingFavorites ?
+    favRecipes.map(f => ({ id: f.id, title: f.title, time: f.duration || '15 min', kcal: f.kcal || 250, img: f.image || '', originalId: f.id })) :
+    effectiveRecipes[categoryNames[active]] || [];
+
   // Apply content limits for free users (but not for favorites)
   const currentRecipes = useMemo(() => {
     if (showingFavorites) return allRecipes; // No limits on favorites
-    const maxRecipes = limits.maxRecipes;
+    const maxRecipes = limits.max_recipes;
     if (maxRecipes === -1) return allRecipes; // unlimited
     return allRecipes.slice(0, maxRecipes);
-  }, [allRecipes, limits.maxRecipes, showingFavorites]);
+  }, [allRecipes, limits.max_recipes, showingFavorites]);
 
   const hasMoreRecipes = !showingFavorites && (allRecipes.length > currentRecipes.length);
 

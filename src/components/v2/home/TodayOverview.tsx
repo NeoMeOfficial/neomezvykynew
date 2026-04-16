@@ -6,7 +6,7 @@ import {
 import GlassCard from '../GlassCard';
 import { colors, innerGlass, iconContainer, sectionLabel as sectionLabelStyle } from '../../../theme/warmDusk';
 import { useMealPlan } from '../../../features/nutrition/useMealPlan';
-import { recipes as recipesData } from '../../../data/recipes';
+import { recipes as recipesData, getRecipeImage } from '../../../data/recipes';
 import { useCycleData } from '../../../features/cycle/useCycleData';
 import { getPhaseRanges, getPhaseByDay, getCurrentCycleDay, getNextPeriodDate } from '../../../features/cycle/utils';
 import { suggestForDay } from '../../../features/cycle/suggestions';
@@ -272,7 +272,7 @@ function StravaSection() {
                   className="flex items-center gap-3 p-2.5 rounded-xl"
                   style={innerGlass}
                 >
-                  <img src={recipe.image} alt={recipe.title} className="w-11 h-11 rounded-lg object-cover shrink-0" />
+                  <img src={getRecipeImage(recipe.title, recipe.category)} alt={recipe.title} className="w-11 h-11 rounded-lg object-cover shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-[11px] font-medium" style={{ color: colors.textTertiary }}>{meal.label}</p>
                     <p className="text-[13px] font-medium truncate" style={{ color: colors.textPrimary }}>{recipe.title}</p>
@@ -289,7 +289,7 @@ function StravaSection() {
         <>
           <p className="text-[11px] font-medium mb-2" style={{ color: colors.textTertiary }}>Recept dňa</p>
           <div className="flex items-center gap-3 p-3 rounded-2xl" style={innerGlass}>
-            <img src={sampleRecipe.image} alt={sampleRecipe.title} className="w-14 h-14 rounded-xl object-cover shrink-0" />
+            <img src={getRecipeImage(sampleRecipe.title, sampleRecipe.category)} alt={sampleRecipe.title} className="w-14 h-14 rounded-xl object-cover shrink-0" />
             <div className="flex-1 min-w-0">
               <p className="text-[13px] font-medium truncate" style={{ color: colors.textPrimary }}>{sampleRecipe.title}</p>
               <p className="text-[11px] mt-0.5" style={{ color: colors.textTertiary }}>

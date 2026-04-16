@@ -8,7 +8,7 @@ import { useMealPlan } from '../../features/nutrition/useMealPlan';
 import { WeekDayNavigator } from '../../features/nutrition/WeekDayNavigator';
 import { useSubscription } from '../../contexts/SimpleSubscriptionContext';
 import NutritionOnboarding from '../../features/nutrition/NutritionOnboarding';
-import { recipes } from '../../data/recipes';
+import { recipes, getRecipeImage } from '../../data/recipes';
 import type { NutritionProfile } from '../../features/nutrition/types';
 import { colors } from '../../theme/warmDusk';
 
@@ -146,7 +146,7 @@ export default function Strava() {
                 onClick={() => navigate(`/recept/${dailyRecipe.id}`)}
                 className="relative w-full h-48 block active:scale-[0.99] transition-transform"
               >
-                <img src={dailyRecipe.image} alt={dailyRecipe.title} className="absolute inset-0 w-full h-full object-cover" />
+                <img src={getRecipeImage(dailyRecipe.title, dailyRecipe.category)} alt={dailyRecipe.title} className="absolute inset-0 w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent" />
                 <div className="absolute bottom-3 left-4 right-4">
                   <p className="text-white text-base font-bold leading-tight drop-shadow-lg">{dailyRecipe.title}</p>
@@ -226,7 +226,7 @@ export default function Strava() {
                     onClick={() => navigate(`/recept/${recipe.id}`)}
                     className="relative w-full h-40 block active:scale-[0.99] transition-transform"
                   >
-                    <img src={recipe.image} alt={recipe.title} className="absolute inset-0 w-full h-full object-cover" />
+                    <img src={getRecipeImage(recipe.title, recipe.category)} alt={recipe.title} className="absolute inset-0 w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/15 to-transparent" />
                     <div className="absolute bottom-3 left-3 right-3">
                       <p className="text-white text-base font-bold leading-tight drop-shadow-lg">{recipe.title}</p>

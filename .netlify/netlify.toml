@@ -1,13 +1,13 @@
-functionsDirectory = "/Users/sambot/.openclaw/workspace/projects/neome/neomezvykynew/netlify/functions"
+functionsDirectory = "/Users/sambot/.openclaw/workspace/projects/neome/neome_app/netlify/functions"
 functionsDirectoryOrigin = "default"
 plugins = []
 
 [build]
-publish = "/Users/sambot/.openclaw/workspace/projects/neome/neomezvykynew/dist"
+publish = "/Users/sambot/.openclaw/workspace/projects/neome/neome_app/dist"
 publishOrigin = "ui"
 commandOrigin = "ui"
 command = "npm run build"
-functions = "/Users/sambot/.openclaw/workspace/projects/neome/neomezvykynew/netlify/functions"
+functions = "/Users/sambot/.openclaw/workspace/projects/neome/neome_app/netlify/functions"
 
 [build.environment]
 

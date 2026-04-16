@@ -1,65 +1,64 @@
+import { useState, useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { colors } from '../../theme/warmDusk';
+import { supabase } from '../../lib/supabase';
+
+type BlogPost = {
+  id: number | string;
+  title: string;
+  excerpt: string;
+  author: string;
+  date: string;
+  category: string;
+  image: string;
+  readTime: string;
+};
+
+const staticBlogPosts: BlogPost[] = [
+  { id: 1, title: '5 najčastejších chýb pri cvičení po pôrode', excerpt: 'Mnoho žien robia tieto chyby, keď sa vracajú k cvičeniu po pôrode. Pozri si, ako sa im vyhnúť.', author: 'Gabi Novakova', date: '15. marec 2026', category: 'Postpartum', image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=250&fit=crop', readTime: '5 min čítania' },
+  { id: 2, title: 'Ako si vytvoriť zdravý jedálniček na celý týždeň', excerpt: 'Praktické tipy pre plánovanie jedla, ktoré ti ušetria čas a pomôžu dosiahnuť tvoje ciele.', author: 'Gabi Novakova', date: '12. marec 2026', category: 'Výživa', image: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=400&h=250&fit=crop', readTime: '7 min čítania' },
+  { id: 3, title: 'Diastáza recti: Čo je to a ako ju riešiť', excerpt: 'Kompletný sprievodca rozchodom brušných svalov po pôrode a ako s ním efektívne pracovať.', author: 'Gabi Novakova', date: '10. marec 2026', category: 'Zdravie', image: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=250&fit=crop', readTime: '8 min čítania' },
+  { id: 4, title: 'Meditácia pre začiatočníkov: Prvé kroky', excerpt: 'Jednoduchý návod, ako začať s meditáciou a vytvoriť si pravidelný návyk.', author: 'Gabi Novakova', date: '8. marec 2026', category: 'Mindfulness', image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=250&fit=crop', readTime: '4 min čítania' },
+];
+
+const categories = ['Všetky', 'Postpartum', 'Výživa', 'Zdravie', 'Mindfulness', 'Cvičenie'];
+
+const getCategoryColor = (category: string) => {
+  switch (category) {
+    case 'Postpartum': return colors.periodka;
+    case 'Výživa': return colors.strava;
+    case 'Zdravie': return colors.telo;
+    case 'Mindfulness': return colors.mysel;
+    case 'Cvičenie': return colors.accent;
+    default: return colors.textSecondary;
+  }
+};
 
 export default function Blog() {
   const navigate = useNavigate();
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>(staticBlogPosts);
 
-  const blogPosts = [
-    {
-      id: 1,
-      title: '5 najčastejších chýb pri cvičení po pôrode',
-      excerpt: 'Mnoho žien robia tieto chyby, keď sa vracajú k cvičeniu po pôrode. Pozri si, ako sa im vyhnúť.',
-      author: 'Gabi Novakova',
-      date: '15. marec 2026',
-      category: 'Postpartum',
-      image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=250&fit=crop',
-      readTime: '5 min čítania'
-    },
-    {
-      id: 2,
-      title: 'Ako si vytvoriť zdravý jedálniček na celý týždeň',
-      excerpt: 'Praktické tipy pre plánovanie jedla, ktoré ti ušetria čas a pomôžu dosiahnuť tvoje ciele.',
-      author: 'Gabi Novakova',
-      date: '12. marec 2026',
-      category: 'Výživa',
-      image: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=400&h=250&fit=crop',
-      readTime: '7 min čítania'
-    },
-    {
-      id: 3,
-      title: 'Diastáza recti: Čo je to a ako ju riešiť',
-      excerpt: 'Kompletný sprievodca rozchodom brušných svalov po pôrode a ako s ním efektívne pracovať.',
-      author: 'Gabi Novakova',
-      date: '10. marec 2026',
-      category: 'Zdravie',
-      image: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=250&fit=crop',
-      readTime: '8 min čítania'
-    },
-    {
-      id: 4,
-      title: 'Meditácia pre začiatočníkov: Prvé kroky',
-      excerpt: 'Jednoduchý návod, ako začať s meditáciou a vytvoriť si pravidelný návyk.',
-      author: 'Gabi Novakova',
-      date: '8. marec 2026',
-      category: 'Mindfulness',
-      image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=250&fit=crop',
-      readTime: '4 min čítania'
-    }
-  ];
-
-  const categories = ['Všetky', 'Postpartum', 'Výživa', 'Zdravie', 'Mindfulness', 'Cvičenie'];
-
-  const getCategoryColor = (category: string) => {
-    switch (category) {
-      case 'Postpartum': return colors.periodka;
-      case 'Výživa': return colors.strava;
-      case 'Zdravie': return colors.telo;
-      case 'Mindfulness': return colors.mysel;
-      case 'Cvičenie': return colors.accent;
-      default: return colors.textSecondary;
-    }
-  };
+  useEffect(() => {
+    supabase
+      .from('blog_posts')
+      .select('id,title,excerpt,author,published_at,category,image,read_time')
+      .eq('published', true)
+      .order('published_at', { ascending: false })
+      .then(({ data }) => {
+        if (!data || data.length === 0) return;
+        setBlogPosts(data.map(p => ({
+          id: p.id,
+          title: p.title,
+          excerpt: p.excerpt,
+          author: p.author,
+          date: new Date(p.published_at).toLocaleDateString('sk-SK', { day: 'numeric', month: 'long', year: 'numeric' }),
+          category: p.category,
+          image: p.image || '',
+          readTime: p.read_time || '5 min čítania',
+        })));
+      });
+  }, []);
 
   return (
     <div className="min-h-screen pb-28" style={{ background: colors.bgGradient }}>
@@ -113,10 +112,7 @@ export default function Blog() {
                   <div className="flex items-center gap-2 mb-2">
                     <span
                       className="text-xs px-2 py-1 rounded-full font-medium"
-                      style={{
-                        backgroundColor: `${getCategoryColor(post.category)}20`,
-                        color: getCategoryColor(post.category)
-                      }}
+                      style={{ backgroundColor: `${getCategoryColor(post.category)}20`, color: getCategoryColor(post.category) }}
                     >
                       {post.category}
                     </span>
@@ -147,7 +143,7 @@ export default function Blog() {
             Čoskoro pridáme viac článkov!
           </h3>
           <p className="text-sm" style={{ color: colors.textSecondary }}>
-            Gabi pre vás pripravuje užitočné články o cvičení, výžive a zdravom životnom štýle. 
+            Gabi pre vás pripravuje užitočné články o cvičení, výžive a zdravom životnom štýle.
             Sledujte túto sekciu pre najnovšie tipy a rady.
           </p>
         </div>

@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Play, Clock, Zap, Filter } from 'lucide-react';
 import { colors } from '../../theme/warmDusk';
+import { supabase } from '../../lib/supabase';
 
 interface Stretch {
   id: string;
@@ -293,15 +294,33 @@ function CategorySection({ title, stretches, icon: Icon, color, allStretches }: 
 
 export default function TeloStrecing() {
   const navigate = useNavigate();
-  
+  const [stretchList, setStretchList] = useState<Stretch[]>(stretches);
+
+  useEffect(() => {
+    supabase.from('exercises').select('*').eq('content_type', 'stretch').eq('active', true)
+      .then(({ data }) => {
+        if (!data || data.length === 0) return;
+        setStretchList(data.map(s => ({
+          id: s.id,
+          name: s.name,
+          duration: s.duration as Stretch['duration'],
+          category: s.category as Stretch['category'],
+          body: s.body as Stretch['body'],
+          equip: s.equip as Stretch['equip'],
+          thumb: s.thumb,
+          description: s.description,
+        })));
+      });
+  }, []);
+
   // Store all stretches for index reference
-  const allStretches = stretches;
-  
+  const allStretches = stretchList;
+
   // Group stretches by body part
   const stretchesByBodyPart = {
-    'Celé telo': stretches.filter(s => s.body === 'Celé telo'),
-    'Vršok/Stred tela': stretches.filter(s => s.body === 'Vršok/Stred tela'),
-    'Dolná časť tela': stretches.filter(s => s.body === 'Dolná časť tela'),
+    'Celé telo': stretchList.filter(s => s.body === 'Celé telo'),
+    'Vršok/Stred tela': stretchList.filter(s => s.body === 'Vršok/Stred tela'),
+    'Dolná časť tela': stretchList.filter(s => s.body === 'Dolná časť tela'),
   };
 
   return (
@@ -361,7 +380,7 @@ export default function TeloStrecing() {
         {/* Stats summary */}
         <div className="text-center pt-4">
           <p className="text-[12px] text-[#8B7560]">
-            {stretches.length} strečingov celkom • Swipe doprava pre viac
+            {stretchList.length} strečingov celkom • Swipe doprava pre viac
           </p>
         </div>
       </div>

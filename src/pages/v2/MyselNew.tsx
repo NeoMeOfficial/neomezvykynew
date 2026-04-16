@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Brain, Play, Clock, Heart } from 'lucide-react';
 import { colors, glassCard } from '../../theme/warmDusk';
@@ -6,6 +6,7 @@ import { usePaywall } from '../../hooks/usePaywall';
 import { PaywallModal } from '../../components/v2/paywall/PaywallModal';
 import FavoriteButton from '../../components/v2/favorites/FavoriteButton';
 import { useUniversalFavorites } from '../../hooks/useUniversalFavorites';
+import { supabase } from '../../lib/supabase';
 
 interface Meditation {
   id: string;
@@ -43,8 +44,25 @@ export default function MyselNew() {
   const { paywallState, closePaywall, handleUpgrade } = usePaywall();
   const { isFavorite } = useUniversalFavorites();
   const [showFavourites, setShowFavourites] = useState(false);
+  const [meditationsList, setMeditationsList] = useState<Meditation[]>(meditations);
 
-  const filtered = meditations.filter(m =>
+  useEffect(() => {
+    supabase.from('meditations').select('*').eq('active', true)
+      .then(({ data }) => {
+        if (!data || data.length === 0) return;
+        setMeditationsList(data.map(m => ({
+          id: m.id,
+          title: m.title,
+          duration: m.duration,
+          description: m.description,
+          audioUrl: m.audio_url,
+          image: m.image,
+          category: m.category,
+        })));
+      });
+  }, []);
+
+  const filtered = meditationsList.filter(m =>
     showFavourites ? isFavorite(m.id, 'meditation') : true
   );
 

@@ -1,18 +1,44 @@
 import { useState } from 'react';
-import { Users, Clock, Check, X, Bell, Heart, Dumbbell, Flame, Droplets } from 'lucide-react';
+import { Users, Clock, Check, X, Bell, Heart, Dumbbell, Flame, Droplets, Zap, CheckCircle2, Brain, UtensilsCrossed } from 'lucide-react';
 import { useBuddySystem } from '../../../hooks/useBuddySystem';
+import { useBuddyActivity, BuddyActivity, ActivityType } from '../../../hooks/useBuddyActivity';
 import { colors, glassCard } from '../../theme/warmDusk';
 
+function relativeTime(iso: string): string {
+  const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+  if (diff < 60) return 'práve teraz';
+  if (diff < 3600) return `pred ${Math.floor(diff / 60)} min`;
+  if (diff < 86400) return `pred ${Math.floor(diff / 3600)}h`;
+  return 'včera';
+}
+
+const activityIcon: Record<ActivityType, React.ElementType> = {
+  workout: Dumbbell,
+  habit: CheckCircle2,
+  meditation: Brain,
+  recipe: UtensilsCrossed,
+};
+
+const activityColor: Record<ActivityType, string> = {
+  workout: '#6B4C3B',
+  habit: '#7A9E78',
+  meditation: '#A8848B',
+  recipe: '#B8864A',
+};
+
 export default function BuddyDashboard() {
-  const { 
-    buddyConnections, 
-    pendingRequests, 
+  const {
+    buddyConnections,
+    pendingRequests,
     buddyNotifications,
     acceptBuddyRequest,
     rejectBuddyRequest,
     markNotificationsSeen,
     getUnreadCount
   } = useBuddySystem();
+
+  const { getActivities } = useBuddyActivity();
+  const recentActivities = getActivities().slice(0, 10);
 
   const [activeTab, setActiveTab] = useState<'buddies' | 'requests' | 'notifications'>('buddies');
   const [processingRequest, setProcessingRequest] = useState<string | null>(null);
@@ -66,21 +92,25 @@ export default function BuddyDashboard() {
 
   if (buddyConnections.length === 0 && pendingRequests.length === 0) {
     return (
-      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-8 shadow-sm border border-white/20 text-center">
-        <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: `rgba(122, 158, 120, 0.14)` }}>
-          <Users size={32} style={{ color: '#7A9E78' }} />
+      <>
+        <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-8 shadow-sm border border-white/20 text-center">
+          <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: `rgba(122, 158, 120, 0.14)` }}>
+            <Users size={32} style={{ color: '#7A9E78' }} />
+          </div>
+          <h3 className="font-semibold text-lg mb-2" style={{ color: '#2E2218' }}>
+            Zatiaľ nemáš žiadnych buddy
+          </h3>
+          <p className="text-sm max-w-sm mx-auto" style={{ color: '#6B4C3B' }}>
+            Pripoj sa s kamarátkami pomocou buddy kódov a motivujte sa navzájom!
+          </p>
         </div>
-        <h3 className="font-semibold text-lg mb-2" style={{ color: '#2E2218' }}>
-          Zatiaľ nemáš žiadnych buddy
-        </h3>
-        <p className="text-sm max-w-sm mx-auto" style={{ color: '#6B4C3B' }}>
-          Pripoj sa s kamarátkami pomocou buddy kódov a motivujte sa navzájom!
-        </p>
-      </div>
+        <ActivityFeed activities={recentActivities} />
+      </>
     );
   }
 
   return (
+    <>
     <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-6 shadow-sm border border-white/20 space-y-4">
       {/* Header */}
       <div className="flex items-center gap-3">
@@ -281,6 +311,76 @@ export default function BuddyDashboard() {
           </>
         )}
       </div>
+    </div>
+    <ActivityFeed activities={recentActivities} />
+    </>
+  );
+}
+
+// ── Activity Feed sub-component ──────────────────────────────────────────────
+
+interface ActivityFeedProps {
+  activities: BuddyActivity[];
+}
+
+function ActivityFeed({ activities }: ActivityFeedProps) {
+  return (
+    <div className="bg-white/40 backdrop-blur-lg rounded-2xl border border-white/30 p-4 space-y-3">
+      {/* Section header */}
+      <div className="flex items-center gap-2">
+        <div
+          className="w-8 h-8 rounded-xl flex items-center justify-center"
+          style={{ background: 'rgba(184, 134, 74, 0.14)' }}
+        >
+          <Zap className="w-4 h-4" style={{ color: '#B8864A' }} />
+        </div>
+        <h3 className="text-[15px] font-semibold" style={{ color: '#2E2218' }}>
+          Aktivita priateľov
+        </h3>
+      </div>
+
+      {/* Feed items */}
+      {activities.length === 0 ? (
+        <p className="text-sm text-center py-4" style={{ color: '#8B7560' }}>
+          Zatiaľ žiadna aktivita
+        </p>
+      ) : (
+        <div className="space-y-2">
+          {activities.map((activity) => {
+            const Icon = activityIcon[activity.type];
+            const color = activityColor[activity.type];
+            return (
+              <div
+                key={activity.id}
+                className="flex items-start gap-3 bg-white/20 rounded-xl p-3"
+              >
+                {/* Icon badge */}
+                <div
+                  className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+                  style={{ background: `${color}22` }}
+                >
+                  <Icon size={14} style={{ color }} />
+                </div>
+
+                {/* Text */}
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium leading-tight" style={{ color: '#2E2218' }}>
+                    {activity.userName}
+                  </p>
+                  <p className="text-xs mt-0.5 truncate" style={{ color: '#8B7560' }}>
+                    {activity.label}
+                  </p>
+                </div>
+
+                {/* Relative time */}
+                <span className="text-xs flex-shrink-0 mt-0.5" style={{ color: '#A0907E' }}>
+                  {relativeTime(activity.completedAt)}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

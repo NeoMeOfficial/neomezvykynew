@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Play, Clock, Zap, Shield, Filter } from 'lucide-react';
 import { colors } from '../../theme/warmDusk';
+import { supabase } from '../../lib/supabase';
 
 interface Exercise {
   id: string;
@@ -367,15 +368,35 @@ function CategorySection({ title, exercises, icon: Icon, color, allExercises }: 
 
 export default function TeloExtra() {
   const navigate = useNavigate();
-  
+  const [exerciseList, setExerciseList] = useState<Exercise[]>(exercises);
+
+  useEffect(() => {
+    supabase.from('exercises').select('*').eq('content_type', 'exercise').eq('active', true)
+      .then(({ data }) => {
+        if (!data || data.length === 0) return;
+        setExerciseList(data.map(e => ({
+          id: e.id,
+          name: e.name,
+          duration: e.duration as Exercise['duration'],
+          category: e.category as Exercise['category'],
+          body: e.body as Exercise['body'],
+          equip: e.equip as Exercise['equip'],
+          level: e.level as Exercise['level'],
+          diastasisSafe: e.diastasis_safe,
+          thumb: e.thumb,
+          description: e.description,
+        })));
+      });
+  }, []);
+
   // Store all exercises for index reference
-  const allExercises = exercises;
-  
+  const allExercises = exerciseList;
+
   // Group exercises by body part
   const exercisesByBodyPart = {
-    'Celé telo': exercises.filter(e => e.body === 'Celé telo'),
-    'Core/Abs': exercises.filter(e => e.body === 'Core/Abs'),
-    'Nohy/Zadok': exercises.filter(e => e.body === 'Nohy/Zadok'),
+    'Celé telo': exerciseList.filter(e => e.body === 'Celé telo'),
+    'Core/Abs': exerciseList.filter(e => e.body === 'Core/Abs'),
+    'Nohy/Zadok': exerciseList.filter(e => e.body === 'Nohy/Zadok'),
   };
 
   return (
@@ -435,7 +456,7 @@ export default function TeloExtra() {
         {/* Stats summary */}
         <div className="text-center pt-4">
           <p className="text-[12px] text-[#8B7560]">
-            {exercises.length} cvičení celkom • Swipe doprava pre viac
+            {exerciseList.length} cvičení celkom • Swipe doprava pre viac
           </p>
         </div>
       </div>

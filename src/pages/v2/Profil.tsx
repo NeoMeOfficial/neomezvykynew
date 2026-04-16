@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Edit3, Smartphone, ChevronRight, LogOut, Flame, Dumbbell, User, CreditCard, Globe, HelpCircle, Settings, Gift, UserPlus, Users } from 'lucide-react';
-import GlassCard from '../../components/v2/GlassCard';
+import { Edit3, Smartphone, ChevronRight, LogOut, Flame, Dumbbell, User, CreditCard, Globe, HelpCircle, Settings, Gift, UserPlus, Users, Info, X } from 'lucide-react';
 import ProgressRing from '../../components/v2/ProgressRing';
 import { useAuthContext } from '../../contexts/AuthContext';
 import { colors } from '../../theme/warmDusk';
@@ -33,6 +32,7 @@ export default function Profil() {
     news: true 
   });
   const [showEditProfile, setShowEditProfile] = useState(false);
+  const [infoModal, setInfoModal] = useState<'referral' | 'partner' | null>(null);
 
   const handleSettingClick = (action: string) => {
     switch(action) {
@@ -194,6 +194,32 @@ export default function Profil() {
         </div>
       </div>
 
+      {/* Info modals */}
+      {infoModal && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center pb-8 px-4" style={{ background: 'rgba(0,0,0,0.4)' }} onClick={() => setInfoModal(null)}>
+          <div className="w-full max-w-sm rounded-2xl p-5 space-y-3" style={{ background: '#FDF6EE', border: '1px solid rgba(255,255,255,0.4)' }} onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between">
+              <h4 className="text-[15px] font-semibold" style={{ color: '#2E2218' }}>
+                {infoModal === 'referral' ? 'Mesiac predplatného zdarma' : 'Zľavy od partnerov'}
+              </h4>
+              <button onClick={() => setInfoModal(null)} className="p-1 rounded-full" style={{ background: 'rgba(0,0,0,0.06)' }}>
+                <X className="w-4 h-4" style={{ color: '#8B7560' }} />
+              </button>
+            </div>
+            <p className="text-[13px] leading-relaxed" style={{ color: '#6B4C3B' }}>
+              {infoModal === 'referral'
+                ? 'Za každú kamarátku, ktorá sa zaregistruje pomocou tvojho kódu a aktivuje predplatné, dostaneš 1 mesiac NeoMe zadarmo. Kredity sa pripisujú po schválení a automaticky sa odpočítavajú z tvojej ďalšej platby.'
+                : 'Ako členka NeoMe získavaš exkluzívne zľavy od našich partnerov — na wellness produkty, cvičebné pomôcky a zdravé potraviny. Zľavy sa aktivujú po prvom mesiaci predplatného.'}
+            </p>
+            <p className="text-[11px]" style={{ color: '#A0907E' }}>
+              {infoModal === 'referral'
+                ? 'Aktuálne odporúčania: 0 kamarátok'
+                : 'Zľavy sa odomknú po 30 dňoch členstva'}
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Referral Section - Odporúčaj & získaj */}
       <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
         <div className="flex items-center gap-2 mb-3">
@@ -202,44 +228,55 @@ export default function Profil() {
           </div>
           <h3 className="text-[14px] font-semibold" style={{ color: '#2E2218' }}>Odporúčaj & získaj</h3>
         </div>
-        
-        <div className="bg-white/40 backdrop-blur-xl rounded-xl p-4 mb-3">
-          <div className="flex items-center justify-between mb-2">
+
+        {/* Referral reward row */}
+        <div className="bg-white/40 backdrop-blur-xl rounded-xl p-4 mb-2">
+          <div className="flex items-center justify-between mb-1">
             <div className="flex items-center gap-2">
-              <Users className="w-5 h-5" style={{ color: '#B8864A' }} />
-              <span className="text-sm font-semibold" style={{ color: '#2E2218' }}>
-                Pozvi kamarátky
-              </span>
+              <Users className="w-4 h-4" style={{ color: '#B8864A' }} />
+              <span className="text-[13px] font-semibold" style={{ color: '#2E2218' }}>Pozvi kamarátky</span>
             </div>
-            <span className="text-xs px-2 py-1 rounded-full" style={{ backgroundColor: 'rgba(184, 134, 74, 0.15)', color: '#6B4C3B' }}>
-              Mesiac zdarma
-            </span>
+            <button onClick={() => setInfoModal('referral')} className="p-1 rounded-full active:scale-95" style={{ background: 'rgba(184,134,74,0.12)' }}>
+              <Info className="w-3.5 h-3.5" style={{ color: '#B8864A' }} />
+            </button>
           </div>
-          <p className="text-xs mb-3" style={{ color: '#6B4C3B' }}>
-            Za každú novú používateľku získaš mesiac predplatného zdarma
+          <p className="text-[11px] mb-3" style={{ color: '#8B7560' }}>
+            Za každú kamarátku → <span className="font-semibold" style={{ color: '#B8864A' }}>1 mesiac predplatného zdarma</span>
           </p>
-          <div className="flex gap-2">
-            <button 
-              onClick={() => navigate('/buddy-system', { state: { from: '/profil' } })}
-              className="flex-1 py-2 px-3 rounded-lg text-xs font-medium text-white transition-all active:scale-95"
-              style={{ backgroundColor: '#B8864A' }}
-            >
-              Zdieľaj kód
-            </button>
-            <button 
-              onClick={() => navigate('/komunita', { state: { from: '/profil', tab: 'discounts' } })}
-              className="py-2 px-3 rounded-lg text-xs font-medium transition-all active:scale-95 bg-white/40 border border-white/40"
-              style={{ color: '#6B4C3B' }}
-            >
-              Zľavy partnerov
-            </button>
+          <div className="flex items-center justify-between mb-3 p-2 rounded-lg" style={{ background: 'rgba(184,134,74,0.08)' }}>
+            <span className="text-[11px]" style={{ color: '#8B7560' }}>Odporúčaní kamarátok</span>
+            <span className="text-[13px] font-bold" style={{ color: '#2E2218' }}>0</span>
           </div>
+          <button
+            onClick={() => navigate('/referral')}
+            className="w-full py-2 px-3 rounded-lg text-[12px] font-medium text-white transition-all active:scale-95"
+            style={{ backgroundColor: '#B8864A' }}
+          >
+            Zdieľaj kód
+          </button>
         </div>
-        
-        <div className="text-center">
-          <p className="text-xs" style={{ color: '#8B7560' }}>
-            Už si pozvala <span className="font-semibold">0 kamarátok</span>
+
+        {/* Partner discounts row */}
+        <div className="bg-white/40 backdrop-blur-xl rounded-xl p-4">
+          <div className="flex items-center justify-between mb-1">
+            <div className="flex items-center gap-2">
+              <Gift className="w-4 h-4" style={{ color: '#A8848B' }} />
+              <span className="text-[13px] font-semibold" style={{ color: '#2E2218' }}>Zľavy partnerov</span>
+            </div>
+            <button onClick={() => setInfoModal('partner')} className="p-1 rounded-full active:scale-95" style={{ background: 'rgba(168,132,139,0.12)' }}>
+              <Info className="w-3.5 h-3.5" style={{ color: '#A8848B' }} />
+            </button>
+          </div>
+          <p className="text-[11px] mb-3" style={{ color: '#8B7560' }}>
+            Exkluzívne zľavy na wellness produkty a zdravé potraviny
           </p>
+          <button
+            onClick={() => setInfoModal('partner')}
+            className="w-full py-2 px-3 rounded-lg text-[12px] font-medium transition-all active:scale-95"
+            style={{ background: 'rgba(168,132,139,0.12)', color: '#A8848B', border: '1px solid rgba(168,132,139,0.2)' }}
+          >
+            Zobraziť zľavy
+          </button>
         </div>
       </div>
 

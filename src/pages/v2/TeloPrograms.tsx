@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Filter, Dumbbell } from 'lucide-react';
 import { colors, glassCard } from '../../theme/warmDusk';
+import { supabase } from '../../lib/supabase';
 
 interface Program {
   id: string;
@@ -122,8 +123,25 @@ const levelMap = { 'Všetko': null, 'Level 1': [1], 'Level 2': [2], 'Level 3': [
 export default function TeloPrograms() {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState(0);
+  const [programList, setProgramList] = useState<Program[]>(programs);
 
-  const filteredPrograms = programs.filter(p => {
+  useEffect(() => {
+    supabase.from('programmes').select('*').eq('active', true).order('level', { ascending: true })
+      .then(({ data }) => {
+        if (!data || data.length === 0) return;
+        setProgramList(data.map(p => ({
+          id: p.id,
+          name: p.name,
+          level: p.level,
+          weeks: p.weeks,
+          description: p.description,
+          detailedDescription: p.detailed_description,
+          image: p.image,
+        })));
+      });
+  }, []);
+
+  const filteredPrograms = programList.filter(p => {
     const selectedLevels = levelMap[filterOptions[activeFilter] as keyof typeof levelMap];
     if (!selectedLevels) return true;
     return selectedLevels.includes(p.level);
