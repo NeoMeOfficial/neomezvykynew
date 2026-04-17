@@ -1178,38 +1178,44 @@ interface AdminAnalytics {
 }
 
 // ═══════════════════════════════════════════
-// SHARED ADMIN CRUD HELPERS
+// SHARED ADMIN CRUD HELPERS — direct Supabase
 // ═══════════════════════════════════════════
+const TABLES: Record<string, string> = {
+  recipes: 'recipes', exercises: 'exercises',
+  meditations: 'meditations', programmes: 'programmes',
+};
+const ORDER_BY: Record<string, { column: string; ascending: boolean }> = {
+  recipes: { column: 'created_at', ascending: false },
+  exercises: { column: 'content_type', ascending: true },
+  meditations: { column: 'created_at', ascending: false },
+  programmes: { column: 'level', ascending: true },
+};
+
 async function adminFetch(type: string) {
-  const res = await fetch(`/api/admin-content?type=${type}`);
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error);
-  return data.items ?? [];
+  const { column, ascending } = ORDER_BY[type];
+  const { data, error } = await supabase.from(TABLES[type]).select('*').order(column, { ascending });
+  if (error) throw new Error(error.message);
+  return data ?? [];
 }
 async function adminUpsert(type: string, item: Record<string, unknown>) {
-  const res = await fetch('/api/admin-content', {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ type, action: 'upsert', data: item }),
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error);
-  return data.item;
+  const { data, error } = await supabase.from(TABLES[type]).upsert([item], { onConflict: 'id' }).select();
+  if (error) throw new Error(error.message);
+  return data?.[0];
 }
 async function adminDelete(type: string, id: string) {
-  const res = await fetch('/api/admin-content', {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ type, action: 'delete', id }),
-  });
-  if (!res.ok) { const d = await res.json(); throw new Error(d.error); }
+  const { error } = await supabase.from(TABLES[type]).delete().eq('id', id);
+  if (error) throw new Error(error.message);
 }
 async function adminSeed(type: string, items: Record<string, unknown>[]) {
-  const res = await fetch('/api/admin-content', {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ type, action: 'seed', items }),
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error);
-  return data.seeded;
+  const chunkSize = 50;
+  let inserted = 0;
+  for (let i = 0; i < items.length; i += chunkSize) {
+    const chunk = items.slice(i, i + chunkSize);
+    const { error } = await supabase.from(TABLES[type]).upsert(chunk, { onConflict: 'id' });
+    if (error) throw new Error(error.message);
+    inserted += chunk.length;
+  }
+  return inserted;
 }
 
 const AdminCard = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
