@@ -1181,13 +1181,13 @@ interface AdminAnalytics {
 // SHARED ADMIN CRUD HELPERS
 // ═══════════════════════════════════════════
 async function adminFetch(type: string) {
-  const res = await fetch(`/.netlify/functions/admin-content?type=${type}`);
+  const res = await fetch(`/api/admin-content?type=${type}`);
   const data = await res.json();
   if (!res.ok) throw new Error(data.error);
   return data.items ?? [];
 }
 async function adminUpsert(type: string, item: Record<string, unknown>) {
-  const res = await fetch('/.netlify/functions/admin-content', {
+  const res = await fetch('/api/admin-content', {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ type, action: 'upsert', data: item }),
   });
@@ -1196,14 +1196,14 @@ async function adminUpsert(type: string, item: Record<string, unknown>) {
   return data.item;
 }
 async function adminDelete(type: string, id: string) {
-  const res = await fetch('/.netlify/functions/admin-content', {
+  const res = await fetch('/api/admin-content', {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ type, action: 'delete', id }),
   });
   if (!res.ok) { const d = await res.json(); throw new Error(d.error); }
 }
 async function adminSeed(type: string, items: Record<string, unknown>[]) {
-  const res = await fetch('/.netlify/functions/admin-content', {
+  const res = await fetch('/api/admin-content', {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ type, action: 'seed', items }),
   });
