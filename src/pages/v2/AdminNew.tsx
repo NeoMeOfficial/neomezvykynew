@@ -12,6 +12,9 @@ import { supabase } from '../../lib/supabase';
 import ContentManager from '../../components/admin/ContentManager';
 import { useAdminMessages } from '../../hooks/useMessages';
 import { useCommunityPosts } from '../../hooks/useCommunityPosts';
+import { recipes as staticRecipesData } from '../../data/recipes';
+import { TeloExtraStaticData } from '../../data/teloExtraData';
+import { TeloStrecingStaticData } from '../../data/teloStrecingData';
 
 // Simple Card component
 const Card = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
@@ -1328,8 +1331,7 @@ function RecipesTab() {
   const seedFromStatic = async () => {
     setSeeding(true); setError(null);
     try {
-      const { recipes: staticRecipes } = await import('../../data/recipes');
-      const payload = staticRecipes.map((r: any) => ({
+      const payload = staticRecipesData.map((r: any) => ({
         id: r.id, title: r.title, category: r.category, description: r.description ?? '',
         prep_time: r.prepTime, servings: r.servings, calories: r.calories,
         protein: r.protein, carbs: r.carbs, fat: r.fat, fiber: r.fiber,
@@ -1543,13 +1545,6 @@ function ExercisesTab() {
   const seedFromStatic = async () => {
     setSeeding(true); setError(null);
     try {
-      const { TeloExtraStaticData } = await import('../../data/teloExtraData').catch(() => ({ TeloExtraStaticData: [] }));
-      const { TeloStrecingStaticData } = await import('../../data/teloStrecingData').catch(() => ({ TeloStrecingStaticData: [] }));
-      // If no separate data files exist, note to user they can add manually
-      if (TeloExtraStaticData.length === 0 && TeloStrecingStaticData.length === 0) {
-        alert('Statické dáta cvičení nie sú v samostatnom súbore. Pridaj cvičenia manuálne.');
-        setSeeding(false); return;
-      }
       const payload = [
         ...TeloExtraStaticData.map((e: any) => ({ ...e, content_type: 'exercise' })),
         ...TeloStrecingStaticData.map((s: any) => ({ ...s, content_type: 'stretch' })),
