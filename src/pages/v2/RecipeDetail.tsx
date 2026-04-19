@@ -7,6 +7,7 @@ import { colors } from '../../theme/warmDusk';
 import { useFavorites } from '../../hooks/useFavorites';
 import { useSubscription } from '../../contexts/SimpleSubscriptionContext';
 import { recipes as recipeDatabase, getRecipeImage } from '../../data/recipes';
+import { supabase } from '../../lib/supabase';
 import { Document, Page } from 'react-pdf';
 
 // Helper function to get recipe by ID
@@ -41,9 +42,40 @@ export default function RecipeDetail() {
   const { id } = useParams();
   const { toggleFavorite, isFavorite } = useFavorites();
   const { canUseMealPlanner } = useSubscription();
-  
+  const [liveRecipe, setLiveRecipe] = useState<typeof fallbackRecipe | null>(null);
+
+  // Fetch from Supabase; fall back to static data
+  useEffect(() => {
+    if (!id) return;
+    supabase.from('recipes').select('*').eq('id', id).single()
+      .then(({ data }) => {
+        if (!data) return;
+        setLiveRecipe({
+          id: data.id,
+          title: data.title,
+          image: data.image || getRecipeImage(data.title, data.category),
+          prepTime: data.prep_time,
+          calories: data.calories,
+          servings: data.servings,
+          category: data.category,
+          description: data.description ?? '',
+          ingredients: data.ingredients ?? [],
+          steps: data.steps ?? [],
+          allergens: data.allergens ?? [],
+          dietary: data.dietary ?? [],
+          tags: data.tags ?? [],
+          difficulty: data.difficulty ?? 'easy',
+          protein: data.protein,
+          carbs: data.carbs,
+          fat: data.fat,
+          fiber: data.fiber,
+          pdfPath: data.pdf_path ?? '',
+        });
+      });
+  }, [id]);
+
   // Load recipe from database using ID from URL
-  const recipe = getRecipeById(id || '') || fallbackRecipe;
+  const recipe = liveRecipe ?? getRecipeById(id || '') ?? fallbackRecipe;
   const [checked, setChecked] = useState<boolean[]>(new Array(recipe.ingredients.length).fill(false));
   const [addedToMealPlan, setAddedToMealPlan] = useState(false);
   const [showPromoBanner, setShowPromoBanner] = useState(false);
