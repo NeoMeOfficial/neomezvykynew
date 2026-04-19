@@ -6,7 +6,7 @@ import ProgressRing from '../../components/v2/ProgressRing';
 import { useNutritionProfile } from '../../features/nutrition/useNutritionProfile';
 import { useMealPlan } from '../../features/nutrition/useMealPlan';
 import { WeekDayNavigator } from '../../features/nutrition/WeekDayNavigator';
-import { useSubscription } from '../../contexts/SimpleSubscriptionContext';
+import { useSubscription } from '../../contexts/SubscriptionContext';
 import NutritionOnboarding from '../../features/nutrition/NutritionOnboarding';
 import { recipes, getRecipeImage } from '../../data/recipes';
 import type { NutritionProfile } from '../../features/nutrition/types';

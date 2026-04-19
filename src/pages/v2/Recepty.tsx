@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Clock, Flame, Lock, Heart } from 'lucide-react';
-import { useSubscription } from '../../contexts/SimpleSubscriptionContext';
+import { useSubscription } from '../../contexts/SubscriptionContext';
 import { usePaywall } from '../../hooks/usePaywall';
 import { PaywallModal } from '../../components/v2/paywall/PaywallModal';
 import { useUniversalFavorites } from '../../hooks/useUniversalFavorites';
@@ -65,7 +65,7 @@ export default function Recepty() {
   const fetchedRef = useRef(false);
   const navigate = useNavigate();
   
-  const { limits } = useSubscription();
+  const { getRemaining } = useSubscription();
   const { paywallState, showContentPaywall, closePaywall, handleUpgrade, getContentWarning } = usePaywall();
   const { getFavoritesByType } = useUniversalFavorites();
 
@@ -96,12 +96,12 @@ export default function Recepty() {
     effectiveRecipes[categoryNames[active]] || [];
 
   // Apply content limits for free users (but not for favorites)
+  const recipesRemaining = getRemaining('recipes');
   const currentRecipes = useMemo(() => {
     if (showingFavorites) return allRecipes; // No limits on favorites
-    const maxRecipes = limits.max_recipes;
-    if (maxRecipes === -1) return allRecipes; // unlimited
-    return allRecipes.slice(0, maxRecipes);
-  }, [allRecipes, limits.max_recipes, showingFavorites]);
+    if (recipesRemaining === null) return allRecipes; // unlimited
+    return allRecipes.slice(0, recipesRemaining);
+  }, [allRecipes, recipesRemaining, showingFavorites]);
 
   const hasMoreRecipes = !showingFavorites && (allRecipes.length > currentRecipes.length);
 

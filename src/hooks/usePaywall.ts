@@ -1,128 +1,58 @@
-import { useState, useCallback } from 'react';
-import { useSubscription } from '../contexts/SimpleSubscriptionContext';
-import { useAuthContext } from '../contexts/AuthContext';
-
-interface PaywallState {
-  isOpen: boolean;
-  title: string;
-  message: string;
-  limitType: 'content' | 'data_save' | 'meal_planner';
-}
+/**
+ * Thin wrapper around the unified SubscriptionContext.
+ * Keeps the old `usePaywall()` API so existing callers don't need big rewrites.
+ * New code should use `useAccess()` or `useSubscription()` from contexts/SubscriptionContext directly.
+ */
+import { useSubscription } from '../contexts/SubscriptionContext';
 
 export function usePaywall() {
-  const { limits, tier, getRemainingCount, canUseMealPlanner } = useSubscription();
-  const { user } = useAuthContext();
-  
-  const [paywallState, setPaywallState] = useState<PaywallState>({
-    isOpen: false,
-    title: '',
-    message: '',
-    limitType: 'content',
-  });
-
-  const [checkoutOpen, setCheckoutOpen] = useState(false);
-
-  const closePaywall = useCallback(() => {
-    setPaywallState(prev => ({ ...prev, isOpen: false }));
-  }, []);
-
-  // Check if user can access content (considering limits)
-  const checkContentAccess = useCallback((
-    contentType: 'exercises' | 'recipes' | 'meditations' | 'stretches',
-    requestedCount: number = 1
-  ): boolean => {
-    // 🎯 TESTING MODE: All content freely accessible
-    console.log('🎯 Testing Mode: Content access granted for', contentType);
-    return true; // Always allow access during testing
-  }, []);
-
-  // Show content limit paywall
-  const showContentPaywall = useCallback((contentType: 'exercises' | 'recipes' | 'meditations' | 'stretches') => {
-    // 🎯 TESTING MODE: Never show content paywall
-    console.log('🎯 Testing Mode: Content paywall bypassed for', contentType);
-    // Don't set paywall state - just log and return
-  }, []);
-
-  // Show data save paywall
-  const showDataSavePaywall = useCallback(() => {
-    setPaywallState({
-      isOpen: true,
-      title: 'Údaje sa neuložia',
-      message: 'V bezplatnej verzii sa tvoje údaje neukladajú. Upgradni si účet pre trvalé ukladanie svojich pokrokov a preferencií.',
-      limitType: 'data_save',
-    });
-  }, []);
-
-  // Show meal planner paywall
-  const showMealPlannerPaywall = useCallback(() => {
-    setPaywallState({
-      isOpen: true,
-      title: 'Jedálničky sú prémiová funkcia',
-      message: 'Personalizované jedálničky vyžadujú samostatný nákup alebo Program Bundle. Jeden token ti umožní vytvoriť jeden kompletný týždňový jedálniček.',
-      limitType: 'meal_planner',
-    });
-  }, []);
-
-  const openCheckout = useCallback(() => {
-    closePaywall();
-    setCheckoutOpen(true);
-  }, [closePaywall]);
-
-  const closeCheckout = useCallback(() => {
-    setCheckoutOpen(false);
-  }, []);
-
-  // Handle upgrade action
-  const handleUpgrade = useCallback((selectedTier: 'neome_plus' | 'program_bundle' | 'meal_planner_tokens') => {
-    if (selectedTier === 'meal_planner_tokens') {
-      openCheckout();
-      return;
-    }
-    // For other tiers: placeholder (Stripe not yet wired)
-    closePaywall();
-    console.log(`Upgrading to: ${selectedTier}`);
-  }, [closePaywall, openCheckout]);
-
-  // Check if user needs to see data save warning
-  const shouldShowDataSaveWarning = useCallback((): boolean => {
-    // 🎯 TESTING MODE: No data save warnings during testing
-    console.log('🎯 Testing Mode: Data save warning bypassed');
-    return false; // Never show data save warnings during testing
-  }, []);
-
-  // Get content warning message (async)
-  const getContentWarning = useCallback(async (contentType: 'exercises' | 'recipes' | 'meditations' | 'stretches'): Promise<string | null> => {
-    // 🎯 TESTING MODE: No content warnings during testing
-    console.log('🎯 Testing Mode: Content warning bypassed for', contentType);
-    return null; // Never show warnings during testing
-  }, []);
+  const {
+    canAccess,
+    isPremium,
+    hasMealPlanner,
+    gate,
+    paywallVisible,
+    dismissPaywall,
+    startCheckout,
+  } = useSubscription();
 
   return {
-    // State
-    paywallState,
-    
+    // State — map paywallVisible to the old shape
+    paywallState: {
+      isOpen: paywallVisible,
+      title: '',
+      message: '',
+      limitType: 'content' as const,
+    },
+
     // Content access
-    checkContentAccess,
-    getContentWarning,
-    
+    checkContentAccess: (contentType: 'exercises' | 'recipes' | 'meditations' | 'stretches') =>
+      canAccess(contentType),
+    getContentWarning: async () => null,
+
     // Data save
-    shouldShowDataSaveWarning,
-    
+    shouldShowDataSaveWarning: () => !isPremium,
+
     // Meal planner
-    canUseMealPlanner,
-    
+    canUseMealPlanner: hasMealPlanner,
+
     // Paywall triggers
-    showContentPaywall,
-    showDataSavePaywall, 
-    showMealPlannerPaywall,
-    
+    showContentPaywall: () => gate(),
+    showDataSavePaywall: () => gate(),
+    showMealPlannerPaywall: () => gate(),
+
     // Actions
-    closePaywall,
-    handleUpgrade,
+    closePaywall: () => dismissPaywall(),
+    handleUpgrade: (selectedTier: string) => {
+      dismissPaywall();
+      if (selectedTier === 'meal_planner_tokens') {
+        startCheckout('price_meal_planner');
+      }
+    },
 
     // Checkout
-    checkoutOpen,
-    openCheckout,
-    closeCheckout,
+    checkoutOpen: false,
+    openCheckout: () => gate(),
+    closeCheckout: () => dismissPaywall(),
   };
 }

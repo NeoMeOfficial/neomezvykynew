@@ -5,7 +5,7 @@ import GlassCard from '../../components/v2/GlassCard';
 import { RecipePromoBanner } from '../../components/v2/RecipePromoBanner';
 import { colors } from '../../theme/warmDusk';
 import { useFavorites } from '../../hooks/useFavorites';
-import { useSubscription } from '../../contexts/SimpleSubscriptionContext';
+import { useSubscription } from '../../contexts/SubscriptionContext';
 import { recipes as recipeDatabase } from '../../data/recipes';
 import { useRecipeDetails } from '../../hooks/useSpoonacular';
 import { mapSpoonacularToLocal } from '../../components/SpoonacularRecipeGrid';

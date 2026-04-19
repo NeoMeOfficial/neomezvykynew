@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Droplets, Moon, BookOpen, Dumbbell, Apple, Plus, Check, ArrowLeft, GlassWater } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../contexts/AuthContext';
-import { useSubscription } from '../../contexts/SimpleSubscriptionContext';
+import { useSubscription } from '../../contexts/SubscriptionContext';
 import { colors, glassCard } from '../../theme/warmDusk';
 
 const DAYS = ['Po', 'Ut', 'St', 'Št', 'Pi', 'So', 'Ne'];
@@ -24,8 +24,8 @@ const defaultHabitsData = [
 
 export default function NavykyTracker() {
   const { user } = useAuthContext();
-  const { subscription } = useSubscription();
-  const isSubscribed = subscription.active && subscription.tier === 'premium';
+  const { isPremium } = useSubscription();
+  const isSubscribed = isPremium;
   const [habits, setHabits] = useState<HabitData[]>([]);
   const [weekDots, setWeekDots] = useState([true, true, true, false, false, false, false]);
   const [showPaywall, setShowPaywall] = useState(false);

@@ -1,7 +1,18 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { useSupabaseAuth } from './SupabaseAuthContext';
+/**
+ * Unified Subscription Module
+ *
+ * Single provider + hook that replaces:
+ *  - SimpleSubscriptionContext (deleted)
+ *  - old usePaywall hook (deleted)
+ *  - old SubscriptionContext (this file, rewritten)
+ *
+ * Dual-mode:
+ *  - Demo (no Stripe key): everything unlocked, checkout is a no-op
+ *  - Production (Stripe key present): real gating, Stripe checkout + billing
+ */
+import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react';
 import {
-  SubscriptionData,
+  type SubscriptionData,
   isSubscriptionActive,
   isTrialActive,
   getDaysUntilExpiration,
@@ -10,22 +21,67 @@ import {
   createPortalSession,
   createPortalSessionMock,
   SUBSCRIPTION_PLANS,
-  stripePromise
+  stripePromise,
 } from '../lib/stripe';
-import { supabase } from '../lib/supabase';
+
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
+
+export type ContentType = 'recipes' | 'exercises' | 'meditations' | 'stretches';
+export type Tier = 'free' | 'premium';
+
+const MEAL_PLANNER_KEY = 'neome_meal_planner_purchased';
+
+/** Per-tier content limits. -1 = unlimited. */
+const TIER_LIMITS: Record<Tier, Record<ContentType, number>> = {
+  free: { recipes: 10, exercises: 3, meditations: 3, stretches: 3 },
+  premium: { recipes: -1, exercises: -1, meditations: -1, stretches: -1 },
+};
 
 // True when a real Stripe publishable key is configured
 const isStripeConfigured = () =>
-  !!(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY &&
-     (import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY.startsWith('pk_test_') ||
-      import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY.startsWith('pk_live_')));
+  !!(
+    import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY &&
+    (import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY.startsWith('pk_test_') ||
+      import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY.startsWith('pk_live_'))
+  );
+
+// True when Supabase is configured (auth available)
+const isAuthConfigured = () =>
+  !!(import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY);
+
+// ---------------------------------------------------------------------------
+// Context shape
+// ---------------------------------------------------------------------------
 
 interface SubscriptionContextType {
+  // Stripe-level data (for SubscriptionManagement page)
   subscription: SubscriptionData | null;
-  isLoading: boolean;
+
+  // Computed access state
+  tier: Tier;
   isPremium: boolean;
   isTrialing: boolean;
   daysLeft: number;
+  loading: boolean;
+  isLoading: boolean; // alias for loading (used by SubscriptionManagement)
+
+  // Content access
+  canAccess: (content: ContentType) => boolean;
+  getRemaining: (content: ContentType) => number | null; // null = unlimited
+
+  // Meal planner (separate one-time purchase)
+  hasMealPlanner: boolean;
+  canUseMealPlanner: boolean; // alias for hasMealPlanner (used by legacy callers)
+  purchaseMealPlanner: () => void;
+
+  // Paywall gate — shows paywall modal (managed by provider)
+  gate: () => void;
+  paywallVisible: boolean;
+  dismissPaywall: () => void;
+
+  // Stripe actions
   startCheckout: (priceId: string) => Promise<void>;
   manageBilling: () => Promise<void>;
   cancelSubscription: () => Promise<void>;
@@ -34,130 +90,128 @@ interface SubscriptionContextType {
 
 const SubscriptionContext = createContext<SubscriptionContextType | undefined>(undefined);
 
-export function SubscriptionProvider({ children }: { children: ReactNode }) {
-  const { user, profile, updateProfile } = useSupabaseAuth();
-  const [subscription, setSubscription] = useState<SubscriptionData | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+// ---------------------------------------------------------------------------
+// Provider
+// ---------------------------------------------------------------------------
 
-  // Load subscription data when user changes
+export function SubscriptionProvider({ children }: { children: ReactNode }) {
+  const [subscription, setSubscription] = useState<SubscriptionData | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [paywallVisible, setPaywallVisible] = useState(false);
+
+  const [mealPlannerPurchased, setMealPlannerPurchased] = useState<boolean>(
+    () => localStorage.getItem(MEAL_PLANNER_KEY) === 'true'
+  );
+
+  // Demo mode: no Stripe key → everything unlocked
+  const demoMode = !isStripeConfigured();
+
+  // ------ Load subscription on mount (production only) ------
   useEffect(() => {
-    if (user) {
-      loadSubscription();
-    } else {
-      setSubscription(null);
-    }
-  }, [user]);
+    if (demoMode) return;
+    loadSubscription();
+  }, [demoMode]);
 
   const loadSubscription = async () => {
-    if (!user) return;
-
-    setIsLoading(true);
+    setLoading(true);
     try {
-      // For development: Load from localStorage first
-      const mockSubscription = localStorage.getItem(`subscription_${user.id}`);
-      if (mockSubscription) {
-        setSubscription(JSON.parse(mockSubscription));
-        setIsLoading(false);
-        return;
+      // Check localStorage for mock/dev subscription
+      const userId = getUserId();
+      if (userId) {
+        const stored = localStorage.getItem(`subscription_${userId}`);
+        if (stored) {
+          setSubscription(JSON.parse(stored));
+          setLoading(false);
+          return;
+        }
       }
-
-      // TODO: Replace with actual Stripe API call
-      // const response = await fetch(`/api/subscription/${user.id}`);
-      // const subscriptionData = await response.json();
-      // setSubscription(subscriptionData);
-
-      // For now, check profile subscription status
-      if (profile?.subscription_status === 'premium') {
-        const mockActiveSubscription: SubscriptionData = {
-          id: 'sub_premium_' + user.id,
-          status: 'active',
-          current_period_start: Date.now() / 1000,
-          current_period_end: (Date.now() + (30 * 24 * 60 * 60 * 1000)) / 1000,
-          cancel_at_period_end: false,
-          customer_id: 'cus_' + user.id
-        };
-        setSubscription(mockActiveSubscription);
-      } else if (profile?.subscription_status === 'trial' && profile.trial_end_date) {
-        const trialEnd = new Date(profile.trial_end_date).getTime() / 1000;
-        const mockTrialSubscription: SubscriptionData = {
-          id: 'sub_trial_' + user.id,
-          status: 'trialing',
-          current_period_start: Date.now() / 1000,
-          current_period_end: trialEnd,
-          trial_end: trialEnd,
-          cancel_at_period_end: false,
-          customer_id: 'cus_' + user.id
-        };
-        setSubscription(mockTrialSubscription);
-      } else {
-        setSubscription(null);
-      }
-
+      // TODO: When Supabase subscription table is ready, fetch from there
+      setSubscription(null);
     } catch (error) {
       console.error('Error loading subscription:', error);
       setSubscription(null);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  const startCheckout = async (priceId: string) => {
-    if (!user || !profile) {
-      throw new Error('User must be logged in');
-    }
+  // ------ Derived state ------
+  const isPremium = demoMode || isSubscriptionActive(subscription);
+  const isTrialing = !demoMode && isTrialActive(subscription);
+  const daysLeft = demoMode ? 999 : getDaysUntilExpiration(subscription);
+  const tier: Tier = isPremium ? 'premium' : 'free';
 
-    setIsLoading(true);
-    try {
-      if (isStripeConfigured()) {
-        // Live Stripe checkout — redirect to Stripe-hosted page
-        const sessionId = await createCheckoutSession(priceId, user.id, profile.email);
-        const stripe = await stripePromise;
-        if (stripe) {
-          await stripe.redirectToCheckout({ sessionId });
+  const canAccess = useCallback(
+    (content: ContentType): boolean => {
+      if (demoMode) return true;
+      if (isPremium) return true;
+      const limit = TIER_LIMITS.free[content];
+      // For now, free tier has a static limit — usage tracking comes later
+      return limit > 0;
+    },
+    [demoMode, isPremium]
+  );
+
+  const getRemaining = useCallback(
+    (content: ContentType): number | null => {
+      if (demoMode || isPremium) return null; // unlimited
+      return TIER_LIMITS.free[content];
+    },
+    [demoMode, isPremium]
+  );
+
+  // ------ Paywall gate ------
+  const gate = useCallback(() => {
+    if (demoMode || isPremium) return; // no-op in demo or premium
+    setPaywallVisible(true);
+  }, [demoMode, isPremium]);
+
+  const dismissPaywall = useCallback(() => setPaywallVisible(false), []);
+
+  // ------ Meal planner ------
+  const purchaseMealPlanner = useCallback(() => {
+    localStorage.setItem(MEAL_PLANNER_KEY, 'true');
+    setMealPlannerPurchased(true);
+  }, []);
+
+  // ------ Stripe actions ------
+  const startCheckout = useCallback(
+    async (priceId: string) => {
+      setLoading(true);
+      try {
+        const userId = getUserId();
+        const email = getUserEmail();
+
+        if (isStripeConfigured()) {
+          const sessionId = await createCheckoutSession(priceId, userId || 'anon', email || '');
+          const stripe = await stripePromise;
+          if (stripe) {
+            await stripe.redirectToCheckout({ sessionId });
+          }
+        } else {
+          const sessionId = await createCheckoutSessionMock(priceId, userId || 'demo', email || 'demo@neome.sk');
+          if (sessionId === 'demo_session_success') {
+            await loadSubscription();
+          }
         }
-      } else {
-        // Demo/dev mode mock
-        const sessionId = await createCheckoutSessionMock(priceId, user.id, profile.email);
-        if (sessionId === 'demo_session_success') {
-          const trialEnd = (Date.now() + (7 * 24 * 60 * 60 * 1000)) / 1000;
-          const newSubscription: SubscriptionData = {
-            id: 'sub_' + Date.now(),
-            status: 'trialing',
-            current_period_start: Date.now() / 1000,
-            current_period_end: (Date.now() + (30 * 24 * 60 * 60 * 1000)) / 1000,
-            trial_end: trialEnd,
-            cancel_at_period_end: false,
-            customer_id: 'cus_' + user.id
-          };
-          setSubscription(newSubscription);
-          await updateProfile({
-            subscription_status: 'trial',
-            subscription_id: newSubscription.id,
-            trial_end_date: new Date(trialEnd * 1000).toISOString()
-          });
-        }
+      } catch (error) {
+        console.error('Error starting checkout:', error);
+        throw error;
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error('Error starting checkout:', error);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    },
+    []
+  );
 
-  const manageBilling = async () => {
-    if (!subscription) {
-      throw new Error('No active subscription');
-    }
-
-    setIsLoading(true);
+  const manageBilling = useCallback(async () => {
+    if (!subscription) throw new Error('No active subscription');
+    setLoading(true);
     try {
       if (isStripeConfigured()) {
-        // Live Stripe portal — redirect to billing portal
         const portalUrl = await createPortalSession(subscription.customer_id);
         window.location.href = portalUrl;
       } else {
-        // Demo mode
         await createPortalSessionMock(subscription.customer_id);
         alert('Demo: v produkcii by si bola presmerovaná na Stripe billing portál.');
       }
@@ -165,67 +219,72 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
       console.error('Error accessing billing portal:', error);
       throw error;
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
-  };
+  }, [subscription]);
 
-  const cancelSubscription = async () => {
-    if (!subscription || !user) {
-      throw new Error('No subscription to cancel');
-    }
-
-    setIsLoading(true);
+  const cancelSubscription = useCallback(async () => {
+    if (!subscription) throw new Error('No subscription to cancel');
+    const userId = getUserId();
+    setLoading(true);
     try {
       if (isStripeConfigured()) {
-        // Live: cancel via Netlify function
         await fetch('/.netlify/functions/cancel-subscription', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ subscriptionId: subscription.id, userId: user.id })
+          body: JSON.stringify({ subscriptionId: subscription.id, userId }),
         });
       }
-      // Update local state regardless (webhook will confirm via Supabase)
-      const canceledSubscription = { ...subscription, cancel_at_period_end: true };
-      setSubscription(canceledSubscription);
-      if (!isStripeConfigured()) {
-        localStorage.setItem(`subscription_${user.id}`, JSON.stringify(canceledSubscription));
+      const canceled = { ...subscription, cancel_at_period_end: true };
+      setSubscription(canceled);
+      if (!isStripeConfigured() && userId) {
+        localStorage.setItem(`subscription_${userId}`, JSON.stringify(canceled));
       }
     } catch (error) {
       console.error('Error canceling subscription:', error);
       throw error;
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
-  };
+  }, [subscription]);
 
-  const refreshSubscription = async () => {
+  const refreshSubscription = useCallback(async () => {
     await loadSubscription();
-  };
+  }, []);
 
-  // Computed values
-  const isPremium = isSubscriptionActive(subscription);
-  const isTrialing = isTrialActive(subscription);
-  const daysLeft = getDaysUntilExpiration(subscription);
+  // ------ Context value ------
+  const hasMealPlannerValue = demoMode || mealPlannerPurchased;
 
   const value: SubscriptionContextType = {
     subscription,
-    isLoading,
+    tier,
     isPremium,
     isTrialing,
     daysLeft,
+    loading,
+    isLoading: loading,
+    canAccess,
+    getRemaining,
+    hasMealPlanner: hasMealPlannerValue,
+    canUseMealPlanner: hasMealPlannerValue,
+    purchaseMealPlanner,
+    gate,
+    paywallVisible,
+    dismissPaywall,
     startCheckout,
     manageBilling,
     cancelSubscription,
     refreshSubscription,
   };
 
-  return (
-    <SubscriptionContext.Provider value={value}>
-      {children}
-    </SubscriptionContext.Provider>
-  );
+  return <SubscriptionContext.Provider value={value}>{children}</SubscriptionContext.Provider>;
 }
 
+// ---------------------------------------------------------------------------
+// Hooks
+// ---------------------------------------------------------------------------
+
+/** Full subscription context — use in any component. */
 export function useSubscription() {
   const context = useContext(SubscriptionContext);
   if (context === undefined) {
@@ -234,25 +293,56 @@ export function useSubscription() {
   return context;
 }
 
-// Utility hook for checking premium access
+/**
+ * Convenience hook for the most common pattern: check content access + gate.
+ *
+ *   const { allowed, gate } = useAccess('recipes');
+ *   if (!allowed) return gate();
+ */
+export function useAccess(content: ContentType) {
+  const { canAccess, getRemaining, gate, loading } = useSubscription();
+  return {
+    allowed: canAccess(content),
+    remaining: getRemaining(content),
+    gate,
+    loading,
+  };
+}
+
+/** Quick boolean check. */
 export function useIsPremium(): boolean {
   const { isPremium } = useSubscription();
   return isPremium;
 }
 
-// Hook for paywall logic
-export function usePaywall() {
-  const { isPremium, isTrialing, daysLeft, startCheckout } = useSubscription();
-  
-  const showPaywall = !isPremium;
-  const showTrialBanner = isTrialing && daysLeft <= 3;
-  
-  return {
-    showPaywall,
-    showTrialBanner,
-    isPremium,
-    isTrialing,
-    daysLeft,
-    startCheckout
-  };
+// ---------------------------------------------------------------------------
+// Helpers (read auth state without importing auth context — avoids circular dep)
+// ---------------------------------------------------------------------------
+
+function getUserId(): string | null {
+  try {
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    if (!supabaseUrl) return null;
+    const key = 'sb-' + new URL(supabaseUrl).hostname.split('.')[0] + '-auth-token';
+    const raw = localStorage.getItem(key);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed?.user?.id || null;
+  } catch {
+    return null;
+  }
+}
+
+function getUserEmail(): string | null {
+  try {
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    if (!supabaseUrl) return null;
+    const key = 'sb-' + new URL(supabaseUrl).hostname.split('.')[0] + '-auth-token';
+    const raw = localStorage.getItem(key);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed?.user?.email || null;
+  } catch {
+    return null;
+  }
 }

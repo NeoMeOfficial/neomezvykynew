@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Clock, Flame, Lock, Heart } from 'lucide-react';
-import { useSubscription } from '../../contexts/SimpleSubscriptionContext';
+import { useSubscription } from '../../contexts/SubscriptionContext';
 import { usePaywall } from '../../hooks/usePaywall';
 import { PaywallModal } from '../../components/v2/paywall/PaywallModal';
 import { useUniversalFavorites } from '../../hooks/useUniversalFavorites';
@@ -20,7 +20,7 @@ const categoryNames = ['Raňajky', 'Hlavné jedlá a polievky', 'Snacky'];
 
 export default function ReceptySpoonacular() {
   const navigate = useNavigate();
-  const { isSubscribed } = useSubscription();
+  const { isPremium: isSubscribed } = useSubscription();
   const { showContentPaywall, paywallState, closePaywall, handleUpgrade } = usePaywall();
   const { favorites, toggleFavorite, isFavorite } = useUniversalFavorites();
   const [searchParams] = useSearchParams();

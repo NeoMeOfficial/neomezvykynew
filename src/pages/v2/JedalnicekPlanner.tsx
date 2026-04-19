@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, UtensilsCrossed, ChefHat, Coffee, Moon, Cookie, Download, Check } from 'lucide-react';
 import GlassCard from '../../components/v2/GlassCard';
 import ProgressRing from '../../components/v2/ProgressRing';
-import { useSubscription } from '../../contexts/SimpleSubscriptionContext';
+import { useSubscription } from '../../contexts/SubscriptionContext';
 import { usePaywall } from '../../hooks/usePaywall';
 import { MealPlannerBanner } from '../../components/v2/paywall/MealPlannerBanner';
 import { PaywallModal } from '../../components/v2/paywall/PaywallModal';

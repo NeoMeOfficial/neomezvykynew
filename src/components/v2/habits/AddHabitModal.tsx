@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, Plus, Lock, Heart, Dumbbell, Brain, Utensils, Moon, TrendingUp, type LucideIcon } from 'lucide-react';
 import { colors } from '../../../theme/warmDusk';
-import { useSubscription } from '../../../contexts/SimpleSubscriptionContext';
+import { useSubscription } from '../../../contexts/SubscriptionContext';
 
 interface AddHabitModalProps {
   isOpen: boolean;

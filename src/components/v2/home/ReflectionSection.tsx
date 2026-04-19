@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { BookOpen, Send, Check, Pencil, Lock } from 'lucide-react';
 import GlassCard from '../GlassCard';
 import { colors, iconContainer, innerGlass } from '../../../theme/warmDusk';
-import { useSubscription } from '../../../contexts/SimpleSubscriptionContext';
+import { useSubscription } from '../../../contexts/SubscriptionContext';
 
 /* ── Section Header (matches TodayOverview style) ──────────── */
 function SectionHeader({ icon: Icon, label, color }: { icon: typeof BookOpen; label: string; color: string }) {
