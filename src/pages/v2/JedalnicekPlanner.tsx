@@ -222,6 +222,19 @@ export default function JedalnicekPlanner() {
         </GlassCard>
       )}
 
+      {/* Breastfeeding note */}
+      {plan.profile.isBreastfeeding && (
+        <GlassCard className="!p-4" style={{ background: 'rgba(122,158,120,0.08)', border: '1px solid rgba(122,158,120,0.25)' }}>
+          <p className="text-[12px] font-semibold mb-1.5" style={{ color: '#7A9E78' }}>🤱 Poznámka pre kojace mamičky</p>
+          <p className="text-[12px] leading-relaxed mb-2" style={{ color: '#2E2218' }}>
+            Keďže kojíš, tvoj stravovací plán nie je nastavený na veľký kalorický deficit. Je zameraný na vyváženú a nutrične bohatú stravu, ktorá ti pomôže sa lepšie cítiť a naštartovať metabolizmus.
+          </p>
+          <p className="text-[11px] italic leading-relaxed" style={{ color: '#8B7560' }}>
+            Tvoje kojenie je odzrkadlené v tvojom dennom kalorickom príjme. Ak znížiš počet kŕmení alebo prestaneš kojiť, bude potrebné si upraviť profil.
+          </p>
+        </GlassCard>
+      )}
+
       {/* Meals — dual cards for today/future, single for past */}
       <div className="space-y-3">
         {day?.meals.map((meal, mealIdx) => (

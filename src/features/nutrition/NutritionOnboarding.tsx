@@ -1,6 +1,7 @@
 import { useState, type CSSProperties } from 'react';
 import GlassCard from '../../components/v2/GlassCard';
 import type { NutritionProfile } from './types';
+import { getBreastfeedingBonus } from './useNutritionProfile';
 
 /* ─── colour tokens ─── */
 const PRIMARY = '#6B4C3B';
@@ -120,23 +121,33 @@ function deriveActivityLevel(
 }
 
 const ACTIVITY_MULTIPLIER = { sedentary: 1.2, light: 1.375, moderate: 1.55, active: 1.725 };
-const MIN_CALORIES = 1500;
+const MIN_CALORIES_DEFAULT = 1500;
+const MIN_CALORIES_BREASTFEEDING = 1800;
 
-function calcNutrition(w: number, h: number, age: number, activity: string, goal: Goal, isBreastfeeding: boolean) {
+function calcNutrition(
+  w: number,
+  h: number,
+  age: number,
+  activity: string,
+  goal: Goal,
+  isBreastfeeding: boolean,
+  bfFrequency?: number,
+) {
   const bmr = 10 * w + 6.25 * h - 5 * age - 161;
   const tdeeRaw = Math.round(bmr * (ACTIVITY_MULTIPLIER[activity as keyof typeof ACTIVITY_MULTIPLIER] ?? 1.2));
-  const bfBonus = isBreastfeeding ? 330 : 0;
+  const bfBonus = getBreastfeedingBonus(isBreastfeeding, bfFrequency);
+  const floor = isBreastfeeding ? MIN_CALORIES_BREASTFEEDING : MIN_CALORIES_DEFAULT;
 
   // Smart deficit: sedentary → max 200 kcal deficit, others → 300 kcal
   let deficit = 0;
   let targetCal: number;
   if (goal === 'maintain') {
-    targetCal = tdeeRaw + bfBonus;
+    targetCal = Math.max(floor, tdeeRaw + bfBonus);
   } else if (goal === 'gain') {
-    targetCal = tdeeRaw + 250 + bfBonus;
+    targetCal = Math.max(floor, tdeeRaw + 250 + bfBonus);
   } else {
     deficit = activity === 'sedentary' ? 200 : 300;
-    targetCal = Math.max(MIN_CALORIES, tdeeRaw - deficit + bfBonus);
+    targetCal = Math.max(floor, tdeeRaw - deficit + bfBonus);
     // Recalculate actual deficit after floor
     deficit = tdeeRaw - (targetCal - bfBonus);
   }
@@ -150,7 +161,7 @@ function calcNutrition(w: number, h: number, age: number, activity: string, goal
   const fiberG = age >= 38 ? 30 : 25;
   const proteinPct = Math.round((proteinG * 4 / targetCal) * 100);
   const carbPct = Math.round((carbCal / targetCal) * 100);
-  return { tdee: tdeeRaw, targetCal, deficit, proteinG, carbG, fatG, fiberG, proteinPerKg, proteinPct, carbPct };
+  return { tdee: tdeeRaw, targetCal, deficit, proteinG, carbG, fatG, fiberG, proteinPerKg, proteinPct, carbPct, bfBonus };
 }
 
 function getWaistRisk(cm: number): { label: string; color: string; desc: string } {
@@ -289,7 +300,8 @@ export default function NutritionOnboarding({
     const a = parseInt(age) || 25;
     const allSports = sportsOther.trim() ? [...sports, sportsOther.trim()] : sports;
     const activity = deriveActivityLevel(regularDay, stepsRange, allSports.length, sportsFrequency ?? 0);
-    return calcNutrition(w, h, a, activity, goal ?? 'maintain', isBreastfeeding === true);
+    const bfFreq = bfFrequency ? parseInt(bfFrequency) : undefined;
+    return calcNutrition(w, h, a, activity, goal ?? 'maintain', isBreastfeeding === true, bfFreq);
   };
 
   const canNext = (): boolean => {
@@ -699,7 +711,12 @@ export default function NutritionOnboarding({
             <label style={s.label}>Koľkokrát za 24 hodín?</label>
             <input style={s.input} type="number" inputMode="numeric" value={bfFrequency}
               onChange={e => setBfFrequency(e.target.value)} placeholder="napr. 6" />
-            <div style={{ fontSize: 11, color: ACCENT, marginTop: 6 }}>+330 kcal bude pridaných k dennému príjmu.</div>
+            <div style={{ fontSize: 11, color: ACCENT, marginTop: 6, lineHeight: 1.5 }}>
+              Podľa počtu kŕmení ti pridáme +250 až +500 kcal. Ak nevyplníš, použijeme +300 kcal.
+            </div>
+            <div style={{ fontSize: 11, color: MUTED, marginTop: 6, lineHeight: 1.5, fontStyle: 'italic' }}>
+              Ak neskôr znížiš počet kŕmení alebo prestaneš kojiť, nezabudni si upraviť profil — tvoj denný kalorický príjem sa tomu prispôsobí.
+            </div>
           </div>
         )}
       </GlassCard>
@@ -757,8 +774,11 @@ export default function NutritionOnboarding({
                 <div style={{ fontSize: 28, fontWeight: 700, color: PRIMARY }}>{n.targetCal} kcal</div>
                 <div style={{ fontSize: 12, color: MUTED_LIGHT }}>– {n.deficit} kcal/deň</div>
               </div>
-              {n.targetCal === 1500 && (
+              {n.targetCal === 1500 && !isBreastfeeding && (
                 <div style={{ fontSize: 11, color: ACCENT, marginTop: 4 }}>Minimálny odporúčaný príjem pre ženy.</div>
+              )}
+              {n.targetCal === 1800 && isBreastfeeding && (
+                <div style={{ fontSize: 11, color: ACCENT, marginTop: 4 }}>Minimálny odporúčaný príjem pre kojace ženy.</div>
               )}
             </div>
           )}
@@ -768,10 +788,22 @@ export default function NutritionOnboarding({
               <div style={{ fontSize: 28, fontWeight: 700, color: PRIMARY }}>{n.targetCal} kcal</div>
             </div>
           )}
-          {isBreastfeeding && (
-            <div style={{ marginTop: 8, fontSize: 11, color: GREEN }}>🤱 +330 kcal zahrnuté pre laktáciu</div>
+          {isBreastfeeding && n.bfBonus > 0 && (
+            <div style={{ marginTop: 8, fontSize: 11, color: GREEN }}>🤱 +{n.bfBonus} kcal zahrnuté pre laktáciu</div>
           )}
         </GlassCard>
+
+        {isBreastfeeding && (
+          <GlassCard style={{ padding: '14px 16px', marginBottom: 10, background: 'rgba(122,158,120,0.08)', border: '1px solid rgba(122,158,120,0.25)' }}>
+            <div style={{ fontSize: 12, fontWeight: 600, color: GREEN, marginBottom: 6 }}>🤱 Poznámka pre kojace mamičky</div>
+            <div style={{ fontSize: 12, color: PRIMARY, lineHeight: 1.55, marginBottom: 6 }}>
+              Keďže kojíš, tvoj stravovací plán nie je nastavený na veľký kalorický deficit. Je zameraný na vyváženú a nutrične bohatú stravu, ktorá ti pomôže sa lepšie cítiť a naštartovať metabolizmus.
+            </div>
+            <div style={{ fontSize: 11, color: MUTED, lineHeight: 1.5, fontStyle: 'italic' }}>
+              Tvoje kojenie je odzrkadlené v tvojom dennom kalorickom príjme. Ak znížiš počet kŕmení alebo prestaneš kojiť, bude potrebné si upraviť profil.
+            </div>
+          </GlassCard>
+        )}
 
         {/* Macros */}
         <GlassCard style={{ padding: '18px' }}>
