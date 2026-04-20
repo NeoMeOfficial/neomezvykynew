@@ -230,7 +230,7 @@ export default function JedalnicekPlanner() {
             Keďže kojíš, tvoj stravovací plán nie je nastavený na veľký kalorický deficit. Je zameraný na vyváženú a nutrične bohatú stravu, ktorá ti pomôže sa lepšie cítiť a naštartovať metabolizmus.
           </p>
           <p className="text-[11px] italic leading-relaxed" style={{ color: '#8B7560' }}>
-            Tvoje kojenie je odzrkadlené v tvojom dennom kalorickom príjme. Ak znížiš počet kŕmení alebo prestaneš kojiť, bude potrebné si upraviť profil.
+            Tvoje kojenie je odzrkadlené v tvojom dennom kalorickom príjme. Ak znížiš počet kŕmení alebo prestaneš kojiť, bude potrebné nanovo vytvoriť stravovací plán podľa nových údajov.
           </p>
         </GlassCard>
       )}

@@ -715,7 +715,7 @@ export default function NutritionOnboarding({
               Podľa počtu kŕmení ti pridáme +250 až +500 kcal. Ak nevyplníš, použijeme +300 kcal.
             </div>
             <div style={{ fontSize: 11, color: MUTED, marginTop: 6, lineHeight: 1.5, fontStyle: 'italic' }}>
-              Ak neskôr znížiš počet kŕmení alebo prestaneš kojiť, nezabudni si upraviť profil — tvoj denný kalorický príjem sa tomu prispôsobí.
+              Ak neskôr znížiš počet kŕmení alebo prestaneš kojiť, bude potrebné nanovo vytvoriť stravovací plán podľa nových údajov.
             </div>
           </div>
         )}
@@ -800,7 +800,7 @@ export default function NutritionOnboarding({
               Keďže kojíš, tvoj stravovací plán nie je nastavený na veľký kalorický deficit. Je zameraný na vyváženú a nutrične bohatú stravu, ktorá ti pomôže sa lepšie cítiť a naštartovať metabolizmus.
             </div>
             <div style={{ fontSize: 11, color: MUTED, lineHeight: 1.5, fontStyle: 'italic' }}>
-              Tvoje kojenie je odzrkadlené v tvojom dennom kalorickom príjme. Ak znížiš počet kŕmení alebo prestaneš kojiť, bude potrebné si upraviť profil.
+              Tvoje kojenie je odzrkadlené v tvojom dennom kalorickom príjme. Ak znížiš počet kŕmení alebo prestaneš kojiť, bude potrebné nanovo vytvoriť stravovací plán podľa nových údajov.
             </div>
           </GlassCard>
         )}
