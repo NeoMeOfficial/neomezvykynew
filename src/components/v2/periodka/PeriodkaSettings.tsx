@@ -9,13 +9,7 @@ import { useCycleData } from '../../../features/cycle/useCycleData';
 import { getNextPeriodDate, formatDateSk, getCurrentCycleDay, getPhaseByDay, getPhaseRanges } from '../../../features/cycle/utils';
 import { colors } from '../../../theme/warmDusk';
 
-// Consistent phase names matching DailyOverview
-const PHASE_NAMES: Record<string, string> = {
-  menstrual: 'Menštruácia',
-  follicular: 'Folikulárna fáza',
-  ovulation: 'Ovulácia',
-  luteal: 'Luteálna fáza',
-};
+import { PHASE_NAMES } from '../../../features/cycle/constants';
 
 // Period history types
 interface PeriodHistoryEntry {

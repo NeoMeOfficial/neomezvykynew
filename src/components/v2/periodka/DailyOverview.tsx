@@ -61,28 +61,18 @@ const getSymptomsForDate = (date: string): DaySymptoms[] => {
   return symptomData.filter(item => item.date === date);
 };
 
+import { PHASE_COLORS as _PHASE_COLORS, PHASE_NAMES as _PHASE_NAMES, PHASE_DESCRIPTIONS, FERTILITY_COLOR, FERTILITY_NAME } from '../../../features/cycle/constants';
+
 const PHASE_COLORS: Record<PhaseKey | 'fertility', string> = {
-  menstrual: '#C27A6E',
-  follicular: '#7A9E78', 
-  ovulation: '#8B5FBF',  // Changed to more visible purple-pink
-  luteal: '#B8864A',
-  fertility: '#E91E63',  // Pink color for fertility days
+  ..._PHASE_COLORS,
+  fertility: FERTILITY_COLOR,
 };
 
 const PHASE_NAMES: Record<PhaseKey | 'fertility', string> = {
-  menstrual: 'Menštruácia',
-  follicular: 'Folikulárna fáza',
-  ovulation: 'Ovulácia', 
-  luteal: 'Luteálna fáza',
-  fertility: 'Plodné dni',
+  ..._PHASE_NAMES,
+  fertility: FERTILITY_NAME,
 };
 
-const PHASE_DESCRIPTIONS: Record<PhaseKey, string> = {
-  menstrual: 'Tvoje telo sa regeneruje a obnovuje. Hladiny estrogénu a progesterónu sú nízke, čo môže spôsobiť únavu a potrebu odpočinku.',
-  follicular: 'Energia sa postupne vracia! Estrogén stúpa, čo zlepšuje náladu a motiváciu. Ideálny čas na nové výzvy a projekty.',
-  ovulation: 'Vrchol energie a sebavedomia. Estrogén je na maximum, telo uvoľňuje vajíčko. Cítiš sa sociálnejšia, komunikatívnejšia a plná sily.',
-  luteal: 'Telo sa pripravuje na ďalší cyklus. Progesterón stúpa, môžeš cítiť potrebu spomalenia a starostlivosti o seba.',
-};
 
 // Subphase-specific descriptions for luteal phase
 const LUTEAL_DESCRIPTIONS: Record<'early' | 'late', { short: string; long: string; name: string }> = {

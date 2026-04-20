@@ -23,8 +23,6 @@ const Spravy = lazy(() => import('./pages/v2/Spravy'));
 const Profil = lazy(() => import('./pages/v2/Profil'));
 const Recepty = lazy(() => import('./pages/v2/Recepty'));
 const RecipeDetail = lazy(() => import('./pages/v2/RecipeDetail'));
-const ReceptySpoonacular = lazy(() => import('./pages/v2/Recepty-Spoonacular'));
-const RecipeDetailSpoonacular = lazy(() => import('./pages/v2/RecipeDetail-Spoonacular'));
 const Meditacie = lazy(() => import('./pages/v2/Meditacie'));
 const MeditationPlayer = lazy(() => import('./pages/v2/MeditationPlayer'));
 const ExercisePlayer = lazy(() => import('./pages/v2/ExercisePlayer'));
@@ -158,8 +156,6 @@ export default function AppV2() {
               <Route path="/admin/referrals" element={<AdminReferrals />} />
               <Route path="/recepty" element={<Recepty />} />
               <Route path="/recept/:id" element={<RecipeDetail />} />
-              <Route path="/recepty-spoonacular" element={<ReceptySpoonacular />} />
-              <Route path="/recepty-spoonacular/:id" element={<RecipeDetailSpoonacular />} />
               <Route path="/meditacie" element={<Meditacie />} />
               <Route path="/meditacia/:meditationId" element={<MeditationPlayer />} />
               <Route path="/exercise-player" element={<ExercisePlayer />} />

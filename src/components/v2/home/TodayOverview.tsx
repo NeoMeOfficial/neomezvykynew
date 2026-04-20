@@ -16,21 +16,7 @@ import { useUserProgram, usePromotionalOffers } from '../../../hooks/useUserProg
 import { PromotionalBanner } from './PromotionalBanner';
 import { getRecommendedExercise } from '../../../data/exercises';
 
-const PHASE_NAMES: Record<PhaseKey, string> = {
-  menstrual: 'Menštruácia', follicular: 'Folikulárna fáza', ovulation: 'Ovulácia', luteal: 'Luteálna fáza',
-};
-const PHASE_EMOJI: Record<PhaseKey, string> = {
-  menstrual: '🌸', follicular: '🌱', ovulation: '✨', luteal: '🌙',
-};
-const PHASE_COLORS: Record<PhaseKey, string> = {
-  menstrual: colors.periodka, follicular: colors.strava, ovulation: colors.mysel, luteal: colors.accent,
-};
-const PHASE_MESSAGES: Record<PhaseKey, string> = {
-  menstrual: 'Tvoje telo regeneruje — dopraj si pokoj a teplo',
-  follicular: 'Energia rastie — skvelý čas na nové výzvy!',
-  ovulation: 'Si na vrchole energie — využi to naplno!',
-  luteal: 'Spomaľ a počúvaj svoje telo — zaslúžiš si starostlivosť',
-};
+import { PHASE_NAMES, PHASE_COLORS, PHASE_MESSAGES } from '../../../features/cycle/constants';
 
 // Phase descriptions for better user guidance
 const PHASE_DESCRIPTIONS: Record<PhaseKey, string> = {

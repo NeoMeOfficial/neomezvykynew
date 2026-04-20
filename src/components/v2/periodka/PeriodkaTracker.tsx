@@ -20,26 +20,7 @@ import { usePaywall } from '../../../hooks/useSubscriptionStatus';
 import PaywallModal from '../subscription/PaywallModal';
 import { colors, glassCard } from '../../theme/warmDusk';
 
-const PHASE_COLORS: Record<PhaseKey, string> = {
-  menstrual: '#C27A6E',
-  follicular: '#7A9E78',
-  ovulation: '#A8848B',
-  luteal: '#B8864A',
-};
-
-const PHASE_NAMES: Record<PhaseKey, string> = {
-  menstrual: 'Menštruácia',
-  follicular: 'Folikulárna fáza',
-  ovulation: 'Ovulácia',
-  luteal: 'Luteálna fáza',
-};
-
-const PHASE_MESSAGES: Record<PhaseKey, string> = {
-  menstrual: 'Tvoje telo regeneruje — dopraj si pokoj a teplo 🌸',
-  follicular: 'Energia rastie — skvelý čas na nové výzvy! 🌱',
-  ovulation: 'Si na vrchole energie — využi to naplno! ✨',
-  luteal: 'Spomaľ a počúvaj svoje telo — zaslúžiš si starostlivosť 🌙',
-};
+import { PHASE_COLORS, PHASE_NAMES, PHASE_MESSAGES, PHASE_EMOJI } from '../../../features/cycle/constants';
 
 const EXERCISE_REC: Record<PhaseKey, string> = {
   menstrual: 'Jemná joga alebo strečing',
@@ -240,7 +221,7 @@ export default function PeriodkaTracker() {
           {PHASE_NAMES[phase.key]}
         </p>
         <p className="text-[13px] text-[#8B7560] mt-1 leading-snug">
-          {PHASE_MESSAGES[phase.key]}
+          {PHASE_MESSAGES[phase.key]} {PHASE_EMOJI[phase.key]}
         </p>
         <div className="mt-4 flex items-baseline gap-1">
           <span className="text-3xl font-semibold text-[#2E2218]">Deň {displayDay}</span>

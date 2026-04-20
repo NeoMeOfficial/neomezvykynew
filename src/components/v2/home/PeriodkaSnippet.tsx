@@ -8,23 +8,7 @@ import { suggestForDay } from '../../../features/cycle/suggestions';
 import type { PhaseKey } from '../../../features/cycle/types';
 import { differenceInDays } from 'date-fns';
 
-const PHASE_COLORS: Record<PhaseKey, string> = {
-  menstrual: colors.periodka,
-  follicular: colors.strava,
-  ovulation: colors.mysel,
-  luteal: colors.accent,
-};
-
-const PHASE_NAMES: Record<PhaseKey, string> = {
-  menstrual: 'Menštruácia',
-  follicular: 'Folikulárna fáza',
-  ovulation: 'Ovulácia',
-  luteal: 'Luteálna fáza',
-};
-
-const PHASE_EMOJI: Record<PhaseKey, string> = {
-  menstrual: '🌸', follicular: '🌱', ovulation: '✨', luteal: '🌙',
-};
+import { PHASE_COLORS, PHASE_NAMES, PHASE_EMOJI } from '../../../features/cycle/constants';
 
 const PHASE_MESSAGES: Record<PhaseKey, string> = {
   menstrual: 'Tvoje telo regeneruje — dopraj si pokoj a teplo',
