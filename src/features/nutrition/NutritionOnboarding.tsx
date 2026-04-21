@@ -16,7 +16,7 @@ type RegularDay = 'sedentary_work' | 'on_feet' | 'with_kids';
 type StepsRange = '<5000' | '5000-10000' | '>10000';
 type DietType = 'standard' | 'semi-vegetarian' | 'vegetarian';
 type FavMeal = 'ranajky' | 'obed' | 'vecera' | 'snack';
-type Allergy = 'gluten' | 'dairy' | 'eggs' | 'fish' | 'shellfish' | 'nuts' | 'peanuts' | 'soy' | 'celery' | 'mustard' | 'sesame' | 'sulfites' | 'lupin' | 'molluscs';
+type Allergy = 'gluten' | 'dairy' | 'eggs' | 'fish' | 'nuts' | 'peanuts' | 'soy' | 'celery' | 'mustard' | 'sesame';
 
 /* ─── step → section mapping ─── */
 // 12 internal steps mapping to 7 user-visible sections
@@ -55,16 +55,12 @@ const ALLERGY_LABELS: { key: Allergy; label: string }[] = [
   { key: 'dairy', label: 'Mlieko / laktóza' },
   { key: 'eggs', label: 'Vajcia' },
   { key: 'fish', label: 'Ryby' },
-  { key: 'shellfish', label: 'Kôrovce' },
   { key: 'nuts', label: 'Orechy (mandle, vlašské...)' },
   { key: 'peanuts', label: 'Arašidy' },
   { key: 'soy', label: 'Sója' },
   { key: 'celery', label: 'Zeler' },
   { key: 'mustard', label: 'Horčica' },
   { key: 'sesame', label: 'Sezam' },
-  { key: 'sulfites', label: 'Siričitany' },
-  { key: 'lupin', label: 'Vlčí bôb' },
-  { key: 'molluscs', label: 'Mäkkýše' },
 ];
 
 const INGREDIENT_SUGGESTIONS = [
@@ -762,34 +758,82 @@ export default function NutritionOnboarding({
       <>
         <div style={s.title}>Tvoj výživový plán</div>
 
-        {/* TDEE + calorie goal card */}
-        <GlassCard style={{ padding: '20px 18px', marginBottom: 10 }}>
-          <div style={{ fontSize: 12, color: MUTED, marginBottom: 4 }}>Tvoj denný energetický výdaj</div>
-          <div style={{ fontSize: 36, fontWeight: 700, color: PRIMARY, lineHeight: 1 }}>{n.tdee} kcal</div>
+        {/* Hero card — final recommended intake */}
+        <GlassCard style={{ padding: '22px 20px', marginBottom: 12, textAlign: 'center' }}>
+          <div style={{ fontSize: 12, color: MUTED, marginBottom: 6, letterSpacing: 0.3, textTransform: 'uppercase', fontWeight: 600 }}>
+            Tvoj denný príjem
+          </div>
+          <div style={{ fontSize: 52, fontWeight: 800, color: PRIMARY, lineHeight: 1, letterSpacing: -1 }}>
+            {n.targetCal}
+          </div>
+          <div style={{ fontSize: 14, color: MUTED, marginTop: 4, fontWeight: 500 }}>kcal za deň</div>
+          <div style={{ fontSize: 12, color: MUTED_LIGHT, marginTop: 10, lineHeight: 1.5, padding: '0 4px' }}>
+            Vypočítané na mieru tebe — podľa tvojich aktivít{goal === 'lose' ? ', cieľa schudnúť' : goal === 'gain' ? ', cieľa nabrať' : ''}{isBreastfeeding ? ' a kojenia' : ''}.
+          </div>
+        </GlassCard>
 
-          {goal === 'lose' && (
-            <div style={{ marginTop: 12, padding: '10px 12px', borderRadius: 10, background: 'rgba(107,76,59,0.06)', border: '1px solid rgba(107,76,59,0.12)' }}>
-              <div style={{ fontSize: 12, color: MUTED, marginBottom: 2 }}>Na dosiahnutie cieľa ({goalLabel}) odporúčam</div>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-                <div style={{ fontSize: 28, fontWeight: 700, color: PRIMARY }}>{n.targetCal} kcal</div>
-                <div style={{ fontSize: 12, color: MUTED_LIGHT }}>– {n.deficit} kcal/deň</div>
+        {/* Breakdown — how we got there */}
+        <GlassCard style={{ padding: '16px 18px', marginBottom: 10 }}>
+          <div style={{ fontSize: 12, color: MUTED, marginBottom: 12, fontWeight: 600, letterSpacing: 0.2 }}>
+            Ako sme sa k tomuto číslu dostali
+          </div>
+
+          {/* Step 1 — baseline TDEE */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, paddingBottom: 12, borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: PRIMARY, marginBottom: 2 }}>Základné potreby tvojho tela</div>
+              <div style={{ fontSize: 11, color: MUTED_LIGHT, lineHeight: 1.4 }}>Koľko kalórií spáliš za deň podľa tvojich aktivít</div>
+            </div>
+            <div style={{ fontSize: 15, fontWeight: 700, color: PRIMARY, whiteSpace: 'nowrap' }}>{n.tdee} kcal</div>
+          </div>
+
+          {/* Step 2 — goal adjustment */}
+          {goal === 'lose' && n.deficit > 0 && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, paddingTop: 12, paddingBottom: 12, borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: PRIMARY, marginBottom: 2 }}>Mierny deficit na chudnutie</div>
+                <div style={{ fontSize: 11, color: MUTED_LIGHT, lineHeight: 1.4 }}>Udržateľné chudnutie bez hladovania</div>
               </div>
-              {n.targetCal === 1500 && !isBreastfeeding && (
-                <div style={{ fontSize: 11, color: ACCENT, marginTop: 4 }}>Minimálny odporúčaný príjem pre ženy.</div>
-              )}
-              {n.targetCal === 1800 && isBreastfeeding && (
-                <div style={{ fontSize: 11, color: ACCENT, marginTop: 4 }}>Minimálny odporúčaný príjem pre kojace ženy.</div>
-              )}
+              <div style={{ fontSize: 15, fontWeight: 700, color: '#C27A6E', whiteSpace: 'nowrap' }}>−{n.deficit} kcal</div>
             </div>
           )}
-          {goal !== 'lose' && (
-            <div style={{ marginTop: 12, padding: '10px 12px', borderRadius: 10, background: 'rgba(107,76,59,0.06)', border: '1px solid rgba(107,76,59,0.12)' }}>
-              <div style={{ fontSize: 12, color: MUTED, marginBottom: 2 }}>Odporúčaný denný príjem ({goalLabel})</div>
-              <div style={{ fontSize: 28, fontWeight: 700, color: PRIMARY }}>{n.targetCal} kcal</div>
+          {goal === 'gain' && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, paddingTop: 12, paddingBottom: 12, borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: PRIMARY, marginBottom: 2 }}>Mierny prebytok na naberanie</div>
+                <div style={{ fontSize: 11, color: MUTED_LIGHT, lineHeight: 1.4 }}>Pre zdravý rast svalovej hmoty</div>
+              </div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: GREEN, whiteSpace: 'nowrap' }}>+250 kcal</div>
             </div>
           )}
+
+          {/* Step 3 — breastfeeding bonus */}
           {isBreastfeeding && n.bfBonus > 0 && (
-            <div style={{ marginTop: 8, fontSize: 11, color: GREEN }}>🤱 +{n.bfBonus} kcal zahrnuté pre laktáciu</div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, paddingTop: 12, paddingBottom: 12, borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: PRIMARY, marginBottom: 2 }}>🤱 Kojenie</div>
+                <div style={{ fontSize: 11, color: MUTED_LIGHT, lineHeight: 1.4 }}>Extra energia pre tvoje dieťatko</div>
+              </div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: GREEN, whiteSpace: 'nowrap' }}>+{n.bfBonus} kcal</div>
+            </div>
+          )}
+
+          {/* Result */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, paddingTop: 14, marginTop: 2 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: PRIMARY }}>Výsledok</div>
+            <div style={{ fontSize: 20, fontWeight: 800, color: ACCENT, whiteSpace: 'nowrap' }}>{n.targetCal} kcal</div>
+          </div>
+
+          {/* Floor notices */}
+          {n.targetCal === 1500 && !isBreastfeeding && goal === 'lose' && (
+            <div style={{ fontSize: 11, color: ACCENT, marginTop: 10, padding: '8px 10px', background: 'rgba(184,134,74,0.08)', borderRadius: 8, lineHeight: 1.4 }}>
+              ℹ️ Upravené na minimálny odporúčaný príjem pre ženy (1500 kcal).
+            </div>
+          )}
+          {n.targetCal === 1800 && isBreastfeeding && (
+            <div style={{ fontSize: 11, color: ACCENT, marginTop: 10, padding: '8px 10px', background: 'rgba(184,134,74,0.08)', borderRadius: 8, lineHeight: 1.4 }}>
+              ℹ️ Upravené na minimálny odporúčaný príjem pre kojace ženy (1800 kcal).
+            </div>
           )}
         </GlassCard>
 
