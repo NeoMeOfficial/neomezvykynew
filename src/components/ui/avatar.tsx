@@ -1,48 +1,57 @@
-import * as React from "react"
-import * as AvatarPrimitive from "@radix-ui/react-avatar"
+import * as React from 'react';
+import { cn } from '@/lib/utils';
 
-import { cn } from "@/lib/utils"
+/**
+ * Avatar — circular user avatar.
+ *
+ * Use `src` for an image, or `initial` for a typographic fallback.
+ *
+ * <Avatar src="/avatars/eva.jpg" size={40} />
+ * <Avatar initial="E" pillar="strava" />
+ */
+type PillarKey = 'telo' | 'strava' | 'mysel' | 'cyklus';
 
-const Avatar = React.forwardRef<
-  React.ElementRef<typeof AvatarPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Root>
->(({ className, ...props }, ref) => (
-  <AvatarPrimitive.Root
-    ref={ref}
-    className={cn(
-      "relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full",
-      className
-    )}
-    {...props}
-  />
-))
-Avatar.displayName = AvatarPrimitive.Root.displayName
+const PILLAR_BG: Record<PillarKey, { bg: string; text: string }> = {
+  telo:   { bg: 'bg-pillar-telo-100',   text: 'text-pillar-telo-700' },
+  strava: { bg: 'bg-pillar-strava-100', text: 'text-pillar-strava-700' },
+  mysel:  { bg: 'bg-pillar-mysel-100',  text: 'text-pillar-mysel-700' },
+  cyklus: { bg: 'bg-pillar-cyklus-100', text: 'text-pillar-cyklus-700' },
+};
 
-const AvatarImage = React.forwardRef<
-  React.ElementRef<typeof AvatarPrimitive.Image>,
-  React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Image>
->(({ className, ...props }, ref) => (
-  <AvatarPrimitive.Image
-    ref={ref}
-    className={cn("aspect-square h-full w-full", className)}
-    {...props}
-  />
-))
-AvatarImage.displayName = AvatarPrimitive.Image.displayName
+export interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
+  src?: string;
+  alt?: string;
+  initial?: string;
+  size?: number;
+  pillar?: PillarKey;
+}
 
-const AvatarFallback = React.forwardRef<
-  React.ElementRef<typeof AvatarPrimitive.Fallback>,
-  React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Fallback>
->(({ className, ...props }, ref) => (
-  <AvatarPrimitive.Fallback
-    ref={ref}
-    className={cn(
-      "flex h-full w-full items-center justify-center rounded-full bg-muted",
-      className
-    )}
-    {...props}
-  />
-))
-AvatarFallback.displayName = AvatarPrimitive.Fallback.displayName
-
-export { Avatar, AvatarImage, AvatarFallback }
+export const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
+  ({ className, src, alt, initial, size = 36, pillar = 'strava', style, ...props }, ref) => {
+    const colors = PILLAR_BG[pillar];
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          'inline-flex items-center justify-center rounded-full overflow-hidden flex-shrink-0',
+          !src && colors.bg,
+          !src && colors.text,
+          className
+        )}
+        style={{ width: size, height: size, fontSize: size * 0.42, ...style }}
+        {...props}
+      >
+        {src ? (
+          <img
+            src={src}
+            alt={alt || ''}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <span className="font-serif">{initial}</span>
+        )}
+      </div>
+    );
+  }
+);
+Avatar.displayName = 'Avatar';
