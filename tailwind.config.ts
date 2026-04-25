@@ -178,6 +178,10 @@ export default {
 				'display': '-0.015em',
 				'hero':    '-0.01em',
 			},
+			spacing: {
+				// NeoMe button heights (handoff-2 pill sizes use h-13)
+				'13': '3.25rem', // 52px
+			},
 			transitionTimingFunction: {
 				'nm':     'cubic-bezier(0.16, 1, 0.3, 1)',
 				'nm-std': 'cubic-bezier(0.4, 0, 0.2, 1)',
