@@ -104,8 +104,36 @@ export default {
 				blush: 'hsl(var(--blush))',
 				lavender: 'hsl(var(--lavender))',
 				mint: 'hsl(var(--mint))',
-				gold: 'hsl(var(--gold))',
-				// NeoMe design system tokens
+				// Legacy beach-palette gold (referenced via hsl(var(--gold)) in some files)
+				goldHsl: 'hsl(var(--gold))',
+				// NeoMe design system tokens (handoff-2 adoption — 2026-04-25)
+				pillar: {
+					telo:   { DEFAULT: '#C1856A', 100: '#EAD5C7', 300: '#D5AC95', 500: '#C1856A', 700: '#9C6148' },
+					strava: { DEFAULT: '#8B9E88', 100: '#D8DFD7', 300: '#B2BFB0', 500: '#8B9E88', 700: '#6B7C68' },
+					mysel:  { DEFAULT: '#A395AC', 100: '#E0D9E3', 300: '#C3B7CB', 500: '#A395AC', 700: '#7C6D88' },
+					cyklus: { DEFAULT: '#B08A9A', 100: '#E8D8DF', 300: '#CFB0BC', 500: '#B08A9A', 700: '#8A6775' },
+					myselCool: '#89B0BC',
+				},
+				cream: {
+					DEFAULT: '#F8F5F0',
+					50:  '#FBF9F5',
+					100: '#F8F5F0',
+					200: '#F1ECE3',
+					300: '#EAE3D6',
+				},
+				ink: {
+					DEFAULT: '#3D2921',
+					500: '#8B6959',
+					700: '#5F3E31',
+				},
+				gold: {
+					DEFAULT: '#B8965A',
+					100: '#EEDFC2',
+				},
+				sandy: '#D4C4B0',
+				success: '#6B8C5F',
+				danger: '#B5544A',
+				// Legacy NeoMe brand tokens (kept for any prior callsites)
 				neome: {
 					primary: '#5F3E31',
 					bg: '#F6F6F1',
@@ -117,22 +145,42 @@ export default {
 				}
 			},
 			fontFamily: {
-				// Display/editorial serif — matches NeoMe website headlines
-				'display': ['"Bodoni Moda"', 'Georgia', 'serif'],
-				// Body/UI sans — matches NeoMe website body text
-				'sans': ['"DM Sans"', 'system-ui', 'sans-serif'],
-				// Aliases kept for any legacy references
-				'lufga': ['"DM Sans"', 'system-ui', 'sans-serif'],
+				// NeoMe (handoff-2): Gilda Display + DM Sans
+				'serif':   ['Gilda Display', 'Didot', 'Bodoni 72', 'Georgia', 'serif'],
+				'sans':    ['DM Sans', 'system-ui', '-apple-system', 'sans-serif'],
+				'display': ['Gilda Display', 'Didot', 'Bodoni 72', 'Georgia', 'serif'],
+				'body':    ['DM Sans', 'system-ui', '-apple-system', 'sans-serif'],
+				// Legacy alias kept so any prior `font-lufga` references compile.
+				'lufga':   ['DM Sans', 'system-ui', 'sans-serif'],
 			},
 			fontSize: {
-				// Optimized for readability - minimum 16px for body text on mobile
-				'mobile-xs': ['12px', { lineHeight: '18px', letterSpacing: '0.01em' }], // Labels, captions
-				'mobile-sm': ['14px', { lineHeight: '21px', letterSpacing: '0.01em' }], // Small text, metadata
-				'mobile-base': ['16px', { lineHeight: '24px', letterSpacing: '0.01em' }], // Body text (minimum readable size)
-				'mobile-lg': ['18px', { lineHeight: '28px', letterSpacing: '0.01em' }], // Subheadings
-				'mobile-xl': ['20px', { lineHeight: '30px', letterSpacing: '0.01em' }], // Section headings
-				'mobile-2xl': ['24px', { lineHeight: '32px', letterSpacing: '0.01em' }], // Page titles
-				'mobile-3xl': ['28px', { lineHeight: '36px', letterSpacing: '0.01em' }], // Hero headings
+				// NeoMe type scale (handoff-2)
+				'display': ['42px', { lineHeight: '1.05', letterSpacing: '-0.015em' }],
+				'hero':    ['34px', { lineHeight: '1.05', letterSpacing: '-0.01em' }],
+				'h1':      ['28px', { lineHeight: '1.15' }],
+				'h2':      ['22px', { lineHeight: '1.15' }],
+				'h3':      ['18px', { lineHeight: '1.45' }],
+				'lg':      ['17px', { lineHeight: '1.55' }],
+				'md':      ['15px', { lineHeight: '1.55' }],
+				'sm':      ['13px', { lineHeight: '1.45' }],
+				'xs':      ['11px', { lineHeight: '1.45', letterSpacing: '0.24em' }],
+				// Legacy mobile-* scale kept (66 callsites still use these — migrate later)
+				'mobile-xs': ['12px', { lineHeight: '18px', letterSpacing: '0.01em' }],
+				'mobile-sm': ['14px', { lineHeight: '21px', letterSpacing: '0.01em' }],
+				'mobile-base': ['16px', { lineHeight: '24px', letterSpacing: '0.01em' }],
+				'mobile-lg': ['18px', { lineHeight: '28px', letterSpacing: '0.01em' }],
+				'mobile-xl': ['20px', { lineHeight: '30px', letterSpacing: '0.01em' }],
+				'mobile-2xl': ['24px', { lineHeight: '32px', letterSpacing: '0.01em' }],
+				'mobile-3xl': ['28px', { lineHeight: '36px', letterSpacing: '0.01em' }],
+			},
+			letterSpacing: {
+				'eyebrow': '0.24em',
+				'display': '-0.015em',
+				'hero':    '-0.01em',
+			},
+			transitionTimingFunction: {
+				'nm':     'cubic-bezier(0.16, 1, 0.3, 1)',
+				'nm-std': 'cubic-bezier(0.4, 0, 0.2, 1)',
 			},
 			backgroundImage: {
 				'gradient-primary': 'var(--gradient-primary)',
@@ -143,11 +191,20 @@ export default {
 			boxShadow: {
 				'neome': '0 4px 20px rgba(95, 62, 49, 0.08)',
 				'neome-lg': '0 8px 32px rgba(95, 62, 49, 0.12)',
+				// NeoMe (handoff-2)
+				'nm-xs': '0 1px 2px rgba(61, 41, 33, 0.04)',
+				'nm-sm': '0 2px 8px rgba(61, 41, 33, 0.05)',
+				'nm-md': '0 6px 24px rgba(61, 41, 33, 0.06)',
+				'nm-lg': '0 20px 60px rgba(61, 41, 33, 0.10)',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
-				sm: 'calc(var(--radius) - 4px)'
+				sm: 'calc(var(--radius) - 4px)',
+				// NeoMe (handoff-2)
+				'card':  '20px',
+				'hero':  '28px',
+				'sheet': '24px',
 			},
 			keyframes: {
 				'accordion-down': {

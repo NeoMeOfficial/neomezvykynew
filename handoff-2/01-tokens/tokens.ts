@@ -1,33 +1,29 @@
 /**
  * NeoMe · Design Tokens (TypeScript)
  *
- * This file replaces the original "Warm Dusk" theme with the new NeoMe
- * design system from Claude Design (handoff-2).
+ * DROP-IN REPLACEMENT for `src/theme/warmDusk.ts`.
  *
- * NEW EXPORTS (preferred):
- *   section, pillar, surface, ink, text, border, accent, gold,
- *   success, danger, cyclePhase, fonts, fontSize, lineHeight,
- *   letterSpacing, radius, space, shadow, motion
+ * Strategy: keep the same export names so existing imports keep compiling.
+ * Internal values are the new NeoMe system.
  *
- * BACKWARDS-COMPAT EXPORTS (`colors`, `glassCard`, etc.):
- *   The previous warmDusk.ts exported `{ colors, textPrimary, ... }`
- *   used by ~113 files across src/. Those are aliased below so the
- *   existing imports keep compiling. New code should prefer the
- *   typed exports above.
+ * Old name → new meaning:
+ *   section.telo     → terracotta (Telo / Body / Movement)
+ *   section.strava   → sage       (Strava / Výživa / Nutrition)
+ *   section.mysel    → mauve      (Myseľ / Mind)
+ *   section.periodka → dusty rose (Cyklus / Period)
+ *   accent           → gold       (Plus tier marker)
  *
- * To migrate `colors.*` callsites: replace `colors.telo` → `section.telo`,
- * `colors.textPrimary` → `text.primary`, etc. Then delete the alias block
- * at the bottom of this file.
+ * After porting this file, also update:
+ *   - src/index.css  (HSL block — see ./index.css)
+ *   - tailwind.config.ts (mappings — see ./tailwind.config.snippet.ts)
  */
-
-import type { CSSProperties } from 'react';
 
 // ── Pillar accents ─────────────────────────────────────────────────
 export const section = {
   telo:     '#C1856A', // terracotta — Telo / Body
   strava:   '#8B9E88', // sage       — Strava / Výživa
   mysel:    '#A395AC', // mauve      — Myseľ / Mind
-  periodka: '#B08A9A', // dusty rose — Cyklus / Period (kept name "periodka": user-facing name stays Periodka)
+  periodka: '#B08A9A', // dusty rose — Cyklus / Period
 } as const;
 
 // Pillar tints — for backgrounds, chips, soft fills
@@ -67,14 +63,14 @@ export const text = {
   onDark3:   'rgba(255, 255, 255, 0.48)',
 } as const;
 
-// Backwards-compat top-level text aliases.
+// Backwards-compat aliases — keep old names from warmDusk.ts compiling.
 export const textPrimary   = text.primary;
 export const textSecondary = text.secondary;
 export const textTertiary  = text.tertiary;
 
 // ── Borders ────────────────────────────────────────────────────────
 export const border = {
-  hair:       'rgba(61, 41, 33, 0.08)',
+  hair:       'rgba(61, 41, 33, 0.08)', // 1px warm border
   hairStrong: 'rgba(61, 41, 33, 0.14)',
 } as const;
 
@@ -89,32 +85,31 @@ export const gold = {
 export const success = '#6B8C5F';
 export const danger  = '#B5544A';
 
-// ── Cycle phases (used by Periodka) ────────────────────────────────
+// ── Cycle phases ───────────────────────────────────────────────────
+// (Used by Cyklus screens — phase-tinted backgrounds.)
 export const cyclePhase = {
-  menstruation: '#B08A9A',
-  follicular:   '#A395AC',
-  ovulation:    '#C1856A',
-  luteal:       '#8B9E88',
+  menstruation: '#B08A9A', // dusty rose
+  follicular:   '#A395AC', // mauve
+  ovulation:    '#C1856A', // terracotta
+  luteal:       '#8B9E88', // sage
 } as const;
 
 // ── Typography ─────────────────────────────────────────────────────
 export const fonts = {
   display: "'Gilda Display', 'Didot', 'Bodoni 72', Georgia, serif",
   body:    "'DM Sans', system-ui, -apple-system, sans-serif",
-  // Legacy alias — old code uses `fonts.sans`.
-  sans:    "'DM Sans', system-ui, -apple-system, sans-serif",
 } as const;
 
 export const fontSize = {
-  display: '42px',
-  hero:    '34px',
-  h1:      '28px',
-  h2:      '22px',
-  h3:      '18px',
-  lg:      '17px',
-  md:      '15px',
-  sm:      '13px',
-  xs:      '11px',
+  display: '42px', // onboarding hero
+  hero:    '34px', // screen headers
+  h1:      '28px', // section headers
+  h2:      '22px', // card headers
+  h3:      '18px', // sub-headers
+  lg:      '17px', // lead body
+  md:      '15px', // body
+  sm:      '13px', // meta / caption
+  xs:      '11px', // pill labels only
 } as const;
 
 export const lineHeight = {
@@ -136,8 +131,8 @@ export const radius = {
   xs:   '8px',
   sm:   '12px',
   md:   '16px',
-  lg:   '20px',
-  xl:   '28px',
+  lg:   '20px',  // card default
+  xl:   '28px',  // hero card
   '2xl':'36px',
   pill: '9999px',
 } as const;
@@ -177,6 +172,8 @@ export const motion = {
 // New code should prefer Tailwind classes over these; they exist so
 // existing screens that import { glassCard } etc. keep rendering.
 
+import type { CSSProperties } from 'react';
+
 export const glassCard: CSSProperties = {
   background: surface.white,
   borderRadius: radius.lg,
@@ -207,69 +204,13 @@ export const primaryButton: CSSProperties = {
   fontWeight: 500,
 };
 
-// Legacy: existing `iconContainer(sectionColor)` factory.
-export function iconContainer(sectionColor: string): CSSProperties {
-  return {
-    background: `${sectionColor}14`,
-    border: `1px solid ${sectionColor}20`,
-    borderRadius: 12,
-    boxShadow: `0 4px 12px ${sectionColor}10`,
-  };
-}
-
-// Legacy: section label utility style.
-export const sectionLabel: CSSProperties = {
-  color: text.secondary,
-  fontSize: 11,
-  fontWeight: 600,
-  textTransform: 'uppercase' as const,
-  letterSpacing: letterSpacing.eyebrow,
-};
-
-// ── Helpers ────────────────────────────────────────────────────────
+// ── Helper ─────────────────────────────────────────────────────────
 export type PillarKey = 'telo' | 'strava' | 'mysel' | 'cyklus';
 
 export const pillarColor = (key: PillarKey, shade: 100 | 300 | 500 | 700 = 500) => {
   const map = pillar[key as Exclude<PillarKey, 'cyklus'>] ?? pillar.cyklus;
   return map[shade];
 };
-
-// ══════════════════════════════════════════════════════════════════════
-// BACKWARDS-COMPAT: `colors` export.
-// Used by ~113 existing imports across src/. Each field maps to the
-// closest equivalent in the new system. To remove this block, migrate
-// callsites with: `colors.telo` → `section.telo`,
-//                 `colors.textPrimary` → `text.primary`,
-//                 `colors.phaseMenstrual` → `cyclePhase.menstruation`,
-//                 `colors.bgFlat` → `surface.cream100`, etc.
-// ══════════════════════════════════════════════════════════════════════
-export const colors = {
-  // Pillar accents
-  telo:     section.telo,
-  strava:   section.strava,
-  mysel:    section.mysel,
-  periodka: section.periodka,
-
-  // System accent
-  accent,
-
-  // Text hierarchy
-  textPrimary:   text.primary,
-  textSecondary: text.secondary,
-  textTertiary:  text.tertiary,
-
-  // Backgrounds — the old system used a beige gradient. The new
-  // system is flat cream. We provide a subtle cream-50 → cream-200
-  // gradient so existing pages keep some hierarchy until migrated.
-  bgGradient: 'linear-gradient(to bottom, #FBF9F5, #F1ECE3)',
-  bgFlat:     surface.cream100,
-
-  // Cycle phase tints (old: phaseMenstrual; new: cyclePhase.menstruation)
-  phaseMenstrual:  cyclePhase.menstruation,
-  phaseFollicular: cyclePhase.follicular,
-  phaseOvulation:  cyclePhase.ovulation,
-  phaseLuteal:     cyclePhase.luteal,
-} as const;
 
 // ── Default export — the whole theme as one object ─────────────────
 const theme = {
