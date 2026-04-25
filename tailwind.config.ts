@@ -120,6 +120,21 @@ export default {
 					100: '#F8F5F0',
 					200: '#F1ECE3',
 					300: '#EAE3D6',
+					// Screen aliases used in handoff-2 (cream-2 == cream-200)
+					'2': '#F1ECE3',
+				},
+				// Pillar accent aliases used directly in screens
+				terra:  '#C1856A',  // alias for pillar-telo
+				rose:   '#B08A9A',  // alias for pillar-cyklus
+				mauve:  '#A395AC',  // alias for pillar-mysel
+				// Hair = the standard 8% ink border
+				hair:   'rgba(61, 41, 33, 0.08)',
+				// Foreground tone shorthand used in screens (text-fg-3 / text-fg / text-fg-muted)
+				fg: {
+					DEFAULT: '#3D2921',
+					'2':     'rgba(61, 41, 33, 0.72)',
+					'3':     'rgba(61, 41, 33, 0.56)',
+					muted:   'rgba(61, 41, 33, 0.40)',
 				},
 				ink: {
 					DEFAULT: '#3D2921',

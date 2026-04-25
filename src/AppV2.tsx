@@ -50,6 +50,14 @@ const BuddySystem = lazy(() => import('./pages/v2/BuddySystem'));
 const Blog = lazy(() => import('./pages/v2/Blog'));
 const SubscriptionManagement = lazy(() => import('./pages/v2/SubscriptionManagement'));
 
+// New design system trial-batch screens (handoff-2)
+const HomeNew = lazy(() => import('./pages/v2/HomeNew'));
+const OnboardingWelcome = lazy(() => import('./pages/v2/OnboardingWelcome'));
+const OnboardingCycle = lazy(() => import('./pages/v2/OnboardingCycle'));
+const OnboardingNotifications = lazy(() => import('./pages/v2/OnboardingNotifications'));
+const SettingsHub = lazy(() => import('./pages/v2/SettingsHub'));
+const SettingsNotifications = lazy(() => import('./pages/v2/SettingsNotifications'));
+
 function LoadingSpinner() {
   const [loadingText, setLoadingText] = useState('Načítavam...');
   
@@ -116,14 +124,21 @@ export default function AppV2() {
             <Route path="/" element={<Welcome />} />
             <Route path="/welcome" element={<Welcome />} />
             <Route path="/onboarding" element={<Onboarding />} />
+            <Route path="/onboarding/welcome" element={<OnboardingWelcome />} />
+            <Route path="/onboarding/cycle" element={<OnboardingCycle />} />
+            <Route path="/onboarding/notifications" element={<OnboardingNotifications />} />
             <Route path="/ref/:code" element={<ReferralLanding />} />
             <Route path="/admin-new" element={<RequireAuth><AdminNew /></RequireAuth>} />
 
             {/* Protected routes */}
             <Route element={<RequireAuth><AppLayout /></RequireAuth>}>
               <Route path="/domov" element={<Navigate to="/domov-new" replace />} />
-              <Route path="/domov-new" element={<DomovNew />} />
-              <Route path="/new-home" element={<DomovNew />} />
+              <Route path="/domov-new" element={<HomeNew />} />
+              <Route path="/new-home" element={<HomeNew />} />
+              <Route path="/domov-legacy" element={<DomovNew />} />
+              <Route path="/nastavenia" element={<SettingsHub />} />
+              <Route path="/nastavenia/upozornenia" element={<SettingsNotifications />} />
+              <Route path="/nastavenia/notifikacie" element={<SettingsNotifications />} />
               <Route path="/kniznica" element={<Kniznica />} />
               <Route path="/kniznica/telo" element={<Telo />} />
               <Route path="/kniznica/telo/programy" element={<TeloPrograms />} />
