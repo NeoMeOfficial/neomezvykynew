@@ -1,0 +1,157 @@
+/* ══════════════════════════════════════════════════════════════════════════════
+   NeoMe · Global CSS — replaces the @layer base / shadcn HSL block in
+   src/index.css.
+
+   HOW TO MIGRATE
+   1. In your existing src/index.css, find the `:root { ... }` block that
+      defines --background, --foreground, --primary, etc. (HSL format).
+   2. Replace that whole :root block with the one below.
+   3. Replace the .dark variant the same way.
+   4. Keep the rest of your index.css (Tailwind directives, custom layers,
+      anything app-specific) untouched.
+   5. Add the @import line at the very top.
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Gilda+Display&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* ── shadcn surface tokens (HSL — required by shadcn primitives) ── */
+    --background:        36 32% 95%;   /* cream         #F8F5F0 */
+    --foreground:        18 30% 18%;   /* ink           #3D2921 */
+
+    --card:              0 0% 100%;    /* white         #FFFFFF */
+    --card-foreground:   18 30% 18%;
+
+    --popover:           0 0% 100%;
+    --popover-foreground:18 30% 18%;
+
+    --primary:           18 30% 18%;   /* ink           #3D2921 */
+    --primary-foreground:36 32% 95%;   /* cream */
+
+    --secondary:         34 28% 89%;   /* cream-200     #F1ECE3 */
+    --secondary-foreground: 18 30% 18%;
+
+    --muted:             34 28% 89%;
+    --muted-foreground:  18 19% 39%;   /* ink-500       #8B6959 */
+
+    --accent:            36 38% 54%;   /* gold          #B8965A */
+    --accent-foreground: 0  0% 100%;
+
+    --destructive:       6 41% 50%;    /* danger        #B5544A */
+    --destructive-foreground: 0 0% 100%;
+
+    --border:            18 30% 18% / 0.08;   /* hair */
+    --input:             18 30% 18% / 0.14;   /* hair-strong */
+    --ring:              18 30% 18%;          /* ink */
+
+    --radius:            1.25rem;             /* 20px = nm-r-lg */
+
+    /* ── NeoMe extensions (use Tailwind arbitrary or referenced as var) ── */
+    --nm-cream:        #F8F5F0;
+    --nm-cream-50:     #FBF9F5;
+    --nm-cream-100:    #F8F5F0;
+    --nm-cream-200:    #F1ECE3;
+    --nm-cream-300:    #EAE3D6;
+    --nm-ink:          #3D2921;
+    --nm-ink-700:      #5F3E31;
+    --nm-ink-500:      #8B6959;
+    --nm-white:        #FFFFFF;
+    --nm-sandy:        #D4C4B0;
+    --nm-hair:         rgba(61, 41, 33, 0.08);
+    --nm-hair-strong:  rgba(61, 41, 33, 0.14);
+
+    --nm-telo:         #C1856A;
+    --nm-telo-100:     #EAD5C7;
+    --nm-telo-300:     #D5AC95;
+    --nm-telo-500:     #C1856A;
+    --nm-telo-700:     #9C6148;
+
+    --nm-strava:       #8B9E88;
+    --nm-strava-100:   #D8DFD7;
+    --nm-strava-300:   #B2BFB0;
+    --nm-strava-500:   #8B9E88;
+    --nm-strava-700:   #6B7C68;
+
+    --nm-mysel:        #A395AC;
+    --nm-mysel-100:    #E0D9E3;
+    --nm-mysel-300:    #C3B7CB;
+    --nm-mysel-500:    #A395AC;
+    --nm-mysel-700:    #7C6D88;
+    --nm-mysel-cool:   #89B0BC;
+
+    --nm-cyklus:       #B08A9A;
+    --nm-cyklus-100:   #E8D8DF;
+    --nm-cyklus-300:   #CFB0BC;
+    --nm-cyklus-500:   #B08A9A;
+    --nm-cyklus-700:   #8A6775;
+
+    --nm-gold:         #B8965A;
+    --nm-gold-100:     #EEDFC2;
+    --nm-gold-soft:    rgba(184, 150, 90, 0.12);
+
+    --nm-success:      #6B8C5F;
+    --nm-danger:       #B5544A;
+
+    --nm-fg:           #3D2921;
+    --nm-fg-2:         rgba(61, 41, 33, 0.72);
+    --nm-fg-3:         rgba(61, 41, 33, 0.56);
+    --nm-fg-muted:     rgba(61, 41, 33, 0.40);
+
+    --nm-serif: 'Gilda Display', 'Didot', 'Bodoni 72', Georgia, serif;
+    --nm-sans:  'DM Sans', system-ui, -apple-system, sans-serif;
+
+    --nm-ease:     cubic-bezier(0.16, 1, 0.3, 1);
+    --nm-ease-std: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* NeoMe is a single-mode design system (warm cream).
+     We do NOT support a dark mode at this time. The .dark block below
+     mirrors :root so existing shadcn `dark:` utilities are no-ops. */
+  .dark {
+    --background:        36 32% 95%;
+    --foreground:        18 30% 18%;
+    --card:              0 0% 100%;
+    --card-foreground:   18 30% 18%;
+    --popover:           0 0% 100%;
+    --popover-foreground:18 30% 18%;
+    --primary:           18 30% 18%;
+    --primary-foreground:36 32% 95%;
+    --secondary:         34 28% 89%;
+    --secondary-foreground: 18 30% 18%;
+    --muted:             34 28% 89%;
+    --muted-foreground:  18 19% 39%;
+    --accent:            36 38% 54%;
+    --accent-foreground: 0 0% 100%;
+    --destructive:       6 41% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border:            18 30% 18% / 0.08;
+    --input:             18 30% 18% / 0.14;
+    --ring:              18 30% 18%;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--nm-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Serif headings by default — screens override per element. */
+  h1, h2, h3 {
+    font-family: var(--nm-serif);
+    letter-spacing: -0.01em;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
