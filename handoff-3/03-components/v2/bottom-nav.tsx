@@ -12,8 +12,7 @@ import { Home, BookOpen, Heart, Users, User } from 'lucide-react';
  *
  * <BottomNav />
  */
-// User-facing pillar name stays "Periodka" — see plan decision 4.
-type TabId = 'domov' | 'kniznica' | 'periodka' | 'komunita' | 'profil';
+type TabId = 'domov' | 'kniznica' | 'cyklus' | 'komunita' | 'profil';
 
 interface Tab {
   id: TabId;
@@ -23,11 +22,11 @@ interface Tab {
 }
 
 const TABS: Tab[] = [
-  { id: 'domov',    label: 'Domov',    path: '/domov-new',          icon: <Home strokeWidth={1.6} /> },
-  { id: 'kniznica', label: 'Knižnica', path: '/kniznica',           icon: <BookOpen strokeWidth={1.6} /> },
-  { id: 'periodka', label: 'Periodka', path: '/kniznica/periodka',  icon: <Heart strokeWidth={1.6} /> },
-  { id: 'komunita', label: 'Komunita', path: '/komunita',           icon: <Users strokeWidth={1.6} /> },
-  { id: 'profil',   label: 'Profil',   path: '/profil',             icon: <User strokeWidth={1.6} /> },
+  { id: 'domov',    label: 'Domov',    path: '/',          icon: <Home strokeWidth={1.6} /> },
+  { id: 'kniznica', label: 'Knižnica', path: '/kniznica',  icon: <BookOpen strokeWidth={1.6} /> },
+  { id: 'cyklus',   label: 'Cyklus',   path: '/periodka',  icon: <Heart strokeWidth={1.6} /> },
+  { id: 'komunita', label: 'Komunita', path: '/komunita',  icon: <Users strokeWidth={1.6} /> },
+  { id: 'profil',   label: 'Profil',   path: '/profil',    icon: <User strokeWidth={1.6} /> },
 ];
 
 const matchesTab = (pathname: string, tab: Tab) => {
@@ -48,7 +47,7 @@ export const BottomNav = React.forwardRef<HTMLDivElement, BottomNavProps>(
       <div
         ref={ref}
         className={cn(
-          'fixed inset-x-0 bottom-0 z-20 px-2 pt-3 pb-[max(env(safe-area-inset-bottom),20px)]',
+          'absolute inset-x-0 bottom-0 px-2 pt-3 pb-7',
           'bg-cream border-t border-ink/[0.08]',
           'flex justify-around items-start',
           className

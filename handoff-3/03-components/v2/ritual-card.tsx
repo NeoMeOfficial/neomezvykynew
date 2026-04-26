@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { ChevronRight, Check } from 'lucide-react';
 import { Eyebrow } from '@/components/ui/eyebrow';
@@ -175,12 +174,10 @@ export const RitualCard = React.forwardRef<HTMLButtonElement, RitualCardProps>(
     );
 
     if (href) {
-      // Use react-router Link so SPA navigation stays snappy
-      // (no full-page reload on the home → pillar transitions).
       return (
-        <Link to={href} className={baseClass} {...(props as React.AnchorHTMLAttributes<HTMLAnchorElement>)}>
+        <a href={href} className={baseClass} {...(props as any)}>
           {inner}
-        </Link>
+        </a>
       );
     }
 
