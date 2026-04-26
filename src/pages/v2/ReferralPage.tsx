@@ -1,255 +1,238 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Gift, Copy, Share2, CheckCircle, Users, ChevronRight } from 'lucide-react';
-import { useAuthContext } from '../../contexts/AuthContext';
-import { colors, glassCard, fonts } from '../../theme/warmDusk';
+import { useSupabaseAuth } from '../../contexts/SupabaseAuthContext';
+import { Page, Eye, Ser, Body, NM } from '../../components/v2/neome';
 
-function generateCodeFromUserId(userId: string): string {
-  const cleaned = userId.replace(/-/g, '').toUpperCase().slice(0, 8);
-  return `NEOME-${cleaned}`;
-}
+/**
+ * Referral — R11 main share screen
+ *
+ * Photo hero, reward breakdown (Pre teba +250 / Pre ňu +100),
+ * personalised code card, share CTA (uses Web Share API), tracking
+ * teaser, 30-day qualification footnote (BC-3).
+ *
+ * Behavior rule (BC-3): points credit only after the invitee passes
+ * the 30-day money-back window. Visual references this; the actual
+ * gate is a separate behavior PR — flagged in REDESIGN_NOTES.
+ *
+ * TODO data: invited count + active Plus count + earned points from
+ * referral tables. Code derived from email when available.
+ *
+ * Old version: ReferralPage.old.tsx.
+ */
 
-function generateCodeFromEmail(email: string): string {
-  const hash = email
-    .split('')
-    .reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  let result = '';
-  let seed = hash;
-  for (let i = 0; i < 8; i++) {
-    result += chars[seed % chars.length];
-    seed = Math.floor(seed / chars.length) + (seed % 7) * 31 + i * 13;
-  }
-  return `NEOME-${result}`;
+function deriveCode(email?: string | null): string {
+  if (!email) return 'TVOJ·KOD';
+  const stem = email.split('@')[0].toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4) || 'NEO';
+  return `${stem}·NEO`;
 }
 
 export default function ReferralPage() {
   const navigate = useNavigate();
-  const { user } = useAuthContext();
+  const { user } = useSupabaseAuth();
+  const code = deriveCode(user?.email);
+  const url = `https://neome.sk/p/${code.toLowerCase().replace('·', '-')}`;
   const [copied, setCopied] = useState(false);
 
-  const referralCode = user?.id && user.id !== 'demo-user-id'
-    ? generateCodeFromUserId(user.id)
-    : user?.email
-    ? generateCodeFromEmail(user.email)
-    : 'NEOME-DEMO1234';
-
-  const shareText = `Pridaj sa ku mne v NeoMe 🌸 Použi môj kód ${referralCode} pri registrácii a získaj prvý mesiac zdarma! neomeapp.netlify.app`;
-
-  const handleCopy = async () => {
+  const onCopy = async () => {
     try {
-      await navigator.clipboard.writeText(referralCode);
+      await navigator.clipboard.writeText(url);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setTimeout(() => setCopied(false), 1500);
     } catch {
-      // Fallback: select text visually
+      /* clipboard unavailable */
     }
   };
 
-  const handleShare = async () => {
-    const shareData = {
-      title: 'NeoMe — wellness pre ženy',
-      text: shareText,
-      url: 'https://neomeapp.netlify.app',
-    };
-
-    if (navigator.share && navigator.canShare?.(shareData)) {
+  const onShare = async () => {
+    if (typeof navigator !== 'undefined' && 'share' in navigator) {
       try {
-        await navigator.share(shareData);
+        await navigator.share({
+          title: 'NeoMe',
+          text: 'Vyskúšaj NeoMe so mnou — a obe dostaneme bonus.',
+          url,
+        });
       } catch {
-        // Share cancelled — no-op
+        /* user cancelled */
       }
     } else {
-      await navigator.clipboard.writeText(shareText);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      onCopy();
     }
   };
 
-  const steps = [
-    {
-      number: 1,
-      title: 'Zdieľaj kód',
-      desc: 'Pošli kamarátke svoj jedinečný kód alebo odkaz',
-      color: colors.strava,
-    },
-    {
-      number: 2,
-      title: 'Kamarátka sa zaregistruje',
-      desc: 'Použije tvoj kód pri registrácii a aktivuje predplatné',
-      color: colors.periodka,
-    },
-    {
-      number: 3,
-      title: 'Ty dostaneš mesiac zdarma',
-      desc: 'Po aktivácii predplatného dostaneš 1 mesiac NeoMe zadarmo',
-      color: colors.accent,
-    },
-  ];
-
   return (
-    <div
-      className="min-h-screen pb-24"
-      style={{ background: colors.bgGradient }}
-    >
-      {/* Header */}
-      <div className="flex items-center gap-3 px-4 pt-12 pb-4">
-        <button
-          onClick={() => navigate(-1)}
-          className="w-9 h-9 flex items-center justify-center rounded-full transition-colors active:scale-95"
-          style={{ background: 'rgba(255,255,255,0.40)', border: '1px solid rgba(255,255,255,0.30)' }}
-          aria-label="Späť"
-        >
-          <ArrowLeft className="w-4 h-4" style={{ color: colors.textPrimary }} />
-        </button>
-        <div className="flex items-center gap-2">
-          <Gift className="w-5 h-5" style={{ color: colors.accent }} strokeWidth={1.8} />
-          <h1
-            className="text-xl"
-            style={{ fontFamily: fonts.display, color: colors.textPrimary, fontWeight: 600 }}
-          >
-            Odporúčaj & získaj
-          </h1>
-        </div>
-      </div>
-
-      <div className="px-4 space-y-4">
-        {/* Hero */}
-        <div
-          className="p-5 text-center"
-          style={glassCard}
-        >
-          <div
-            className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
-            style={{ background: `linear-gradient(135deg, ${colors.accent}, #96703C)` }}
-          >
-            <Gift className="w-8 h-8 text-white" strokeWidth={1.5} />
-          </div>
-          <h2
-            className="text-lg mb-2"
-            style={{ fontFamily: fonts.display, color: colors.textPrimary, fontWeight: 600 }}
-          >
-            Pozvi kamarátku, získaj mesiac zdarma
-          </h2>
-          <p className="text-sm leading-relaxed" style={{ color: colors.textSecondary }}>
-            Za každú kamarátku, ktorá sa zaregistruje a aktivuje predplatné, dostaneš{' '}
-            <span className="font-semibold" style={{ color: colors.accent }}>1 mesiac NeoMe zadarmo</span>.
-          </p>
-        </div>
-
-        {/* Referral code box */}
-        <div style={glassCard} className="p-5">
-          <p
-            className="text-xs font-semibold uppercase tracking-widest mb-3"
-            style={{ color: colors.textTertiary }}
-          >
-            Tvoj odporúčací kód
-          </p>
+    <Page>
+      <div style={{ height: 320, position: 'relative', backgroundImage: 'url(/images/r9/lifestyle-mother-baby.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }}>
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(42,26,20,0.35) 0%, rgba(42,26,20,0.1) 45%, rgba(248,245,240,1) 100%)' }} />
+        <div style={{ position: 'absolute', top: 56, left: 20, right: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <button
-            onClick={handleCopy}
-            className="w-full flex items-center justify-between p-4 rounded-2xl transition-all active:scale-[0.98]"
+            onClick={() => navigate(-1)}
+            aria-label="Späť"
             style={{
-              background: `${colors.accent}12`,
-              border: `2px dashed ${colors.accent}50`,
+              all: 'unset',
+              cursor: 'pointer',
+              width: 36,
+              height: 36,
+              borderRadius: 999,
+              background: 'rgba(255,255,255,0.18)',
+              backdropFilter: 'blur(10px)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
           >
-            <span
-              className="text-2xl font-black tracking-widest"
-              style={{ fontFamily: fonts.display, color: colors.accent }}
-            >
-              {referralCode}
-            </span>
-            <span
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-white transition-colors"
-              style={{ backgroundColor: copied ? colors.strava : colors.accent }}
-            >
-              {copied ? (
-                <>
-                  <CheckCircle className="w-3.5 h-3.5" />
-                  Skopírované!
-                </>
-              ) : (
-                <>
-                  <Copy className="w-3.5 h-3.5" />
-                  Kopírovať
-                </>
-              )}
-            </span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M15 6l-6 6 6 6" />
+            </svg>
           </button>
-          <p className="text-xs mt-2 text-center" style={{ color: colors.textTertiary }}>
-            Klepni na kód pre skopírovanie
-          </p>
-
-          {/* Share button */}
-          <button
-            onClick={handleShare}
-            className="mt-4 w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl text-sm font-semibold text-white transition-all active:scale-95"
-            style={{ background: `linear-gradient(135deg, ${colors.accent}, #96703C)` }}
-          >
-            <Share2 className="w-4 h-4" />
-            Zdieľaj s kamarátkou
-          </button>
+          <Eye color="rgba(255,255,255,0.85)">Pozvi kamarátku</Eye>
+          <div style={{ width: 36, height: 36 }} />
         </div>
-
-        {/* Progress section */}
-        <div style={glassCard} className="p-5">
-          <div className="flex items-center gap-2 mb-3">
-            <Users className="w-5 h-5" style={{ color: colors.accent }} strokeWidth={1.8} />
-            <h3 className="text-sm font-semibold" style={{ color: colors.textPrimary }}>
-              Tvoje odporúčania
-            </h3>
-          </div>
-          <div
-            className="flex items-center justify-between p-4 rounded-2xl mb-3"
-            style={{ background: `${colors.accent}10` }}
-          >
-            <div>
-              <p className="text-3xl font-black" style={{ color: colors.accent }}>0</p>
-              <p className="text-xs" style={{ color: colors.textTertiary }}>úspešných odporúčaní</p>
-            </div>
-            <div className="text-right">
-              <p className="text-sm font-semibold" style={{ color: colors.textPrimary }}>0 mesiacov</p>
-              <p className="text-xs" style={{ color: colors.textTertiary }}>kredity celkom</p>
-            </div>
-          </div>
-          <p className="text-xs" style={{ color: colors.textTertiary }}>
-            Za každú potvrdenú registráciu s predplatným ti pripíšeme 1 mesiac NeoMe zadarmo.
-          </p>
+        <div style={{ position: 'absolute', bottom: 24, left: 20, right: 20 }}>
+          <Eye color={NM.GOLD} style={{ marginBottom: 10 }}>Daruj mesiac · získaj body</Eye>
+          <Ser size={40} color={NM.DEEP}>
+            Podeľ sa o to,
+            <br />
+            čo ti <em style={{ color: NM.GOLD, fontStyle: 'italic', fontWeight: 500 }}>pomáha</em>.
+          </Ser>
         </div>
+      </div>
 
-        {/* How it works */}
-        <div style={glassCard} className="p-5">
-          <h3
-            className="text-base mb-4"
-            style={{ fontFamily: fonts.display, color: colors.textPrimary, fontWeight: 600 }}
-          >
-            Ako to funguje
-          </h3>
-          <div className="space-y-4">
-            {steps.map((step, i) => (
-              <div key={step.number} className="flex items-start gap-4">
-                <div
-                  className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-white text-sm font-bold"
-                  style={{ backgroundColor: step.color }}
-                >
-                  {step.number}
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-semibold" style={{ color: colors.textPrimary }}>
-                    {step.title}
-                  </p>
-                  <p className="text-xs mt-0.5" style={{ color: colors.textSecondary }}>
-                    {step.desc}
-                  </p>
-                </div>
-                {i < steps.length - 1 && (
-                  <ChevronRight className="w-4 h-4 mt-2 flex-shrink-0" style={{ color: colors.textTertiary }} />
-                )}
-              </div>
-            ))}
+      <div style={{ padding: '0 20px' }}>
+        <Body size={14} color={NM.DEEP} weight={400} style={{ maxWidth: 340 }}>
+          Pošli kamarátke svoj kód. Keď si aktivuje Plus, obe dostanete odmenu.
+        </Body>
+      </div>
+
+      <div style={{ margin: '24px 20px 0', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        <div style={{ padding: '18px 16px', background: '#fff', borderRadius: 18, border: `1px solid ${NM.HAIR}` }}>
+          <Eye size={9} color={NM.GOLD} style={{ marginBottom: 10 }}>Pre teba</Eye>
+          <div style={{ fontFamily: NM.SERIF, fontSize: 34, color: NM.GOLD, fontWeight: 500, letterSpacing: '-0.02em', lineHeight: 1 }}>+250</div>
+          <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.EYEBROW, marginTop: 4, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 600 }}>bodov</div>
+          <div style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.MUTED, marginTop: 10, fontWeight: 400, lineHeight: 1.45 }}>Za každú kamarátku, ktorá si aktivuje Plus.</div>
+        </div>
+        <div style={{ padding: '18px 16px', background: NM.CREAM_2 ?? '#F1ECE3', borderRadius: 18, border: `1px solid ${NM.HAIR}` }}>
+          <Eye size={9} color={NM.TERRA} style={{ marginBottom: 10 }}>Pre ňu</Eye>
+          <div style={{ fontFamily: NM.SERIF, fontSize: 34, color: NM.TERRA, fontWeight: 500, letterSpacing: '-0.02em', lineHeight: 1 }}>+100</div>
+          <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.EYEBROW, marginTop: 4, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 600 }}>uvítacích bodov</div>
+          <div style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.MUTED, marginTop: 10, fontWeight: 400, lineHeight: 1.45 }}>Na príchod do odmien, hneď po registrácii.</div>
+        </div>
+      </div>
+
+      {/* Code card */}
+      <div style={{ margin: '22px 20px 0', padding: '22px', background: `linear-gradient(135deg, ${NM.DEEP_2}, ${NM.DEEP})`, color: '#fff', borderRadius: 22, position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', top: -60, right: -40, width: 200, height: 200, borderRadius: 999, background: `radial-gradient(circle, ${NM.GOLD}44, transparent 70%)` }} />
+        <div style={{ position: 'relative' }}>
+          <Eye size={9} color={NM.GOLD}>Tvoj kód</Eye>
+          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: 10, gap: 12 }}>
+            <div style={{ fontFamily: NM.SERIF, fontSize: 36, fontWeight: 500, letterSpacing: '0.12em' }}>{code}</div>
+            <button
+              onClick={onCopy}
+              style={{
+                all: 'unset',
+                cursor: 'pointer',
+                padding: '8px 12px',
+                background: 'rgba(255,255,255,0.12)',
+                border: '1px solid rgba(255,255,255,0.18)',
+                borderRadius: 10,
+                fontFamily: NM.SANS,
+                fontSize: 11,
+                fontWeight: 500,
+                letterSpacing: '0.04em',
+              }}
+            >
+              {copied ? 'Skopírované' : 'Kopírovať'}
+            </button>
+          </div>
+          <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid rgba(255,255,255,0.12)', fontFamily: NM.SANS, fontSize: 11.5, color: 'rgba(255,255,255,0.65)', fontWeight: 400, lineHeight: 1.5 }}>
+            {url}
           </div>
         </div>
       </div>
-    </div>
+
+      {/* Share CTA */}
+      <div style={{ margin: '20px 20px 0' }}>
+        <button
+          onClick={onShare}
+          style={{
+            width: '100%',
+            padding: '15px 20px',
+            background: NM.TERRA,
+            color: '#fff',
+            border: 'none',
+            borderRadius: 999,
+            fontFamily: NM.SANS,
+            fontSize: 14,
+            fontWeight: 500,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 10,
+            cursor: 'pointer',
+          }}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M4 12v7a1 1 0 001 1h14a1 1 0 001-1v-7M16 6l-4-4-4 4M12 2v14" />
+          </svg>
+          Zdieľať pozvánku
+        </button>
+        <div style={{ marginTop: 10, textAlign: 'center', fontFamily: NM.SANS, fontSize: 11.5, color: NM.TERTIARY, fontWeight: 400 }}>
+          Otvorí sa systémové zdieľanie
+        </div>
+      </div>
+
+      {/* Tracking teaser */}
+      <button
+        onClick={() => navigate('/referral/tracking')}
+        style={{
+          all: 'unset',
+          cursor: 'pointer',
+          margin: '24px 20px 0',
+          padding: '16px 18px',
+          background: '#fff',
+          borderRadius: 16,
+          border: `1px solid ${NM.HAIR}`,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 16,
+        }}
+      >
+        <div style={{ display: 'flex' }}>
+          {[NM.TERRA, NM.SAGE, NM.MAUVE].map((c, i) => (
+            <div
+              key={c}
+              style={{
+                width: 34,
+                height: 34,
+                borderRadius: 999,
+                background: c,
+                border: '2px solid #fff',
+                marginLeft: i ? -10 : 0,
+                fontFamily: NM.SERIF,
+                fontSize: 13,
+                color: '#fff',
+                fontWeight: 500,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              {['L', 'Z', 'M'][i]}
+            </div>
+          ))}
+        </div>
+        <div style={{ flex: 1 }}>
+          {/* TODO data: real invitee + active Plus counts */}
+          <div style={{ fontFamily: NM.SANS, fontSize: 13, color: NM.DEEP, fontWeight: 500 }}>3 pozvané kamarátky</div>
+          <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.EYEBROW, marginTop: 3, fontWeight: 400 }}>2 s aktívnym Plus · 500 bodov získaných</div>
+        </div>
+        <div style={{ color: NM.TERTIARY, fontSize: 16 }}>›</div>
+      </button>
+
+      {/* Legal summary — BC-3 visual reference */}
+      <div style={{ margin: '20px 20px 0', fontFamily: NM.SANS, fontSize: 10.5, color: NM.TERTIARY, lineHeight: 1.55, fontWeight: 400 }}>
+        Body sa pripisujú po 30-dňovej lehote záruky vrátenia peňazí. Bez limitu na počet pozvaní.{' '}
+        <span style={{ color: NM.DEEP, textDecoration: 'underline', fontWeight: 500 }}>Celé pravidlá</span>
+      </div>
+    </Page>
   );
 }
