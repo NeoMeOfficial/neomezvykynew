@@ -1,804 +1,396 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Play, Calendar, ChevronDown, ChevronUp, AlertTriangle, RotateCcw, Video } from 'lucide-react';
-import GlassCard from '../../components/v2/GlassCard';
-import { colors } from '../../theme/warmDusk';
+import { useSubscription } from '../../contexts/SubscriptionContext';
+import { Eye, Ser, Body, PlusTag, NM } from '../../components/v2/neome';
 
-interface Exercise {
-  id: string;
-  name: string;
-  duration: string;
-  type: 'strength' | 'cardio' | 'flexibility' | 'core';
-  videoUrl: string;
-  thumbnail: string;
-  description: string;
-  hasDemo?: boolean;
-  instructions?: string[];
-  tips?: string[];
-}
+/**
+ * Program detail — R9
+ *
+ * Full-bleed hero, key-stats strip, overview, weekly outline,
+ * Mondays-only start picker, primary CTA.
+ *
+ * Plus: "Aktivovať program · <date>" — wires to existing
+ * activate-program flow (FEATURE flagged: writing the chosen Monday
+ * to the user's profile).
+ *
+ * Free: dark editorial Plus card with gold CTA → /paywall.
+ *
+ * Behavior rule (BC-5): start dates are Mondays only. Picker constructs
+ * upcoming Mondays from "today" rather than hardcoding.
+ */
 
-interface WeekPlan {
-  week: number;
-  title: string;
-  exercises: Exercise[];
-}
-
-interface ProgramData {
-  id: string;
-  name: string;
-  description: string;
-  totalWeeks: number;
-  currentWeek: number;
-  currentDay: number;
-  startDate: string;
-  isPaused: boolean;
-  weekPlans: WeekPlan[];
-}
-
-// Mock program data - Full program details for landing/sales pages
-const programData: Record<string, ProgramData> = {
-  'postpartum': {
-    id: 'postpartum',
-    name: 'Postpartum',
-    description: 'Program je vhodný pre ženy, ktoré potrebujú spevniť brušný korzet, vyriešiť diastázu či inkontinenciu, mesiace aj roky po pôrode.',
-    totalWeeks: 8,
-    currentWeek: 1,
-    currentDay: 1,
-    startDate: '2026-02-27',
-    isPaused: false,
-    weekPlans: [
-      {
-        week: 1,
-        title: 'Týždeň 1: Základy a obnova',
-        exercises: [
-          { 
-            id: 'p1-1', 
-            name: 'Dychové cvičenia a core aktivácia', 
-            duration: '10 min', 
-            type: 'core', 
-            videoUrl: 'https://www.youtube.com/watch?v=VQiGJRBkkSQ&t=66s', 
-            thumbnail: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&h=300&fit=crop', 
-            description: 'Základné dychové techniky pre aktiváciu hlbokého stabilizačného systému',
-            hasDemo: true,
-            instructions: [
-              'Ľahni si na chrbát, nohy zohnú v kolenách',
-              'Polož jednu ruku na hruď, druhú na brucho',
-              'Nádych cez nos, břicho sa zdvíha',
-              'Výdych cez ústa, břicho sa spúšťa',
-              'Opakuj 8-10 krát pomaly'
-            ],
-            tips: [
-              'Sústreď sa na pomalý a kontrolovaný dych',
-              'Hruď by sa nemala výrazne dvíhať',
-              'Pri bolesti prestaň a poraď sa s trénerom'
-            ]
-          },
-          { 
-            id: 'p1-2', 
-            name: 'Aktivácia panvového dna', 
-            duration: '8 min', 
-            type: 'core', 
-            videoUrl: '', 
-            thumbnail: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&h=300&fit=crop', 
-            description: 'Jemná aktivácia a posilnenie panvového dna',
-            instructions: [
-              'Sadni si pohodlne s rovnými chrbtom',
-              'Predstav si, že dvíhaš výťah vo svojom panve',
-              'Na výdychu jemne napni svaly panvového dna',
-              'Na nádychu svaly uvoľni',
-              'Opakuj 10-15 krát'
-            ],
-            tips: [
-              'Neprehraj silu, pohyb má byť jemný',
-              'Nepridržuj dych počas cvičenia',
-              'Ak nevieš aktivovať svaly, skús si predstaviť, že zastavuješ močenie'
-            ]
-          },
-          { 
-            id: 'p1-3', 
-            name: 'Jemný strečing a mobilita', 
-            duration: '12 min', 
-            type: 'flexibility', 
-            videoUrl: '', 
-            thumbnail: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&h=300&fit=crop', 
-            description: 'Uvoľnenie napätých svalov',
-            instructions: [
-              'Začni s krúžením hlavy do oboch strán',
-              'Pokračuj s krúžením ramien',
-              'Jemne sa natiahni do strán',
-              'Urob mačacie vystretie',
-              'Skončí s detskou pozíciou'
-            ],
-            tips: [
-              'Všetky pohyby vykonávaj pomaly',
-              'Nedržíš polohy príliš dlho',
-              'Počúvaj svoje telo a nejdi do bolesti'
-            ]
-          },
-        ]
-      },
-      {
-        week: 2,
-        title: 'Týždeň 2: Pokročilé základy',
-        exercises: [
-          { 
-            id: 'p2-1', 
-            name: 'Silový tréning - horná časť', 
-            duration: '15 min', 
-            type: 'strength', 
-            videoUrl: '', 
-            thumbnail: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&h=300&fit=crop', 
-            description: 'Posilnenie rúk, ramien a hornej časti tela',
-            instructions: [
-              'Začni s rozohratím ramien 2 minúty',
-              'Pushup z kolien 3 série po 8 opakovaní',
-              'Tricepsové kliky z lavičky 3x6',
-              'Plank 3x30 sekúnd',
-              'Cool down stretching 3 minúty'
-            ],
-            tips: [
-              'Ak si začiatočník, rób cviky z kolien',
-              'Udržuj správnu techniku pred počtom opakovaní',
-              'Medzi sériami si odpočiň 30-60 sekúnd'
-            ]
-          },
-          { 
-            id: 'p2-2', 
-            name: 'Core stability pokročilé', 
-            duration: '12 min', 
-            type: 'core', 
-            videoUrl: '', 
-            thumbnail: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&h=300&fit=crop', 
-            description: 'Pokročilé cviky pre stabilitu jadra tela',
-            instructions: [
-              'Dead bug 3 série po 6 na každú stranu',
-              'Bird dog 3x6 na každú stranu',
-              'Modified plank s dvíhaním končatín',
-              'Wall sit s aktiváciou core',
-              'Záverečné uvoľnenie'
-            ],
-            tips: [
-              'Kvalita pred kvantitou',
-              'Udržuj neutrálny chrbát',
-              'Aktivuj hlboký stabilizačný systém'
-            ]
-          },
-          { 
-            id: 'p2-3', 
-            name: 'Funkčné cvičenia', 
-            duration: '10 min', 
-            type: 'strength', 
-            videoUrl: '', 
-            thumbnail: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&h=300&fit=crop', 
-            description: 'Každodenné pohyby a funkčná sila',
-            instructions: [
-              'Squats z stoličky 3x8',
-              'Lunges s podporou 3x5 na každú nohu',
-              'Step-ups na nízky schod 3x6',
-              'Funkčné výpony na špičky',
-              'Strečing nohákov'
-            ],
-            tips: [
-              'Používaj podporu pri rovnováhe',
-              'Neponáhľaj sa, ide o kontrolu',
-              'Počúvaj signály svojho tela'
-            ]
-          },
-        ]
-      },
-    ]
-  },
-  'bodyforming': {
-    id: 'bodyforming',
-    name: 'BodyForming', 
-    description: 'Program je vhodný pre ženy, ktoré začínajú so spevňovaním celého tela a netrpia diastázou.',
-    totalWeeks: 6,
-    currentWeek: 1,
-    currentDay: 1,
-    startDate: '2026-02-27',
-    isPaused: false,
-    weekPlans: [
-      {
-        week: 1,
-        title: 'Týždeň 1: Základy posilňovania',
-        exercises: [
-          { 
-            id: 'b1-1', 
-            name: 'Celotělové rozhriatie', 
-            duration: '8 min', 
-            type: 'cardio', 
-            videoUrl: '', 
-            thumbnail: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=300&fit=crop', 
-            description: 'Príprava tela na tréning a aktivácia svalov',
-            instructions: [
-              'Začni krokom na mieste 2 minúty',
-              'Krúženie ramien dopredu a dozadu',
-              'Výpady s rotáciou trupu',
-              'Drep s natiahnutím rúk nad hlavu',
-              'Dokončí jemným strečingom'
-            ],
-            tips: [
-              'Rozcvička je kľúčová pre predchádzanie zranení',
-              'Postupne zvyšuj intenzitu',
-              'Nezabúdaj na správne dýchanie'
-            ]
-          },
-          { 
-            id: 'b1-2', 
-            name: 'Posilnenie dolnej časti tela', 
-            duration: '15 min', 
-            type: 'strength', 
-            videoUrl: '', 
-            thumbnail: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=300&fit=crop', 
-            description: 'Základné cviky pre formovanie zadku a stehien s vlastnou váhou',
-            instructions: [
-              'Drepov s vlastnou váhou 3x12',
-              'Výpadov striedavo 3x10 na nohu',
-              'Zdvíhanie panvy vľaku 3x15',
-              'Stranové výpady 2x8 na stranu',
-              'Wall sit 3x30 sekúnd'
-            ],
-            tips: [
-              'Sústreď sa na správnu techniku',
-              'Kolená by nemali presahovať špičky chodidiel',
-              'Medzi sériami odpočiň 45-60 sekúnd'
-            ]
-          },
-          { 
-            id: 'b1-3', 
-            name: 'Core a brušné svaly', 
-            duration: '12 min', 
-            type: 'core', 
-            videoUrl: '', 
-            thumbnail: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=300&fit=crop', 
-            description: 'Posilnenie brušných svalov a core stability',
-            instructions: [
-              'Plank 3x30 sekúnd',
-              'Dead bug 3x8 na stranu',
-              'Modified bicycle crunches 3x12',
-              'Side plank 2x20 sekúnd na stranu',
-              'Bird dog 3x6 na stranu'
-            ],
-            tips: [
-              'Kvalita pred kvantitou',
-              'Aktivuj hlboké brušné svaly',
-              'Nepridržuj dych počas cvičenia'
-            ]
-          },
-        ]
-      },
-    ]
-  },
-  'elastic-bands': {
-    id: 'elastic-bands',
-    name: 'ElasticBands',
-    description: 'Program je vhodný pre ženy, ktoré chcú vyformovať postavu a zvýšiť intenzitu cvičenia s použitím dynamického odporu elastických gúm.',
-    totalWeeks: 6,
-    currentWeek: 1,
-    currentDay: 1,
-    startDate: '2026-02-10',
-    isPaused: false,
-    weekPlans: [
-      {
-        week: 1,
-        title: 'Týždeň 1: Úvod do elastických gúm',
-        exercises: [
-          { 
-            id: 'e1-1', 
-            name: 'Rozcvička s gumami', 
-            duration: '10 min', 
-            type: 'cardio', 
-            videoUrl: '', 
-            thumbnail: 'https://images.unsplash.com/photo-1598289431512-b97b0917affc?w=400&h=300&fit=crop', 
-            description: 'Dynamické rozhriatie s použitím ľahkého odporu gúm',
-            instructions: [
-              'Začni s ľahkou gumou okolo zápästí',
-              'Krúženie ramien s odporom 10x',
-              'Laterálne zdvíhanie rúk 15x',
-              'Gumy okolo stehien - bočné kroky 2x10',
-              'Aktivácia core s gumou 8x'
-            ],
-            tips: [
-              'Začni vždy s najľahšou gumou',
-              'Pohyby vykonávaj kontrolovane',
-              'Guma má byť pod napätím počas celého pohybu'
-            ]
-          },
-          { 
-            id: 'e1-2', 
-            name: 'Horná časť tela s odporom', 
-            duration: '15 min', 
-            type: 'strength', 
-            videoUrl: '', 
-            thumbnail: 'https://images.unsplash.com/photo-1598289431512-b97b0917affc?w=400&h=300&fit=crop', 
-            description: 'Formovanie ramien, rúk a chrbta pomocou elastických gúm',
-            instructions: [
-              'Rows s gumou (ťahanie k hrudi) 3x12',
-              'Chest press s gumou 3x10',
-              'Lateral raises 3x12',
-              'Biceps curls 3x15',
-              'Triceps extensions 3x10'
-            ],
-            tips: [
-              'Guma musí byť správne zakotvená',
-              'Udržuj napätie v gume počas celého pohybu',
-              'Kontroluj návratný pohyb'
-            ]
-          },
-          { 
-            id: 'e1-3', 
-            name: 'Dolná časť s dynamickým odporom', 
-            duration: '10 min', 
-            type: 'strength', 
-            videoUrl: '', 
-            thumbnail: 'https://images.unsplash.com/photo-1598289431512-b97b0917affc?w=400&h=300&fit=crop', 
-            description: 'Intenzívne formovanie zadku a stehien s gumami',
-            instructions: [
-              'Squaty s gumou okolo stehien 3x15',
-              'Bočné kroky s gumou 3x12 na stranu',
-              'Glute bridges s gumou 3x15',
-              'Clamshells s gumou 2x12 na stranu',
-              'Monster walks 2x10 krokov'
-            ],
-            tips: [
-              'Guma má byť pod napätím aj v spodnej pozícii',
-              'Kolená tlač smerom von proti odporu',
-              'Aktivuj gluteálne svaly počas každého pohybu'
-            ]
-          },
-        ]
-      },
-    ]
-  },
-  'strong-sexy': {
-    id: 'strong-sexy',
-    name: 'Strong&Sexy',
-    description: 'Program je vhodný pre ženy, ktoré chcú posunúť svoje hranice, získať silnejšie a vyformovanejšie telo a začať cvičiť s jednoručkami.',
-    totalWeeks: 6,
-    currentWeek: 1,
-    currentDay: 1,
-    startDate: '2026-02-15',
-    isPaused: false,
-    weekPlans: [
-      {
-        week: 1,
-        title: 'Týždeň 1: Sila a formovanie',
-        exercises: [
-          { 
-            id: 's1-1', 
-            name: 'Power warm-up s jednoručkami', 
-            duration: '12 min', 
-            type: 'cardio', 
-            videoUrl: '', 
-            thumbnail: 'https://images.unsplash.com/photo-1550345332-09e3ac987658?w=400&h=300&fit=crop', 
-            description: 'Dynamické rozcvičenie s ľahkými jednoručkami',
-            instructions: [
-              'Arm circles s 1-2kg jednoručkami 2x10',
-              'Shoulder shrugs s jednoručkami 15x',
-              'Walking lunges s jednoručkami 2x8',
-              'Overhead press s ľahkými váhami 10x',
-              'Deadlifts s jednoručkami pre rozcvičku 8x'
-            ],
-            tips: [
-              'Začni s ľahšími váhami pre rozcvičku',
-              'Sústreď sa na aktiváciu celého tela',
-              'Priprav kĺby na záťaž s váhami'
-            ]
-          },
-          { 
-            id: 's1-2', 
-            name: 'Zložené pohyby s jednoručkami', 
-            duration: '20 min', 
-            type: 'strength', 
-            videoUrl: '', 
-            thumbnail: 'https://images.unsplash.com/photo-1550345332-09e3ac987658?w=400&h=300&fit=crop', 
-            description: 'Hlavné silové cviky s jednoručkami pre celé telo',
-            instructions: [
-              'Goblet squats s jednoručkou 4x12',
-              'Dumbbell rows 4x10 na ruku',
-              'Romanian deadlifts 4x10',
-              'Overhead press 3x8',
-              'Reverse lunges s jednoručkami 3x10 na nohu'
-            ],
-            tips: [
-              'Vyber váhy, s ktorými dokončíš poslednú sériu správne',
-              'Medzi sériami odpočiň 60-90 sekúnd',
-              'Kontroluj pohyb dole aj hore'
-            ]
-          },
-          { 
-            id: 's1-3', 
-            name: 'Sexy sculpting finisher', 
-            duration: '13 min', 
-            type: 'strength', 
-            videoUrl: '', 
-            thumbnail: 'https://images.unsplash.com/photo-1550345332-09e3ac987658?w=400&h=300&fit=crop', 
-            description: 'Cielené formovanie pre sexy krivky a definíciu',
-            instructions: [
-              'Single arm chest press vľaku 3x8 na ruku',
-              'Glute bridges s jednoručkou 3x15',
-              'Lateral raises super-slow 3x8',
-              'Bulgarian split squats s jednoručkou 2x8 na nohu',
-              'Plank to downward dog 2x8'
-            ],
-            tips: [
-              'Sústreď sa na kvalitu pohybu',
-              'Pomalé tempo pre maximálne napätie',
-              'Cíť svaly, na ktoré sa zameriavame'
-            ]
-          },
-        ]
-      },
-    ]
+function getNextMondays(count = 4, from = new Date()): Date[] {
+  const result: Date[] = [];
+  const d = new Date(from);
+  const dow = d.getDay();
+  const offset = dow === 1 ? 0 : (8 - dow) % 7;
+  d.setDate(d.getDate() + offset);
+  for (let i = 0; i < count; i++) {
+    const m = new Date(d);
+    m.setDate(d.getDate() + i * 7);
+    result.push(m);
   }
+  return result;
+}
+
+const SK_MONTHS_SHORT = ['jan', 'feb', 'mar', 'apr', 'máj', 'jún', 'júl', 'aug', 'sep', 'okt', 'nov', 'dec'];
+
+const PROGRAMS: Record<string, { name: string; eyebrowColor?: string; img: string; weeks: number; exercises: number; minPerDay: number; intro: string; outline: { w: string; t: string; d: string }[] }> = {
+  postpartum: {
+    name: 'Postpartum\nnávrat',
+    img: '/images/r9/program-postpartum.jpg',
+    weeks: 4,
+    exercises: 28,
+    minPerDay: 15,
+    intro: 'Jemná 4-týždňová cesta späť k tvojmu telu po pôrode. Zameranie na panvové dno, bránicu a hlboký stred.',
+    outline: [
+      { w: 'Týždeň 1', t: 'Dych a panvové dno', d: '7 krátkych cvičení · 10 min' },
+      { w: 'Týždeň 2', t: 'Jemný stred', d: '7 cvičení · 15 min' },
+      { w: 'Týždeň 3', t: 'Celotelová aktivácia', d: '7 cvičení · 15 min' },
+      { w: 'Týždeň 4', t: 'Sila a návrat', d: '7 cvičení · 20 min' },
+    ],
+  },
+  'body-forming': {
+    name: 'BodyForming',
+    img: '/images/r9/program-body-forming.jpg',
+    weeks: 6,
+    exercises: 42,
+    minPerDay: 25,
+    intro: 'Tonizácia celého tela s dôrazom na držanie. Stredná intenzita, postupný progres.',
+    outline: [
+      { w: 'Týždeň 1–2', t: 'Aktivácia', d: 'Základné vzorce pohybu · 20 min' },
+      { w: 'Týždeň 3–4', t: 'Progres', d: 'Sila a tonus · 25 min' },
+      { w: 'Týždeň 5–6', t: 'Celistvosť', d: 'Komplexné okruhy · 30 min' },
+    ],
+  },
+  hormonal: {
+    name: 'Hormonálna\njoga',
+    img: '/images/r9/program-hormonal.jpg',
+    weeks: 4,
+    exercises: 24,
+    minPerDay: 20,
+    intro: 'Joga podporujúca hormonálnu rovnováhu a cyklus. Tempo a intenzita sa prispôsobujú fáze.',
+    outline: [
+      { w: 'Týždeň 1', t: 'Folikulárna fáza', d: 'Energia a tvorba · 20 min' },
+      { w: 'Týždeň 2', t: 'Ovulácia', d: 'Sila a vyjadrenie · 20 min' },
+      { w: 'Týždeň 3', t: 'Luteálna fáza', d: 'Spomalenie · 20 min' },
+      { w: 'Týždeň 4', t: 'Menštruácia', d: 'Pokoj a obnova · 15 min' },
+    ],
+  },
+  mindful: {
+    name: 'Mindful\npohyb',
+    img: '/images/r9/program-mindful.jpg',
+    weeks: 3,
+    exercises: 18,
+    minPerDay: 12,
+    intro: 'Vnímavý pohyb s dychom pre pokojnú hlavu. Krátke denné jednotky.',
+    outline: [
+      { w: 'Týždeň 1', t: 'Uzemnenie', d: 'Dych a stred · 10 min' },
+      { w: 'Týždeň 2', t: 'Plynutie', d: 'Mäkké zostavy · 12 min' },
+      { w: 'Týždeň 3', t: 'Sloboda', d: 'Vlastné variácie · 15 min' },
+    ],
+  },
 };
 
 export default function ProgramDetail() {
+  const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  const { programId } = useParams();
-  const [program, setProgram] = useState<ProgramData | null>(null);
-  const [openWeek, setOpenWeek] = useState<number | null>(null);
-  const [showPauseConfirm, setShowPauseConfirm] = useState(false);
-  const [showRestartConfirm, setShowRestartConfirm] = useState(false);
+  const { isPremium } = useSubscription();
+  const program = (slug && PROGRAMS[slug]) || PROGRAMS.postpartum;
+  const mondays = getNextMondays(4);
+  const [selectedIdx, setSelectedIdx] = useState(0);
 
-  useEffect(() => {
-    if (programId && programData[programId]) {
-      const prog = programData[programId];
-      setProgram(prog);
-      setOpenWeek(prog.currentWeek); // Open current week by default
-    }
-  }, [programId]);
-
-  if (!program) {
-    return (
-      <div className="flex items-center gap-3">
-        <button onClick={() => navigate('/kniznica/telo/programy')} className="p-1">
-          <ArrowLeft className="w-5 h-5 text-[#2E2218]" strokeWidth={1.5} />
-        </button>
-        <h1 className="text-xl font-semibold text-[#2E2218]">Program nenájdený</h1>
-      </div>
-    );
-  }
-
-  const todaysExercise = program.weekPlans
-    .find(w => w.week === program.currentWeek)?.exercises[program.currentDay - 1];
-
-  const handlePauseProgram = () => {
-    // In real app, this would call webhook to Active Campaign
-    console.log('Pausing program:', program.id);
-    
-    // Mock: Call webhook
-    fetch('/api/webhook/pause-program', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        programId: program.id,
-        userId: 'current-user-id', // Replace with actual user ID
-        action: 'pause'
-      })
-    }).then(() => {
-      setProgram(prev => prev ? { ...prev, isPaused: true } : null);
-      setShowPauseConfirm(false);
-      alert('Program pozastavený. Active Campaign bola upovedomená.');
-    }).catch(() => {
-      alert('Program pozastavený lokálne. (Webhook nedostupný)');
-      setProgram(prev => prev ? { ...prev, isPaused: true } : null);
-      setShowPauseConfirm(false);
-    });
-  };
-
-  const handleRestartProgram = () => {
-    // In real app, this would call webhook to Active Campaign
-    console.log('Restarting program:', program.id);
-    
-    // Mock: Call webhook
-    fetch('/api/webhook/restart-program', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        programId: program.id,
-        userId: 'current-user-id', // Replace with actual user ID
-        action: 'restart'
-      })
-    }).then(() => {
-      setProgram(prev => prev ? { ...prev, isPaused: false, currentWeek: 1, currentDay: 1 } : null);
-      setShowRestartConfirm(false);
-      alert('Program restartovaný. Active Campaign bola upovedomená.');
-    }).catch(() => {
-      alert('Program restartovaný lokálne. (Webhook nedostupný)');
-      setProgram(prev => prev ? { ...prev, isPaused: false, currentWeek: 1, currentDay: 1 } : null);
-      setShowRestartConfirm(false);
-    });
-  };
-
-  const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('sk-SK');
-  };
+  const formatMonday = (d: Date) => `${d.getDate()}. ${SK_MONTHS_SHORT[d.getMonth()]}`;
+  const formatFull = (d: Date) => `${d.getDate()}. ${SK_MONTHS_SHORT[d.getMonth()]}`;
+  const finalDate = (() => {
+    const d = new Date(mondays[selectedIdx]);
+    d.setDate(d.getDate() + (program.weeks * 7));
+    return formatFull(d);
+  })();
 
   return (
-    <div className="w-full min-h-screen px-3 py-6 pb-28 space-y-6">
-      {/* Nordic Header */}
-      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
-        <div className="flex items-center gap-3 mb-4">
-          <button onClick={() => navigate('/kniznica/telo/programy')} className="p-1">
-            <ArrowLeft className="w-5 h-5 text-gray-600" strokeWidth={1.5} />
-          </button>
-          <div className="flex-1 text-center">
-            <h1 className="text-[16px] font-semibold" style={{ color: '#2E2218' }}>{program.name}</h1>
-            <p className="text-sm font-medium" style={{ color: '#6B4C3B' }}>
-              Týždeň {program.currentWeek} z {program.totalWeeks}
-            </p>
+    <div style={{ background: NM.BG, minHeight: '100vh', paddingBottom: 160, fontFamily: NM.SANS, color: NM.DEEP }}>
+      {/* Hero */}
+      <div
+        style={{
+          position: 'relative',
+          height: 380,
+          backgroundImage: `url(${program.img})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(42,26,20,0.32) 0%, rgba(42,26,20,0) 40%, rgba(248,245,240,0.18) 70%, rgba(248,245,240,0.96) 100%)' }} />
+        <button
+          onClick={() => navigate(-1)}
+          aria-label="Späť"
+          style={{
+            all: 'unset',
+            cursor: 'pointer',
+            position: 'absolute',
+            top: 56,
+            left: 20,
+            width: 38,
+            height: 38,
+            borderRadius: 999,
+            background: 'rgba(255,255,255,0.92)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
+          }}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={NM.DEEP} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M15 6l-6 6 6 6" />
+          </svg>
+        </button>
+        <div style={{ position: 'absolute', bottom: 20, left: 20, right: 20 }}>
+          <Eye color={NM.TERRA}>Program · Telo</Eye>
+          <div style={{ marginTop: 8 }}>
+            <Ser size={34} style={{ whiteSpace: 'pre-line' }}>
+              {program.name.split('\n').map((line, i, arr) =>
+                i === arr.length - 1 ? (
+                  <em key={i} style={{ color: NM.TERRA, fontStyle: 'italic', fontWeight: 500 }}>{line}</em>
+                ) : (
+                  <span key={i}>
+                    {line}
+                    <br />
+                  </span>
+                )
+              )}
+            </Ser>
           </div>
         </div>
       </div>
 
-      {/* Program Welcome */}
-      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-6 shadow-sm border border-white/20 text-center">
-        <h2 className="text-lg font-bold mb-3" style={{ color: '#2E2218' }}>
-          Vitaj v programe {program.name}! 
-        </h2>
-        
-        {/* Intro Video Section - Only for Postpartum program */}
-        {program.id === 'postpartum' && (
-          <div className="mb-6">
-            <div className="bg-white/40 rounded-2xl p-4 mb-4">
-              <h3 className="text-sm font-semibold mb-3" style={{ color: '#2E2218' }}>
-                Úvodné video od Gabi
-              </h3>
-              {/* Video placeholder - will be replaced with actual video upload */}
-              <div className="relative bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl aspect-video flex items-center justify-center mb-3">
-                <div className="text-center">
-                  <Video className="w-8 h-8 mx-auto mb-2" style={{ color: colors.telo }} />
-                  <p className="text-xs text-gray-600">Video bude nahraté Gabi</p>
-                  <p className="text-xs text-gray-500">Úvod do programu a motivácia</p>
+      {/* Key stats */}
+      <div
+        style={{
+          margin: '8px 20px 0',
+          padding: '16px 18px',
+          background: '#fff',
+          borderRadius: 20,
+          border: `1px solid ${NM.HAIR}`,
+          boxShadow: '0 10px 28px rgba(61,41,33,0.06)',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, 1fr)',
+        }}
+      >
+        {[
+          { n: program.weeks, l: 'týždne' },
+          { n: program.exercises, l: 'cvičení' },
+          { n: program.minPerDay, l: 'min / deň' },
+        ].map((s, i) => (
+          <div key={s.l} style={{ textAlign: 'center', borderLeft: i > 0 ? `1px solid ${NM.HAIR}` : 'none' }}>
+            <div style={{ fontFamily: NM.SERIF, fontSize: 22, fontWeight: 500, color: NM.TERRA, lineHeight: 1, letterSpacing: '-0.01em' }}>{s.n}</div>
+            <div style={{ fontFamily: NM.SANS, fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: NM.EYEBROW, marginTop: 7, fontWeight: 500 }}>{s.l}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Overview */}
+      <div style={{ margin: '24px 20px 0' }}>
+        <Eye size={10} style={{ marginBottom: 10 }}>O programe</Eye>
+        <Body size={14} color={NM.DEEP} weight={400}>{program.intro}</Body>
+      </div>
+
+      {/* Outline */}
+      <div style={{ margin: '28px 20px 0' }}>
+        <Eye size={10} style={{ marginBottom: 12 }}>Osnova</Eye>
+        <div style={{ background: '#fff', borderRadius: 18, border: `1px solid ${NM.HAIR}`, overflow: 'hidden' }}>
+          {program.outline.map((wk, i, arr) => (
+            <div
+              key={wk.w}
+              style={{
+                padding: '14px 18px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 14,
+                borderBottom: i < arr.length - 1 ? `1px solid ${NM.HAIR}` : 'none',
+              }}
+            >
+              <div
+                style={{
+                  width: 28,
+                  height: 28,
+                  borderRadius: 999,
+                  background: `${NM.TERRA}18`,
+                  color: NM.TERRA,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontFamily: NM.SERIF,
+                  fontSize: 13,
+                  fontWeight: 500,
+                  flexShrink: 0,
+                }}
+              >
+                {i + 1}
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontFamily: NM.SANS, fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: NM.EYEBROW, fontWeight: 500 }}>{wk.w}</div>
+                <div style={{ fontFamily: NM.SERIF, fontSize: 14, fontWeight: 500, color: NM.DEEP, marginTop: 3, letterSpacing: '-0.005em' }}>{wk.t}</div>
+                <div style={{ fontFamily: NM.SANS, fontSize: 10.5, color: NM.EYEBROW, marginTop: 3, fontWeight: 400 }}>{wk.d}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Mondays-only picker (BC-5) */}
+      <div style={{ margin: '28px 20px 0' }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 12 }}>
+          <Eye size={10}>Začni v pondelok</Eye>
+          {!isPremium && <PlusTag />}
+        </div>
+        <div
+          style={{
+            padding: '18px 18px 20px',
+            borderRadius: 20,
+            background: '#fff',
+            border: `1px solid ${NM.HAIR}`,
+            boxShadow: '0 10px 28px rgba(61,41,33,0.06)',
+            opacity: isPremium ? 1 : 0.6,
+            position: 'relative',
+          }}
+        >
+          {!isPremium && <div style={{ position: 'absolute', inset: 0, borderRadius: 20, background: 'rgba(248,245,240,0.25)', pointerEvents: 'none' }} />}
+          <div style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.EYEBROW, fontWeight: 400, marginBottom: 14 }}>
+            Programy prebiehajú v týždňových cykloch — vyber si pondelok, kedy chceš začať.
+          </div>
+          <div style={{ display: 'flex', gap: 8, overflowX: 'auto', margin: '0 -18px', padding: '0 18px 4px' }}>
+            {mondays.map((d, i) => {
+              const sel = i === selectedIdx;
+              return (
+                <button
+                  key={i}
+                  onClick={() => isPremium && setSelectedIdx(i)}
+                  style={{
+                    all: 'unset',
+                    cursor: isPremium ? 'pointer' : 'not-allowed',
+                    flexShrink: 0,
+                    width: 76,
+                    padding: '13px 0',
+                    borderRadius: 14,
+                    background: sel ? NM.TERRA : NM.CREAM_2 ?? '#F1ECE3',
+                    color: sel ? '#fff' : NM.DEEP,
+                    border: sel ? 'none' : `1px solid ${NM.HAIR}`,
+                    textAlign: 'center' as const,
+                  }}
+                >
+                  <div style={{ fontFamily: NM.SANS, fontSize: 9, letterSpacing: '0.22em', textTransform: 'uppercase', color: sel ? 'rgba(255,255,255,0.8)' : NM.EYEBROW, fontWeight: 500 }}>Pon</div>
+                  <div style={{ fontFamily: NM.SERIF, fontSize: 22, fontWeight: 500, marginTop: 4, letterSpacing: '-0.01em' }}>{d.getDate()}.</div>
+                  <div style={{ fontFamily: NM.SANS, fontSize: 10, color: sel ? 'rgba(255,255,255,0.7)' : NM.TERTIARY, marginTop: 2, fontWeight: 400 }}>{SK_MONTHS_SHORT[d.getMonth()]}</div>
+                </button>
+              );
+            })}
+          </div>
+          <div style={{ marginTop: 14, fontFamily: NM.SANS, fontSize: 11, color: NM.MUTED, fontWeight: 400, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={NM.TERRA} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="5" width="18" height="16" rx="2" />
+              <path d="M3 10h18M8 3v4M16 3v4" />
+            </svg>
+            {isPremium ? (
+              <>
+                Skončíš v pondelok <strong style={{ color: NM.DEEP, fontWeight: 500 }}>{finalDate}</strong>.
+              </>
+            ) : (
+              <>Začni v pondelok ľubovoľný týždeň.</>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Primary CTA */}
+      <div style={{ margin: '24px 20px 0' }}>
+        {isPremium ? (
+          <>
+            <button
+              // FEATURE: persist selected start date to active program record
+              onClick={() => navigate('/domov-new')}
+              style={{
+                width: '100%',
+                padding: '15px 20px',
+                background: NM.TERRA,
+                color: '#fff',
+                border: 'none',
+                borderRadius: 999,
+                fontFamily: NM.SANS,
+                fontSize: 14,
+                fontWeight: 500,
+                letterSpacing: '0.02em',
+                cursor: 'pointer',
+              }}
+            >
+              Aktivovať program · {formatMonday(mondays[selectedIdx])}
+            </button>
+            <div style={{ textAlign: 'center', marginTop: 10, fontFamily: NM.SANS, fontSize: 11, color: NM.TERTIARY, fontWeight: 400 }}>
+              Pridá sa do Domov a Kalendára
+            </div>
+          </>
+        ) : (
+          <>
+            <div
+              style={{
+                padding: '18px 20px',
+                borderRadius: 20,
+                background: `linear-gradient(135deg, ${NM.DEEP_2} 0%, ${NM.DEEP} 100%)`,
+                color: '#fff',
+                position: 'relative',
+                overflow: 'hidden',
+              }}
+            >
+              <div style={{ position: 'absolute', top: -40, right: -40, width: 140, height: 140, borderRadius: 999, background: `radial-gradient(circle, ${NM.GOLD}44, transparent 70%)` }} />
+              <div style={{ position: 'relative' }}>
+                <Eye color={NM.GOLD} size={10}>Plus program</Eye>
+                <div style={{ fontFamily: NM.SERIF, fontSize: 18, fontWeight: 500, fontStyle: 'italic', marginTop: 8, letterSpacing: '-0.005em' }}>
+                  Aktivuj Plus a začni v pondelok.
+                </div>
+                <button
+                  onClick={() => navigate('/paywall')}
+                  style={{
+                    marginTop: 14,
+                    width: '100%',
+                    padding: '13px 20px',
+                    background: NM.GOLD,
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: 999,
+                    fontFamily: NM.SANS,
+                    fontSize: 13,
+                    fontWeight: 500,
+                    letterSpacing: '0.02em',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Aktivovať Plus
+                </button>
+                <div style={{ textAlign: 'center', marginTop: 8, fontFamily: NM.SANS, fontSize: 11, color: 'rgba(255,255,255,0.5)', fontWeight: 300 }}>
+                  Prvý mesiac 4,99 €
                 </div>
               </div>
-              <p className="text-xs" style={{ color: '#6B4C3B' }}>
-                V tomto videu ti Gabi vysvetlí, čo ťa v programe čaká a ako ho správne absolvovať.
-              </p>
             </div>
-          </div>
-        )}
-        
-        <p className="text-sm mb-4" style={{ color: '#6B4C3B' }}>
-          {program.description}
-        </p>
-        <div className="flex items-center justify-center gap-4">
-          <span className="text-xs px-3 py-1.5 rounded-xl bg-[#6B4C3B] bg-opacity-10 text-[#6B4C3B]">
-            Týždeň {program.currentWeek} z {program.totalWeeks}
-          </span>
-          <span className="text-xs px-3 py-1.5 rounded-xl bg-[#B8864A] bg-opacity-10 text-[#B8864A]">
-            Deň {program.currentDay}
-          </span>
-        </div>
-      </div>
-
-      {/* Progress Section */}
-      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
-        <div className="flex items-center gap-2 mb-4">
-          <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(107, 76, 59, 0.14)` }}>
-            <Calendar className="w-4 h-4" style={{ color: '#6B4C3B' }} />
-          </div>
-          <h3 className="text-[14px] font-semibold" style={{ color: '#2E2218' }}>Pokrok</h3>
-        </div>
-        
-        <div className="space-y-3">
-          <div className="flex justify-between text-xs text-gray-600">
-            <span>Začiatok: {formatDate(program.startDate)}</span>
-            <span>{program.isPaused ? 'Pozastavený' : 'Aktívny'}</span>
-          </div>
-          <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-            <div 
-              className="h-full rounded-full transition-all bg-[#6B4C3B]"
-              style={{ 
-                width: `${((program.currentWeek - 1) * 100) / program.totalWeeks}%`,
+            <button
+              onClick={() => navigate('/domov-new')}
+              style={{
+                all: 'unset',
+                cursor: 'pointer',
+                display: 'block',
+                width: '100%',
+                textAlign: 'center',
+                marginTop: 12,
+                fontFamily: NM.SANS,
+                fontSize: 12,
+                color: NM.TERTIARY,
+                fontWeight: 400,
+                textDecoration: 'underline',
               }}
-            />
-          </div>
-        </div>
+            >
+              Pokračovať zdarma
+            </button>
+          </>
+        )}
       </div>
-
-      {/* Today's Workout */}
-      {todaysExercise && (
-        <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(107, 76, 59, 0.14)` }}>
-              <Play className="w-4 h-4" style={{ color: '#6B4C3B' }} />
-            </div>
-            <h3 className="text-[14px] font-semibold" style={{ color: '#2E2218' }}>Dnešné cvičenie</h3>
-          </div>
-          
-          <button
-            onClick={() => navigate('/exercise-player', { 
-              state: { 
-                exercise: todaysExercise, 
-                programName: program.name 
-              } 
-            })}
-            className="w-full flex items-center gap-3 p-3 rounded-xl bg-white/20 hover:bg-white/25 active:scale-[0.98] transition-all"
-          >
-            <div className="relative w-16 h-16 rounded-xl overflow-hidden flex-shrink-0">
-              <img src={todaysExercise.thumbnail} alt={todaysExercise.name} className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                <Play size={16} className="text-white" fill="white" />
-              </div>
-            </div>
-            <div className="flex-1 text-left">
-              <p className="text-sm font-medium text-gray-800">
-                {todaysExercise.name}
-              </p>
-              <div className="text-xs mt-0.5 text-gray-600 flex items-center gap-1">
-                <span>{todaysExercise.duration}</span>
-                <span>•</span>
-                {todaysExercise.hasDemo && (
-                  <>
-                    <Video className="w-3 h-3" style={{ color: colors.telo }} />
-                    <span>DEMO •</span>
-                  </>
-                )}
-                <span>{todaysExercise.description}</span>
-              </div>
-            </div>
-          </button>
-        </div>
-      )}
-
-      {/* Exercise Accordion by Weeks */}
-      <div className="space-y-4">
-        <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(107, 76, 59, 0.14)` }}>
-              <Calendar className="w-4 h-4" style={{ color: '#6B4C3B' }} />
-            </div>
-            <h3 className="text-[14px] font-semibold" style={{ color: '#2E2218' }}>Všetky cvičenia</h3>
-          </div>
-          
-          <div className="space-y-3">
-            {program.weekPlans.map((week) => (
-              <div 
-                key={week.week}
-                className="bg-white/20 rounded-xl overflow-hidden"
-              >
-                <button
-                  onClick={() => setOpenWeek(openWeek === week.week ? null : week.week)}
-                  className="w-full p-4 flex items-center justify-between text-left hover:bg-white/25 transition-colors"
-                >
-                  <div>
-                    <p className="text-sm font-semibold text-gray-800">
-                      {week.title}
-                    </p>
-                    <p className="text-xs mt-0.5 text-gray-600">
-                      {week.exercises.length} cvičení
-                    </p>
-                  </div>
-                  {openWeek === week.week ? (
-                    <ChevronUp size={16} className="text-gray-600" />
-                  ) : (
-                    <ChevronDown size={16} className="text-gray-600" />
-                  )}
-                </button>
-                
-                {openWeek === week.week && (
-                  <div className="border-t border-white/35 bg-white">
-                    {week.exercises.map((exercise, idx) => (
-                      <button 
-                        key={exercise.id}
-                        className="w-full p-3 border-b border-white/30 last:border-b-0 flex items-center gap-3 hover:bg-white/20 active:scale-[0.98] transition-all text-left"
-                        onClick={() => navigate('/exercise-player', { 
-                          state: { 
-                            exercise, 
-                            programName: program.name 
-                          } 
-                        })}
-                      >
-                        <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
-                          <img src={exercise.thumbnail} alt={exercise.name} className="w-full h-full object-cover" />
-                          <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                            <Play size={12} className="text-white" fill="white" />
-                          </div>
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-xs font-medium text-gray-800">
-                            {exercise.name}
-                          </p>
-                          <p className="text-xs mt-0.5 text-gray-600">
-                            {exercise.duration}
-                          </p>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Program Actions — always last */}
-      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
-        <div className="flex gap-3">
-          <button
-            onClick={() => setShowPauseConfirm(true)}
-            disabled={program.isPaused}
-            className="flex-1 py-3 px-4 rounded-xl text-sm font-medium transition-all active:scale-95 disabled:opacity-50 bg-[#B8864A] bg-opacity-10 text-[#B8864A] hover:bg-opacity-20"
-          >
-            Pozastaviť
-          </button>
-          <button
-            onClick={() => setShowRestartConfirm(true)}
-            className="flex-1 py-3 px-4 rounded-xl text-sm font-medium transition-all active:scale-95 bg-[#6B4C3B] bg-opacity-10 text-[#6B4C3B] hover:bg-opacity-20"
-          >
-            Nový začiatok
-          </button>
-        </div>
-      </div>
-
-      {/* Pause Confirmation Modal */}
-      {showPauseConfirm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-6 w-full max-w-sm shadow-xl">
-            <div className="text-center space-y-4">
-              <div className="w-12 h-12 rounded-full mx-auto flex items-center justify-center bg-[#B8864A] bg-opacity-15">
-                <AlertTriangle size={20} style={{ color: '#B8864A' }} />
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-gray-800">Pozastaviť program?</h3>
-                <p className="text-sm mt-2 text-gray-600">
-                  Tvoj pokrok bude uložený a môžeš pokračovať kedykoľvek.
-                </p>
-              </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setShowPauseConfirm(false)}
-                  className="flex-1 py-2.5 px-4 rounded-xl text-sm font-medium bg-white/25 text-gray-600 hover:bg-gray-200 transition-colors"
-                >
-                  Zrušiť
-                </button>
-                <button
-                  onClick={handlePauseProgram}
-                  className="flex-1 py-2.5 px-4 rounded-xl text-sm font-medium text-white bg-[#B8864A] hover:bg-[#A6784A] transition-colors"
-                >
-                  Pozastaviť
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Restart Confirmation Modal */}
-      {showRestartConfirm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-6 w-full max-w-sm shadow-xl">
-            <div className="text-center space-y-4">
-              <div className="w-12 h-12 rounded-full mx-auto flex items-center justify-center bg-[#6B4C3B] bg-opacity-15">
-                <RotateCcw size={20} style={{ color: '#6B4C3B' }} />
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-gray-800">Nový začiatok?</h3>
-                <p className="text-sm mt-2 text-gray-600">
-                  Program sa resetuje na týždeň 1, deň 1. Pokrok bude stratený.
-                </p>
-              </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setShowRestartConfirm(false)}
-                  className="flex-1 py-2.5 px-4 rounded-xl text-sm font-medium bg-white/25 text-gray-600 hover:bg-gray-200 transition-colors"
-                >
-                  Zrušiť
-                </button>
-                <button
-                  onClick={handleRestartProgram}
-                  className="flex-1 py-2.5 px-4 rounded-xl text-sm font-medium text-white bg-[#6B4C3B] hover:bg-[#5A3F31] transition-colors"
-                >
-                  Resetovať
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
