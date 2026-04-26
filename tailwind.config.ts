@@ -142,7 +142,26 @@ export default {
 					sage: '#C5D5C0',
 					lavender: '#D5C8E0',
 					card: '#FFFFFF',
-				}
+				},
+				// Redesign R9/R12 ("Final Review") — only consumed by src/pages/v2/*
+				// and src/components/v2/neome/*. Pillar-locked, never mix.
+				'neome-r9': {
+					bg: '#F8F5F0',
+					'cream-2': '#F1ECE3',
+					'cream-3': '#EAE3D6',
+					deep: '#3D2921',
+					'deep-2': '#2A1A14',
+					sage: '#8B9E88',
+					terra: '#C1856A',
+					dusty: '#89B0BC',
+					mauve: '#A8848B',
+					sandy: '#D4C4B0',
+					gold: '#B8864A',
+					eyebrow: 'rgba(61, 41, 33, 0.55)',
+					muted: 'rgba(61, 41, 33, 0.72)',
+					tertiary: 'rgba(61, 41, 33, 0.42)',
+					hair: 'rgba(61, 41, 33, 0.08)',
+				},
 			},
 			fontFamily: {
 				// NeoMe (handoff-2): Gilda Display + DM Sans

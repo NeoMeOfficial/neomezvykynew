@@ -641,3 +641,41 @@ All colors MUST be HSL.
 .delay-300 { animation-delay: 300ms; }
 .delay-400 { animation-delay: 400ms; }
 .delay-500 { animation-delay: 500ms; }
+/* ─────────────────────────────────────────────────────────────
+   NeoMe redesign tokens (R9/R12 — "Final Review")
+   All names prefixed --neome-r9-* to avoid collision with the
+   old design system. Only consumed by src/pages/v2/* and
+   src/components/v2/neome/*.
+   ───────────────────────────────────────────────────────────── */
+:root {
+  /* Cream backgrounds + ink text */
+  --neome-r9-bg: #F8F5F0;
+  --neome-r9-cream-2: #F1ECE3;
+  --neome-r9-cream-3: #EAE3D6;
+  --neome-r9-deep: #3D2921;
+  --neome-r9-deep-2: #2A1A14;
+
+  /* Pillar accents — locked, never mix */
+  --neome-r9-sage: #8B9E88;     /* Strava / Nutrition */
+  --neome-r9-terra: #C1856A;    /* Telo / Body */
+  --neome-r9-dusty: #89B0BC;    /* Myseľ alt */
+  --neome-r9-mauve: #A8848B;    /* Cyklus / Period */
+  --neome-r9-sandy: #D4C4B0;
+  --neome-r9-gold: #B8864A;     /* Rewards / Plus accent */
+
+  /* Typographic alphas of ink */
+  --neome-r9-eyebrow: rgba(61, 41, 33, 0.55);
+  --neome-r9-muted: rgba(61, 41, 33, 0.72);
+  --neome-r9-tertiary: rgba(61, 41, 33, 0.42);
+  --neome-r9-hair: rgba(61, 41, 33, 0.08);
+  --neome-r9-hair-2: rgba(61, 41, 33, 0.14);
+
+  /* Type families */
+  --neome-r9-serif: 'Gilda Display', Georgia, serif;
+  --neome-r9-sans: 'DM Sans', system-ui, sans-serif;
+
+  /* Radii */
+  --neome-r9-radius-card: 22px;
+  --neome-r9-radius-tile: 18px;
+  --neome-r9-radius-pill: 999px;
+}

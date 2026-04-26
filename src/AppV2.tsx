@@ -11,6 +11,7 @@ const Welcome = lazy(() => import('./pages/v2/Welcome'));
 const Onboarding = lazy(() => import('./pages/v2/Onboarding'));
 const DomovNew = lazy(() => import('./pages/v2/DomovNew'));
 const Kniznica = lazy(() => import('./pages/v2/Kniznica'));
+const KniznicaPreview = lazy(() => import('./pages/v2/KniznicaPreview'));
 const Telo = lazy(() => import('./pages/v2/Telo'));
 const Strava = lazy(() => import('./pages/v2/Strava'));
 const MyselNew = lazy(() => import('./pages/v2/MyselNew'));
@@ -125,6 +126,7 @@ export default function AppV2() {
               <Route path="/domov-new" element={<DomovNew />} />
               <Route path="/new-home" element={<DomovNew />} />
               <Route path="/kniznica" element={<Kniznica />} />
+              <Route path="/kniznica/preview" element={<KniznicaPreview />} />
               <Route path="/kniznica/telo" element={<Telo />} />
               <Route path="/kniznica/telo/programy" element={<TeloPrograms />} />
               <Route path="/kniznica/telo/extra" element={<TeloExtra />} />
