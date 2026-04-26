@@ -72,20 +72,46 @@ Updated as each ships. Format: `<screen> — <commit sha> — <notes>`.
 - ⏳ Pending: `Eye`, `Ser`, `Body`, `Card`, `SearchBar`, `PlusTag`, `BackHeader` in `src/components/v2/neome/`.
 
 ### Wave 3 — Screens (priority order)
-- ⏳ Knižnica R9-C → replace `KniznicaPreview` with full wired version at `/kniznica`
-- ⏳ Domov R12 → `DomovNew.tsx`
-- ⏳ Onboarding R7 (6 screens)
-- ⏳ Paywall R7 (warm + dark + compare)
-- ⏳ Telo R9 (hub + Programy + Program detail)
-- ⏳ Cyklus R5 dashboard (R11 log = BC-2 visual port; full behavior = separate PR)
-- ⏳ Strava R3 (hub + Recipes + Recipe detail + Meal plan)
-- ⏳ Myseľ R3 (hub + Meditation player + Reflection)
-- ⏳ Komunita R2 (feed + post + composer + Zľavy)
-- ⏳ Správy R10 (inbox + thread + composer)
-- ⏳ Profil R7-B + Settings R10
-- ⏳ Blog R7 (list + article)
-- ⏳ Rewards R10 + Referral R11 (visuals only; BC-3 = behavior PR)
-- ⏳ Checkout R10 (entry/processing/success/receipt) + Cancel (BC-1)
+
+**Shipped:**
+- ✅ Knižnica R9-C wired at `/kniznica` — 7 pillar tiles, live `useSubscription`, free paywall card
+- ✅ Domov R12 wired at `/domov-new` — 5 ritual cards + Cyklus, name from auth, Plus/Free conditionals
+- ✅ Onboarding R7 6-step flow at `/onboarding` — welcome / cycle / programs / nutrition upsell / nutrition prefs (conditional) / notifs
+- ✅ Paywall R7 at `/paywall?v=warm|dark|compare` — three variants for A/B; CTA → `/checkout`
+- ✅ Telo R9 hub at `/kniznica/telo` — 3 equal editorial cards
+- ✅ Telo Programy at `/kniznica/telo/programy` — list + active program badge
+- ✅ Program detail at `/program/:slug` — Mondays-only picker (BC-5 visual)
+- ✅ Cyklus R5 at `/kniznica/periodka` — phase ring + calendar + symptoms (Plus) / faded preview (Free)
+- ✅ Strava R3 hub at `/kniznica/strava`
+- ✅ Myseľ R3 hub at `/kniznica/mysel`
+- ✅ Blog R7-A at `/kniznica/blog` — featured + category chips + latest
+- ✅ Komunita R2 at `/komunita`
+- ✅ Správy R10 inbox at `/spravy` — pinned Gabi w/ gold star
+- ✅ Profil R7-B at `/profil` — wired auth + signOut
+- ✅ Settings hub R10 at `/settings`
+- ✅ Referral R11 main at `/referral` — Web Share API, code derived from email
+
+**Not yet ported (flagged for follow-up):**
+- ⏳ R11 Cyklus log sheet (BC-2 — sheet flow + cross-pillar nudge insight)
+- ⏳ R10 Settings sub-screens: Profile / Notifications / Privacy / Delete account
+- ⏳ R10 Cancel arc (BC-1 — 3-step retention → confirm → farewell)
+- ⏳ R10 Checkout entry / processing / success / receipt (existing /checkout still serves Stripe)
+- ⏳ R10 Rewards Toast / Summary / Catalog
+- ⏳ R11 Referral tracking / invitee landing / success / badges (visual port)
+- ⏳ R10 Habit composer + Diary archive + Diary entry (existing v2 pages serve)
+- ⏳ R10 Workout / Program completion celebrations
+- ⏳ R3 Recipe detail + Meal plan (existing v2 pages serve)
+- ⏳ R3 Meditation player
+- ⏳ R2 Post detail + Composer + Zľavy
+- ⏳ Spravy thread + composer
+- ⏳ Blog article detail
+- ⏳ R7 Profil A variant (B is canonical, A kept for reference)
+- ⏳ R8 Search idle / results / library empty / loading skeleton
+- ⏳ R9 Cvičenia / Strečing lists (existing /kniznica/telo/extra and /kniznica/telo/strecing serve)
+
+### Bug-fix follow-ups discovered during port
+- `src/pages/Komunita.tsx` (non-v2) has 10 pre-existing tsc errors (NordicCard tag mismatch). Out of scope for this redesign but should be fixed alongside the live-app upgrade.
+- `src/pages/Profil.tsx` (non-v2) has 6 pre-existing tsc errors. Same status.
 
 ---
 
