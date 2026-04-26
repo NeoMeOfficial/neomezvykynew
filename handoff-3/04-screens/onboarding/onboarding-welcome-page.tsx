@@ -6,10 +6,11 @@
  * Editorial hero. No auth-first. The user can browse the value prop and
  * progress straight into the cycle setup; account creation happens later.
  *
- * Pattern: warm cream background, full-bleed editorial photography, serif
- * display, single sticky CTA, de-emphasized "Pokračovať bez účtu" below.
+ * Pattern: full-bleed warm cream background, serif display, single sticky CTA,
+ * de-emphasized "Pokračovať bez účtu" link below.
  */
 
+import { Link } from "react-router-dom"; // or your router of choice
 import { SerifHeader } from "@/components/ui/serif-header";
 import { BodyText } from "@/components/ui/body-text";
 import { Eyebrow } from "@/components/ui/eyebrow";
@@ -32,15 +33,8 @@ export default function OnboardingWelcomePage() {
           v slovenčine, pre ženy ako ty.
         </BodyText>
 
-        {/* Editorial photography (handoff-3 hero-yoga.jpg) */}
-        <div className="mt-10 mx-auto w-full max-w-[300px] aspect-[3/4] rounded-3xl overflow-hidden border border-hair">
-          <img
-            src="/neome-onboarding-hero.jpg"
-            alt=""
-            className="w-full h-full object-cover"
-            loading="lazy"
-          />
-        </div>
+        {/* Editorial imagery placeholder — replace with real photography */}
+        <div className="mt-10 mx-auto w-full max-w-[280px] aspect-[3/4] rounded-3xl bg-cream-2 border border-hair" />
       </div>
 
       {/* Sticky bottom CTA */}
@@ -51,7 +45,7 @@ export default function OnboardingWelcomePage() {
         }}
         secondary={{
           label: "Pokračovať bez účtu",
-          href: "/domov-new",
+          href: "/home",
         }}
         legalNote="Pokračovaním súhlasíš s podmienkami."
       />
