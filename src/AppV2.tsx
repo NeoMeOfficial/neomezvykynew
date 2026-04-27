@@ -15,6 +15,7 @@ const KniznicaPreview = lazy(() => import('./pages/v2/KniznicaPreview'));
 const Paywall = lazy(() => import('./pages/v2/Paywall'));
 const CompletionWorkout = lazy(() => import('./pages/v2/CompletionWorkout'));
 const CompletionProgram = lazy(() => import('./pages/v2/CompletionProgram'));
+const ReflectionEntry = lazy(() => import('./pages/v2/ReflectionEntry'));
 const Telo = lazy(() => import('./pages/v2/Telo'));
 const Strava = lazy(() => import('./pages/v2/Strava'));
 const MyselNew = lazy(() => import('./pages/v2/MyselNew'));
@@ -133,6 +134,7 @@ export default function AppV2() {
               <Route path="/paywall" element={<Paywall />} />
               <Route path="/completion/workout" element={<CompletionWorkout />} />
               <Route path="/completion/program" element={<CompletionProgram />} />
+              <Route path="/dennik/new" element={<ReflectionEntry />} />
               <Route path="/kniznica/telo" element={<Telo />} />
               <Route path="/kniznica/telo/programy" element={<TeloPrograms />} />
               <Route path="/kniznica/telo/extra" element={<TeloExtra />} />

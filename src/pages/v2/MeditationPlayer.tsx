@@ -1,362 +1,217 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Play, Pause, RotateCcw } from 'lucide-react';
-import { colors, glassCard } from '../../theme/warmDusk';
+import { NM } from '../../components/v2/neome';
 
-interface Meditation {
-  id: string;
-  title: string;
-  duration: string;
-  description: string;
-  audioUrl: string;
-  image: string;
+/**
+ * Meditation player — R3 ambient
+ *
+ * Dark warm gradient with two soft orbs, serif title centered, fake
+ * waveform with progress, time labels, transport controls, ambient
+ * sound toggle row.
+ *
+ * FEATURE-NEEDED-MYSEL-AUDIO-PLAYER: real audio playback. The design
+ * shows transport (play/skip/±15s) and a live waveform; the live app
+ * has SecureVideoService but no audio-meditation pipeline. Build:
+ *   - Storage bucket for meditation audio (signed URLs)
+ *   - <audio> element + useState for playing/time
+ *   - Update waveform via animationframe based on currentTime
+ *   - Persist 'last position' per meditation in user_progress table
+ * Currently the controls are static affordances.
+ *
+ * FEATURE-NEEDED-MYSEL-AMBIENT-MIX: ambient-sound layering (rain,
+ * ocean, etc.) on top of the guided audio. Needs a separate buffer
+ * per ambient track + volume mix UI.
+ *
+ * Old version: MeditationPlayer.old.tsx.
+ */
+
+const MEDITATIONS: Record<string, { title: string; eyebrow: string; subtitle: string; durationSec: number }> = {
+  'rann-pokoj': {
+    title: 'Ticho pred dňom',
+    eyebrow: 'Ranná meditácia',
+    subtitle: '10-minútové ranné stíšenie s Gabi. Zamestnaj dych, nechaj myseľ spomaliť.',
+    durationSec: 600,
+  },
+  upokojenie: {
+    title: 'Upokojenie úzkosti',
+    eyebrow: 'Emócie',
+    subtitle: '12 minút na uzemnenie keď cítiš nepokoj. Postupné uvedomenie tela a dychu.',
+    durationSec: 720,
+  },
+  spanok: {
+    title: 'Dych pre spánok',
+    eyebrow: 'Večer',
+    subtitle: '15 minút pomalého dychu pre prechod do spánku.',
+    durationSec: 900,
+  },
+  prijatie: {
+    title: 'Prijatie tela',
+    eyebrow: 'Telo',
+    subtitle: '8 minút body-scan praxe.',
+    durationSec: 480,
+  },
+};
+
+const HEIGHTS = [20, 10, 28, 16, 32, 22, 14, 30, 18, 26, 12, 34, 20];
+
+function fmtTime(s: number): string {
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return `${m}:${sec.toString().padStart(2, '0')}`;
 }
-
-// Skutočné meditácie pre ženy a matky - len pokojné prírodné scenérie
-const meditations: Meditation[] = [
-  {
-    id: 'med-1',
-    title: 'Nájdenie vnútorného pokoja uprostred chaosu',
-    duration: '5 min',
-    description: 'Naučte sa nájsť pokojné miesto vo svojej mysli aj v najrušnejších dňoch',
-    audioUrl: '/audio/inner-peace-chaos.mp3',
-    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop'
-  },
-  {
-    id: 'med-2', 
-    title: 'Učenie sa byť prítomná pri každodenných úlohách',
-    duration: '5 min',
-    description: 'Transformujte bežné činnosti na príležitosti pre mindfulness',
-    audioUrl: '/audio/present-daily-tasks.mp3',
-    image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=300&fit=crop'
-  },
-  {
-    id: 'med-3',
-    title: 'Objavovanie trpezlivosti vo výchovnom procese',
-    duration: '5 min', 
-    description: 'Kultivujte trpezlivosť a porozumenie v náročných výchovných momentoch',
-    audioUrl: '/audio/patience-parenting.mp3',
-    image: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=400&h=300&fit=crop'
-  },
-  {
-    id: 'med-4',
-    title: 'Nájdenie radosti v malých veciach',
-    duration: '5 min',
-    description: 'Objavte krásu v jednoduchých, každodenných momentoch',
-    audioUrl: '/audio/joy-small-things.mp3',
-    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop'
-  },
-  {
-    id: 'med-5',
-    title: 'Udržiavanie emocionálnej rovnováhy',
-    duration: '5 min',
-    description: 'Technika na stabilizovanie emócií a nájdenie vnútornej harmónie',
-    audioUrl: '/audio/emotional-balance.mp3',
-    image: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=400&h=300&fit=crop'
-  },
-  {
-    id: 'med-6',
-    title: 'Vytváranie času pre seba',
-    duration: '5 min',
-    description: 'Naučte sa prioritizovať svoju pohodu a vytvoriť priestor pre seba',
-    audioUrl: '/audio/time-for-self.mp3',
-    image: 'https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=400&h=300&fit=crop'
-  },
-  {
-    id: 'med-7',
-    title: 'Posilňovanie väzby s dieťaťom',
-    duration: '5 min',
-    description: 'Meditácia zameraná na prehĺbenie lásky a spojenia s vaším dieťaťom',
-    audioUrl: '/audio/bond-with-child.mp3',
-    image: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=400&h=300&fit=crop'
-  },
-  {
-    id: 'med-8',
-    title: 'Prijímanie nepredvídateľnosti materstva',
-    duration: '5 min',
-    description: 'Naučte sa flexibilne reagovať na neočakávané situácie v materstve',
-    audioUrl: '/audio/accept-unpredictability.mp3',
-    image: 'https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=400&h=300&fit=crop'
-  },
-  {
-    id: 'med-9',
-    title: 'Naučiť sa odpúšťať sebe a iným',
-    duration: '5 min',
-    description: 'Oslobodenie sa od viny a rozhorčenia cez praktiku odpúštania',
-    audioUrl: '/audio/forgiveness-practice.mp3',
-    image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=300&fit=crop'
-  },
-  {
-    id: 'med-10',
-    title: 'Rozvíjanie empatie a porozumenia',
-    duration: '5 min',
-    description: 'Prehĺbenie schopnosti porozumieť sebe aj ostatným s láskavosťou',
-    audioUrl: '/audio/empathy-understanding.mp3',
-    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop'
-  },
-  {
-    id: 'med-11',
-    title: 'Prekonávanie stresu a úzkosti',
-    duration: '5 min',
-    description: 'Efektívne techniky na zvládanie stresu a upokojenie anxióznych myšlienok',
-    audioUrl: '/audio/overcome-stress-anxiety.mp3',
-    image: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&h=300&fit=crop'
-  },
-  {
-    id: 'med-12',
-    title: 'Budovanie sebadôvery a sebaúcty',
-    duration: '5 min',
-    description: 'Posilnenie vnútornej sily a pozitívneho vzťahu k sebe',
-    audioUrl: '/audio/self-confidence-esteem.mp3',
-    image: 'https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?w=400&h=300&fit=crop'
-  },
-  {
-    id: 'med-13',
-    title: 'Nájdenie rovnováhy medzi kariérou a osobným životom',
-    duration: '5 min',
-    description: 'Harmonizácia pracovných a osobných priorít s múdrosťou',
-    audioUrl: '/audio/work-life-balance.mp3',
-    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop'
-  },
-  {
-    id: 'med-14',
-    title: 'Učenie sa hovoriť „nie" bez pocitu viny',
-    duration: '5 min',
-    description: 'Nastavenie zdravých hraníc a sebapéça bez pocitov viny',
-    audioUrl: '/audio/saying-no-guilt.mp3',
-    image: 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=400&h=300&fit=crop'
-  },
-  {
-    id: 'med-15',
-    title: 'Rozvíjanie kreativity a hľadanie inšpirácie',
-    duration: '5 min',
-    description: 'Prebudenie tvorivého ducha a otvorenie sa novým možnostiam',
-    audioUrl: '/audio/creativity-inspiration.mp3',
-    image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=300&fit=crop'
-  },
-  {
-    id: 'med-16',
-    title: 'Zvládanie pocitu osamelosti a izolácie',
-    duration: '5 min',
-    description: 'Nájdenie spojenia a zmyslu aj v momentoch osamelosti',
-    audioUrl: '/audio/loneliness-isolation.mp3',
-    image: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=400&h=300&fit=crop'
-  },
-  {
-    id: 'med-17',
-    title: 'Udržiavanie pozitívneho myslenia',
-    duration: '5 min',
-    description: 'Kultivovanie optimizmu a vďačnosti v každodennom živote',
-    audioUrl: '/audio/positive-thinking.mp3',
-    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop'
-  }
-];
 
 export default function MeditationPlayer() {
   const navigate = useNavigate();
   const { meditationId } = useParams<{ meditationId: string }>();
-  const audioRef = useRef<HTMLAudioElement>(null);
-  
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
+  const m = (meditationId && MEDITATIONS[meditationId]) || MEDITATIONS['rann-pokoj'];
 
-  const meditation = meditations.find(m => m.id === meditationId);
-
-  useEffect(() => {
-    if (!meditation) {
-      navigate('/kniznica/mysel');
-      return;
-    }
-
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    const updateTime = () => setCurrentTime(audio.currentTime);
-    const updateDuration = () => {
-      setDuration(audio.duration);
-      setIsLoading(false);
-    };
-    const handleEnded = () => setIsPlaying(false);
-
-    audio.addEventListener('timeupdate', updateTime);
-    audio.addEventListener('loadedmetadata', updateDuration);
-    audio.addEventListener('ended', handleEnded);
-
-    return () => {
-      audio.removeEventListener('timeupdate', updateTime);
-      audio.removeEventListener('loadedmetadata', updateDuration);
-      audio.removeEventListener('ended', handleEnded);
-    };
-  }, [meditation, navigate]);
-
-  const togglePlay = async () => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    try {
-      if (isPlaying) {
-        audio.pause();
-      } else {
-        await audio.play();
-      }
-      setIsPlaying(!isPlaying);
-    } catch (error) {
-      console.error('Audio playback error:', error);
-      // Fallback for demo - show message
-      if (!isPlaying) {
-        setIsPlaying(true);
-        // Simulate meditation timer
-        setTimeout(() => setIsPlaying(false), 5000);
-      }
-    }
-  };
-
-  const restart = () => {
-    const audio = audioRef.current;
-    if (audio) {
-      audio.currentTime = 0;
-    }
-    setCurrentTime(0);
-  };
-
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const progressPercentage = duration > 0 ? (currentTime / duration) * 100 : 0;
-
-  if (!meditation) {
-    return null;
-  }
+  // FEATURE-NEEDED-MYSEL-AUDIO-PLAYER — currently fake state for visual only
+  const [playedSec] = useState(222); // 3:42 — matches design
+  const remaining = m.durationSec - playedSec;
+  const playedRatio = playedSec / m.durationSec;
+  const totalBars = 48;
+  const playedBars = Math.floor(totalBars * playedRatio);
 
   return (
-    <div className="w-full min-h-screen px-3 py-6 pb-28" style={{ background: colors.bgGradient }}>
-      {/* Header */}
-      <div className="flex items-center gap-3 mb-6">
+    <div
+      style={{
+        minHeight: '100vh',
+        background: `linear-gradient(160deg, ${NM.DEEP_2} 0%, #4A3327 40%, #3E2820 100%)`,
+        position: 'relative',
+        overflow: 'hidden',
+        fontFamily: NM.SANS,
+      }}
+    >
+      <div
+        style={{
+          position: 'absolute',
+          top: '22%',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: 280,
+          height: 280,
+          borderRadius: 999,
+          background: 'radial-gradient(circle, rgba(216,180,145,0.35) 0%, rgba(216,180,145,0.15) 40%, transparent 70%)',
+          filter: 'blur(20px)',
+        }}
+      />
+      <div
+        style={{
+          position: 'absolute',
+          top: '28%',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: 180,
+          height: 180,
+          borderRadius: 999,
+          background: 'radial-gradient(circle, rgba(193,133,106,0.45) 0%, rgba(193,133,106,0.1) 60%, transparent 80%)',
+          filter: 'blur(15px)',
+        }}
+      />
+
+      <div style={{ position: 'relative', padding: 'calc(env(safe-area-inset-top) + 14px) 18px 16px', display: 'flex', alignItems: 'center', zIndex: 10 }}>
         <button
-          onClick={() => navigate('/kniznica/mysel')}
-          className="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
+          onClick={() => navigate(-1)}
+          aria-label="Zavrieť"
+          style={{
+            all: 'unset',
+            cursor: 'pointer',
+            background: 'rgba(255,255,255,0.12)',
+            width: 36,
+            height: 36,
+            borderRadius: 999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backdropFilter: 'blur(10px)',
+          }}
         >
-          <ArrowLeft className="h-5 w-5" style={{ color: colors.mysel }} />
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M4 10l4-4 4 4" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
         </button>
-        <h1 className="text-lg font-semibold" style={{ color: colors.mysel }}>
-          Meditácia
-        </h1>
+        <div style={{ flex: 1 }} />
       </div>
 
-      {/* Main Player Card */}
-      <div 
-        className="rounded-2xl p-6 mb-6 relative overflow-hidden"
-        style={glassCard}
-      >
-        {/* Background Image */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center opacity-20"
-          style={{ backgroundImage: `url(${meditation.image})` }}
-        />
-        
-        {/* Gradient Overlay */}
-        <div 
-          className="absolute inset-0"
+      <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', minHeight: 'calc(100vh - 100px)', padding: '0 28px 32px', boxSizing: 'border-box' }}>
+        <div style={{ textAlign: 'center', marginBottom: 40 }}>
+          <div style={{ fontFamily: NM.SANS, fontSize: 10, letterSpacing: '0.28em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)', marginBottom: 18 }}>
+            {m.eyebrow}
+          </div>
+          <div style={{ fontFamily: NM.SERIF, fontSize: 42, fontWeight: 400, color: '#fff', letterSpacing: '-0.015em', lineHeight: 1.05, marginBottom: 16 }}>
+            {m.title}
+          </div>
+          <div style={{ fontFamily: NM.SANS, fontSize: 13, color: 'rgba(255,255,255,0.65)', lineHeight: 1.5, maxWidth: 280, margin: '0 auto' }}>
+            {m.subtitle}
+          </div>
+        </div>
+
+        <div style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 3, justifyContent: 'center', height: 40, marginBottom: 14 }}>
+          {Array.from({ length: totalBars }).map((_, i) => {
+            const h = HEIGHTS[i % HEIGHTS.length];
+            const played = i < playedBars;
+            return (
+              <div key={i} style={{ flex: 1, height: h, background: played ? '#fff' : 'rgba(255,255,255,0.25)', borderRadius: 999, maxWidth: 3 }} />
+            );
+          })}
+        </div>
+
+        <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', fontFamily: NM.SANS, fontSize: 11, color: 'rgba(255,255,255,0.6)', fontVariantNumeric: 'tabular-nums', marginBottom: 28 }}>
+          <span>{fmtTime(playedSec)}</span>
+          <span>−{fmtTime(remaining)}</span>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 22, marginBottom: 22 }}>
+          <button aria-label="Predošlá" style={{ all: 'unset', cursor: 'pointer', padding: 8 }}>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 4L6 10l6 6M15 4v12" stroke="#fff" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+          <button aria-label="O 15 sekúnd späť" style={{ all: 'unset', cursor: 'pointer', border: '1px solid rgba(255,255,255,0.35)', padding: '10px 14px', borderRadius: 999, color: '#fff', fontFamily: NM.SANS, fontSize: 12 }}>
+            −15s
+          </button>
+          <button aria-label="Pauza / prehrať" style={{ all: 'unset', cursor: 'pointer', background: '#fff', width: 72, height: 72, borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <rect x="6" y="4" width="3" height="14" rx="1" fill={NM.DEEP} />
+              <rect x="13" y="4" width="3" height="14" rx="1" fill={NM.DEEP} />
+            </svg>
+          </button>
+          <button aria-label="O 15 sekúnd dopredu" style={{ all: 'unset', cursor: 'pointer', border: '1px solid rgba(255,255,255,0.35)', padding: '10px 14px', borderRadius: 999, color: '#fff', fontFamily: NM.SANS, fontSize: 12 }}>
+            +15s
+          </button>
+          <button aria-label="Ďalšia" style={{ all: 'unset', cursor: 'pointer', padding: 8 }}>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M8 4l6 6-6 6M5 4v12" stroke="#fff" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        </div>
+
+        <div
           style={{
-            background: `linear-gradient(135deg, ${colors.mysel}10 0%, ${colors.mysel}20 100%)`
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '12px 16px',
+            background: 'rgba(255,255,255,0.08)',
+            borderRadius: 999,
+            border: '1px solid rgba(255,255,255,0.12)',
+            backdropFilter: 'blur(10px)',
+            marginBottom: 'calc(env(safe-area-inset-bottom) + 20px)',
+            boxSizing: 'border-box',
           }}
-        />
-
-        {/* Content */}
-        <div className="relative z-10 text-center">
-          <h2 className="text-2xl font-bold mb-2" style={{ color: colors.mysel }}>
-            {meditation.title}
-          </h2>
-          <p className="text-gray-600 text-sm mb-6 leading-relaxed">
-            {meditation.description}
-          </p>
-
-          {/* Time Display */}
-          <div className="mb-8">
-            <div className="text-3xl font-bold mb-2" style={{ color: colors.mysel }}>
-              {formatTime(currentTime)}
-            </div>
-            <div className="text-sm text-gray-500">
-              z {meditation.duration}
-            </div>
+        >
+          <div style={{ fontFamily: NM.SANS, fontSize: 11, color: 'rgba(255,255,255,0.75)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+            Ambientný zvuk
           </div>
-
-          {/* Progress Bar */}
-          <div className="mb-8">
-            <div className="w-full h-1 bg-gray-200 rounded-full overflow-hidden">
-              <div 
-                className="h-full transition-all duration-300 ease-out"
-                style={{ 
-                  width: `${progressPercentage}%`,
-                  backgroundColor: colors.mysel 
-                }}
-              />
-            </div>
-          </div>
-
-          {/* Controls */}
-          <div className="flex items-center justify-center gap-6">
-            <button
-              onClick={restart}
-              className="p-3 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
-            >
-              <RotateCcw className="h-6 w-6" style={{ color: colors.mysel }} />
-            </button>
-
-            <button
-              onClick={togglePlay}
-              className="p-4 rounded-full shadow-lg transition-all duration-200 hover:scale-105"
-              style={{ backgroundColor: colors.mysel }}
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : isPlaying ? (
-                <Pause className="h-8 w-8 text-white fill-current" />
-              ) : (
-                <Play className="h-8 w-8 text-white fill-current ml-1" />
-              )}
-            </button>
-
-            <div className="w-12" /> {/* Spacer for symmetry */}
+          <div style={{ fontFamily: NM.SANS, fontSize: 12, color: '#fff', display: 'flex', alignItems: 'center', gap: 6 }}>
+            Jemný dážď
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+              <path d="M2 3l3 3 3-3" stroke="rgba(255,255,255,0.6)" strokeWidth="1.3" strokeLinecap="round" />
+            </svg>
           </div>
         </div>
       </div>
-
-      {/* Instructions Card */}
-      <div 
-        className="rounded-2xl p-4"
-        style={{
-          ...glassCard,
-          backgroundColor: `${colors.mysel}08`
-        }}
-      >
-        <h3 className="font-semibold mb-3" style={{ color: colors.mysel }}>
-          Pred začatím meditácie:
-        </h3>
-        <ul className="space-y-2 text-sm text-gray-600">
-          <li>• Nájdi si pokojné miesto bez rušenia</li>
-          <li>• Sadni si pohodlne a narovnaj chrbticu</li>
-          <li>• Zatvor oči a sústreď sa na svojich dych</li>
-          <li>• Nech ťa myšlienky nerozptyľujú, len ich pozoruj</li>
-        </ul>
-      </div>
-
-      {/* Hidden Audio Element */}
-      <audio
-        ref={audioRef}
-        src={meditation.audioUrl}
-        preload="metadata"
-        onError={() => {
-          console.log('Audio file not found, using demo mode');
-          setIsLoading(false);
-        }}
-      />
     </div>
   );
 }
