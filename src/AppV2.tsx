@@ -4,6 +4,7 @@ import { SupabaseAuthProvider } from './contexts/SupabaseAuthContext';
 import { SubscriptionProvider } from './contexts/SubscriptionContext';
 import AppLayout from './layouts/v2/AppLayout';
 import ErrorBoundary from './components/v2/ErrorBoundary';
+import { Toaster } from '@/components/ui/toaster';
 
 const AuthReal = lazy(() => import('./pages/v2/AuthReal'));
 const AuthDemo = lazy(() => import('./pages/v2/AuthDemo'));
@@ -123,6 +124,7 @@ export default function AppV2() {
     <ErrorBoundary>
     <SupabaseAuthProvider>
     <SubscriptionProvider>
+      <Toaster />
       <BrowserRouter>
         <Suspense fallback={<LoadingSpinner />}>
             <Routes>

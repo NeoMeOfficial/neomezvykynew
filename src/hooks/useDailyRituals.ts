@@ -64,7 +64,7 @@ export function useReflections() {
       .limit(50);
     setEntries((data as ReflectionEntry[] | null) ?? []);
     setLoading(false);
-  }, [real, user]);
+  }, [real, user?.id]);
 
   useEffect(() => {
     refresh();
@@ -94,7 +94,7 @@ export function useReflections() {
       });
       if (!error) refresh();
     },
-    [entries, real, refresh, user],
+    [entries, real, refresh, user?.id],
   );
 
   return { entries, count: entries.length, loading, addReflection, refresh };
@@ -143,7 +143,7 @@ export function useCycleSymptoms() {
       .order('date', { ascending: false });
     setDays((data as SymptomDay[] | null) ?? []);
     setLoading(false);
-  }, [real, user]);
+  }, [real, user?.id]);
 
   useEffect(() => {
     refresh();
@@ -187,7 +187,7 @@ export function useCycleSymptoms() {
           );
       }
     },
-    [days, real, todayMap, user],
+    [days, real, todayMap, user?.id],
   );
 
   // Helper: list of dates (YYYY-MM-DD) in the last 60 days that have any symptom logged.
@@ -226,7 +226,7 @@ export function useActiveProgram() {
       .maybeSingle();
     setProgram((data as ActiveProgram | null) ?? null);
     setLoading(false);
-  }, [real, user]);
+  }, [real, user?.id]);
 
   useEffect(() => {
     refresh();
@@ -260,7 +260,7 @@ export function useActiveProgram() {
         );
       return { error };
     },
-    [real, user],
+    [real, user?.id],
   );
 
   return { program, loading, activateProgram, refresh };
