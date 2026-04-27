@@ -10,8 +10,10 @@ export default function AppLayout() {
       style={{ background: 'linear-gradient(to bottom, #FAF7F2, #F5F1E8)' }}
     >
       
-      {/* Mobile-optimized main content */}
-      <main className="relative z-10 pb-28 w-full max-w-none mx-auto px-0 sm:px-2 pt-4 sm:pt-6 min-h-screen safe-area-padding">
+      {/* Main content — redesigned screens handle their own safe-area
+          padding via env(safe-area-inset-*). No top/bottom padding here
+          so hero photos can full-bleed under the status bar. */}
+      <main className="relative z-10 w-full max-w-none mx-auto min-h-screen">
         <ErrorBoundary>
           <Outlet />
         </ErrorBoundary>

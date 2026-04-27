@@ -154,7 +154,7 @@ export default function Profil() {
       <div
         style={{
           position: 'relative',
-          paddingTop: 56,
+          paddingTop: 'calc(env(safe-area-inset-top) + 8px)',
           paddingBottom: 28,
           backgroundImage: `linear-gradient(180deg, rgba(248,245,240,0) 20%, rgba(248,245,240,0.7) 80%, ${NM.BG} 100%), url(/images/r9/lifestyle-yoga-pose.jpg)`,
           backgroundSize: 'cover',

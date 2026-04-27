@@ -70,7 +70,7 @@ export default function ReferralPage() {
     <Page>
       <div style={{ height: 320, position: 'relative', backgroundImage: 'url(/images/r9/lifestyle-mother-baby.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }}>
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(42,26,20,0.35) 0%, rgba(42,26,20,0.1) 45%, rgba(248,245,240,1) 100%)' }} />
-        <div style={{ position: 'absolute', top: 56, left: 20, right: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ position: 'absolute', top: 'calc(env(safe-area-inset-top) + 8px)', left: 18, right: 18, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <button
             onClick={() => navigate(-1)}
             aria-label="Späť"

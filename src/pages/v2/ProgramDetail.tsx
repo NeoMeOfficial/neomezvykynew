@@ -128,7 +128,7 @@ export default function ProgramDetail() {
             all: 'unset',
             cursor: 'pointer',
             position: 'absolute',
-            top: 56,
+            top: 'calc(env(safe-area-inset-top) + 8px)',
             left: 20,
             width: 38,
             height: 38,
