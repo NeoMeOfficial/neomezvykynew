@@ -1,465 +1,194 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Play, Clock, Zap, Shield, Filter } from 'lucide-react';
-import { colors } from '../../theme/warmDusk';
-import { supabase } from '../../lib/supabase';
+import { useSubscription } from '../../contexts/SubscriptionContext';
+import { Page, BackHeader, Eye, Ser, Body, PlusTag, NM } from '../../components/v2/neome';
 
-interface Exercise {
+/**
+ * Telo · Cvičenia — R9 sectioned list
+ *
+ * Body-part filter chips + duration sub-chips, then 3 sections grouped
+ * by length (Krátke / Stredné / Dlhé). Each row: thumbnail w/ play
+ * glyph + title + meta + Plus chip if locked.
+ *
+ * FEATURE-NEEDED-TELO-EXERCISES-CATALOG: Supabase-backed exercise
+ * catalog. Currently 8 hardcoded entries; admin-curated list lets
+ * Gabi add/remove without redeploying.
+ *
+ * Old version: TeloExtra.old.tsx.
+ */
+
+const FILTERS = ['Všetko', 'Celé telo', 'Brucho', 'Panvové dno', 'Chrbát', 'Nohy', 'Ruky'] as const;
+const DURATIONS = ['Krátke', 'Stredné', 'Dlhé'] as const;
+
+interface ExItem {
   id: string;
-  name: string;
-  duration: '15 min' | '5 min';
-  category: '15min' | 'dopalovacka';
-  body: 'Celé telo' | 'Core/Abs' | 'Nohy/Zadok';
-  equip: 'Bez pomôcok' | 'S gumou' | 'S činkami';
-  level: 1 | 2 | 3 | 4;
-  diastasisSafe: boolean;
-  thumb: string;
-  description?: string;
-}
-
-// Level colors - subtle but helpful
-const LEVEL_COLORS = {
-  1: '#7A9E78', // Green
-  2: '#B8864A', // Amber  
-  3: '#C27A6E', // Orange
-  4: '#8B7D6B', // Brown
-};
-
-type FilterState = {
-  level: number | null;
-  duration: string | null;
-  equip: string | null;
-  diastasis: boolean | null;
-};
-
-const exercises: Exercise[] = [
-  // Celé telo exercises - black and white aesthetic, women doing full body workouts
-  { id: 'ct-1', name: 'Celé telo', duration: '15 min', category: '15min', body: 'Celé telo', equip: 'Bez pomôcok', level: 1, diastasisSafe: true, thumb: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Komplexné posilnenie celého tela pre začiatočníčky' },
-  { id: 'ct-2', name: 'Celé telo', duration: '15 min', category: '15min', body: 'Celé telo', equip: 'S činkami', level: 3, diastasisSafe: true, thumb: 'https://images.unsplash.com/photo-1520877880798-5ee002cf2d03?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Pokročilé posilnenie s činkami' },
-  { id: 'ct-3', name: 'Celé telo', duration: '15 min', category: '15min', body: 'Celé telo', equip: 'S gumou', level: 2, diastasisSafe: true, thumb: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Stredne náročné cvičenie s gumou' },
-  { id: 'ct-4', name: 'Celé telo', duration: '5 min', category: 'dopalovacka', body: 'Celé telo', equip: 'Bez pomôcok', level: 1, diastasisSafe: true, thumb: 'https://images.unsplash.com/photo-1506629905496-f43367ee050d?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Jemná aktivácia celého tela' },
-  { id: 'ct-5', name: 'Celé telo', duration: '5 min', category: 'dopalovacka', body: 'Celé telo', equip: 'S činkami', level: 4, diastasisSafe: true, thumb: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Intenzívna dopaľovačka s činkami' },
-  { id: 'ct-6', name: 'Celé telo', duration: '5 min', category: 'dopalovacka', body: 'Celé telo', equip: 'S gumou', level: 2, diastasisSafe: true, thumb: 'https://images.unsplash.com/photo-1594737625785-a6cbdabd333c?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Stredná dopaľovačka s gumou' },
-  
-  // Core/Abs exercises - black and white, women doing core/ab focused exercises
-  { id: 'core-1', name: 'Core/Abs', duration: '15 min', category: '15min', body: 'Core/Abs', equip: 'Bez pomôcok', level: 3, diastasisSafe: false, thumb: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Pokročilé posilnenie brušných svalov' },
-  { id: 'core-2', name: 'Core/Abs', duration: '15 min', category: '15min', body: 'Core/Abs', equip: 'Bez pomôcok', level: 1, diastasisSafe: true, thumb: 'https://images.unsplash.com/photo-1593080358201-8c69903ac8fe?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Jemné posilnenie core pre diastázu' },
-  { id: 'core-3', name: 'Core/Abs', duration: '5 min', category: 'dopalovacka', body: 'Core/Abs', equip: 'Bez pomôcok', level: 4, diastasisSafe: false, thumb: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Intenzívna aktivácia brucha' },
-  { id: 'core-4', name: 'Core/Abs', duration: '5 min', category: 'dopalovacka', body: 'Core/Abs', equip: 'Bez pomôcok', level: 1, diastasisSafe: true, thumb: 'https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Jemná aktivácia pre diastázu' },
-  
-  // Nohy/Zadok exercises - black and white, women doing leg/glute focused exercises  
-  { id: 'legs-1', name: 'Nohy/Zadok', duration: '15 min', category: '15min', body: 'Nohy/Zadok', equip: 'S gumou', level: 2, diastasisSafe: true, thumb: 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Stredné posilnenie nôh a zadku' },
-  { id: 'legs-2', name: 'Nohy/Zadok', duration: '15 min', category: '15min', body: 'Nohy/Zadok', equip: 'Bez pomôcok', level: 1, diastasisSafe: true, thumb: 'https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Základné posilnenie bez pomôcok' },
-  { id: 'legs-3', name: 'Nohy/Zadok', duration: '5 min', category: 'dopalovacka', body: 'Nohy/Zadok', equip: 'S gumou', level: 3, diastasisSafe: true, thumb: 'https://images.unsplash.com/photo-1605296867304-46d5465a13f1?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Pokročilá aktivácia s gumou' },
-  { id: 'legs-4', name: 'Nohy/Zadok', duration: '5 min', category: 'dopalovacka', body: 'Nohy/Zadok', equip: 'Bez pomôcok', level: 2, diastasisSafe: true, thumb: 'https://images.unsplash.com/photo-1616279969856-759f316a32d4?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Stredná aktivácia bez pomôcok' },
-];
-
-const glassCard = {
-  backgroundColor: 'rgba(255,255,255,0.35)',
-  backdropFilter: 'blur(40px)',
-  border: '1px solid rgba(255,255,255,0.8)',
-  boxShadow: '0 8px 32px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.3)',
-};
-
-// Compact exercise card for slider
-function SliderExerciseCard({ exercise, onClick }: { exercise: Exercise; onClick: () => void }) {
-  const levelColor = LEVEL_COLORS[exercise.level];
-  
-  return (
-    <div 
-      className="w-80 flex-shrink-0 overflow-hidden cursor-pointer active:scale-[0.98] transition-all duration-200"
-      style={{
-        ...glassCard,
-        borderRadius: 16,
-        backgroundColor: 'rgba(255,255,255,0.9)',
-        backdropFilter: 'blur(20px)',
-      }}
-      onClick={onClick}
-    >
-      <div className="relative h-40">
-        <img src={exercise.thumb} alt={exercise.name} className="w-full h-full object-cover" />
-        <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-          <div 
-            className="w-12 h-12 rounded-full flex items-center justify-center"
-            style={{ 
-              backgroundColor: 'rgba(255,255,255,0.95)',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-            }}
-          >
-            <Play 
-              className="w-5 h-5 ml-0.5" 
-              style={{ color: colors.telo }} 
-              fill={colors.telo} 
-              strokeWidth={0} 
-            />
-          </div>
-        </div>
-      </div>
-      
-      <div className="p-4 space-y-2">
-        {/* Exercise name */}
-        <h4 className="text-[15px] font-semibold text-[#2E2218] mb-2">
-          {exercise.name}
-        </h4>
-        
-        {/* First row: Level + Duration */}
-        <div className="flex items-center gap-2">
-          {/* Level tag */}
-          <span 
-            className="text-[11px] px-2 py-1 rounded-full font-bold text-white"
-            style={{ backgroundColor: levelColor }}
-          >
-            Level {exercise.level}
-          </span>
-          
-          {/* Duration tag */}
-          <span 
-            className="text-[11px] px-2 py-1 rounded-full font-medium bg-[#6B4C3B]/10"
-            style={{ color: colors.telo }}
-          >
-            {exercise.duration}
-          </span>
-        </div>
-        
-        {/* Second row: Equipment + Diastasis + Category */}
-        <div className="flex items-center gap-2 flex-wrap">
-          {/* Equipment tag */}
-          <span 
-            className="text-[11px] px-2 py-1 rounded-full font-medium"
-            style={{
-              backgroundColor: `${colors.accent}15`,
-              color: colors.accent,
-            }}
-          >
-            {exercise.equip}
-          </span>
-          
-          {/* Diastasis safe tag */}
-          {exercise.diastasisSafe && (
-            <span className="text-[11px] px-2 py-1 rounded-full font-medium bg-green-500/10 text-green-600 flex items-center gap-1">
-              <Shield className="w-3 h-3" strokeWidth={2} />
-              Diastáza safe
-            </span>
-          )}
-          
-          {/* Dopalovacka tag */}
-          {exercise.category === 'dopalovacka' && (
-            <span 
-              className="text-[11px] px-2 py-1 rounded-full font-medium bg-[#7A9E78]/10"
-              style={{ color: colors.strava }}
-            >
-              Dopaľovačka
-            </span>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Filter button component
-function FilterButton({ label, active, onClick, color }: { 
-  label: string; 
-  active: boolean; 
-  onClick: () => void;
-  color?: string;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={`px-2.5 py-1.5 rounded-lg text-[10px] font-medium whitespace-nowrap transition-all active:scale-95 ${
-        active 
-          ? 'text-white shadow-sm' 
-          : 'bg-white/50 text-[#8B7560] hover:bg-white/70 border border-white/40'
-      }`}
-      style={active ? { backgroundColor: color || colors.telo } : {}}
-    >
-      {label}
-    </button>
-  );
-}
-
-// Category section with horizontal slider and filters
-function CategorySection({ title, exercises, icon: Icon, color, allExercises }: {
   title: string;
-  exercises: Exercise[];
-  icon: React.ElementType;
-  color: string;
-  allExercises: Exercise[];
-}) {
-  const navigate = useNavigate();
-  const [filters, setFilters] = useState<FilterState>({
-    level: null,
-    duration: null,
-    equip: null,
-    diastasis: null,
-  });
-  const [showFilters, setShowFilters] = useState(false);
-
-  const handleFilterToggle = (type: keyof FilterState, value: any) => {
-    setFilters(prev => ({
-      ...prev,
-      [type]: prev[type] === value ? null : value
-    }));
-  };
-
-  const clearFilters = () => {
-    setFilters({ level: null, duration: null, equip: null, diastasis: null });
-  };
-
-  const hasActiveFilters = Object.values(filters).some(v => v !== null);
-
-  // Apply filters
-  const filteredExercises = exercises.filter((exercise) => {
-    if (filters.level && exercise.level !== filters.level) return false;
-    if (filters.duration && exercise.duration !== filters.duration) return false;
-    if (filters.equip && exercise.equip !== filters.equip) return false;
-    if (filters.diastasis !== null && exercise.diastasisSafe !== filters.diastasis) return false;
-    return true;
-  });
-  
-  return (
-    <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20">
-      {/* Category header with filter */}
-      <div className="mb-4 space-y-3">
-        {/* Category title */}
-        <h3 className="text-[16px] font-semibold text-[#2E2218]">{title}</h3>
-        
-        {/* Filter and swipe row */}
-        <div className="flex items-center justify-between">
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className={`px-3 py-2 rounded-xl transition-all active:scale-95 flex items-center gap-2 ${
-              showFilters || hasActiveFilters
-                ? 'text-white shadow-md' 
-                : 'bg-white/50 text-[#8B7560] hover:bg-white/70 border border-white/40'
-            }`}
-            style={showFilters || hasActiveFilters ? { backgroundColor: color } : {}}
-          >
-            <Filter className="w-4 h-4" strokeWidth={1.5} />
-            <span className="text-[13px] font-medium">Nájdi si vhodné cvičenie</span>
-          </button>
-          
-          {/* Swipe indicator */}
-          <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white/50">
-            <span className="text-[10px] font-medium text-[#8B7560]">Swipe</span>
-            <ArrowLeft className="w-3 h-3 text-[#8B7560] transform rotate-180" strokeWidth={2} />
-          </div>
-        </div>
-      </div>
-
-      {/* Organized filters */}
-      {showFilters && (
-        <div className="mb-4 space-y-3">
-          {/* Náročnosť */}
-          <div className="space-y-2">
-            <p className="text-[11px] font-medium text-[#8B7560] uppercase tracking-wide">Náročnosť</p>
-            <div className="flex gap-2">
-              {[1, 2, 3, 4].map((level) => (
-                <FilterButton
-                  key={level}
-                  label={`Level ${level}`}
-                  active={filters.level === level}
-                  onClick={() => handleFilterToggle('level', level)}
-                  color={LEVEL_COLORS[level as keyof typeof LEVEL_COLORS]}
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* Dĺžka */}
-          <div className="space-y-2">
-            <p className="text-[11px] font-medium text-[#8B7560] uppercase tracking-wide">Dĺžka</p>
-            <div className="flex gap-2">
-              <FilterButton
-                label="15 min"
-                active={filters.duration === '15 min'}
-                onClick={() => handleFilterToggle('duration', '15 min')}
-                color={color}
-              />
-              <FilterButton
-                label="5 min"
-                active={filters.duration === '5 min'}
-                onClick={() => handleFilterToggle('duration', '5 min')}
-                color={color}
-              />
-            </div>
-          </div>
-
-          {/* Pomôcky */}
-          <div className="space-y-2">
-            <p className="text-[11px] font-medium text-[#8B7560] uppercase tracking-wide">Pomôcky</p>
-            <div className="flex gap-2 flex-wrap">
-              <FilterButton
-                label="Bez pomôcok"
-                active={filters.equip === 'Bez pomôcok'}
-                onClick={() => handleFilterToggle('equip', 'Bez pomôcok')}
-                color={color}
-              />
-              <FilterButton
-                label="S gumou"
-                active={filters.equip === 'S gumou'}
-                onClick={() => handleFilterToggle('equip', 'S gumou')}
-                color={color}
-              />
-              <FilterButton
-                label="S činkami"
-                active={filters.equip === 'S činkami'}
-                onClick={() => handleFilterToggle('equip', 'S činkami')}
-                color={color}
-              />
-            </div>
-          </div>
-
-          {/* Bezpečnosť */}
-          <div className="space-y-2">
-            <p className="text-[11px] font-medium text-[#8B7560] uppercase tracking-wide">Bezpečnosť</p>
-            <div className="flex gap-2">
-              <FilterButton
-                label="Diastáza safe"
-                active={filters.diastasis === true}
-                onClick={() => handleFilterToggle('diastasis', true)}
-                color="#10b981"
-              />
-            </div>
-          </div>
-
-          {/* Clear filters */}
-          {hasActiveFilters && (
-            <button
-              onClick={clearFilters}
-              className="text-[10px] text-[#8B7560] hover:text-[#6B4C3B] underline"
-            >
-              Vymazať filtre
-            </button>
-          )}
-        </div>
-      )}
-      
-      {/* Horizontal slider */}
-      <div className="relative">
-        {filteredExercises.length > 0 ? (
-          <>
-            <div className="-mx-0.5 px-0.5 overflow-x-auto scrollbar-hide">
-              <div className="flex gap-3 pb-2" style={{ scrollSnapType: 'x mandatory' }}>
-                {filteredExercises.map((exercise, i) => (
-                  <div key={exercise.id} style={{ scrollSnapAlign: 'start' }}>
-                    <SliderExerciseCard 
-                      exercise={exercise} 
-                      onClick={() => navigate(`/exercise/extra/${allExercises.findIndex(e => e.id === exercise.id)}`)}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-            
-            {/* Fade indicators */}
-            <div className="absolute right-0 top-0 bottom-2 w-6 bg-gradient-to-l from-white/40 to-transparent pointer-events-none" />
-          </>
-        ) : (
-          <div className="text-center py-8">
-            <p className="text-[12px] text-[#8B7560]">Žiadne cvičenia nevyhovujú filtrom</p>
-          </div>
-        )}
-      </div>
-    </div>
-  );
+  meta: string;
+  img: string;
+  locked: boolean;
 }
+
+interface ExSection {
+  eye: string;
+  items: ExItem[];
+}
+
+const SECTIONS: ExSection[] = [
+  {
+    eye: 'Krátke · do 10 min',
+    items: [
+      { id: 'ranne-prebudenie', title: 'Ranné prebudenie', meta: '8 min · celé telo', img: 'lifestyle-yoga-pose.jpg', locked: false },
+      { id: 'panvove-dno-zaklad', title: 'Panvové dno · základ', meta: '6 min · jemné', img: 'program-postpartum.jpg', locked: true },
+      { id: 'aktivacia-stredu', title: 'Aktivácia stredu', meta: '10 min · stredné', img: 'lifestyle-core-workout.jpg', locked: true },
+    ],
+  },
+  {
+    eye: 'Stredné · 10–20 min',
+    items: [
+      { id: 'jemny-core', title: 'Jemný core', meta: '15 min · jemné', img: 'lifestyle-core-workout.jpg', locked: false },
+      { id: 'funkcny-trening', title: 'Funkčný tréning', meta: '18 min · stredné', img: 'program-body-forming.jpg', locked: true },
+    ],
+  },
+  {
+    eye: 'Dlhé · 20+ min',
+    items: [
+      { id: 'celotelova-tonizacia', title: 'Celotelová tonizácia', meta: '28 min · stredné', img: 'program-body-forming.jpg', locked: true },
+      { id: 'joga-pre-silu', title: 'Joga pre silu', meta: '25 min · jemné', img: 'program-hormonal.jpg', locked: true },
+    ],
+  },
+];
 
 export default function TeloExtra() {
   const navigate = useNavigate();
-  const [exerciseList, setExerciseList] = useState<Exercise[]>(exercises);
-
-  useEffect(() => {
-    supabase.from('exercises').select('*').eq('content_type', 'exercise').eq('active', true)
-      .then(({ data }) => {
-        if (!data || data.length === 0) return;
-        setExerciseList(data.map(e => ({
-          id: e.id,
-          name: e.name,
-          duration: e.duration as Exercise['duration'],
-          category: e.category as Exercise['category'],
-          body: e.body as Exercise['body'],
-          equip: e.equip as Exercise['equip'],
-          level: e.level as Exercise['level'],
-          diastasisSafe: e.diastasis_safe,
-          thumb: e.thumb,
-          description: e.description,
-        })));
-      });
-  }, []);
-
-  // Store all exercises for index reference
-  const allExercises = exerciseList;
-
-  // Group exercises by body part
-  const exercisesByBodyPart = {
-    'Celé telo': exerciseList.filter(e => e.body === 'Celé telo'),
-    'Core/Abs': exerciseList.filter(e => e.body === 'Core/Abs'),
-    'Nohy/Zadok': exerciseList.filter(e => e.body === 'Nohy/Zadok'),
-  };
+  const { isPremium } = useSubscription();
+  const [activeFilter, setActiveFilter] = useState<string>('Všetko');
+  const [activeDuration, setActiveDuration] = useState<string | null>(null);
 
   return (
-    <div className="min-h-screen pb-20" style={{ background: colors.bgGradient }}>
-      <div className="p-5 space-y-8">
-        {/* Header */}
-        <div className="flex items-center gap-3 pt-8">
-          <button onClick={() => navigate('/kniznica/telo')} className="p-1">
-            <ArrowLeft className="w-5 h-5" style={{ color: colors.textPrimary }} strokeWidth={1.5} />
-          </button>
-          <div>
-            <h1 className="text-[22px] font-medium leading-tight" style={{ color: colors.textPrimary, fontFamily: '"Bodoni Moda", Georgia, serif' }}>Extra cvičenia</h1>
-          </div>
-        </div>
+    <Page>
+      <BackHeader title="Telo · Cvičenia" showSearch={false} />
 
-        {/* Hero Section */}
-        <div className="bg-white/30 backdrop-blur-xl rounded-3xl p-6 border border-white/30">
-          <div className="text-center mb-6">
-            <p className="text-sm" style={{ color: colors.textSecondary }}>
-              Máš extra čas a extra chuť si zacvičiť niečo extra?
-              <br />
-              Obohať si svoje 15-minútové denné cvičenia z programu a vyber si dopaľovačku zameranú na to, čo potrebuješ.
-            </p>
-          </div>
-        </div>
-
-        {/* Category Sections with Horizontal Sliders */}
-        <div className="space-y-5">
-          {/* Celé telo */}
-          <CategorySection
-          title="Celé telo" 
-          exercises={exercisesByBodyPart['Celé telo']}
-          icon={Zap}
-          color={colors.telo}
-          allExercises={allExercises}
-        />
-        
-          {/* Core/Abs */}
-          <CategorySection
-            title="Core/Abs" 
-            exercises={exercisesByBodyPart['Core/Abs']}
-            icon={Zap}
-            color={colors.strava}
-            allExercises={allExercises}
-          />
-          
-          {/* Nohy/Zadok */}
-          <CategorySection
-            title="Nohy/Zadok" 
-            exercises={exercisesByBodyPart['Nohy/Zadok']}
-            icon={Zap}
-            color={colors.accent}
-            allExercises={allExercises}
-          />
-        </div>
-
-        {/* Stats summary */}
-        <div className="text-center pt-4">
-          <p className="text-[12px] text-[#8B7560]">
-            {exerciseList.length} cvičení celkom • Swipe doprava pre viac
-          </p>
-        </div>
+      <div style={{ padding: '0 18px' }}>
+        <Ser size={30}>
+          Jednotlivé <em style={{ color: NM.TERRA, fontWeight: 500, fontStyle: 'italic' }}>tréningy</em>.
+        </Ser>
+        <Body style={{ marginTop: 10, maxWidth: 320 }}>
+          Vyber si podľa času a partie tela. 3 cvičenia dostupné zadarmo — ostatné s Plus.
+        </Body>
       </div>
-    </div>
+
+      <div style={{ display: 'flex', gap: 8, overflowX: 'auto', padding: '22px 18px 2px' }}>
+        {FILTERS.map((f) => {
+          const active = activeFilter === f;
+          return (
+            <button
+              key={f}
+              onClick={() => setActiveFilter(f)}
+              style={{
+                all: 'unset',
+                cursor: 'pointer',
+                flexShrink: 0,
+                padding: '8px 14px',
+                borderRadius: 999,
+                background: active ? NM.DEEP : '#fff',
+                color: active ? '#fff' : NM.DEEP,
+                border: active ? 'none' : `1px solid ${NM.HAIR_2}`,
+                fontFamily: NM.SANS,
+                fontSize: 12,
+                fontWeight: 400,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {f}
+            </button>
+          );
+        })}
+      </div>
+
+      <div style={{ display: 'flex', gap: 6, overflowX: 'auto', padding: '12px 18px 2px' }}>
+        {DURATIONS.map((d) => {
+          const active = activeDuration === d;
+          return (
+            <button
+              key={d}
+              onClick={() => setActiveDuration(active ? null : d)}
+              style={{
+                all: 'unset',
+                cursor: 'pointer',
+                flexShrink: 0,
+                padding: '6px 10px',
+                borderRadius: 999,
+                background: active ? NM.DEEP : NM.CREAM_2 ?? '#F1ECE3',
+                color: active ? '#fff' : NM.MUTED,
+                fontFamily: NM.SANS,
+                fontSize: 10.5,
+                fontWeight: 400,
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+              }}
+            >
+              {d}
+            </button>
+          );
+        })}
+      </div>
+
+      {SECTIONS.map((sec) => (
+        <div key={sec.eye} style={{ margin: '26px 18px 0' }}>
+          <Eye size={10} color={NM.TERRA} style={{ marginBottom: 10 }}>{sec.eye}</Eye>
+          <div style={{ background: '#fff', borderRadius: 18, border: `1px solid ${NM.HAIR}`, overflow: 'hidden' }}>
+            {sec.items.map((it, i, arr) => (
+              <button
+                key={it.id}
+                onClick={() => {
+                  if (it.locked && !isPremium) {
+                    navigate('/paywall');
+                  } else {
+                    navigate(`/exercise/extra/${it.id}`);
+                  }
+                }}
+                style={{
+                  all: 'unset',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  width: '100%',
+                  gap: 14,
+                  padding: '12px 14px',
+                  alignItems: 'center',
+                  borderBottom: i < arr.length - 1 ? `1px solid ${NM.HAIR}` : 'none',
+                  boxSizing: 'border-box',
+                }}
+              >
+                <div
+                  style={{
+                    width: 60,
+                    height: 60,
+                    borderRadius: 12,
+                    flexShrink: 0,
+                    backgroundImage: `url(/images/r9/${it.img})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    position: 'relative',
+                  }}
+                >
+                  <div style={{ position: 'absolute', inset: 0, borderRadius: 12, background: 'rgba(42,26,20,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ width: 24, height: 24, borderRadius: 999, background: 'rgba(255,255,255,0.92)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <svg width="8" height="9" viewBox="0 0 8 9" fill="none">
+                        <path d="M1 1v7l6-3.5L1 1z" fill={NM.DEEP} />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+                <div style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
+                  <div style={{ fontFamily: NM.SERIF, fontSize: 15, fontWeight: 500, color: NM.DEEP, letterSpacing: '-0.005em' }}>{it.title}</div>
+                  <div style={{ fontFamily: NM.SANS, fontSize: 10.5, color: NM.EYEBROW, marginTop: 3, fontWeight: 400 }}>{it.meta}</div>
+                </div>
+                {it.locked && !isPremium ? <PlusTag /> : <div style={{ color: NM.TERTIARY, fontSize: 14 }}>›</div>}
+              </button>
+            ))}
+          </div>
+        </div>
+      ))}
+    </Page>
   );
 }
