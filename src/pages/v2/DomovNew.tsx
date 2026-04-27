@@ -1,29 +1,37 @@
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseAuth } from '../../contexts/SupabaseAuthContext';
 import { useSubscription } from '../../contexts/SubscriptionContext';
+import { useUserProgram } from '../../hooks/useUserProgram';
+import { useMealPlan } from '../../features/nutrition/useMealPlan';
+import { useSupabaseHabits } from '../../hooks/useSupabaseHabits';
+import { useWorkoutHistory } from '../../hooks/useWorkoutHistory';
+import { useCycleData } from '../../features/cycle/useCycleData';
+import { recipes } from '../../data/recipes';
 import { Page, Eye, Ser, NM, Card } from '../../components/v2/neome';
 
 /**
- * Domov · R12 (canonical home)
- * ----------------------------------------------------------------
+ * Domov · R12 — wired
+ *
  * Five daily-ritual cards in fixed order (Body · Nutrition · Mindset
- * · Habits · Reflections) plus a Cyklus card. The cards ARE the nav.
+ * · Habits · Reflections) plus a Cyklus card.
  *
- * Wired:
- * - User name from useSupabaseAuth (falls back to "Eva")
- * - tier from useSubscription (Plus chip in eyebrow + Free upgrade nudge)
- * - All CTAs route to existing v2 destinations
+ * Wired to live data:
+ * - User name from useSupabaseAuth
+ * - tier from useSubscription
+ * - Active program from useUserProgram (currently always null per
+ *   hook's TEMP — design's "no program" path is what shows)
+ * - Today's meals from useMealPlan().todayPlan
+ * - Habits with today's completion state from useSupabaseHabits
+ * - Cycle day/phase from useCycleData
+ * - Week-strip activity dots from useWorkoutHistory.workoutHistory
  *
- * Static / TODO data (flagged inline):
- * - Today's date string ("Streda · 22. apríla") — wire to date-fns
- *   in a follow-up; locale already imported elsewhere in the project
- * - Active program day, week — needs hook from useWorkoutHistory
- * - Meal plan rows, kcal — useMealPlan
- * - Habits, reflections, cycle phase — existing widgets in
- *   src/components/v2/home/* hold the real data; we'll thread them
- *   in once the visual port is approved
- *
- * Old version: DomovNew.old.tsx (preserved as fallback).
+ * Static (FEATURE-NEEDED to wire):
+ * - "Dnešné zamyslenie" prompt — needs server-side prompt-of-day
+ *   service or static curated list (currently editorial copy)
+ * - "Meditácia dňa" — same: needs daily-meditation curation service
+ * - Reflection history pills (Plus tier) — wired to access-code-
+ *   based reflection system; the access-code tier is non-trivial
+ *   to thread here, see FEATURE-NEEDED-DOMOV-REFLECTIONS
  */
 
 const SECTIONS = {
@@ -35,6 +43,43 @@ const SECTIONS = {
 
 const SK_DAYS = ['Nedeľa', 'Pondelok', 'Utorok', 'Streda', 'Štvrtok', 'Piatok', 'Sobota'];
 const SK_MONTHS = ['január', 'február', 'marec', 'apríl', 'máj', 'jún', 'júl', 'august', 'september', 'október', 'november', 'december'];
+
+const PHASE_COLOR: Record<string, string> = {
+  menstrual: '#D69A9A',
+  follicular: '#A8C4A0',
+  ovulation: '#C8A8D4',
+  luteal: '#D4B48C',
+};
+
+const PHASE_LABEL: Record<string, string> = {
+  menstrual: 'Menštruačná',
+  follicular: 'Folikulárna',
+  ovulation: 'Ovulácia',
+  luteal: 'Luteálna',
+};
+
+const PHASE_BLURB: Record<string, string> = {
+  menstrual: 'Telo sa resetuje — doprajte si pokoj a teplo.',
+  follicular: 'Energia sa vracia — dobré okno na pohyb.',
+  ovulation: 'Vrchol energie a sebavedomia — sociálny čas.',
+  luteal: 'Spomaľ a uzemni sa — telo sa pripravuje.',
+};
+
+const MEAL_LABELS: Record<string, string> = {
+  ranajky: 'Raňajky',
+  desiata: 'Desiata',
+  obed: 'Obed',
+  olovrant: 'Olovrant',
+  vecera: 'Večera',
+};
+
+const MEAL_TIMES: Record<string, string> = {
+  ranajky: '7:30',
+  desiata: '10:30',
+  obed: '13:00',
+  olovrant: '16:00',
+  vecera: '19:00',
+};
 
 function formatToday(d = new Date()): string {
   return `${SK_DAYS[d.getDay()]} · ${d.getDate()}. ${SK_MONTHS[d.getMonth()]}`;
@@ -54,6 +99,10 @@ function deriveName(user: { email?: string | null; user_metadata?: { full_name?:
   if (meta?.name) return meta.name.split(' ')[0];
   if (user.email) return user.email.split('@')[0].split('.')[0].replace(/^[a-z]/, (c) => c.toUpperCase());
   return 'Eva';
+}
+
+function recipeById(id: string) {
+  return recipes.find((r) => r.id === id);
 }
 
 function SectionHeader({ children, right }: { children: string; right?: string }) {
@@ -104,18 +153,22 @@ function Greeting({ name, isPremium }: { name: string; isPremium: boolean }) {
 }
 
 function WeekStrip() {
-  // TODO data: derive from real today + activity log via useWorkoutHistory
+  const { workoutHistory } = useWorkoutHistory();
   const days = ['Po', 'Ut', 'St', 'Št', 'Pi', 'So', 'Ne'];
   const today = new Date();
   const dow = (today.getDay() + 6) % 7; // Mon=0
   const start = new Date(today);
   start.setDate(today.getDate() - dow);
-  const dates = Array.from({ length: 7 }, (_, i) => {
+
+  const dates: number[] = [];
+  const marked: boolean[] = [];
+  for (let i = 0; i < 7; i++) {
     const d = new Date(start);
     d.setDate(start.getDate() + i);
-    return d.getDate();
-  });
-  const marked = [true, true, true, false, false, false, false]; // TODO data: real activity
+    dates.push(d.getDate());
+    const dStr = d.toISOString().split('T')[0];
+    marked.push(workoutHistory.some((w) => w.completedAt.split('T')[0] === dStr));
+  }
 
   return (
     <div style={{ padding: '20px 18px 0' }}>
@@ -195,13 +248,12 @@ function CTAArrow({ color, label, onClick }: { color: string; label: string; onC
   );
 }
 
-// ─── 1 · Body card ──────────────────────────────────────────────
+// ─── 1 · Body card ─────────────────────────────────────────────
 function BodyCard({ isPremium }: { isPremium: boolean }) {
   const navigate = useNavigate();
-  // TODO data: hasProgram from useWorkoutHistory / active program
-  const hasProgram = isPremium;
+  const { userProgram } = useUserProgram();
 
-  if (hasProgram) {
+  if (userProgram) {
     return (
       <div style={{ padding: '0 18px', marginBottom: 12 }}>
         <Card padding={18}>
@@ -215,7 +267,7 @@ function BodyCard({ isPremium }: { isPremium: boolean }) {
               borderRadius: 14,
               overflow: 'hidden',
               aspectRatio: '16/10',
-              background: 'url(/images/r9/lifestyle-core-workout.jpg) center/cover',
+              background: `url(${userProgram.todaysExercise?.thumbnail ?? '/images/r9/lifestyle-core-workout.jpg'}) center/cover`,
             }}
           >
             <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0) 45%, rgba(0,0,0,0.45) 100%)' }} />
@@ -237,34 +289,19 @@ function BodyCard({ isPremium }: { isPremium: boolean }) {
                 <path d="M8 5v14l11-7z" />
               </svg>
             </div>
-            <div style={{ position: 'absolute', bottom: 10, right: 10, padding: '4px 10px', borderRadius: 999, background: 'rgba(0,0,0,0.55)', color: '#fff', fontSize: 10.5, fontWeight: 500, letterSpacing: '0.04em' }}>
-              32 min
-            </div>
+            {userProgram.todaysExercise?.duration && (
+              <div style={{ position: 'absolute', bottom: 10, right: 10, padding: '4px 10px', borderRadius: 999, background: 'rgba(0,0,0,0.55)', color: '#fff', fontSize: 10.5, fontWeight: 500, letterSpacing: '0.04em' }}>
+                {userProgram.todaysExercise.duration}
+              </div>
+            )}
           </div>
           <div style={{ marginTop: 14 }}>
-            {/* TODO data: program name, week, day from useWorkoutHistory */}
-            <Ser size={20}>BodyForming · Týž. 4, Deň 2</Ser>
-            <div style={{ fontSize: 12.5, color: NM.MUTED, marginTop: 4, lineHeight: 1.45, fontWeight: 300 }}>
-              Dolná časť tela · dnes ráno si preskočila — skús poobede
-            </div>
-            <div style={{ display: 'flex', gap: 6, marginTop: 12, flexWrap: 'wrap' }}>
-              {['Posilňovanie', 'Dolné končatiny'].map((t, i) => (
-                <div
-                  key={t}
-                  style={{
-                    padding: '5px 10px',
-                    borderRadius: 999,
-                    background: i === 1 ? `${SECTIONS.TELO}22` : 'rgba(178,125,98,0.08)',
-                    color: i === 1 ? SECTIONS.TELO : NM.TERTIARY,
-                    fontSize: 10.5,
-                    fontWeight: 500,
-                    letterSpacing: '0.03em',
-                  }}
-                >
-                  {t}
-                </div>
-              ))}
-            </div>
+            <Ser size={20}>
+              {userProgram.name} · Týž. {userProgram.week}, Deň {userProgram.day}
+            </Ser>
+            {userProgram.todaysExercise && (
+              <div style={{ fontSize: 12.5, color: NM.MUTED, marginTop: 4, lineHeight: 1.45, fontWeight: 300 }}>{userProgram.todaysExercise.title}</div>
+            )}
             <CTAArrow color={SECTIONS.TELO} label="Spustiť tréning" onClick={() => navigate('/kniznica/telo/programy')} />
           </div>
         </Card>
@@ -272,7 +309,8 @@ function BodyCard({ isPremium }: { isPremium: boolean }) {
     );
   }
 
-  // No program → suggested exercise
+  // No active program → suggested exercise (curated, not from a hook)
+  // FEATURE-NEEDED: "exercise of the day" curation service (currently static)
   return (
     <div style={{ padding: '0 18px', marginBottom: 12 }}>
       <Card padding={18}>
@@ -295,30 +333,50 @@ function BodyCard({ isPremium }: { isPremium: boolean }) {
   );
 }
 
-// ─── 2 · Nutrition card ─────────────────────────────────────────
+// ─── 2 · Nutrition card ────────────────────────────────────────
 function NutritionCard({ isPremium }: { isPremium: boolean }) {
   const navigate = useNavigate();
-  // TODO data: real meal plan from useMealPlan
-  const hasMealPlan = isPremium;
+  const { todayPlan } = useMealPlan();
 
-  if (hasMealPlan) {
-    const meals = [
-      { eye: 'Raňajky · 7:30', title: 'Banánovo medové smoothie', sub: '195 kcal · 5 min', img: 'testimonial-recipe.jpg' },
-      { eye: 'Obed · 13:00', title: 'Buddha bowl s batátou', sub: '520 kcal · 30 min', img: 'section-nutrition.jpg' },
-      { eye: 'Večera · 19:00', title: 'Tofu so zeleninou', sub: '410 kcal · 25 min', img: 'program-postpartum.jpg' },
-    ];
+  // Resolve recipe IDs to titles (selected option of each meal)
+  const meals = todayPlan?.meals
+    .map((slot) => {
+      const recipeId = slot.options[slot.selected];
+      const recipe = recipeById(recipeId);
+      if (!recipe) return null;
+      return {
+        eye: `${MEAL_LABELS[slot.type] ?? slot.type} · ${MEAL_TIMES[slot.type] ?? ''}`.trim().replace(/·\s*$/, ''),
+        title: recipe.title,
+        sub: `${Math.round(recipe.calories * slot.portionMultiplier)} kcal · ${recipe.prepTime} min`,
+        recipeId: recipe.id,
+        // Use cycle/category-based image stand-in (real recipe.imageUrl depends on
+        // recipes data; we keep section thumbnails consistent with the design)
+        img: recipe.category === 'ranajky' || recipe.category === 'snack' || recipe.category === 'smoothie' ? 'testimonial-recipe.jpg' : 'section-nutrition.jpg',
+      };
+    })
+    .filter(Boolean)
+    .slice(0, 3) as { eye: string; title: string; sub: string; recipeId: string; img: string }[] | undefined;
+
+  if (todayPlan && meals && meals.length > 0) {
+    const dow = (new Date().getDay() + 6) % 7;
+    const dayLabel = ['pondelok', 'utorok', 'streda', 'štvrtok', 'piatok', 'sobota', 'nedeľa'][dow];
     return (
       <div style={{ padding: '0 18px', marginBottom: 12 }}>
         <Card padding={18}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 14 }}>
             <PillarDot color={SECTIONS.STRAVA} />
-            <Eye size={10}>Jedálniček · streda · 1 620 kcal</Eye>
+            <Eye size={10}>
+              Jedálniček · {dayLabel} · {todayPlan.totalCalories} kcal
+            </Eye>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             {meals.map((r, i) => (
-              <div
-                key={r.eye}
+              <button
+                key={r.eye + r.title}
+                onClick={() => navigate(`/recipe/${r.recipeId}`)}
                 style={{
+                  all: 'unset',
+                  cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   gap: 12,
@@ -327,7 +385,7 @@ function NutritionCard({ isPremium }: { isPremium: boolean }) {
                 }}
               >
                 <div style={{ width: 48, height: 48, borderRadius: 10, background: `url(/images/r9/${r.img}) center/cover`, flexShrink: 0 }} />
-                <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
                   <Eye size={9.5}>{r.eye}</Eye>
                   <div style={{ fontFamily: NM.SERIF, fontSize: 15, fontWeight: 500, color: NM.DEEP, marginTop: 2, lineHeight: 1.2 }}>{r.title}</div>
                   <div style={{ fontSize: 11.5, color: NM.MUTED, marginTop: 1, fontWeight: 300 }}>{r.sub}</div>
@@ -335,7 +393,7 @@ function NutritionCard({ isPremium }: { isPremium: boolean }) {
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={NM.TERTIARY} strokeWidth="2" strokeLinecap="round">
                   <path d="M9 6l6 6-6 6" />
                 </svg>
-              </div>
+              </button>
             ))}
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 14 }}>
@@ -346,7 +404,8 @@ function NutritionCard({ isPremium }: { isPremium: boolean }) {
     );
   }
 
-  // No meal plan → recipe of the day + quiet upsell
+  // No meal plan → recipe of the day + quiet upsell.
+  // FEATURE-NEEDED: "recipe of the day" rotation service. Currently static curated.
   return (
     <div style={{ padding: '0 18px', marginBottom: 12 }}>
       <Card padding={18}>
@@ -364,39 +423,43 @@ function NutritionCard({ isPremium }: { isPremium: boolean }) {
           <span>Z knižnice</span>
         </div>
         <CTAArrow color={SECTIONS.STRAVA} label="Otvoriť recept" onClick={() => navigate('/kniznica/strava')} />
-        <div style={{ marginTop: 14, paddingTop: 12, borderTop: `1px solid ${NM.HAIR}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ fontSize: 11, color: NM.TERTIARY, fontWeight: 300, lineHeight: 1.4 }}>
-            Pridaj jedálniček — každodenné jedlá prispôsobené tebe.
+        {!isPremium && (
+          <div style={{ marginTop: 14, paddingTop: 12, borderTop: `1px solid ${NM.HAIR}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ fontSize: 11, color: NM.TERTIARY, fontWeight: 300, lineHeight: 1.4 }}>
+              Pridaj jedálniček — každodenné jedlá prispôsobené tebe.
+            </div>
+            <button
+              onClick={() => navigate('/checkout?upsell=mealplan')}
+              style={{
+                background: 'transparent',
+                border: 0,
+                padding: 0,
+                cursor: 'pointer',
+                fontSize: 11,
+                fontWeight: 500,
+                color: SECTIONS.STRAVA,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 4,
+                whiteSpace: 'nowrap',
+                fontFamily: NM.SANS,
+              }}
+            >
+              +57 €
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={SECTIONS.STRAVA} strokeWidth="2" strokeLinecap="round">
+                <path d="M9 6l6 6-6 6" />
+              </svg>
+            </button>
           </div>
-          <button
-            onClick={() => navigate('/checkout?upsell=mealplan')}
-            style={{
-              background: 'transparent',
-              border: 0,
-              padding: 0,
-              cursor: 'pointer',
-              fontSize: 11,
-              fontWeight: 500,
-              color: SECTIONS.STRAVA,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 4,
-              whiteSpace: 'nowrap',
-              fontFamily: NM.SANS,
-            }}
-          >
-            +57 €
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={SECTIONS.STRAVA} strokeWidth="2" strokeLinecap="round">
-              <path d="M9 6l6 6-6 6" />
-            </svg>
-          </button>
-        </div>
+        )}
       </Card>
     </div>
   );
 }
 
-// ─── 3 · Mindset card ───────────────────────────────────────────
+// ─── 3 · Mindset card ──────────────────────────────────────────
+// FEATURE-NEEDED-DOMOV-MEDITATION: meditation-of-the-day rotation service.
+// Currently editorial curation: fixed "Ranný pokoj · 10 min · Gabi".
 function MindsetCard() {
   const navigate = useNavigate();
   return (
@@ -450,15 +513,19 @@ function MindsetCard() {
   );
 }
 
-// ─── 4 · Habits card ────────────────────────────────────────────
+// ─── 4 · Habits card ───────────────────────────────────────────
 function HabitsCard({ isPremium }: { isPremium: boolean }) {
   const navigate = useNavigate();
-  // TODO data: real habits from existing habit hook (src/components/v2/habits/*)
-  const habits = [
-    { label: 'Piť 2 l vody', done: true },
-    { label: '10 minút pohybu', done: true },
-    { label: 'Večerná meditácia', done: false },
-  ];
+  const { habits, loading } = useSupabaseHabits() as {
+    habits: { id: string; name: string; targetPerDay: number; completions: Record<string, number> }[];
+    loading: boolean;
+  };
+  const todayStr = new Date().toISOString().split('T')[0];
+  const visible = (habits ?? []).slice(0, 3).map((h) => ({
+    label: h.name,
+    done: (h.completions?.[todayStr] ?? 0) >= h.targetPerDay,
+  }));
+
   return (
     <div style={{ padding: '0 18px', marginBottom: 12 }}>
       <Card padding={18}>
@@ -468,40 +535,46 @@ function HabitsCard({ isPremium }: { isPremium: boolean }) {
         </div>
         <Ser size={20} style={{ marginBottom: 10 }}>Malé kroky, veľký rozdiel</Ser>
         <div>
-          {habits.map((h, i) => (
-            <div
-              key={h.label}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 12,
-                padding: '10px 0',
-                borderBottom: i < habits.length - 1 ? `1px solid ${NM.HAIR}` : 'none',
-              }}
-            >
+          {loading || visible.length === 0 ? (
+            <div style={{ padding: '14px 0', fontSize: 12.5, color: NM.MUTED, fontWeight: 300, lineHeight: 1.5 }}>
+              {loading ? 'Načítavam návyky…' : 'Zatiaľ žiadne návyky. Pridaj si prvý.'}
+            </div>
+          ) : (
+            visible.map((h, i) => (
               <div
+                key={h.label + i}
                 style={{
-                  width: 20,
-                  height: 20,
-                  borderRadius: 10,
-                  flexShrink: 0,
-                  border: `1.5px solid ${h.done ? SECTIONS.TELO : NM.HAIR_2}`,
-                  background: h.done ? SECTIONS.TELO : 'transparent',
-                  display: 'grid',
-                  placeItems: 'center',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  padding: '10px 0',
+                  borderBottom: i < visible.length - 1 ? `1px solid ${NM.HAIR}` : 'none',
                 }}
               >
-                {h.done && (
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M5 12l5 5 9-11" />
-                  </svg>
-                )}
+                <div
+                  style={{
+                    width: 20,
+                    height: 20,
+                    borderRadius: 10,
+                    flexShrink: 0,
+                    border: `1.5px solid ${h.done ? SECTIONS.TELO : NM.HAIR_2}`,
+                    background: h.done ? SECTIONS.TELO : 'transparent',
+                    display: 'grid',
+                    placeItems: 'center',
+                  }}
+                >
+                  {h.done && (
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M5 12l5 5 9-11" />
+                    </svg>
+                  )}
+                </div>
+                <div style={{ fontSize: 13.5, color: h.done ? NM.TERTIARY : NM.DEEP, textDecoration: h.done ? 'line-through' : 'none' }}>
+                  {h.label}
+                </div>
               </div>
-              <div style={{ fontSize: 13.5, color: h.done ? NM.TERTIARY : NM.DEEP, textDecoration: h.done ? 'line-through' : 'none' }}>
-                {h.label}
-              </div>
-            </div>
-          ))}
+            ))
+          )}
           <button
             onClick={() => navigate('/navyky')}
             style={{
@@ -531,7 +604,7 @@ function HabitsCard({ isPremium }: { isPremium: boolean }) {
               Ukladá sa len s <span style={{ color: NM.GOLD, fontWeight: 500 }}>Plus</span>
             </div>
             <button
-              onClick={() => navigate('/checkout')}
+              onClick={() => navigate('/paywall')}
               style={{
                 background: 'transparent',
                 border: 0,
@@ -558,7 +631,10 @@ function HabitsCard({ isPremium }: { isPremium: boolean }) {
   );
 }
 
-// ─── 5 · Reflections card ───────────────────────────────────────
+// ─── 5 · Reflections card ──────────────────────────────────────
+// FEATURE-NEEDED-DOMOV-REFLECTIONS: prompt-of-the-day curation +
+// account-scoped (vs access-code-scoped) reflection store. Currently
+// the prompt is editorial, the textarea routes to /dennik for entry.
 function ReflectionsCard({ isPremium }: { isPremium: boolean }) {
   const navigate = useNavigate();
   const history = [
@@ -630,7 +706,7 @@ function ReflectionsCard({ isPremium }: { isPremium: boolean }) {
               Ukladá sa len s <span style={{ color: NM.GOLD, fontWeight: 500 }}>Plus</span>
             </div>
             <button
-              onClick={() => navigate('/checkout')}
+              onClick={() => navigate('/paywall')}
               style={{
                 background: 'transparent',
                 border: 0,
@@ -657,18 +733,18 @@ function ReflectionsCard({ isPremium }: { isPremium: boolean }) {
   );
 }
 
-// ─── 6 · Cyklus card ────────────────────────────────────────────
-function CyklusCard({ isPremium }: { isPremium: boolean }) {
+// ─── 6 · Cyklus card ───────────────────────────────────────────
+function CyklusCard() {
   const navigate = useNavigate();
-  // TODO data: from features/cycle hooks (deviation/phase/day count)
-  const hasCycleData = isPremium;
+  const { cycleData, derivedState } = useCycleData();
+  const hasCycleData = !!cycleData?.lastPeriodStart;
 
   if (!hasCycleData) {
     return (
       <div style={{ padding: '0 18px', marginBottom: 12 }}>
         <div
           style={{
-            background: `linear-gradient(180deg, #F1E6EA 0%, #fff 100%)`,
+            background: 'linear-gradient(180deg, #F1E6EA 0%, #fff 100%)',
             borderRadius: 20,
             padding: 20,
             border: `1px solid ${NM.HAIR}`,
@@ -718,18 +794,23 @@ function CyklusCard({ isPremium }: { isPremium: boolean }) {
     );
   }
 
-  // Plus with cycle data — phase ring summary
-  // TODO data: real day, total, phase, days-to-next from features/cycle
-  const day = 7;
-  const total = 28;
-  const phases = [
-    { w: 5 / total, c: '#C6758A' },
-    { w: 8 / total, c: '#B48499' },
-    { w: 3 / total, c: '#A36C8E' },
-    { w: 12 / total, c: '#7A5A72' },
-  ];
+  const day = derivedState?.currentDay ?? 1;
+  const total = cycleData.cycleLength ?? 28;
+  const phaseKey = derivedState?.currentPhase?.key ?? 'follicular';
+  const phaseColor = PHASE_COLOR[phaseKey] ?? '#7A5A72';
+  const phaseLabel = PHASE_LABEL[phaseKey] ?? 'Folikulárna';
+  const phaseBlurb = PHASE_BLURB[phaseKey] ?? 'Energia sa vracia — dobré okno na pohyb.';
+  const daysToNext = Math.max(0, total - day);
+  const phases = (derivedState?.phaseRanges ?? [
+    { key: 'menstrual', name: '', start: 1, end: 5 },
+    { key: 'follicular', name: '', start: 6, end: 13 },
+    { key: 'ovulation', name: '', start: 14, end: 16 },
+    { key: 'luteal', name: '', start: 17, end: 28 },
+  ]).map((p) => ({
+    w: (p.end - p.start + 1) / total,
+    c: PHASE_COLOR[p.key] ?? '#7A5A72',
+  }));
   const todayPct = day / total;
-  const MAUVE = '#7A5A72';
 
   return (
     <div style={{ padding: '0 18px', marginBottom: 12 }}>
@@ -761,12 +842,12 @@ function CyklusCard({ isPremium }: { isPremium: boolean }) {
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: 14, marginBottom: 6 }}>
             <div style={{ fontFamily: NM.SERIF, fontSize: 76, lineHeight: 0.9, color: NM.DEEP, fontWeight: 500, letterSpacing: '-0.04em' }}>{day}</div>
             <div style={{ paddingBottom: 8 }}>
-              <div style={{ fontFamily: NM.SERIF, fontSize: 20, fontStyle: 'italic', color: MAUVE, fontWeight: 500, lineHeight: 1.1 }}>Folikulárna</div>
+              <div style={{ fontFamily: NM.SERIF, fontSize: 20, fontStyle: 'italic', color: phaseColor, fontWeight: 500, lineHeight: 1.1 }}>{phaseLabel}</div>
               <div style={{ fontSize: 11, color: NM.TERTIARY, fontWeight: 400, marginTop: 2, letterSpacing: '0.02em' }}>fáza</div>
             </div>
           </div>
           <Ser size={18} style={{ lineHeight: 1.25, marginTop: 10, marginBottom: 14, maxWidth: 280 }}>
-            Energia sa vracia — dobré okno na pohyb.
+            {phaseBlurb}
           </Ser>
           <div style={{ position: 'relative', marginBottom: 12 }}>
             <div style={{ display: 'flex', height: 5, borderRadius: 3, overflow: 'hidden', background: NM.HAIR_2 }}>
@@ -790,7 +871,7 @@ function CyklusCard({ isPremium }: { isPremium: boolean }) {
           </div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 12, borderTop: `1px solid ${NM.HAIR}` }}>
             <div style={{ fontSize: 11.5, color: NM.MUTED, fontWeight: 300, lineHeight: 1.4 }}>
-              Menštruácia o <span style={{ color: NM.DEEP, fontWeight: 500 }}>21 dní</span>
+              Menštruácia o <span style={{ color: NM.DEEP, fontWeight: 500 }}>{daysToNext} dní</span>
             </div>
             <button
               onClick={() => navigate('/kniznica/periodka')}
@@ -871,7 +952,7 @@ function FooterNudge({ isPremium }: { isPremium: boolean }) {
               ))}
             </div>
             <button
-              onClick={() => navigate('/checkout')}
+              onClick={() => navigate('/paywall')}
               style={{
                 width: '100%',
                 padding: '14px 20px',
@@ -940,7 +1021,7 @@ export default function DomovNew() {
       <HabitsCard isPremium={isPremium} />
       <ReflectionsCard isPremium={isPremium} />
       <SectionHeader right={SK_MONTHS[new Date().getMonth()]}>Tento týždeň</SectionHeader>
-      <CyklusCard isPremium={isPremium} />
+      <CyklusCard />
       <FooterNudge isPremium={isPremium} />
     </Page>
   );
