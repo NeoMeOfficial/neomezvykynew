@@ -1065,26 +1065,21 @@ function ActiveProgramBanner() {
   today.setHours(0, 0, 0, 0);
   start.setHours(0, 0, 0, 0);
   const diffDays = Math.round((start.getTime() - today.getTime()) / 86400000);
+
+  // Once the program has started (start_date < today), the BodyCard
+  // surfaces today's exercise directly — a banner here would be redundant.
+  // Only show this banner for upcoming or starts-today states.
+  if (diffDays < 0) return null;
+
   const programName = PROGRAM_NAMES[program.program_id] ?? program.program_id;
   const startsToday = diffDays === 0;
-  const upcoming = diffDays > 0;
 
-  let title = '';
-  let subtitle = '';
-  if (upcoming) {
-    title = `Program začne o ${diffDays} ${diffDays === 1 ? 'deň' : diffDays < 5 ? 'dni' : 'dní'}`;
-    subtitle = `${programName} · pondelok ${start.getDate()}. ${SK_MONTHS_SHORT[start.getMonth()]}`;
-  } else if (startsToday) {
-    title = 'Tvoj program začína dnes';
-    subtitle = `${programName} · týždeň 1, deň 1`;
-  } else {
-    // started in the past — week/day computed from elapsed time.
-    const elapsedDays = Math.abs(diffDays);
-    const week = Math.min(8, Math.floor(elapsedDays / 7) + 1);
-    const day = (elapsedDays % 7) + 1;
-    title = `Týždeň ${week} · deň ${day}`;
-    subtitle = `${programName} · pokračuj v dnešnej jednotke`;
-  }
+  const title = startsToday
+    ? 'Tvoj program začína dnes'
+    : `Program začne o ${diffDays} ${diffDays === 1 ? 'deň' : diffDays < 5 ? 'dni' : 'dní'}`;
+  const subtitle = startsToday
+    ? `${programName} · týždeň 1, deň 1`
+    : `${programName} · pondelok ${start.getDate()}. ${SK_MONTHS_SHORT[start.getMonth()]}`;
 
   return (
     <div style={{ padding: '0 18px', marginBottom: 12 }}>
@@ -1122,7 +1117,7 @@ function ActiveProgramBanner() {
           </div>
           <div style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
             <div style={{ fontFamily: NM.SANS, fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: NM.TERRA, fontWeight: 600 }}>
-              {upcoming ? 'Aktívny program' : 'Tvoj program'}
+              {startsToday ? 'Tvoj program' : 'Aktívny program'}
             </div>
             <div style={{ fontFamily: NM.SERIF, fontSize: 16, fontWeight: 500, color: NM.DEEP, marginTop: 3, letterSpacing: '-0.005em' }}>{title}</div>
             <div style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.MUTED, marginTop: 2, fontWeight: 400 }}>{subtitle}</div>
