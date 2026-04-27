@@ -50,9 +50,11 @@ export default function ExercisePlayer() {
     setIsPlaying(false);
   };
 
+  const isVimeo = !!exercise.videoUrl && /^\d+$/.test(exercise.videoUrl);
+
   const handleAirplay = async () => {
     const videoUrl = exercise.videoUrl
-      ? `https://youtu.be/${exercise.videoUrl}`
+      ? (isVimeo ? `https://vimeo.com/${exercise.videoUrl}` : `https://youtu.be/${exercise.videoUrl}`)
       : window.location.href;
 
     if (navigator.share) {
@@ -145,11 +147,16 @@ export default function ExercisePlayer() {
       <div className="bg-white/30 backdrop-blur-xl rounded-2xl overflow-hidden shadow-sm border border-white/20">
         <div className="relative aspect-video bg-black rounded-t-2xl overflow-hidden">
           {exercise.videoUrl ? (
-            /* Real YouTube embed */
+            /* Real video embed — Vimeo (numeric ID) or YouTube */
             <iframe
-              src={`https://www.youtube.com/embed/${exercise.videoUrl}?rel=0&modestbranding=1&playsinline=1&iv_load_policy=3&showinfo=0`}
+              src={
+                isVimeo
+                  ? `https://player.vimeo.com/video/${exercise.videoUrl}?badge=0&autopause=0&player_id=0&app_id=58479`
+                  : `https://www.youtube.com/embed/${exercise.videoUrl}?rel=0&modestbranding=1&playsinline=1&iv_load_policy=3&showinfo=0`
+              }
               title={exercise.name}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+              referrerPolicy="strict-origin-when-cross-origin"
               allowFullScreen
               className="w-full h-full border-0"
             />

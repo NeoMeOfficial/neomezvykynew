@@ -9,7 +9,7 @@ export interface Exercise {
   phase: 'menstrual' | 'follicular' | 'ovulation' | 'luteal' | 'all';
   intensity: 'low' | 'medium' | 'high';
   route: string;
-  /** YouTube video ID (e.g. "v7AYKMP6rOE") or full video URL. When set, renders an embedded player. */
+  /** Video ID. All-digit string (e.g. "1186819320") is treated as a Vimeo ID; otherwise YouTube ID (e.g. "v7AYKMP6rOE"). When set, renders an embedded player. */
   videoUrl?: string;
 }
 
@@ -74,7 +74,7 @@ const stretchExercises: Exercise[] = [
 const strengthExercises: Exercise[] = [
   {
     id: 'strength-1',
-    name: 'Full Body Burn',
+    name: 'BodyForming · Deň 1, Týždeň 1',
     duration: '15 min',
     body: 'Celé telo',
     equip: 'Bez pomôcok',
@@ -83,7 +83,7 @@ const strengthExercises: Exercise[] = [
     phase: 'follicular',
     intensity: 'high',
     route: '/exercise/extra/0',
-    videoUrl: 'jZ6ZQXB1F7g',
+    videoUrl: '1186819320',
   },
   {
     id: 'strength-2',
