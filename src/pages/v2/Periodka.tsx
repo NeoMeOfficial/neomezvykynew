@@ -234,8 +234,8 @@ function PaidView({ navigate, cycleData, derivedState }: PaidViewProps) {
   // F-004: cycle_symptoms via useCycleSymptoms (real DB / localStorage demo).
   const { todayMap, symptomDates, toggleSymptom } = useCycleSymptoms();
   // Calendar dots — derive day-of-month for current month from symptomDates.
-  const today = new Date();
-  const ym = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+  const nowDate = new Date();
+  const ym = `${nowDate.getFullYear()}-${String(nowDate.getMonth() + 1).padStart(2, '0')}`;
   const symptomDays: number[] = symptomDates
     .filter((d) => d.startsWith(ym))
     .map((d) => parseInt(d.slice(8, 10), 10));
