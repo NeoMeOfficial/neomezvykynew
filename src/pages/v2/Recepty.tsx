@@ -1,285 +1,174 @@
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Clock, Flame, Lock, Heart } from 'lucide-react';
-import { useSubscription } from '../../contexts/SubscriptionContext';
-import { usePaywall } from '../../hooks/usePaywall';
-import { PaywallModal } from '../../components/v2/paywall/PaywallModal';
-import { useUniversalFavorites } from '../../hooks/useUniversalFavorites';
-import FavoriteButton from '../../components/v2/favorites/FavoriteButton';
-import { colors } from '../../theme/warmDusk';
-import { recipes as recipeDatabase, getRecipeImage } from '../../data/recipes';
-import { supabase } from '../../lib/supabase';
+import { recipes, type Recipe } from '../../data/recipes';
+import { Page, BackHeader, Eye, NM } from '../../components/v2/neome';
 
-const categoryNames = ['Raňajky', 'Obedy', 'Večere', 'Snacky', 'Smoothie & Nápoje'];
-const FAVORITES_KEY = 'Obľúbené';
+/**
+ * Recepty / Recipes browser — R3 filtered list
+ *
+ * Search row + filter chips + sectioned editorial rows.
+ *
+ * Wired:
+ * - recipes from src/data/recipes
+ * - URL ?cat= filter from Strava hub category clicks
+ * - Search by query (?q=)
+ *
+ * FEATURE-NEEDED-RECEPTY-FILTERS: dietary filters (vegetariánske /
+ * bez lepku / vysoký proteín) — requires diet_tags column on recipes
+ * + admin tagging. Currently only category and prep-time filters work.
+ *
+ * Old version: Recepty.old.tsx.
+ */
 
-// Map UI categories to database categories
-const categoryMapping: Record<string, string> = {
-  'Raňajky': 'ranajky',
-  'Obedy': 'obed',
-  'Večere': 'vecera',
-  'Snacky': 'snack',
-  'Smoothie & Nápoje': 'smoothie',
+const CAT_LABEL: Record<Recipe['category'], string> = {
+  ranajky: 'Raňajky',
+  obed: 'Obed',
+  vecera: 'Večera',
+  snack: 'Snack',
+  smoothie: 'Smoothie',
 };
 
-// Function to get recipes by UI category
-const getRecipesByCategory = (uiCategory: string) => {
-  const dbCategory = categoryMapping[uiCategory];
-  if (!dbCategory) return [];
-  return recipeDatabase.filter(r => r.category === dbCategory);
+const CATEGORY_QUERY_MAP: Record<string, Recipe['category']> = {
+  rananky: 'ranajky',
+  obedy: 'obed',
+  vecera: 'vecera',
+  snacky: 'snack',
+  napoje: 'smoothie',
 };
 
-// Convert database recipes to UI format
-const convertToUIFormat = (dbRecipes: typeof recipeDatabase) => {
-  return dbRecipes.map((recipe) => ({
-    id: recipe.id,
-    title: recipe.title,
-    time: `${recipe.prepTime} min`,
-    kcal: recipe.calories,
-    img: getRecipeImage(recipe.title, recipe.category),
-    originalId: recipe.id
-  }));
-};
+const FILTER_CHIPS = [
+  { id: 'cat', label: 'Typ jedla' },
+  { id: 'fast', label: 'Do 20 min' },
+  { id: 'veg', label: 'Vegetariánske' },
+  { id: 'gf', label: 'Bez lepku' },
+  { id: 'protein', label: 'Vysoký proteín' },
+] as const;
 
-// Generate recipes object from database
-const recipes: Record<string, { id: string; title: string; time: string; kcal: number; img: string; originalId: string }[]> =
-  categoryNames.reduce((acc, category) => {
-    const dbRecipes = getRecipesByCategory(category);
-    acc[category] = convertToUIFormat(dbRecipes);
-    return acc;
-  }, {} as Record<string, any>);
-
-type UIRecipe = { id: string; title: string; time: string; kcal: number; img: string; originalId: string };
+function recipeImg(r: Recipe): string {
+  if (r.category === 'ranajky' || r.category === 'snack' || r.category === 'smoothie') return 'testimonial-recipe.jpg';
+  if (r.category === 'obed') return 'section-nutrition.jpg';
+  return 'program-body-forming.jpg';
+}
 
 export default function Recepty() {
-  const [searchParams] = useSearchParams();
-  const catParam = searchParams.get('cat') || categoryNames[0];
-
-  // Check if showing favorites
-  const showingFavorites = catParam === FAVORITES_KEY;
-  const defaultActive = showingFavorites ? -1 : Math.max(0, categoryNames.indexOf(catParam));
-
-  const [active, setActive] = useState(defaultActive);
-  const [warningMessage, setWarningMessage] = useState<string | null>(null);
-  const [liveRecipes, setLiveRecipes] = useState<Record<string, UIRecipe[]> | null>(null);
-  const fetchedRef = useRef(false);
   const navigate = useNavigate();
-  
-  const { getRemaining } = useSubscription();
-  const { paywallState, showContentPaywall, closePaywall, handleUpgrade, getContentWarning } = usePaywall();
-  const { getFavoritesByType } = useUniversalFavorites();
+  const [params] = useSearchParams();
+  const [query, setQuery] = useState(params.get('q') ?? '');
+  const [activeFast, setActiveFast] = useState(false);
 
-  // Fetch from Supabase once; fall back to static data if empty
-  useEffect(() => {
-    if (fetchedRef.current) return;
-    fetchedRef.current = true;
-    supabase.from('recipes').select('id,title,category,prep_time,calories,image').eq('active', true)
-      .then(({ data }) => {
-        if (!data || data.length === 0) return;
-        const mapped: Record<string, UIRecipe[]> = {};
-        categoryNames.forEach(cat => {
-          const dbCat = categoryMapping[cat];
-          mapped[cat] = data
-            .filter(r => r.category === dbCat)
-            .map(r => ({ id: r.id, title: r.title, time: `${r.prep_time} min`, kcal: r.calories, img: r.image || getRecipeImage(r.title, r.category), originalId: r.id }));
-        });
-        setLiveRecipes(mapped);
-      });
-  }, []);
+  const cat = params.get('cat');
+  const recipeCat = cat ? CATEGORY_QUERY_MAP[cat] ?? null : null;
 
-  const effectiveRecipes = liveRecipes ?? recipes;
-
-  // Get recipes based on active tab
-  const favRecipes = getFavoritesByType('recipe');
-  const allRecipes = showingFavorites ?
-    favRecipes.map(f => ({ id: f.id, title: f.title, time: f.duration || '15 min', kcal: f.kcal || 250, img: f.image || '', originalId: f.id })) :
-    effectiveRecipes[categoryNames[active]] || [];
-
-  // Apply content limits for free users (but not for favorites)
-  const recipesRemaining = getRemaining('recipes');
-  const currentRecipes = useMemo(() => {
-    if (showingFavorites) return allRecipes; // No limits on favorites
-    if (recipesRemaining === null) return allRecipes; // unlimited
-    return allRecipes.slice(0, recipesRemaining);
-  }, [allRecipes, recipesRemaining, showingFavorites]);
-
-  const hasMoreRecipes = !showingFavorites && (allRecipes.length > currentRecipes.length);
-
-  // Load warning message asynchronously
-  useEffect(() => {
-    const loadWarning = async () => {
-      const warning = await getContentWarning('recipes');
-      setWarningMessage(warning);
-    };
-    loadWarning();
-  }, [getContentWarning]);
+  const filtered = useMemo(() => {
+    let list = recipes;
+    if (recipeCat) list = list.filter((r) => r.category === recipeCat);
+    if (activeFast) list = list.filter((r) => r.prepTime <= 20);
+    if (query.trim().length > 0) {
+      const q = query.toLowerCase();
+      list = list.filter((r) => r.title.toLowerCase().includes(q) || r.description.toLowerCase().includes(q));
+    }
+    return list;
+  }, [recipeCat, activeFast, query]);
 
   return (
-    <div className="w-full min-h-screen px-3 py-6 pb-28 space-y-6">
-      {/* Nordic Header */}
-      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
-        <div className="flex items-center gap-3">
-          <button onClick={() => navigate('/strava')} className="p-1">
-            <ArrowLeft className="w-5 h-5 text-gray-600" strokeWidth={1.5} />
-          </button>
-          <div className="flex items-center gap-2 flex-1">
-            <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(122, 158, 120, 0.14)` }}>
-              <Clock className="w-4 h-4" style={{ color: '#7A9E78' }} />
-            </div>
-            <h1 className="text-[26px] font-medium leading-tight" style={{ color: '#2E2218', fontFamily: '"Bodoni Moda", Georgia, serif' }}>Recepty</h1>
-          </div>
-        </div>
-      </div>
+    <Page>
+      <BackHeader title="Hľadať v receptoch" showSearch={false} />
 
-      {/* Category Selection */}
-      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
-        <div className="flex gap-2 overflow-x-auto scrollbar-hide">
-          {/* Favorites pill */}
-          <button
-            onClick={() => {
-              setActive(-1);
-              navigate(`?cat=${encodeURIComponent(FAVORITES_KEY)}`);
+      <div style={{ padding: '4px 18px 14px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', background: '#fff', border: `1px solid ${NM.HAIR_2}`, borderRadius: 999 }}>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <circle cx="7" cy="7" r="5" stroke={NM.TERTIARY} strokeWidth="1.4" />
+            <path d="M11 11l3.5 3.5" stroke={NM.TERTIARY} strokeWidth="1.4" strokeLinecap="round" />
+          </svg>
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={recipeCat ? CAT_LABEL[recipeCat] : 'Hľadaj recept…'}
+            style={{
+              flex: 1,
+              border: 'none',
+              outline: 'none',
+              background: 'transparent',
+              fontFamily: NM.SANS,
+              fontSize: 13,
+              color: NM.DEEP,
             }}
-            className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all flex items-center gap-1.5 ${
-              showingFavorites
-                ? 'bg-[#C27A6E] text-white'
-                : 'bg-white/25 text-gray-600 hover:bg-gray-200'
-            }`}
-          >
-            <Heart size={14} fill={showingFavorites ? 'white' : 'none'} />
-            {FAVORITES_KEY} ({favRecipes.length})
-          </button>
-          
-          {categoryNames.map((c, i) => (
-            <button
-              key={c}
-              onClick={() => {
-                setActive(i);
-                navigate(`?cat=${encodeURIComponent(c)}`);
-              }}
-              className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${
-                active === i && !showingFavorites
-                  ? 'bg-[#6B4C3B] text-white'
-                  : 'bg-white/25 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              {c}
-            </button>
-          ))}
+          />
         </div>
       </div>
 
-      {/* Warning banner */}
-      {warningMessage && (
-        <div className="bg-orange-50 border border-orange-200 rounded-2xl p-4">
-          <p className="text-sm font-medium text-orange-700 flex items-center gap-2">
-            ⚠️ {warningMessage}
-          </p>
-        </div>
-      )}
-
-      {/* Recipe Cards */}
-      <div className="space-y-4">
-        {currentRecipes.map((r) => {
-          const currentCategory = showingFavorites ? favRecipes.find(f => f.id === r.id)?.category || categoryNames[0] : categoryNames[active];
-          
+      <div style={{ padding: '0 18px 6px', display: 'flex', gap: 8, overflowX: 'auto' }}>
+        {FILTER_CHIPS.map((c) => {
+          const isCat = c.id === 'cat';
+          const isFast = c.id === 'fast';
+          const active = (isCat && !!recipeCat) || (isFast && activeFast);
+          const label = isCat && recipeCat ? `Typ · ${CAT_LABEL[recipeCat]}` : c.label;
           return (
-            <div key={r.id} className="bg-white/30 backdrop-blur-xl rounded-2xl shadow-sm border border-white/20 overflow-hidden">
-              <button
-                onClick={() => navigate(`/recept/${r.originalId}`)}
-                className="relative w-full h-52 block active:scale-[0.98] transition-transform text-left"
-              >
-                <img src={r.img} alt={r.title} className="absolute inset-0 w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/15 to-transparent" />
-                <div className="absolute bottom-4 left-4 right-4">
-                  <p className="text-white text-lg font-bold leading-tight drop-shadow-lg">{r.title}</p>
-                  <div className="flex items-center gap-3 mt-1.5">
-                    <span className="text-white/80 text-xs flex items-center gap-1">
-                      <Clock className="w-3 h-3" />{r.time}
-                    </span>
-                    <span className="text-white/80 text-xs flex items-center gap-1">
-                      <Flame className="w-3 h-3" />{r.kcal} kcal
-                    </span>
-                  </div>
-                </div>
-              </button>
-              
-              {/* Favorite button overlay */}
-              <div className="absolute top-3 right-3">
-                <FavoriteButton
-                  itemId={r.id}
-                  type="recipe"
-                  title={r.title}
-                  image={r.img}
-                  duration={r.time}
-                  kcal={r.kcal}
-                  category={currentCategory}
-                  size="md"
-                  className="bg-black/60 backdrop-blur-[10px] text-white hover:bg-black/70"
-                />
-              </div>
-            </div>
+            <button
+              key={c.id}
+              onClick={() => {
+                if (isFast) setActiveFast((v) => !v);
+                // FEATURE-NEEDED-RECEPTY-FILTERS for the others
+              }}
+              style={{
+                all: 'unset',
+                cursor: 'pointer',
+                padding: '8px 14px',
+                borderRadius: 999,
+                background: active ? NM.DEEP : 'transparent',
+                color: active ? '#fff' : NM.DEEP,
+                border: active ? 'none' : `1px solid ${NM.HAIR_2}`,
+                fontFamily: NM.SANS,
+                fontSize: 12,
+                whiteSpace: 'nowrap',
+                flexShrink: 0,
+              }}
+            >
+              {label}
+            </button>
           );
         })}
-
-        {/* Locked recipes for free users */}
-        {hasMoreRecipes && allRecipes.slice(currentRecipes.length).map((r) => (
-          <div key={`locked-${r.id}`} className="bg-white/30 backdrop-blur-xl rounded-2xl shadow-sm border border-white/20 overflow-hidden opacity-75">
-            <button
-              onClick={() => showContentPaywall('recipes')}
-              className="relative w-full h-52 block active:scale-[0.98] transition-transform text-left"
-            >
-              <img src={r.img} alt={r.title} className="absolute inset-0 w-full h-full object-cover grayscale" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
-              
-              {/* Lock overlay */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-14 h-14 rounded-full bg-[#B8864A]/90 flex items-center justify-center">
-                  <Lock size={24} className="text-white" />
-                </div>
-              </div>
-
-              <div className="absolute bottom-4 left-4 right-4">
-                <p className="text-white text-lg font-bold leading-tight drop-shadow-lg">{r.title}</p>
-                <div className="flex items-center gap-3 mt-1.5">
-                  <span className="text-white/70 text-xs flex items-center gap-1"><Clock className="w-3 h-3" />{r.time}</span>
-                  <span className="text-white/70 text-xs flex items-center gap-1"><Flame className="w-3 h-3" />{r.kcal} kcal</span>
-                </div>
-              </div>
-            </button>
-          </div>
-        ))}
       </div>
 
-      {/* Jedálniček na mieru promo banner */}
-      {!localStorage.getItem('neome-meal-plan') && (
-        <button
-          onClick={() => navigate('/jedalnicek-promo')}
-          className="w-full rounded-2xl overflow-hidden shadow-lg active:scale-[0.98] transition-transform"
-          style={{ background: `linear-gradient(135deg, ${colors.strava}, #5A8A58)` }}
-        >
-          <div className="p-5 flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center flex-shrink-0">
-              <span className="text-2xl">🥗</span>
-            </div>
-            <div className="flex-1 text-left">
-              <p className="text-white font-bold text-sm">Jedálniček na mieru</p>
-              <p className="text-white/80 text-xs mt-0.5">Personalizovaný 7-dňový plán na základe tvojich cieľov a preferencií</p>
-            </div>
-            <div className="text-white/80 text-lg">→</div>
-          </div>
-        </button>
-      )}
+      <div style={{ padding: '18px 18px', display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+        <Eye>Výsledky · {filtered.length}</Eye>
+      </div>
 
-      {/* Paywall modal */}
-      <PaywallModal
-        isOpen={paywallState.isOpen}
-        onClose={closePaywall}
-        title={paywallState.title}
-        message={paywallState.message}
-        limitType={paywallState.limitType}
-        onUpgrade={handleUpgrade}
-      />
-    </div>
+      <div style={{ padding: '0 18px 10px', display: 'flex', flexDirection: 'column', gap: 18 }}>
+        {filtered.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '40px 20px', color: NM.MUTED, fontSize: 13 }}>
+            Nič sa nenašlo. Skús inú frázu alebo zruš filter.
+          </div>
+        ) : (
+          filtered.map((r) => (
+            <button
+              key={r.id}
+              onClick={() => navigate(`/recipe/${r.id}`)}
+              style={{ all: 'unset', cursor: 'pointer', display: 'flex', gap: 14, width: '100%' }}
+            >
+              <div
+                style={{
+                  width: 92,
+                  height: 92,
+                  borderRadius: 14,
+                  backgroundImage: `url(/images/r9/${recipeImg(r)})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  flexShrink: 0,
+                }}
+              />
+              <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', textAlign: 'left' }}>
+                <Eye size={9} style={{ marginBottom: 5 }}>
+                  {CAT_LABEL[r.category]} · {r.prepTime} min
+                </Eye>
+                <div style={{ fontFamily: NM.SERIF, fontSize: 16, fontWeight: 500, color: NM.DEEP, letterSpacing: '-0.008em', lineHeight: 1.25, marginBottom: 6 }}>{r.title}</div>
+                <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.SAGE, fontWeight: 500, letterSpacing: '0.02em' }}>+ Pridať do plánu</div>
+              </div>
+            </button>
+          ))
+        )}
+      </div>
+    </Page>
   );
 }
