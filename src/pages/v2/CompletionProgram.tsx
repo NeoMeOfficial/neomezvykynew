@@ -1,5 +1,7 @@
-import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useSupabaseAuth } from '../../contexts/SupabaseAuthContext';
+import { usePointsLedger } from '../../hooks/usePointsLedger';
 import { Page, Eye, Ser, Body, NM } from '../../components/v2/neome';
 
 /**
@@ -11,12 +13,16 @@ import { Page, Eye, Ser, Body, NM } from '../../components/v2/neome';
  *
  * Wired:
  * - User's first name from useSupabaseAuth → headline
+ * - F-022: awards 50 points via usePointsLedger.addEntry on mount,
+ *   keyed on (programSlug, 'program') for idempotency.
  *
  * FEATURE-NEEDED-COMPLETION-PROGRAM-BADGE: real badge issuance via the
  * achievements service (currently shows "Postpartum · dokončené" hardcoded).
  * FEATURE-NEEDED-COMPLETION-NEXT-PROGRAM: dynamic recommendation based
  * on the program just completed (currently always recommends BodyForming).
  */
+
+const PROGRAM_POINTS = 50;
 
 function deriveFirstName(user: { email?: string | null; user_metadata?: { full_name?: string; name?: string } } | null): string {
   if (!user) return 'Eva';
@@ -29,8 +35,15 @@ function deriveFirstName(user: { email?: string | null; user_metadata?: { full_n
 
 export default function CompletionProgram() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useSupabaseAuth();
+  const { addEntry } = usePointsLedger();
   const firstName = deriveFirstName(user as never);
+  const programSlug = (location.state as { programSlug?: string } | null)?.programSlug ?? 'postpartum';
+
+  useEffect(() => {
+    addEntry('program_completed', PROGRAM_POINTS, programSlug, 'program');
+  }, [addEntry, programSlug]);
 
   return (
     <Page paddingBottom={40}>
@@ -63,7 +76,7 @@ export default function CompletionProgram() {
       <div style={{ margin: '24px 18px 0', padding: '24px 22px', background: `linear-gradient(135deg, ${NM.DEEP_2}, ${NM.DEEP})`, color: '#fff', borderRadius: 22, position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', top: -40, right: -40, width: 180, height: 180, borderRadius: 999, background: `radial-gradient(circle, ${NM.GOLD}55, transparent 70%)` }} />
         <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 20 }}>
-          <div style={{ fontFamily: NM.SERIF, fontSize: 64, color: NM.GOLD, fontWeight: 500, letterSpacing: '-0.03em', lineHeight: 1 }}>+50</div>
+          <div style={{ fontFamily: NM.SERIF, fontSize: 64, color: NM.GOLD, fontWeight: 500, letterSpacing: '-0.03em', lineHeight: 1 }}>+{PROGRAM_POINTS}</div>
           <div>
             <div style={{ fontFamily: NM.SANS, fontSize: 10, color: NM.GOLD, letterSpacing: '0.22em', textTransform: 'uppercase', fontWeight: 600 }}>Získala si</div>
             <div style={{ fontFamily: NM.SERIF, fontSize: 22, fontWeight: 500, fontStyle: 'italic', marginTop: 4, letterSpacing: '-0.005em' }}>Nový odznak</div>

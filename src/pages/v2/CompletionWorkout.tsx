@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { usePointsLedger } from '../../hooks/usePointsLedger';
 import { Page, Eye, Ser, Body, NM } from '../../components/v2/neome';
 
 /**
@@ -11,12 +12,16 @@ import { Page, Eye, Ser, Body, NM } from '../../components/v2/neome';
  *
  * FEATURE-NEEDED-COMPLETION-WORKOUT-LOG: persist mood pick + integrate
  * with reflection store (depends on F-003 reflection store on user.id).
- * FEATURE-NEEDED-COMPLETION-POINTS: real points credit on workout
- * complete (currently shows '+12' static; needs the rewards service).
+ *
+ * Wired (F-022): on mount, awards 10 points via usePointsLedger.addEntry
+ * keyed on (exerciseId, 'exercise') so navigating back doesn't double-credit.
+ * Display value reads back from the ledger entry that was just inserted.
  *
  * Mounted at /completion/workout — receives state via location-state
  * in production; here we render with sane defaults so you can preview.
  */
+
+const WORKOUT_POINTS = 10;
 
 const MOOD_OPTIONS = [
   { id: 'great', t: 'Skvelo', c: NM.SAGE },
@@ -27,7 +32,14 @@ const MOOD_OPTIONS = [
 
 export default function CompletionWorkout() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [mood, setMood] = useState<string | null>(null);
+  const { addEntry } = usePointsLedger();
+  const exerciseId = (location.state as { exerciseId?: string } | null)?.exerciseId ?? 'preview';
+
+  useEffect(() => {
+    addEntry('workout_completed', WORKOUT_POINTS, exerciseId, 'exercise');
+  }, [addEntry, exerciseId]);
 
   return (
     <Page paddingBottom={40}>
@@ -55,7 +67,7 @@ export default function CompletionWorkout() {
             gap: 6,
           }}
         >
-          <div style={{ fontFamily: NM.SERIF, fontSize: 15, color: NM.GOLD, fontWeight: 500 }}>+12</div>
+          <div style={{ fontFamily: NM.SERIF, fontSize: 15, color: NM.GOLD, fontWeight: 500 }}>+{WORKOUT_POINTS}</div>
           <div style={{ fontFamily: NM.SANS, fontSize: 9, color: NM.EYEBROW, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 600 }}>bodov</div>
         </div>
         <div style={{ position: 'absolute', bottom: 16, left: 18, right: 18 }}>
