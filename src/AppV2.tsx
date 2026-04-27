@@ -21,6 +21,7 @@ const HabitCompose = lazy(() => import('./pages/v2/HabitCompose'));
 const KomunitaPostDetail = lazy(() => import('./pages/v2/KomunitaPostDetail'));
 const KomunitaCompose = lazy(() => import('./pages/v2/KomunitaCompose'));
 const SpravyThread = lazy(() => import('./pages/v2/SpravyThread'));
+const CancelArc = lazy(() => import('./pages/v2/CancelArc'));
 const Telo = lazy(() => import('./pages/v2/Telo'));
 const Strava = lazy(() => import('./pages/v2/Strava'));
 const MyselNew = lazy(() => import('./pages/v2/MyselNew'));
@@ -145,6 +146,7 @@ export default function AppV2() {
               <Route path="/komunita/new" element={<KomunitaCompose />} />
               <Route path="/komunita/:id" element={<KomunitaPostDetail />} />
               <Route path="/spravy/:threadId" element={<SpravyThread />} />
+              <Route path="/settings/cancel" element={<CancelArc />} />
               <Route path="/kniznica/telo" element={<Telo />} />
               <Route path="/kniznica/telo/programy" element={<TeloPrograms />} />
               <Route path="/kniznica/telo/extra" element={<TeloExtra />} />
