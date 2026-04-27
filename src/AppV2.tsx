@@ -22,6 +22,11 @@ const KomunitaPostDetail = lazy(() => import('./pages/v2/KomunitaPostDetail'));
 const KomunitaCompose = lazy(() => import('./pages/v2/KomunitaCompose'));
 const SpravyThread = lazy(() => import('./pages/v2/SpravyThread'));
 const CancelArc = lazy(() => import('./pages/v2/CancelArc'));
+const SettingsProfile = lazy(() => import('./pages/v2/SettingsProfile'));
+const SettingsNotificationsV2 = lazy(() => import('./pages/v2/SettingsNotifications'));
+const SettingsPrivacy = lazy(() => import('./pages/v2/SettingsPrivacy'));
+const SettingsDelete = lazy(() => import('./pages/v2/SettingsDelete'));
+const SettingsHub = lazy(() => import('./pages/v2/SettingsHub'));
 const Telo = lazy(() => import('./pages/v2/Telo'));
 const Strava = lazy(() => import('./pages/v2/Strava'));
 const MyselNew = lazy(() => import('./pages/v2/MyselNew'));
@@ -146,6 +151,11 @@ export default function AppV2() {
               <Route path="/komunita/new" element={<KomunitaCompose />} />
               <Route path="/komunita/:id" element={<KomunitaPostDetail />} />
               <Route path="/spravy/:threadId" element={<SpravyThread />} />
+              <Route path="/settings" element={<SettingsHub />} />
+              <Route path="/settings/profile" element={<SettingsProfile />} />
+              <Route path="/settings/notifications" element={<SettingsNotificationsV2 />} />
+              <Route path="/settings/privacy" element={<SettingsPrivacy />} />
+              <Route path="/settings/delete" element={<SettingsDelete />} />
               <Route path="/settings/cancel" element={<CancelArc />} />
               <Route path="/kniznica/telo" element={<Telo />} />
               <Route path="/kniznica/telo/programy" element={<TeloPrograms />} />
