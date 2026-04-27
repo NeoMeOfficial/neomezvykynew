@@ -15,8 +15,12 @@ import { useAuth } from './useAuth';
  * Each ships a localStorage demo fallback so the UI works pre-auth.
  */
 
+// Real Supabase auth users have UUIDs. Demo / mock users have short
+// strings like 'demo' or 'demo-user-id'. Treat anything that isn't
+// UUID-shaped as demo so we don't 400 the API with bad user_id values.
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 function isRealUser(userId: string | undefined | null): boolean {
-  return !!userId && userId !== 'demo-user-id';
+  return !!userId && UUID_RE.test(userId);
 }
 
 function todayISODate(): string {

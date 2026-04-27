@@ -80,7 +80,7 @@ export function usePointsLedger() {
   const [loading, setLoading] = useState(true);
   const [isDemo, setIsDemo] = useState(false);
 
-  const isRealUser = !!user?.id && user.id !== 'demo-user-id';
+  const isRealUser = !!user?.id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(user.id);
 
   const refresh = useCallback(async () => {
     if (!isRealUser) {
@@ -207,7 +207,7 @@ export function useUserBadges() {
   const [rows, setRows] = useState<UserBadgeRow[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const isRealUser = !!user?.id && user.id !== 'demo-user-id';
+  const isRealUser = !!user?.id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(user.id);
 
   useEffect(() => {
     let cancelled = false;
