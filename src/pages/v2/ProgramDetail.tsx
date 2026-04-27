@@ -105,6 +105,8 @@ export default function ProgramDetail() {
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [activating, setActivating] = useState(false);
 
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
   const onActivate = async () => {
     if (activating || !slug) return;
     setActivating(true);
@@ -114,9 +116,22 @@ export default function ProgramDetail() {
       toast({ title: 'Aktivácia zlyhala', description: error.message ?? 'Skús to ešte raz.', variant: 'destructive' });
       return;
     }
-    toast({ title: 'Program aktivovaný', description: `Začneš v pondelok ${formatMonday(mondays[selectedIdx])}.` });
-    navigate('/domov-new');
+    setConfirmOpen(true);
   };
+
+  const onConfirmContinue = () => {
+    setConfirmOpen(false);
+    navigate('/domov-new');
+    // Make sure user lands at the top of Domov, not wherever the previous
+    // scroll position was (the Page wrapper preserves scroll across routes).
+    setTimeout(() => window.scrollTo({ top: 0, behavior: 'auto' }), 0);
+  };
+
+  const startMonday = mondays[selectedIdx];
+  const todayMidnight = new Date();
+  todayMidnight.setHours(0, 0, 0, 0);
+  const daysUntilStart = Math.max(0, Math.round((startMonday.getTime() - todayMidnight.getTime()) / 86400000));
+  const startsToday = daysUntilStart === 0;
 
   const formatMonday = (d: Date) => `${d.getDate()}. ${SK_MONTHS_SHORT[d.getMonth()]}`;
   const formatFull = (d: Date) => `${d.getDate()}. ${SK_MONTHS_SHORT[d.getMonth()]}`;
@@ -410,6 +425,100 @@ export default function ProgramDetail() {
           </>
         )}
       </div>
+
+      {confirmOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(42,26,20,0.55)',
+            backdropFilter: 'blur(6px)',
+            WebkitBackdropFilter: 'blur(6px)',
+            display: 'flex',
+            alignItems: 'flex-end',
+            justifyContent: 'center',
+            zIndex: 100,
+            padding: 18,
+            paddingBottom: 'calc(env(safe-area-inset-bottom) + 24px)',
+          }}
+          onClick={onConfirmContinue}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              width: '100%',
+              maxWidth: 420,
+              background: NM.BG,
+              borderRadius: 24,
+              padding: '28px 24px 24px',
+              border: `1px solid ${NM.HAIR}`,
+              boxShadow: '0 24px 60px rgba(42,26,20,0.28)',
+              fontFamily: NM.SANS,
+              color: NM.DEEP,
+            }}
+          >
+            <div
+              style={{
+                width: 56,
+                height: 56,
+                borderRadius: 999,
+                background: `${NM.TERRA}22`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: 16,
+              }}
+            >
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke={NM.TERRA} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
+            </div>
+            <Eye color={NM.TERRA} size={10}>Program aktivovaný</Eye>
+            <Ser size={26} style={{ marginTop: 8, lineHeight: 1.1 }}>
+              {startsToday ? (
+                <>Začneš <em style={{ color: NM.TERRA, fontStyle: 'italic', fontWeight: 500 }}>dnes</em>.</>
+              ) : (
+                <>Začneš v <em style={{ color: NM.TERRA, fontStyle: 'italic', fontWeight: 500 }}>pondelok {formatMonday(startMonday)}</em>.</>
+              )}
+            </Ser>
+            <Body size={13.5} style={{ marginTop: 14, color: NM.DEEP }}>
+              {startsToday
+                ? `Počas ${program.weeks} ${program.weeks === 1 ? 'týždňa' : program.weeks < 5 ? 'týždňov' : 'týždňov'} ti budeme každý deň pripravovať jednu jednotku. Domov ti pripomenie, ktorá je na rade.`
+                : `Do pondelka zostáva ${daysUntilStart} ${daysUntilStart === 1 ? 'deň' : daysUntilStart < 5 ? 'dni' : 'dní'}. Počas ${program.weeks} ${program.weeks === 1 ? 'týždňa' : program.weeks < 5 ? 'týždňov' : 'týždňov'} ti budeme každý deň pripravovať jednu jednotku. Domov ti pripomenie, ktorá je na rade.`}
+            </Body>
+            <div style={{ marginTop: 18, display: 'flex', gap: 10, alignItems: 'center', padding: '12px 14px', background: '#fff', borderRadius: 14, border: `1px solid ${NM.HAIR}` }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={NM.TERRA} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="5" width="18" height="16" rx="2" />
+                <path d="M3 10h18M8 3v4M16 3v4" />
+              </svg>
+              <div style={{ flex: 1, fontSize: 12, color: NM.DEEP, lineHeight: 1.5 }}>
+                Pridané do <strong style={{ fontWeight: 500 }}>Domov</strong> a <strong style={{ fontWeight: 500 }}>Kalendára</strong>.
+              </div>
+            </div>
+            <button
+              onClick={onConfirmContinue}
+              style={{
+                marginTop: 20,
+                width: '100%',
+                padding: '14px 20px',
+                background: NM.DEEP,
+                color: '#fff',
+                border: 'none',
+                borderRadius: 999,
+                fontFamily: NM.SANS,
+                fontSize: 13.5,
+                fontWeight: 500,
+                letterSpacing: '0.02em',
+                cursor: 'pointer',
+              }}
+            >
+              Pokračovať na Domov
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -7,7 +7,7 @@ import { useSupabaseHabits } from '../../hooks/useSupabaseHabits';
 import { useWorkoutHistory } from '../../hooks/useWorkoutHistory';
 import { useCycleData } from '../../features/cycle/useCycleData';
 import { useDailyMeditation, useDailyRecipe } from '../../hooks/useDailyContent';
-import { useReflections } from '../../hooks/useDailyRituals';
+import { useReflections, useActiveProgram } from '../../hooks/useDailyRituals';
 import { recipes } from '../../data/recipes';
 import { Page, Eye, Ser, NM, Card } from '../../components/v2/neome';
 
@@ -1045,6 +1045,97 @@ function FooterNudge({ isPremium }: { isPremium: boolean }) {
   );
 }
 
+// Friendly display names for active programs. Mirrors ProgramDetail PROGRAMS keys.
+const PROGRAM_NAMES: Record<string, string> = {
+  postpartum: 'Postpartum návrat',
+  'body-forming': 'BodyForming',
+  hormonal: 'Hormonálna joga',
+  mindful: 'Mindful pohyb',
+};
+
+const SK_MONTHS_SHORT = ['jan', 'feb', 'mar', 'apr', 'máj', 'jún', 'júl', 'aug', 'sep', 'okt', 'nov', 'dec'];
+
+function ActiveProgramBanner() {
+  const navigate = useNavigate();
+  const { program } = useActiveProgram();
+  if (!program) return null;
+
+  const start = new Date(program.start_date);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  start.setHours(0, 0, 0, 0);
+  const diffDays = Math.round((start.getTime() - today.getTime()) / 86400000);
+  const programName = PROGRAM_NAMES[program.program_id] ?? program.program_id;
+  const startsToday = diffDays === 0;
+  const upcoming = diffDays > 0;
+
+  let title = '';
+  let subtitle = '';
+  if (upcoming) {
+    title = `Program začne o ${diffDays} ${diffDays === 1 ? 'deň' : diffDays < 5 ? 'dni' : 'dní'}`;
+    subtitle = `${programName} · pondelok ${start.getDate()}. ${SK_MONTHS_SHORT[start.getMonth()]}`;
+  } else if (startsToday) {
+    title = 'Tvoj program začína dnes';
+    subtitle = `${programName} · týždeň 1, deň 1`;
+  } else {
+    // started in the past — week/day computed from elapsed time.
+    const elapsedDays = Math.abs(diffDays);
+    const week = Math.min(8, Math.floor(elapsedDays / 7) + 1);
+    const day = (elapsedDays % 7) + 1;
+    title = `Týždeň ${week} · deň ${day}`;
+    subtitle = `${programName} · pokračuj v dnešnej jednotke`;
+  }
+
+  return (
+    <div style={{ padding: '0 18px', marginBottom: 12 }}>
+      <button
+        onClick={() => navigate(`/program/${program.program_id}`)}
+        style={{
+          all: 'unset',
+          cursor: 'pointer',
+          display: 'block',
+          width: '100%',
+          background: '#fff',
+          border: `1px solid ${NM.HAIR}`,
+          borderRadius: 18,
+          padding: '14px 16px',
+          boxSizing: 'border-box',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div
+            style={{
+              width: 38,
+              height: 38,
+              borderRadius: 999,
+              background: `${NM.TERRA}1f`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+            }}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={NM.TERRA} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="5" width="18" height="16" rx="2" />
+              <path d="M3 10h18M8 3v4M16 3v4" />
+            </svg>
+          </div>
+          <div style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
+            <div style={{ fontFamily: NM.SANS, fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: NM.TERRA, fontWeight: 600 }}>
+              {upcoming ? 'Aktívny program' : 'Tvoj program'}
+            </div>
+            <div style={{ fontFamily: NM.SERIF, fontSize: 16, fontWeight: 500, color: NM.DEEP, marginTop: 3, letterSpacing: '-0.005em' }}>{title}</div>
+            <div style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.MUTED, marginTop: 2, fontWeight: 400 }}>{subtitle}</div>
+          </div>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={NM.TERTIARY} strokeWidth="2" strokeLinecap="round">
+            <path d="M9 6l6 6-6 6" />
+          </svg>
+        </div>
+      </button>
+    </div>
+  );
+}
+
 export default function DomovNew() {
   const { user } = useSupabaseAuth();
   const { isPremium } = useSubscription();
@@ -1054,6 +1145,7 @@ export default function DomovNew() {
     <Page>
       <Greeting name={name} isPremium={isPremium} />
       <WeekStrip />
+      <ActiveProgramBanner />
       <SectionHeader>Dnes</SectionHeader>
       <BodyCard isPremium={isPremium} />
       <NutritionCard isPremium={isPremium} />
