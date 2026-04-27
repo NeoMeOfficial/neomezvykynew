@@ -7,14 +7,15 @@ import { Page, Eye, Ser, NM } from '../../components/v2/neome';
  * Full-bleed photo hero with title overlay, author byline, pullquote,
  * body w/ drop-cap on first paragraph, hashtag footer, related rail.
  *
- * FEATURE-NEEDED-BLOG-CMS: a markdown/CMS-backed article store.
- * Currently 6 hardcoded articles in this file plus a single full
- * body for "postpartum-recovery" — all other slugs render the same
- * body. Build:
- *   - articles table (id, slug, cat, title, excerpt, body_md, author,
- *     read_min, image_key, published_at)
- *   - markdown renderer (e.g. react-markdown) with custom typography
- *   - admin UI for Gabi to author/edit
+ * F-025 status: public.blog_posts schema (migration 20260416) and the
+ * useBlogPost(slug) hook are in place. This page still renders from
+ * the hardcoded ARTICLES constant. Outstanding work to cut over:
+ *   - Add react-markdown for body_md rendering (the editorial layout
+ *     here uses sectioned { heading, text } pairs; markdown is flatter)
+ *   - Map blog_posts.category (general/vyziva/pohyb/mysel/cyklus/
+ *     materstvo) to the existing CAT_COLOR keys
+ *   - Schema currently has `author` as plain text; extend with
+ *     author_role + author_image before cut-over
  *
  * Mounted at /blog/:id.
  */

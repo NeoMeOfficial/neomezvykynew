@@ -6,6 +6,7 @@ import { useMealPlan } from '../../features/nutrition/useMealPlan';
 import { useSupabaseHabits } from '../../hooks/useSupabaseHabits';
 import { useWorkoutHistory } from '../../hooks/useWorkoutHistory';
 import { useCycleData } from '../../features/cycle/useCycleData';
+import { useDailyMeditation, useDailyRecipe } from '../../hooks/useDailyContent';
 import { recipes } from '../../data/recipes';
 import { Page, Eye, Ser, NM, Card } from '../../components/v2/neome';
 
@@ -416,7 +417,17 @@ function NutritionCard({ isPremium }: { isPremium: boolean }) {
   }
 
   // No meal plan → recipe of the day + quiet upsell.
-  // FEATURE-NEEDED: "recipe of the day" rotation service. Currently static curated.
+  // Wired (F-002): useDailyRecipe prefers public.recipes.featured_on=today,
+  // else deterministic dayOfYear pick across active rows.
+  return <NutritionDailyRecipeFallback isPremium={isPremium} navigate={navigate} />;
+}
+
+function NutritionDailyRecipeFallback({ isPremium, navigate }: { isPremium: boolean; navigate: (p: string) => void }) {
+  const { recipe } = useDailyRecipe();
+  const title = recipe?.title ?? 'Zelený šalát s kozím syrom';
+  const sub = recipe ? `${recipe.calories} kcal · ${recipe.prep_time} min` : 'Ľahký obed · 420 kcal · 22 g bielkovín';
+  const minutes = recipe ? `${recipe.prep_time} min` : '15 min';
+  const target = recipe ? `/recipe/${recipe.id}` : '/kniznica/strava';
   return (
     <div style={{ padding: '0 18px', marginBottom: 12 }}>
       <Card padding={18}>
@@ -424,16 +435,16 @@ function NutritionCard({ isPremium }: { isPremium: boolean }) {
           <PillarDot color={SECTIONS.STRAVA} />
           <Eye size={10}>Výživa · recept dňa</Eye>
         </div>
-        <Ser size={20}>Zelený šalát s kozím syrom</Ser>
+        <Ser size={20}>{title}</Ser>
         <div style={{ fontSize: 12.5, color: NM.MUTED, marginTop: 4, lineHeight: 1.45, fontWeight: 300 }}>
-          Ľahký obed · 420 kcal · 22 g bielkovín
+          {sub}
         </div>
         <div style={{ display: 'flex', gap: 10, fontSize: 10.5, letterSpacing: '0.14em', textTransform: 'uppercase', color: NM.TERTIARY, fontWeight: 500, marginTop: 12 }}>
-          <span>15 min</span>
+          <span>{minutes}</span>
           <span>·</span>
           <span>Z knižnice</span>
         </div>
-        <CTAArrow color={SECTIONS.STRAVA} label="Otvoriť recept" onClick={() => navigate('/kniznica/strava')} />
+        <CTAArrow color={SECTIONS.STRAVA} label="Otvoriť recept" onClick={() => navigate(target)} />
         {!isPremium && (
           <div style={{ marginTop: 14, paddingTop: 12, borderTop: `1px solid ${NM.HAIR}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ fontSize: 11, color: NM.TERTIARY, fontWeight: 300, lineHeight: 1.4 }}>
@@ -469,10 +480,12 @@ function NutritionCard({ isPremium }: { isPremium: boolean }) {
 }
 
 // ─── 3 · Mindset card ──────────────────────────────────────────
-// FEATURE-NEEDED-DOMOV-MEDITATION: meditation-of-the-day rotation service.
-// Currently editorial curation: fixed "Ranný pokoj · 10 min · Gabi".
+// Wired (F-001): meditation-of-the-day from useDailyMeditation, which
+// prefers public.meditations.featured_on = today and falls back to a
+// deterministic dayOfYear pick across active rows.
 function MindsetCard() {
   const navigate = useNavigate();
+  const { meditation } = useDailyMeditation();
   return (
     <div style={{ padding: '0 18px', marginBottom: 12 }}>
       <div
@@ -489,13 +502,13 @@ function MindsetCard() {
           <PillarDot color="rgba(255,255,255,0.5)" />
           <Eye size={10} color="rgba(255,255,255,0.7)">Myseľ · meditácia dňa</Eye>
         </div>
-        <Ser size={22} color="#fff" style={{ lineHeight: 1.18, marginBottom: 4 }}>Ranný pokoj</Ser>
+        <Ser size={22} color="#fff" style={{ lineHeight: 1.18, marginBottom: 4 }}>{meditation.title}</Ser>
         <div style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.72)', marginBottom: 14, fontWeight: 300, lineHeight: 1.45 }}>
-          Krátka ranná meditácia na uzemnenie pred dňom.
+          {meditation.description ?? 'Krátka ranná meditácia na uzemnenie pred dňom.'}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', gap: 12, fontSize: 10.5, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)', fontWeight: 500 }}>
-            <span>10 min</span>
+            <span>{meditation.duration}</span>
             <span>·</span>
             <span>Gabi</span>
           </div>

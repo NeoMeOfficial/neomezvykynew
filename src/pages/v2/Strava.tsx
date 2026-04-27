@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { recipes } from '../../data/recipes';
+import { useDailyRecipe } from '../../hooks/useDailyContent';
 import { Page, BackHeader, Eye, Ser, Body, NM } from '../../components/v2/neome';
 
 /**
@@ -14,10 +15,10 @@ import { Page, BackHeader, Eye, Ser, Body, NM } from '../../components/v2/neome'
  * - Recipe of the day picked deterministically by ISO day-of-year so
  *   it rotates daily without server state
  *
- * FEATURE-NEEDED-STRAVA-DAILY-RECIPE: server-side or admin-curated
- * recipe-of-the-day rotation (currently deterministic client pick by
- * day index, which means everyone sees the same recipe each day —
- * fine for v1, but a thoughtful curation service is the upgrade path).
+ * Wired (F-002): useDailyRecipe prefers public.recipes.featured_on=today
+ * (admin-curated row) and falls back to the deterministic dayOfYear
+ * pick across the static recipes data when no DB row is featured.
+ * Both paths render the same JSX shape — fields adapted inline.
  *
  * Old version: Strava.old.tsx.
  */
@@ -54,11 +55,23 @@ export default function Strava() {
     }));
   }, []);
 
+  const { recipe: serverRecipe } = useDailyRecipe();
+
   const featured = useMemo(() => {
+    if (serverRecipe) {
+      return {
+        id: serverRecipe.id,
+        title: serverRecipe.title,
+        category: serverRecipe.category,
+        prepTime: serverRecipe.prep_time,
+        servings: 2,
+        description: serverRecipe.description ?? '',
+      };
+    }
     if (recipes.length === 0) return null;
     const idx = dayOfYear() % recipes.length;
     return recipes[idx];
-  }, []);
+  }, [serverRecipe]);
   return (
     <Page>
       <BackHeader title="Výživa" />

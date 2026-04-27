@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useSubscription } from '../../contexts/SubscriptionContext';
 import { useCycleData } from '../../features/cycle/useCycleData';
+import { usePhaseAdvice } from '../../hooks/useDailyContent';
 import { Page, Eye, Ser, Body, PlusTag, NM } from '../../components/v2/neome';
 import type { DerivedState, CycleData } from '../../features/cycle/types';
 
@@ -244,11 +245,26 @@ function PaidView({ navigate, cycleData, derivedState }: PaidViewProps) {
     { l: 'Únava', on: false },
   ];
 
-  const advice = [
-    { pillar: 'Strava', color: NM.SAGE, title: 'Komplexné sacharidy', body: 'Quinoa, sladké zemiaky — telo ich teraz dobre spracuje.', img: 'testimonial-recipe.jpg', path: '/kniznica/strava' },
-    { pillar: 'Pohyb', color: NM.TERRA, title: 'Nový tréningový plán', body: 'Ideálny čas zvýšiť intenzitu a skúsiť silu.', img: 'lifestyle-core-workout.jpg', path: '/kniznica/telo' },
-    { pillar: 'Myseľ', color: NM.MAUVE, title: 'Plánuj a stanov si ciele', body: 'Myseľ je jasná, optimizmus prirodzene rastie.', img: 'section-mind.jpg', path: '/kniznica/mysel' },
-  ];
+  // F-011: phase-tailored advice from public.phase_advice (12 seed rows,
+  // 3 per phase). Falls back to the hook's hardcoded folikulárna trio
+  // pre-migration so the section never blanks.
+  const PILLAR_META: Record<string, { label: string; color: string; img: string; path: string }> = {
+    strava: { label: 'Strava', color: NM.SAGE,  img: 'testimonial-recipe.jpg',     path: '/kniznica/strava' },
+    telo:   { label: 'Pohyb',  color: NM.TERRA, img: 'lifestyle-core-workout.jpg', path: '/kniznica/telo' },
+    mysel:  { label: 'Myseľ',  color: NM.MAUVE, img: 'section-mind.jpg',           path: '/kniznica/mysel' },
+  };
+  const { rows: phaseAdviceRows } = usePhaseAdvice(currentPhaseKey);
+  const advice = phaseAdviceRows.map((r) => {
+    const meta = PILLAR_META[r.pillar] ?? PILLAR_META.telo;
+    return {
+      pillar: meta.label,
+      color: meta.color,
+      title: r.title,
+      body: r.body_text,
+      img: r.image_key ?? meta.img,
+      path: r.target_path ?? meta.path,
+    };
+  });
 
   return (
     <>

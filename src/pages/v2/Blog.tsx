@@ -9,7 +9,11 @@ import { Page, BackHeader, Eye, Ser, Body, NM } from '../../components/v2/neome'
  * chips + latest section. Article detail is handled by an existing
  * route (no canonical detail screen ported yet — that's a follow-up).
  *
- * TODO data: articles list from CMS / static markdown.
+ * F-025 status: public.blog_posts schema (migration 20260416) and the
+ * useBlogPosts() hook are in place. This list still renders from the
+ * static ARTICLES constant below; cut over to `const { posts } =
+ * useBlogPosts()` once Gabi has authored real entries via Supabase
+ * Studio. The hook ships fallback rows so cutover is one-line.
  *
  * Old version: Blog.old.tsx.
  */
