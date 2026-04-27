@@ -1,6 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { useSubscription } from '../../contexts/SubscriptionContext';
+import { useCycleData } from '../../features/cycle/useCycleData';
 import { Page, Eye, Ser, Body, PlusTag, NM } from '../../components/v2/neome';
+import type { DerivedState, CycleData } from '../../features/cycle/types';
 
 /**
  * Cyklus / Periodka — R5 dashboard
@@ -9,14 +11,21 @@ import { Page, Eye, Ser, Body, PlusTag, NM } from '../../components/v2/neome';
  * phase advice, upcoming events.
  * Free: faded ring preview + dark Plus card + educational phase list.
  *
- * TODO data: cycle phase / day / symptom log / next-event from
- * features/cycle hooks. Currently shows the canonical "day 7,
- * folikulárna" preview from the design source — flagged as the
- * primary wiring task in REDESIGN_NOTES.
+ * Wired:
+ * - useCycleData → cycleData + derivedState (currentDay, phase,
+ *   phaseRanges, today). Plus state shows real day + phase + calendar
+ *   centered on today's month.
+ * - isPremium gates Plus/Free view (?free=1 forces Free)
  *
  * Behavior rule (BC-4): for free users we don't persist preview
  * interactions ("Náhľad bez ukladania"). Visuals only here; the
  * persistence guard is a separate behavior PR.
+ *
+ * FEATURE-NEEDED-PERIODKA-SYMPTOMS: symptom log persistence (today's
+ * tap state currently does nothing — needs cycle.symptoms table or
+ * useCycleData extension).
+ * FEATURE-NEEDED-PERIODKA-ADVICE: phase-based "ako sa môžeš cítiť
+ * lepšie" rotation (currently 3 static curated rows for folikulárna).
  *
  * Old version: Periodka.old.tsx.
  */
@@ -50,9 +59,23 @@ function TopBar({ title, showLock = false, onBack, onSettings }: { title: string
   );
 }
 
-function RingDial({ faded = false }: { faded?: boolean }) {
-  const totalDays = 28;
-  const currentDay = 7;
+interface RingDialProps {
+  faded?: boolean;
+  totalDays?: number;
+  currentDay?: number;
+  phaseLabel?: string;
+  phaseColor?: string;
+  daysToNextLabel?: string;
+}
+
+function RingDial({
+  faded = false,
+  totalDays = 28,
+  currentDay = 7,
+  phaseLabel = 'Folikulárna',
+  phaseColor = PHASE.FOLLIC,
+  daysToNextLabel = 'ďalšia o 21 dní',
+}: RingDialProps) {
   const size = 230;
   const strokeW = 16;
   const r = (size - strokeW) / 2;
@@ -92,13 +115,13 @@ function RingDial({ faded = false }: { faded?: boolean }) {
           DEŇ
         </text>
         <text x={cx} y={cy + 10} textAnchor="middle" fontFamily="Gilda Display" fontSize="38" fontWeight="500" fill={NM.DEEP} letterSpacing="-0.5">
-          7
+          {currentDay}
         </text>
-        <text x={cx} y={cy + 32} textAnchor="middle" fontFamily="Gilda Display" fontSize="13" fontWeight="500" fill={PHASE.FOLLIC} fontStyle="italic">
-          Folikulárna
+        <text x={cx} y={cy + 32} textAnchor="middle" fontFamily="Gilda Display" fontSize="13" fontWeight="500" fill={phaseColor} fontStyle="italic">
+          {phaseLabel}
         </text>
         <text x={cx} y={cy + 48} textAnchor="middle" fontFamily="DM Sans" fontSize="10" fill={NM.MUTED}>
-          ďalšia o 21 dní
+          {daysToNextLabel}
         </text>
       </svg>
     </div>
@@ -124,36 +147,91 @@ function PhaseLegend() {
   );
 }
 
-function PaidView({ navigate }: { navigate: (p: string) => void }) {
-  const todayDate = 7;
-  const phaseOf = (d: number) => {
-    if (d <= 0) return null;
-    if (d <= 5) return PHASE.MENSTR;
-    if (d <= 13) return PHASE.FOLLIC;
-    if (d <= 16) return PHASE.OVULAT;
-    if (d <= 28) return PHASE.LUTEAL;
-    return null;
-  };
-  const symptomDays = [1, 2, 3, 7];
-  // April 2026 grid (starts Wed = 3rd column on Mon-first calendar)
-  type Cell = { d: number; mute?: boolean };
-  const weeks: Cell[][] = [];
-  let row: Cell[] = [
-    { d: 30, mute: true },
-    { d: 31, mute: true },
+interface PaidViewProps {
+  navigate: (p: string) => void;
+  cycleData: CycleData;
+  derivedState: DerivedState | null;
+}
+
+const SK_MONTHS_FULL = ['január', 'február', 'marec', 'apríl', 'máj', 'jún', 'júl', 'august', 'september', 'október', 'november', 'december'];
+const SK_MONTHS_SHORT_LOWER = ['jan', 'feb', 'mar', 'apr', 'máj', 'jún', 'júl', 'aug', 'sep', 'okt', 'nov', 'dec'];
+
+function PaidView({ navigate, cycleData, derivedState }: PaidViewProps) {
+  const totalDays = cycleData.cycleLength ?? 28;
+  const periodLength = cycleData.periodLength ?? 5;
+  const currentDay = derivedState?.currentDay ?? 1;
+  const currentPhaseKey = derivedState?.currentPhase?.key ?? 'follicular';
+  const phases = derivedState?.phaseRanges ?? [
+    { key: 'menstrual' as const, name: 'Menštruácia', start: 1, end: periodLength },
+    { key: 'follicular' as const, name: 'Folikulárna', start: periodLength + 1, end: 13 },
+    { key: 'ovulation' as const, name: 'Ovulácia', start: 14, end: 16 },
+    { key: 'luteal' as const, name: 'Luteálna', start: 17, end: totalDays },
   ];
-  for (let d = 1; d <= 30; d++) {
+  const phaseColorByKey: Record<string, string> = {
+    menstrual: PHASE.MENSTR,
+    follicular: PHASE.FOLLIC,
+    ovulation: PHASE.OVULAT,
+    luteal: PHASE.LUTEAL,
+  };
+  const phaseColor = phaseColorByKey[currentPhaseKey];
+  const currentPhaseName = derivedState?.currentPhase?.name ?? 'Folikulárna';
+  const today = derivedState?.today ?? new Date();
+  const todayDate = today.getDate();
+  const monthIdx = today.getMonth();
+  const yearIdx = today.getFullYear();
+  const monthLabel = SK_MONTHS_FULL[monthIdx];
+  const monthShort = SK_MONTHS_SHORT_LOWER[monthIdx];
+
+  const phaseOf = (d: number) => {
+    const range = phases.find((p) => d >= p.start && d <= p.end);
+    return range ? phaseColorByKey[range.key] : null;
+  };
+
+  const daysToMenstruation = Math.max(0, totalDays - currentDay);
+  const ovulationStart = phases.find((p) => p.key === 'ovulation')?.start ?? 14;
+  const daysToOvulation = ovulationStart > currentDay ? ovulationStart - currentDay : Math.max(0, totalDays + ovulationStart - currentDay);
+
+  // Predicted next-period date
+  const nextPeriodDate = new Date(today);
+  nextPeriodDate.setDate(today.getDate() + daysToMenstruation);
+  const nextPeriodLabel = `${nextPeriodDate.getDate()}. ${SK_MONTHS_SHORT_LOWER[nextPeriodDate.getMonth()]}.`;
+
+  // Headline copy adapts to phase
+  const phaseHeadline: Record<string, { eye: string; before: string; em: string; body: string }> = {
+    menstrual: { eye: `${monthLabel} · deň ${currentDay} z ${totalDays} · menštruácia`, before: 'Telo sa', em: 'reštartuje.', body: 'Doprajte si pokoj, teplo a jemný pohyb.' },
+    follicular: { eye: `${monthLabel} · deň ${currentDay} z ${totalDays} · folikulárna`, before: 'Energia sa', em: 'vracia.', body: 'Estrogén stúpa. Skvelý čas začať niečo nové alebo vrátiť sa k náročnejším tréningom.' },
+    ovulation: { eye: `${monthLabel} · deň ${currentDay} z ${totalDays} · ovulácia`, before: 'Vrchol', em: 'sily.', body: 'Najvyššia energia a sebavedomie. Sociálny, kreatívny čas.' },
+    luteal: { eye: `${monthLabel} · deň ${currentDay} z ${totalDays} · luteálna`, before: 'Spomaľ a', em: 'uzemni sa.', body: 'Telo sa pripravuje na ďalší cyklus. Buď k sebe jemnejšia.' },
+  };
+  const head = phaseHeadline[currentPhaseKey] ?? phaseHeadline.follicular;
+
+  // Build calendar grid for the current month, Mon-first
+  type Cell = { d: number; mute?: boolean };
+  const firstOfMonth = new Date(yearIdx, monthIdx, 1);
+  const lastOfMonth = new Date(yearIdx, monthIdx + 1, 0);
+  const lastOfPrevMonth = new Date(yearIdx, monthIdx, 0);
+  const startDow = (firstOfMonth.getDay() + 6) % 7; // Mon=0
+  const weeks: Cell[][] = [];
+  let row: Cell[] = [];
+  for (let i = startDow - 1; i >= 0; i--) {
+    row.push({ d: lastOfPrevMonth.getDate() - i, mute: true });
+  }
+  for (let d = 1; d <= lastOfMonth.getDate(); d++) {
     row.push({ d });
     if (row.length === 7) {
       weeks.push(row);
       row = [];
     }
   }
-  let n = 1;
-  while (row.length < 7) {
-    row.push({ d: n++, mute: true });
+  let next = 1;
+  while (row.length > 0 && row.length < 7) {
+    row.push({ d: next++, mute: true });
   }
-  weeks.push(row);
+  if (row.length === 7) weeks.push(row);
+
+  // FEATURE-NEEDED-PERIODKA-SYMPTOMS: derive from cycle.symptoms log.
+  // Today gets a marker; otherwise no symptom dots.
+  const symptomDays: number[] = [todayDate];
 
   const symptoms = [
     { l: 'Energická', on: true },
@@ -176,23 +254,23 @@ function PaidView({ navigate }: { navigate: (p: string) => void }) {
     <>
       <TopBar title="Cyklus" onBack={() => navigate('/domov-new')} onSettings={() => navigate('/profil')} />
       <div style={{ padding: '2px 20px 6px' }}>
-        <Eye color={NM.GOLD}>Apríl · deň 7 z 28 · folikulárna</Eye>
+        <Eye color={NM.GOLD}>{head.eye}</Eye>
         <Ser size={30} style={{ marginTop: 10, lineHeight: 1.02 }}>
-          Energia sa
+          {head.before}
           <br />
-          <em style={{ color: PHASE.FOLLIC, fontStyle: 'italic', fontWeight: 500 }}>vracia.</em>
+          <em style={{ color: phaseColor, fontStyle: 'italic', fontWeight: 500 }}>{head.em}</em>
         </Ser>
-        <Body style={{ marginTop: 10, maxWidth: 320 }}>Estrogén stúpa. Skvelý čas začať niečo nové alebo vrátiť sa k náročnejším tréningom.</Body>
+        <Body style={{ marginTop: 10, maxWidth: 320 }}>{head.body}</Body>
       </div>
 
-      <RingDial />
+      <RingDial currentDay={currentDay} totalDays={totalDays} phaseLabel={currentPhaseName} phaseColor={phaseColor} daysToNextLabel={`menštruácia o ${daysToMenstruation} dní`} />
       <PhaseLegend />
 
       <div style={{ padding: '0 20px 22px', display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 8 }}>
         {[
-          { eye: 'Priemer', v: '28 dní', c: NM.DEEP },
-          { eye: 'Predpoveď', v: '28. apr.', c: PHASE.MENSTR },
-          { eye: 'Ovulácia', v: 'o 7 dní', c: PHASE.OVULAT },
+          { eye: 'Priemer', v: `${totalDays} dní`, c: NM.DEEP },
+          { eye: 'Predpoveď', v: nextPeriodLabel, c: PHASE.MENSTR },
+          { eye: 'Ovulácia', v: `o ${daysToOvulation} dní`, c: PHASE.OVULAT },
         ].map((s) => (
           <div key={s.eye} style={{ padding: '12px 10px', background: NM.CREAM_2 ?? '#F1ECE3', borderRadius: 12, textAlign: 'center' }}>
             <Eye size={9} color={NM.TERTIARY}>{s.eye}</Eye>
@@ -234,7 +312,7 @@ function PaidView({ navigate }: { navigate: (p: string) => void }) {
       <div style={{ padding: '0 20px 10px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 14 }}>
           <Eye>Kalendár cyklu</Eye>
-          <div style={{ fontFamily: NM.SERIF, fontSize: 14, color: NM.DEEP, fontWeight: 500, fontStyle: 'italic' }}>apríl 2026</div>
+          <div style={{ fontFamily: NM.SERIF, fontSize: 14, color: NM.DEEP, fontWeight: 500, fontStyle: 'italic' }}>{monthLabel} {yearIdx}</div>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', marginBottom: 5 }}>
           {['Po', 'Ut', 'St', 'Št', 'Pi', 'So', 'Ne'].map((d) => (
@@ -461,8 +539,19 @@ function FreeView({ navigate }: { navigate: (p: string) => void }) {
 export default function Periodka() {
   const navigate = useNavigate();
   const { isPremium } = useSubscription();
+  const { cycleData, derivedState } = useCycleData();
   const forceFree = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('free');
-  const showPlus = isPremium && !forceFree;
+  const hasCycleSetup = !!cycleData?.lastPeriodStart;
+  // Plus + cycle data → rich dashboard. Otherwise → upsell/onboarding view.
+  const showPlus = isPremium && !forceFree && hasCycleSetup;
 
-  return <Page>{showPlus ? <PaidView navigate={navigate} /> : <FreeView navigate={navigate} />}</Page>;
+  return (
+    <Page>
+      {showPlus && cycleData ? (
+        <PaidView navigate={navigate} cycleData={cycleData} derivedState={derivedState} />
+      ) : (
+        <FreeView navigate={navigate} />
+      )}
+    </Page>
+  );
 }
