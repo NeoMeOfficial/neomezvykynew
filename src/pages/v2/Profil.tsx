@@ -36,6 +36,15 @@ function IFlame({ color }: IconProps) {
   );
 }
 
+function IPencil({ color }: IconProps) {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
+    </svg>
+  );
+}
+
 function ITarget({ color }: IconProps) {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
@@ -131,14 +140,17 @@ function Row({ icon, label, value, onClick, last }: { icon: { bg: string; el: Re
 
 export default function Profil() {
   const navigate = useNavigate();
-  const { user, signOut } = useSupabaseAuth();
+  const { user, profile, signOut } = useSupabaseAuth();
   const { isPremium, subscription } = useSubscription();
   const { stats } = useWorkoutHistory() as { stats: { totalWorkouts: number; currentStreak: number; longestStreak: number } };
   const { favoritesCount } = useFavorites();
   const { userProgram } = useUserProgram();
 
   const meta = (user?.user_metadata ?? {}) as { full_name?: string; name?: string };
-  const fullName = meta.full_name ?? meta.name ?? user?.email?.split('@')[0] ?? 'Eva Nová';
+  // Prefer the profiles row (what SettingsProfile.tsx writes via updateProfile),
+  // fall back to user_metadata, then to email-derived, then static placeholder.
+  const fullName = profile?.full_name ?? meta.full_name ?? meta.name ?? user?.email?.split('@')[0] ?? 'Eva Nová';
+  const avatarUrl = profile?.avatar_url ?? '/images/r9/testimonial-lucia.jpg';
 
   const streak = stats?.currentStreak ?? 0;
   const longest = stats?.longestStreak ?? 0;
@@ -169,7 +181,7 @@ export default function Profil() {
                 width: 76,
                 height: 76,
                 borderRadius: 999,
-                background: 'url(/images/r9/testimonial-lucia.jpg) center/cover',
+                background: `url(${avatarUrl}) center/cover`,
                 border: '3px solid #fff',
                 boxShadow: '0 10px 30px rgba(61,41,33,0.18)',
                 flexShrink: 0,
@@ -346,6 +358,7 @@ export default function Profil() {
       {/* Settings */}
       <SectionHead>Nastavenia</SectionHead>
       <div style={{ margin: '0 20px', background: NM.CREAM_2 ?? '#F1ECE3', borderRadius: 18, overflow: 'hidden' }}>
+        <Row icon={{ bg: 'rgba(255,255,255,0.7)', el: <IPencil color={NM.TERRA} /> }} label="Upraviť profil" value="Meno, fotka, bio" onClick={() => navigate('/settings/profile')} />
         <Row icon={{ bg: 'rgba(255,255,255,0.7)', el: <ITarget color={NM.SAGE} /> }} label="Ciele a životná fáza" value="Postpartum · 14. týždeň" onClick={() => navigate('/settings/goals')} />
         <Row icon={{ bg: 'rgba(255,255,255,0.7)', el: <IHeart color={NM.TERRA} /> }} label="Uložené" value="12 receptov · 8 meditácií" onClick={() => navigate('/oblubene')} />
         <Row icon={{ bg: 'rgba(255,255,255,0.7)', el: <IBell color={NM.DUSTY} /> }} label="Upozornenia" value="Ráno 7:30 · Reflexia 21:00" onClick={() => navigate('/settings/notifications')} />
