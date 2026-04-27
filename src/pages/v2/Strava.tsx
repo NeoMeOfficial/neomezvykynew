@@ -1,4 +1,6 @@
+import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { recipes } from '../../data/recipes';
 import { Page, BackHeader, Eye, Ser, Body, NM } from '../../components/v2/neome';
 
 /**
@@ -7,25 +9,56 @@ import { Page, BackHeader, Eye, Ser, Body, NM } from '../../components/v2/neome'
  * Editorial hero, recipe-of-the-day full-bleed card, 5 categories list,
  * meal-plan entry strip.
  *
- * Categories drill into /kniznica/strava/<key> (existing routes via
- * Recepty.tsx); meal plan goes to /kniznica/strava/jedalnicek.
+ * Wired:
+ * - Category counts derived live from src/data/recipes
+ * - Recipe of the day picked deterministically by ISO day-of-year so
+ *   it rotates daily without server state
  *
- * TODO data: category counts from useRecipes / Spoonacular cache,
- * recipe-of-the-day from existing recipes data file.
+ * FEATURE-NEEDED-STRAVA-DAILY-RECIPE: server-side or admin-curated
+ * recipe-of-the-day rotation (currently deterministic client pick by
+ * day index, which means everyone sees the same recipe each day —
+ * fine for v1, but a thoughtful curation service is the upgrade path).
  *
  * Old version: Strava.old.tsx.
  */
 
-const CATEGORIES = [
-  { key: 'rananky', label: 'Raňajky', count: 42, img: 'testimonial-recipe.jpg' },
-  { key: 'obedy', label: 'Obedy', count: 58, img: 'section-nutrition.jpg' },
-  { key: 'vecera', label: 'Večera', count: 36, img: 'lifestyle-core-workout.jpg' },
-  { key: 'snacky', label: 'Snacky', count: 24, img: 'hero-yoga.jpg' },
-  { key: 'napoje', label: 'Nápoje', count: 18, img: 'lifestyle-yoga-pose.jpg' },
+const CATEGORY_DEFS = [
+  { key: 'rananky', recipeCat: 'ranajky' as const, label: 'Raňajky', img: 'testimonial-recipe.jpg' },
+  { key: 'obedy', recipeCat: 'obed' as const, label: 'Obedy', img: 'section-nutrition.jpg' },
+  { key: 'vecera', recipeCat: 'vecera' as const, label: 'Večera', img: 'lifestyle-core-workout.jpg' },
+  { key: 'snacky', recipeCat: 'snack' as const, label: 'Snacky', img: 'hero-yoga.jpg' },
+  { key: 'napoje', recipeCat: 'smoothie' as const, label: 'Nápoje', img: 'lifestyle-yoga-pose.jpg' },
 ];
+
+function dayOfYear(d = new Date()): number {
+  const start = new Date(d.getFullYear(), 0, 0);
+  const diff = d.getTime() - start.getTime();
+  return Math.floor(diff / 86400000);
+}
+
+const CATEGORY_LABEL_BY_KEY: Record<string, string> = {
+  ranajky: 'Raňajky',
+  obed: 'Obed',
+  vecera: 'Večera',
+  snack: 'Snacky',
+  smoothie: 'Nápoje',
+};
 
 export default function Strava() {
   const navigate = useNavigate();
+
+  const categories = useMemo(() => {
+    return CATEGORY_DEFS.map((c) => ({
+      ...c,
+      count: recipes.filter((r) => r.category === c.recipeCat).length,
+    }));
+  }, []);
+
+  const featured = useMemo(() => {
+    if (recipes.length === 0) return null;
+    const idx = dayOfYear() % recipes.length;
+    return recipes[idx];
+  }, []);
   return (
     <Page>
       <BackHeader title="Výživa" />
@@ -40,43 +73,45 @@ export default function Strava() {
         <Body style={{ maxWidth: 310 }}>Recepty s celými potravinami, jednoduchou prípravou a chuťou, ktorú budeš mať rada.</Body>
       </div>
 
-      <div style={{ padding: '0 24px 22px' }}>
-        <Eye color={NM.GOLD} style={{ marginBottom: 14 }}>Recept dňa</Eye>
-        <button
-          onClick={() => navigate('/recipe/recept-dna')}
-          style={{
-            all: 'unset',
-            cursor: 'pointer',
-            display: 'block',
-            width: '100%',
-            borderRadius: 18,
-            overflow: 'hidden',
-            aspectRatio: '4/5',
-            backgroundImage: 'url(/images/r9/testimonial-recipe.jpg)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            position: 'relative',
-          }}
-        >
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.05) 30%, rgba(0,0,0,0.78) 100%)' }} />
-          <div style={{ position: 'absolute', left: 20, right: 20, bottom: 20, color: '#fff' }}>
-            <div style={{ fontFamily: NM.SANS, fontSize: 10, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.8)', marginBottom: 10 }}>
-              Obed · 25 min · 1 porcia
+      {featured && (
+        <div style={{ padding: '0 24px 22px' }}>
+          <Eye color={NM.GOLD} style={{ marginBottom: 14 }}>Recept dňa</Eye>
+          <button
+            onClick={() => navigate(`/recipe/${featured.id}`)}
+            style={{
+              all: 'unset',
+              cursor: 'pointer',
+              display: 'block',
+              width: '100%',
+              borderRadius: 18,
+              overflow: 'hidden',
+              aspectRatio: '4/5',
+              backgroundImage: 'url(/images/r9/testimonial-recipe.jpg)',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              position: 'relative',
+            }}
+          >
+            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.05) 30%, rgba(0,0,0,0.78) 100%)' }} />
+            <div style={{ position: 'absolute', left: 20, right: 20, bottom: 20, color: '#fff' }}>
+              <div style={{ fontFamily: NM.SANS, fontSize: 10, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.8)', marginBottom: 10 }}>
+                {CATEGORY_LABEL_BY_KEY[featured.category] ?? featured.category} · {featured.prepTime} min · {featured.servings} {featured.servings === 1 ? 'porcia' : 'porcie'}
+              </div>
+              <div style={{ fontFamily: NM.SERIF, fontSize: 28, fontWeight: 500, letterSpacing: '-0.012em', lineHeight: 1.05, marginBottom: 10 }}>
+                {featured.title}
+              </div>
+              <div style={{ fontFamily: NM.SANS, fontSize: 12, color: 'rgba(255,255,255,0.78)', lineHeight: 1.5 }}>
+                {featured.description}
+              </div>
             </div>
-            <div style={{ fontFamily: NM.SERIF, fontSize: 28, fontWeight: 500, letterSpacing: '-0.012em', lineHeight: 1.05, marginBottom: 10 }}>
-              Buddha bowl s pečenou batátou
-            </div>
-            <div style={{ fontFamily: NM.SANS, fontSize: 12, color: 'rgba(255,255,255,0.78)', lineHeight: 1.5 }}>
-              Quinoa, avokádo, tahini a pečený cícer. Dlhá energia bez ťažoby.
-            </div>
-          </div>
-        </button>
-      </div>
+          </button>
+        </div>
+      )}
 
       <div style={{ padding: '6px 24px 10px' }}>
         <Eye style={{ marginBottom: 18 }}>Kategórie</Eye>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          {CATEGORIES.map((c) => (
+          {categories.map((c) => (
             <button
               key={c.key}
               onClick={() => navigate(`/kniznica/strava?cat=${c.key}`)}

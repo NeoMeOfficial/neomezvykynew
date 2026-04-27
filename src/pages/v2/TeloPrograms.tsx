@@ -1,26 +1,39 @@
 import { useNavigate } from 'react-router-dom';
 import { useSubscription } from '../../contexts/SubscriptionContext';
+import { useUserProgram } from '../../hooks/useUserProgram';
 import { Page, BackHeader, Eye, Ser, Body, PlusTag, NM } from '../../components/v2/neome';
 
 /**
  * Telo · Programy — R9 list
  *
- * Big editorial program cards. Plus user has one program "Prebieha" with
- * progress bar; Free users see all four with Plus chips.
+ * Big editorial program cards. The user's active program (from
+ * useUserProgram) gets a "Prebieha · deň N" badge and progress bar
+ * derived from week×7 + day; the rest show their Plus chip for Free
+ * users (or no chip when Plus and inactive).
  *
- * TODO data: program list + active program / progress from
- * useWorkoutHistory + Supabase programs table (flagged for follow-up).
+ * FEATURE-NEEDED-TELO-PROGRAMS-CATALOG: programs are currently a static
+ * list — the live app's `programs` table should drive this so curation
+ * + ordering is admin-managed.
  */
 export default function TeloPrograms() {
   const navigate = useNavigate();
   const { isPremium } = useSubscription();
+  const { userProgram } = useUserProgram();
 
   const programs = [
-    { slug: 'postpartum', name: 'Postpartum návrat', weeks: 4, level: 'Jemné', desc: 'Jemné cvičenia pre návrat k panvovému dnu a bruchu.', img: 'program-postpartum.jpg', activeForPlus: true },
-    { slug: 'body-forming', name: 'BodyForming', weeks: 6, level: 'Stredné', desc: 'Tonizácia celého tela s dôrazom na držanie.', img: 'program-body-forming.jpg', activeForPlus: false },
-    { slug: 'hormonal', name: 'Hormonálna joga', weeks: 4, level: 'Jemné', desc: 'Joga podporujúca hormonálnu rovnováhu a cyklus.', img: 'program-hormonal.jpg', activeForPlus: false },
-    { slug: 'mindful', name: 'Mindful pohyb', weeks: 3, level: 'Jemné', desc: 'Vnímavý pohyb s dychom pre pokojnú hlavu.', img: 'program-mindful.jpg', activeForPlus: false },
+    { slug: 'postpartum', name: 'Postpartum návrat', weeks: 4, level: 'Jemné', desc: 'Jemné cvičenia pre návrat k panvovému dnu a bruchu.', img: 'program-postpartum.jpg' },
+    { slug: 'body-forming', name: 'BodyForming', weeks: 6, level: 'Stredné', desc: 'Tonizácia celého tela s dôrazom na držanie.', img: 'program-body-forming.jpg' },
+    { slug: 'hormonal', name: 'Hormonálna joga', weeks: 4, level: 'Jemné', desc: 'Joga podporujúca hormonálnu rovnováhu a cyklus.', img: 'program-hormonal.jpg' },
+    { slug: 'mindful', name: 'Mindful pohyb', weeks: 3, level: 'Jemné', desc: 'Vnímavý pohyb s dychom pre pokojnú hlavu.', img: 'program-mindful.jpg' },
   ];
+
+  // useUserProgram returns a single active program (id like 'bodyforming-1');
+  // match it against our list by best-effort name compare.
+  const activeSlug = userProgram
+    ? programs.find((p) => p.name.toLowerCase().includes(userProgram.name.toLowerCase()))?.slug
+    : null;
+  const activeDayLabel = userProgram ? `Prebieha · deň ${(userProgram.week - 1) * 7 + userProgram.day}` : null;
+  const activeProgress = userProgram ? Math.min(100, Math.round((((userProgram.week - 1) * 7 + userProgram.day) / (userProgram.totalWeeks * 7)) * 100)) : 0;
 
   return (
     <Page>
@@ -42,7 +55,7 @@ export default function TeloPrograms() {
 
       <div style={{ margin: '14px 20px 0', display: 'flex', flexDirection: 'column', gap: 14 }}>
         {programs.map((p) => {
-          const active = isPremium && p.activeForPlus;
+          const active = isPremium && activeSlug === p.slug;
           return (
             <div
               key={p.slug}
@@ -75,7 +88,7 @@ export default function TeloPrograms() {
                     fontWeight: 600,
                   }}
                 >
-                  Prebieha · deň 22
+                  {activeDayLabel}
                 </div>
               )}
               {!isPremium && (
@@ -101,7 +114,7 @@ export default function TeloPrograms() {
                 <Body size={12.5}>{p.desc}</Body>
                 {active && (
                   <div style={{ marginTop: 14, height: 4, borderRadius: 999, background: NM.HAIR, overflow: 'hidden' }}>
-                    <div style={{ height: '100%', width: '78%', background: NM.TERRA }} />
+                    <div style={{ height: '100%', width: `${activeProgress}%`, background: NM.TERRA }} />
                   </div>
                 )}
               </div>
