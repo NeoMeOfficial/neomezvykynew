@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useSupabaseHabits } from '../../hooks/useSupabaseHabits';
+import { useToast } from '@/hooks/use-toast';
 import { Page, BackHeader, Eye, Ser, NM } from '../../components/v2/neome';
 
 /**
@@ -38,8 +40,21 @@ const CATEGORIES = [
 const FREQUENCIES = ['Denne', 'Vybrané dni', 'X × týždenne'] as const;
 const DURATIONS = ['7 dní', '21 dní', '30 dní', 'Bez limitu'] as const;
 
+// Map UI duration label to days int (matches habits.duration_days column).
+const DURATION_DAYS: Record<string, number> = {
+  '7 dní': 7,
+  '14 dní': 14,
+  '21 dní': 21,
+  '30 dní': 30,
+  '60 dní': 60,
+  '90 dní': 90,
+  'Bez konca': 365,
+};
+
 export default function HabitCompose() {
   const navigate = useNavigate();
+  const { addHabit } = useSupabaseHabits();
+  const { toast } = useToast();
   const [name, setName] = useState('Piť 2l vody');
   const [icon, setIcon] = useState('droplet');
   const [category, setCategory] = useState('pohyb');
@@ -48,9 +63,31 @@ export default function HabitCompose() {
   const [reminderOn, setReminderOn] = useState(true);
   const [duration, setDuration] = useState<string>('21 dní');
   const [notes, setNotes] = useState('');
+  const [saving, setSaving] = useState(false);
 
-  const onSave = () => {
-    // FEATURE-NEEDED-HABIT-PERSIST
+  const onSave = async () => {
+    if (saving) return;
+    if (!name.trim()) {
+      toast({ title: 'Zadaj názov návyku', variant: 'destructive' });
+      return;
+    }
+    setSaving(true);
+    // F-008: persist to public.habits via useSupabaseHabits.
+    // The habits schema doesn't yet have icon/category/frequency/reminder
+    // /notes columns — those are encoded into name and dropped silently
+    // for now. Extension follow-up: add habit_metadata jsonb column.
+    const ok = await addHabit({
+      name: name.trim(),
+      durationDays: DURATION_DAYS[duration] ?? 21,
+      unit: 'krát',
+      targetPerDay: 1,
+    });
+    setSaving(false);
+    if (!ok) {
+      toast({ title: 'Uloženie zlyhalo', description: 'Skús to ešte raz.', variant: 'destructive' });
+      return;
+    }
+    toast({ title: 'Návyk vytvorený' });
     navigate('/navyky');
   };
 
@@ -63,8 +100,8 @@ export default function HabitCompose() {
           </svg>
         </button>
         <Eye>Nový návyk</Eye>
-        <button onClick={onSave} style={{ all: 'unset', cursor: 'pointer', fontFamily: NM.SANS, fontSize: 12, color: NM.TERRA, fontWeight: 500, padding: 6 }}>
-          Uložiť
+        <button onClick={onSave} disabled={saving} style={{ all: 'unset', cursor: saving ? 'wait' : 'pointer', fontFamily: NM.SANS, fontSize: 12, color: NM.TERRA, fontWeight: 500, padding: 6, opacity: saving ? 0.6 : 1 }}>
+          {saving ? 'Ukladám…' : 'Uložiť'}
         </button>
       </div>
 

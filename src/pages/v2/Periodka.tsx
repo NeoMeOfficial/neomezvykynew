@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSubscription } from '../../contexts/SubscriptionContext';
 import { useCycleData } from '../../features/cycle/useCycleData';
 import { usePhaseAdvice } from '../../hooks/useDailyContent';
+import { useCycleSymptoms } from '../../hooks/useDailyRituals';
 import { Page, Eye, Ser, Body, PlusTag, NM } from '../../components/v2/neome';
 import type { DerivedState, CycleData } from '../../features/cycle/types';
 
@@ -230,20 +231,26 @@ function PaidView({ navigate, cycleData, derivedState }: PaidViewProps) {
   }
   if (row.length === 7) weeks.push(row);
 
-  // FEATURE-NEEDED-PERIODKA-SYMPTOMS: derive from cycle.symptoms log.
-  // Today gets a marker; otherwise no symptom dots.
-  const symptomDays: number[] = [todayDate];
+  // F-004: cycle_symptoms via useCycleSymptoms (real DB / localStorage demo).
+  const { todayMap, symptomDates, toggleSymptom } = useCycleSymptoms();
+  // Calendar dots — derive day-of-month for current month from symptomDates.
+  const today = new Date();
+  const ym = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+  const symptomDays: number[] = symptomDates
+    .filter((d) => d.startsWith(ym))
+    .map((d) => parseInt(d.slice(8, 10), 10));
 
-  const symptoms = [
-    { l: 'Energická', on: true },
-    { l: 'Sústredená', on: true },
-    { l: 'Kreatívna', on: true },
-    { l: 'Spoločenská', on: false },
-    { l: 'Bolesti hlavy', on: false },
-    { l: 'Citlivé prsia', on: false },
-    { l: 'Nafúknutá', on: false },
-    { l: 'Únava', on: false },
+  const SYMPTOM_DEFS = [
+    { l: 'Energická',     k: 'energetic' },
+    { l: 'Sústredená',    k: 'focused' },
+    { l: 'Kreatívna',     k: 'creative' },
+    { l: 'Spoločenská',   k: 'social' },
+    { l: 'Bolesti hlavy', k: 'headache' },
+    { l: 'Citlivé prsia', k: 'breast_tenderness' },
+    { l: 'Nafúknutá',     k: 'bloating' },
+    { l: 'Únava',         k: 'fatigue' },
   ];
+  const symptoms = SYMPTOM_DEFS.map((s) => ({ l: s.l, k: s.k, on: !!todayMap[s.k] }));
 
   // F-011: phase-tailored advice from public.phase_advice (12 seed rows,
   // 3 per phase). Falls back to the hook's hardcoded folikulárna trio
@@ -374,9 +381,12 @@ function PaidView({ navigate, cycleData, derivedState }: PaidViewProps) {
         <Eye style={{ marginBottom: 12 }}>Ako sa dnes cítiš</Eye>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
           {symptoms.map((s) => (
-            <div
-              key={s.l}
+            <button
+              key={s.k}
+              onClick={() => toggleSymptom(s.k)}
               style={{
+                all: 'unset',
+                cursor: 'pointer',
                 padding: '7px 12px',
                 borderRadius: 999,
                 background: s.on ? NM.DEEP : '#fff',
@@ -388,7 +398,7 @@ function PaidView({ navigate, cycleData, derivedState }: PaidViewProps) {
               }}
             >
               {s.l}
-            </div>
+            </button>
           ))}
         </div>
       </div>

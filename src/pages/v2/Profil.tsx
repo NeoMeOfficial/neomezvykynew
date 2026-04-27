@@ -4,7 +4,13 @@ import { useSubscription } from '../../contexts/SubscriptionContext';
 import { useWorkoutHistory } from '../../hooks/useWorkoutHistory';
 import { useFavorites } from '../../hooks/useFavorites';
 import { useUserProgram } from '../../hooks/useUserProgram';
+import { useReflections } from '../../hooks/useDailyRituals';
 import { Page, Eye, Ser, Body, PlusTag, NM } from '../../components/v2/neome';
+
+function useReflectionsCount(): number {
+  const { count } = useReflections();
+  return count;
+}
 
 /**
  * Profil — R7 variant B (editorial dashboard)
@@ -155,10 +161,9 @@ export default function Profil() {
   const streak = stats?.currentStreak ?? 0;
   const longest = stats?.longestStreak ?? 0;
   const totalWorkouts = stats?.totalWorkouts ?? 0;
-  // FEATURE-NEEDED-PROFIL-REFLECTION-COUNT: account-scoped reflection
-  // count (current useReflectionData uses access-code scope which we
-  // don't thread here). Showing — until that wiring lands.
-  const reflectionCount: number | null = null;
+  // F-003: account-scoped reflection count via useReflections (reads
+  // diary_entries by user.id; demo localStorage fallback).
+  const reflectionCount: number | null = useReflectionsCount();
 
   return (
     <Page>

@@ -7,6 +7,7 @@ import { useSupabaseHabits } from '../../hooks/useSupabaseHabits';
 import { useWorkoutHistory } from '../../hooks/useWorkoutHistory';
 import { useCycleData } from '../../features/cycle/useCycleData';
 import { useDailyMeditation, useDailyRecipe } from '../../hooks/useDailyContent';
+import { useReflections } from '../../hooks/useDailyRituals';
 import { recipes } from '../../data/recipes';
 import { Page, Eye, Ser, NM, Card } from '../../components/v2/neome';
 
@@ -656,16 +657,31 @@ function HabitsCard({ isPremium }: { isPremium: boolean }) {
 }
 
 // ─── 5 · Reflections card ──────────────────────────────────────
-// FEATURE-NEEDED-DOMOV-REFLECTIONS: prompt-of-the-day curation +
-// account-scoped (vs access-code-scoped) reflection store. Currently
-// the prompt is editorial, the textarea routes to /dennik for entry.
+// Wired (F-003): "Predošlé dni" pills derive from useReflections (real
+// diary_entries by user.id; demo localStorage fallback). The day label
+// is the Slovak short weekday for that entry's date.
+//
+// FEATURE-NEEDED-DOMOV-REFLECTIONS-PROMPT: prompt-of-the-day curation
+// service. Today's prompt is still editorial; needs daily-prompts
+// table + admin curation analogous to F-001 daily_meditations.
 function ReflectionsCard({ isPremium }: { isPremium: boolean }) {
   const navigate = useNavigate();
-  const history = [
+  const { entries } = useReflections();
+  const recent = entries.slice(0, 5);
+  const fallbackHistory = [
     { d: 'Ned', excerpt: 'Prechádzka s Léou' },
     { d: 'Sob', excerpt: 'Dlhý spánok a káva' },
     { d: 'Pia', excerpt: 'Tichý večer' },
   ];
+  const history = recent.length > 0
+    ? recent.map((r) => {
+        const d = new Date(r.created_at);
+        return {
+          d: SK_DAYS[d.getDay()],
+          excerpt: r.text.length > 32 ? r.text.slice(0, 32) + '…' : r.text,
+        };
+      })
+    : fallbackHistory;
   return (
     <div style={{ padding: '0 18px', marginBottom: 12 }}>
       <div style={{ background: NM.DEEP, borderRadius: 20, padding: '18px 20px', color: '#fff', overflow: 'hidden' }}>

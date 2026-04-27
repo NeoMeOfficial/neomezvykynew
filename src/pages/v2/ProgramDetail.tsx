@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSubscription } from '../../contexts/SubscriptionContext';
+import { useActiveProgram } from '../../hooks/useDailyRituals';
+import { useToast } from '@/hooks/use-toast';
 import { Eye, Ser, Body, PlusTag, NM } from '../../components/v2/neome';
 
 /**
@@ -96,9 +98,25 @@ export default function ProgramDetail() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { isPremium } = useSubscription();
+  const { activateProgram } = useActiveProgram();
+  const { toast } = useToast();
   const program = (slug && PROGRAMS[slug]) || PROGRAMS.postpartum;
   const mondays = getNextMondays(4);
   const [selectedIdx, setSelectedIdx] = useState(0);
+  const [activating, setActivating] = useState(false);
+
+  const onActivate = async () => {
+    if (activating || !slug) return;
+    setActivating(true);
+    const { error } = await activateProgram(slug, mondays[selectedIdx]);
+    setActivating(false);
+    if (error) {
+      toast({ title: 'Aktivácia zlyhala', description: error.message ?? 'Skús to ešte raz.', variant: 'destructive' });
+      return;
+    }
+    toast({ title: 'Program aktivovaný', description: `Začneš v pondelok ${formatMonday(mondays[selectedIdx])}.` });
+    navigate('/domov-new');
+  };
 
   const formatMonday = (d: Date) => `${d.getDate()}. ${SK_MONTHS_SHORT[d.getMonth()]}`;
   const formatFull = (d: Date) => `${d.getDate()}. ${SK_MONTHS_SHORT[d.getMonth()]}`;
@@ -306,8 +324,8 @@ export default function ProgramDetail() {
         {isPremium ? (
           <>
             <button
-              // FEATURE: persist selected start date to active program record
-              onClick={() => navigate('/domov-new')}
+              onClick={onActivate}
+              disabled={activating}
               style={{
                 width: '100%',
                 padding: '15px 20px',
@@ -319,10 +337,11 @@ export default function ProgramDetail() {
                 fontSize: 14,
                 fontWeight: 500,
                 letterSpacing: '0.02em',
-                cursor: 'pointer',
+                cursor: activating ? 'wait' : 'pointer',
+                opacity: activating ? 0.6 : 1,
               }}
             >
-              Aktivovať program · {formatMonday(mondays[selectedIdx])}
+              {activating ? 'Aktivujem…' : `Aktivovať program · ${formatMonday(mondays[selectedIdx])}`}
             </button>
             <div style={{ textAlign: 'center', marginTop: 10, fontFamily: NM.SANS, fontSize: 11, color: NM.TERTIARY, fontWeight: 400 }}>
               Pridá sa do Domov a Kalendára

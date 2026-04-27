@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { usePointsLedger } from '../../hooks/usePointsLedger';
+import { useWorkoutHistory } from '../../hooks/useWorkoutHistory';
 import { Page, Eye, Ser, Body, NM } from '../../components/v2/neome';
 
 /**
@@ -10,12 +11,17 @@ import { Page, Eye, Ser, Body, NM } from '../../components/v2/neome';
  * full-bleed photo + serif headline, points float, stats strip, streak
  * row, mood-pick reflection chips, primary CTA.
  *
- * FEATURE-NEEDED-COMPLETION-WORKOUT-LOG: persist mood pick + integrate
- * with reflection store (depends on F-003 reflection store on user.id).
+ * Wired (F-010): on mount, calls useWorkoutHistory.completeWorkout to log
+ * the session (id, title, type, duration) which feeds the streak/total
+ * stats on Profil and Domov. Once-per-mount guard so re-render doesn't
+ * double-log.
  *
  * Wired (F-022): on mount, awards 10 points via usePointsLedger.addEntry
  * keyed on (exerciseId, 'exercise') so navigating back doesn't double-credit.
  * Display value reads back from the ledger entry that was just inserted.
+ *
+ * FEATURE-NEEDED-COMPLETION-WORKOUT-LOG-MOOD: mood pick still local-only;
+ * persisting needs F-003 (reflections / journal entry on user.id).
  *
  * Mounted at /completion/workout — receives state via location-state
  * in production; here we render with sane defaults so you can preview.
@@ -35,11 +41,21 @@ export default function CompletionWorkout() {
   const location = useLocation();
   const [mood, setMood] = useState<string | null>(null);
   const { addEntry } = usePointsLedger();
-  const exerciseId = (location.state as { exerciseId?: string } | null)?.exerciseId ?? 'preview';
+  const { completeWorkout } = useWorkoutHistory();
+  const state = (location.state ?? {}) as { exerciseId?: string; title?: string; type?: string; duration?: number; program?: string };
+  const exerciseId = state.exerciseId ?? 'preview';
+  const title = state.title ?? 'Cvičenie';
+  const type = state.type ?? 'workout';
+  const duration = state.duration ?? 15;
+  const program = state.program;
+  const loggedRef = useRef(false);
 
   useEffect(() => {
+    if (loggedRef.current) return;
+    loggedRef.current = true;
     addEntry('workout_completed', WORKOUT_POINTS, exerciseId, 'exercise');
-  }, [addEntry, exerciseId]);
+    completeWorkout(exerciseId, title, type, duration, program);
+  }, [addEntry, completeWorkout, exerciseId, title, type, duration, program]);
 
   return (
     <Page paddingBottom={40}>
