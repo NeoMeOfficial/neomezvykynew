@@ -132,7 +132,7 @@ function Row({ icon, label, value, onClick, last }: { icon: { bg: string; el: Re
 export default function Profil() {
   const navigate = useNavigate();
   const { user, signOut } = useSupabaseAuth();
-  const { isPremium } = useSubscription();
+  const { isPremium, subscription } = useSubscription();
   const { stats } = useWorkoutHistory() as { stats: { totalWorkouts: number; currentStreak: number; longestStreak: number } };
   const { favoritesCount } = useFavorites();
   const { userProgram } = useUserProgram();
@@ -299,11 +299,18 @@ export default function Profil() {
                 <Eye color={NM.GOLD} size={10}>NeoMe Plus · aktívne</Eye>
                 <div style={{ fontFamily: NM.SANS, fontSize: 10, color: 'rgba(255,255,255,0.5)', fontWeight: 400 }}>Spravovať ›</div>
               </div>
-              {/* TODO data: real next-payment date + last 4 from Stripe */}
               <div style={{ fontFamily: NM.SERIF, fontSize: 17, fontStyle: 'italic', fontWeight: 500, letterSpacing: '-0.005em', marginBottom: 4 }}>
-                Ďalšia platba 21. máj
+                {(() => {
+                  if (!subscription?.current_period_end) return 'Aktívne predplatné';
+                  const d = new Date(subscription.current_period_end * 1000);
+                  const sk = ['januára', 'februára', 'marca', 'apríla', 'mája', 'júna', 'júla', 'augusta', 'septembra', 'októbra', 'novembra', 'decembra'];
+                  return `Ďalšia platba ${d.getDate()}. ${sk[d.getMonth()]}`;
+                })()}
               </div>
-              <div style={{ fontFamily: NM.SANS, fontSize: 11, color: 'rgba(255,255,255,0.55)', fontWeight: 400 }}>9,99 € / mes · Visa · 4242</div>
+              {/* FEATURE-NEEDED-PROFIL-PAYMENT-METHOD: surface card brand
+                  + last4 via Stripe customer.payment_methods. Currently
+                  not pulled into SubscriptionData. */}
+              <div style={{ fontFamily: NM.SANS, fontSize: 11, color: 'rgba(255,255,255,0.55)', fontWeight: 400 }}>9,99 € / mes · zrušíš kedykoľvek</div>
             </div>
           </button>
         ) : (

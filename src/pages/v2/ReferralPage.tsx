@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseAuth } from '../../contexts/SupabaseAuthContext';
+import { useReferral } from '../../hooks/useReferral';
 import { Page, Eye, Ser, Body, NM } from '../../components/v2/neome';
 
 /**
@@ -29,9 +30,15 @@ function deriveCode(email?: string | null): string {
 export default function ReferralPage() {
   const navigate = useNavigate();
   const { user } = useSupabaseAuth();
-  const code = deriveCode(user?.email);
-  const url = `https://neome.sk/p/${code.toLowerCase().replace('·', '-')}`;
+  const { referralCode, stats, getShareUrl, getShareText } = useReferral();
+  // Prefer real referral code from the user's row; fall back to email-derived
+  const code = referralCode?.code ?? deriveCode(user?.email);
+  const url = getShareUrl() ?? `https://neome.sk/p/${code.toLowerCase().replace('·', '-')}`;
   const [copied, setCopied] = useState(false);
+
+  const totalInvited = stats?.totalReferrals ?? 0;
+  const approved = stats?.approvedReferrals ?? 0;
+  const earnedPoints = stats?.totalCreditsEarned ?? 0;
 
   const onCopy = async () => {
     try {
@@ -48,7 +55,7 @@ export default function ReferralPage() {
       try {
         await navigator.share({
           title: 'NeoMe',
-          text: 'Vyskúšaj NeoMe so mnou — a obe dostaneme bonus.',
+          text: getShareText() ?? 'Vyskúšaj NeoMe so mnou — a obe dostaneme bonus.',
           url,
         });
       } catch {
@@ -221,9 +228,12 @@ export default function ReferralPage() {
           ))}
         </div>
         <div style={{ flex: 1 }}>
-          {/* TODO data: real invitee + active Plus counts */}
-          <div style={{ fontFamily: NM.SANS, fontSize: 13, color: NM.DEEP, fontWeight: 500 }}>3 pozvané kamarátky</div>
-          <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.EYEBROW, marginTop: 3, fontWeight: 400 }}>2 s aktívnym Plus · 500 bodov získaných</div>
+          <div style={{ fontFamily: NM.SANS, fontSize: 13, color: NM.DEEP, fontWeight: 500 }}>
+            {totalInvited === 0 ? 'Zatiaľ bez pozvaní' : `${totalInvited} ${totalInvited === 1 ? 'pozvaná kamarátka' : totalInvited < 5 ? 'pozvané kamarátky' : 'pozvaných kamarátok'}`}
+          </div>
+          <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.EYEBROW, marginTop: 3, fontWeight: 400 }}>
+            {approved} s aktívnym Plus · {earnedPoints} bodov získaných
+          </div>
         </div>
         <div style={{ color: NM.TERTIARY, fontSize: 16 }}>›</div>
       </button>

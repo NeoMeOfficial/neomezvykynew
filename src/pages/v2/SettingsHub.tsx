@@ -83,14 +83,29 @@ function buildGroups(email: string, isPremium: boolean) {
   ];
 }
 
+const SK_MONTHS_FULL = ['januára', 'februára', 'marca', 'apríla', 'mája', 'júna', 'júla', 'augusta', 'septembra', 'októbra', 'novembra', 'decembra'];
+
 export default function SettingsHub() {
   const navigate = useNavigate();
   const { user, signOut } = useSupabaseAuth();
-  const { isPremium } = useSubscription();
+  const { isPremium, subscription } = useSubscription();
   const meta = (user?.user_metadata ?? {}) as { full_name?: string; name?: string };
   const fullName = meta.full_name ?? meta.name ?? user?.email?.split('@')[0] ?? 'Eva Nová';
   const email = user?.email ?? '—';
   const groups = buildGroups(email, isPremium);
+
+  // Subscription start date — Stripe's current_period_start is a Unix
+  // timestamp in seconds; for "od mesiac rok" copy we use the very first
+  // start that the local subscription record knows about. (Real first-
+  // started-at would need an extra column in the subscriptions table —
+  // see FEATURE-NEEDED-SETTINGS-STARTED-AT.)
+  let subStatusLabel = 'Free';
+  if (isPremium && subscription?.current_period_start) {
+    const d = new Date(subscription.current_period_start * 1000);
+    subStatusLabel = `Plus · od ${SK_MONTHS_FULL[d.getMonth()]} ${d.getFullYear()}`;
+  } else if (isPremium) {
+    subStatusLabel = 'Plus';
+  }
 
   return (
     <Page>
@@ -108,7 +123,7 @@ export default function SettingsHub() {
         <div style={{ width: 54, height: 54, borderRadius: 999, backgroundImage: 'url(/images/r9/testimonial-anna.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }} />
         <div style={{ flex: 1 }}>
           <div style={{ fontFamily: NM.SERIF, fontSize: 17, color: NM.DEEP, fontWeight: 500, letterSpacing: '-0.005em' }}>{fullName}</div>
-          <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.EYEBROW, marginTop: 2, fontWeight: 400 }}>{isPremium ? 'Plus · od februára 2026' : 'Free'}</div>
+          <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.EYEBROW, marginTop: 2, fontWeight: 400 }}>{subStatusLabel}</div>
         </div>
       </div>
 
