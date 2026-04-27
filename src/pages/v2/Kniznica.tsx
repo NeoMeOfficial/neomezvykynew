@@ -52,7 +52,7 @@ export default function Kniznica() {
 
   return (
     <Page>
-      <div style={{ padding: '60px 20px 18px' }}>
+      <div style={{ padding: 'calc(env(safe-area-inset-top) + 16px) 18px 14px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Eye>
             Knižnica

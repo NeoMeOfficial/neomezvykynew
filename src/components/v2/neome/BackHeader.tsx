@@ -18,7 +18,7 @@ export function BackHeader({ title, onBack, showSearch = true, onSearch }: Props
   const back = onBack ?? (() => navigate(-1));
 
   return (
-    <div style={{ padding: '56px 20px 18px' }}>
+    <div style={{ padding: 'calc(env(safe-area-inset-top) + 14px) 18px 14px' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <button
           onClick={back}

@@ -74,8 +74,8 @@ interface ShellProps {
 
 function Shell({ step, totalSteps, onBack, children, bg = NM.BG }: ShellProps) {
   return (
-    <div style={{ background: bg, minHeight: '100vh', position: 'relative', paddingBottom: 140, fontFamily: NM.SANS, color: NM.DEEP }}>
-      <div style={{ padding: '60px 22px 18px', display: 'flex', alignItems: 'center', gap: 14 }}>
+    <div style={{ background: bg, minHeight: '100vh', position: 'relative', paddingBottom: `calc(env(safe-area-inset-bottom) + 140px)`, fontFamily: NM.SANS, color: NM.DEEP }}>
+      <div style={{ padding: 'calc(env(safe-area-inset-top) + 14px) 18px 14px', display: 'flex', alignItems: 'center', gap: 14 }}>
         {onBack ? (
           <button
             onClick={onBack}
@@ -206,7 +206,7 @@ function StepWelcome({ onContinue, onLogin }: { onContinue: () => void; onLogin:
         fontFamily: NM.SANS,
       }}
     >
-      <div style={{ padding: '68px 22px 0', display: 'flex', alignItems: 'center', gap: 10 }}>
+      <div style={{ padding: 'calc(env(safe-area-inset-top) + 22px) 18px 0', display: 'flex', alignItems: 'center', gap: 10 }}>
         <span style={{ fontFamily: NM.SERIF, fontSize: 18, fontStyle: 'italic', fontWeight: 500, color: '#fff', letterSpacing: '-0.01em' }}>NeoMe</span>
       </div>
       <div style={{ position: 'absolute', bottom: 180, left: 0, right: 0, padding: '0 22px' }}>

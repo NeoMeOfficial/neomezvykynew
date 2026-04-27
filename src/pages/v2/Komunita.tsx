@@ -164,7 +164,7 @@ export default function Komunita() {
 
   return (
     <Page>
-      <div style={{ padding: '60px 24px 8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ padding: 'calc(env(safe-area-inset-top) + 16px) 18px 8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ fontFamily: NM.SERIF, fontSize: 18, fontWeight: 500, color: NM.DEEP }}>Komunita</div>
         <button aria-label="Profil" style={{ all: 'unset', cursor: 'pointer', padding: 6 }}>
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none">

@@ -116,7 +116,7 @@ function SectionHeader({ children, right }: { children: string; right?: string }
 
 function Greeting({ name, isPremium }: { name: string; isPremium: boolean }) {
   return (
-    <div style={{ padding: '62px 22px 0' }}>
+    <div style={{ padding: 'calc(env(safe-area-inset-top) + 16px) 18px 0' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div style={{ fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: NM.TERTIARY, fontWeight: 500 }}>
           {formatToday()}
@@ -313,22 +313,33 @@ function BodyCard({ isPremium }: { isPremium: boolean }) {
   // FEATURE-NEEDED: "exercise of the day" curation service (currently static)
   return (
     <div style={{ padding: '0 18px', marginBottom: 12 }}>
-      <Card padding={18}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-          <PillarDot color={SECTIONS.TELO} />
-          <Eye size={10}>{isPremium ? 'Telo · navrhujeme' : 'Telo · cvik dňa'}</Eye>
+      <div style={{ background: '#fff', border: `1px solid ${NM.HAIR}`, borderRadius: 22, boxShadow: '0 10px 28px rgba(61,41,33,0.06)', overflow: 'hidden' }}>
+        <div
+          style={{
+            height: 120,
+            backgroundImage: 'linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.28) 100%), url(/images/r9/lifestyle-core-workout.jpg)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            position: 'relative',
+          }}
+        >
+          <div style={{ position: 'absolute', top: 14, left: 18, fontSize: 9.5, letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 500, color: '#fff', opacity: 0.92 }}>
+            {isPremium ? 'Telo · navrhujeme' : 'Telo · cvik dňa'}
+          </div>
         </div>
-        <Ser size={20}>Uvoľni driek · 8 min</Ser>
-        <div style={{ fontSize: 12.5, color: NM.MUTED, marginTop: 4, lineHeight: 1.45, fontWeight: 300 }}>
-          Krátka sekvencia proti bolesti chrbta — z knižnice
+        <div style={{ padding: 18 }}>
+          <Ser size={20}>Uvoľni driek · 8 min</Ser>
+          <div style={{ fontSize: 12.5, color: NM.MUTED, marginTop: 4, lineHeight: 1.45, fontWeight: 300 }}>
+            Krátka sekvencia proti bolesti chrbta — z knižnice
+          </div>
+          <div style={{ display: 'flex', gap: 10, fontSize: 10.5, letterSpacing: '0.14em', textTransform: 'uppercase', color: NM.TERTIARY, fontWeight: 500, marginTop: 12 }}>
+            <span>8 min</span>
+            <span>·</span>
+            <span>Začiatočník</span>
+          </div>
+          <CTAArrow color={SECTIONS.TELO} label="Začať cvičiť" onClick={() => navigate('/kniznica/telo')} />
         </div>
-        <div style={{ display: 'flex', gap: 10, fontSize: 10.5, letterSpacing: '0.14em', textTransform: 'uppercase', color: NM.TERTIARY, fontWeight: 500, marginTop: 12 }}>
-          <span>8 min</span>
-          <span>·</span>
-          <span>Začiatočník</span>
-        </div>
-        <CTAArrow color={SECTIONS.TELO} label="Začať cvičiť" onClick={() => navigate('/kniznica/telo')} />
-      </Card>
+      </div>
     </div>
   );
 }

@@ -72,7 +72,7 @@ export default function Spravy() {
 
   return (
     <Page>
-      <div style={{ padding: '56px 20px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ padding: 'calc(env(safe-area-inset-top) + 14px) 18px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Eye>Správy</Eye>
         <button
           onClick={() => navigate('/spravy/new')}

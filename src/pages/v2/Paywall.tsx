@@ -48,7 +48,7 @@ function PaywallWarm({ onContinueFree, onClose, onActivate }: { onContinueFree: 
   ];
   return (
     <div style={{ background: NM.BG, minHeight: '100vh', position: 'relative', paddingBottom: 220, fontFamily: NM.SANS, color: NM.DEEP }}>
-      <div style={{ padding: '60px 22px 0', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+      <div style={{ padding: 'calc(env(safe-area-inset-top) + 16px) 18px 0', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
         <CloseButton onClick={onClose} />
       </div>
       <div style={{ margin: '22px 22px 0', aspectRatio: '4/3', borderRadius: 24, overflow: 'hidden', position: 'relative' }}>
@@ -157,7 +157,7 @@ function PaywallDark({ onContinueFree, onClose, onActivate }: { onContinueFree: 
       <div style={{ position: 'absolute', top: -80, right: -120, width: 320, height: 320, borderRadius: 999, background: `radial-gradient(circle, ${NM.GOLD}2e, transparent 65%)`, pointerEvents: 'none' }} />
       <div style={{ position: 'absolute', top: 280, left: -100, width: 280, height: 280, borderRadius: 999, background: `radial-gradient(circle, ${NM.TERRA}24, transparent 65%)`, pointerEvents: 'none' }} />
       <div style={{ position: 'relative' }}>
-        <div style={{ padding: '60px 22px 0', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+        <div style={{ padding: 'calc(env(safe-area-inset-top) + 16px) 18px 0', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
           <CloseButton dark onClick={onClose} />
         </div>
         <div style={{ padding: '40px 22px 0' }}>
@@ -249,7 +249,7 @@ function PaywallCompare({ onContinueFree, onClose, onActivate }: { onContinueFre
   ];
   return (
     <div style={{ background: NM.BG, minHeight: '100vh', position: 'relative', paddingBottom: 220, fontFamily: NM.SANS, color: NM.DEEP }}>
-      <div style={{ padding: '60px 22px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ padding: 'calc(env(safe-area-inset-top) + 16px) 18px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Eye>Vyber si</Eye>
         <CloseButton onClick={onClose} />
       </div>

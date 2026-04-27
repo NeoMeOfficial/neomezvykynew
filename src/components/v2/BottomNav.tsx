@@ -16,8 +16,9 @@ export default function BottomNav() {
 
   return (
     <nav
-      className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 flex items-center gap-6 px-8 py-3 rounded-full"
+      className="fixed left-1/2 -translate-x-1/2 z-50 flex items-center gap-6 px-8 py-3 rounded-full"
       style={{
+        bottom: 'calc(env(safe-area-inset-bottom) + 8px)',
         background: 'rgba(255,255,255,0.75)',
         backdropFilter: 'blur(48px)',
         WebkitBackdropFilter: 'blur(48px)',
