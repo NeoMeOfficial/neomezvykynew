@@ -95,7 +95,7 @@ const PROGRAMS: Record<string, { name: string; eyebrowColor?: string; img: strin
 };
 
 export default function ProgramDetail() {
-  const { slug } = useParams<{ slug: string }>();
+  const { programId: slug } = useParams<{ programId: string }>();
   const navigate = useNavigate();
   const { isPremium } = useSubscription();
   const { activateProgram } = useActiveProgram();
