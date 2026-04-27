@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useMessages } from '../../hooks/useMessages';
 import { Page, Eye, Ser, NM } from '../../components/v2/neome';
 
 /**
@@ -7,8 +8,19 @@ import { Page, Eye, Ser, NM } from '../../components/v2/neome';
  * Pinned Gabi thread (gold star indicator), search row, threads list
  * with unread dot.
  *
- * TODO data: thread list from messaging service / Supabase. Detail
- * thread with auto-reply badge is a follow-up screen.
+ * Wired:
+ * - useMessages → real Gabi thread from `messages` table (or demo
+ *   localStorage when Supabase isn't configured). Shows last message
+ *   body as preview, real read state, real timestamp.
+ *
+ * FEATURE-NEEDED-SPRAVY-FRIEND-DMS: peer-to-peer messaging between
+ * users (Lucia, Anna, Martina threads in the design). Requires:
+ * - friends/conversations table
+ * - inbox endpoint listing all conversations
+ * - composer screen for starting a new thread
+ * - moderation + report flow
+ * Currently the inbox only renders the Gabi thread; the design's
+ * other 3 threads are static-curated examples removed in this wire.
  *
  * Old version: Spravy.old.tsx.
  */
@@ -23,15 +35,41 @@ interface Thread {
   isGabi?: boolean;
 }
 
-const THREADS: Thread[] = [
-  { id: 'gabi', name: 'Gabi Drobová', avatar: 'founder-gabi.png', msg: 'Ahoj Sam, ako sa cítiš po prvom týždni programu?', time: '09:24', unread: true, isGabi: true },
-  { id: 'lucia', name: 'Lucia K.', avatar: 'testimonial-lucia.jpg', msg: 'Tiež som začala postpartum program! Držím palce.', time: 'včera', unread: true },
-  { id: 'anna', name: 'Anna M.', avatar: 'testimonial-anna.jpg', msg: 'Vďaka za tip na ten recept, vyšiel skvele.', time: 'pon', unread: false },
-  { id: 'martina', name: 'Martina Š.', avatar: 'testimonial-martina.jpg', msg: 'Môžeme si dohodnúť výmenu skúseností?', time: '12. apr', unread: false },
-];
+function formatRelative(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'teraz';
+  if (mins < 60) return `${mins} min`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h`;
+  const d = Math.floor(hrs / 24);
+  if (d === 1) return 'včera';
+  if (d < 7) return `${d}d`;
+  // Fall back to "DD. mmm" — Slovak short month
+  const date = new Date(iso);
+  const sk = ['jan', 'feb', 'mar', 'apr', 'máj', 'jún', 'júl', 'aug', 'sep', 'okt', 'nov', 'dec'];
+  return `${date.getDate()}. ${sk[date.getMonth()]}`;
+}
 
 export default function Spravy() {
   const navigate = useNavigate();
+  const { messages, unreadCount } = useMessages();
+
+  const last = messages.length > 0 ? messages[messages.length - 1] : null;
+  const gabiThread: Thread | null = last
+    ? {
+        id: 'gabi',
+        name: 'Gabi Drobová',
+        avatar: 'founder-gabi.png',
+        msg: last.body,
+        time: formatRelative(last.created_at),
+        unread: unreadCount > 0,
+        isGabi: true,
+      }
+    : null;
+
+  const threads: Thread[] = gabiThread ? [gabiThread] : [];
+
   return (
     <Page>
       <div style={{ padding: '56px 20px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -85,8 +123,14 @@ export default function Spravy() {
         <div style={{ flex: 1, fontFamily: NM.SANS, fontSize: 12.5, color: NM.TERTIARY, fontWeight: 400 }}>Hľadaj správu alebo meno…</div>
       </div>
 
+      {threads.length === 0 ? (
+        <div style={{ margin: '0 20px', padding: '40px 24px', background: '#fff', borderRadius: 18, border: `1px solid ${NM.HAIR}`, textAlign: 'center' }}>
+          <div style={{ fontFamily: NM.SERIF, fontSize: 18, fontWeight: 500, color: NM.DEEP, marginBottom: 6 }}>Zatiaľ tu nič nie je</div>
+          <div style={{ fontFamily: NM.SANS, fontSize: 12, color: NM.MUTED, lineHeight: 1.5 }}>Tvoja schránka sa otvorí, keď ti Gabi alebo komunita napíše.</div>
+        </div>
+      ) : (
       <div style={{ margin: '0 20px', background: '#fff', borderRadius: 18, border: `1px solid ${NM.HAIR}`, overflow: 'hidden' }}>
-        {THREADS.map((th, i) => (
+        {threads.map((th, i) => (
           <button
             key={th.id}
             onClick={() => navigate(`/spravy/${th.id}`)}
@@ -97,7 +141,7 @@ export default function Spravy() {
               gap: 14,
               padding: '14px 16px',
               alignItems: 'center',
-              borderBottom: i < THREADS.length - 1 ? `1px solid ${NM.HAIR}` : 'none',
+              borderBottom: i < threads.length - 1 ? `1px solid ${NM.HAIR}` : 'none',
               width: '100%',
               boxSizing: 'border-box',
             }}
@@ -159,6 +203,7 @@ export default function Spravy() {
           </button>
         ))}
       </div>
+      )}
     </Page>
   );
 }

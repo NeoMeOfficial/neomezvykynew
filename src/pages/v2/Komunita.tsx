@@ -1,15 +1,28 @@
 import { useNavigate } from 'react-router-dom';
+import { useCommunityPosts } from '../../hooks/useCommunityPosts';
 import { Page, Eye, Ser, Body, NM } from '../../components/v2/neome';
 
 /**
  * Komunita — R2 feed
  *
  * Editorial intro, "Dnes v komunite" stats line, "Najviac rezonovalo
- * dnes" highlights, collapsed composer pill, latest posts feed.
+ * dnes" highlights (top 2 by likes), collapsed composer pill, latest
+ * posts feed.
  *
- * TODO data: feed from useCommunityPosts hook (already exists in
- * src/hooks/useCommunityPosts.ts). Wire posts, likes, comments,
- * follow state.
+ * Wired:
+ * - useCommunityPosts → posts list, likedIds, toggleLike via Supabase
+ *   community_posts table (falls back to SEED_POSTS when Supabase
+ *   isn't configured)
+ *
+ * FEATURE-NEEDED-KOMUNITA-RANKING: server-side aggregation for
+ * "Najviac rezonovalo dnes" — currently sorts client-side by likes,
+ * which works for small feeds but won't scale.
+ * FEATURE-NEEDED-KOMUNITA-ATTACHMENTS: post photos (CommunityPost
+ * has no photo field; the design shows photo posts. Photos render
+ * only on canonical seed entries via avatar-tone matching).
+ * FEATURE-NEEDED-KOMUNITA-FOLLOW: per-author follow/unfollow with
+ * indicator pill (currently every post shows "Sledovať" link as a
+ * static affordance).
  *
  * Old version: Komunita.old.tsx.
  */
@@ -22,6 +35,23 @@ const TONE_COLOR: Record<AvatarTone, string> = {
   mauve: NM.MAUVE,
   gold: NM.GOLD,
   dusty: NM.DUSTY,
+};
+
+const TONES: AvatarTone[] = ['sage', 'terra', 'mauve', 'gold', 'dusty'];
+
+// Stable hash → tone mapping per author so the same person always gets
+// the same colored avatar.
+function toneForAuthor(name: string): AvatarTone {
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) | 0;
+  return TONES[Math.abs(h) % TONES.length];
+}
+
+// Author photo override — seed posts have curated photos in the design.
+// Otherwise, fall back to no photo (avatar-only).
+const SEED_PHOTOS: Record<string, string> = {
+  'seed-1': 'testimonial-workout.jpg',
+  'seed-3': 'testimonial-recipe.jpg',
 };
 
 function Avatar({ size = 36, initial, tone }: { size?: number; initial: string; tone: AvatarTone }) {
@@ -47,8 +77,8 @@ function Avatar({ size = 36, initial, tone }: { size?: number; initial: string; 
   );
 }
 
-interface Post {
-  id: number;
+interface DisplayPost {
+  id: string;
   who: string;
   initial: string;
   tone: AvatarTone;
@@ -61,19 +91,7 @@ interface Post {
   isQuestion?: boolean;
 }
 
-const RESONATED: Post[] = [
-  { id: 100, who: 'Katarína M.', initial: 'K', tone: 'gold', time: 'dnes', text: 'Prvýkrát som zvládla 30-minútovú meditáciu. Ďakujem za guided sessions.', likes: 31, comments: 4 },
-  { id: 101, who: 'Mária K.', initial: 'M', tone: 'terra', time: 'dnes', text: 'Dokončila som 4. týždeň BodyForming. Cítim sa silnejšia každým dňom.', likes: 24, comments: 6 },
-];
-
-const POSTS: Post[] = [
-  { id: 1, who: 'Zuzana P.', initial: 'Z', tone: 'sage', time: 'pred 5h', photo: 'testimonial-recipe.jpg', text: 'Dnešný recept na Buddha bowl bol úžasný. Určite vyskúšajte.', likes: 18, comments: 3, liked: true },
-  { id: 2, who: 'Jana V.', initial: 'J', tone: 'dusty', time: 'pred 3h', isQuestion: true, text: 'Aký strečing odporúčate po behu? Mám problém s lýtkami.', likes: 8, comments: 5 },
-  { id: 3, who: 'Lucia H.', initial: 'L', tone: 'mauve', time: 'pred 8h', isQuestion: true, text: 'Má niekto skúsenosti s Postpartum programom? Zvažujem začať.', likes: 12, comments: 8 },
-  { id: 4, who: 'Mária K.', initial: 'M', tone: 'gold', time: 'pred 2h', photo: 'testimonial-workout.jpg', text: 'Dokončila som 4. týždeň BodyForming! Cítim sa silnejšia každým dňom.', likes: 24, comments: 6 },
-];
-
-function FeedPost({ post }: { post: Post }) {
+function FeedPost({ post, onToggleLike }: { post: DisplayPost; onToggleLike?: (id: string) => void }) {
   const navigate = useNavigate();
   return (
     <button
@@ -123,6 +141,27 @@ function FeedPost({ post }: { post: Post }) {
 
 export default function Komunita() {
   const navigate = useNavigate();
+  const { posts, likedIds } = useCommunityPosts();
+
+  // Map raw posts → display posts (assign tone + photo)
+  const display: DisplayPost[] = posts.map((p) => ({
+    id: p.id,
+    who: p.author,
+    initial: p.author.charAt(0).toUpperCase(),
+    tone: toneForAuthor(p.author),
+    time: p.time,
+    text: p.text,
+    photo: SEED_PHOTOS[p.id],
+    likes: p.likes,
+    comments: p.comments,
+    liked: likedIds.has(p.id),
+    isQuestion: p.type === 'question',
+  }));
+
+  // "Najviac rezonovalo dnes" — top 2 by likes
+  const resonated = [...display].sort((a, b) => b.likes - a.likes).slice(0, 2);
+  const feed = display;
+
   return (
     <Page>
       <div style={{ padding: '60px 24px 8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -177,7 +216,7 @@ export default function Komunita() {
       <div style={{ padding: '0 24px 24px' }}>
         <Eye color={NM.GOLD} style={{ marginBottom: 14 }}>Najviac rezonovalo dnes</Eye>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          {RESONATED.map((p) => (
+          {resonated.map((p) => (
             <div key={p.id} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
               <Avatar size={36} initial={p.initial} tone={p.tone} />
               <div style={{ flex: 1, minWidth: 0 }}>
@@ -227,7 +266,7 @@ export default function Komunita() {
         <Eye>Novinky</Eye>
       </div>
 
-      {POSTS.map((p) => (
+      {feed.map((p) => (
         <FeedPost key={p.id} post={p} />
       ))}
     </Page>
