@@ -1,6 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseAuth } from '../../contexts/SupabaseAuthContext';
 import { useSubscription } from '../../contexts/SubscriptionContext';
+import { useWorkoutHistory } from '../../hooks/useWorkoutHistory';
+import { useFavorites } from '../../hooks/useFavorites';
+import { useUserProgram } from '../../hooks/useUserProgram';
 import { Page, Eye, Ser, Body, PlusTag, NM } from '../../components/v2/neome';
 
 /**
@@ -130,9 +133,20 @@ export default function Profil() {
   const navigate = useNavigate();
   const { user, signOut } = useSupabaseAuth();
   const { isPremium } = useSubscription();
+  const { stats } = useWorkoutHistory() as { stats: { totalWorkouts: number; currentStreak: number; longestStreak: number } };
+  const { favoritesCount } = useFavorites();
+  const { userProgram } = useUserProgram();
 
   const meta = (user?.user_metadata ?? {}) as { full_name?: string; name?: string };
   const fullName = meta.full_name ?? meta.name ?? user?.email?.split('@')[0] ?? 'Eva Nová';
+
+  const streak = stats?.currentStreak ?? 0;
+  const longest = stats?.longestStreak ?? 0;
+  const totalWorkouts = stats?.totalWorkouts ?? 0;
+  // FEATURE-NEEDED-PROFIL-REFLECTION-COUNT: account-scoped reflection
+  // count (current useReflectionData uses access-code scope which we
+  // don't thread here). Showing — until that wiring lands.
+  const reflectionCount: number | null = null;
 
   return (
     <Page>
@@ -191,19 +205,19 @@ export default function Profil() {
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div>
-                <span style={{ fontFamily: NM.SERIF, fontSize: 22, fontWeight: 500, color: NM.DEEP, letterSpacing: '-0.02em' }}>{isPremium ? 18 : 4}</span>
+                <span style={{ fontFamily: NM.SERIF, fontSize: 22, fontWeight: 500, color: NM.DEEP, letterSpacing: '-0.02em' }}>{streak}</span>
                 <span style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.EYEBROW, marginLeft: 5, fontWeight: 400 }}>dní v rade</span>
               </div>
               <div style={{ fontFamily: NM.SANS, fontSize: 10.5, color: NM.TERTIARY, marginTop: 2, fontWeight: 400 }}>
-                {isPremium ? 'Rekord: 32 dní' : 'Začiatok cesty'}
+                {longest > 0 ? `Rekord: ${longest} dní` : 'Začiatok cesty'}
               </div>
             </div>
           </div>
           <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>
             {[
-              { n: isPremium ? 42 : 8, l: 'cvičení', c: NM.SAGE },
-              { n: isPremium ? 86 : 12, l: 'reflexií', c: NM.MAUVE },
-              { n: isPremium ? 29 : 0, l: 'receptov', c: NM.GOLD },
+              { n: totalWorkouts, l: 'cvičení', c: NM.SAGE },
+              { n: reflectionCount ?? '—', l: 'reflexií', c: NM.MAUVE },
+              { n: favoritesCount, l: 'receptov', c: NM.GOLD },
             ].map((s) => (
               <div key={s.l} style={{ flex: 1, padding: '10px 4px', borderRadius: 12, background: NM.CREAM_2 ?? '#F1ECE3', textAlign: 'center' }}>
                 <div style={{ fontFamily: NM.SERIF, fontSize: 17, fontWeight: 500, color: s.c, lineHeight: 1, letterSpacing: '-0.01em' }}>{s.n}</div>
@@ -222,32 +236,33 @@ export default function Profil() {
             Všetky ›
           </button>
         </div>
-        {isPremium ? (
+        {userProgram ? (
           <div style={{ display: 'flex', gap: 10 }}>
-            {[
-              { t: 'BodyForming', w: 'Týždeň 4', img: 'program-body-forming.jpg' },
-              { t: 'Postpartum', w: 'Týždeň 8', img: 'program-postpartum.jpg' },
-            ].map((p) => (
-              <div
-                key={p.t}
-                style={{
-                  flex: 1,
-                  borderRadius: 18,
-                  overflow: 'hidden',
-                  aspectRatio: '3/4',
-                  position: 'relative',
-                  backgroundImage: `url(/images/r9/${p.img})`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                }}
-              >
-                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, transparent 40%, rgba(42,26,20,0.78) 100%)' }} />
-                <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '14px' }}>
-                  <div style={{ fontFamily: NM.SANS, fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.75)', fontWeight: 500 }}>{p.w}</div>
-                  <div style={{ fontFamily: NM.SERIF, fontSize: 15, fontWeight: 500, color: '#fff', marginTop: 3, letterSpacing: '-0.005em' }}>{p.t}</div>
+            <div
+              style={{
+                flex: 1,
+                borderRadius: 18,
+                overflow: 'hidden',
+                aspectRatio: '3/4',
+                position: 'relative',
+                backgroundImage: `url(${userProgram.todaysExercise?.thumbnail ?? '/images/r9/program-body-forming.jpg'})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+              }}
+            >
+              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, transparent 40%, rgba(42,26,20,0.78) 100%)' }} />
+              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '14px' }}>
+                <div style={{ fontFamily: NM.SANS, fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.75)', fontWeight: 500 }}>
+                  Týždeň {userProgram.week} / {userProgram.totalWeeks}
                 </div>
+                <div style={{ fontFamily: NM.SERIF, fontSize: 15, fontWeight: 500, color: '#fff', marginTop: 3, letterSpacing: '-0.005em' }}>{userProgram.name}</div>
               </div>
-            ))}
+            </div>
+          </div>
+        ) : isPremium ? (
+          <div style={{ borderRadius: 18, padding: '22px 20px', background: NM.CREAM_2 ?? '#F1ECE3', border: `1px solid ${NM.HAIR}`, textAlign: 'center' }}>
+            <Ser size={18} style={{ marginBottom: 6 }}>Zatiaľ bez programu</Ser>
+            <Body size={12}>Vyber si jeden zo 4 programov v <span style={{ color: NM.TERRA, fontWeight: 500 }}>Telo · Programy</span>.</Body>
           </div>
         ) : (
           <div style={{ borderRadius: 18, padding: '22px 20px', background: NM.CREAM_2 ?? '#F1ECE3', border: `1px solid ${NM.HAIR}`, textAlign: 'center' }}>
