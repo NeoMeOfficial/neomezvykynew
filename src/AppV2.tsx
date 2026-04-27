@@ -27,6 +27,9 @@ const SettingsNotificationsV2 = lazy(() => import('./pages/v2/SettingsNotificati
 const SettingsPrivacy = lazy(() => import('./pages/v2/SettingsPrivacy'));
 const SettingsDelete = lazy(() => import('./pages/v2/SettingsDelete'));
 const SettingsHub = lazy(() => import('./pages/v2/SettingsHub'));
+const PointsSummary = lazy(() => import('./pages/v2/PointsSummary'));
+const PointsRewards = lazy(() => import('./pages/v2/PointsRewards'));
+const BlogArticle = lazy(() => import('./pages/v2/BlogArticle'));
 const Telo = lazy(() => import('./pages/v2/Telo'));
 const Strava = lazy(() => import('./pages/v2/Strava'));
 const MyselNew = lazy(() => import('./pages/v2/MyselNew'));
@@ -157,6 +160,9 @@ export default function AppV2() {
               <Route path="/settings/privacy" element={<SettingsPrivacy />} />
               <Route path="/settings/delete" element={<SettingsDelete />} />
               <Route path="/settings/cancel" element={<CancelArc />} />
+              <Route path="/body" element={<PointsSummary />} />
+              <Route path="/body/odmeny" element={<PointsRewards />} />
+              <Route path="/blog/:id" element={<BlogArticle />} />
               <Route path="/kniznica/telo" element={<Telo />} />
               <Route path="/kniznica/telo/programy" element={<TeloPrograms />} />
               <Route path="/kniznica/telo/extra" element={<TeloExtra />} />
