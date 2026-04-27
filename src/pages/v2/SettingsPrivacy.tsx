@@ -1,5 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useSupabaseAuth } from '../../contexts/SupabaseAuthContext';
+import { supabase } from '../../lib/supabase';
+import { useToast } from '@/hooks/use-toast';
 import { Page, BackHeader, Eye, Ser, NM } from '../../components/v2/neome';
 
 /**
@@ -7,10 +10,12 @@ import { Page, BackHeader, Eye, Ser, NM } from '../../components/v2/neome';
  *
  * Visibility segment, permissions toggles, data actions list.
  *
- * FEATURE-NEEDED-SETTINGS-PRIVACY-PERSIST: persist visibility +
- * permission toggles via user_metadata or privacy_settings table.
- * FEATURE-NEEDED-DATA-EXPORT: PDF export endpoint that aggregates
- * journal + stats + cycle log into a downloadable file.
+ * Wired (F-029 / F-032):
+ * - Visibility + permission toggles persist to profiles.privacy_prefs
+ *   jsonb via updateProfile.
+ * - "Stiahnuť moje dáta" calls Netlify fn /export-user-data which
+ *   aggregates user-scoped tables and returns a JSON download.
+ *   Rate-limited to 1/24h via profiles.last_data_export_at.
  *
  * Mounted at /settings/privacy.
  */
@@ -30,8 +35,77 @@ const DATA_ACTIONS = [
 
 export default function SettingsPrivacy() {
   const navigate = useNavigate();
+  const { profile, updateProfile } = useSupabaseAuth();
+  const { toast } = useToast();
   const [visibility, setVisibility] = useState<'public' | 'private'>('public');
   const [perms, setPerms] = useState<Record<string, boolean>>(() => Object.fromEntries(PERMS.map((p) => [p.id, p.defaultOn])));
+  const [exporting, setExporting] = useState(false);
+
+  useEffect(() => {
+    const prefs = (profile?.privacy_prefs ?? {}) as Record<string, boolean | string>;
+    if (Object.keys(prefs).length === 0) return;
+    if (prefs.visibility === 'public' || prefs.visibility === 'private') {
+      setVisibility(prefs.visibility);
+    }
+    setPerms((s) => {
+      const next = { ...s };
+      Object.keys(s).forEach((k) => {
+        if (typeof prefs[k] === 'boolean') next[k] = prefs[k] as boolean;
+      });
+      return next;
+    });
+  }, [profile?.privacy_prefs]);
+
+  const persist = async (vNext: 'public' | 'private', pNext: Record<string, boolean>) => {
+    const { error } = await updateProfile({
+      privacy_prefs: { visibility: vNext, ...pNext },
+    } as Partial<typeof profile>);
+    if (error) toast({ title: 'Nepodarilo sa uložiť', variant: 'destructive' });
+  };
+
+  const onVisibility = (v: 'public' | 'private') => {
+    setVisibility(v);
+    persist(v, perms);
+  };
+
+  const onTogglePerm = (id: string) => {
+    setPerms((s) => {
+      const next = { ...s, [id]: !s[id] };
+      persist(visibility, next);
+      return next;
+    });
+  };
+
+  const onExport = async () => {
+    if (exporting) return;
+    setExporting(true);
+    try {
+      const { data: sess } = await supabase.auth.getSession();
+      const token = sess.session?.access_token;
+      const res = await fetch('/.netlify/functions/export-user-data', {
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        toast({
+          title: 'Export zlyhal',
+          description: body.error === 'rate_limited' ? 'Skús to o 24 hodín.' : 'Skús to neskôr.',
+          variant: 'destructive',
+        });
+        return;
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `neome-export-${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast({ title: 'Export pripravený' });
+    } finally {
+      setExporting(false);
+    }
+  };
 
   return (
     <Page>
@@ -52,7 +126,7 @@ export default function SettingsPrivacy() {
             return (
               <button
                 key={v}
-                onClick={() => setVisibility(v)}
+                onClick={() => onVisibility(v)}
                 style={{
                   all: 'unset',
                   cursor: 'pointer',
@@ -82,7 +156,7 @@ export default function SettingsPrivacy() {
               <div key={p.id} style={{ padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: i < PERMS.length - 1 ? `1px solid ${NM.HAIR}` : 'none' }}>
                 <div style={{ fontFamily: NM.SANS, fontSize: 13, color: NM.DEEP, fontWeight: 400, maxWidth: '75%' }}>{p.t}</div>
                 <button
-                  onClick={() => setPerms((s) => ({ ...s, [p.id]: !s[p.id] }))}
+                  onClick={() => onTogglePerm(p.id)}
                   aria-pressed={on}
                   style={{ all: 'unset', cursor: 'pointer', width: 40, height: 24, borderRadius: 999, background: on ? NM.DEEP : NM.HAIR_2, position: 'relative', flexShrink: 0 }}
                 >
@@ -102,7 +176,7 @@ export default function SettingsPrivacy() {
               key={it.id}
               onClick={() => {
                 if (it.id === 'export') {
-                  // FEATURE-NEEDED-DATA-EXPORT
+                  onExport();
                 } else if (it.id === 'rules') {
                   window.open('https://neome.sk/privacy', '_blank');
                 } else if (it.id === 'thirdparty') {

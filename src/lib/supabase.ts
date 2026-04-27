@@ -11,12 +11,31 @@ export const isSupabaseConfigured = () => {
 };
 
 // Database table types
+export type NotificationPrefs = {
+  daily_reminder?: boolean
+  community_replies?: boolean
+  weekly_summary?: boolean
+  cycle_alerts?: boolean
+  plus_offers?: boolean
+}
+
+export type PrivacyPrefs = {
+  community_visible?: boolean
+  dm_open?: boolean
+  share_streak?: boolean
+}
+
 export type UserProfile = {
   id: string
   email: string
+  full_name?: string | null
   first_name?: string
   last_name?: string
   avatar_url?: string
+  bio?: string | null
+  notification_prefs?: NotificationPrefs
+  privacy_prefs?: PrivacyPrefs
+  last_data_export_at?: string | null
   subscription_status: 'free' | 'premium' | 'trial'
   subscription_id?: string
   trial_end_date?: string

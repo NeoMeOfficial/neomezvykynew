@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSupabaseAuth } from '../../contexts/SupabaseAuthContext';
+import { useToast } from '@/hooks/use-toast';
 import { Page, BackHeader, Eye, Ser, NM } from '../../components/v2/neome';
 
 /**
@@ -7,14 +9,13 @@ import { Page, BackHeader, Eye, Ser, NM } from '../../components/v2/neome';
  * Master toggle + 5 pillar-grouped toggle lists (Pohyb / Výživa /
  * Myseľ / Cyklus / Komunita).
  *
- * FEATURE-NEEDED-SETTINGS-NOTIFICATIONS-PERSIST: persist toggles
- * via supabase user_metadata.notification_prefs OR a dedicated
- * notification_settings table. Currently local state only.
+ * Wired (F-028): toggles persist to profiles.notification_prefs (jsonb)
+ * via updateProfile. The 'master' switch is stored under the same
+ * key as `__master`. Initial state hydrates from the profile row.
  *
  * FEATURE-NEEDED-PUSH-NOTIFICATIONS: PWA push subscription via
  * service worker is not yet implemented. Toggling 'Všetky notifikácie'
- * doesn't request OS push permission. See cross-cutting note in
- * FEATURES_TO_BUILD.md.
+ * persists the preference but doesn't request OS push permission.
  *
  * Mounted at /settings/notifications.
  */
@@ -88,6 +89,8 @@ const GROUPS: Group[] = [
 ];
 
 export default function SettingsNotifications() {
+  const { profile, updateProfile } = useSupabaseAuth();
+  const { toast } = useToast();
   const [master, setMaster] = useState(true);
   const [state, setState] = useState<Record<string, boolean>>(() => {
     const init: Record<string, boolean> = {};
@@ -95,11 +98,41 @@ export default function SettingsNotifications() {
     return init;
   });
 
-  const toggle = (id: string) =>
+  useEffect(() => {
+    const prefs = (profile?.notification_prefs ?? {}) as Record<string, boolean>;
+    if (Object.keys(prefs).length === 0) return;
     setState((s) => {
-      // FEATURE-NEEDED-SETTINGS-NOTIFICATIONS-PERSIST
-      return { ...s, [id]: !s[id] };
+      const next: Record<string, boolean> = { ...s };
+      Object.keys(s).forEach((k) => {
+        if (typeof prefs[k] === 'boolean') next[k] = prefs[k];
+      });
+      return next;
     });
+    if (typeof prefs.__master === 'boolean') setMaster(prefs.__master);
+  }, [profile?.notification_prefs]);
+
+  const persist = async (next: Record<string, boolean>, masterNext: boolean) => {
+    const { error } = await updateProfile({
+      notification_prefs: { ...next, __master: masterNext },
+    } as Partial<typeof profile>);
+    if (error) toast({ title: 'Nepodarilo sa uložiť', variant: 'destructive' });
+  };
+
+  const toggle = (id: string) => {
+    setState((s) => {
+      const next = { ...s, [id]: !s[id] };
+      persist(next, master);
+      return next;
+    });
+  };
+
+  const toggleMaster = () => {
+    setMaster((m) => {
+      const next = !m;
+      persist(state, next);
+      return next;
+    });
+  };
 
   return (
     <Page>
@@ -117,7 +150,7 @@ export default function SettingsNotifications() {
           <div style={{ fontFamily: NM.SANS, fontSize: 13.5, color: NM.DEEP, fontWeight: 500 }}>Všetky notifikácie</div>
           <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.EYEBROW, marginTop: 2, fontWeight: 400 }}>Hlavný prepínač</div>
         </div>
-        <Toggle on={master} onChange={() => setMaster((m) => !m)} color={NM.DEEP} />
+        <Toggle on={master} onChange={toggleMaster} color={NM.DEEP} />
       </div>
 
       {GROUPS.map((g) => (

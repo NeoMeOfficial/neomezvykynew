@@ -1,7 +1,11 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useWorkoutHistory } from '../../hooks/useWorkoutHistory';
 import { useFavorites } from '../../hooks/useFavorites';
 import { useReferral } from '../../hooks/useReferral';
+import { useSupabaseAuth } from '../../contexts/SupabaseAuthContext';
+import { supabase } from '../../lib/supabase';
+import { useToast } from '@/hooks/use-toast';
 import { Page, BackHeader, Eye, Ser, Body, NM } from '../../components/v2/neome';
 
 /**
@@ -19,9 +23,10 @@ import { Page, BackHeader, Eye, Ser, Body, NM } from '../../components/v2/neome'
  * - 'priateľstiev v komunite' — FEATURE-NEEDED-KOMUNITA-FOLLOW
  *   (no follow table yet); placeholder dash
  *
- * FEATURE-NEEDED-ACCOUNT-DELETE: actual account deletion via Supabase
- * admin API + Stripe customer cleanup. Currently 'Napriek tomu zmazať
- * účet' just navigates to /. Listed as P0 in FEATURES_TO_BUILD.md.
+ * Wired (F-007): "Napriek tomu zmazať účet" calls Netlify fn
+ * /delete-account which verifies the user's access token, deletes the
+ * Stripe customer (if any), and removes the auth user (cascades
+ * profile + user-scoped rows via FK on delete cascade).
  *
  * Mounted at /settings/delete.
  */
@@ -31,6 +36,39 @@ export default function SettingsDelete() {
   const { stats } = useWorkoutHistory() as { stats: { currentStreak: number } };
   const { favoritesCount } = useFavorites();
   const { stats: refStats } = useReferral();
+  const { signOut } = useSupabaseAuth();
+  const { toast } = useToast();
+  const [deleting, setDeleting] = useState(false);
+
+  const onDelete = async () => {
+    if (deleting) return;
+    const ok = window.confirm('Naozaj chceš zmazať svoj účet? Túto akciu nemožno vrátiť.');
+    if (!ok) return;
+    setDeleting(true);
+    try {
+      const { data: sess } = await supabase.auth.getSession();
+      const token = sess.session?.access_token;
+      const res = await fetch('/.netlify/functions/delete-account', {
+        method: 'POST',
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        toast({
+          title: 'Zmazanie zlyhalo',
+          description: body.error ?? 'Skús to neskôr.',
+          variant: 'destructive',
+        });
+        setDeleting(false);
+        return;
+      }
+      await signOut();
+      navigate('/');
+    } catch {
+      toast({ title: 'Sieťová chyba', variant: 'destructive' });
+      setDeleting(false);
+    }
+  };
 
   const streak = stats?.currentStreak ?? 0;
   const credits = refStats?.totalCreditsEarned ?? 0;
@@ -99,8 +137,8 @@ export default function SettingsDelete() {
 
       <div style={{ margin: '28px 18px 0' }}>
         <button
-          // FEATURE-NEEDED-ACCOUNT-DELETE
-          onClick={() => navigate('/')}
+          onClick={onDelete}
+          disabled={deleting}
           style={{
             width: '100%',
             padding: '14px 20px',
@@ -111,10 +149,11 @@ export default function SettingsDelete() {
             fontFamily: NM.SANS,
             fontSize: 13,
             fontWeight: 500,
-            cursor: 'pointer',
+            cursor: deleting ? 'wait' : 'pointer',
+            opacity: deleting ? 0.6 : 1,
           }}
         >
-          Napriek tomu zmazať účet
+          {deleting ? 'Mažem účet…' : 'Napriek tomu zmazať účet'}
         </button>
         <button onClick={() => navigate('/settings')} style={{ all: 'unset', cursor: 'pointer', display: 'block', width: '100%', marginTop: 12, fontFamily: NM.SANS, fontSize: 12, color: NM.DEEP, textAlign: 'center', fontWeight: 500 }}>
           Vrátiť sa
