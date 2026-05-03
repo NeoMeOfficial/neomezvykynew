@@ -164,10 +164,9 @@ export default function PeriodkaTracker() {
   }, [todayStr]);
 
   const toggleSymptom = useCallback((idx: number) => {
-    // Check if paywall should be shown for period tracker
-    if (showPaywall('period_tracker', 'Ukladanie symptómov')) {
-      return; // Paywall shown, block the action
-    }
+    // Period tracker paywall removed — symptom logging is open to all users.
+    // (Earlier behaviour blocked symptom toggles behind showPaywall(); kept
+    // the import to preserve the broader paywall hook surface for other features.)
 
     setActiveSymptoms(prev => {
       const next = [...prev];
