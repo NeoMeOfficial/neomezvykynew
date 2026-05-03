@@ -3,7 +3,7 @@
 // Schema is informal; the renderer is forgiving of missing fields.
 
 window.TRACKER = {
-  lastUpdated: "2026-05-04",
+  lastUpdated: "2026-05-05",
 
   blockers: [
     {
@@ -20,14 +20,14 @@ window.TRACKER = {
       title: "Admin panel rebuild",
       pillar: "telo",
       status: "in-progress",
-      summary: "Wire admin panel to Supabase end-to-end so changes reach users. Phases 0–1 shipped. Phase 2 exercises + meditations admin done (status enum, thumbnail upload). Exercise video URLs not yet populated — seeding deferred.",
+      summary: "Wire admin panel to Supabase end-to-end so changes reach users. Phases 0–2 shipped and committed. Phase 2: exercises + meditations use status enum (draft/published/archived), thumbnail upload, cycleStatus badge. Exercise/meditation video URLs not yet populated — seeding deferred until URLs are ready. Next: Phase 3 (Programmes admin) + wire TeloPrograms user-facing view to Supabase.",
       blocker: null,
-      nextAction: "Phase 2 remainder: seed exercises/meditations once video URLs ready. Phase 3: Programmes admin.",
-      timeline: "~5 weeks remaining (phases 2–5)",
+      nextAction: "Phase 3: Programmes admin CRUD. Wire TeloPrograms.tsx / ProgramDetail.tsx to programmes table instead of static src/data/programs.ts.",
+      timeline: "~4 weeks remaining (phases 3–5)",
       phases: [
         { id: 0, label: "Foundation — migrations, Edge Function, Storage bucket, React Query, admin auth", status: "shipped", weeks: "Week 1" },
         { id: 1, label: "Blog posts — rich text editor, image upload, user-facing rendering", status: "shipped", weeks: "Week 2" },
-        { id: 2, label: "Recipes + Exercises + Stretches + Meditations", status: "in-progress", weeks: "Weeks 3-4" },
+        { id: 2, label: "Exercises + Meditations (status enum, thumbnail upload)", status: "shipped", weeks: "Weeks 3-4", note: "Recipes deferred until recipe pipeline finishes" },
         { id: 3, label: "Programs + Scheduled inbox messages", status: "pending", weeks: "Week 5" },
         { id: 4, label: "Messaging UI + User management", status: "pending", weeks: "Week 6" },
         { id: 5, label: "Stats dashboard", status: "pending", weeks: "Week 7" },
@@ -68,13 +68,22 @@ window.TRACKER = {
       ],
     },
     {
+      id: "nutrition-onboarding",
+      title: "Nutrition onboarding (R7)",
+      pillar: "strava",
+      status: "shipped",
+      summary: "NutritionOnboarding redesigned with energy-range calorie display (lowCal–highCal per day instead of a single number) and 3-way life phase radio (regular / postpartum / pregnant). Postpartum reveals breastfeeding follow-up with frequency input (+250–500 kcal). Pregnant shows gynaecologist disclaimer. Summary step shows full breakdown: TDEE → goal adjustment range → breastfeeding bonus → result range. Macros computed off midpoint. Types updated: lifePhase, dailyCaloriesMin, dailyCaloriesMax.",
+      blocker: null,
+      nextAction: "Wire profile to meal-plan generator once recipe pipeline finishes. Consider showing range in Strava hub.",
+    },
+    {
       id: "design-system",
       title: "R12 design system rollout",
       pillar: "mysel",
       status: "shipped",
-      summary: "All 4 PRs complete. Tokens (warmDusk.ts + index.css + tailwind.config), shadcn reskin (Button/Card/Input new variants), component library (9 atoms + 10 molecules), and trial screens (Onboarding, SettingsHub, DomovNew) all wired.",
+      summary: "All 4 PRs committed. Tokens (warmDusk.ts + index.css + tailwind.config), shadcn reskin (Button/Card/Input new variants), component library (9 atoms + 10 molecules), and trial screens applied to Blog, BlogArticle, Periodka, TeloPrograms, ProgramDetail. ConfirmSheet and FaqAccordion added. R12 handoff files in handoff-4/ for reference.",
       blocker: null,
-      nextAction: "No active work — polish as needed",
+      nextAction: "Wave 2 screens (Strava, Myseľ, Cyklus) when next handoff batch arrives.",
     },
     {
       id: "period-tracker",
@@ -113,7 +122,9 @@ window.TRACKER = {
   ],
 
   recentDecisions: [
-    { date: "2026-05-04", what: "Phase 2 started: ExercisesTab + MeditationsTab migrated to status enum (draft/published/archived), thumbnail image upload, cycleStatus badge. Video URL stays as text input (URLs not yet populated)." },
+    { date: "2026-05-05", what: "All uncommitted work committed across 5 clean PRs: nutrition onboarding (R7), admin rebuild Phases 0–2, R12 design system rollout, programmes data + periodka paywall removal, tracker + ops docs." },
+    { date: "2026-05-05", what: "Nutrition onboarding: energy range replaces single dailyCalories. Life phase radio (regular/postpartum/pregnant) replaces binary isPregnant. Types updated with lifePhase, dailyCaloriesMin, dailyCaloriesMax." },
+    { date: "2026-05-04", what: "Phase 2 shipped: ExercisesTab + MeditationsTab migrated to status enum (draft/published/archived), thumbnail image upload, cycleStatus badge. Video URL stays as text input (URLs not yet populated). Sync triggers dropped (migration 20260503)." },
     { date: "2026-05-03", what: "Phase 1 shipped: Tiptap rich text editor with bubble menu, inline image upload (auto WebP), blog list + article wired to Supabase." },
     { date: "2026-05-02", what: "Phase 0 fully shipped: Edge Function deployed, admin role confirmed, Storage bucket created, /admin route accessible." },
     { date: "2026-05-01", what: "Phase 0 code complete: migrations, Edge Function, storage helper, React Query, AdminDashboard deletion, Admin route move. Build green." },
