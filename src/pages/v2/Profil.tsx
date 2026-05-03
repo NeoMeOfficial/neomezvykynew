@@ -5,7 +5,7 @@ import { useWorkoutHistory } from '../../hooks/useWorkoutHistory';
 import { useFavorites } from '../../hooks/useFavorites';
 import { useUserProgram } from '../../hooks/useUserProgram';
 import { useReflections } from '../../hooks/useDailyRituals';
-import { Page, Eye, Ser, Body, PlusTag, NM } from '../../components/v2/neome';
+import { Page, Eye, Ser, Body, PlusTag, AdminTierToggle, NM } from '../../components/v2/neome';
 
 function useReflectionsCount(): number {
   const { count } = useReflections();
@@ -359,6 +359,9 @@ export default function Profil() {
           </div>
         )}
       </div>
+
+      {/* Admin-only Free/Plus tier toggle (renders nothing for non-admins) */}
+      <AdminTierToggle />
 
       {/* Settings */}
       <SectionHead>Nastavenia</SectionHead>

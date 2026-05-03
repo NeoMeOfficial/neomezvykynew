@@ -120,6 +120,19 @@ const ACTIVITY_MULTIPLIER = { sedentary: 1.2, light: 1.375, moderate: 1.55, acti
 const MIN_CALORIES_DEFAULT = 1500;
 const MIN_CALORIES_BREASTFEEDING = 1800;
 
+/**
+ * Energy-range adjustments per goal (Strategy memo 2026-04-23).
+ *   Lose:     [TDEE − 400, TDEE − 100]
+ *   Maintain: [TDEE − 100, TDEE + 100]
+ *   Gain:     [TDEE + 150, TDEE + 400]
+ * Floor (1500 / 1800 if breastfeeding) is applied to BOTH bounds.
+ */
+const RANGE_ADJ: Record<Goal, { low: number; high: number }> = {
+  lose:     { low: -400, high: -100 },
+  maintain: { low: -100, high:  100 },
+  gain:     { low:  150, high:  400 },
+};
+
 function calcNutrition(
   w: number,
   h: number,
@@ -134,20 +147,12 @@ function calcNutrition(
   const bfBonus = getBreastfeedingBonus(isBreastfeeding, bfFrequency);
   const floor = isBreastfeeding ? MIN_CALORIES_BREASTFEEDING : MIN_CALORIES_DEFAULT;
 
-  // Smart deficit: sedentary → max 200 kcal deficit, others → 300 kcal
-  let deficit = 0;
-  let targetCal: number;
-  if (goal === 'maintain') {
-    targetCal = Math.max(floor, tdeeRaw + bfBonus);
-  } else if (goal === 'gain') {
-    targetCal = Math.max(floor, tdeeRaw + 250 + bfBonus);
-  } else {
-    deficit = activity === 'sedentary' ? 200 : 300;
-    targetCal = Math.max(floor, tdeeRaw - deficit + bfBonus);
-    // Recalculate actual deficit after floor
-    deficit = tdeeRaw - (targetCal - bfBonus);
-  }
+  const adj = RANGE_ADJ[goal];
+  const lowCal  = Math.max(floor, Math.round(tdeeRaw + adj.low  + bfBonus));
+  const highCal = Math.max(lowCal + 100, Math.round(tdeeRaw + adj.high + bfBonus));
+  const targetCal = Math.round((lowCal + highCal) / 2);
 
+  // Macros computed off the midpoint.
   const proteinPerKg = age >= 38 ? 2.2 : 1.8;
   const proteinG = Math.round(w * proteinPerKg);
   const fatCal = Math.round(targetCal * 0.27);
@@ -157,7 +162,23 @@ function calcNutrition(
   const fiberG = age >= 38 ? 30 : 25;
   const proteinPct = Math.round((proteinG * 4 / targetCal) * 100);
   const carbPct = Math.round((carbCal / targetCal) * 100);
-  return { tdee: tdeeRaw, targetCal, deficit, proteinG, carbG, fatG, fiberG, proteinPerKg, proteinPct, carbPct, bfBonus };
+
+  return {
+    tdee: tdeeRaw,
+    targetCal,
+    lowCal,
+    highCal,
+    proteinG,
+    carbG,
+    fatG,
+    fiberG,
+    proteinPerKg,
+    proteinPct,
+    carbPct,
+    bfBonus,
+    goalAdjLow:  adj.low,
+    goalAdjHigh: adj.high,
+  };
 }
 
 function getWaistRisk(cm: number): { label: string; color: string; desc: string } {
@@ -272,9 +293,13 @@ export default function NutritionOnboarding({
   const [customAllergies, setCustomAllergies] = useState<string[]>([]);
 
   // S5 — Extra info
+  // Life phase replaces the standalone "Si tehotná?" yes/no with a 3-way
+  // editorial radio (R7 prototype). 'pregnant' derives the legacy
+  // isPregnant boolean; 'postpartum' shows the breastfeeding follow-up.
+  type LifePhase = 'regular' | 'postpartum' | 'pregnant';
+  const [lifePhase, setLifePhase] = useState<LifePhase | null>(null);
   const [isBreastfeeding, setIsBreastfeeding] = useState<boolean | null>(null);
   const [bfFrequency, setBfFrequency] = useState('');
-  const [isPregnant, setIsPregnant] = useState<boolean | null>(null);
 
   // S7 — Start date
   const [startDate, setStartDate] = useState<Date | null>(null);
@@ -311,7 +336,11 @@ export default function NutritionOnboarding({
       case 7: return selectedMeals.length >= 1;
       case 8: return true;
       case 9: return true;
-      case 10: return isBreastfeeding !== null && isPregnant !== null;
+      case 10:
+        if (lifePhase === null) return false;
+        // 'postpartum' must answer the breastfeeding follow-up too.
+        if (lifePhase === 'postpartum') return isBreastfeeding !== null;
+        return true;
       case 11: return true;
       case 12: return startDate !== null;
       default: return false;
@@ -345,10 +374,13 @@ export default function NutritionOnboarding({
       likedIngredients,
       dislikedIngredients,
       favouriteMealOfDay: favMeal,
-      isBreastfeeding: isBreastfeeding ?? false,
+      lifePhase: lifePhase ?? 'regular',
+      isBreastfeeding: lifePhase === 'postpartum' ? (isBreastfeeding ?? false) : false,
       breastfeedingFrequency: bfFrequency ? parseInt(bfFrequency) : undefined,
-      isPregnant: isPregnant ?? false,
+      isPregnant: lifePhase === 'pregnant',
       dailyCalories: n.targetCal,
+      dailyCaloriesMin: n.lowCal,
+      dailyCaloriesMax: n.highCal,
       dailyProtein: n.proteinG,
       dailyCarbs: n.carbG,
       dailyFat: n.fatG,
@@ -686,56 +718,74 @@ export default function NutritionOnboarding({
     </>
   );
 
-  // S5 — Extra info
+  // S5 — Extra info: životná fáza + breastfeeding follow-up.
   const renderStep10 = () => (
     <>
-      <div style={s.title}>Doplnkové údaje</div>
+      <div style={s.title}>Životná fáza</div>
+      <div style={{ fontSize: 13, color: MUTED, marginBottom: 14, lineHeight: 1.55 }}>
+        Pomôže nám prispôsobiť tvoj plán — kojace mamičky a tehotné majú iné nutričné potreby.
+      </div>
 
-      {/* Breastfeeding */}
-      <GlassCard style={{ padding: '16px', marginBottom: 10 }}>
-        <div style={{ fontSize: 13, fontWeight: 600, color: PRIMARY, marginBottom: 12 }}>Kojiš?</div>
-        <div style={{ display: 'flex', gap: 10 }}>
-          {[{ v: true, label: 'Áno' }, { v: false, label: 'Nie' }].map(o => (
-            <button key={String(o.v)} onClick={() => setIsBreastfeeding(o.v)}
-              style={{ ...s.pill, ...(isBreastfeeding === o.v ? s.pillSel : {}), flex: 1, textAlign: 'center' }}>
-              {o.label}
-            </button>
-          ))}
-        </div>
-        {isBreastfeeding === true && (
-          <div style={{ marginTop: 14 }}>
-            <label style={s.label}>Koľkokrát za 24 hodín?</label>
-            <input style={s.input} type="number" inputMode="numeric" value={bfFrequency}
-              onChange={e => setBfFrequency(e.target.value)} placeholder="napr. 6" />
-            <div style={{ fontSize: 11, color: ACCENT, marginTop: 6, lineHeight: 1.5 }}>
-              Podľa počtu kŕmení ti pridáme +250 až +500 kcal. Ak nevyplníš, použijeme +300 kcal.
-            </div>
-            <div style={{ fontSize: 11, color: MUTED, marginTop: 6, lineHeight: 1.5, fontStyle: 'italic' }}>
-              Ak neskôr znížiš počet kŕmení alebo prestaneš kojiť, bude potrebné nanovo vytvoriť stravovací plán podľa nových údajov.
-            </div>
+      {/* Life phase — 3-way radio */}
+      {([
+        { key: 'regular' as const,    title: 'Mám pravidelný cyklus', desc: 'Menštruácia, ovulácia, luteálna fáza.' },
+        { key: 'postpartum' as const, title: 'Som po pôrode',          desc: 'Postpartum — prvé týždne aj mesiace.' },
+        { key: 'pregnant' as const,   title: 'Som tehotná',            desc: 'Aktuálne tehotenstvo.' },
+      ]).map(o => (
+        <GlassCard key={o.key}
+          onClick={() => {
+            setLifePhase(o.key);
+            // Switching away from postpartum clears the breastfeeding follow-up.
+            if (o.key !== 'postpartum') {
+              setIsBreastfeeding(null);
+              setBfFrequency('');
+            }
+          }}
+          style={{ ...s.optionCard, ...(lifePhase === o.key ? selBorder : {}) }}
+        >
+          <div style={s.optionTitle}>{o.title}</div>
+          <div style={s.optionDesc}>{o.desc}</div>
+        </GlassCard>
+      ))}
+
+      {/* Postpartum follow-up: breastfeeding */}
+      {lifePhase === 'postpartum' && (
+        <GlassCard style={{ padding: '16px', marginTop: 4, marginBottom: 10 }}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: PRIMARY, marginBottom: 12 }}>Kojíš?</div>
+          <div style={{ display: 'flex', gap: 10 }}>
+            {[{ v: true, label: 'Áno' }, { v: false, label: 'Nie' }].map(o => (
+              <button key={String(o.v)} onClick={() => setIsBreastfeeding(o.v)}
+                style={{ ...s.pill, ...(isBreastfeeding === o.v ? s.pillSel : {}), flex: 1, textAlign: 'center' }}>
+                {o.label}
+              </button>
+            ))}
           </div>
-        )}
-      </GlassCard>
+          {isBreastfeeding === true && (
+            <div style={{ marginTop: 14 }}>
+              <label style={s.label}>Koľkokrát za 24 hodín?</label>
+              <input style={s.input} type="number" inputMode="numeric" value={bfFrequency}
+                onChange={e => setBfFrequency(e.target.value)} placeholder="napr. 6" />
+              <div style={{ fontSize: 11, color: ACCENT, marginTop: 6, lineHeight: 1.5 }}>
+                Podľa počtu kŕmení ti pridáme +250 až +500 kcal. Ak nevyplníš, použijeme +300 kcal.
+              </div>
+              <div style={{ fontSize: 11, color: MUTED, marginTop: 6, lineHeight: 1.5, fontStyle: 'italic' }}>
+                Ak neskôr znížiš počet kŕmení alebo prestaneš kojiť, bude potrebné nanovo vytvoriť stravovací plán podľa nových údajov.
+              </div>
+            </div>
+          )}
+        </GlassCard>
+      )}
 
-      {/* Pregnancy */}
-      <GlassCard style={{ padding: '16px', marginBottom: 12 }}>
-        <div style={{ fontSize: 13, fontWeight: 600, color: PRIMARY, marginBottom: 12 }}>Si tehotná?</div>
-        <div style={{ display: 'flex', gap: 10 }}>
-          {[{ v: true, label: 'Áno' }, { v: false, label: 'Nie' }].map(o => (
-            <button key={String(o.v)} onClick={() => setIsPregnant(o.v)}
-              style={{ ...s.pill, ...(isPregnant === o.v ? s.pillSel : {}), flex: 1, textAlign: 'center' }}>
-              {o.label}
-            </button>
-          ))}
-        </div>
-        {isPregnant === true && (
-          <div style={{ marginTop: 10, padding: '10px 12px', borderRadius: 10, background: 'rgba(184,134,74,0.08)', border: '1px solid rgba(184,134,74,0.2)' }}>
+      {/* Pregnancy disclaimer */}
+      {lifePhase === 'pregnant' && (
+        <GlassCard style={{ padding: '16px', marginTop: 4, marginBottom: 12 }}>
+          <div style={{ marginTop: 0, padding: '10px 12px', borderRadius: 10, background: 'rgba(184,134,74,0.08)', border: '1px solid rgba(184,134,74,0.2)' }}>
             <div style={{ fontSize: 12, color: ACCENT, lineHeight: 1.5 }}>
               Počas tehotenstva odporúčame konzultovať výživový plán so svojím gynekológom alebo pôrodníkom.
             </div>
           </div>
-        )}
-      </GlassCard>
+        </GlassCard>
+      )}
 
       {/* Health disclaimer */}
       <div style={{ fontSize: 11, color: MUTED_LIGHT, lineHeight: 1.6, padding: '0 2px' }}>
@@ -754,28 +804,64 @@ export default function NutritionOnboarding({
     };
     const goalLabel = goalLabels[goal ?? 'maintain'];
 
+    const fmt = (n: number) => n.toLocaleString('sk-SK').replace(/,/g, ' ');
+    const goalAdjLabel = goal === 'lose'
+      ? { name: 'Mierny deficit na chudnutie', sub: 'Udržateľné chudnutie bez hladovania', range: `${n.goalAdjLow} až ${n.goalAdjHigh} kcal`, color: '#C27A6E' }
+      : goal === 'gain'
+      ? { name: 'Mierny prebytok na naberanie', sub: 'Pre zdravý rast svalovej hmoty', range: `+${n.goalAdjLow} až +${n.goalAdjHigh} kcal`, color: GREEN }
+      : { name: 'Udržanie váhy', sub: 'Rozmedzie okolo tvojich potrieb', range: `${n.goalAdjLow} až +${n.goalAdjHigh} kcal`, color: PRIMARY };
+
     return (
       <>
         <div style={s.title}>Tvoj výživový plán</div>
 
-        {/* Hero card — final recommended intake */}
+        {/* Hero card — energy range */}
         <GlassCard style={{ padding: '22px 20px', marginBottom: 12, textAlign: 'center' }}>
           <div style={{ fontSize: 12, color: MUTED, marginBottom: 6, letterSpacing: 0.3, textTransform: 'uppercase', fontWeight: 600 }}>
-            Tvoj denný príjem
+            Tvoje denné rozmedzie
           </div>
-          <div style={{ fontSize: 52, fontWeight: 800, color: PRIMARY, lineHeight: 1, letterSpacing: -1 }}>
-            {n.targetCal}
+          <div style={{ fontSize: 38, fontWeight: 800, color: PRIMARY, lineHeight: 1.05, letterSpacing: -0.5 }}>
+            {fmt(n.lowCal)} <span style={{ color: MUTED_LIGHT, fontWeight: 400 }}>—</span> {fmt(n.highCal)}
           </div>
-          <div style={{ fontSize: 14, color: MUTED, marginTop: 4, fontWeight: 500 }}>kcal za deň</div>
-          <div style={{ fontSize: 12, color: MUTED_LIGHT, marginTop: 10, lineHeight: 1.5, padding: '0 4px' }}>
-            Vypočítané na mieru tebe — podľa tvojich aktivít{goal === 'lose' ? ', cieľa schudnúť' : goal === 'gain' ? ', cieľa nabrať' : ''}{isBreastfeeding ? ' a kojenia' : ''}.
+          <div style={{ fontSize: 14, color: MUTED, marginTop: 6, fontWeight: 500 }}>kcal za deň</div>
+          <div style={{ fontSize: 12, color: MUTED_LIGHT, marginTop: 12, lineHeight: 1.55, padding: '0 4px' }}>
+            Tvoje telo dnes potrebuje niekde medzi týmito hodnotami — podľa tvojich aktivít{goal === 'lose' ? ', cieľa schudnúť' : goal === 'gain' ? ', cieľa nabrať' : ''}{isBreastfeeding ? ' a kojenia' : ''}.
+          </div>
+        </GlassCard>
+
+        {/* Active vs easy day guidance */}
+        <GlassCard style={{ padding: '14px 16px', marginBottom: 10 }}>
+          <div style={{ fontSize: 12, color: MUTED, marginBottom: 10, fontWeight: 600, letterSpacing: 0.2 }}>
+            Ako čítať toto rozmedzie
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+              <div style={{ width: 28, fontSize: 12, fontWeight: 700, color: GREEN, flexShrink: 0 }}>{fmt(n.highCal)}</div>
+              <div style={{ flex: 1, fontSize: 12, color: PRIMARY, lineHeight: 1.5 }}>
+                <strong style={{ fontWeight: 600 }}>Aktívny deň</strong> — keď máš tréning, dlhú prechádzku alebo náročný režim, siahni po hornej hranici.
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+              <div style={{ width: 28, fontSize: 12, fontWeight: 700, color: MUTED, flexShrink: 0 }}>{fmt(n.lowCal)}</div>
+              <div style={{ flex: 1, fontSize: 12, color: PRIMARY, lineHeight: 1.5 }}>
+                <strong style={{ fontWeight: 600 }}>Ľahší deň</strong> — keď oddychuješ alebo máš pokojný režim, postačí dolná hranica.
+              </div>
+            </div>
+            {isBreastfeeding && (
+              <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginTop: 4, paddingTop: 8, borderTop: '1px solid rgba(0,0,0,0.06)' }}>
+                <div style={{ width: 28, fontSize: 12, fontWeight: 700, color: GREEN, flexShrink: 0 }}>·</div>
+                <div style={{ flex: 1, fontSize: 12, color: PRIMARY, lineHeight: 1.5 }}>
+                  <strong style={{ fontWeight: 600 }}>Počas luteálnej fázy</strong> — drž sa v strede alebo pri hornej hranici, telo prirodzene potrebuje viac.
+                </div>
+              </div>
+            )}
           </div>
         </GlassCard>
 
         {/* Breakdown — how we got there */}
         <GlassCard style={{ padding: '16px 18px', marginBottom: 10 }}>
           <div style={{ fontSize: 12, color: MUTED, marginBottom: 12, fontWeight: 600, letterSpacing: 0.2 }}>
-            Ako sme sa k tomuto číslu dostali
+            Ako sme sa k tomuto rozmedziu dostali
           </div>
 
           {/* Step 1 — baseline TDEE */}
@@ -784,62 +870,53 @@ export default function NutritionOnboarding({
               <div style={{ fontSize: 13, fontWeight: 600, color: PRIMARY, marginBottom: 2 }}>Základné potreby tvojho tela</div>
               <div style={{ fontSize: 11, color: MUTED_LIGHT, lineHeight: 1.4 }}>Koľko kalórií spáliš za deň podľa tvojich aktivít</div>
             </div>
-            <div style={{ fontSize: 15, fontWeight: 700, color: PRIMARY, whiteSpace: 'nowrap' }}>{n.tdee} kcal</div>
+            <div style={{ fontSize: 15, fontWeight: 700, color: PRIMARY, whiteSpace: 'nowrap' }}>{fmt(n.tdee)} kcal</div>
           </div>
 
-          {/* Step 2 — goal adjustment */}
-          {goal === 'lose' && n.deficit > 0 && (
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, paddingTop: 12, paddingBottom: 12, borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: PRIMARY, marginBottom: 2 }}>Mierny deficit na chudnutie</div>
-                <div style={{ fontSize: 11, color: MUTED_LIGHT, lineHeight: 1.4 }}>Udržateľné chudnutie bez hladovania</div>
-              </div>
-              <div style={{ fontSize: 15, fontWeight: 700, color: '#C27A6E', whiteSpace: 'nowrap' }}>−{n.deficit} kcal</div>
+          {/* Step 2 — goal adjustment range */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, paddingTop: 12, paddingBottom: 12, borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: PRIMARY, marginBottom: 2 }}>{goalAdjLabel.name}</div>
+              <div style={{ fontSize: 11, color: MUTED_LIGHT, lineHeight: 1.4 }}>{goalAdjLabel.sub}</div>
             </div>
-          )}
-          {goal === 'gain' && (
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, paddingTop: 12, paddingBottom: 12, borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: PRIMARY, marginBottom: 2 }}>Mierny prebytok na naberanie</div>
-                <div style={{ fontSize: 11, color: MUTED_LIGHT, lineHeight: 1.4 }}>Pre zdravý rast svalovej hmoty</div>
-              </div>
-              <div style={{ fontSize: 15, fontWeight: 700, color: GREEN, whiteSpace: 'nowrap' }}>+250 kcal</div>
-            </div>
-          )}
+            <div style={{ fontSize: 13, fontWeight: 700, color: goalAdjLabel.color, whiteSpace: 'nowrap', textAlign: 'right' }}>{goalAdjLabel.range}</div>
+          </div>
 
           {/* Step 3 — breastfeeding bonus */}
           {isBreastfeeding && n.bfBonus > 0 && (
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, paddingTop: 12, paddingBottom: 12, borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: PRIMARY, marginBottom: 2 }}>🤱 Kojenie</div>
-                <div style={{ fontSize: 11, color: MUTED_LIGHT, lineHeight: 1.4 }}>Extra energia pre tvoje dieťatko</div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: PRIMARY, marginBottom: 2 }}>Kojenie</div>
+                <div style={{ fontSize: 11, color: MUTED_LIGHT, lineHeight: 1.4 }}>Extra energia pre tvoje dieťatko (vždy + k obom hraniciam)</div>
               </div>
               <div style={{ fontSize: 15, fontWeight: 700, color: GREEN, whiteSpace: 'nowrap' }}>+{n.bfBonus} kcal</div>
             </div>
           )}
 
-          {/* Result */}
+          {/* Result range */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, paddingTop: 14, marginTop: 2 }}>
-            <div style={{ fontSize: 14, fontWeight: 700, color: PRIMARY }}>Výsledok</div>
-            <div style={{ fontSize: 20, fontWeight: 800, color: ACCENT, whiteSpace: 'nowrap' }}>{n.targetCal} kcal</div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: PRIMARY }}>Tvoje rozmedzie</div>
+            <div style={{ fontSize: 18, fontWeight: 800, color: ACCENT, whiteSpace: 'nowrap' }}>
+              {fmt(n.lowCal)} — {fmt(n.highCal)} kcal
+            </div>
           </div>
 
           {/* Floor notices */}
-          {n.targetCal === 1500 && !isBreastfeeding && goal === 'lose' && (
+          {n.lowCal === 1500 && !isBreastfeeding && goal === 'lose' && (
             <div style={{ fontSize: 11, color: ACCENT, marginTop: 10, padding: '8px 10px', background: 'rgba(184,134,74,0.08)', borderRadius: 8, lineHeight: 1.4 }}>
-              ℹ️ Upravené na minimálny odporúčaný príjem pre ženy (1500 kcal).
+              Dolná hranica upravená na minimálny odporúčaný príjem pre ženy (1500 kcal).
             </div>
           )}
-          {n.targetCal === 1800 && isBreastfeeding && (
+          {n.lowCal === 1800 && isBreastfeeding && (
             <div style={{ fontSize: 11, color: ACCENT, marginTop: 10, padding: '8px 10px', background: 'rgba(184,134,74,0.08)', borderRadius: 8, lineHeight: 1.4 }}>
-              ℹ️ Upravené na minimálny odporúčaný príjem pre kojace ženy (1800 kcal).
+              Dolná hranica upravená na minimálny odporúčaný príjem pre kojace ženy (1800 kcal).
             </div>
           )}
         </GlassCard>
 
         {isBreastfeeding && (
           <GlassCard style={{ padding: '14px 16px', marginBottom: 10, background: 'rgba(122,158,120,0.08)', border: '1px solid rgba(122,158,120,0.25)' }}>
-            <div style={{ fontSize: 12, fontWeight: 600, color: GREEN, marginBottom: 6 }}>🤱 Poznámka pre kojace mamičky</div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: GREEN, marginBottom: 6, letterSpacing: 0.2, textTransform: 'uppercase' }}>Poznámka pre kojace mamičky</div>
             <div style={{ fontSize: 12, color: PRIMARY, lineHeight: 1.55, marginBottom: 6 }}>
               Keďže kojíš, tvoj stravovací plán nie je nastavený na veľký kalorický deficit. Je zameraný na vyváženú a nutrične bohatú stravu, ktorá ti pomôže sa lepšie cítiť a naštartovať metabolizmus.
             </div>

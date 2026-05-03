@@ -19,10 +19,27 @@ export interface NutritionProfile {
   sports?: string[];
   sportsFrequency?: number;
   // Health context
+  /**
+   * Life phase — three-way radio asked early in onboarding.
+   *   'regular'    → standard cycle (menštruácia, ovulácia, luteálna fáza)
+   *   'postpartum' → after birth (asks breastfeeding frequency follow-up)
+   *   'pregnant'   → currently pregnant (gynaecologist disclaimer)
+   * Derives `isPregnant` (= 'pregnant') for backwards compat with code
+   * that still reads the legacy boolean. Breastfeeding stays a separate
+   * sub-question because postpartum users may or may not breastfeed.
+   */
+  lifePhase?: 'regular' | 'postpartum' | 'pregnant';
   isBreastfeeding?: boolean;
   breastfeedingFrequency?: number;
   isPregnant?: boolean;
+  /**
+   * Daily calorie midpoint — kept for backwards compat with all existing
+   * meal-planner / progress-ring code that consumed the old single number.
+   * The new editorial UI shows the range (dailyCaloriesMin–Max) instead.
+   */
   dailyCalories: number;
+  dailyCaloriesMin: number;  // lower bound of the energy range
+  dailyCaloriesMax: number;  // upper bound of the energy range
   dailyProtein: number;
   dailyCarbs: number;
   dailyFat: number;

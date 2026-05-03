@@ -40,6 +40,25 @@ export function getBreastfeedingBonus(
   return 250;
 }
 
+/**
+ * Energy-range adjustments per goal (Strategy memo 2026-04-23).
+ *
+ * Lose:     [TDEE − 400, TDEE − 100]  → floor enforced AFTER bonus
+ * Maintain: [TDEE − 100, TDEE + 100]
+ * Gain:     [TDEE + 150, TDEE + 400]
+ *
+ * Why a range and not a single number:
+ *   - On easy days the body burns less, on active days more.
+ *   - Sticking to the lower bound on easy days, higher on active days,
+ *     keeps the average in deficit/surplus while letting intuition lead.
+ *   - "Range, not budget" — Gabi's editorial direction.
+ */
+const RANGE_ADJUSTMENTS: Record<NutritionProfile['goal'], { low: number; high: number }> = {
+  lose:     { low: -400, high: -100 },
+  maintain: { low: -100, high:  100 },
+  gain:     { low:  150, high:  400 },
+};
+
 export function calculateDailyTargets(
   weight: number,
   height: number,
@@ -51,22 +70,34 @@ export function calculateDailyTargets(
 ) {
   // Mifflin-St Jeor (female)
   const bmr = 10 * weight + 6.25 * height - 5 * age - 161;
-  const tdee = bmr * ACTIVITY_MULTIPLIERS[activityLevel];
+  const tdee = Math.round(bmr * ACTIVITY_MULTIPLIERS[activityLevel]);
   const bfBonus = getBreastfeedingBonus(isBreastfeeding, breastfeedingFrequency);
 
   // Floor: 1800 kcal for breastfeeding women, 1500 otherwise.
-  // Floor is applied AFTER goal adjustment AND breastfeeding bonus.
+  // Applied AFTER goal adjustment AND breastfeeding bonus to BOTH bounds
+  // of the range — even on easy days a breastfeeding mum eats ≥ 1800.
   const minCalories = isBreastfeeding ? MIN_CALORIES_BREASTFEEDING : MIN_CALORIES_DEFAULT;
+  const adj = RANGE_ADJUSTMENTS[goal];
 
-  const rawCalories = tdee + GOAL_ADJUSTMENTS[goal] + bfBonus;
-  const dailyCalories = Math.max(minCalories, Math.round(rawCalories));
+  const dailyCaloriesMin = Math.max(minCalories, Math.round(tdee + adj.low + bfBonus));
+  const dailyCaloriesMax = Math.max(dailyCaloriesMin + 100, Math.round(tdee + adj.high + bfBonus));
+  const dailyCalories = Math.round((dailyCaloriesMin + dailyCaloriesMax) / 2);
 
-  // Macros: protein 30%, carbs 40%, fat 30%
+  // Macros computed off the midpoint — protein 30%, carbs 40%, fat 30%.
   const dailyProtein = Math.round((dailyCalories * 0.3) / 4);
   const dailyCarbs = Math.round((dailyCalories * 0.4) / 4);
   const dailyFat = Math.round((dailyCalories * 0.3) / 9);
 
-  return { dailyCalories, dailyProtein, dailyCarbs, dailyFat, breastfeedingBonus: bfBonus };
+  return {
+    tdee,
+    dailyCalories,        // midpoint — back-compat for code reading the single value
+    dailyCaloriesMin,
+    dailyCaloriesMax,
+    dailyProtein,
+    dailyCarbs,
+    dailyFat,
+    breastfeedingBonus: bfBonus,
+  };
 }
 
 function loadProfile(): NutritionProfile | null {
