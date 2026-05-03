@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NeoMe — Project Tracker</title>
+<style>
+  :root {
+    --cream-50: #FBF9F5;
+    --cream-100: #F8F5F0;
+    --cream-200: #F1ECE3;
+    --ink: #3D2921;
+    --ink-soft: #6B5345;
+    --ink-mute: #8B7560;
+    --line: rgba(61, 41, 33, 0.08);
+    --line-strong: rgba(61, 41, 33, 0.16);
+    --telo: #6B4C3B;
+    --strava: #7A9E78;
+    --mysel: #A8848B;
+    --periodka: #C27A6E;
+    --gold: #B8864A;
+    --danger: #B7494A;
+    --warn: #C68A3A;
+    --ok: #5C8C5E;
+    --plan: #7A6F65;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", system-ui, sans-serif;
+    background: var(--cream-100);
+    color: var(--ink);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 1100px; margin: 0 auto; padding: 32px 24px 80px; }
+
+  /* Header */
+  header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 24px; }
+  h1 { font-family: "Cormorant Garamond", "Iowan Old Style", "Georgia", serif; font-weight: 500; font-size: 36px; margin: 0; letter-spacing: -0.02em; }
+  .meta { color: var(--ink-mute); font-size: 13px; }
+
+  h2 {
+    font-family: "Cormorant Garamond", "Iowan Old Style", "Georgia", serif;
+    font-weight: 500; font-size: 22px; letter-spacing: -0.01em;
+    margin: 36px 0 16px; color: var(--ink);
+  }
+
+  /* Blockers strip */
+  .blockers {
+    background: rgba(183, 73, 74, 0.06);
+    border: 1px solid rgba(183, 73, 74, 0.18);
+    border-radius: 14px; padding: 18px 20px; margin-bottom: 12px;
+  }
+  .blockers .label { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--danger); margin-bottom: 8px; }
+  .blockers ul { margin: 0; padding: 0; list-style: none; }
+  .blockers li { display: grid; grid-template-columns: 1fr auto; gap: 12px; padding: 8px 0; border-bottom: 1px dashed rgba(183, 73, 74, 0.16); align-items: center; }
+  .blockers li:last-child { border-bottom: none; }
+  .blockers .who { font-weight: 600; color: var(--danger); margin-right: 6px; }
+  .blockers .since { font-size: 12px; color: var(--ink-mute); white-space: nowrap; }
+
+  /* Workstream cards */
+  .cards { display: grid; gap: 16px; }
+  .card {
+    background: white; border: 1px solid var(--line); border-radius: 16px;
+    padding: 20px 22px; transition: border-color 0.15s ease;
+  }
+  .card:hover { border-color: var(--line-strong); }
+  .card.expanded { border-color: var(--line-strong); }
+  .card-head { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; cursor: pointer; user-select: none; }
+  .pillar-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .pillar-telo { background: var(--telo); }
+  .pillar-strava { background: var(--strava); }
+  .pillar-mysel { background: var(--mysel); }
+  .pillar-periodka { background: var(--periodka); }
+  .pillar-gold { background: var(--gold); }
+  .card h3 { margin: 0; font-size: 16px; font-weight: 600; color: var(--ink); }
+  .badge { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 999px; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; }
+  .badge-plan { background: rgba(122, 111, 101, 0.12); color: var(--plan); }
+  .badge-progress { background: rgba(198, 138, 58, 0.14); color: var(--warn); }
+  .badge-blocked { background: rgba(183, 73, 74, 0.12); color: var(--danger); }
+  .badge-shipped { background: rgba(92, 140, 94, 0.12); color: var(--ok); }
+  .badge-ready { background: rgba(184, 134, 74, 0.16); color: var(--gold); }
+
+  .card-summary { color: var(--ink-soft); font-size: 14px; margin: 12px 0 0 20px; }
+
+  .card-meta { display: grid; gap: 4px; margin: 12px 0 0 20px; font-size: 13px; }
+  .card-meta .row { display: grid; grid-template-columns: 100px 1fr; gap: 8px; }
+  .card-meta .key { color: var(--ink-mute); font-weight: 500; }
+  .card-meta .val { color: var(--ink); }
+
+  .details { display: none; margin: 16px 0 0 20px; padding-top: 16px; border-top: 1px solid var(--line); }
+  .card.expanded .details { display: block; }
+
+  .details h4 { margin: 16px 0 8px; font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-mute); }
+  .details h4:first-child { margin-top: 0; }
+
+  .stage-list, .phase-list { list-style: none; padding: 0; margin: 0; }
+  .stage, .phase { display: grid; grid-template-columns: 24px 1fr auto; gap: 8px; padding: 6px 0; align-items: center; font-size: 13px; }
+  .stage-icon, .phase-icon {
+    width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700;
+  }
+  .stage-icon.done, .phase-icon.done { background: var(--ok); color: white; }
+  .stage-icon.ready, .phase-icon.ready { background: var(--gold); color: white; }
+  .stage-icon.pending, .phase-icon.pending { background: rgba(122, 111, 101, 0.15); color: var(--ink-mute); }
+  .stage-icon.blocked, .phase-icon.blocked { background: var(--danger); color: white; }
+  .stage-icon.abandoned, .phase-icon.abandoned { background: var(--ink-mute); color: white; text-decoration: line-through; opacity: 0.5; }
+  .stage .note, .phase .note { font-size: 12px; color: var(--ink-mute); white-space: nowrap; }
+  .stage.abandoned, .phase.abandoned { opacity: 0.5; text-decoration: line-through; }
+
+  .links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .links a {
+    display: inline-block; font-size: 12px; padding: 4px 10px; border-radius: 999px;
+    background: var(--cream-200); color: var(--ink-soft); text-decoration: none;
+    border: 1px solid var(--line);
+  }
+  .links a:hover { background: white; color: var(--ink); border-color: var(--line-strong); }
+
+  /* Backlog chips */
+  .backlog-list { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    display: inline-block; padding: 6px 12px; border-radius: 999px; font-size: 13px;
+    border: 1px solid var(--line); background: white;
+  }
+  .chip.tier-high { border-color: rgba(184, 134, 74, 0.4); background: rgba(184, 134, 74, 0.06); }
+  .chip.tier-medium { border-color: var(--line); }
+  .chip.tier-low { color: var(--ink-mute); }
+  .chip-note { color: var(--ink-mute); font-size: 12px; margin-left: 4px; }
+
+  /* Decisions log */
+  .log { list-style: none; padding: 0; margin: 0; }
+  .log li { display: grid; grid-template-columns: 110px 1fr; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+  .log li:last-child { border-bottom: none; }
+  .log .date { color: var(--ink-mute); font-variant-numeric: tabular-nums; }
+
+  .empty { color: var(--ink-mute); font-size: 13px; font-style: italic; }
+
+  /* Toggle indicator */
+  .toggle { color: var(--ink-mute); font-size: 18px; transition: transform 0.15s ease; }
+  .card.expanded .toggle { transform: rotate(45deg); }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    h1 { font-size: 28px; }
+    .container { padding: 20px 16px 60px; }
+    .card-meta .row { grid-template-columns: 80px 1fr; }
+    header { flex-direction: column; gap: 4px; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <h1>NeoMe — Project Tracker</h1>
+    <span class="meta" id="last-updated"></span>
+  </header>
+
+  <div id="blockers-section"></div>
+
+  <h2>Workstreams</h2>
+  <div class="cards" id="workstreams"></div>
+
+  <h2>Backlog</h2>
+  <div id="backlog"></div>
+
+  <h2>Recent decisions</h2>
+  <ul class="log" id="decisions"></ul>
+
+</div>
+
+<script src="tracker.data.js"></script>
+<script>
+(function () {
+  const data = window.TRACKER || {};
+
+  // Last updated
+  document.getElementById('last-updated').textContent = data.lastUpdated ? `Last updated ${data.lastUpdated}` : '';
+
+  // Blockers
+  const blockersHost = document.getElementById('blockers-section');
+  if (data.blockers && data.blockers.length) {
+    blockersHost.innerHTML = `
+      <div class="blockers">
+        <div class="label">Blocked on someone (${data.blockers.length})</div>
+        <ul>
+          ${data.blockers.map(b => `
+            <li>
+              <span><span class="who">${b.blockedOn}:</span>${esc(b.what)} — <em style="color: var(--ink-soft)">${esc(b.action)}</em></span>
+              <span class="since">since ${esc(b.since)}</span>
+            </li>
+          `).join('')}
+        </ul>
+      </div>
+    `;
+  } else {
+    blockersHost.innerHTML = `<div class="empty">No blockers right now. ✨</div>`;
+  }
+
+  // Workstreams
+  const wsHost = document.getElementById('workstreams');
+  wsHost.innerHTML = (data.workstreams || []).map((ws, i) => {
+    const badgeClass = `badge-${ws.status}`;
+    const pillarClass = `pillar-${ws.pillar || 'gold'}`;
+
+    let phasesHtml = '';
+    if (ws.phases) {
+      phasesHtml = `
+        <h4>Phases</h4>
+        <ul class="phase-list">
+          ${ws.phases.map(p => `
+            <li class="phase ${p.status}">
+              <span class="phase-icon ${p.status}">${stageGlyph(p.status)}</span>
+              <span><strong>Phase ${p.id}.</strong> ${esc(p.label)}</span>
+              <span class="note">${esc(p.weeks || '')}</span>
+            </li>
+          `).join('')}
+        </ul>
+      `;
+    }
+
+    let stagesHtml = '';
+    if (ws.stages) {
+      stagesHtml = `
+        <h4>Stages</h4>
+        <ul class="stage-list">
+          ${ws.stages.map(s => `
+            <li class="stage ${s.status}">
+              <span class="stage-icon ${s.status}">${stageGlyph(s.status)}</span>
+              <span>${esc(s.label)}</span>
+              <span class="note">${esc(s.note || '')}</span>
+            </li>
+          `).join('')}
+        </ul>
+      `;
+    }
+
+    let linksHtml = '';
+    if (ws.links && ws.links.length) {
+      linksHtml = `
+        <h4>Links</h4>
+        <div class="links">
+          ${ws.links.map(l => `<a href="${esc(l.href)}" target="_blank">${esc(l.label)}</a>`).join('')}
+        </div>
+      `;
+    }
+
+    return `
+      <div class="card" data-id="${ws.id}">
+        <div class="card-head" onclick="document.querySelector('[data-id=\\'${ws.id}\\']').classList.toggle('expanded')">
+          <span class="pillar-dot ${pillarClass}"></span>
+          <h3>${esc(ws.title)}</h3>
+          <span class="badge ${badgeClass}">${statusLabel(ws.status)}</span>
+          <span></span>
+        </div>
+        <p class="card-summary">${esc(ws.summary)}</p>
+        <div class="card-meta">
+          ${ws.blocker ? `<div class="row"><span class="key">Blocker</span><span class="val">${esc(ws.blocker)}</span></div>` : ''}
+          ${ws.nextAction ? `<div class="row"><span class="key">Next</span><span class="val">${esc(ws.nextAction)}</span></div>` : ''}
+          ${ws.timeline ? `<div class="row"><span class="key">Timeline</span><span class="val">${esc(ws.timeline)}</span></div>` : ''}
+        </div>
+        <div class="details">
+          ${phasesHtml}
+          ${stagesHtml}
+          ${linksHtml}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // Auto-expand cards that have a blocker or are in progress
+  document.querySelectorAll('.card').forEach(c => {
+    const id = c.getAttribute('data-id');
+    const ws = (data.workstreams || []).find(w => w.id === id);
+    if (ws && (ws.status === 'blocked' || ws.status === 'progress' || ws.status === 'plan')) {
+      c.classList.add('expanded');
+    }
+  });
+
+  // Backlog
+  const bl = document.getElementById('backlog');
+  if (data.backlog && data.backlog.length) {
+    bl.innerHTML = `
+      <div class="backlog-list">
+        ${data.backlog.map(b => `
+          <span class="chip tier-${b.tier}">${esc(b.label)}${b.note ? `<span class="chip-note"> — ${esc(b.note)}</span>` : ''}</span>
+        `).join('')}
+      </div>
+    `;
+  } else {
+    bl.innerHTML = `<div class="empty">Backlog is empty.</div>`;
+  }
+
+  // Decisions
+  const dec = document.getElementById('decisions');
+  if (data.recentDecisions && data.recentDecisions.length) {
+    dec.innerHTML = data.recentDecisions.map(d => `
+      <li><span class="date">${esc(d.date)}</span><span>${esc(d.what)}</span></li>
+    `).join('');
+  } else {
+    dec.innerHTML = `<div class="empty">No decisions logged.</div>`;
+  }
+
+  // Helpers
+  function esc(s) {
+    if (s == null) return '';
+    return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+  }
+
+  function statusLabel(s) {
+    return ({ plan:'Plan', progress:'In progress', blocked:'Blocked', shipped:'Shipped', ready:'Ready', done:'Done', pending:'Pending', abandoned:'Abandoned' })[s] || s;
+  }
+
+  function stageGlyph(s) {
+    return ({ done:'✓', ready:'→', pending:'·', blocked:'!', abandoned:'×' })[s] || '·';
+  }
+})();
+</script>
+</body>
+</html>

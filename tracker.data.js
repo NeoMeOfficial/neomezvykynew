@@ -1,0 +1,127 @@
+// NeoMe project tracker data — updated by Claude as workstreams progress.
+// Edit this file (not tracker.html) when status changes.
+// Schema is informal; the renderer is forgiving of missing fields.
+
+window.TRACKER = {
+  lastUpdated: "2026-05-04",
+
+  blockers: [
+    {
+      what: "Recipe schema decision",
+      blockedOn: "Gabi",
+      action: "Review nutrition-curated.csv (top 150 ingredients)",
+      since: "2026-04-30",
+    },
+  ],
+
+  workstreams: [
+    {
+      id: "admin-rebuild",
+      title: "Admin panel rebuild",
+      pillar: "telo",
+      status: "in-progress",
+      summary: "Wire admin panel to Supabase end-to-end so changes reach users. Phases 0–1 shipped. Phase 2 exercises + meditations admin done (status enum, thumbnail upload). Exercise video URLs not yet populated — seeding deferred.",
+      blocker: null,
+      nextAction: "Phase 2 remainder: seed exercises/meditations once video URLs ready. Phase 3: Programmes admin.",
+      timeline: "~5 weeks remaining (phases 2–5)",
+      phases: [
+        { id: 0, label: "Foundation — migrations, Edge Function, Storage bucket, React Query, admin auth", status: "shipped", weeks: "Week 1" },
+        { id: 1, label: "Blog posts — rich text editor, image upload, user-facing rendering", status: "shipped", weeks: "Week 2" },
+        { id: 2, label: "Recipes + Exercises + Stretches + Meditations", status: "in-progress", weeks: "Weeks 3-4" },
+        { id: 3, label: "Programs + Scheduled inbox messages", status: "pending", weeks: "Week 5" },
+        { id: 4, label: "Messaging UI + User management", status: "pending", weeks: "Week 6" },
+        { id: 5, label: "Stats dashboard", status: "pending", weeks: "Week 7" },
+      ],
+      links: [
+        { label: "Phase 0 plan", href: ".claude/plans/admin-phase-0-foundation.md" },
+        { label: "Design decisions (memory)", href: "memory/project_admin_panel_plan.md" },
+      ],
+    },
+    {
+      id: "recipe-pipeline",
+      title: "Recipe parser pipeline",
+      pillar: "strava",
+      status: "blocked",
+      summary: "Convert Gabi's 20 client meal-plan CSVs into a curated NeoMe recipe library. 1913 recipes parsed and deduped, ingredient normalisation done. Currently waiting on Gabi's nutrition values review.",
+      blocker: "Gabi reviewing nutrition-curated.csv",
+      nextAction: "Gabi saves nutrition-reviewed.csv → Claude applies values + runs authoring gate",
+      stages: [
+        { label: "Parse 20 CSVs", status: "done", note: "2763 raw blocks" },
+        { label: "Clean + dedup", status: "done", note: "2085 recipes, 1170 ingredients" },
+        { label: "Ingredient normalisation template", status: "done" },
+        { label: "Apply Gabi's normalisation", status: "done", note: "54 edits, 47 IGNOREs" },
+        { label: "Strip false-positive titles", status: "done", note: "1913 recipes" },
+        { label: "OpenFoodFacts auto-match", status: "abandoned", note: "16% — pivoted to hand-curated" },
+        { label: "Hand-curated nutrition table (top 150)", status: "blocked", note: "Awaiting Gabi review" },
+        { label: "Apply nutrition to all recipes", status: "pending" },
+        { label: "Compute sub-recipe nutrition", status: "pending" },
+        { label: "Authoring gate (30/40/30 ± 5%)", status: "pending" },
+        { label: "Send pass/adjust/skip report", status: "pending" },
+        { label: "Define recipes table schema", status: "pending", note: "Locks Phase 2 of admin rebuild" },
+        { label: "Import to Supabase", status: "pending" },
+      ],
+      links: [
+        { label: "Pipeline state (memory)", href: "memory/project_recipe_pipeline_state.md" },
+        { label: "Nutrition strategy", href: "memory/project_nutrition_strategy_2026.md" },
+        { label: "Output: recipes-final.json", href: "data/parsed/recipes-final.json" },
+        { label: "Pending: nutrition-curated.csv", href: "data/parsed/nutrition-curated.csv" },
+      ],
+    },
+    {
+      id: "design-system",
+      title: "R12 design system rollout",
+      pillar: "mysel",
+      status: "shipped",
+      summary: "All 4 PRs complete. Tokens (warmDusk.ts + index.css + tailwind.config), shadcn reskin (Button/Card/Input new variants), component library (9 atoms + 10 molecules), and trial screens (Onboarding, SettingsHub, DomovNew) all wired.",
+      blocker: null,
+      nextAction: "No active work — polish as needed",
+    },
+    {
+      id: "period-tracker",
+      title: "Period tracker (Periodka)",
+      pillar: "periodka",
+      status: "shipped",
+      summary: "Fully shipped including Supabase sync. cycle_data syncs via user_app_data table (useCycleData). Symptom chips sync via cycle_symptoms table (useCycleSymptoms). Old localStorage-based tracker components (PeriodkaTracker, SimplePeriodkaTracker) are dead code in Periodka.old.tsx.",
+      blocker: null,
+      nextAction: "No active work. Cleanup opportunity: delete dead tracker components + Periodka.old.tsx.",
+    },
+    {
+      id: "stripe-checkout",
+      title: "Stripe live checkout",
+      pillar: "telo",
+      status: "blocked",
+      summary: "Scaffolded but not wired live. Promo codes sync to Stripe via AdminNew. €79 meal plan + €30 discount UI not built.",
+      blocker: "Post-MVP priority",
+      nextAction: "Defer until after launch unless revenue is needed earlier",
+    },
+  ],
+
+  backlog: [
+    { tier: "high", label: "Webhooks for external integrations", note: "ActiveCampaign on programme completion, etc." },
+    { tier: "high", label: "Per-client recipe scaling", note: "Depends on recipe pipeline finishing" },
+    { tier: "high", label: "Engagement dashboard", note: "Stats Option B — cohort retention, funnels" },
+    { tier: "high", label: "PDF export for JedalnicekPlanner", note: "jsPDF already installed" },
+    { tier: "high", label: "Live Stripe checkout", note: "€79 meal plan + €30 discount" },
+    { tier: "medium", label: "Cron safety-net for scheduled inbox messages" },
+    { tier: "medium", label: "Scheduled-publish for blog posts" },
+    { tier: "medium", label: "Content versioning / revisions" },
+    { tier: "medium", label: "Multi-stage approval workflow" },
+    { tier: "medium", label: "Periodka Supabase migration" },
+    { tier: "low", label: "Old screen cleanup PR (delete *.old.tsx)" },
+    { tier: "low", label: "Admin audit log table" },
+    { tier: "low", label: "Bulk import UI for content tables" },
+  ],
+
+  recentDecisions: [
+    { date: "2026-05-04", what: "Phase 2 started: ExercisesTab + MeditationsTab migrated to status enum (draft/published/archived), thumbnail image upload, cycleStatus badge. Video URL stays as text input (URLs not yet populated)." },
+    { date: "2026-05-03", what: "Phase 1 shipped: Tiptap rich text editor with bubble menu, inline image upload (auto WebP), blog list + article wired to Supabase." },
+    { date: "2026-05-02", what: "Phase 0 fully shipped: Edge Function deployed, admin role confirmed, Storage bucket created, /admin route accessible." },
+    { date: "2026-05-01", what: "Phase 0 code complete: migrations, Edge Function, storage helper, React Query, AdminDashboard deletion, Admin route move. Build green." },
+    { date: "2026-05-01", what: "Admin rebuild: 23 design decisions locked, Phase 0 plan written" },
+    { date: "2026-04-30", what: "Recipe pipeline: pivoted from OpenFoodFacts to hand-curated nutrition" },
+    { date: "2026-04-30", what: "Editorial rule: no juices in recipes (lemon as flavouring OK)" },
+    { date: "2026-04-29", what: "Recipe pipeline kicked off — 67k lines parsed → 1913 deduped recipes" },
+    { date: "2026-04-25", what: "Gamification dropped from nutrition strategy" },
+    { date: "2026-04-23", what: "Nutrition strategy redesign: curated library + energy range + cycle awareness" },
+  ],
+};
