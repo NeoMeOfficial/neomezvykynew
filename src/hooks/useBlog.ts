@@ -59,7 +59,7 @@ export function useBlogPosts() {
       const { data } = await supabase
         .from('blog_posts')
         .select('*')
-        .eq('published', true)
+        .eq('status', 'published')
         .order('published_at', { ascending: false });
       if (!cancelled) {
         if (data && data.length > 0) setPosts(data as BlogPost[]);
@@ -89,7 +89,7 @@ export function useBlogPost(slug: string | undefined) {
         .from('blog_posts')
         .select('*')
         .eq('slug', slug)
-        .eq('published', true)
+        .eq('status', 'published')
         .limit(1);
       if (!cancelled) {
         if (data && data.length > 0) {

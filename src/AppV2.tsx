@@ -1,10 +1,23 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { SupabaseAuthProvider } from './contexts/SupabaseAuthContext';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { SupabaseAuthProvider, useSupabaseAuth } from './contexts/SupabaseAuthContext';
 import { SubscriptionProvider } from './contexts/SubscriptionContext';
 import AppLayout from './layouts/v2/AppLayout';
 import ErrorBoundary from './components/v2/ErrorBoundary';
 import { Toaster } from '@/components/ui/toaster';
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000,        // 5 min — content rarely changes
+      gcTime: 30 * 60 * 1000,           // 30 min — keep cached entries reasonably long
+      refetchOnWindowFocus: true,
+      refetchOnMount: 'always',
+      retry: 1,
+    },
+  },
+});
 
 const AuthReal = lazy(() => import('./pages/v2/AuthReal'));
 const AuthDemo = lazy(() => import('./pages/v2/AuthDemo'));
@@ -55,8 +68,7 @@ const PostpartumInfo = lazy(() => import('./pages/v2/PostpartumInfo'));
 const ReferralLanding = lazy(() => import('./pages/v2/ReferralLanding'));
 const ReferralCenter = lazy(() => import('./components/v2/referral/ReferralCenter'));
 const ReferralPage = lazy(() => import('./pages/v2/ReferralPage'));
-const AdminDashboard = lazy(() => import('./pages/v2/AdminDashboard'));
-const AdminNew = lazy(() => import('./pages/v2/AdminNew'));
+const Admin = lazy(() => import('./pages/v2/Admin'));
 const AdminReferrals = lazy(() => import('./pages/v2/AdminReferrals'));
 const TeloExtra = lazy(() => import('./pages/v2/TeloExtra'));
 const TeloStrecing = lazy(() => import('./pages/v2/TeloStrecing'));
@@ -106,22 +118,28 @@ function LoadingSpinner() {
   );
 }
 
-/* Auth guard — enforces login when Supabase is configured, open in demo mode */
+/* Auth guard — redirects to /auth if no Supabase session. */
 function RequireAuth({ children }: { children: React.ReactNode }) {
-  const supabaseConfigured = !!(import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY);
-  if (!supabaseConfigured) {
-    return <>{children}</>;
-  }
-  const hasSession = !!localStorage.getItem('sb-' + new URL(import.meta.env.VITE_SUPABASE_URL).hostname.split('.')[0] + '-auth-token');
-  if (!hasSession) {
-    return <Navigate to="/auth" replace />;
-  }
+  const { user, loading } = useSupabaseAuth();
+  if (loading) return <LoadingSpinner />;
+  if (!user) return <Navigate to="/auth" replace />;
+  return <>{children}</>;
+}
+
+/* Admin guard — RequireAuth + JWT role check. Non-admins redirect to /domov-new. */
+function RequireAdmin({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useSupabaseAuth();
+  if (loading) return <LoadingSpinner />;
+  if (!user) return <Navigate to="/auth" replace />;
+  const role = (user.app_metadata as Record<string, unknown> | null)?.role;
+  if (role !== 'admin') return <Navigate to="/domov-new" replace />;
   return <>{children}</>;
 }
 
 export default function AppV2() {
   return (
     <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
     <SupabaseAuthProvider>
     <SubscriptionProvider>
       <Toaster />
@@ -138,7 +156,6 @@ export default function AppV2() {
             <Route path="/welcome" element={<Welcome />} />
             <Route path="/onboarding" element={<Onboarding />} />
             <Route path="/ref/:code" element={<ReferralLanding />} />
-            <Route path="/admin-new" element={<RequireAuth><AdminNew /></RequireAuth>} />
 
             {/* Protected routes */}
             <Route element={<RequireAuth><AppLayout /></RequireAuth>}>
@@ -191,9 +208,10 @@ export default function AppV2() {
               <Route path="/profil/predplatne" element={<SubscriptionManagement />} />
               <Route path="/referral" element={<ReferralPage />} />
               <Route path="/referral-center" element={<ReferralCenter />} />
-              <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin" element={<RequireAdmin><Admin /></RequireAdmin>} />
+              <Route path="/admin-new" element={<Navigate to="/admin" replace />} />
               <Route path="/admin/dashboard" element={<Navigate to="/admin" replace />} />
-              <Route path="/admin/referrals" element={<AdminReferrals />} />
+              <Route path="/admin/referrals" element={<RequireAdmin><AdminReferrals /></RequireAdmin>} />
               <Route path="/recepty" element={<Recepty />} />
               <Route path="/recept/:id" element={<RecipeDetail />} />
               <Route path="/meditacie" element={<Meditacie />} />
@@ -214,6 +232,7 @@ export default function AppV2() {
       </BrowserRouter>
     </SubscriptionProvider>
     </SupabaseAuthProvider>
+    </QueryClientProvider>
     </ErrorBoundary>
   );
 }

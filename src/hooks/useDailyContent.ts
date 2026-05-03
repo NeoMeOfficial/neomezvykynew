@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 
 /**
@@ -7,6 +7,10 @@ import { supabase } from '../lib/supabase';
  * Each hook prefers an explicit "featured today" row from the live
  * tables (set via Supabase Studio / admin UI) and falls back to
  * deterministic dayOfYear-indexed picks so the UI never blanks.
+ *
+ * Powered by React Query (5 min stale time, refetch on window focus).
+ * Migrated to React Query in Phase 0 of the admin rebuild as the
+ * proof-of-pattern for converting other hooks (see project_admin_panel_plan).
  */
 
 function dayOfYear(d = new Date()): number {
@@ -19,6 +23,7 @@ function todayISODate(): string {
 }
 
 // ─── Meditation ─────────────────────────────────────────────
+
 export interface DailyMeditation {
   id: string;
   title: string;
@@ -39,51 +44,49 @@ const MEDITATION_FALLBACK: DailyMeditation = {
   category: 'Mindfulness',
 };
 
+async function fetchDailyMeditation(): Promise<DailyMeditation> {
+  const today = todayISODate();
+
+  // Prefer today's featured_on row
+  const { data: featured } = await supabase
+    .from('meditations')
+    .select('id, title, duration, description, audio_url, image, category')
+    .eq('status', 'published')
+    .eq('featured_on', today)
+    .limit(1);
+
+  if (featured && featured.length > 0) {
+    return featured[0] as DailyMeditation;
+  }
+
+  // Fallback: deterministic pick from all published rows
+  const { data: all } = await supabase
+    .from('meditations')
+    .select('id, title, duration, description, audio_url, image, category')
+    .eq('status', 'published')
+    .order('id', { ascending: true });
+
+  if (all && all.length > 0) {
+    const idx = dayOfYear() % all.length;
+    return all[idx] as DailyMeditation;
+  }
+
+  return MEDITATION_FALLBACK;
+}
+
 export function useDailyMeditation() {
-  const [meditation, setMeditation] = useState<DailyMeditation>(MEDITATION_FALLBACK);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      // Prefer today's featured_on row
-      const { data: featured } = await supabase
-        .from('meditations')
-        .select('id, title, duration, description, audio_url, image, category')
-        .eq('active', true)
-        .eq('featured_on', todayISODate())
-        .limit(1);
-
-      if (!cancelled && featured && featured.length > 0) {
-        setMeditation(featured[0] as DailyMeditation);
-        setLoading(false);
-        return;
-      }
-
-      // Fallback to deterministic pick across active rows
-      const { data: all } = await supabase
-        .from('meditations')
-        .select('id, title, duration, description, audio_url, image, category')
-        .eq('active', true)
-        .order('id', { ascending: true });
-
-      if (!cancelled) {
-        if (all && all.length > 0) {
-          const idx = dayOfYear() % all.length;
-          setMeditation(all[idx] as DailyMeditation);
-        }
-        setLoading(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  return { meditation, loading };
+  const { data, isLoading } = useQuery({
+    queryKey: ['daily-meditation', todayISODate()],
+    queryFn: fetchDailyMeditation,
+  });
+  return {
+    meditation: data ?? MEDITATION_FALLBACK,
+    loading: isLoading,
+  };
 }
 
 // ─── Recipe ─────────────────────────────────────────────────
+
 export interface DailyRecipe {
   id: string;
   title: string;
@@ -94,49 +97,47 @@ export interface DailyRecipe {
   image: string | null;
 }
 
+async function fetchDailyRecipe(): Promise<DailyRecipe | null> {
+  const today = todayISODate();
+
+  const { data: featured } = await supabase
+    .from('recipes')
+    .select('id, title, category, description, prep_time, calories, image')
+    .eq('status', 'published')
+    .eq('featured_on', today)
+    .limit(1);
+
+  if (featured && featured.length > 0) {
+    return featured[0] as DailyRecipe;
+  }
+
+  const { data: all } = await supabase
+    .from('recipes')
+    .select('id, title, category, description, prep_time, calories, image')
+    .eq('status', 'published')
+    .order('id', { ascending: true });
+
+  if (all && all.length > 0) {
+    const idx = dayOfYear() % all.length;
+    return all[idx] as DailyRecipe;
+  }
+
+  return null;
+}
+
 export function useDailyRecipe() {
-  const [recipe, setRecipe] = useState<DailyRecipe | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      const { data: featured } = await supabase
-        .from('recipes')
-        .select('id, title, category, description, prep_time, calories, image')
-        .eq('active', true)
-        .eq('featured_on', todayISODate())
-        .limit(1);
-
-      if (!cancelled && featured && featured.length > 0) {
-        setRecipe(featured[0] as DailyRecipe);
-        setLoading(false);
-        return;
-      }
-
-      const { data: all } = await supabase
-        .from('recipes')
-        .select('id, title, category, description, prep_time, calories, image')
-        .eq('active', true)
-        .order('id', { ascending: true });
-
-      if (!cancelled) {
-        if (all && all.length > 0) {
-          const idx = dayOfYear() % all.length;
-          setRecipe(all[idx] as DailyRecipe);
-        }
-        setLoading(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  return { recipe, loading };
+  const { data, isLoading } = useQuery({
+    queryKey: ['daily-recipe', todayISODate()],
+    queryFn: fetchDailyRecipe,
+  });
+  return {
+    recipe: data ?? null,
+    loading: isLoading,
+  };
 }
 
 // ─── Phase advice ───────────────────────────────────────────
+
 export interface PhaseAdviceRow {
   id: string;
   phase_key: 'menstrual' | 'follicular' | 'ovulation' | 'luteal';
@@ -156,38 +157,26 @@ const PHASE_ADVICE_FALLBACK: Record<string, PhaseAdviceRow[]> = {
   ],
 };
 
+async function fetchPhaseAdvice(phaseKey: string): Promise<PhaseAdviceRow[]> {
+  const { data } = await supabase
+    .from('phase_advice')
+    .select('*')
+    .eq('active', true)              // phase_advice keeps `active` (not migrated to status)
+    .eq('phase_key', phaseKey)
+    .order('sort_order', { ascending: true });
+
+  if (data && data.length > 0) return data as PhaseAdviceRow[];
+  return PHASE_ADVICE_FALLBACK[phaseKey] ?? PHASE_ADVICE_FALLBACK.follicular;
+}
+
 export function usePhaseAdvice(phaseKey: string | null | undefined) {
-  const [rows, setRows] = useState<PhaseAdviceRow[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    let cancelled = false;
-    if (!phaseKey) {
-      setRows(PHASE_ADVICE_FALLBACK.follicular);
-      setLoading(false);
-      return;
-    }
-    (async () => {
-      const { data } = await supabase
-        .from('phase_advice')
-        .select('*')
-        .eq('active', true)
-        .eq('phase_key', phaseKey)
-        .order('sort_order', { ascending: true });
-
-      if (!cancelled) {
-        if (data && data.length > 0) {
-          setRows(data as PhaseAdviceRow[]);
-        } else {
-          setRows(PHASE_ADVICE_FALLBACK[phaseKey] ?? PHASE_ADVICE_FALLBACK.follicular);
-        }
-        setLoading(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [phaseKey]);
-
-  return { rows, loading };
+  const { data, isLoading } = useQuery({
+    queryKey: ['phase-advice', phaseKey ?? 'follicular'],
+    queryFn: () => fetchPhaseAdvice(phaseKey ?? 'follicular'),
+    enabled: !!phaseKey,
+  });
+  return {
+    rows: data ?? PHASE_ADVICE_FALLBACK.follicular,
+    loading: isLoading,
+  };
 }

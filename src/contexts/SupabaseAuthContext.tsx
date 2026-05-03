@@ -1,12 +1,6 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, AuthError, Session } from '@supabase/supabase-js';
-import { supabase, UserProfile } from '../lib/supabase';
-import { migrateLocalStorageToSupabase } from '../utils/dataMigration';
-
-// Check if Supabase is properly configured
-const isSupabaseConfigured = () => {
-  return !!(import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY);
-};
+import { supabase, isSupabaseConfigured, UserProfile } from '../lib/supabase';
 
 interface AuthContextType {
   user: User | null;
@@ -26,20 +20,17 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!isSupabaseConfigured()) {
-      console.log('🎯 Demo Mode: Supabase not configured, using localStorage fallback');
-      setLoading(false);
-      return;
-    }
-
-    // Real Supabase auth initialization
+    setLoading(true);
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      if (session?.user) loadUserProfile(session.user.id);
+      if (session?.user) {
+        loadUserProfile(session.user.id);
+        setAdminRoleIfBootstrap();
+      }
       setLoading(false);
     });
 
@@ -48,6 +39,7 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
       setUser(session?.user ?? null);
       if (session?.user) {
         loadUserProfile(session.user.id);
+        setAdminRoleIfBootstrap();
       } else {
         setProfile(null);
       }
@@ -55,6 +47,30 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  /**
+   * Calls the `set-admin-role` Edge Function. If the user is in the bootstrap
+   * email list and doesn't yet have `app_metadata.role='admin'`, the function
+   * sets it. We then refresh the session so the new JWT (with the role claim)
+   * is picked up by RLS-protected queries.
+   *
+   * Safe to call on every session change — the Edge Function is idempotent.
+   */
+  const setAdminRoleIfBootstrap = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('set-admin-role', {});
+      if (error) {
+        console.warn('set-admin-role failed (non-fatal):', error.message);
+        return;
+      }
+      if (data?.justSet) {
+        // Force JWT refresh to pick up the new role claim
+        await supabase.auth.refreshSession();
+      }
+    } catch (err) {
+      console.warn('set-admin-role threw (non-fatal):', err);
+    }
+  };
 
   const loadUserProfile = async (userId: string) => {
     try {
@@ -70,13 +86,6 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
       }
 
       setProfile(data);
-
-      // Run data migration from localStorage if needed
-      setTimeout(() => {
-        migrateLocalStorageToSupabase(userId).catch(err => {
-          console.error('Migration failed:', err);
-        });
-      }, 1000);
 
       // Process pending referral code (set during landing page visit)
       const pendingReferralCode = localStorage.getItem('referralCode');
@@ -307,58 +316,7 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
 export function useSupabaseAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    // Return demo fallback instead of throwing error
-    console.log('🎯 Demo Mode: SupabaseAuth not available, using demo fallback');
-    const demoUserData = localStorage.getItem('demo_user');
-    const demoSession = localStorage.getItem('demo_session');
-    
-    if (demoSession === 'active' && demoUserData) {
-      const demoUser = JSON.parse(demoUserData);
-      return {
-        user: {
-          id: demoUser.id,
-          email: demoUser.email,
-          created_at: demoUser.createdAt,
-          updated_at: demoUser.createdAt,
-          app_metadata: {},
-          user_metadata: {},
-          aud: 'demo',
-          email_confirmed_at: demoUser.createdAt,
-          confirmed_at: demoUser.createdAt,
-          role: 'authenticated'
-        },
-        profile: {
-          id: demoUser.id,
-          email: demoUser.email,
-          first_name: demoUser.firstName,
-          last_name: demoUser.lastName,
-          full_name: `${demoUser.firstName} ${demoUser.lastName}`,
-          subscription_tier: 'premium' as const,
-          subscription_status: 'active' as const,
-          created_at: demoUser.createdAt,
-          updated_at: demoUser.createdAt
-        },
-        session: null,
-        loading: false,
-        signUp: async () => ({ error: null }),
-        signIn: async () => ({ error: null }),
-        signOut: async () => ({ error: null }),
-        updateProfile: async () => ({ error: null }),
-        resetPassword: async () => ({ error: null })
-      };
-    }
-    
-    return {
-      user: null,
-      profile: null,
-      session: null,
-      loading: false,
-      signUp: async () => ({ error: null }),
-      signIn: async () => ({ error: null }),
-      signOut: async () => ({ error: null }),
-      updateProfile: async () => ({ error: null }),
-      resetPassword: async () => ({ error: null })
-    };
+    throw new Error('useSupabaseAuth must be used inside <SupabaseAuthProvider>');
   }
   return context;
 }

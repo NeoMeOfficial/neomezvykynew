@@ -1,17 +1,26 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { useAuth } from './useAuth';
+import { useSupabaseAuth } from '../contexts/SupabaseAuthContext';
 import { AdminUser, AdminAnalytics, UserManagement, AdminNotification } from '../types/admin';
 
 export function useAdmin() {
-  const { user } = useAuth();
+  // Use the single source of truth that the app actually subscribes to.
+  // (Previously this hook used `./useAuth`, which is a separate freestanding
+  // hook — its instance never matched the SupabaseAuthProvider session, so
+  // admin email checks always saw `user = null` for logged-in users.)
+  const { user } = useSupabaseAuth();
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [adminUser, setAdminUser] = useState<AdminUser | null>(null);
   const [analytics, setAnalytics] = useState<AdminAnalytics | null>(null);
   const [notifications, setNotifications] = useState<AdminNotification[]>([]);
 
-  // Check if current user has admin privileges
+  // Check if current user has admin privileges.
+  //
+  // Source of truth: the JWT's `app_metadata.role === 'admin'` claim, set
+  // server-side by the `set-admin-role` Edge Function. Bootstrap emails
+  // (src/config/admin-emails.ts) get the role automatically on first login.
+  // Additional admins are added from the admin panel's "Invite admin" flow.
   const checkAdminStatus = async () => {
     if (!user) {
       setIsAdmin(false);
@@ -21,47 +30,27 @@ export function useAdmin() {
     }
 
     try {
-      // For now, we'll use a simple email check
-      // In production, you'd want a proper admin_users table
-      const adminEmails = [
-        'gabi@neome.com.au',
-        'admin@neome.com.au',
-        'sambot@gmail.com', // Your email for testing
-        'admin@test.com', // Test admin account
-        'samuelgrecner@gmail.com' // Sam's personal admin access
-      ];
-
-      const userIsAdmin = adminEmails.includes(user.email || '');
+      const role = (user.app_metadata as Record<string, unknown> | null)?.role;
+      const userIsAdmin = role === 'admin';
       setIsAdmin(userIsAdmin);
 
       if (userIsAdmin) {
-        // Create admin user object
         const adminUserData: AdminUser = {
           id: user.id,
           email: user.email || '',
-          role: user.email === 'gabi@neome.com.au' ? 'admin' : 'admin',
+          role: 'admin',
           permissions: [
-            {
-              resource: 'users',
-              actions: ['read', 'create', 'update', 'delete']
-            },
-            {
-              resource: 'referrals', 
-              actions: ['read', 'create', 'update', 'delete']
-            },
-            {
-              resource: 'content',
-              actions: ['read', 'create', 'update', 'delete']
-            },
-            {
-              resource: 'analytics',
-              actions: ['read']
-            }
+            { resource: 'users', actions: ['read', 'create', 'update', 'delete'] },
+            { resource: 'referrals', actions: ['read', 'create', 'update', 'delete'] },
+            { resource: 'content', actions: ['read', 'create', 'update', 'delete'] },
+            { resource: 'analytics', actions: ['read'] },
           ],
           created_at: user.created_at || new Date().toISOString(),
-          is_active: true
+          is_active: true,
         };
         setAdminUser(adminUserData);
+      } else {
+        setAdminUser(null);
       }
     } catch (error) {
       console.error('Error checking admin status:', error);

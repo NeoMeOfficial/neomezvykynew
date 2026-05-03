@@ -9,6 +9,8 @@ import {
 } from 'lucide-react';
 import { colors } from '../../theme/warmDusk';
 import { supabase } from '../../lib/supabase';
+import { uploadContentImage } from '../../lib/storage';
+import BlogEditor from '../../components/admin/BlogEditor';
 import ContentManager from '../../components/admin/ContentManager';
 import { useAdminMessages } from '../../hooks/useMessages';
 import { useCommunityPosts } from '../../hooks/useCommunityPosts';
@@ -783,6 +785,7 @@ interface BlogPost {
   cover_image: string | null;
   category: string;
   author: string;
+  status: 'draft' | 'published' | 'archived';
   published: boolean;
   published_at: string | null;
   created_at: string;
@@ -794,7 +797,9 @@ function BlogPostsTab() {
   const [showForm, setShowForm] = useState(false);
   const [editPost, setEditPost] = useState<BlogPost | null>(null);
   const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState<Partial<BlogPost>>({ category: 'general', author: 'Gabi', published: false });
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [imageError, setImageError] = useState<string | null>(null);
+  const [form, setForm] = useState<Partial<BlogPost>>({ category: 'general', author: 'Gabi', status: 'draft' });
 
   const fetchPosts = async () => {
     setLoading(true);
@@ -809,11 +814,27 @@ function BlogPostsTab() {
 
   useEffect(() => { fetchPosts(); }, []);
 
-  const openAdd = () => { setForm({ category: 'general', author: 'Gabi', published: false }); setEditPost(null); setShowForm(true); };
+  const openAdd = () => { setForm({ category: 'general', author: 'Gabi', status: 'draft' }); setEditPost(null); setShowForm(true); };
   const openEdit = (p: BlogPost) => { setForm({ ...p }); setEditPost(p); setShowForm(true); };
-  const closeForm = () => { setShowForm(false); setEditPost(null); setForm({ category: 'general', author: 'Gabi', published: false }); };
+  const closeForm = () => { setShowForm(false); setEditPost(null); setForm({ category: 'general', author: 'Gabi', status: 'draft' }); };
 
   const generateSlug = (title: string) => title.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').trim();
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingImage(true);
+    setImageError(null);
+    try {
+      const result = await uploadContentImage(file, 'blog');
+      setForm(f => ({ ...f, cover_image: result.url }));
+    } catch (err: any) {
+      setImageError(err.message ?? 'Nahrávanie zlyhalo.');
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
 
   const savePost = async () => {
     if (!form.title) return;
@@ -821,6 +842,7 @@ function BlogPostsTab() {
     const payload = {
       ...form,
       slug: form.slug || generateSlug(form.title),
+      published_at: form.status === 'published' ? (form.published_at || new Date().toISOString()) : null,
     };
     if (editPost) {
       const { error } = await supabase.from('blog_posts').update(payload).eq('id', editPost.id);
@@ -834,9 +856,13 @@ function BlogPostsTab() {
     setSaving(false);
   };
 
-  const togglePublished = async (post: BlogPost) => {
-    const { error } = await supabase.from('blog_posts').update({ published: !post.published }).eq('id', post.id);
-    if (!error) setPosts(prev => prev.map(p => p.id === post.id ? { ...p, published: !p.published } : p));
+  const cycleStatus = async (post: BlogPost) => {
+    const next = post.status === 'draft' ? 'published' : post.status === 'published' ? 'archived' : 'draft';
+    const { error } = await supabase.from('blog_posts').update({
+      status: next,
+      published_at: next === 'published' ? (post.published_at || new Date().toISOString()) : post.published_at,
+    }).eq('id', post.id);
+    if (!error) setPosts(prev => prev.map(p => p.id === post.id ? { ...p, status: next } : p));
   };
 
   const deletePost = async (id: string) => {
@@ -854,10 +880,6 @@ function BlogPostsTab() {
     { value: 'cyklus', label: 'Cyklus' },
     { value: 'materstvo', label: 'Materstvo' },
   ];
-
-  const Card = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
-    <div className={`bg-white/40 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-lg ${className}`}>{children}</div>
-  );
 
   return (
     <div className="space-y-6">
@@ -894,22 +916,38 @@ function BlogPostsTab() {
               <input value={form.author || 'Gabi'} onChange={e => setForm(f => ({ ...f, author: e.target.value }))} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }} />
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Cover image URL</label>
-              <input value={form.cover_image || ''} onChange={e => setForm(f => ({ ...f, cover_image: e.target.value }))} placeholder="https://..." className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }} />
+              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Cover obrázok (JPEG, PNG, WebP)</label>
+              <div className="space-y-2">
+                <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleImageUpload} disabled={uploadingImage} className="w-full text-xs" style={{ color: colors.textPrimary }} />
+                {uploadingImage && <p className="text-xs" style={{ color: colors.textSecondary }}>Konvertujem a nahrávam…</p>}
+                {imageError && <p className="text-xs" style={{ color: colors.periodka }}>{imageError}</p>}
+                {form.cover_image && !uploadingImage && (
+                  <div className="flex items-center gap-2">
+                    <img src={form.cover_image} alt="" className="w-16 h-10 object-cover rounded-lg" />
+                    <p className="text-xs font-mono truncate flex-1" style={{ color: colors.strava }}>✓ Nahraté</p>
+                    <button type="button" onClick={() => setForm(f => ({ ...f, cover_image: undefined }))} className="text-xs" style={{ color: colors.periodka }}>Odstrániť</button>
+                  </div>
+                )}
+              </div>
             </div>
             <div className="col-span-2">
               <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Perex (krátky úvod)</label>
               <textarea value={form.excerpt || ''} onChange={e => setForm(f => ({ ...f, excerpt: e.target.value }))} rows={2} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none resize-none" style={{ color: colors.textPrimary }} />
             </div>
             <div className="col-span-2">
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Obsah (Markdown)</label>
-              <textarea value={form.content || ''} onChange={e => setForm(f => ({ ...f, content: e.target.value }))} rows={8} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none resize-y font-mono text-xs" style={{ color: colors.textPrimary }} />
+              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Obsah</label>
+              <BlogEditor
+                content={form.content || ''}
+                onChange={html => setForm(f => ({ ...f, content: html }))}
+              />
             </div>
-            <div className="flex items-center gap-2">
-              <button onClick={() => setForm(f => ({ ...f, published: !f.published }))} className="p-1">
-                {form.published ? <CheckSquare className="w-5 h-5" style={{ color: colors.strava }} /> : <Square className="w-5 h-5" style={{ color: colors.textSecondary }} />}
-              </button>
-              <span className="text-sm" style={{ color: colors.textPrimary }}>Publikovať ihneď</span>
+            <div>
+              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Stav</label>
+              <select value={form.status || 'draft'} onChange={e => setForm(f => ({ ...f, status: e.target.value as BlogPost['status'] }))} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }}>
+                <option value="draft">Draft</option>
+                <option value="published">Publikovaný</option>
+                <option value="archived">Archivovaný</option>
+              </select>
             </div>
           </div>
           <div className="flex justify-end gap-3 mt-4">
@@ -955,9 +993,11 @@ function BlogPostsTab() {
                     <td className="py-3 px-4 text-xs" style={{ color: colors.textSecondary }}>{post.author}</td>
                     <td className="py-3 px-4 text-xs" style={{ color: colors.textSecondary }}>{new Date(post.created_at).toLocaleDateString('sk-SK')}</td>
                     <td className="py-3 px-4">
-                      <button onClick={() => togglePublished(post)}>
-                        {post.published
+                      <button onClick={() => cycleStatus(post)} title="Klikni pre zmenu stavu">
+                        {post.status === 'published'
                           ? <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700">Publikovaný</span>
+                          : post.status === 'archived'
+                          ? <span className="text-xs px-2 py-0.5 rounded-full bg-orange-100 text-orange-600">Archivovaný</span>
                           : <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">Draft</span>
                         }
                       </button>
@@ -1481,7 +1521,8 @@ interface ExerciseRow {
   id: string; content_type: 'exercise' | 'stretch'; name: string;
   duration: string; category: string; body: string; equip: string;
   level: number | null; diastasis_safe: boolean; thumb: string;
-  description: string; video_url: string; active: boolean;
+  description: string; video_url: string;
+  status: 'draft' | 'published' | 'archived'; active: boolean;
 }
 
 function ExercisesTab() {
@@ -1492,7 +1533,10 @@ function ExercisesTab() {
   const [saving, setSaving] = useState(false);
   const [seeding, setSeeding] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [form, setForm] = useState<Partial<ExerciseRow>>({ content_type: 'exercise', duration: '15 min', active: true, diastasis_safe: true });
+  const [form, setForm] = useState<Partial<ExerciseRow>>({ content_type: 'exercise', duration: '15 min', status: 'draft', diastasis_safe: true });
+  const [uploadingThumb, setUploadingThumb] = useState(false);
+  const [thumbError, setThumbError] = useState<string | null>(null);
+  const thumbInputRef = useRef<HTMLInputElement>(null);
 
   const load = async () => {
     setLoading(true); setError(null);
@@ -1501,7 +1545,7 @@ function ExercisesTab() {
   };
   useEffect(() => { load(); }, []);
 
-  const openAdd = () => { setForm({ content_type: 'exercise', duration: '15 min', active: true, diastasis_safe: true }); setEditId(null); setShowForm(true); setError(null); };
+  const openAdd = () => { setForm({ content_type: 'exercise', duration: '15 min', status: 'draft', diastasis_safe: true }); setEditId(null); setShowForm(true); setError(null); };
   const openEdit = (r: ExerciseRow) => { setForm({ ...r }); setEditId(r.id); setShowForm(true); setError(null); };
   const closeForm = () => { setShowForm(false); setEditId(null); setError(null); };
 
@@ -1509,6 +1553,7 @@ function ExercisesTab() {
     if (!form.name) return;
     setSaving(true); setError(null);
     try {
+      const status = form.status ?? 'draft';
       const payload: ExerciseRow = {
         id: editId ?? `${form.content_type}-${Date.now()}`,
         content_type: form.content_type ?? 'exercise',
@@ -1522,7 +1567,8 @@ function ExercisesTab() {
         thumb: form.thumb ?? '',
         description: form.description ?? '',
         video_url: form.video_url ?? '',
-        active: form.active ?? true,
+        status,
+        active: status === 'published',
       };
       await adminUpsert('exercises', payload as unknown as Record<string, unknown>);
       await load(); closeForm();
@@ -1535,11 +1581,27 @@ function ExercisesTab() {
     try { await adminDelete('exercises', id); setItems(p => p.filter(r => r.id !== id)); } catch (e: any) { alert(e.message); }
   };
 
-  const toggleActive = async (r: ExerciseRow) => {
+  const cycleStatus = async (r: ExerciseRow) => {
+    const next: ExerciseRow['status'] = r.status === 'draft' ? 'published' : r.status === 'published' ? 'archived' : 'draft';
     try {
-      await adminUpsert('exercises', { ...r, active: !r.active } as unknown as Record<string, unknown>);
-      setItems(p => p.map(x => x.id === r.id ? { ...x, active: !r.active } : x));
+      await adminUpsert('exercises', { ...r, status: next, active: next === 'published' } as unknown as Record<string, unknown>);
+      setItems(p => p.map(x => x.id === r.id ? { ...x, status: next, active: next === 'published' } : x));
     } catch (e: any) { alert(e.message); }
+  };
+
+  const handleThumbUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingThumb(true); setThumbError(null);
+    try {
+      const result = await uploadContentImage(file, 'exercises');
+      setForm(f => ({ ...f, thumb: result.url }));
+    } catch (err: any) {
+      setThumbError(err.message ?? 'Nahrávanie zlyhalo');
+    } finally {
+      setUploadingThumb(false);
+      e.target.value = '';
+    }
   };
 
   const seedFromStatic = async () => {
@@ -1627,25 +1689,41 @@ function ExercisesTab() {
               </div>
             )}
             <div className="col-span-2">
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>URL náhľadového obrázka</label>
-              <input value={form.thumb ?? ''} onChange={e => setForm(f => ({ ...f, thumb: e.target.value }))} placeholder="https://..." className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }} />
+              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Náhľadový obrázok</label>
+              <div className="flex items-center gap-3">
+                {form.thumb && <img src={form.thumb} alt="" className="w-14 h-14 rounded-lg object-cover border border-white/30" />}
+                <button
+                  type="button"
+                  disabled={uploadingThumb}
+                  onMouseDown={e => { e.preventDefault(); thumbInputRef.current?.click(); }}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs border border-white/30 bg-white/20 hover:bg-white/30 transition-colors disabled:opacity-40"
+                  style={{ color: colors.textSecondary }}
+                >
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>
+                  {uploadingThumb ? 'Nahrávam…' : form.thumb ? 'Zmeniť' : 'Nahrať obrázok'}
+                </button>
+                {thumbError && <span className="text-xs text-red-500">{thumbError}</span>}
+              </div>
+              <input ref={thumbInputRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handleThumbUpload} />
             </div>
             <div className="col-span-2">
               <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Video URL</label>
-              <input value={form.video_url ?? ''} onChange={e => setForm(f => ({ ...f, video_url: e.target.value }))} placeholder="https://..." className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }} />
+              <input value={form.video_url ?? ''} onChange={e => setForm(f => ({ ...f, video_url: e.target.value }))} placeholder="Doplníš neskôr…" className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }} />
             </div>
             <div className="col-span-2">
               <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Popis</label>
               <textarea value={form.description ?? ''} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} rows={2} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none resize-none" style={{ color: colors.textPrimary }} />
             </div>
-            <div className="flex items-center gap-2">
-              <button onClick={() => setForm(f => ({ ...f, active: !f.active }))}>
-                {form.active ? <CheckSquare className="w-5 h-5" style={{ color: colors.strava }} /> : <Square className="w-5 h-5" style={{ color: colors.textSecondary }} />}
-              </button>
-              <span className="text-sm" style={{ color: colors.textPrimary }}>Aktívne</span>
+            <div>
+              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Stav</label>
+              <select value={form.status ?? 'draft'} onChange={e => setForm(f => ({ ...f, status: e.target.value as ExerciseRow['status'] }))} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }}>
+                <option value="draft">Draft</option>
+                <option value="published">Publikované</option>
+                <option value="archived">Archivované</option>
+              </select>
             </div>
             {form.content_type === 'exercise' && (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 pt-5">
                 <button onClick={() => setForm(f => ({ ...f, diastasis_safe: !f.diastasis_safe }))}>
                   {form.diastasis_safe ? <CheckSquare className="w-5 h-5" style={{ color: colors.strava }} /> : <Square className="w-5 h-5" style={{ color: colors.textSecondary }} />}
                 </button>
@@ -1683,7 +1761,17 @@ function ExercisesTab() {
                   </div>
                 </div>
                 <div className="flex items-center gap-1">
-                  <button onClick={() => toggleActive(r)}>{r.active ? <CheckSquare className="w-4 h-4" style={{ color: colors.strava }} /> : <Square className="w-4 h-4" style={{ color: colors.textSecondary }} />}</button>
+                  <button
+                    title="Kliknúť pre zmenu stavu"
+                    onClick={() => cycleStatus(r)}
+                    className="px-2 py-0.5 rounded-full text-xs font-medium"
+                    style={{
+                      backgroundColor: r.status === 'published' ? `${colors.strava}20` : r.status === 'archived' ? `${colors.textSecondary}15` : `${colors.accent}20`,
+                      color: r.status === 'published' ? colors.strava : r.status === 'archived' ? colors.textSecondary : colors.accent,
+                    }}
+                  >
+                    {r.status === 'published' ? 'live' : r.status === 'archived' ? 'arch' : 'draft'}
+                  </button>
                   <button onClick={() => openEdit(r)} className="p-1.5 rounded-lg hover:bg-white/20"><Edit3 className="w-3.5 h-3.5" style={{ color: colors.textSecondary }} /></button>
                   <button onClick={() => remove(r.id)} className="p-1.5 rounded-lg hover:bg-white/20"><Trash2 className="w-3.5 h-3.5" style={{ color: colors.periodka }} /></button>
                 </div>
@@ -1702,7 +1790,7 @@ function ExercisesTab() {
 interface MeditationRow {
   id: string; title: string; duration: string; description: string;
   audio_url: string; image: string; category: string;
-  featured: boolean; active: boolean;
+  featured: boolean; status: 'draft' | 'published' | 'archived'; active: boolean;
 }
 
 function MeditationsTab() {
@@ -1713,7 +1801,7 @@ function MeditationsTab() {
   const [saving, setSaving] = useState(false);
   const [seeding, setSeeding] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [form, setForm] = useState<Partial<MeditationRow>>({ duration: '5 min', category: 'Stres', active: true, featured: false });
+  const [form, setForm] = useState<Partial<MeditationRow>>({ duration: '5 min', category: 'Stres', status: 'draft', featured: false });
 
   const load = async () => {
     setLoading(true); setError(null);
@@ -1722,7 +1810,7 @@ function MeditationsTab() {
   };
   useEffect(() => { load(); }, []);
 
-  const openAdd = () => { setForm({ duration: '5 min', category: 'Stres', active: true, featured: false }); setEditId(null); setShowForm(true); setError(null); };
+  const openAdd = () => { setForm({ duration: '5 min', category: 'Stres', status: 'draft', featured: false }); setEditId(null); setShowForm(true); setError(null); };
   const openEdit = (r: MeditationRow) => { setForm({ ...r }); setEditId(r.id); setShowForm(true); setError(null); };
   const closeForm = () => { setShowForm(false); setEditId(null); setError(null); };
 
@@ -1730,6 +1818,7 @@ function MeditationsTab() {
     if (!form.title) return;
     setSaving(true); setError(null);
     try {
+      const status = form.status ?? 'draft';
       const payload: MeditationRow = {
         id: editId ?? `med-${Date.now()}`,
         title: form.title!,
@@ -1739,7 +1828,8 @@ function MeditationsTab() {
         image: form.image ?? '',
         category: form.category ?? 'Stres',
         featured: form.featured ?? false,
-        active: form.active ?? true,
+        status,
+        active: status === 'published',
       };
       await adminUpsert('meditations', payload as unknown as Record<string, unknown>);
       await load(); closeForm();
@@ -1752,10 +1842,11 @@ function MeditationsTab() {
     try { await adminDelete('meditations', id); setItems(p => p.filter(r => r.id !== id)); } catch (e: any) { alert(e.message); }
   };
 
-  const toggleActive = async (r: MeditationRow) => {
+  const cycleStatus = async (r: MeditationRow) => {
+    const next: MeditationRow['status'] = r.status === 'draft' ? 'published' : r.status === 'published' ? 'archived' : 'draft';
     try {
-      await adminUpsert('meditations', { ...r, active: !r.active } as unknown as Record<string, unknown>);
-      setItems(p => p.map(x => x.id === r.id ? { ...x, active: !r.active } : x));
+      await adminUpsert('meditations', { ...r, status: next, active: next === 'published' } as unknown as Record<string, unknown>);
+      setItems(p => p.map(x => x.id === r.id ? { ...x, status: next, active: next === 'published' } : x));
     } catch (e: any) { alert(e.message); }
   };
 
@@ -1765,23 +1856,23 @@ function MeditationsTab() {
       // Import inline meditations from MyselNew — they're hardcoded there
       // We provide the static seed here directly
       const staticMeds: MeditationRow[] = [
-        { id: 'med-1', category: 'Stres', title: 'Nájdenie vnútorného pokoja uprostred chaosu', duration: '5 min', description: 'Naučte sa nájsť pokojné miesto vo svojej mysli aj v najrušnejších dňoch', audio_url: '/audio/inner-peace-chaos.mp3', image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop', featured: false, active: true },
-        { id: 'med-2', category: 'Mindfulness', title: 'Učenie sa byť prítomná pri každodenných úlohách', duration: '5 min', description: 'Transformujte bežné činnosti na príležitosti pre mindfulness', audio_url: '/audio/present-daily-tasks.mp3', image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=300&fit=crop', featured: false, active: true },
-        { id: 'med-3', category: 'Materstvo', title: 'Objavovanie trpezlivosti vo výchovnom procese', duration: '5 min', description: 'Kultivujte trpezlivosť a porozumenie v náročných výchovných momentoch', audio_url: '/audio/patience-parenting.mp3', image: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=400&h=300&fit=crop', featured: false, active: true },
-        { id: 'med-4', category: 'Mindfulness', title: 'Nájdenie radosti v malých veciach', duration: '5 min', description: 'Objavte krásu v jednoduchých, každodenných momentoch', audio_url: '/audio/joy-small-things.mp3', image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop', featured: false, active: true },
-        { id: 'med-5', category: 'Emócie', title: 'Udržiavanie emocionálnej rovnováhy', duration: '5 min', description: 'Technika na stabilizovanie emócií a nájdenie vnútornej harmónie', audio_url: '/audio/emotional-balance.mp3', image: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=400&h=300&fit=crop', featured: false, active: true },
-        { id: 'med-6', category: 'Ja', title: 'Vytváranie času pre seba', duration: '5 min', description: 'Naučte sa prioritizovať svoju pohodu a vytvoriť priestor pre seba', audio_url: '/audio/time-for-self.mp3', image: 'https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=400&h=300&fit=crop', featured: false, active: true },
-        { id: 'med-7', category: 'Materstvo', title: 'Posilňovanie väzby s dieťaťom', duration: '5 min', description: 'Meditácia zameraná na prehĺbenie lásky a spojenia s vaším dieťaťom', audio_url: '/audio/bond-with-child.mp3', image: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=400&h=300&fit=crop', featured: false, active: true },
-        { id: 'med-8', category: 'Materstvo', title: 'Prijímanie nepredvídateľnosti materstva', duration: '5 min', description: 'Naučte sa flexibilne reagovať na neočakávané situácie v materstve', audio_url: '/audio/accept-unpredictability.mp3', image: 'https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=400&h=300&fit=crop', featured: false, active: true },
-        { id: 'med-9', category: 'Emócie', title: 'Naučiť sa odpúšťať sebe a iným', duration: '5 min', description: 'Oslobodenie sa od viny a rozhorčenia cez praktiku odpúštania', audio_url: '/audio/forgiveness-practice.mp3', image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=300&fit=crop', featured: false, active: true },
-        { id: 'med-10', category: 'Emócie', title: 'Rozvíjanie empatie a porozumenia', duration: '5 min', description: 'Prehĺbenie schopnosti porozumieť sebe aj ostatným s láskavosťou', audio_url: '/audio/empathy-understanding.mp3', image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop', featured: false, active: true },
-        { id: 'med-11', category: 'Stres', title: 'Prekonávanie stresu a úzkosti', duration: '5 min', description: 'Efektívne techniky na zvládanie stresu a upokojenie anxióznych myšlienok', audio_url: '/audio/overcome-stress-anxiety.mp3', image: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&h=300&fit=crop', featured: false, active: true },
-        { id: 'med-12', category: 'Ja', title: 'Budovanie sebadôvery a sebaúcty', duration: '5 min', description: 'Posilnenie vnútornej sily a pozitívneho vzťahu k sebe', audio_url: '/audio/self-confidence-esteem.mp3', image: 'https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?w=400&h=300&fit=crop', featured: false, active: true },
-        { id: 'med-13', category: 'Ja', title: 'Nájdenie rovnováhy medzi kariérou a osobným životom', duration: '5 min', description: 'Harmonizácia pracovných a osobných priorít s múdrosťou', audio_url: '/audio/work-life-balance.mp3', image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop', featured: false, active: true },
-        { id: 'med-14', category: 'Ja', title: 'Učenie sa hovoriť „nie" bez pocitu viny', duration: '5 min', description: 'Nastavenie zdravých hraníc a sebapéča bez pocitov viny', audio_url: '/audio/saying-no-guilt.mp3', image: 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=400&h=300&fit=crop', featured: false, active: true },
-        { id: 'med-15', category: 'Ja', title: 'Rozvíjanie kreativity a hľadanie inšpirácie', duration: '5 min', description: 'Prebudenie tvorivého ducha a otvorenie sa novým možnostiam', audio_url: '/audio/creativity-inspiration.mp3', image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=300&fit=crop', featured: false, active: true },
-        { id: 'med-16', category: 'Emócie', title: 'Zvládanie pocitu osamelosti a izolácie', duration: '5 min', description: 'Nájdenie spojenia a zmyslu aj v momentoch osamelosti', audio_url: '/audio/loneliness-isolation.mp3', image: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=400&h=300&fit=crop', featured: false, active: true },
-        { id: 'med-17', category: 'Mindfulness', title: 'Udržiavanie pozitívneho myslenia', duration: '5 min', description: 'Kultivovanie optimizmu a vďačnosti v každodennom živote', audio_url: '/audio/positive-thinking.mp3', image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop', featured: false, active: true },
+        { id: 'med-1', category: 'Stres', title: 'Nájdenie vnútorného pokoja uprostred chaosu', duration: '5 min', description: 'Naučte sa nájsť pokojné miesto vo svojej mysli aj v najrušnejších dňoch', audio_url: '/audio/inner-peace-chaos.mp3', image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop', featured: false, status: 'published', active: true },
+        { id: 'med-2', category: 'Mindfulness', title: 'Učenie sa byť prítomná pri každodenných úlohách', duration: '5 min', description: 'Transformujte bežné činnosti na príležitosti pre mindfulness', audio_url: '/audio/present-daily-tasks.mp3', image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=300&fit=crop', featured: false, status: 'published', active: true },
+        { id: 'med-3', category: 'Materstvo', title: 'Objavovanie trpezlivosti vo výchovnom procese', duration: '5 min', description: 'Kultivujte trpezlivosť a porozumenie v náročných výchovných momentoch', audio_url: '/audio/patience-parenting.mp3', image: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=400&h=300&fit=crop', featured: false, status: 'published', active: true },
+        { id: 'med-4', category: 'Mindfulness', title: 'Nájdenie radosti v malých veciach', duration: '5 min', description: 'Objavte krásu v jednoduchých, každodenných momentoch', audio_url: '/audio/joy-small-things.mp3', image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop', featured: false, status: 'published', active: true },
+        { id: 'med-5', category: 'Emócie', title: 'Udržiavanie emocionálnej rovnováhy', duration: '5 min', description: 'Technika na stabilizovanie emócií a nájdenie vnútornej harmónie', audio_url: '/audio/emotional-balance.mp3', image: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=400&h=300&fit=crop', featured: false, status: 'published', active: true },
+        { id: 'med-6', category: 'Ja', title: 'Vytváranie času pre seba', duration: '5 min', description: 'Naučte sa prioritizovať svoju pohodu a vytvoriť priestor pre seba', audio_url: '/audio/time-for-self.mp3', image: 'https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=400&h=300&fit=crop', featured: false, status: 'published', active: true },
+        { id: 'med-7', category: 'Materstvo', title: 'Posilňovanie väzby s dieťaťom', duration: '5 min', description: 'Meditácia zameraná na prehĺbenie lásky a spojenia s vaším dieťaťom', audio_url: '/audio/bond-with-child.mp3', image: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=400&h=300&fit=crop', featured: false, status: 'published', active: true },
+        { id: 'med-8', category: 'Materstvo', title: 'Prijímanie nepredvídateľnosti materstva', duration: '5 min', description: 'Naučte sa flexibilne reagovať na neočakávané situácie v materstve', audio_url: '/audio/accept-unpredictability.mp3', image: 'https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=400&h=300&fit=crop', featured: false, status: 'published', active: true },
+        { id: 'med-9', category: 'Emócie', title: 'Naučiť sa odpúšťať sebe a iným', duration: '5 min', description: 'Oslobodenie sa od viny a rozhorčenia cez praktiku odpúštania', audio_url: '/audio/forgiveness-practice.mp3', image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=300&fit=crop', featured: false, status: 'published', active: true },
+        { id: 'med-10', category: 'Emócie', title: 'Rozvíjanie empatie a porozumenia', duration: '5 min', description: 'Prehĺbenie schopnosti porozumieť sebe aj ostatným s láskavosťou', audio_url: '/audio/empathy-understanding.mp3', image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop', featured: false, status: 'published', active: true },
+        { id: 'med-11', category: 'Stres', title: 'Prekonávanie stresu a úzkosti', duration: '5 min', description: 'Efektívne techniky na zvládanie stresu a upokojenie anxióznych myšlienok', audio_url: '/audio/overcome-stress-anxiety.mp3', image: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&h=300&fit=crop', featured: false, status: 'published', active: true },
+        { id: 'med-12', category: 'Ja', title: 'Budovanie sebadôvery a sebaúcty', duration: '5 min', description: 'Posilnenie vnútornej sily a pozitívneho vzťahu k sebe', audio_url: '/audio/self-confidence-esteem.mp3', image: 'https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?w=400&h=300&fit=crop', featured: false, status: 'published', active: true },
+        { id: 'med-13', category: 'Ja', title: 'Nájdenie rovnováhy medzi kariérou a osobným životom', duration: '5 min', description: 'Harmonizácia pracovných a osobných priorít s múdrosťou', audio_url: '/audio/work-life-balance.mp3', image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop', featured: false, status: 'published', active: true },
+        { id: 'med-14', category: 'Ja', title: 'Učenie sa hovoriť „nie" bez pocitu viny', duration: '5 min', description: 'Nastavenie zdravých hraníc a sebapéča bez pocitov viny', audio_url: '/audio/saying-no-guilt.mp3', image: 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=400&h=300&fit=crop', featured: false, status: 'published', active: true },
+        { id: 'med-15', category: 'Ja', title: 'Rozvíjanie kreativity a hľadanie inšpirácie', duration: '5 min', description: 'Prebudenie tvorivého ducha a otvorenie sa novým možnostiam', audio_url: '/audio/creativity-inspiration.mp3', image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=300&fit=crop', featured: false, status: 'published', active: true },
+        { id: 'med-16', category: 'Emócie', title: 'Zvládanie pocitu osamelosti a izolácie', duration: '5 min', description: 'Nájdenie spojenia a zmyslu aj v momentoch osamelosti', audio_url: '/audio/loneliness-isolation.mp3', image: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=400&h=300&fit=crop', featured: false, status: 'published', active: true },
+        { id: 'med-17', category: 'Mindfulness', title: 'Udržiavanie pozitívneho myslenia', duration: '5 min', description: 'Kultivovanie optimizmu a vďačnosti v každodennom živote', audio_url: '/audio/positive-thinking.mp3', image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop', featured: false, status: 'published', active: true },
       ];
       const count = await adminSeed('meditations', staticMeds as unknown as Record<string, unknown>[]);
       alert(`✅ Importovaných ${count} meditácií`);
@@ -1848,13 +1939,15 @@ function MeditationsTab() {
               <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>URL obrázka</label>
               <input value={form.image ?? ''} onChange={e => setForm(f => ({ ...f, image: e.target.value }))} placeholder="https://..." className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }} />
             </div>
-            <div className="flex items-center gap-2">
-              <button onClick={() => setForm(f => ({ ...f, active: !f.active }))}>
-                {form.active ? <CheckSquare className="w-5 h-5" style={{ color: colors.strava }} /> : <Square className="w-5 h-5" style={{ color: colors.textSecondary }} />}
-              </button>
-              <span className="text-sm" style={{ color: colors.textPrimary }}>Aktívna</span>
+            <div>
+              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Stav</label>
+              <select value={form.status ?? 'draft'} onChange={e => setForm(f => ({ ...f, status: e.target.value as MeditationRow['status'] }))} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }}>
+                <option value="draft">Draft</option>
+                <option value="published">Publikovaná</option>
+                <option value="archived">Archivovaná</option>
+              </select>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 pt-5">
               <button onClick={() => setForm(f => ({ ...f, featured: !f.featured }))}>
                 {form.featured ? <CheckSquare className="w-5 h-5" style={{ color: colors.accent }} /> : <Square className="w-5 h-5" style={{ color: colors.textSecondary }} />}
               </button>
@@ -1884,12 +1977,22 @@ function MeditationsTab() {
                     <div className="text-xs flex gap-2" style={{ color: colors.textSecondary }}>
                       <span className="px-1.5 py-0.5 rounded-full" style={{ backgroundColor: `${colors.mysel}20`, color: colors.mysel }}>{r.category}</span>
                       <span>{r.duration}</span>
-                      {r.featured && <span className="px-1.5 py-0.5 rounded-full" style={{ backgroundColor: `${colors.accent}20`, color: colors.accent }}>⭐ Featured</span>}
+                      {r.featured && <span className="px-1.5 py-0.5 rounded-full" style={{ backgroundColor: `${colors.accent}20`, color: colors.accent }}>Featured</span>}
                     </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-1">
-                  <button onClick={() => toggleActive(r)}>{r.active ? <CheckSquare className="w-4 h-4" style={{ color: colors.strava }} /> : <Square className="w-4 h-4" style={{ color: colors.textSecondary }} />}</button>
+                  <button
+                    title="Kliknúť pre zmenu stavu"
+                    onClick={() => cycleStatus(r)}
+                    className="px-2 py-0.5 rounded-full text-xs font-medium"
+                    style={{
+                      backgroundColor: r.status === 'published' ? `${colors.strava}20` : r.status === 'archived' ? `${colors.textSecondary}15` : `${colors.accent}20`,
+                      color: r.status === 'published' ? colors.strava : r.status === 'archived' ? colors.textSecondary : colors.accent,
+                    }}
+                  >
+                    {r.status === 'published' ? 'live' : r.status === 'archived' ? 'arch' : 'draft'}
+                  </button>
                   <button onClick={() => openEdit(r)} className="p-1.5 rounded-lg hover:bg-white/20"><Edit3 className="w-3.5 h-3.5" style={{ color: colors.textSecondary }} /></button>
                   <button onClick={() => remove(r.id)} className="p-1.5 rounded-lg hover:bg-white/20"><Trash2 className="w-3.5 h-3.5" style={{ color: colors.periodka }} /></button>
                 </div>

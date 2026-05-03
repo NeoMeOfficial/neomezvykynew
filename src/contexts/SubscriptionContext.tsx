@@ -106,6 +106,44 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   // Demo mode: no Stripe key → everything unlocked
   const demoMode = !isStripeConfigured();
 
+  // Dev-only tier override (set via Admin → Premium Access panel).
+  // Stored in localStorage as `dev_tier_override_${userId}` = 'plus' | 'free'.
+  // Highest-priority signal: overrides demoMode AND any real subscription.
+  // Only honoured in dev builds (import.meta.env.DEV) so it can never leak to prod.
+  const [devOverride, setDevOverride] = useState<Tier | null>(() => {
+    if (!import.meta.env.DEV) return null;
+    try {
+      const userId = getUserId();
+      if (!userId) return null;
+      const stored = localStorage.getItem(`dev_tier_override_${userId}`);
+      if (stored === 'premium' || stored === 'free') return stored;
+      return null;
+    } catch {
+      return null;
+    }
+  });
+
+  // Listen for cross-tab/admin-panel updates so the toggle reflects immediately.
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    const sync = () => {
+      try {
+        const userId = getUserId();
+        if (!userId) return setDevOverride(null);
+        const stored = localStorage.getItem(`dev_tier_override_${userId}`);
+        setDevOverride(stored === 'premium' || stored === 'free' ? stored : null);
+      } catch {
+        setDevOverride(null);
+      }
+    };
+    window.addEventListener('storage', sync);
+    window.addEventListener('neome:dev-tier-override', sync);
+    return () => {
+      window.removeEventListener('storage', sync);
+      window.removeEventListener('neome:dev-tier-override', sync);
+    };
+  }, []);
+
   // ------ Load subscription on mount (production only) ------
   useEffect(() => {
     if (demoMode) return;
@@ -136,8 +174,14 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   };
 
   // ------ Derived state ------
-  const isPremium = demoMode || isSubscriptionActive(subscription);
-  const isTrialing = !demoMode && isTrialActive(subscription);
+  // Dev override takes top priority (only when import.meta.env.DEV is true).
+  const overrideForcesPremium = devOverride === 'premium';
+  const overrideForcesFree    = devOverride === 'free';
+
+  const isPremium =
+    overrideForcesPremium ||
+    (!overrideForcesFree && (demoMode || isSubscriptionActive(subscription)));
+  const isTrialing = !demoMode && !devOverride && isTrialActive(subscription);
   const daysLeft = demoMode ? 999 : getDaysUntilExpiration(subscription);
   const tier: Tier = isPremium ? 'premium' : 'free';
 

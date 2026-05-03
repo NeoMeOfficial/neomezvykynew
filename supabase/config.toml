@@ -1,4 +1,4 @@
-project_id = "xqihoxgwxgiwwbybztbp"
+project_id = "lczfxbghlsqkieatxouy"
 
 [functions.validate-access-code]
 verify_jwt = false
@@ -11,3 +11,9 @@ verify_jwt = false
 
 [functions.approve-cycle-tips]
 verify_jwt = false
+
+# set-admin-role MUST verify the caller's JWT — the function reads
+# the JWT to identify which user is logging in and only sets the role
+# if their email is in the bootstrap allow-list (server-side).
+[functions.set-admin-role]
+verify_jwt = true
