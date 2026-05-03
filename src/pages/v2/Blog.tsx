@@ -1,22 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Page, BackHeader, Eye, Ser, Body, NM } from '../../components/v2/neome';
-
-/**
- * Blog — R7 list (variant A: editorial magazine)
- *
- * Available to all users (Free + Plus). Featured article + category
- * chips + latest section. Article detail is handled by an existing
- * route (no canonical detail screen ported yet — that's a follow-up).
- *
- * F-025 status: public.blog_posts schema (migration 20260416) and the
- * useBlogPosts() hook are in place. This list still renders from the
- * static ARTICLES constant below; cut over to `const { posts } =
- * useBlogPosts()` once Gabi has authored real entries via Supabase
- * Studio. The hook ships fallback rows so cutover is one-line.
- *
- * Old version: Blog.old.tsx.
- */
+import { useBlogPosts } from '../../hooks/useBlog';
 
 const CAT_COLOR: Record<string, string> = {
   Telo: NM.TERRA,
@@ -24,36 +9,61 @@ const CAT_COLOR: Record<string, string> = {
   Myseľ: NM.MAUVE,
   Cyklus: NM.DUSTY,
   Postpartum: NM.SAGE,
+  Všeobecné: NM.MUTED ?? '#A0907E',
 };
 
-interface Article {
-  id: number;
-  cat: keyof typeof CAT_COLOR;
-  title: string;
-  excerpt: string;
-  author: string;
-  read: string;
-  date: string;
-  img: string;
+const DB_CAT_TO_DISPLAY: Record<string, string> = {
+  general: 'Všeobecné',
+  vyziva: 'Strava',
+  pohyb: 'Telo',
+  mysel: 'Myseľ',
+  cyklus: 'Cyklus',
+  materstvo: 'Postpartum',
+};
+
+function readTime(content: string | null): string {
+  if (!content) return '3 min';
+  const words = content.trim().split(/\s+/).length;
+  return `${Math.max(1, Math.ceil(words / 200))} min`;
 }
 
-const ARTICLES: Article[] = [
-  { id: 1, cat: 'Postpartum', title: 'Prvých 40 dní po pôrode — čo potrebuje tvoje telo', excerpt: 'Stručný sprievodca jemným návratom k pohybu, spánku a blízkosti.', author: 'Dr. Veronika Horváth', read: '6 min', date: '2. jún', img: 'blog-postpartum-recovery.jpg' },
-  { id: 2, cat: 'Cyklus', title: 'Ako plánovať tréning podľa fáz cyklu', excerpt: 'Folikulárna, ovulačná, luteálna, menštruačná — každá má svoj rytmus.', author: 'Andrea Vrábelová', read: '8 min', date: '28. máj', img: 'blog-cycle-training.jpg' },
-  { id: 3, cat: 'Strava', title: 'Železo po pôrode: 7 jedál, ktoré vrátia energiu', excerpt: 'Nie suplement. Skutočné jedlo, ktoré si dáš bez nervov aj s bábätkom na rukách.', author: 'Mária Kučerová', read: '5 min', date: '24. máj', img: 'blog-iron-rich-foods.jpg' },
-  { id: 4, cat: 'Myseľ', title: 'Keď sa vráti úzkosť — tri jemné kroky', excerpt: 'Čo pomáha, keď ráno otvoríš oči a hruď sa ti zviera.', author: 'Jana Bartošová', read: '4 min', date: '21. máj', img: 'blog-morning-anxiety.jpg' },
-  { id: 5, cat: 'Telo', title: 'Diastáza: ako ju rozpoznať a prvé bezpečné cviky', excerpt: 'Bez strachu. Bez hanby. S telom, ktoré sa lieči.', author: 'Dr. Veronika Horváth', read: '7 min', date: '18. máj', img: 'blog-diastasis.jpg' },
-  { id: 6, cat: 'Strava', title: 'Čo jesť v luteálnej fáze, aby si nemala chute', excerpt: 'Magnézium, B6 a pár jednoduchých receptov.', author: 'Mária Kučerová', read: '5 min', date: '14. máj', img: 'blog-luteal-nutrition.jpg' },
-];
+function formatDate(iso: string | null): string {
+  if (!iso) return '';
+  return new Date(iso).toLocaleDateString('sk-SK', { day: 'numeric', month: 'long' });
+}
 
 const CATS = ['Všetko', 'Telo', 'Strava', 'Myseľ', 'Cyklus', 'Postpartum'] as const;
 
 export default function Blog() {
   const navigate = useNavigate();
   const [cat, setCat] = useState<string>('Všetko');
-  const visible = cat === 'Všetko' ? ARTICLES : ARTICLES.filter((a) => a.cat === cat);
+  const { posts, loading } = useBlogPosts();
+
+  const mapped = posts.map(p => ({
+    slug: p.slug,
+    cat: DB_CAT_TO_DISPLAY[p.category] ?? 'Všeobecné',
+    title: p.title,
+    excerpt: p.excerpt ?? '',
+    author: p.author,
+    read: readTime(p.content),
+    date: formatDate(p.published_at),
+    img: p.cover_image ?? null,
+  }));
+
+  const visible = cat === 'Všetko' ? mapped : mapped.filter(a => a.cat === cat);
   const feat = visible[0];
   const rest = visible.slice(1);
+
+  if (loading) {
+    return (
+      <Page>
+        <BackHeader title="Knižnica" />
+        <div style={{ padding: '40px 22px', textAlign: 'center', fontFamily: NM.SANS, fontSize: 13, color: NM.EYEBROW }}>
+          Načítavam…
+        </div>
+      </Page>
+    );
+  }
 
   return (
     <Page>
@@ -97,10 +107,16 @@ export default function Blog() {
         <div style={{ paddingRight: 14 }} />
       </div>
 
+      {visible.length === 0 && (
+        <div style={{ padding: '40px 22px', textAlign: 'center', fontFamily: NM.SANS, fontSize: 13, color: NM.EYEBROW }}>
+          Žiadne príspevky v tejto kategórii.
+        </div>
+      )}
+
       {feat && (
         <div style={{ margin: '20px 22px 0' }}>
           <button
-            onClick={() => navigate(`/blog/${feat.id}`)}
+            onClick={() => navigate(`/blog/${feat.slug}`)}
             style={{
               all: 'unset',
               cursor: 'pointer',
@@ -116,7 +132,8 @@ export default function Blog() {
             <div
               style={{
                 aspectRatio: '5/3',
-                backgroundImage: `url(/images/r9/${feat.img})`,
+                backgroundImage: feat.img ? `url(${feat.img})` : undefined,
+                backgroundColor: feat.img ? undefined : NM.CREAM_2 ?? '#F1ECE3',
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
               }}
@@ -127,8 +144,8 @@ export default function Blog() {
                   style={{
                     padding: '3px 10px',
                     borderRadius: 999,
-                    background: `${CAT_COLOR[feat.cat]}18`,
-                    color: CAT_COLOR[feat.cat],
+                    background: `${CAT_COLOR[feat.cat] ?? NM.MUTED}18`,
+                    color: CAT_COLOR[feat.cat] ?? NM.MUTED,
                     fontFamily: NM.SANS,
                     fontSize: 10,
                     letterSpacing: '0.16em',
@@ -146,54 +163,61 @@ export default function Blog() {
                 <span>{feat.author}</span>
                 <span style={{ width: 3, height: 3, borderRadius: 999, background: NM.HAIR_2 }} />
                 <span>{feat.read}</span>
-                <span style={{ width: 3, height: 3, borderRadius: 999, background: NM.HAIR_2 }} />
-                <span>{feat.date}</span>
+                {feat.date && (
+                  <>
+                    <span style={{ width: 3, height: 3, borderRadius: 999, background: NM.HAIR_2 }} />
+                    <span>{feat.date}</span>
+                  </>
+                )}
               </div>
             </div>
           </button>
         </div>
       )}
 
-      <div style={{ margin: '28px 22px 0' }}>
-        <Eye size={10} style={{ marginBottom: 12 }}>Najnovšie</Eye>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          {rest.map((a) => (
-            <button
-              key={a.id}
-              onClick={() => navigate(`/blog/${a.id}`)}
-              style={{
-                all: 'unset',
-                cursor: 'pointer',
-                display: 'flex',
-                gap: 12,
-                width: '100%',
-                textAlign: 'left',
-              }}
-            >
-              <div
+      {rest.length > 0 && (
+        <div style={{ margin: '28px 22px 0' }}>
+          <Eye size={10} style={{ marginBottom: 12 }}>Najnovšie</Eye>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {rest.map((a) => (
+              <button
+                key={a.slug}
+                onClick={() => navigate(`/blog/${a.slug}`)}
                 style={{
-                  width: 96,
-                  height: 96,
-                  borderRadius: 14,
-                  flexShrink: 0,
-                  backgroundImage: `url(/images/r9/${a.img})`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
+                  all: 'unset',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  gap: 12,
+                  width: '100%',
+                  textAlign: 'left',
                 }}
-              />
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ marginBottom: 4 }}>
-                  <span style={{ fontFamily: NM.SANS, fontSize: 9.5, letterSpacing: '0.18em', textTransform: 'uppercase', color: CAT_COLOR[a.cat], fontWeight: 500 }}>{a.cat}</span>
+              >
+                <div
+                  style={{
+                    width: 96,
+                    height: 96,
+                    borderRadius: 14,
+                    flexShrink: 0,
+                    backgroundImage: a.img ? `url(${a.img})` : undefined,
+                    backgroundColor: a.img ? undefined : NM.CREAM_2 ?? '#F1ECE3',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                  }}
+                />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ marginBottom: 4 }}>
+                    <span style={{ fontFamily: NM.SANS, fontSize: 9.5, letterSpacing: '0.18em', textTransform: 'uppercase', color: CAT_COLOR[a.cat] ?? NM.MUTED, fontWeight: 500 }}>{a.cat}</span>
+                  </div>
+                  <div style={{ fontFamily: NM.SERIF, fontSize: 15, fontWeight: 500, color: NM.DEEP, letterSpacing: '-0.005em', lineHeight: 1.25 }}>{a.title}</div>
+                  <div style={{ marginTop: 6, fontFamily: NM.SANS, fontSize: 10.5, color: NM.EYEBROW, fontWeight: 400 }}>
+                    {a.read}{a.date ? ` · ${a.date}` : ''}
+                  </div>
                 </div>
-                <div style={{ fontFamily: NM.SERIF, fontSize: 15, fontWeight: 500, color: NM.DEEP, letterSpacing: '-0.005em', lineHeight: 1.25 }}>{a.title}</div>
-                <div style={{ marginTop: 6, fontFamily: NM.SANS, fontSize: 10.5, color: NM.EYEBROW, fontWeight: 400 }}>
-                  {a.read} · {a.date}
-                </div>
-              </div>
-            </button>
-          ))}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </Page>
   );
 }

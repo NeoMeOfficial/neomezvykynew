@@ -2,38 +2,50 @@ import { useNavigate } from 'react-router-dom';
 import { useSubscription } from '../../contexts/SubscriptionContext';
 import { useUserProgram } from '../../hooks/useUserProgram';
 import { Page, BackHeader, Eye, Ser, Body, PlusTag, NM } from '../../components/v2/neome';
+import { programList, type Program } from '../../data/programs';
 
 /**
  * Telo · Programy — R9 list
  *
- * Big editorial program cards. The user's active program (from
+ * Big editorial program cards. Source of truth is `src/data/programs.ts`
+ * (Gabi's authored content). The user's active program (from
  * useUserProgram) gets a "Prebieha · deň N" badge and progress bar
  * derived from week×7 + day; the rest show their Plus chip for Free
  * users (or no chip when Plus and inactive).
- *
- * FEATURE-NEEDED-TELO-PROGRAMS-CATALOG: programs are currently a static
- * list — the live app's `programs` table should drive this so curation
- * + ordering is admin-managed.
  */
+const LEVEL_LABEL: Record<Program['level'], string> = {
+  1: 'Jemné',
+  2: 'Stredné',
+  3: 'Pokročilé',
+  4: 'Náročné',
+};
+
+const HERO_IMAGES: Record<string, string> = {
+  postpartum:     '/images/r9/program-postpartum.jpg',
+  bodyforming:    '/images/r9/program-body-forming.jpg',
+  'elastic-bands':'/images/r9/program-elastic-bands.jpg',
+  'strong-sexy':  '/images/r9/program-strong-sexy.jpg',
+};
+
 export default function TeloPrograms() {
   const navigate = useNavigate();
   const { isPremium } = useSubscription();
   const { userProgram } = useUserProgram();
 
-  const programs = [
-    { slug: 'postpartum', name: 'Postpartum návrat', weeks: 4, level: 'Jemné', desc: 'Jemné cvičenia pre návrat k panvovému dnu a bruchu.', img: 'program-postpartum.jpg' },
-    { slug: 'body-forming', name: 'BodyForming', weeks: 6, level: 'Stredné', desc: 'Tonizácia celého tela s dôrazom na držanie.', img: 'program-body-forming.jpg' },
-    { slug: 'hormonal', name: 'Hormonálna joga', weeks: 4, level: 'Jemné', desc: 'Joga podporujúca hormonálnu rovnováhu a cyklus.', img: 'program-hormonal.jpg' },
-    { slug: 'mindful', name: 'Mindful pohyb', weeks: 3, level: 'Jemné', desc: 'Vnímavý pohyb s dychom pre pokojnú hlavu.', img: 'program-mindful.jpg' },
-  ];
-
-  // useUserProgram returns a single active program (id like 'bodyforming-1');
-  // match it against our list by best-effort name compare.
+  // useUserProgram returns a single active program — match it against our
+  // canonical list by best-effort name compare (lowercased substring).
   const activeSlug = userProgram
-    ? programs.find((p) => p.name.toLowerCase().includes(userProgram.name.toLowerCase()))?.slug
+    ? programList.find((p) => p.name.toLowerCase().includes(userProgram.name.toLowerCase()))?.slug
     : null;
-  const activeDayLabel = userProgram ? `Prebieha · deň ${(userProgram.week - 1) * 7 + userProgram.day}` : null;
-  const activeProgress = userProgram ? Math.min(100, Math.round((((userProgram.week - 1) * 7 + userProgram.day) / (userProgram.totalWeeks * 7)) * 100)) : 0;
+  const activeDayLabel = userProgram
+    ? `Prebieha · deň ${(userProgram.week - 1) * 7 + userProgram.day}`
+    : null;
+  const activeProgress = userProgram
+    ? Math.min(
+        100,
+        Math.round((((userProgram.week - 1) * 7 + userProgram.day) / (userProgram.totalWeeks * 7)) * 100)
+      )
+    : 0;
 
   return (
     <Page>
@@ -43,23 +55,32 @@ export default function TeloPrograms() {
           Tvoja <em style={{ color: NM.TERRA, fontWeight: 500, fontStyle: 'italic' }}>cesta</em>.
         </Ser>
         <Body style={{ marginTop: 10, maxWidth: 320 }}>
-          Niekoľkotýždenné programy s jasným rytmom. Začínajú v pondelok — tvoj kalendár sa prispôsobí.
+          Niekoľkotýždňové programy s jasným rytmom. Začínajú v pondelok — tvoj kalendár sa prispôsobí.
         </Body>
       </div>
 
-      {isPremium && (
+      {isPremium && activeSlug && (
         <div style={{ margin: '22px 20px 0' }}>
           <Eye size={10} color={NM.TERRA}>Aktívny program</Eye>
         </div>
       )}
 
       <div style={{ margin: '14px 20px 0', display: 'flex', flexDirection: 'column', gap: 14 }}>
-        {programs.map((p) => {
+        {programList.map((p) => {
           const active = isPremium && activeSlug === p.slug;
+          const heroImg = HERO_IMAGES[p.slug] ?? '/images/r9/program-postpartum.jpg';
           return (
             <div
               key={p.slug}
               onClick={() => navigate(`/program/${p.slug}`)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  navigate(`/program/${p.slug}`);
+                }
+              }}
               style={{
                 borderRadius: 22,
                 overflow: 'hidden',
@@ -99,19 +120,24 @@ export default function TeloPrograms() {
               <div
                 style={{
                   height: 180,
-                  backgroundImage: `url(/images/r9/${p.img})`,
+                  backgroundImage: `url(${heroImg})`,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
+                  backgroundColor: NM.CREAM_2,
                 }}
               />
               <div style={{ padding: '18px 20px 20px' }}>
-                <div style={{ display: 'flex', gap: 10, marginBottom: 8 }}>
-                  <div style={{ fontFamily: NM.SANS, fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: NM.TERRA, fontWeight: 600 }}>{p.weeks} týždňov</div>
+                <div style={{ display: 'flex', gap: 10, alignItems: 'baseline', marginBottom: 8 }}>
+                  <div style={{ fontFamily: NM.SANS, fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: NM.TERRA, fontWeight: 600 }}>
+                    {p.weeks} týždňov
+                  </div>
                   <span style={{ color: NM.TERTIARY, fontSize: 10 }}>·</span>
-                  <div style={{ fontFamily: NM.SANS, fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: NM.EYEBROW, fontWeight: 500 }}>{p.level}</div>
+                  <div style={{ fontFamily: NM.SANS, fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: NM.EYEBROW, fontWeight: 500 }}>
+                    Level {p.level} · {LEVEL_LABEL[p.level]}
+                  </div>
                 </div>
                 <Ser size={22} style={{ marginBottom: 8 }}>{p.name}</Ser>
-                <Body size={12.5}>{p.desc}</Body>
+                <Body size={12.5}>{p.description}</Body>
                 {active && (
                   <div style={{ marginTop: 14, height: 4, borderRadius: 999, background: NM.HAIR, overflow: 'hidden' }}>
                     <div style={{ height: '100%', width: `${activeProgress}%`, background: NM.TERRA }} />

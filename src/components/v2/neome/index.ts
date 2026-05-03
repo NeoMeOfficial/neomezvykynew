@@ -17,3 +17,8 @@ export { PillarTile } from './PillarTile';
 export { PaywallCard } from './PaywallCard';
 export { Card } from './Card';
 export { Page } from './Page';
+export { FaqAccordion } from './FaqAccordion';
+export type { FaqItem, FaqAccordionProps } from './FaqAccordion';
+export { AdminTierToggle } from './AdminTierToggle';
+export { ConfirmSheet } from './ConfirmSheet';
+export type { ConfirmSheetProps } from './ConfirmSheet';

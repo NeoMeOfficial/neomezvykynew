@@ -42,6 +42,33 @@
   }
 }
 
+/* ── Blog editor (Tiptap ProseMirror) ─────────────────────────────────────── */
+.blog-editor-prose .ProseMirror { outline: none; }
+.blog-editor-prose .ProseMirror > * + * { margin-top: 0.75rem; }
+.blog-editor-prose .ProseMirror p { font-family: 'DM Sans', sans-serif; font-size: 0.875rem; color: #3D2921; line-height: 1.75; font-weight: 300; }
+.blog-editor-prose .ProseMirror h2 { font-family: 'Bodoni Moda', serif; font-size: 1.15rem; font-weight: 500; color: #3D2921; letter-spacing: -0.005em; margin-top: 1.5rem; }
+.blog-editor-prose .ProseMirror h3 { font-family: 'Bodoni Moda', serif; font-size: 1rem; font-weight: 500; color: #3D2921; margin-top: 1.25rem; }
+.blog-editor-prose .ProseMirror strong { font-weight: 600; }
+.blog-editor-prose .ProseMirror em { font-style: italic; }
+.blog-editor-prose .ProseMirror blockquote { border-left: 3px solid #B8864A; margin: 1rem 0; padding: 0.75rem 1rem; background: rgba(241,236,227,0.6); border-radius: 0 10px 10px 0; font-family: 'Bodoni Moda', serif; font-style: italic; font-size: 1rem; color: #3D2921; }
+.blog-editor-prose .ProseMirror blockquote p { font-family: 'Bodoni Moda', serif; font-style: italic; font-size: 1rem; margin: 0; font-weight: 400; }
+.blog-editor-prose .ProseMirror hr { border: none; border-top: 1px solid rgba(184,164,148,0.4); margin: 1.5rem 0; }
+.blog-editor-prose .ProseMirror img { max-width: 100%; border-radius: 12px; margin: 1rem 0; display: block; }
+.blog-editor-prose .ProseMirror p.is-editor-empty:first-child::before { color: #A0907E; content: attr(data-placeholder); float: left; height: 0; pointer-events: none; font-family: 'DM Sans', sans-serif; font-size: 0.875rem; font-weight: 300; }
+
+/* ── Blog article HTML rendering ──────────────────────────────────────────── */
+.blog-prose > * + * { margin-top: 1rem; }
+.blog-prose p { font-family: 'DM Sans', sans-serif; font-size: 14px; color: #3D2921; line-height: 1.75; font-weight: 300; letter-spacing: 0.005em; }
+.blog-prose h2 { font-family: 'Bodoni Moda', serif; font-size: 18px; font-weight: 500; color: #3D2921; letter-spacing: -0.005em; margin-top: 1.75rem; }
+.blog-prose h3 { font-family: 'Bodoni Moda', serif; font-size: 15px; font-weight: 500; color: #3D2921; margin-top: 1.25rem; }
+.blog-prose strong { font-weight: 600; }
+.blog-prose em { font-style: italic; }
+.blog-prose blockquote { border-left: 3px solid #B8864A; margin: 1.25rem 0; padding: 1rem 1.25rem; background: #F1ECE3; border-radius: 0 14px 14px 0; }
+.blog-prose blockquote p { font-family: 'Bodoni Moda', serif; font-style: italic; font-size: 17px; line-height: 1.5; font-weight: 400; letter-spacing: -0.005em; margin: 0; }
+.blog-prose hr { border: none; border-top: 1px solid rgba(184,164,148,0.35); margin: 1.75rem 0; }
+.blog-prose img { max-width: 100%; border-radius: 14px; margin: 1.25rem 0; display: block; }
+.blog-prose p:first-of-type::first-letter { font-family: 'Bodoni Moda', serif; font-size: 3rem; font-weight: 500; color: #6B4C3B; float: left; line-height: 0.85; margin-right: 8px; margin-top: 6px; letter-spacing: -0.04em; }
+
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
 All colors MUST be HSL.
 */

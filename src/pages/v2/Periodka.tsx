@@ -1,9 +1,9 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSubscription } from '../../contexts/SubscriptionContext';
 import { useCycleData } from '../../features/cycle/useCycleData';
-import { usePhaseAdvice } from '../../hooks/useDailyContent';
 import { useCycleSymptoms } from '../../hooks/useDailyRituals';
-import { Page, Eye, Ser, Body, PlusTag, NM } from '../../components/v2/neome';
+import { Page, Eye, Ser, Body, PlusTag, ConfirmSheet, NM } from '../../components/v2/neome';
+import { getCycleTipByDay } from '../../data/cycleTips';
 import type { DerivedState, CycleData } from '../../features/cycle/types';
 
 /**
@@ -17,7 +17,8 @@ import type { DerivedState, CycleData } from '../../features/cycle/types';
  * - useCycleData → cycleData + derivedState (currentDay, phase,
  *   phaseRanges, today). Plus state shows real day + phase + calendar
  *   centered on today's month.
- * - isPremium gates Plus/Free view (?free=1 forces Free)
+ * - hasCycleSetup gates dashboard/setup view (?free=1 forces setup view).
+ *   Period tracking is open to all users — no paywall on this surface.
  *
  * Behavior rule (BC-4): for free users we don't persist preview
  * interactions ("Náhľad bez ukladania"). Visuals only here; the
@@ -153,12 +154,13 @@ interface PaidViewProps {
   navigate: (p: string) => void;
   cycleData: CycleData;
   derivedState: DerivedState | null;
+  onMarkPeriodStart: () => void;
 }
 
 const SK_MONTHS_FULL = ['január', 'február', 'marec', 'apríl', 'máj', 'jún', 'júl', 'august', 'september', 'október', 'november', 'december'];
 const SK_MONTHS_SHORT_LOWER = ['jan', 'feb', 'mar', 'apr', 'máj', 'jún', 'júl', 'aug', 'sep', 'okt', 'nov', 'dec'];
 
-function PaidView({ navigate, cycleData, derivedState }: PaidViewProps) {
+function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart }: PaidViewProps) {
   const totalDays = cycleData.cycleLength ?? 28;
   const periodLength = cycleData.periodLength ?? 5;
   const currentDay = derivedState?.currentDay ?? 1;
@@ -252,24 +254,39 @@ function PaidView({ navigate, cycleData, derivedState }: PaidViewProps) {
   ];
   const symptoms = SYMPTOM_DEFS.map((s) => ({ l: s.l, k: s.k, on: !!todayMap[s.k] }));
 
-  // F-011: phase-tailored advice from public.phase_advice (12 seed rows,
-  // 3 per phase). Falls back to the hook's hardcoded folikulárna trio
-  // pre-migration so the section never blanks.
-  const PILLAR_META: Record<string, { label: string; color: string; img: string; path: string }> = {
-    strava: { label: 'Strava', color: NM.SAGE,  img: 'testimonial-recipe.jpg',     path: '/kniznica/strava' },
-    telo:   { label: 'Pohyb',  color: NM.TERRA, img: 'lifestyle-core-workout.jpg', path: '/kniznica/telo' },
-    mysel:  { label: 'Myseľ',  color: NM.MAUVE, img: 'section-mind.jpg',           path: '/kniznica/mysel' },
+  // Phase-tailored daily advice — rotates through Gabi's 105-tip library
+  // (5 phases × 3 categories × 7 tips/phase) by day-in-phase. Source:
+  // src/data/cycleTips.ts. Categories map: pohyb=Body, strava=Nutrition,
+  // mysel=Mindset.
+  const PILLAR_META: Record<'telo' | 'strava' | 'mysel', { category: 'pohyb' | 'strava' | 'mysel'; label: string; title: string; color: string; img: string; path: string }> = {
+    telo:   { category: 'pohyb',  label: 'Pohyb',  title: 'Tvoj pohyb dnes',  color: NM.TERRA, img: 'lifestyle-core-workout.jpg', path: '/kniznica/telo' },
+    strava: { category: 'strava', label: 'Strava', title: 'Tvoja strava dnes', color: NM.SAGE,  img: 'testimonial-recipe.jpg',     path: '/kniznica/strava' },
+    mysel:  { category: 'mysel',  label: 'Myseľ',  title: 'Tvoja myseľ dnes', color: NM.MAUVE, img: 'section-mind.jpg',           path: '/kniznica/mysel' },
   };
-  const { rows: phaseAdviceRows } = usePhaseAdvice(currentPhaseKey);
-  const advice = phaseAdviceRows.map((r) => {
-    const meta = PILLAR_META[r.pillar] ?? PILLAR_META.telo;
+
+  // Day-in-phase: 1-indexed within the current phase. e.g. on day 1 of
+  // menstruation = 1, on day 14 of a 14-day follicular phase = 14.
+  const phaseStart = derivedState?.currentPhase?.start ?? 1;
+  const dayInPhase = Math.max(1, currentDay - phaseStart + 1);
+
+  // Subphase: only luteal phase has early/late split. We bisect by halfway
+  // through the phase length — anything past midpoint is "late".
+  const phaseEnd = derivedState?.currentPhase?.end ?? totalDays;
+  const phaseLength = Math.max(1, phaseEnd - phaseStart + 1);
+  const subphase = currentPhaseKey === 'luteal'
+    ? (dayInPhase > phaseLength / 2 ? 'late' : 'early')
+    : null;
+
+  const advice = (['telo', 'strava', 'mysel'] as const).map((pillarKey) => {
+    const meta = PILLAR_META[pillarKey];
+    const tip = getCycleTipByDay(currentPhaseKey, subphase, meta.category, dayInPhase);
     return {
       pillar: meta.label,
       color: meta.color,
-      title: r.title,
-      body: r.body_text,
-      img: r.image_key ?? meta.img,
-      path: r.target_path ?? meta.path,
+      title: meta.title,
+      body: tip,
+      img: meta.img,
+      path: meta.path,
     };
   });
 
@@ -304,7 +321,7 @@ function PaidView({ navigate, cycleData, derivedState }: PaidViewProps) {
 
       <div style={{ padding: '0 20px 24px' }}>
         <button
-          // FEATURE: persists "today = period start" via existing cycle hook
+          onClick={onMarkPeriodStart}
           style={{
             all: 'unset',
             cursor: 'pointer',
@@ -404,9 +421,9 @@ function PaidView({ navigate, cycleData, derivedState }: PaidViewProps) {
       </div>
 
       <div style={{ padding: '28px 20px 0' }}>
-        <Eye style={{ marginBottom: 6 }}>Pre folikulárnu fázu</Eye>
+        <Eye style={{ marginBottom: 6 }}>Pre {currentPhaseName.toLowerCase()} fázu · deň {dayInPhase}</Eye>
         <Ser size={20} style={{ marginTop: 8, lineHeight: 1.2 }}>
-          Ako sa dnes môžeš cítiť <em style={{ color: PHASE.FOLLIC, fontWeight: 500, fontStyle: 'italic' }}>ešte lepšie</em>
+          Ako sa dnes môžeš cítiť <em style={{ color: phaseColor, fontWeight: 500, fontStyle: 'italic' }}>ešte lepšie</em>
         </Ser>
         <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column' }}>
           {advice.map((r, i) => (
@@ -472,9 +489,9 @@ function FreeView({ navigate }: { navigate: (p: string) => void }) {
   ];
   return (
     <>
-      <TopBar title="Cyklus" showLock onBack={() => navigate('/domov-new')} />
+      <TopBar title="Cyklus" onBack={() => navigate('/domov-new')} />
       <div style={{ padding: '2px 20px 6px' }}>
-        <Eye color={NM.GOLD}>Dostupné s NeoMe Plus</Eye>
+        <Eye color={NM.TERRA}>Začni so sledovaním</Eye>
         <Ser size={30} style={{ marginTop: 10, lineHeight: 1.02 }}>
           Spoznaj svoj
           <br />
@@ -492,51 +509,61 @@ function FreeView({ navigate }: { navigate: (p: string) => void }) {
       <PhaseLegend />
 
       <div style={{ padding: '0 20px 22px' }}>
-        <div style={{ padding: '24px 22px', borderRadius: 22, background: `linear-gradient(135deg, ${NM.DEEP} 0%, ${NM.DEEP_2} 100%)`, color: '#fff', position: 'relative', overflow: 'hidden' }}>
-          <div style={{ position: 'absolute', top: -50, right: -50, width: 140, height: 140, borderRadius: 999, background: `radial-gradient(circle, ${NM.GOLD}44, transparent 70%)` }} />
-          <div style={{ position: 'relative' }}>
-            <Eye color={NM.GOLD} style={{ marginBottom: 12 }}>NeoMe Plus</Eye>
-            <Ser size={22} color="#fff" style={{ lineHeight: 1.12, marginBottom: 10 }}>
-              Odomkni sledovanie
-              <br />
-              <em style={{ color: NM.GOLD, fontStyle: 'italic', fontWeight: 500 }}>cyklu a fáz.</em>
-            </Ser>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, margin: '16px 0 18px' }}>
-              {[
-                'Sledovanie 28-dňového cyklu a fáz',
-                'Predpovede menštruácie a ovulácie',
-                'Záznam príznakov a energie',
-                'Tipy na stravu a pohyb pre každú fázu',
-              ].map((b) => (
-                <div key={b} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                    <path d="M2 7l3 3 7-7" stroke={NM.GOLD} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                  <div style={{ fontFamily: NM.SANS, fontSize: 12, color: 'rgba(255,255,255,0.9)' }}>{b}</div>
-                </div>
-              ))}
-            </div>
-            <button
-              onClick={() => navigate('/paywall')}
-              style={{
-                width: '100%',
-                padding: '14px 20px',
-                background: NM.GOLD,
-                color: '#fff',
-                border: 'none',
-                borderRadius: 999,
-                fontFamily: NM.SANS,
-                fontSize: 13,
-                fontWeight: 500,
-                letterSpacing: '0.02em',
-                cursor: 'pointer',
-              }}
-            >
-              Aktivovať NeoMe Plus
-            </button>
-            <div style={{ textAlign: 'center', marginTop: 10, fontFamily: NM.SANS, fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>
-              9,99 € / mesiac · zrušenie kedykoľvek
-            </div>
+        <div
+          style={{
+            padding: '24px 22px',
+            borderRadius: 22,
+            background: '#fff',
+            border: `1px solid ${NM.HAIR}`,
+            boxShadow: '0 10px 28px rgba(61,41,33,0.06)',
+            position: 'relative',
+            overflow: 'hidden',
+          }}
+        >
+          <Eye color={NM.TERRA} style={{ marginBottom: 12 }}>Pridaj svoje údaje</Eye>
+          <Ser size={22} style={{ lineHeight: 1.12, marginBottom: 10 }}>
+            Nastav svoj
+            <br />
+            <em style={{ color: NM.TERRA, fontStyle: 'italic', fontWeight: 500 }}>cyklus.</em>
+          </Ser>
+          <Body size={13} style={{ marginTop: 4 }}>
+            Zadaj posledný deň menštruácie a priemernú dĺžku cyklu — okamžite uvidíš svoju aktuálnu fázu, odporúčania a predpovede.
+          </Body>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, margin: '18px 0 20px' }}>
+            {[
+              'Sledovanie 28-dňového cyklu a fáz',
+              'Predpovede menštruácie a ovulácie',
+              'Záznam príznakov a energie',
+              'Tipy na stravu a pohyb pre každú fázu',
+            ].map((b) => (
+              <div key={b} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path d="M2 7l3 3 7-7" stroke={NM.TERRA} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                <div style={{ fontFamily: NM.SANS, fontSize: 12, color: NM.MUTED, fontWeight: 400 }}>{b}</div>
+              </div>
+            ))}
+          </div>
+          <button
+            onClick={() => navigate('/kniznica/periodka/nastavenia')}
+            style={{
+              width: '100%',
+              padding: '14px 20px',
+              background: NM.TERRA,
+              color: '#fff',
+              border: 'none',
+              borderRadius: 999,
+              fontFamily: NM.SANS,
+              fontSize: 13,
+              fontWeight: 500,
+              letterSpacing: '0.02em',
+              cursor: 'pointer',
+            }}
+          >
+            Pridať svoje údaje
+          </button>
+          <div style={{ textAlign: 'center', marginTop: 10, fontFamily: NM.SANS, fontSize: 11, color: NM.TERTIARY, fontWeight: 400 }}>
+            Trvá to menej ako minútu · údaje zostávajú v tvojom telefóne
           </div>
         </div>
       </div>
@@ -564,20 +591,45 @@ function FreeView({ navigate }: { navigate: (p: string) => void }) {
 
 export default function Periodka() {
   const navigate = useNavigate();
-  const { isPremium } = useSubscription();
-  const { cycleData, derivedState } = useCycleData();
+  const { cycleData, derivedState, setLastPeriodStart } = useCycleData();
+  const [confirmStartOpen, setConfirmStartOpen] = useState(false);
+
+  // ?free=1 still works for testing the upsell/setup view, but tier no
+  // longer gates the dashboard — period tracking is open to all users.
   const forceFree = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('free');
   const hasCycleSetup = !!cycleData?.lastPeriodStart;
-  // Plus + cycle data → rich dashboard. Otherwise → upsell/onboarding view.
-  const showPlus = isPremium && !forceFree && hasCycleSetup;
+  // Has data → rich dashboard. No data → setup prompt (no paywall).
+  const showDashboard = hasCycleSetup && !forceFree;
+
+  const handleConfirmPeriodStart = () => {
+    setLastPeriodStart(new Date());
+    setConfirmStartOpen(false);
+  };
 
   return (
     <Page>
-      {showPlus && cycleData ? (
-        <PaidView navigate={navigate} cycleData={cycleData} derivedState={derivedState} />
+      {showDashboard && cycleData ? (
+        <PaidView
+          navigate={navigate}
+          cycleData={cycleData}
+          derivedState={derivedState}
+          onMarkPeriodStart={() => setConfirmStartOpen(true)}
+        />
       ) : (
         <FreeView navigate={navigate} />
       )}
+
+      <ConfirmSheet
+        open={confirmStartOpen}
+        eyebrow="Cyklus"
+        title="Označiť dnešok ako začiatok menštruácie?"
+        message="Tým sa znovu nastaví tvoj cyklus tak, aby dnešný deň bol deň 1. Môžeš to kedykoľvek opraviť v nastaveniach cyklu."
+        confirmLabel="Áno, dnes mi začala"
+        cancelLabel="Späť"
+        accent={PHASE.MENSTR}
+        onConfirm={handleConfirmPeriodStart}
+        onCancel={() => setConfirmStartOpen(false)}
+      />
     </Page>
   );
 }
