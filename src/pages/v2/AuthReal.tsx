@@ -1,12 +1,15 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { useSupabaseAuth } from '../../contexts/SupabaseAuthContext';
+import { Eyebrow } from '@/components/ui/eyebrow';
 import { SerifHeader } from '@/components/ui/serif-header';
 import { BodyText } from '@/components/ui/body-text';
 
-const INPUT_CLASS = 'w-full px-4 py-3 rounded-xl bg-cream-200 border border-ink/[0.10] font-sans text-sm text-ink placeholder:text-ink/36 focus:outline-none focus:border-ink/30 transition-colors';
-const LABEL_CLASS = 'font-sans text-xs font-medium text-ink/56 uppercase tracking-[0.1em] mb-1.5 block';
+const INPUT =
+  'w-full px-4 py-3.5 rounded-2xl bg-white border border-ink/[0.08] font-sans text-sm text-ink placeholder:text-ink/32 focus:outline-none focus:border-ink/24 transition-colors';
+const LABEL =
+  'font-sans text-[10px] font-medium text-ink/48 uppercase tracking-[0.14em] mb-1.5 block';
 
 export default function AuthReal() {
   const navigate = useNavigate();
@@ -14,7 +17,10 @@ export default function AuthReal() {
 
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({ email: '', password: '', firstName: '', lastName: '', confirmPassword: '', gdprConsent: false });
+  const [formData, setFormData] = useState({
+    email: '', password: '', firstName: '', lastName: '',
+    confirmPassword: '', gdprConsent: false,
+  });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -22,7 +28,6 @@ export default function AuthReal() {
     e.preventDefault();
     setErrors({});
     setIsSubmitting(true);
-
     try {
       if (isLogin) {
         const { error } = await signIn(formData.email, formData.password);
@@ -45,9 +50,12 @@ export default function AuthReal() {
           setErrors({ gdpr: 'Súhlas so spracovaním údajov je povinný' });
           return;
         }
-        const { error } = await signUp(formData.email, formData.password, formData.firstName, formData.lastName, true);
+        const { error } = await signUp(
+          formData.email, formData.password,
+          formData.firstName, formData.lastName, true
+        );
         if (error) setErrors({ submit: error.message });
-        else setErrors({ success: 'Registrácia úspešná! Skontrolujte email pre potvrdenie.' });
+        else setErrors({ success: 'Registrácia úspešná! Skontrolujte email.' });
       }
     } catch (err: unknown) {
       setErrors({ submit: err instanceof Error ? err.message : 'Nastala chyba' });
@@ -62,19 +70,19 @@ export default function AuthReal() {
   };
 
   const switchMode = () => {
-    setIsLogin(!isLogin);
+    setIsLogin(v => !v);
     setErrors({});
     setFormData({ email: '', password: '', firstName: '', lastName: '', confirmPassword: '', gdprConsent: false });
   };
 
   return (
-    <div className="min-h-screen bg-cream">
-      <div className="px-5 pt-14 pb-12">
-        {/* Back */}
-        <button onClick={() => navigate('/')} className="mb-8 flex items-center gap-1.5 text-ink/48 font-sans text-sm">
-          <ArrowLeft className="size-4" />
-          Späť
-        </button>
+    <div className="min-h-screen bg-cream flex flex-col">
+      <div className="flex-1 px-5 pt-14 pb-10">
+
+        {/* Wordmark */}
+        <div className="mb-10">
+          <Eyebrow tone="muted">NEOME</Eyebrow>
+        </div>
 
         {/* Headline */}
         <div className="mb-8">
@@ -88,82 +96,88 @@ export default function AuthReal() {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+
           {!isLogin && (
             <div className="flex gap-3">
               <div className="flex-1">
-                <label className={LABEL_CLASS}>Meno</label>
+                <label className={LABEL}>Meno</label>
                 <input
                   type="text"
                   value={formData.firstName}
                   onChange={e => set('firstName', e.target.value)}
-                  className={INPUT_CLASS}
+                  className={INPUT}
                   placeholder="Meno"
                   required={!isLogin}
+                  autoComplete="given-name"
                 />
               </div>
               <div className="flex-1">
-                <label className={LABEL_CLASS}>Priezvisko</label>
+                <label className={LABEL}>Priezvisko</label>
                 <input
                   type="text"
                   value={formData.lastName}
                   onChange={e => set('lastName', e.target.value)}
-                  className={INPUT_CLASS}
+                  className={INPUT}
                   placeholder="Priezvisko"
                   required={!isLogin}
+                  autoComplete="family-name"
                 />
               </div>
             </div>
           )}
-
-          {errors.name && <p className="text-[13px] text-red-500">{errors.name}</p>}
+          {errors.name && <BodyText size="sm" className="text-terra -mt-2">{errors.name}</BodyText>}
 
           <div>
-            <label className={LABEL_CLASS}>Email</label>
+            <label className={LABEL}>Email</label>
             <input
               type="email"
               value={formData.email}
               onChange={e => set('email', e.target.value)}
-              className={INPUT_CLASS}
+              className={INPUT}
               placeholder="tvoj@email.sk"
               required
+              autoComplete="email"
             />
           </div>
 
           <div>
-            <label className={LABEL_CLASS}>Heslo</label>
+            <label className={LABEL}>Heslo</label>
             <div className="relative">
               <input
                 type={showPassword ? 'text' : 'password'}
                 value={formData.password}
                 onChange={e => set('password', e.target.value)}
-                className={`${INPUT_CLASS} pr-12`}
-                placeholder={isLogin ? 'Tvoje heslo' : 'Minimálne 6 znakov'}
+                className={`${INPUT} pr-12`}
+                placeholder={isLogin ? 'Tvoje heslo' : 'Minimálne 8 znakov'}
                 required
-                minLength={!isLogin ? 6 : undefined}
+                autoComplete={isLogin ? 'current-password' : 'new-password'}
               />
               <button
                 type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-ink/40"
+                onClick={() => setShowPassword(v => !v)}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 text-ink/36"
               >
                 {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
               </button>
             </div>
-            {errors.password && <p className="mt-1 text-[13px] text-red-500">{errors.password}</p>}
+            {errors.password && <BodyText size="sm" className="mt-1 text-terra">{errors.password}</BodyText>}
           </div>
 
           {!isLogin && (
             <div>
-              <label className={LABEL_CLASS}>Potvrdiť heslo</label>
+              <label className={LABEL}>Potvrdiť heslo</label>
               <input
                 type="password"
                 value={formData.confirmPassword}
                 onChange={e => set('confirmPassword', e.target.value)}
-                className={INPUT_CLASS}
+                className={INPUT}
                 placeholder="Zopakuj heslo"
                 required={!isLogin}
+                autoComplete="new-password"
               />
-              {errors.confirmPassword && <p className="mt-1 text-[13px] text-red-500">{errors.confirmPassword}</p>}
+              {errors.confirmPassword && (
+                <BodyText size="sm" className="mt-1 text-terra">{errors.confirmPassword}</BodyText>
+              )}
             </div>
           )}
 
@@ -179,54 +193,68 @@ export default function AuthReal() {
                 }}
                 className="mt-0.5 h-4 w-4 rounded border-ink/20 accent-ink flex-shrink-0 cursor-pointer"
               />
-              <label htmlFor="gdpr-consent" className="font-sans text-xs text-ink/60 leading-relaxed cursor-pointer">
+              <label htmlFor="gdpr-consent" className="font-sans text-xs text-ink/52 leading-relaxed cursor-pointer">
                 Súhlasím so{' '}
-                <a href="https://neome.sk/privacy" target="_blank" rel="noreferrer" className="text-ink underline">spracovaním osobných údajov</a>
+                <a href="https://neome.sk/privacy" target="_blank" rel="noreferrer" className="text-ink underline underline-offset-2">
+                  spracovaním osobných údajov
+                </a>
                 {' '}vrátane zdravotných dát (cyklus, symptómy) v súlade s GDPR.{' '}
-                <a href="https://neome.sk/privacy" target="_blank" rel="noreferrer" className="text-ink underline">Zásady ochrany súkromia</a>
+                <a href="https://neome.sk/privacy" target="_blank" rel="noreferrer" className="text-ink underline underline-offset-2">
+                  Zásady ochrany súkromia
+                </a>
               </label>
             </div>
           )}
-          {errors.gdpr && <p className="text-[13px] text-red-500 -mt-2">{errors.gdpr}</p>}
+          {errors.gdpr && <BodyText size="sm" className="-mt-2 text-terra">{errors.gdpr}</BodyText>}
 
           {errors.submit && (
-            <div className="px-4 py-3 rounded-xl bg-red-50 border border-red-200">
-              <p className="font-sans text-sm text-red-600">{errors.submit}</p>
+            <div className="px-4 py-3 rounded-2xl bg-white border border-terra/20">
+              <BodyText size="sm" className="text-terra">{errors.submit}</BodyText>
             </div>
           )}
           {errors.success && (
-            <div className="px-4 py-3 rounded-xl bg-green-50 border border-green-200">
-              <p className="font-sans text-sm text-green-700">{errors.success}</p>
+            <div className="px-4 py-3 rounded-2xl bg-white border border-ink/[0.08]">
+              <BodyText size="sm" tone="secondary">{errors.success}</BodyText>
             </div>
           )}
 
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-4 mt-2 rounded-full bg-ink text-cream font-sans font-semibold text-base transition-all active:scale-[0.98] disabled:opacity-50"
+            className="w-full py-4 mt-2 rounded-full bg-ink text-cream font-sans font-semibold text-[15px] tracking-[-0.01em] transition-all active:scale-[0.98] disabled:opacity-40"
           >
             {isSubmitting ? 'Spracováva sa…' : (isLogin ? 'Prihlásiť sa' : 'Registrovať sa')}
           </button>
+
+          {isLogin && (
+            <button
+              type="button"
+              onClick={() => navigate('/reset-password')}
+              className="text-center font-sans text-xs text-ink/40"
+            >
+              Zabudnuté heslo?
+            </button>
+          )}
         </form>
 
         {/* Switch mode */}
-        <div className="mt-6 text-center">
-          <button onClick={switchMode} className="font-sans text-sm text-ink/56">
+        <div className="mt-8 text-center">
+          <BodyText size="sm" tone="muted">
             {isLogin ? 'Nemáš účet? ' : 'Máš účet? '}
-            <span className="text-ink font-medium">{isLogin ? 'Registruj sa' : 'Prihláš sa'}</span>
-          </button>
+            <button onClick={switchMode} className="text-ink font-medium">
+              {isLogin ? 'Registruj sa' : 'Prihláš sa'}
+            </button>
+          </BodyText>
         </div>
 
         {/* Trust signals */}
-        <div className="mt-10 pt-8 border-t border-ink/[0.06]">
-          <div className="flex justify-around">
-            {[['2 400+', 'žien v komunite'], ['105', 'receptov'], ['17', 'meditácií']].map(([n, l]) => (
-              <div key={l} className="text-center">
-                <div className="font-serif text-h2 text-ink">{n}</div>
-                <BodyText size="sm" tone="muted">{l}</BodyText>
-              </div>
-            ))}
-          </div>
+        <div className="mt-10 pt-8 border-t border-ink/[0.06] flex justify-around">
+          {[['2 400+', 'žien v komunite'], ['105', 'receptov'], ['17', 'meditácií']].map(([n, l]) => (
+            <div key={l} className="text-center">
+              <div className="font-serif text-2xl font-normal text-ink tracking-tight leading-none mb-1">{n}</div>
+              <Eyebrow tone="muted">{l}</Eyebrow>
+            </div>
+          ))}
         </div>
       </div>
     </div>
