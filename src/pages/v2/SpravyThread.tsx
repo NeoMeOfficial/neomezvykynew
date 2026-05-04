@@ -45,12 +45,13 @@ export default function SpravyThread() {
   const [draft, setDraft] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Mark unread admin messages as read on mount
+  // Mark all unread admin messages as read when the thread opens
   useEffect(() => {
-    messages.forEach((m) => {
-      if (m.is_from_admin && !m.read_at) markRead(m.id);
-    });
-  }, [messages, markRead]);
+    if (messages.some((m) => m.is_from_admin && !m.read_at)) {
+      markRead();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Scroll to bottom when messages change
   useEffect(() => {

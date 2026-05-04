@@ -5,7 +5,7 @@ import {
   Calendar, FolderOpen, Bell, Settings, LogOut, Shield, ChevronRight, Plus,
   Eye, Trash2, Edit3, Pencil, TrendingUp, Activity, Send, ArrowLeft,
   Tag, Percent, Mail, Play, CheckSquare, Square, X, Check, AlertTriangle,
-  BookOpen, RefreshCw, ExternalLink
+  BookOpen, RefreshCw, ExternalLink, Search
 } from 'lucide-react';
 import { colors } from '../../theme/warmDusk';
 import { supabase } from '../../lib/supabase';
@@ -18,9 +18,27 @@ import { recipes as staticRecipesData } from '../../data/recipes';
 import { TeloExtraStaticData } from '../../data/teloExtraData';
 import { TeloStrecingStaticData } from '../../data/teloStrecingData';
 
+// A14 tokens (forward-declared for use in tab components before the const A block)
+const _A = {
+  BG:       '#F8F5F0',
+  SIDEBAR:  '#FAF7F2',
+  CARD:     '#FFFFFF',
+  CREAM2:   '#F1ECE3',
+  DEEP:     '#3D2921',
+  EYEBROW:  'rgba(61,41,33,0.55)',
+  MUTED:    'rgba(61,41,33,0.72)',
+  TERTIARY: 'rgba(61,41,33,0.42)',
+  HAIR:     'rgba(61,41,33,0.08)',
+  HAIR2:    'rgba(61,41,33,0.14)',
+  GOLD:     '#B8864A',
+  SAGE:     '#8B9E88',
+  TERRA:    '#C1856A',
+  MAUVE:    '#A8848B',
+};
+
 // Simple Card component
 const Card = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
-  <div className={`bg-white/40 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-lg ${className}`}>{children}</div>
+  <div className={className} style={{ background: _A.CARD, borderRadius: 16, border: `1px solid ${_A.HAIR}`, padding: '22px 24px' }}>{children}</div>
 );
 
 // Navigation items
@@ -91,6 +109,12 @@ const CATEGORY_LABELS: Record<PartnerDiscount['category'], string> = {
   wellness: 'Wellness', food: 'Jedlo', fitness: 'Fitness', other: 'Iné',
 };
 
+const inputStyle: React.CSSProperties = { background: _A.CREAM2, border: `1px solid rgba(61,41,33,0.10)`, borderRadius: 10, padding: '9px 12px', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.DEEP, width: '100%', outline: 'none', boxSizing: 'border-box' };
+const labelStyle: React.CSSProperties = { display: 'block', fontFamily: 'DM Sans, system-ui', fontSize: 9.5, letterSpacing: '0.18em', textTransform: 'uppercase', color: _A.EYEBROW, fontWeight: 500, marginBottom: 6 };
+const btnPrimary: React.CSSProperties = { background: _A.DEEP, color: '#fff', borderRadius: 10, padding: '10px 16px', border: 'none', fontFamily: 'DM Sans, system-ui', fontSize: 12, fontWeight: 500, cursor: 'pointer' };
+const btnSecondary: React.CSSProperties = { background: _A.CREAM2, color: _A.DEEP, borderRadius: 10, padding: '10px 16px', border: 'none', fontFamily: 'DM Sans, system-ui', fontSize: 12, fontWeight: 500, cursor: 'pointer' };
+const btnDanger: React.CSSProperties = { background: _A.TERRA, color: '#fff', borderRadius: 10, padding: '10px 16px', border: 'none', fontFamily: 'DM Sans, system-ui', fontSize: 12, fontWeight: 500, cursor: 'pointer' };
+
 function PartnerDiscountsTab() {
   const [discounts, setDiscounts] = useState<PartnerDiscount[]>(() => loadLS('neome-admin-partner-discounts', INIT_PARTNER_DISCOUNTS));
   const [showForm, setShowForm] = useState(false);
@@ -127,42 +151,40 @@ function PartnerDiscountsTab() {
   const remove = (id: string) => setDiscounts(prev => prev.filter(d => d.id !== id));
   const toggle = (id: string) => setDiscounts(prev => prev.map(d => d.id === id ? { ...d, isActive: !d.isActive } : d));
 
-  const Card = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
-    <div className={`bg-white/40 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-lg ${className}`}>{children}</div>
-  );
+  const thStyle: React.CSSProperties = { textAlign: 'left', padding: '11px 14px', fontFamily: 'DM Sans, system-ui', fontSize: 9.5, letterSpacing: '0.18em', textTransform: 'uppercase', color: _A.EYEBROW, fontWeight: 500 };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold" style={{ color: colors.textPrimary }}>Partner Zľavy</h2>
-        <button onClick={openAdd} className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white" style={{ backgroundColor: colors.telo }}>
-          <Plus className="w-4 h-4" />Pridať partnera
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 22, fontWeight: 500, color: _A.DEEP }}>Partner Zľavy</div>
+        <button onClick={openAdd} style={{ ...btnPrimary, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Plus style={{ width: 14, height: 14 }} />Pridať partnera
         </button>
       </div>
 
       {/* Form panel */}
       {showForm && (
         <Card>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-lg" style={{ color: colors.textPrimary }}>{editId ? 'Upraviť zľavu' : 'Nová partnerská zľava'}</h3>
-            <button onClick={closeForm} className="p-1 rounded-lg hover:bg-white/20"><X className="w-4 h-4" style={{ color: colors.textSecondary }} /></button>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
+            <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 18, fontWeight: 500, color: _A.DEEP }}>{editId ? 'Upraviť zľavu' : 'Nová partnerská zľava'}</div>
+            <button onClick={closeForm} style={{ all: 'unset', cursor: 'pointer' }}><X style={{ width: 16, height: 16, color: _A.MUTED }} /></button>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
             <div>
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Meno partnera *</label>
-              <input value={form.partnerName || ''} onChange={e => setForm(f => ({ ...f, partnerName: e.target.value }))} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }} />
+              <label style={labelStyle}>Meno partnera *</label>
+              <input value={form.partnerName || ''} onChange={e => setForm(f => ({ ...f, partnerName: e.target.value }))} style={inputStyle} />
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Kód *</label>
-              <input value={form.code || ''} onChange={e => setForm(f => ({ ...f, code: e.target.value.toUpperCase() }))} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none font-mono" style={{ color: colors.textPrimary }} />
+              <label style={labelStyle}>Kód *</label>
+              <input value={form.code || ''} onChange={e => setForm(f => ({ ...f, code: e.target.value.toUpperCase() }))} style={{ ...inputStyle, fontFamily: 'monospace' }} />
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Hodnota zľavy</label>
-              <input value={form.discountValue || ''} onChange={e => setForm(f => ({ ...f, discountValue: e.target.value }))} placeholder="napr. 20% alebo €10" className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }} />
+              <label style={labelStyle}>Hodnota zľavy</label>
+              <input value={form.discountValue || ''} onChange={e => setForm(f => ({ ...f, discountValue: e.target.value }))} placeholder="napr. 20% alebo €10" style={inputStyle} />
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Kategória</label>
-              <select value={form.category || 'wellness'} onChange={e => setForm(f => ({ ...f, category: e.target.value as PartnerDiscount['category'] }))} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }}>
+              <label style={labelStyle}>Kategória</label>
+              <select value={form.category || 'wellness'} onChange={e => setForm(f => ({ ...f, category: e.target.value as PartnerDiscount['category'] }))} style={inputStyle}>
                 <option value="wellness">Wellness</option>
                 <option value="food">Jedlo</option>
                 <option value="fitness">Fitness</option>
@@ -170,65 +192,65 @@ function PartnerDiscountsTab() {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Platnosť do</label>
-              <input type="date" value={form.expiryDate || ''} onChange={e => setForm(f => ({ ...f, expiryDate: e.target.value }))} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }} />
+              <label style={labelStyle}>Platnosť do</label>
+              <input type="date" value={form.expiryDate || ''} onChange={e => setForm(f => ({ ...f, expiryDate: e.target.value }))} style={inputStyle} />
             </div>
-            <div className="flex items-end">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <button onClick={() => setForm(f => ({ ...f, isActive: !f.isActive }))} className="p-1">
-                  {form.isActive ? <CheckSquare className="w-5 h-5" style={{ color: colors.strava }} /> : <Square className="w-5 h-5" style={{ color: colors.textSecondary }} />}
+            <div style={{ display: 'flex', alignItems: 'flex-end' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                <button onClick={() => setForm(f => ({ ...f, isActive: !f.isActive }))} style={{ all: 'unset', cursor: 'pointer' }}>
+                  {form.isActive ? <CheckSquare style={{ width: 18, height: 18, color: _A.SAGE }} /> : <Square style={{ width: 18, height: 18, color: _A.MUTED }} />}
                 </button>
-                <span className="text-sm" style={{ color: colors.textPrimary }}>Aktívna</span>
+                <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.DEEP }}>Aktívna</span>
               </label>
             </div>
-            <div className="col-span-2">
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Popis</label>
-              <textarea value={form.description || ''} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} rows={2} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none resize-none" style={{ color: colors.textPrimary }} />
+            <div style={{ gridColumn: '1 / -1' }}>
+              <label style={labelStyle}>Popis</label>
+              <textarea value={form.description || ''} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} rows={2} style={{ ...inputStyle, resize: 'none' }} />
             </div>
           </div>
-          <div className="flex justify-end gap-3 mt-4">
-            <button onClick={closeForm} className="px-4 py-2 rounded-xl text-sm" style={{ backgroundColor: 'rgba(255,255,255,0.3)', color: colors.textPrimary }}>Zrušiť</button>
-            <button onClick={save} className="px-4 py-2 rounded-xl text-sm text-white" style={{ backgroundColor: colors.telo }}>Uložiť</button>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 18 }}>
+            <button onClick={closeForm} style={btnSecondary}>Zrušiť</button>
+            <button onClick={save} style={btnPrimary}>Uložiť</button>
           </div>
         </Card>
       )}
 
       {/* Table */}
       <Card>
-        <table className="w-full text-sm">
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
-            <tr className="border-b border-white/20">
+            <tr style={{ background: _A.CREAM2, borderRadius: 8 }}>
               {['Partner', 'Kód', 'Zľava', 'Kategória', 'Platnosť', 'Aktívna', 'Akcie'].map(h => (
-                <th key={h} className="text-left py-2 pr-4 font-medium text-xs" style={{ color: colors.textSecondary }}>{h}</th>
+                <th key={h} style={thStyle}>{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {discounts.map(d => (
-              <tr key={d.id} className="border-b border-white/10 last:border-0 hover:bg-white/10 transition-colors">
-                <td className="py-3 pr-4">
-                  <div className="font-medium" style={{ color: colors.textPrimary }}>{d.partnerName}</div>
-                  {d.description && <div className="text-xs mt-0.5" style={{ color: colors.textSecondary }}>{d.description}</div>}
+              <tr key={d.id} style={{ borderBottom: `1px solid ${_A.HAIR}` }}>
+                <td style={{ padding: '12px 14px' }}>
+                  <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 13, fontWeight: 500, color: _A.DEEP }}>{d.partnerName}</div>
+                  {d.description && <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED, marginTop: 2 }}>{d.description}</div>}
                 </td>
-                <td className="py-3 pr-4"><span className="font-mono text-xs px-2 py-1 rounded-lg bg-white/30" style={{ color: colors.textPrimary }}>{d.code}</span></td>
-                <td className="py-3 pr-4 font-semibold" style={{ color: colors.accent }}>{d.discountValue}</td>
-                <td className="py-3 pr-4"><span className="text-xs px-2 py-1 rounded-full" style={{ backgroundColor: `${colors.telo}15`, color: colors.telo }}>{CATEGORY_LABELS[d.category]}</span></td>
-                <td className="py-3 pr-4 text-xs" style={{ color: colors.textSecondary }}>{d.expiryDate}</td>
-                <td className="py-3 pr-4">
-                  <button onClick={() => toggle(d.id)} className="p-1">
-                    {d.isActive ? <CheckSquare className="w-4 h-4" style={{ color: colors.strava }} /> : <Square className="w-4 h-4" style={{ color: colors.textSecondary }} />}
+                <td style={{ padding: '12px 14px' }}><span style={{ fontFamily: 'monospace', fontSize: 11, padding: '3px 8px', borderRadius: 6, background: _A.CREAM2, color: _A.DEEP }}>{d.code}</span></td>
+                <td style={{ padding: '12px 14px', fontFamily: 'DM Sans, system-ui', fontSize: 13, fontWeight: 600, color: _A.GOLD }}>{d.discountValue}</td>
+                <td style={{ padding: '12px 14px' }}><span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', padding: '3px 8px', borderRadius: 999, background: `rgba(193,133,106,0.18)`, color: _A.TERRA }}>{CATEGORY_LABELS[d.category]}</span></td>
+                <td style={{ padding: '12px 14px', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>{d.expiryDate}</td>
+                <td style={{ padding: '12px 14px' }}>
+                  <button onClick={() => toggle(d.id)} style={{ all: 'unset', cursor: 'pointer' }}>
+                    {d.isActive ? <CheckSquare style={{ width: 16, height: 16, color: _A.SAGE }} /> : <Square style={{ width: 16, height: 16, color: _A.MUTED }} />}
                   </button>
                 </td>
-                <td className="py-3">
-                  <div className="flex items-center gap-1">
-                    <button onClick={() => openEdit(d)} className="p-1.5 rounded-lg hover:bg-white/20 transition-colors"><Edit3 className="w-3.5 h-3.5" style={{ color: colors.textSecondary }} /></button>
-                    <button onClick={() => remove(d.id)} className="p-1.5 rounded-lg hover:bg-white/20 transition-colors"><Trash2 className="w-3.5 h-3.5" style={{ color: colors.periodka }} /></button>
+                <td style={{ padding: '12px 14px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <button onClick={() => openEdit(d)} style={{ all: 'unset', cursor: 'pointer', padding: 6, borderRadius: 8 }}><Edit3 style={{ width: 14, height: 14, color: _A.MUTED }} /></button>
+                    <button onClick={() => remove(d.id)} style={{ all: 'unset', cursor: 'pointer', padding: 6, borderRadius: 8 }}><Trash2 style={{ width: 14, height: 14, color: _A.TERRA }} /></button>
                   </div>
                 </td>
               </tr>
             ))}
             {discounts.length === 0 && (
-              <tr><td colSpan={7} className="py-8 text-center text-sm" style={{ color: colors.textSecondary }}>Žiadne partnerské zľavy.</td></tr>
+              <tr><td colSpan={7} style={{ padding: '32px 14px', textAlign: 'center', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>Žiadne partnerské zľavy.</td></tr>
             )}
           </tbody>
         </table>
@@ -328,30 +350,28 @@ function PromoCodesTab() {
     setVerifyResult({ ok: true, msg: `Platný! Zľava: ${discStr}. Zostatok použití: ${rem} z ${c.maxUses}.` });
   };
 
-  const Card = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
-    <div className={`bg-white/40 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-lg ${className}`}>{children}</div>
-  );
+  const thStyle: React.CSSProperties = { textAlign: 'left', padding: '11px 14px', fontFamily: 'DM Sans, system-ui', fontSize: 9.5, letterSpacing: '0.18em', textTransform: 'uppercase', color: _A.EYEBROW, fontWeight: 500 };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold" style={{ color: colors.textPrimary }}>Promo Kódy</h2>
-        <button onClick={openAdd} className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white" style={{ backgroundColor: colors.accent }}>
-          <Plus className="w-4 h-4" />Nový kód
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 22, fontWeight: 500, color: _A.DEEP }}>Promo Kódy</div>
+        <button onClick={openAdd} style={{ ...btnPrimary, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Plus style={{ width: 14, height: 14 }} />Nový kód
         </button>
       </div>
 
       {/* Verify tool */}
       <Card>
-        <h3 className="font-semibold mb-3" style={{ color: colors.textPrimary }}>Overiť kód</h3>
-        <div className="flex gap-3 items-start">
-          <input value={verifyInput} onChange={e => { setVerifyInput(e.target.value); setVerifyResult(null); }} placeholder="Zadaj kód..." className="flex-1 px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none font-mono" style={{ color: colors.textPrimary }} />
-          <button onClick={verify} className="px-4 py-2 rounded-xl text-sm font-medium text-white" style={{ backgroundColor: colors.telo }}>Overiť</button>
+        <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 16, fontWeight: 500, color: _A.DEEP, marginBottom: 14 }}>Overiť kód</div>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+          <input value={verifyInput} onChange={e => { setVerifyInput(e.target.value); setVerifyResult(null); }} placeholder="Zadaj kód..." style={{ ...inputStyle, flex: 1, fontFamily: 'monospace' }} />
+          <button onClick={verify} style={btnPrimary}>Overiť</button>
         </div>
         {verifyResult && (
-          <div className={`mt-3 flex items-center gap-2 px-4 py-2 rounded-xl text-sm ${verifyResult.ok ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
-            {verifyResult.ok ? <Check className="w-4 h-4 text-green-600 flex-shrink-0" /> : <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0" />}
-            <span style={{ color: verifyResult.ok ? '#16a34a' : '#dc2626' }}>{verifyResult.msg}</span>
+          <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', borderRadius: 10, background: verifyResult.ok ? 'rgba(139,158,136,0.12)' : 'rgba(193,133,106,0.12)', border: `1px solid ${verifyResult.ok ? _A.SAGE : _A.TERRA}30` }}>
+            {verifyResult.ok ? <Check style={{ width: 14, height: 14, color: _A.SAGE, flexShrink: 0 }} /> : <AlertTriangle style={{ width: 14, height: 14, color: _A.TERRA, flexShrink: 0 }} />}
+            <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: verifyResult.ok ? _A.SAGE : _A.TERRA }}>{verifyResult.msg}</span>
           </div>
         )}
       </Card>
@@ -359,57 +379,57 @@ function PromoCodesTab() {
       {/* Form */}
       {showForm && (
         <Card>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-lg" style={{ color: colors.textPrimary }}>{editId ? 'Upraviť kód' : 'Nový promo kód'}</h3>
-            <button onClick={closeForm} className="p-1 rounded-lg hover:bg-white/20"><X className="w-4 h-4" style={{ color: colors.textSecondary }} /></button>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
+            <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 18, fontWeight: 500, color: _A.DEEP }}>{editId ? 'Upraviť kód' : 'Nový promo kód'}</div>
+            <button onClick={closeForm} style={{ all: 'unset', cursor: 'pointer' }}><X style={{ width: 16, height: 16, color: _A.MUTED }} /></button>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
             <div>
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Kód *</label>
-              <input value={form.code || ''} onChange={e => setForm(f => ({ ...f, code: e.target.value.toUpperCase() }))} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none font-mono" style={{ color: colors.textPrimary }} />
+              <label style={labelStyle}>Kód *</label>
+              <input value={form.code || ''} onChange={e => setForm(f => ({ ...f, code: e.target.value.toUpperCase() }))} style={{ ...inputStyle, fontFamily: 'monospace' }} />
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Typ zľavy</label>
-              <select value={form.discountType || 'percent'} onChange={e => setForm(f => ({ ...f, discountType: e.target.value as PromoCode['discountType'] }))} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }}>
+              <label style={labelStyle}>Typ zľavy</label>
+              <select value={form.discountType || 'percent'} onChange={e => setForm(f => ({ ...f, discountType: e.target.value as PromoCode['discountType'] }))} style={inputStyle}>
                 <option value="percent">Percentuálna (%)</option>
                 <option value="fixed">Fixná (€)</option>
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Hodnota {form.discountType === 'fixed' ? '(€)' : '(%)'}</label>
-              <input type="number" value={form.discountValueStr || ''} onChange={e => setForm(f => ({ ...f, discountValueStr: e.target.value }))} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }} />
+              <label style={labelStyle}>Hodnota {form.discountType === 'fixed' ? '(€)' : '(%)'}</label>
+              <input type="number" value={form.discountValueStr || ''} onChange={e => setForm(f => ({ ...f, discountValueStr: e.target.value }))} style={inputStyle} />
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Max. použití</label>
-              <input type="number" value={form.maxUsesStr || ''} onChange={e => setForm(f => ({ ...f, maxUsesStr: e.target.value }))} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }} />
+              <label style={labelStyle}>Max. použití</label>
+              <input type="number" value={form.maxUsesStr || ''} onChange={e => setForm(f => ({ ...f, maxUsesStr: e.target.value }))} style={inputStyle} />
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Platnosť do</label>
-              <input type="date" value={form.expiryDate || ''} onChange={e => setForm(f => ({ ...f, expiryDate: e.target.value }))} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }} />
+              <label style={labelStyle}>Platnosť do</label>
+              <input type="date" value={form.expiryDate || ''} onChange={e => setForm(f => ({ ...f, expiryDate: e.target.value }))} style={inputStyle} />
             </div>
-            <div className="flex items-end">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <button onClick={() => setForm(f => ({ ...f, isActive: !f.isActive }))} className="p-1">
-                  {form.isActive ? <CheckSquare className="w-5 h-5" style={{ color: colors.strava }} /> : <Square className="w-5 h-5" style={{ color: colors.textSecondary }} />}
+            <div style={{ display: 'flex', alignItems: 'flex-end' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                <button onClick={() => setForm(f => ({ ...f, isActive: !f.isActive }))} style={{ all: 'unset', cursor: 'pointer' }}>
+                  {form.isActive ? <CheckSquare style={{ width: 18, height: 18, color: _A.SAGE }} /> : <Square style={{ width: 18, height: 18, color: _A.MUTED }} />}
                 </button>
-                <span className="text-sm" style={{ color: colors.textPrimary }}>Aktívny</span>
+                <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.DEEP }}>Aktívny</span>
               </label>
             </div>
-            <div className="col-span-2">
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Popis</label>
-              <textarea value={form.description || ''} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} rows={2} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none resize-none" style={{ color: colors.textPrimary }} />
+            <div style={{ gridColumn: '1 / -1' }}>
+              <label style={labelStyle}>Popis</label>
+              <textarea value={form.description || ''} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} rows={2} style={{ ...inputStyle, resize: 'none' }} />
             </div>
           </div>
           {saveError && (
-            <div className="mt-3 flex items-center gap-2 px-4 py-2 rounded-xl text-sm bg-red-50 border border-red-200">
-              <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0" />
-              <span className="text-red-600">{saveError}</span>
+            <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', borderRadius: 10, background: 'rgba(193,133,106,0.12)', border: `1px solid ${_A.TERRA}30` }}>
+              <AlertTriangle style={{ width: 14, height: 14, color: _A.TERRA, flexShrink: 0 }} />
+              <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.TERRA }}>{saveError}</span>
             </div>
           )}
-          <div className="flex justify-end gap-3 mt-4">
-            <button onClick={closeForm} disabled={saving} className="px-4 py-2 rounded-xl text-sm" style={{ backgroundColor: 'rgba(255,255,255,0.3)', color: colors.textPrimary }}>Zrušiť</button>
-            <button onClick={saveCode} disabled={saving} className="px-4 py-2 rounded-xl text-sm text-white flex items-center gap-2" style={{ backgroundColor: saving ? `${colors.accent}80` : colors.accent }}>
-              {saving && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 18 }}>
+            <button onClick={closeForm} disabled={saving} style={btnSecondary}>Zrušiť</button>
+            <button onClick={saveCode} disabled={saving} style={{ ...btnPrimary, display: 'flex', alignItems: 'center', gap: 8, opacity: saving ? 0.7 : 1 }}>
+              {saving && <RefreshCw style={{ width: 13, height: 13, animation: 'spin 1s linear infinite' }} />}
               {saving ? (editId ? 'Ukladám...' : 'Synchronizujem so Stripe...') : 'Uložiť'}
             </button>
           </div>
@@ -418,11 +438,11 @@ function PromoCodesTab() {
 
       {/* Table */}
       <Card>
-        <table className="w-full text-sm">
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
-            <tr className="border-b border-white/20">
+            <tr style={{ background: _A.CREAM2 }}>
               {['Kód', 'Stripe', 'Zľava', 'Použitia', 'Platnosť', 'Popis', 'Aktívny', 'Akcie'].map(h => (
-                <th key={h} className="text-left py-2 pr-4 font-medium text-xs" style={{ color: colors.textSecondary }}>{h}</th>
+                <th key={h} style={{ textAlign: 'left', padding: '11px 14px', fontFamily: 'DM Sans, system-ui', fontSize: 9.5, letterSpacing: '0.18em', textTransform: 'uppercase', color: _A.EYEBROW, fontWeight: 500 }}>{h}</th>
               ))}
             </tr>
           </thead>
@@ -431,42 +451,42 @@ function PromoCodesTab() {
               const remaining = c.maxUses - c.usedCount;
               const pct = Math.min(100, (c.usedCount / c.maxUses) * 100);
               return (
-                <tr key={c.id} className="border-b border-white/10 last:border-0 hover:bg-white/10 transition-colors">
-                  <td className="py-3 pr-4"><span className="font-mono font-semibold" style={{ color: colors.textPrimary }}>{c.code}</span></td>
-                  <td className="py-3 pr-4">
+                <tr key={c.id} style={{ borderBottom: `1px solid ${_A.HAIR}` }}>
+                  <td style={{ padding: '12px 14px' }}><span style={{ fontFamily: 'monospace', fontSize: 13, fontWeight: 600, color: _A.DEEP }}>{c.code}</span></td>
+                  <td style={{ padding: '12px 14px' }}>
                     {(c as PromoCodeExtended).stripeSynced ? (
-                      <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-green-100 text-green-700 font-medium">✓ Stripe</span>
+                      <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', padding: '3px 8px', borderRadius: 999, background: 'rgba(139,158,136,0.15)', color: _A.SAGE }}>Stripe</span>
                     ) : (
-                      <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-500">lokálny</span>
+                      <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', padding: '3px 8px', borderRadius: 999, background: `rgba(61,41,33,0.07)`, color: _A.MUTED }}>lokálny</span>
                     )}
                   </td>
-                  <td className="py-3 pr-4 font-semibold" style={{ color: colors.accent }}>
+                  <td style={{ padding: '12px 14px', fontFamily: 'DM Sans, system-ui', fontSize: 13, fontWeight: 600, color: _A.GOLD }}>
                     {c.discountType === 'percent' ? `${c.discountValue}%` : `€${c.discountValue}`}
                   </td>
-                  <td className="py-3 pr-4">
-                    <div className="text-xs" style={{ color: colors.textPrimary }}>{c.usedCount}/{c.maxUses} ({remaining} zostatok)</div>
-                    <div className="mt-1 h-1.5 rounded-full bg-white/30 overflow-hidden w-24">
-                      <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: pct > 80 ? colors.periodka : colors.strava }} />
+                  <td style={{ padding: '12px 14px' }}>
+                    <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.DEEP }}>{c.usedCount}/{c.maxUses} ({remaining} zostatok)</div>
+                    <div style={{ marginTop: 4, height: 4, borderRadius: 999, background: _A.CREAM2, overflow: 'hidden', width: 80 }}>
+                      <div style={{ height: '100%', borderRadius: 999, width: `${pct}%`, background: pct > 80 ? _A.TERRA : _A.SAGE }} />
                     </div>
                   </td>
-                  <td className="py-3 pr-4 text-xs" style={{ color: colors.textSecondary }}>{c.expiryDate}</td>
-                  <td className="py-3 pr-4 text-xs max-w-[160px] truncate" style={{ color: colors.textSecondary }}>{c.description}</td>
-                  <td className="py-3 pr-4">
-                    <button onClick={() => toggle(c.id)} className="p-1">
-                      {c.isActive ? <CheckSquare className="w-4 h-4" style={{ color: colors.strava }} /> : <Square className="w-4 h-4" style={{ color: colors.textSecondary }} />}
+                  <td style={{ padding: '12px 14px', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>{c.expiryDate}</td>
+                  <td style={{ padding: '12px 14px', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED, maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.description}</td>
+                  <td style={{ padding: '12px 14px' }}>
+                    <button onClick={() => toggle(c.id)} style={{ all: 'unset', cursor: 'pointer' }}>
+                      {c.isActive ? <CheckSquare style={{ width: 16, height: 16, color: _A.SAGE }} /> : <Square style={{ width: 16, height: 16, color: _A.MUTED }} />}
                     </button>
                   </td>
-                  <td className="py-3">
-                    <div className="flex items-center gap-1">
-                      <button onClick={() => openEdit(c)} className="p-1.5 rounded-lg hover:bg-white/20 transition-colors"><Edit3 className="w-3.5 h-3.5" style={{ color: colors.textSecondary }} /></button>
-                      <button onClick={() => remove(c.id)} className="p-1.5 rounded-lg hover:bg-white/20 transition-colors"><Trash2 className="w-3.5 h-3.5" style={{ color: colors.periodka }} /></button>
+                  <td style={{ padding: '12px 14px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <button onClick={() => openEdit(c)} style={{ all: 'unset', cursor: 'pointer', padding: 6, borderRadius: 8 }}><Edit3 style={{ width: 14, height: 14, color: _A.MUTED }} /></button>
+                      <button onClick={() => remove(c.id)} style={{ all: 'unset', cursor: 'pointer', padding: 6, borderRadius: 8 }}><Trash2 style={{ width: 14, height: 14, color: _A.TERRA }} /></button>
                     </div>
                   </td>
                 </tr>
               );
             })}
             {codes.length === 0 && (
-              <tr><td colSpan={7} className="py-8 text-center text-sm" style={{ color: colors.textSecondary }}>Žiadne promo kódy.</td></tr>
+              <tr><td colSpan={8} style={{ padding: '32px 14px', textAlign: 'center', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>Žiadne promo kódy.</td></tr>
             )}
           </tbody>
         </table>
@@ -487,71 +507,73 @@ function CommunityModerationTab() {
   const handleRemove = (id: string) => setLocalStatus(p => ({ ...p, [id]: 'removed' }));
   // TODO: wire to Supabase community_posts table — update `status` column on approve/remove
 
-  const Card = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
-    <div className={`bg-white/40 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-lg ${className}`}>{children}</div>
-  );
-
   const visible = posts.filter(p => {
     if (localStatus[p.id] === 'removed') return false;
     return true;
   });
 
+  const statNum = (val: number, color: string) => (
+    <div style={{ textAlign: 'center' }}>
+      <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 28, fontWeight: 500, color, letterSpacing: '-0.02em', lineHeight: 1 }}>{val}</div>
+    </div>
+  );
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold" style={{ color: colors.textPrimary }}>Community Moderácia</h2>
-        <div className="flex gap-2">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 22, fontWeight: 500, color: _A.DEEP }}>Community Moderácia</div>
+        <div style={{ display: 'flex', gap: 8 }}>
           {(['all', 'flagged'] as const).map(f => (
-            <button key={f} onClick={() => setFilter(f)} className="px-3 py-1.5 rounded-lg text-sm font-medium" style={filter === f ? { backgroundColor: colors.telo, color: '#fff' } : { backgroundColor: 'rgba(255,255,255,0.3)', color: colors.textPrimary }}>
+            <button key={f} onClick={() => setFilter(f)} style={{ padding: '8px 14px', borderRadius: 10, border: 'none', cursor: 'pointer', fontFamily: 'DM Sans, system-ui', fontSize: 12, fontWeight: 500, background: filter === f ? _A.DEEP : _A.CREAM2, color: filter === f ? '#fff' : _A.DEEP }}>
               {f === 'all' ? 'Všetky' : 'Nahlásené'}
             </button>
           ))}
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
-        <Card><div className="text-center"><div className="text-2xl font-bold" style={{ color: colors.textPrimary }}>{posts.length}</div><div className="text-sm" style={{ color: colors.textSecondary }}>Celkovo príspevkov</div></div></Card>
-        <Card><div className="text-center"><div className="text-2xl font-bold" style={{ color: colors.strava }}>{Object.values(localStatus).filter(s => s === 'approved').length}</div><div className="text-sm" style={{ color: colors.textSecondary }}>Schválené (session)</div></div></Card>
-        <Card><div className="text-center"><div className="text-2xl font-bold" style={{ color: colors.periodka }}>{Object.values(localStatus).filter(s => s === 'removed').length}</div><div className="text-sm" style={{ color: colors.textSecondary }}>Odstránené (session)</div></div></Card>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14 }}>
+        <Card>{statNum(posts.length, _A.DEEP)}<div style={{ textAlign: 'center', fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED, marginTop: 6 }}>Celkovo príspevkov</div></Card>
+        <Card>{statNum(Object.values(localStatus).filter(s => s === 'approved').length, _A.SAGE)}<div style={{ textAlign: 'center', fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED, marginTop: 6 }}>Schválené (session)</div></Card>
+        <Card>{statNum(Object.values(localStatus).filter(s => s === 'removed').length, _A.TERRA)}<div style={{ textAlign: 'center', fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED, marginTop: 6 }}>Odstránené (session)</div></Card>
       </div>
 
-      <Card className="!p-0">
+      <div style={{ background: _A.CARD, borderRadius: 16, border: `1px solid ${_A.HAIR}`, overflow: 'hidden' }}>
         {loading ? (
-          <div className="p-8 text-center text-sm" style={{ color: colors.textSecondary }}>Načítavam príspevky…</div>
+          <div style={{ padding: 32, textAlign: 'center', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>Načítavam príspevky…</div>
         ) : (
-          <div className="divide-y divide-white/10">
-            {visible.map(post => {
+          <div>
+            {visible.map((post, i) => {
               const status = localStatus[post.id];
               return (
-                <div key={post.id} className="p-4 hover:bg-white/10 transition-colors">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex items-start gap-3 flex-1 min-w-0">
-                      <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 text-white text-xs font-bold" style={{ background: `linear-gradient(135deg, ${colors.telo}, ${colors.accent})` }}>
+                <div key={post.id} style={{ padding: '14px 20px', borderBottom: i < visible.length - 1 ? `1px solid ${_A.HAIR}` : 'none' }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16 }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, flex: 1, minWidth: 0 }}>
+                      <div style={{ width: 34, height: 34, borderRadius: 999, background: _A.CREAM2, color: _A.DEEP, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Gilda Display, Georgia, serif', fontSize: 14, fontWeight: 500, flexShrink: 0 }}>
                         {post.author.slice(0, 1)}
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-0.5">
-                          <span className="font-medium text-sm" style={{ color: colors.textPrimary }}>{post.author}</span>
-                          <span className="text-xs" style={{ color: colors.textTertiary }}>{post.time}</span>
-                          <span className="text-xs px-1.5 py-0.5 rounded-full" style={{ backgroundColor: `${colors.mysel}20`, color: colors.mysel }}>{post.type === 'question' ? 'Otázka' : 'Príspevok'}</span>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                          <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 13, fontWeight: 500, color: _A.DEEP }}>{post.author}</span>
+                          <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.TERTIARY }}>{post.time}</span>
+                          <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', padding: '3px 8px', borderRadius: 999, background: `rgba(168,132,139,0.15)`, color: _A.MAUVE }}>{post.type === 'question' ? 'Otázka' : 'Príspevok'}</span>
                         </div>
-                        <p className="text-sm" style={{ color: colors.textPrimary }}>{post.text}</p>
-                        <div className="flex items-center gap-3 mt-1 text-xs" style={{ color: colors.textTertiary }}>
-                          <span>❤️ {post.likes}</span>
-                          <span>💬 {post.comments}</span>
+                        <p style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.DEEP, lineHeight: 1.5 }}>{post.text}</p>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 6, fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.TERTIARY }}>
+                          <span>{post.likes} likes</span>
+                          <span>{post.comments} komentárov</span>
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 flex-shrink-0">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
                       {status === 'approved' ? (
-                        <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-700">Schválené</span>
+                        <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', padding: '3px 8px', borderRadius: 999, background: 'rgba(139,158,136,0.15)', color: _A.SAGE }}>Schválené</span>
                       ) : (
                         <>
-                          <button onClick={() => handleApprove(post.id)} className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium" style={{ backgroundColor: `${colors.strava}20`, color: colors.strava }}>
-                            <Check className="w-3 h-3" />Schváliť
+                          <button onClick={() => handleApprove(post.id)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 8, border: 'none', cursor: 'pointer', fontFamily: 'DM Sans, system-ui', fontSize: 11, fontWeight: 500, background: 'rgba(139,158,136,0.15)', color: _A.SAGE }}>
+                            <Check style={{ width: 12, height: 12 }} />Schváliť
                           </button>
-                          <button onClick={() => handleRemove(post.id)} className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium" style={{ backgroundColor: `${colors.periodka}15`, color: colors.periodka }}>
-                            <Trash2 className="w-3 h-3" />Odstrániť
+                          <button onClick={() => handleRemove(post.id)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 8, border: 'none', cursor: 'pointer', fontFamily: 'DM Sans, system-ui', fontSize: 11, fontWeight: 500, background: 'rgba(193,133,106,0.15)', color: _A.TERRA }}>
+                            <Trash2 style={{ width: 12, height: 12 }} />Odstrániť
                           </button>
                         </>
                       )}
@@ -561,11 +583,11 @@ function CommunityModerationTab() {
               );
             })}
             {visible.length === 0 && (
-              <div className="p-8 text-center text-sm" style={{ color: colors.textSecondary }}>Žiadne príspevky.</div>
+              <div style={{ padding: 32, textAlign: 'center', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>Žiadne príspevky.</div>
             )}
           </div>
         )}
-      </Card>
+      </div>
     </div>
   );
 }
@@ -662,22 +684,18 @@ function UsersTab() {
   const tierLabel = (tier: string) => ({ free: 'Free', neome_plus: 'Premium', program_bundle: 'Bundle' }[tier] ?? tier);
   const tierColor = (tier: string) => ({ free: '#A0907E', neome_plus: '#7A9E78', program_bundle: '#B8864A' }[tier] ?? '#A0907E');
 
-  const Card = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
-    <div className={`bg-white/40 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-lg ${className}`}>{children}</div>
-  );
-
-  if (loading) return <div className="flex items-center justify-center py-20 text-sm" style={{ color: colors.textSecondary }}>Načítavam používateľov…</div>;
+  if (loading) return <div style={{ padding: '60px 0', textAlign: 'center', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>Načítavam používateľov…</div>;
   if (error) return (
-    <div className="space-y-4">
-      <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-sm text-red-600 flex items-center gap-2">
-        <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div style={{ padding: '14px 16px', borderRadius: 12, background: 'rgba(193,133,106,0.12)', border: `1px solid ${_A.TERRA}30`, fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.TERRA, display: 'flex', alignItems: 'center', gap: 8 }}>
+        <AlertTriangle style={{ width: 14, height: 14, flexShrink: 0 }} />
         {error}
         {error.includes('SUPABASE_SERVICE_ROLE_KEY') || error.includes('service') ? (
-          <span className="ml-2 font-medium">— Add SUPABASE_SERVICE_ROLE_KEY to Netlify environment variables.</span>
+          <span style={{ fontWeight: 600 }}>— Add SUPABASE_SERVICE_ROLE_KEY to Netlify environment variables.</span>
         ) : null}
       </div>
-      <button onClick={fetchUsers} className="px-4 py-2 rounded-xl text-sm text-white flex items-center gap-2" style={{ backgroundColor: colors.telo }}>
-        <RefreshCw className="w-4 h-4" /> Skúsiť znova
+      <button onClick={fetchUsers} style={{ ...btnPrimary, display: 'flex', alignItems: 'center', gap: 8, alignSelf: 'flex-start' }}>
+        <RefreshCw style={{ width: 14, height: 14 }} /> Skúsiť znova
       </button>
     </div>
   );
@@ -687,26 +705,26 @@ function UsersTab() {
   const freeUsers = users.filter(u => !u.subscriptions || u.subscriptions.tier === 'free').length;
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold" style={{ color: colors.textPrimary }}>User Management</h2>
-        <button onClick={fetchUsers} className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm" style={{ backgroundColor: 'rgba(255,255,255,0.4)', color: colors.textSecondary }}>
-          <RefreshCw className="w-4 h-4" /> Obnoviť
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 22, fontWeight: 500, color: _A.DEEP }}>User Management</div>
+        <button onClick={fetchUsers} style={{ ...btnSecondary, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <RefreshCw style={{ width: 13, height: 13 }} /> Obnoviť
         </button>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4">
-        <Card><div className="text-center"><div className="text-2xl font-bold" style={{ color: colors.textPrimary }}>{totalUsers}</div><div className="text-sm" style={{ color: colors.textSecondary }}>Celkovo používateľov</div></div></Card>
-        <Card><div className="text-center"><div className="text-2xl font-bold" style={{ color: colors.strava }}>{premiumUsers}</div><div className="text-sm" style={{ color: colors.textSecondary }}>Premium</div></div></Card>
-        <Card><div className="text-center"><div className="text-2xl font-bold" style={{ color: colors.textSecondary }}>{freeUsers}</div><div className="text-sm" style={{ color: colors.textSecondary }}>Free</div></div></Card>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14 }}>
+        <Card><div style={{ textAlign: 'center' }}><div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 28, fontWeight: 500, color: _A.DEEP, letterSpacing: '-0.02em', lineHeight: 1 }}>{totalUsers}</div><div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED, marginTop: 6 }}>Celkovo používateľov</div></div></Card>
+        <Card><div style={{ textAlign: 'center' }}><div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 28, fontWeight: 500, color: _A.SAGE, letterSpacing: '-0.02em', lineHeight: 1 }}>{premiumUsers}</div><div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED, marginTop: 6 }}>Premium</div></div></Card>
+        <Card><div style={{ textAlign: 'center' }}><div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 28, fontWeight: 500, color: _A.MUTED, letterSpacing: '-0.02em', lineHeight: 1 }}>{freeUsers}</div><div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED, marginTop: 6 }}>Free</div></div></Card>
       </div>
 
-      {/* Filters */}
+      {/* Filters + list */}
       <Card>
-        <div className="flex gap-3 mb-4">
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Hľadaj podľa emailu alebo mena..." className="flex-1 px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }} />
-          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }}>
+        <div style={{ display: 'flex', gap: 10, marginBottom: 18 }}>
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Hľadaj podľa emailu alebo mena..." style={{ ...inputStyle, flex: 1 }} />
+          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} style={{ ...inputStyle, width: 'auto' }}>
             <option value="all">Všetky</option>
             <option value="neome_plus">Premium</option>
             <option value="program_bundle">Bundle</option>
@@ -714,53 +732,58 @@ function UsersTab() {
           </select>
         </div>
 
-        <div className="space-y-3">
-          {filtered.length === 0 && <p className="text-center py-6 text-sm" style={{ color: colors.textSecondary }}>Žiadni používatelia.</p>}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {filtered.length === 0 && <p style={{ textAlign: 'center', padding: '24px 0', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>Žiadni používatelia.</p>}
           {filtered.map(user => {
             const sub = user.subscriptions;
             const tier = sub?.tier ?? 'free';
+            const tierBadgeStyle = (t: string): React.CSSProperties => {
+              const map: Record<string, { bg: string; col: string }> = {
+                neome_plus: { bg: 'rgba(139,158,136,0.15)', col: _A.SAGE },
+                program_bundle: { bg: 'rgba(184,134,74,0.15)', col: _A.GOLD },
+                free: { bg: `rgba(61,41,33,0.07)`, col: _A.MUTED },
+              };
+              const s = map[t] ?? map.free;
+              return { fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', padding: '3px 8px', borderRadius: 999, background: s.bg, color: s.col };
+            };
             return (
-              <div key={user.id} className="flex items-center justify-between p-4 rounded-xl bg-white/20 border border-white/20">
-                <div className="flex items-center gap-3 flex-1 min-w-0">
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
-                    style={{ background: `linear-gradient(135deg, ${colors.telo}, ${colors.accent})` }}>
+              <div key={user.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px', borderRadius: 12, border: `1px solid ${_A.HAIR}`, background: _A.BG }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1, minWidth: 0 }}>
+                  <div style={{ width: 36, height: 36, borderRadius: 999, background: _A.CREAM2, color: _A.DEEP, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Gilda Display, Georgia, serif', fontSize: 15, fontWeight: 500, flexShrink: 0 }}>
                     {(user.full_name || user.email || '?').charAt(0).toUpperCase()}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-medium text-sm" style={{ color: colors.textPrimary }}>{user.full_name || '—'}</div>
-                    <div className="text-xs" style={{ color: colors.textSecondary }}>{user.email}</div>
-                    <div className="text-[10px] mt-0.5" style={{ color: colors.textTertiary }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 13, fontWeight: 500, color: _A.DEEP }}>{user.full_name || '—'}</div>
+                    <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED }}>{user.email}</div>
+                    <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10, color: _A.TERTIARY, marginTop: 2 }}>
                       Registrovaný: {new Date(user.created_at).toLocaleDateString('sk-SK')}
                       {sub?.current_period_end && ` · Predplatné do: ${new Date(sub.current_period_end).toLocaleDateString('sk-SK')}`}
-                      {sub?.cancel_at_period_end && ' · ⚠️ Ruší sa'}
+                      {sub?.cancel_at_period_end && ' · Ruší sa'}
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <span className="text-xs px-2 py-1 rounded-full font-medium" style={{ backgroundColor: `${tierColor(tier)}20`, color: tierColor(tier) }}>
-                    {tierLabel(tier)}
-                  </span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+                  <span style={tierBadgeStyle(tier)}>{tierLabel(tier)}</span>
                   {sub?.stripe_subscription_id && !sub?.cancel_at_period_end && (
                     <button
                       onClick={() => handleCancelSubscription(user)}
                       disabled={cancelling === user.id}
-                      className="text-xs px-3 py-1.5 rounded-lg font-medium transition-colors"
-                      style={{ backgroundColor: `${colors.periodka}15`, color: colors.periodka }}
+                      style={{ ...btnDanger, padding: '7px 12px', fontSize: 11, opacity: cancelling === user.id ? 0.6 : 1 }}
                     >
                       {cancelling === user.id ? '...' : 'Zrušiť predplatné'}
                     </button>
                   )}
                   {confirmDelete === user.id ? (
-                    <div className="flex items-center gap-1">
-                      <span className="text-xs" style={{ color: colors.periodka }}>Naozaj?</span>
-                      <button onClick={() => handleDeleteUser(user.id)} disabled={deleting === user.id} className="text-xs px-2 py-1 rounded-lg text-white" style={{ backgroundColor: colors.periodka }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.TERRA }}>Naozaj?</span>
+                      <button onClick={() => handleDeleteUser(user.id)} disabled={deleting === user.id} style={{ ...btnDanger, padding: '6px 10px', fontSize: 11 }}>
                         {deleting === user.id ? '...' : 'Áno'}
                       </button>
-                      <button onClick={() => setConfirmDelete(null)} className="text-xs px-2 py-1 rounded-lg" style={{ backgroundColor: 'rgba(255,255,255,0.4)', color: colors.textPrimary }}>Nie</button>
+                      <button onClick={() => setConfirmDelete(null)} style={{ ...btnSecondary, padding: '6px 10px', fontSize: 11 }}>Nie</button>
                     </div>
                   ) : (
-                    <button onClick={() => setConfirmDelete(user.id)} className="p-2 rounded-lg hover:bg-red-50 transition-colors">
-                      <Trash2 className="w-3.5 h-3.5" style={{ color: colors.periodka }} />
+                    <button onClick={() => setConfirmDelete(user.id)} style={{ all: 'unset', cursor: 'pointer', padding: 8, borderRadius: 8 }}>
+                      <Trash2 style={{ width: 14, height: 14, color: _A.TERRA }} />
                     </button>
                   )}
                 </div>
@@ -881,79 +904,89 @@ function BlogPostsTab() {
     { value: 'materstvo', label: 'Materstvo' },
   ];
 
+  const statusBadgeBlog = (status: BlogPost['status']) => {
+    const map: Record<string, { bg: string; col: string; label: string }> = {
+      published: { bg: 'rgba(139,158,136,0.15)', col: _A.SAGE, label: 'Publikovaný' },
+      archived:  { bg: 'rgba(184,134,74,0.15)',  col: _A.GOLD, label: 'Archivovaný' },
+      draft:     { bg: `rgba(61,41,33,0.07)`,    col: _A.MUTED, label: 'Draft' },
+    };
+    const s = map[status] ?? map.draft;
+    return <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', padding: '3px 8px', borderRadius: 999, background: s.bg, color: s.col }}>{s.label}</span>;
+  };
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold" style={{ color: colors.textPrimary }}>Blog</h2>
-        <button onClick={openAdd} className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white" style={{ backgroundColor: colors.mysel }}>
-          <Plus className="w-4 h-4" /> Nový príspevok
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 22, fontWeight: 500, color: _A.DEEP }}>Blog</div>
+        <button onClick={openAdd} style={{ ...btnPrimary, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Plus style={{ width: 14, height: 14 }} /> Nový príspevok
         </button>
       </div>
 
       {showForm && (
         <Card>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-lg" style={{ color: colors.textPrimary }}>{editPost ? 'Upraviť príspevok' : 'Nový príspevok'}</h3>
-            <button onClick={closeForm} className="p-1 rounded-lg hover:bg-white/20"><X className="w-4 h-4" style={{ color: colors.textSecondary }} /></button>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
+            <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 18, fontWeight: 500, color: _A.DEEP }}>{editPost ? 'Upraviť príspevok' : 'Nový príspevok'}</div>
+            <button onClick={closeForm} style={{ all: 'unset', cursor: 'pointer' }}><X style={{ width: 16, height: 16, color: _A.MUTED }} /></button>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="col-span-2">
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Nadpis *</label>
-              <input value={form.title || ''} onChange={e => setForm(f => ({ ...f, title: e.target.value, slug: generateSlug(e.target.value) }))} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }} />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+            <div style={{ gridColumn: '1 / -1' }}>
+              <label style={labelStyle}>Nadpis *</label>
+              <input value={form.title || ''} onChange={e => setForm(f => ({ ...f, title: e.target.value, slug: generateSlug(e.target.value) }))} style={inputStyle} />
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Slug (URL)</label>
-              <input value={form.slug || ''} onChange={e => setForm(f => ({ ...f, slug: e.target.value }))} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none font-mono" style={{ color: colors.textPrimary }} />
+              <label style={labelStyle}>Slug (URL)</label>
+              <input value={form.slug || ''} onChange={e => setForm(f => ({ ...f, slug: e.target.value }))} style={{ ...inputStyle, fontFamily: 'monospace' }} />
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Kategória</label>
-              <select value={form.category || 'general'} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }}>
+              <label style={labelStyle}>Kategória</label>
+              <select value={form.category || 'general'} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} style={inputStyle}>
                 {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Autor</label>
-              <input value={form.author || 'Gabi'} onChange={e => setForm(f => ({ ...f, author: e.target.value }))} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }} />
+              <label style={labelStyle}>Autor</label>
+              <input value={form.author || 'Gabi'} onChange={e => setForm(f => ({ ...f, author: e.target.value }))} style={inputStyle} />
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Cover obrázok (JPEG, PNG, WebP)</label>
-              <div className="space-y-2">
-                <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleImageUpload} disabled={uploadingImage} className="w-full text-xs" style={{ color: colors.textPrimary }} />
-                {uploadingImage && <p className="text-xs" style={{ color: colors.textSecondary }}>Konvertujem a nahrávam…</p>}
-                {imageError && <p className="text-xs" style={{ color: colors.periodka }}>{imageError}</p>}
+              <label style={labelStyle}>Cover obrázok (JPEG, PNG, WebP)</label>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleImageUpload} disabled={uploadingImage} style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED }} />
+                {uploadingImage && <p style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED }}>Konvertujem a nahrávam…</p>}
+                {imageError && <p style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.TERRA }}>{imageError}</p>}
                 {form.cover_image && !uploadingImage && (
-                  <div className="flex items-center gap-2">
-                    <img src={form.cover_image} alt="" className="w-16 h-10 object-cover rounded-lg" />
-                    <p className="text-xs font-mono truncate flex-1" style={{ color: colors.strava }}>✓ Nahraté</p>
-                    <button type="button" onClick={() => setForm(f => ({ ...f, cover_image: undefined }))} className="text-xs" style={{ color: colors.periodka }}>Odstrániť</button>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <img src={form.cover_image} alt="" style={{ width: 64, height: 40, objectFit: 'cover', borderRadius: 8 }} />
+                    <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.SAGE, flex: 1 }}>Nahraté</span>
+                    <button type="button" onClick={() => setForm(f => ({ ...f, cover_image: undefined }))} style={{ all: 'unset', cursor: 'pointer', fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.TERRA }}>Odstrániť</button>
                   </div>
                 )}
               </div>
             </div>
-            <div className="col-span-2">
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Perex (krátky úvod)</label>
-              <textarea value={form.excerpt || ''} onChange={e => setForm(f => ({ ...f, excerpt: e.target.value }))} rows={2} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none resize-none" style={{ color: colors.textPrimary }} />
+            <div style={{ gridColumn: '1 / -1' }}>
+              <label style={labelStyle}>Perex (krátky úvod)</label>
+              <textarea value={form.excerpt || ''} onChange={e => setForm(f => ({ ...f, excerpt: e.target.value }))} rows={2} style={{ ...inputStyle, resize: 'none' }} />
             </div>
-            <div className="col-span-2">
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Obsah</label>
+            <div style={{ gridColumn: '1 / -1' }}>
+              <label style={labelStyle}>Obsah</label>
               <BlogEditor
                 content={form.content || ''}
                 onChange={html => setForm(f => ({ ...f, content: html }))}
               />
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Stav</label>
-              <select value={form.status || 'draft'} onChange={e => setForm(f => ({ ...f, status: e.target.value as BlogPost['status'] }))} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }}>
+              <label style={labelStyle}>Stav</label>
+              <select value={form.status || 'draft'} onChange={e => setForm(f => ({ ...f, status: e.target.value as BlogPost['status'] }))} style={inputStyle}>
                 <option value="draft">Draft</option>
                 <option value="published">Publikovaný</option>
                 <option value="archived">Archivovaný</option>
               </select>
             </div>
           </div>
-          <div className="flex justify-end gap-3 mt-4">
-            <button onClick={closeForm} disabled={saving} className="px-4 py-2 rounded-xl text-sm" style={{ backgroundColor: 'rgba(255,255,255,0.3)', color: colors.textPrimary }}>Zrušiť</button>
-            <button onClick={savePost} disabled={saving} className="px-4 py-2 rounded-xl text-sm text-white flex items-center gap-2" style={{ backgroundColor: saving ? `${colors.mysel}80` : colors.mysel }}>
-              {saving && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 18 }}>
+            <button onClick={closeForm} disabled={saving} style={btnSecondary}>Zrušiť</button>
+            <button onClick={savePost} disabled={saving} style={{ ...btnPrimary, display: 'flex', alignItems: 'center', gap: 8, opacity: saving ? 0.7 : 1 }}>
+              {saving && <RefreshCw style={{ width: 13, height: 13, animation: 'spin 1s linear infinite' }} />}
               {saving ? 'Ukladám...' : 'Uložiť'}
             </button>
           </div>
@@ -961,51 +994,46 @@ function BlogPostsTab() {
       )}
 
       {loading ? (
-        <div className="py-12 text-center text-sm" style={{ color: colors.textSecondary }}>Načítavam príspevky…</div>
+        <div style={{ padding: '48px 0', textAlign: 'center', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>Načítavam príspevky…</div>
       ) : (
-        <Card className="!p-0">
+        <div style={{ background: _A.CARD, borderRadius: 16, border: `1px solid ${_A.HAIR}`, overflow: 'hidden' }}>
           {posts.length === 0 ? (
-            <div className="py-12 text-center">
-              <BookOpen className="w-10 h-10 mx-auto mb-3" style={{ color: colors.textSecondary }} />
-              <p className="text-sm" style={{ color: colors.textSecondary }}>Zatiaľ žiadne príspevky. Vytvor prvý!</p>
+            <div style={{ padding: '48px 0', textAlign: 'center' }}>
+              <BookOpen style={{ width: 36, height: 36, color: _A.MUTED, margin: '0 auto 12px' }} />
+              <p style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>Zatiaľ žiadne príspevky. Vytvor prvý!</p>
             </div>
           ) : (
-            <table className="w-full text-sm">
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
-                <tr className="border-b border-white/20">
-                  {['Nadpis', 'Kategória', 'Autor', 'Vytvorený', 'Publikovaný', 'Akcie'].map(h => (
-                    <th key={h} className="text-left py-3 px-4 font-medium text-xs" style={{ color: colors.textSecondary }}>{h}</th>
+                <tr style={{ background: _A.CREAM2 }}>
+                  {['Nadpis', 'Kategória', 'Autor', 'Vytvorený', 'Stav', 'Akcie'].map(h => (
+                    <th key={h} style={{ textAlign: 'left', padding: '11px 14px', fontFamily: 'DM Sans, system-ui', fontSize: 9.5, letterSpacing: '0.18em', textTransform: 'uppercase', color: _A.EYEBROW, fontWeight: 500 }}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {posts.map(post => (
-                  <tr key={post.id} className="border-b border-white/10 last:border-0 hover:bg-white/10 transition-colors">
-                    <td className="py-3 px-4">
-                      <div className="font-medium" style={{ color: colors.textPrimary }}>{post.title}</div>
-                      <div className="text-xs font-mono" style={{ color: colors.textTertiary }}>{post.slug}</div>
+                  <tr key={post.id} style={{ borderBottom: `1px solid ${_A.HAIR}` }}>
+                    <td style={{ padding: '12px 14px' }}>
+                      <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 13, fontWeight: 500, color: _A.DEEP }}>{post.title}</div>
+                      <div style={{ fontFamily: 'monospace', fontSize: 10, color: _A.TERTIARY, marginTop: 2 }}>{post.slug}</div>
                     </td>
-                    <td className="py-3 px-4">
-                      <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: `${colors.mysel}20`, color: colors.mysel }}>
+                    <td style={{ padding: '12px 14px' }}>
+                      <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', padding: '3px 8px', borderRadius: 999, background: `rgba(168,132,139,0.15)`, color: _A.MAUVE }}>
                         {CATEGORIES.find(c => c.value === post.category)?.label ?? post.category}
                       </span>
                     </td>
-                    <td className="py-3 px-4 text-xs" style={{ color: colors.textSecondary }}>{post.author}</td>
-                    <td className="py-3 px-4 text-xs" style={{ color: colors.textSecondary }}>{new Date(post.created_at).toLocaleDateString('sk-SK')}</td>
-                    <td className="py-3 px-4">
-                      <button onClick={() => cycleStatus(post)} title="Klikni pre zmenu stavu">
-                        {post.status === 'published'
-                          ? <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700">Publikovaný</span>
-                          : post.status === 'archived'
-                          ? <span className="text-xs px-2 py-0.5 rounded-full bg-orange-100 text-orange-600">Archivovaný</span>
-                          : <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">Draft</span>
-                        }
+                    <td style={{ padding: '12px 14px', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>{post.author}</td>
+                    <td style={{ padding: '12px 14px', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>{new Date(post.created_at).toLocaleDateString('sk-SK')}</td>
+                    <td style={{ padding: '12px 14px' }}>
+                      <button onClick={() => cycleStatus(post)} title="Klikni pre zmenu stavu" style={{ all: 'unset', cursor: 'pointer' }}>
+                        {statusBadgeBlog(post.status)}
                       </button>
                     </td>
-                    <td className="py-3 px-4">
-                      <div className="flex items-center gap-1">
-                        <button onClick={() => openEdit(post)} className="p-1.5 rounded-lg hover:bg-white/20 transition-colors"><Edit3 className="w-3.5 h-3.5" style={{ color: colors.textSecondary }} /></button>
-                        <button onClick={() => deletePost(post.id)} className="p-1.5 rounded-lg hover:bg-white/20 transition-colors"><Trash2 className="w-3.5 h-3.5" style={{ color: colors.periodka }} /></button>
+                    <td style={{ padding: '12px 14px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <button onClick={() => openEdit(post)} style={{ all: 'unset', cursor: 'pointer', padding: 6, borderRadius: 8 }}><Edit3 style={{ width: 14, height: 14, color: _A.MUTED }} /></button>
+                        <button onClick={() => deletePost(post.id)} style={{ all: 'unset', cursor: 'pointer', padding: 6, borderRadius: 8 }}><Trash2 style={{ width: 14, height: 14, color: _A.TERRA }} /></button>
                       </div>
                     </td>
                   </tr>
@@ -1013,7 +1041,7 @@ function BlogPostsTab() {
               </tbody>
             </table>
           )}
-        </Card>
+        </div>
       )}
     </div>
   );
@@ -1041,120 +1069,98 @@ function MessagesTab() {
     return d.toLocaleDateString('sk-SK', { day: 'numeric', month: 'short' });
   };
 
-  const Card = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
-    <div className={`bg-white/40 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-lg ${className}`}>{children}</div>
-  );
-
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold" style={{ color: colors.textPrimary }}>
-          Messages
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 22, fontWeight: 500, color: _A.DEEP }}>Messages</div>
           {totalUnread > 0 && (
-            <span className="ml-3 px-2 py-0.5 text-sm rounded-full text-white" style={{ background: colors.periodka }}>
-              {totalUnread} new
-            </span>
+            <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', padding: '3px 8px', borderRadius: 999, background: 'rgba(193,133,106,0.15)', color: _A.TERRA }}>{totalUnread} new</span>
           )}
-        </h2>
+        </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-6" style={{ height: '600px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 14, height: 600 }}>
         {/* Conversation list */}
-        <Card className="overflow-hidden flex flex-col !p-0">
-          <div className="px-4 py-3 border-b border-white/20">
-            <h3 className="font-semibold text-sm" style={{ color: colors.textPrimary }}>Conversations</h3>
-          </div>
-          <div className="flex-1 overflow-y-auto">
+        <div style={{ background: _A.CARD, borderRadius: 16, border: `1px solid ${_A.HAIR}`, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ padding: '14px 18px', borderBottom: `1px solid ${_A.HAIR}`, fontFamily: 'DM Sans, system-ui', fontSize: 9.5, letterSpacing: '0.18em', textTransform: 'uppercase', color: _A.EYEBROW, fontWeight: 500 }}>Conversations</div>
+          <div style={{ flex: 1, overflowY: 'auto' }}>
             {loading ? (
-              <p className="text-sm p-4" style={{ color: colors.textSecondary }}>Loading…</p>
+              <p style={{ padding: 16, fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>Loading…</p>
             ) : conversations.length === 0 ? (
-              <div className="p-6 text-center">
-                <MessageSquare className="w-8 h-8 mx-auto mb-2" style={{ color: colors.textSecondary }} />
-                <p className="text-sm" style={{ color: colors.textSecondary }}>No messages yet</p>
+              <div style={{ padding: '24px 16px', textAlign: 'center' }}>
+                <MessageSquare style={{ width: 28, height: 28, color: _A.MUTED, margin: '0 auto 8px' }} />
+                <p style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>No messages yet</p>
               </div>
             ) : (
               conversations.map((conv) => (
                 <button
                   key={conv.user_id}
                   onClick={() => setSelectedUserId(conv.user_id)}
-                  className="w-full text-left px-4 py-3 border-b border-white/10 hover:bg-white/20 transition-all"
-                  style={selectedUserId === conv.user_id ? { background: 'rgba(184,134,74,0.12)' } : {}}
+                  style={{ all: 'unset', cursor: 'pointer', display: 'block', width: '100%', padding: '12px 16px', borderBottom: `1px solid ${_A.HAIR}`, background: selectedUserId === conv.user_id ? `rgba(184,134,74,0.10)` : 'transparent', boxSizing: 'border-box' }}
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
-                      style={{ background: `linear-gradient(135deg, ${colors.telo}, ${colors.accent})` }}>
-                      U
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-medium truncate" style={{ color: colors.textPrimary }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ width: 30, height: 30, borderRadius: 999, background: _A.CREAM2, color: _A.DEEP, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Gilda Display, Georgia, serif', fontSize: 13, fontWeight: 500, flexShrink: 0 }}>U</div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, fontWeight: 500, color: _A.DEEP, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {conv.user_id === 'demo' ? 'Demo User' : conv.user_id.slice(0, 8) + '…'}
                         </span>
-                        <span className="text-[10px] flex-shrink-0" style={{ color: colors.textTertiary }}>
-                          {formatTime(conv.last_time)}
-                        </span>
+                        <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10, color: _A.TERTIARY, flexShrink: 0 }}>{formatTime(conv.last_time)}</span>
                       </div>
-                      <p className="text-xs truncate mt-0.5" style={{ color: colors.textSecondary }}>
-                        {conv.last_message}
-                      </p>
+                      <p style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: 2 }}>{conv.last_message}</p>
                     </div>
                     {conv.unread > 0 && (
-                      <span className="w-5 h-5 rounded-full text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0"
-                        style={{ background: colors.periodka }}>
-                        {conv.unread}
-                      </span>
+                      <span style={{ width: 18, height: 18, borderRadius: 999, background: _A.TERRA, color: '#fff', fontSize: 9, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{conv.unread}</span>
                     )}
                   </div>
                 </button>
               ))
             )}
           </div>
-        </Card>
+        </div>
 
         {/* Thread + composer */}
-        <Card className="col-span-2 overflow-hidden flex flex-col !p-0">
+        <div style={{ background: _A.CARD, borderRadius: 16, border: `1px solid ${_A.HAIR}`, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
           {!selectedUserId ? (
-            <div className="flex-1 flex items-center justify-center">
-              <div className="text-center">
-                <MessageSquare className="w-10 h-10 mx-auto mb-3" style={{ color: colors.textSecondary }} />
-                <p className="text-sm" style={{ color: colors.textSecondary }}>Select a conversation to reply</p>
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ textAlign: 'center' }}>
+                <MessageSquare style={{ width: 36, height: 36, color: _A.MUTED, margin: '0 auto 12px' }} />
+                <p style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>Select a conversation to reply</p>
               </div>
             </div>
           ) : (
             <>
               {/* Thread header */}
-              <div className="px-5 py-3 border-b border-white/20 flex items-center gap-3">
-                <button onClick={() => setSelectedUserId(null)} className="p-1 hover:bg-white/20 rounded-lg">
-                  <ArrowLeft className="w-4 h-4" style={{ color: colors.textSecondary }} />
+              <div style={{ padding: '12px 18px', borderBottom: `1px solid ${_A.HAIR}`, display: 'flex', alignItems: 'center', gap: 10 }}>
+                <button onClick={() => setSelectedUserId(null)} style={{ all: 'unset', cursor: 'pointer', padding: 6, borderRadius: 8 }}>
+                  <ArrowLeft style={{ width: 15, height: 15, color: _A.MUTED }} />
                 </button>
-                <div className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold"
-                  style={{ background: `linear-gradient(135deg, ${colors.telo}, ${colors.accent})` }}>
-                  U
-                </div>
-                <span className="text-sm font-medium" style={{ color: colors.textPrimary }}>
+                <div style={{ width: 28, height: 28, borderRadius: 999, background: _A.CREAM2, color: _A.DEEP, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Gilda Display, Georgia, serif', fontSize: 13, fontWeight: 500 }}>U</div>
+                <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 13, fontWeight: 500, color: _A.DEEP }}>
                   {selectedUserId === 'demo' ? 'Demo User' : selectedUserId.slice(0, 8) + '…'}
                 </span>
               </div>
 
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3">
+              <div style={{ flex: 1, overflowY: 'auto', padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {thread.map((msg) => {
                   const isGabi = msg.is_from_admin;
                   return (
-                    <div key={msg.id} className={`flex ${isGabi ? 'justify-end' : 'justify-start'}`}>
-                      <div className="max-w-[70%]">
-                        <div
-                          className="px-4 py-2.5 text-sm leading-relaxed"
-                          style={{
-                            borderRadius: isGabi ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
-                            background: isGabi ? colors.accent : 'rgba(255,255,255,0.75)',
-                            color: isGabi ? '#fff' : colors.textPrimary,
-                          }}
-                        >
+                    <div key={msg.id} style={{ display: 'flex', justifyContent: isGabi ? 'flex-end' : 'flex-start' }}>
+                      <div style={{ maxWidth: '70%' }}>
+                        <div style={{
+                          padding: '10px 14px',
+                          fontFamily: 'DM Sans, system-ui',
+                          fontSize: 13,
+                          lineHeight: 1.5,
+                          borderRadius: isGabi ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+                          background: isGabi ? _A.DEEP : _A.CREAM2,
+                          color: isGabi ? '#fff' : _A.DEEP,
+                        }}>
                           {msg.body}
                         </div>
-                        <p className={`text-[10px] mt-1 px-1 ${isGabi ? 'text-right' : 'text-left'}`}
-                          style={{ color: colors.textTertiary }}>
+                        <p style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10, marginTop: 4, paddingLeft: isGabi ? 0 : 4, paddingRight: isGabi ? 4 : 0, textAlign: isGabi ? 'right' : 'left', color: _A.TERTIARY }}>
                           {isGabi ? 'Gabi · ' : 'User · '}{formatTime(msg.created_at)}
                         </p>
                       </div>
@@ -1165,7 +1171,7 @@ function MessagesTab() {
               </div>
 
               {/* Reply composer */}
-              <div className="px-5 py-3 border-t border-white/20 flex items-end gap-2">
+              <div style={{ padding: '12px 18px', borderTop: `1px solid ${_A.HAIR}`, display: 'flex', alignItems: 'flex-end', gap: 10 }}>
                 <textarea
                   value={reply}
                   onChange={e => setReply(e.target.value)}
@@ -1180,12 +1186,7 @@ function MessagesTab() {
                   }}
                   placeholder="Reply as Gabi…"
                   rows={2}
-                  className="flex-1 px-3 py-2 text-sm resize-none rounded-xl outline-none"
-                  style={{
-                    background: 'rgba(255,255,255,0.50)',
-                    border: '1px solid rgba(255,255,255,0.60)',
-                    color: colors.textPrimary,
-                  }}
+                  style={{ flex: 1, ...inputStyle, resize: 'none' }}
                 />
                 <button
                   onClick={() => {
@@ -1195,16 +1196,15 @@ function MessagesTab() {
                     }
                   }}
                   disabled={!reply.trim() || sending}
-                  className="px-4 py-2 rounded-xl text-sm font-medium text-white flex items-center gap-2 transition-opacity"
-                  style={{ background: reply.trim() ? colors.accent : 'rgba(184,134,74,0.35)' }}
+                  style={{ ...btnPrimary, display: 'flex', alignItems: 'center', gap: 8, opacity: !reply.trim() ? 0.4 : 1 }}
                 >
-                  <Send className="w-3.5 h-3.5" />
+                  <Send style={{ width: 13, height: 13 }} />
                   Send
                 </button>
               </div>
             </>
           )}
-        </Card>
+        </div>
       </div>
     </div>
   );
@@ -1261,8 +1261,8 @@ async function adminSeed(type: string, items: Record<string, unknown>[]) {
   return inserted;
 }
 
-const AdminCard = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
-  <div className={`bg-white/40 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-lg ${className}`}>{children}</div>
+const AdminCard = ({ children, className = '', title }: { children: React.ReactNode; className?: string; title?: string }) => (
+  <div className={className} style={{ background: '#FFFFFF', borderRadius: 16, border: `1px solid rgba(61,41,33,0.08)`, padding: '22px 24px' }}>{children}</div>
 );
 
 // ═══════════════════════════════════════════
@@ -1390,119 +1390,117 @@ function RecipesTab() {
   const CATS = ['ranajky', 'obed', 'vecera', 'snack', 'smoothie'];
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold" style={{ color: colors.textPrimary }}>Recipe Database</h2>
-        <div className="flex gap-2">
-          <button onClick={seedFromStatic} disabled={seeding} className="px-4 py-2 rounded-xl text-sm font-medium text-white" style={{ backgroundColor: colors.accent }}>
-            {seeding ? '⟳ Importujem...' : '⬆ Import statických receptov'}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 22, fontWeight: 500, color: _A.DEEP }}>Recipe Database</div>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button onClick={seedFromStatic} disabled={seeding} style={btnSecondary}>
+            {seeding ? 'Importujem...' : 'Import statických receptov'}
           </button>
-          <button onClick={openAdd} className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white" style={{ backgroundColor: colors.strava }}>
-            <Plus className="w-4 h-4" />Nový recept
+          <button onClick={openAdd} style={{ ...btnPrimary, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Plus style={{ width: 14, height: 14 }} />Nový recept
           </button>
         </div>
       </div>
 
-      {error && <div className="px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-600"><AlertTriangle className="w-4 h-4 inline mr-2" />{error}</div>}
+      {error && <div style={{ padding: '12px 16px', borderRadius: 12, background: 'rgba(193,133,106,0.12)', border: `1px solid ${_A.TERRA}30`, fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.TERRA, display: 'flex', alignItems: 'center', gap: 8 }}><AlertTriangle style={{ width: 14, height: 14, flexShrink: 0 }} />{error}</div>}
 
       {showForm && (
         <AdminCard>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-lg" style={{ color: colors.textPrimary }}>{editId ? 'Upraviť recept' : 'Nový recept'}</h3>
-            <button onClick={closeForm}><X className="w-4 h-4" style={{ color: colors.textSecondary }} /></button>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
+            <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 18, fontWeight: 500, color: _A.DEEP }}>{editId ? 'Upraviť recept' : 'Nový recept'}</div>
+            <button onClick={closeForm} style={{ all: 'unset', cursor: 'pointer' }}><X style={{ width: 16, height: 16, color: _A.MUTED }} /></button>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="col-span-2">
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Názov *</label>
-              <input value={form.title ?? ''} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }} />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+            <div style={{ gridColumn: '1 / -1' }}>
+              <label style={labelStyle}>Názov *</label>
+              <input value={form.title ?? ''} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} style={inputStyle} />
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Kategória</label>
-              <select value={form.category ?? 'ranajky'} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }}>
+              <label style={labelStyle}>Kategória</label>
+              <select value={form.category ?? 'ranajky'} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} style={inputStyle}>
                 {CATS.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Obtiažnosť</label>
-              <select value={form.difficulty ?? 'easy'} onChange={e => setForm(f => ({ ...f, difficulty: e.target.value }))} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }}>
+              <label style={labelStyle}>Obtiažnosť</label>
+              <select value={form.difficulty ?? 'easy'} onChange={e => setForm(f => ({ ...f, difficulty: e.target.value }))} style={inputStyle}>
                 <option value="easy">Jednoduchý</option>
                 <option value="medium">Stredný</option>
               </select>
             </div>
             {[['prep_time','Čas prípravy (min)'],['servings','Porcie'],['calories','Kalórie'],['protein','Bielkoviny (g)'],['carbs','Sacharidy (g)'],['fat','Tuky (g)']].map(([field, label]) => (
               <div key={field}>
-                <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>{label}</label>
-                <input type="number" value={(form as any)[field] ?? ''} onChange={e => setForm(f => ({ ...f, [field]: e.target.value }))} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }} />
+                <label style={labelStyle}>{label}</label>
+                <input type="number" value={(form as any)[field] ?? ''} onChange={e => setForm(f => ({ ...f, [field]: e.target.value }))} style={inputStyle} />
               </div>
             ))}
-            <div className="col-span-2">
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>URL obrázka</label>
-              <input value={form.image ?? ''} onChange={e => setForm(f => ({ ...f, image: e.target.value }))} placeholder="https://..." className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }} />
+            <div style={{ gridColumn: '1 / -1' }}>
+              <label style={labelStyle}>URL obrázka</label>
+              <input value={form.image ?? ''} onChange={e => setForm(f => ({ ...f, image: e.target.value }))} placeholder="https://..." style={inputStyle} />
             </div>
-            <div className="col-span-2">
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Popis</label>
-              <textarea value={form.description ?? ''} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} rows={2} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none resize-none" style={{ color: colors.textPrimary }} />
+            <div style={{ gridColumn: '1 / -1' }}>
+              <label style={labelStyle}>Popis</label>
+              <textarea value={form.description ?? ''} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} rows={2} style={{ ...inputStyle, resize: 'none' }} />
             </div>
-            <div className="col-span-2">
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Ingrediencie (jeden na riadok, formát "Názov: Množstvo")</label>
-              <textarea value={ingText} onChange={e => setIngText(e.target.value)} rows={5} placeholder="Avokádo: 1 ks&#10;Vajíčko: 2 ks" className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none resize-none font-mono" style={{ color: colors.textPrimary }} />
+            <div style={{ gridColumn: '1 / -1' }}>
+              <label style={labelStyle}>Ingrediencie (jeden na riadok, formát "Názov: Množstvo")</label>
+              <textarea value={ingText} onChange={e => setIngText(e.target.value)} rows={5} placeholder={'Avokádo: 1 ks\nVajíčko: 2 ks'} style={{ ...inputStyle, resize: 'none', fontFamily: 'monospace' }} />
             </div>
-            <div className="col-span-2">
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Postup (jeden krok na riadok)</label>
-              <textarea value={stepsText} onChange={e => setStepsText(e.target.value)} rows={4} placeholder="Nakrájaj avokádo..." className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none resize-none" style={{ color: colors.textPrimary }} />
-            </div>
-            <div>
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Alergény (čiarkou oddelené)</label>
-              <input value={allerText} onChange={e => setAllerText(e.target.value)} placeholder="dairy, gluten" className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }} />
+            <div style={{ gridColumn: '1 / -1' }}>
+              <label style={labelStyle}>Postup (jeden krok na riadok)</label>
+              <textarea value={stepsText} onChange={e => setStepsText(e.target.value)} rows={4} placeholder="Nakrájaj avokádo..." style={{ ...inputStyle, resize: 'none' }} />
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Tagy (čiarkou oddelené)</label>
-              <input value={tagsText} onChange={e => setTagsText(e.target.value)} placeholder="postpartum, proteín" className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }} />
+              <label style={labelStyle}>Alergény (čiarkou oddelené)</label>
+              <input value={allerText} onChange={e => setAllerText(e.target.value)} placeholder="dairy, gluten" style={inputStyle} />
             </div>
-            <div className="flex items-center gap-2">
-              <button onClick={() => setForm(f => ({ ...f, active: !f.active }))}>
-                {form.active ? <CheckSquare className="w-5 h-5" style={{ color: colors.strava }} /> : <Square className="w-5 h-5" style={{ color: colors.textSecondary }} />}
+            <div>
+              <label style={labelStyle}>Tagy (čiarkou oddelené)</label>
+              <input value={tagsText} onChange={e => setTagsText(e.target.value)} placeholder="postpartum, proteín" style={inputStyle} />
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <button onClick={() => setForm(f => ({ ...f, active: !f.active }))} style={{ all: 'unset', cursor: 'pointer' }}>
+                {form.active ? <CheckSquare style={{ width: 18, height: 18, color: _A.SAGE }} /> : <Square style={{ width: 18, height: 18, color: _A.MUTED }} />}
               </button>
-              <span className="text-sm" style={{ color: colors.textPrimary }}>Aktívny</span>
+              <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.DEEP }}>Aktívny</span>
             </div>
           </div>
-          {error && <div className="mt-3 text-sm text-red-600"><AlertTriangle className="w-4 h-4 inline mr-1" />{error}</div>}
-          <div className="flex justify-end gap-3 mt-4">
-            <button onClick={closeForm} className="px-4 py-2 rounded-xl text-sm" style={{ backgroundColor: 'rgba(255,255,255,0.3)', color: colors.textPrimary }}>Zrušiť</button>
-            <button onClick={save} disabled={saving} className="px-4 py-2 rounded-xl text-sm text-white flex items-center gap-2" style={{ backgroundColor: saving ? `${colors.strava}80` : colors.strava }}>
-              {saving && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}Uložiť
+          {error && <div style={{ marginTop: 12, fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.TERRA, display: 'flex', alignItems: 'center', gap: 6 }}><AlertTriangle style={{ width: 13, height: 13 }} />{error}</div>}
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 18 }}>
+            <button onClick={closeForm} style={btnSecondary}>Zrušiť</button>
+            <button onClick={save} disabled={saving} style={{ ...btnPrimary, display: 'flex', alignItems: 'center', gap: 8, opacity: saving ? 0.7 : 1 }}>
+              {saving && <RefreshCw style={{ width: 13, height: 13, animation: 'spin 1s linear infinite' }} />}Uložiť
             </button>
           </div>
         </AdminCard>
       )}
 
       <AdminCard>
-        {loading ? <div className="py-8 text-center text-sm" style={{ color: colors.textSecondary }}>Načítavam...</div> : (
+        {loading ? <div style={{ padding: '32px 0', textAlign: 'center', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>Načítavam...</div> : (
           <>
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-sm font-medium" style={{ color: colors.textSecondary }}>{items.length} receptov</span>
-            </div>
-            <div className="space-y-2">
-              {items.length === 0 && <p className="py-6 text-center text-sm" style={{ color: colors.textSecondary }}>Žiadne recepty. Pridaj prvý alebo importuj statické.</p>}
+            <div style={{ marginBottom: 16, fontFamily: 'DM Sans, system-ui', fontSize: 9.5, letterSpacing: '0.18em', textTransform: 'uppercase', color: _A.EYEBROW, fontWeight: 500 }}>{items.length} receptov</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {items.length === 0 && <p style={{ padding: '24px 0', textAlign: 'center', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>Žiadne recepty. Pridaj prvý alebo importuj statické.</p>}
               {items.map(r => (
-                <div key={r.id} className="flex items-center justify-between p-3 rounded-xl bg-white/20 border border-white/20">
-                  <div className="flex items-center gap-3">
-                    {r.image && <img src={r.image} alt="" className="w-10 h-10 rounded-lg object-cover" />}
+                <div key={r.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', borderRadius: 12, border: `1px solid ${_A.HAIR}`, background: _A.BG }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    {r.image && <img src={r.image} alt="" style={{ width: 40, height: 40, borderRadius: 10, objectFit: 'cover' }} />}
                     <div>
-                      <div className="text-sm font-medium" style={{ color: colors.textPrimary }}>{r.title}</div>
-                      <div className="text-xs flex gap-2" style={{ color: colors.textSecondary }}>
-                        <span className="px-1.5 py-0.5 rounded-full" style={{ backgroundColor: `${colors.strava}20`, color: colors.strava }}>{r.category}</span>
-                        <span>{r.calories} kcal</span>
-                        <span>{r.prep_time} min</span>
+                      <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 13, fontWeight: 500, color: _A.DEEP }}>{r.title}</div>
+                      <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 3 }}>
+                        <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', padding: '2px 7px', borderRadius: 999, background: 'rgba(139,158,136,0.15)', color: _A.SAGE }}>{r.category}</span>
+                        <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED }}>{r.calories} kcal</span>
+                        <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED }}>{r.prep_time} min</span>
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <button onClick={() => toggleActive(r)} title={r.active ? 'Deaktivácia' : 'Aktivácia'}>
-                      {r.active ? <CheckSquare className="w-4 h-4" style={{ color: colors.strava }} /> : <Square className="w-4 h-4" style={{ color: colors.textSecondary }} />}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <button onClick={() => toggleActive(r)} title={r.active ? 'Deaktivácia' : 'Aktivácia'} style={{ all: 'unset', cursor: 'pointer', padding: 4 }}>
+                      {r.active ? <CheckSquare style={{ width: 16, height: 16, color: _A.SAGE }} /> : <Square style={{ width: 16, height: 16, color: _A.MUTED }} />}
                     </button>
-                    <button onClick={() => openEdit(r)} className="p-1.5 rounded-lg hover:bg-white/20"><Edit3 className="w-3.5 h-3.5" style={{ color: colors.textSecondary }} /></button>
-                    <button onClick={() => remove(r.id)} className="p-1.5 rounded-lg hover:bg-white/20"><Trash2 className="w-3.5 h-3.5" style={{ color: colors.periodka }} /></button>
+                    <button onClick={() => openEdit(r)} style={{ all: 'unset', cursor: 'pointer', padding: 6, borderRadius: 8 }}><Edit3 style={{ width: 14, height: 14, color: _A.MUTED }} /></button>
+                    <button onClick={() => remove(r.id)} style={{ all: 'unset', cursor: 'pointer', padding: 6, borderRadius: 8 }}><Trash2 style={{ width: 14, height: 14, color: _A.TERRA }} /></button>
                   </div>
                 </div>
               ))}
@@ -1621,60 +1619,70 @@ function ExercisesTab() {
   const exercises = items.filter(i => i.content_type === 'exercise');
   const stretches = items.filter(i => i.content_type === 'stretch');
 
+  const exStatusBadge = (status: string) => {
+    const map: Record<string, { bg: string; col: string; label: string }> = {
+      published: { bg: 'rgba(139,158,136,0.15)', col: _A.SAGE, label: 'live' },
+      archived:  { bg: `rgba(61,41,33,0.07)`,    col: _A.MUTED, label: 'arch' },
+      draft:     { bg: 'rgba(184,134,74,0.15)',   col: _A.GOLD, label: 'draft' },
+    };
+    const s = map[status] ?? map.draft;
+    return <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', padding: '3px 8px', borderRadius: 999, background: s.bg, color: s.col }}>{s.label}</span>;
+  };
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold" style={{ color: colors.textPrimary }}>Exercise Library</h2>
-        <div className="flex gap-2">
-          <button onClick={seedFromStatic} disabled={seeding} className="px-4 py-2 rounded-xl text-sm font-medium border-2 text-white" style={{ backgroundColor: colors.accent, borderColor: colors.accent }}>
-            {seeding ? '⟳ ...' : '⬆ Import'}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 22, fontWeight: 500, color: _A.DEEP }}>Exercise Library</div>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button onClick={seedFromStatic} disabled={seeding} style={btnSecondary}>
+            {seeding ? 'Importujem...' : 'Import'}
           </button>
-          <button onClick={openAdd} className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white" style={{ backgroundColor: colors.telo }}>
-            <Plus className="w-4 h-4" />Nové cvičenie
+          <button onClick={openAdd} style={{ ...btnPrimary, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Plus style={{ width: 14, height: 14 }} />Nové cvičenie
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
-        {[['Celkovo', items.length, colors.textPrimary], ['Silové', exercises.length, colors.telo], ['Strečing', stretches.length, colors.mysel]].map(([label, val, col]) => (
-          <AdminCard key={label as string}><div className="text-center"><div className="text-2xl font-bold" style={{ color: col as string }}>{val as number}</div><div className="text-sm" style={{ color: colors.textSecondary }}>{label as string}</div></div></AdminCard>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14 }}>
+        {[['Celkovo', items.length, _A.DEEP], ['Silové', exercises.length, _A.TERRA], ['Strečing', stretches.length, _A.MAUVE]].map(([label, val, col]) => (
+          <AdminCard key={label as string}><div style={{ textAlign: 'center' }}><div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 28, fontWeight: 500, color: col as string, letterSpacing: '-0.02em', lineHeight: 1 }}>{val as number}</div><div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED, marginTop: 6 }}>{label as string}</div></div></AdminCard>
         ))}
       </div>
 
-      {error && <div className="px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-600"><AlertTriangle className="w-4 h-4 inline mr-2" />{error}</div>}
+      {error && <div style={{ padding: '12px 16px', borderRadius: 12, background: 'rgba(193,133,106,0.12)', border: `1px solid ${_A.TERRA}30`, fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.TERRA, display: 'flex', alignItems: 'center', gap: 8 }}><AlertTriangle style={{ width: 14, height: 14, flexShrink: 0 }} />{error}</div>}
 
       {showForm && (
         <AdminCard>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-lg" style={{ color: colors.textPrimary }}>{editId ? 'Upraviť cvičenie' : 'Nové cvičenie'}</h3>
-            <button onClick={closeForm}><X className="w-4 h-4" style={{ color: colors.textSecondary }} /></button>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
+            <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 18, fontWeight: 500, color: _A.DEEP }}>{editId ? 'Upraviť cvičenie' : 'Nové cvičenie'}</div>
+            <button onClick={closeForm} style={{ all: 'unset', cursor: 'pointer' }}><X style={{ width: 16, height: 16, color: _A.MUTED }} /></button>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
             <div>
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Typ</label>
-              <select value={form.content_type ?? 'exercise'} onChange={e => setForm(f => ({ ...f, content_type: e.target.value as 'exercise' | 'stretch' }))} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }}>
+              <label style={labelStyle}>Typ</label>
+              <select value={form.content_type ?? 'exercise'} onChange={e => setForm(f => ({ ...f, content_type: e.target.value as 'exercise' | 'stretch' }))} style={inputStyle}>
                 <option value="exercise">Silové cvičenie</option>
                 <option value="stretch">Strečing</option>
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Názov *</label>
-              <input value={form.name ?? ''} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }} />
+              <label style={labelStyle}>Názov *</label>
+              <input value={form.name ?? ''} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} style={inputStyle} />
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Dĺžka</label>
-              <select value={form.duration ?? '15 min'} onChange={e => setForm(f => ({ ...f, duration: e.target.value }))} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }}>
+              <label style={labelStyle}>Dĺžka</label>
+              <select value={form.duration ?? '15 min'} onChange={e => setForm(f => ({ ...f, duration: e.target.value }))} style={inputStyle}>
                 <option value="5 min">5 min</option>
                 <option value="15 min">15 min</option>
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Partie tela</label>
-              <input value={form.body ?? ''} onChange={e => setForm(f => ({ ...f, body: e.target.value }))} placeholder="Celé telo / Core / Nohy..." className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }} />
+              <label style={labelStyle}>Partie tela</label>
+              <input value={form.body ?? ''} onChange={e => setForm(f => ({ ...f, body: e.target.value }))} placeholder="Celé telo / Core / Nohy..." style={inputStyle} />
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Pomôcky</label>
-              <select value={form.equip ?? 'Bez pomôcok'} onChange={e => setForm(f => ({ ...f, equip: e.target.value }))} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }}>
+              <label style={labelStyle}>Pomôcky</label>
+              <select value={form.equip ?? 'Bez pomôcok'} onChange={e => setForm(f => ({ ...f, equip: e.target.value }))} style={inputStyle}>
                 <option>Bez pomôcok</option>
                 <option>S gumou</option>
                 <option>S činkami</option>
@@ -1682,98 +1690,91 @@ function ExercisesTab() {
             </div>
             {form.content_type === 'exercise' && (
               <div>
-                <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Level (1-4)</label>
-                <select value={form.level ?? 1} onChange={e => setForm(f => ({ ...f, level: Number(e.target.value) }))} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }}>
+                <label style={labelStyle}>Level (1-4)</label>
+                <select value={form.level ?? 1} onChange={e => setForm(f => ({ ...f, level: Number(e.target.value) }))} style={inputStyle}>
                   {[1,2,3,4].map(l => <option key={l} value={l}>{l}</option>)}
                 </select>
               </div>
             )}
-            <div className="col-span-2">
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Náhľadový obrázok</label>
-              <div className="flex items-center gap-3">
-                {form.thumb && <img src={form.thumb} alt="" className="w-14 h-14 rounded-lg object-cover border border-white/30" />}
+            <div style={{ gridColumn: '1 / -1' }}>
+              <label style={labelStyle}>Náhľadový obrázok</label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                {form.thumb && <img src={form.thumb} alt="" style={{ width: 52, height: 52, borderRadius: 10, objectFit: 'cover', border: `1px solid ${_A.HAIR}` }} />}
                 <button
                   type="button"
                   disabled={uploadingThumb}
                   onMouseDown={e => { e.preventDefault(); thumbInputRef.current?.click(); }}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs border border-white/30 bg-white/20 hover:bg-white/30 transition-colors disabled:opacity-40"
-                  style={{ color: colors.textSecondary }}
+                  style={{ ...btnSecondary, display: 'flex', alignItems: 'center', gap: 8, opacity: uploadingThumb ? 0.5 : 1 }}
                 >
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>
                   {uploadingThumb ? 'Nahrávam…' : form.thumb ? 'Zmeniť' : 'Nahrať obrázok'}
                 </button>
-                {thumbError && <span className="text-xs text-red-500">{thumbError}</span>}
+                {thumbError && <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.TERRA }}>{thumbError}</span>}
               </div>
-              <input ref={thumbInputRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handleThumbUpload} />
+              <input ref={thumbInputRef} type="file" accept="image/jpeg,image/png,image/webp" style={{ display: 'none' }} onChange={handleThumbUpload} />
             </div>
-            <div className="col-span-2">
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Video URL</label>
-              <input value={form.video_url ?? ''} onChange={e => setForm(f => ({ ...f, video_url: e.target.value }))} placeholder="Doplníš neskôr…" className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }} />
+            <div style={{ gridColumn: '1 / -1' }}>
+              <label style={labelStyle}>Video URL</label>
+              <input value={form.video_url ?? ''} onChange={e => setForm(f => ({ ...f, video_url: e.target.value }))} placeholder="Doplníš neskôr…" style={inputStyle} />
             </div>
-            <div className="col-span-2">
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Popis</label>
-              <textarea value={form.description ?? ''} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} rows={2} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none resize-none" style={{ color: colors.textPrimary }} />
+            <div style={{ gridColumn: '1 / -1' }}>
+              <label style={labelStyle}>Popis</label>
+              <textarea value={form.description ?? ''} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} rows={2} style={{ ...inputStyle, resize: 'none' }} />
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Stav</label>
-              <select value={form.status ?? 'draft'} onChange={e => setForm(f => ({ ...f, status: e.target.value as ExerciseRow['status'] }))} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }}>
+              <label style={labelStyle}>Stav</label>
+              <select value={form.status ?? 'draft'} onChange={e => setForm(f => ({ ...f, status: e.target.value as ExerciseRow['status'] }))} style={inputStyle}>
                 <option value="draft">Draft</option>
                 <option value="published">Publikované</option>
                 <option value="archived">Archivované</option>
               </select>
             </div>
             {form.content_type === 'exercise' && (
-              <div className="flex items-center gap-2 pt-5">
-                <button onClick={() => setForm(f => ({ ...f, diastasis_safe: !f.diastasis_safe }))}>
-                  {form.diastasis_safe ? <CheckSquare className="w-5 h-5" style={{ color: colors.strava }} /> : <Square className="w-5 h-5" style={{ color: colors.textSecondary }} />}
-                </button>
-                <span className="text-sm" style={{ color: colors.textPrimary }}>Bezpečné pri diastáze</span>
+              <div style={{ display: 'flex', alignItems: 'flex-end' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                  <button onClick={() => setForm(f => ({ ...f, diastasis_safe: !f.diastasis_safe }))} style={{ all: 'unset', cursor: 'pointer' }}>
+                    {form.diastasis_safe ? <CheckSquare style={{ width: 18, height: 18, color: _A.SAGE }} /> : <Square style={{ width: 18, height: 18, color: _A.MUTED }} />}
+                  </button>
+                  <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.DEEP }}>Bezpečné pri diastáze</span>
+                </label>
               </div>
             )}
           </div>
-          {error && <div className="mt-3 text-sm text-red-600">{error}</div>}
-          <div className="flex justify-end gap-3 mt-4">
-            <button onClick={closeForm} className="px-4 py-2 rounded-xl text-sm" style={{ backgroundColor: 'rgba(255,255,255,0.3)', color: colors.textPrimary }}>Zrušiť</button>
-            <button onClick={save} disabled={saving} className="px-4 py-2 rounded-xl text-sm text-white flex items-center gap-2" style={{ backgroundColor: colors.telo }}>
-              {saving && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}Uložiť
+          {error && <div style={{ marginTop: 12, fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.TERRA }}>{error}</div>}
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 18 }}>
+            <button onClick={closeForm} style={btnSecondary}>Zrušiť</button>
+            <button onClick={save} disabled={saving} style={{ ...btnPrimary, display: 'flex', alignItems: 'center', gap: 8, opacity: saving ? 0.7 : 1 }}>
+              {saving && <RefreshCw style={{ width: 13, height: 13, animation: 'spin 1s linear infinite' }} />}Uložiť
             </button>
           </div>
         </AdminCard>
       )}
 
       <AdminCard>
-        {loading ? <div className="py-8 text-center text-sm" style={{ color: colors.textSecondary }}>Načítavam...</div> : (
-          <div className="space-y-2">
-            {items.length === 0 && <p className="py-6 text-center text-sm" style={{ color: colors.textSecondary }}>Žiadne cvičenia. Pridaj prvé.</p>}
+        {loading ? <div style={{ padding: '32px 0', textAlign: 'center', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>Načítavam...</div> : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {items.length === 0 && <p style={{ padding: '24px 0', textAlign: 'center', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>Žiadne cvičenia. Pridaj prvé.</p>}
             {items.map(r => (
-              <div key={r.id} className="flex items-center justify-between p-3 rounded-xl bg-white/20 border border-white/20">
-                <div className="flex items-center gap-3">
-                  {r.thumb && <img src={r.thumb} alt="" className="w-10 h-10 rounded-lg object-cover" />}
+              <div key={r.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', borderRadius: 12, border: `1px solid ${_A.HAIR}`, background: _A.BG }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  {r.thumb && <img src={r.thumb} alt="" style={{ width: 40, height: 40, borderRadius: 10, objectFit: 'cover' }} />}
                   <div>
-                    <div className="text-sm font-medium" style={{ color: colors.textPrimary }}>{r.name}</div>
-                    <div className="text-xs flex gap-2" style={{ color: colors.textSecondary }}>
-                      <span className="px-1.5 py-0.5 rounded-full" style={{ backgroundColor: `${r.content_type === 'exercise' ? colors.telo : colors.mysel}20`, color: r.content_type === 'exercise' ? colors.telo : colors.mysel }}>
+                    <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 13, fontWeight: 500, color: _A.DEEP }}>{r.name}</div>
+                    <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 3 }}>
+                      <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', padding: '2px 7px', borderRadius: 999, background: r.content_type === 'exercise' ? 'rgba(193,133,106,0.15)' : 'rgba(168,132,139,0.15)', color: r.content_type === 'exercise' ? _A.TERRA : _A.MAUVE }}>
                         {r.content_type === 'exercise' ? 'Silové' : 'Strečing'}
                       </span>
-                      <span>{r.duration}</span>
-                      {r.body && <span>{r.body}</span>}
+                      <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED }}>{r.duration}</span>
+                      {r.body && <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED }}>{r.body}</span>}
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-1">
-                  <button
-                    title="Kliknúť pre zmenu stavu"
-                    onClick={() => cycleStatus(r)}
-                    className="px-2 py-0.5 rounded-full text-xs font-medium"
-                    style={{
-                      backgroundColor: r.status === 'published' ? `${colors.strava}20` : r.status === 'archived' ? `${colors.textSecondary}15` : `${colors.accent}20`,
-                      color: r.status === 'published' ? colors.strava : r.status === 'archived' ? colors.textSecondary : colors.accent,
-                    }}
-                  >
-                    {r.status === 'published' ? 'live' : r.status === 'archived' ? 'arch' : 'draft'}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <button title="Kliknúť pre zmenu stavu" onClick={() => cycleStatus(r)} style={{ all: 'unset', cursor: 'pointer' }}>
+                    {exStatusBadge(r.status)}
                   </button>
-                  <button onClick={() => openEdit(r)} className="p-1.5 rounded-lg hover:bg-white/20"><Edit3 className="w-3.5 h-3.5" style={{ color: colors.textSecondary }} /></button>
-                  <button onClick={() => remove(r.id)} className="p-1.5 rounded-lg hover:bg-white/20"><Trash2 className="w-3.5 h-3.5" style={{ color: colors.periodka }} /></button>
+                  <button onClick={() => openEdit(r)} style={{ all: 'unset', cursor: 'pointer', padding: 6, borderRadius: 8 }}><Edit3 style={{ width: 14, height: 14, color: _A.MUTED }} /></button>
+                  <button onClick={() => remove(r.id)} style={{ all: 'unset', cursor: 'pointer', padding: 6, borderRadius: 8 }}><Trash2 style={{ width: 14, height: 14, color: _A.TERRA }} /></button>
                 </div>
               </div>
             ))}
@@ -1883,118 +1884,122 @@ function MeditationsTab() {
 
   const CATS = ['Stres', 'Mindfulness', 'Materstvo', 'Emócie', 'Ja'];
 
+  const medStatusBadge = (status: string) => {
+    const map: Record<string, { bg: string; col: string; label: string }> = {
+      published: { bg: 'rgba(139,158,136,0.15)', col: _A.SAGE, label: 'live' },
+      archived:  { bg: `rgba(61,41,33,0.07)`,    col: _A.MUTED, label: 'arch' },
+      draft:     { bg: 'rgba(184,134,74,0.15)',   col: _A.GOLD, label: 'draft' },
+    };
+    const s = map[status] ?? map.draft;
+    return <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', padding: '3px 8px', borderRadius: 999, background: s.bg, color: s.col }}>{s.label}</span>;
+  };
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold" style={{ color: colors.textPrimary }}>Meditation Content</h2>
-        <div className="flex gap-2">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 22, fontWeight: 500, color: _A.DEEP }}>Meditation Content</div>
+        <div style={{ display: 'flex', gap: 10 }}>
           {items.length === 0 && !loading && (
-            <button onClick={seedFromStatic} disabled={seeding} className="px-4 py-2 rounded-xl text-sm font-medium text-white" style={{ backgroundColor: colors.accent }}>
-              {seeding ? '⟳ Importujem...' : '⬆ Import 17 meditácií'}
+            <button onClick={seedFromStatic} disabled={seeding} style={btnSecondary}>
+              {seeding ? 'Importujem...' : 'Import 17 meditácií'}
             </button>
           )}
-          <button onClick={openAdd} className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white" style={{ backgroundColor: colors.mysel }}>
-            <Plus className="w-4 h-4" />Nová meditácia
+          <button onClick={openAdd} style={{ ...btnPrimary, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Plus style={{ width: 14, height: 14 }} />Nová meditácia
           </button>
         </div>
       </div>
 
-      {error && <div className="px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-600"><AlertTriangle className="w-4 h-4 inline mr-2" />{error}</div>}
+      {error && <div style={{ padding: '12px 16px', borderRadius: 12, background: 'rgba(193,133,106,0.12)', border: `1px solid ${_A.TERRA}30`, fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.TERRA, display: 'flex', alignItems: 'center', gap: 8 }}><AlertTriangle style={{ width: 14, height: 14, flexShrink: 0 }} />{error}</div>}
 
       {showForm && (
         <AdminCard>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-lg" style={{ color: colors.textPrimary }}>{editId ? 'Upraviť meditáciu' : 'Nová meditácia'}</h3>
-            <button onClick={closeForm}><X className="w-4 h-4" style={{ color: colors.textSecondary }} /></button>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
+            <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 18, fontWeight: 500, color: _A.DEEP }}>{editId ? 'Upraviť meditáciu' : 'Nová meditácia'}</div>
+            <button onClick={closeForm} style={{ all: 'unset', cursor: 'pointer' }}><X style={{ width: 16, height: 16, color: _A.MUTED }} /></button>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="col-span-2">
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Názov *</label>
-              <input value={form.title ?? ''} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }} />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+            <div style={{ gridColumn: '1 / -1' }}>
+              <label style={labelStyle}>Názov *</label>
+              <input value={form.title ?? ''} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} style={inputStyle} />
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Kategória</label>
-              <select value={form.category ?? 'Stres'} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }}>
+              <label style={labelStyle}>Kategória</label>
+              <select value={form.category ?? 'Stres'} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} style={inputStyle}>
                 {CATS.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Dĺžka</label>
-              <select value={form.duration ?? '5 min'} onChange={e => setForm(f => ({ ...f, duration: e.target.value }))} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }}>
+              <label style={labelStyle}>Dĺžka</label>
+              <select value={form.duration ?? '5 min'} onChange={e => setForm(f => ({ ...f, duration: e.target.value }))} style={inputStyle}>
                 <option value="5 min">5 min</option>
                 <option value="10 min">10 min</option>
                 <option value="15 min">15 min</option>
                 <option value="20 min">20 min</option>
               </select>
             </div>
-            <div className="col-span-2">
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Popis</label>
-              <textarea value={form.description ?? ''} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} rows={2} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none resize-none" style={{ color: colors.textPrimary }} />
+            <div style={{ gridColumn: '1 / -1' }}>
+              <label style={labelStyle}>Popis</label>
+              <textarea value={form.description ?? ''} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} rows={2} style={{ ...inputStyle, resize: 'none' }} />
             </div>
-            <div className="col-span-2">
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Audio URL</label>
-              <input value={form.audio_url ?? ''} onChange={e => setForm(f => ({ ...f, audio_url: e.target.value }))} placeholder="/audio/file.mp3 alebo https://..." className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }} />
+            <div style={{ gridColumn: '1 / -1' }}>
+              <label style={labelStyle}>Audio URL</label>
+              <input value={form.audio_url ?? ''} onChange={e => setForm(f => ({ ...f, audio_url: e.target.value }))} placeholder="/audio/file.mp3 alebo https://..." style={inputStyle} />
             </div>
-            <div className="col-span-2">
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>URL obrázka</label>
-              <input value={form.image ?? ''} onChange={e => setForm(f => ({ ...f, image: e.target.value }))} placeholder="https://..." className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }} />
+            <div style={{ gridColumn: '1 / -1' }}>
+              <label style={labelStyle}>URL obrázka</label>
+              <input value={form.image ?? ''} onChange={e => setForm(f => ({ ...f, image: e.target.value }))} placeholder="https://..." style={inputStyle} />
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1" style={{ color: colors.textSecondary }}>Stav</label>
-              <select value={form.status ?? 'draft'} onChange={e => setForm(f => ({ ...f, status: e.target.value as MeditationRow['status'] }))} className="w-full px-3 py-2 rounded-xl text-sm bg-white/30 border border-white/30 outline-none" style={{ color: colors.textPrimary }}>
+              <label style={labelStyle}>Stav</label>
+              <select value={form.status ?? 'draft'} onChange={e => setForm(f => ({ ...f, status: e.target.value as MeditationRow['status'] }))} style={inputStyle}>
                 <option value="draft">Draft</option>
                 <option value="published">Publikovaná</option>
                 <option value="archived">Archivovaná</option>
               </select>
             </div>
-            <div className="flex items-center gap-2 pt-5">
-              <button onClick={() => setForm(f => ({ ...f, featured: !f.featured }))}>
-                {form.featured ? <CheckSquare className="w-5 h-5" style={{ color: colors.accent }} /> : <Square className="w-5 h-5" style={{ color: colors.textSecondary }} />}
-              </button>
-              <span className="text-sm" style={{ color: colors.textPrimary }}>Odporúčaná</span>
+            <div style={{ display: 'flex', alignItems: 'flex-end' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                <button onClick={() => setForm(f => ({ ...f, featured: !f.featured }))} style={{ all: 'unset', cursor: 'pointer' }}>
+                  {form.featured ? <CheckSquare style={{ width: 18, height: 18, color: _A.GOLD }} /> : <Square style={{ width: 18, height: 18, color: _A.MUTED }} />}
+                </button>
+                <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.DEEP }}>Odporúčaná</span>
+              </label>
             </div>
           </div>
-          {error && <div className="mt-3 text-sm text-red-600">{error}</div>}
-          <div className="flex justify-end gap-3 mt-4">
-            <button onClick={closeForm} className="px-4 py-2 rounded-xl text-sm" style={{ backgroundColor: 'rgba(255,255,255,0.3)', color: colors.textPrimary }}>Zrušiť</button>
-            <button onClick={save} disabled={saving} className="px-4 py-2 rounded-xl text-sm text-white flex items-center gap-2" style={{ backgroundColor: colors.mysel }}>
-              {saving && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}Uložiť
+          {error && <div style={{ marginTop: 12, fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.TERRA }}>{error}</div>}
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 18 }}>
+            <button onClick={closeForm} style={btnSecondary}>Zrušiť</button>
+            <button onClick={save} disabled={saving} style={{ ...btnPrimary, display: 'flex', alignItems: 'center', gap: 8, opacity: saving ? 0.7 : 1 }}>
+              {saving && <RefreshCw style={{ width: 13, height: 13, animation: 'spin 1s linear infinite' }} />}Uložiť
             </button>
           </div>
         </AdminCard>
       )}
 
       <AdminCard>
-        {loading ? <div className="py-8 text-center text-sm" style={{ color: colors.textSecondary }}>Načítavam...</div> : (
-          <div className="space-y-2">
-            {items.length === 0 && <p className="py-6 text-center text-sm" style={{ color: colors.textSecondary }}>Žiadne meditácie. Importuj existujúce alebo pridaj novú.</p>}
+        {loading ? <div style={{ padding: '32px 0', textAlign: 'center', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>Načítavam...</div> : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {items.length === 0 && <p style={{ padding: '24px 0', textAlign: 'center', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>Žiadne meditácie. Importuj existujúce alebo pridaj novú.</p>}
             {items.map(r => (
-              <div key={r.id} className="flex items-center justify-between p-3 rounded-xl bg-white/20 border border-white/20">
-                <div className="flex items-center gap-3">
-                  {r.image && <img src={r.image} alt="" className="w-10 h-10 rounded-lg object-cover" />}
+              <div key={r.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', borderRadius: 12, border: `1px solid ${_A.HAIR}`, background: _A.BG }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  {r.image && <img src={r.image} alt="" style={{ width: 40, height: 40, borderRadius: 10, objectFit: 'cover' }} />}
                   <div>
-                    <div className="text-sm font-medium" style={{ color: colors.textPrimary }}>{r.title}</div>
-                    <div className="text-xs flex gap-2" style={{ color: colors.textSecondary }}>
-                      <span className="px-1.5 py-0.5 rounded-full" style={{ backgroundColor: `${colors.mysel}20`, color: colors.mysel }}>{r.category}</span>
-                      <span>{r.duration}</span>
-                      {r.featured && <span className="px-1.5 py-0.5 rounded-full" style={{ backgroundColor: `${colors.accent}20`, color: colors.accent }}>Featured</span>}
+                    <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 13, fontWeight: 500, color: _A.DEEP }}>{r.title}</div>
+                    <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 3 }}>
+                      <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', padding: '2px 7px', borderRadius: 999, background: 'rgba(168,132,139,0.15)', color: _A.MAUVE }}>{r.category}</span>
+                      <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED }}>{r.duration}</span>
+                      {r.featured && <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', padding: '2px 7px', borderRadius: 999, background: 'rgba(184,134,74,0.15)', color: _A.GOLD }}>Featured</span>}
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-1">
-                  <button
-                    title="Kliknúť pre zmenu stavu"
-                    onClick={() => cycleStatus(r)}
-                    className="px-2 py-0.5 rounded-full text-xs font-medium"
-                    style={{
-                      backgroundColor: r.status === 'published' ? `${colors.strava}20` : r.status === 'archived' ? `${colors.textSecondary}15` : `${colors.accent}20`,
-                      color: r.status === 'published' ? colors.strava : r.status === 'archived' ? colors.textSecondary : colors.accent,
-                    }}
-                  >
-                    {r.status === 'published' ? 'live' : r.status === 'archived' ? 'arch' : 'draft'}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <button title="Kliknúť pre zmenu stavu" onClick={() => cycleStatus(r)} style={{ all: 'unset', cursor: 'pointer' }}>
+                    {medStatusBadge(r.status)}
                   </button>
-                  <button onClick={() => openEdit(r)} className="p-1.5 rounded-lg hover:bg-white/20"><Edit3 className="w-3.5 h-3.5" style={{ color: colors.textSecondary }} /></button>
-                  <button onClick={() => remove(r.id)} className="p-1.5 rounded-lg hover:bg-white/20"><Trash2 className="w-3.5 h-3.5" style={{ color: colors.periodka }} /></button>
+                  <button onClick={() => openEdit(r)} style={{ all: 'unset', cursor: 'pointer', padding: 6, borderRadius: 8 }}><Edit3 style={{ width: 14, height: 14, color: _A.MUTED }} /></button>
+                  <button onClick={() => remove(r.id)} style={{ all: 'unset', cursor: 'pointer', padding: 6, borderRadius: 8 }}><Trash2 style={{ width: 14, height: 14, color: _A.TERRA }} /></button>
                 </div>
               </div>
             ))}
@@ -2144,141 +2149,137 @@ function ProgramsTab() {
     setEditing(p => p && ({ ...p, schedule: p.schedule.map(w => w.weekNumber === weekNumber ? { ...w, title } : w) }));
   };
 
-  const DAY_TYPE_COLORS: Record<DayType, string> = { exercise: colors.telo, meditation: colors.mysel, rest: colors.textSecondary };
+  const DAY_TYPE_COLORS: Record<DayType, string> = { exercise: _A.TERRA, meditation: _A.MAUVE, rest: _A.TERTIARY };
   const DAY_TYPE_LABELS: Record<DayType, string> = { exercise: 'Cvičenie', meditation: 'Meditácia', rest: 'Voľno' };
 
-  const statusBadge = (status: string) => (
-    <span className="px-2 py-0.5 rounded-full text-xs font-medium cursor-pointer" style={{
-      backgroundColor: status === 'published' ? `${colors.strava}20` : status === 'archived' ? `${colors.textSecondary}15` : `${colors.accent}20`,
-      color: status === 'published' ? colors.strava : status === 'archived' ? colors.textSecondary : colors.accent,
-    }}>
-      {status === 'published' ? 'live' : status === 'archived' ? 'arch' : 'draft'}
-    </span>
-  );
+  const progStatusBadge = (status: string) => {
+    const map: Record<string, { bg: string; col: string; label: string }> = {
+      published: { bg: 'rgba(139,158,136,0.15)', col: _A.SAGE, label: 'live' },
+      archived:  { bg: `rgba(61,41,33,0.07)`,    col: _A.MUTED, label: 'arch' },
+      draft:     { bg: 'rgba(184,134,74,0.15)',   col: _A.GOLD, label: 'draft' },
+    };
+    const s = map[status] ?? map.draft;
+    return <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', padding: '3px 8px', borderRadius: 999, background: s.bg, color: s.col, cursor: 'pointer' }}>{s.label}</span>;
+  };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold" style={{ color: colors.textPrimary }}>Fitness Programy</h2>
-        <div className="flex gap-2">
-          <button onClick={seedFromStatic} disabled={seeding} className="px-3 py-2 rounded-xl text-sm font-medium text-white" style={{ backgroundColor: colors.accent }}>
-            {seeding ? 'Importujem…' : '⬆ Seed 4 programy'}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 22, fontWeight: 500, color: _A.DEEP }}>Fitness Programy</div>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button onClick={seedFromStatic} disabled={seeding} style={btnSecondary}>
+            {seeding ? 'Importujem…' : 'Seed 4 programy'}
           </button>
-          <button onClick={openNew} className="px-4 py-2 rounded-xl text-sm font-medium text-white" style={{ backgroundColor: colors.telo }}>
-            <Plus className="w-4 h-4 mr-2 inline" />Nový program
+          <button onClick={openNew} style={{ ...btnPrimary, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Plus style={{ width: 14, height: 14 }} />Nový program
           </button>
         </div>
       </div>
 
-      {error && <div className="p-3 rounded-xl bg-red-50 text-red-600 text-sm">{error}</div>}
+      {error && <div style={{ padding: '12px 16px', borderRadius: 12, background: 'rgba(193,133,106,0.12)', border: `1px solid ${_A.TERRA}30`, fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.TERRA }}>{error}</div>}
 
       {/* Edit / Schedule-builder form */}
       {editing && (
-        <AdminCard title={editing.name || 'Nový program'}>
+        <AdminCard>
           {/* Metadata */}
-          <div className="grid grid-cols-2 gap-4 mb-6">
-            <div className="col-span-2">
-              <label className="text-xs font-medium mb-1 block" style={{ color: colors.textSecondary }}>Názov</label>
-              <input value={editing.name} onChange={e => setEditing(p => p && ({ ...p, name: e.target.value }))} className="w-full px-3 py-2 rounded-lg bg-white/40 border border-white/40 text-sm" />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 22 }}>
+            <div style={{ gridColumn: '1 / -1' }}>
+              <label style={labelStyle}>Názov</label>
+              <input value={editing.name} onChange={e => setEditing(p => p && ({ ...p, name: e.target.value }))} style={inputStyle} />
             </div>
             <div>
-              <label className="text-xs font-medium mb-1 block" style={{ color: colors.textSecondary }}>Level (1–4)</label>
-              <input type="number" min={1} max={4} value={editing.level} onChange={e => setEditing(p => p && ({ ...p, level: Number(e.target.value) }))} className="w-full px-3 py-2 rounded-lg bg-white/40 border border-white/40 text-sm" />
+              <label style={labelStyle}>Level (1–4)</label>
+              <input type="number" min={1} max={4} value={editing.level} onChange={e => setEditing(p => p && ({ ...p, level: Number(e.target.value) }))} style={inputStyle} />
             </div>
             <div>
-              <label className="text-xs font-medium mb-1 block" style={{ color: colors.textSecondary }}>Počet týždňov</label>
-              <input type="number" min={1} max={16} value={editing.weeks} onChange={e => setWeeksCount(Number(e.target.value))} className="w-full px-3 py-2 rounded-lg bg-white/40 border border-white/40 text-sm" />
+              <label style={labelStyle}>Počet týždňov</label>
+              <input type="number" min={1} max={16} value={editing.weeks} onChange={e => setWeeksCount(Number(e.target.value))} style={inputStyle} />
             </div>
-            <div className="col-span-2">
-              <label className="text-xs font-medium mb-1 block" style={{ color: colors.textSecondary }}>Status</label>
-              <select value={editing.status} onChange={e => setEditing(p => p && ({ ...p, status: e.target.value as ProgItem['status'] }))} className="w-full px-3 py-2 rounded-lg bg-white/40 border border-white/40 text-sm">
+            <div style={{ gridColumn: '1 / -1' }}>
+              <label style={labelStyle}>Status</label>
+              <select value={editing.status} onChange={e => setEditing(p => p && ({ ...p, status: e.target.value as ProgItem['status'] }))} style={inputStyle}>
                 <option value="draft">Draft</option>
                 <option value="published">Published (live)</option>
                 <option value="archived">Archived</option>
               </select>
             </div>
-            <div className="col-span-2">
-              <label className="text-xs font-medium mb-1 block" style={{ color: colors.textSecondary }}>Krátky popis</label>
-              <textarea rows={2} value={editing.description} onChange={e => setEditing(p => p && ({ ...p, description: e.target.value }))} className="w-full px-3 py-2 rounded-lg bg-white/40 border border-white/40 text-sm resize-none" />
+            <div style={{ gridColumn: '1 / -1' }}>
+              <label style={labelStyle}>Krátky popis</label>
+              <textarea rows={2} value={editing.description} onChange={e => setEditing(p => p && ({ ...p, description: e.target.value }))} style={{ ...inputStyle, resize: 'none' }} />
             </div>
-            <div className="col-span-2">
-              <label className="text-xs font-medium mb-1 block" style={{ color: colors.textSecondary }}>Detailný popis</label>
-              <textarea rows={4} value={editing.detailed_description} onChange={e => setEditing(p => p && ({ ...p, detailed_description: e.target.value }))} className="w-full px-3 py-2 rounded-lg bg-white/40 border border-white/40 text-sm resize-none" />
+            <div style={{ gridColumn: '1 / -1' }}>
+              <label style={labelStyle}>Detailný popis</label>
+              <textarea rows={4} value={editing.detailed_description} onChange={e => setEditing(p => p && ({ ...p, detailed_description: e.target.value }))} style={{ ...inputStyle, resize: 'none' }} />
             </div>
-            <div className="col-span-2">
-              <label className="text-xs font-medium mb-1 block" style={{ color: colors.textSecondary }}>Cover obrázok</label>
-              <div className="flex items-center gap-3">
-                {editing.image && <img src={editing.image} className="w-16 h-10 rounded-lg object-cover border border-white/30" />}
+            <div style={{ gridColumn: '1 / -1' }}>
+              <label style={labelStyle}>Cover obrázok</label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                {editing.image && <img src={editing.image} style={{ width: 64, height: 40, borderRadius: 8, objectFit: 'cover', border: `1px solid ${_A.HAIR}` }} />}
                 <button type="button" disabled={uploadingCover} onMouseDown={e => { e.preventDefault(); coverInputRef.current?.click(); }}
-                  className="px-3 py-1.5 rounded-lg text-xs font-medium border border-white/40 bg-white/20 hover:bg-white/30 disabled:opacity-40">
+                  style={{ ...btnSecondary, opacity: uploadingCover ? 0.5 : 1 }}>
                   {uploadingCover ? 'Nahrávam…' : editing.image ? 'Zmeniť obrázok' : 'Nahrať obrázok'}
                 </button>
-                <input ref={coverInputRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handleCoverUpload} />
+                <input ref={coverInputRef} type="file" accept="image/jpeg,image/png,image/webp" style={{ display: 'none' }} onChange={handleCoverUpload} />
               </div>
-              {coverError && <p className="text-xs text-red-500 mt-1">{coverError}</p>}
+              {coverError && <p style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.TERRA, marginTop: 4 }}>{coverError}</p>}
             </div>
           </div>
 
           {/* ── Schedule Builder ── */}
-          <div className="border-t border-white/20 pt-5">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold" style={{ color: colors.textPrimary }}>Rozvrh programu</h3>
-              <span className="text-xs" style={{ color: colors.textSecondary }}>{editing.weeks} týž × 5 dní (Po–Pi)</span>
+          <div style={{ borderTop: `1px solid ${_A.HAIR}`, paddingTop: 20 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+              <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 9.5, letterSpacing: '0.18em', textTransform: 'uppercase', color: _A.EYEBROW, fontWeight: 500 }}>Rozvrh programu</div>
+              <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED }}>{editing.weeks} týž × 5 dní (Po–Pi)</span>
             </div>
-            <div className="flex gap-3 mb-4 text-xs">
+            <div style={{ display: 'flex', gap: 14, marginBottom: 14 }}>
               {(['exercise', 'meditation', 'rest'] as DayType[]).map(t => (
-                <span key={t} className="flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full inline-block" style={{ backgroundColor: DAY_TYPE_COLORS[t] }} />
-                  <span style={{ color: colors.textSecondary }}>{DAY_TYPE_LABELS[t]}</span>
+                <span key={t} style={{ display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED }}>
+                  <span style={{ width: 8, height: 8, borderRadius: 999, display: 'inline-block', background: DAY_TYPE_COLORS[t] }} />
+                  {DAY_TYPE_LABELS[t]}
                 </span>
               ))}
             </div>
 
-            <div className="space-y-2">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {editing.schedule.map(week => (
-                <div key={week.weekNumber} className="rounded-xl border border-white/20 overflow-hidden">
+                <div key={week.weekNumber} style={{ borderRadius: 12, border: `1px solid ${_A.HAIR}`, overflow: 'hidden' }}>
                   {/* Week header — click to expand */}
                   <button type="button"
                     onClick={() => setExpandedWeek(p => p === week.weekNumber ? null : week.weekNumber)}
-                    className="w-full flex items-center justify-between px-4 py-3 bg-white/20 hover:bg-white/30 text-left">
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs font-bold w-7 text-center rounded-full py-0.5" style={{ backgroundColor: `${colors.telo}20`, color: colors.telo }}>
+                    style={{ all: 'unset', cursor: 'pointer', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', background: _A.CREAM2, boxSizing: 'border-box' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 9, fontWeight: 700, padding: '2px 8px', borderRadius: 999, background: 'rgba(193,133,106,0.15)', color: _A.TERRA }}>
                         W{week.weekNumber}
                       </span>
-                      <span className="text-sm font-medium" style={{ color: colors.textPrimary }}>{week.title}</span>
+                      <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 13, fontWeight: 500, color: _A.DEEP }}>{week.title}</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <div className="flex gap-0.5">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <div style={{ display: 'flex', gap: 3 }}>
                         {week.days.map((d, di) => (
-                          <span key={di} className="w-2 h-2 rounded-full inline-block" style={{ backgroundColor: DAY_TYPE_COLORS[d.type] }} />
+                          <span key={di} style={{ width: 8, height: 8, borderRadius: 999, display: 'inline-block', background: DAY_TYPE_COLORS[d.type] }} />
                         ))}
                       </div>
-                      <span className="text-xs" style={{ color: colors.textSecondary }}>{expandedWeek === week.weekNumber ? '▲' : '▼'}</span>
+                      <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED }}>{expandedWeek === week.weekNumber ? '▲' : '▼'}</span>
                     </div>
                   </button>
 
                   {/* Week body */}
                   {expandedWeek === week.weekNumber && (
-                    <div className="p-4 space-y-3 bg-white/10">
-                      <div className="flex items-center gap-2">
-                        <label className="text-xs shrink-0" style={{ color: colors.textSecondary }}>Názov týždňa:</label>
+                    <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 10, background: _A.BG }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <label style={{ ...labelStyle, marginBottom: 0, flexShrink: 0 }}>Názov týždňa:</label>
                         <input value={week.title} onChange={e => updateWeekTitle(week.weekNumber, e.target.value)}
-                          className="flex-1 px-2 py-1 rounded-lg bg-white/40 border border-white/40 text-xs" />
+                          style={{ ...inputStyle, flex: 1 }} />
                       </div>
                       {week.days.map((day, di) => (
-                        <div key={di} className="rounded-lg border border-white/20 bg-white/20 p-3">
-                          <div className="flex flex-wrap items-center gap-2 mb-2">
-                            <span className="text-xs font-semibold w-20 shrink-0" style={{ color: colors.textPrimary }}>{day.dayName}</span>
-                            <div className="flex gap-1">
+                        <div key={di} style={{ borderRadius: 10, border: `1px solid ${_A.HAIR}`, background: _A.CARD, padding: 12 }}>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                            <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, fontWeight: 600, color: _A.DEEP, width: 80, flexShrink: 0 }}>{day.dayName}</span>
+                            <div style={{ display: 'flex', gap: 6 }}>
                               {(['exercise', 'meditation', 'rest'] as DayType[]).map(t => (
                                 <button key={t} type="button"
                                   onClick={() => updateDay(week.weekNumber, di, { type: t, contentId: '' })}
-                                  className="px-2 py-0.5 rounded-full text-xs font-medium transition-colors"
-                                  style={{
-                                    backgroundColor: day.type === t ? `${DAY_TYPE_COLORS[t]}30` : 'rgba(255,255,255,0.2)',
-                                    color: day.type === t ? DAY_TYPE_COLORS[t] : colors.textSecondary,
-                                    border: day.type === t ? `1px solid ${DAY_TYPE_COLORS[t]}60` : '1px solid rgba(255,255,255,0.3)',
-                                  }}>
+                                  style={{ padding: '4px 10px', borderRadius: 999, fontFamily: 'DM Sans, system-ui', fontSize: 10, fontWeight: 500, cursor: 'pointer', border: day.type === t ? `1px solid ${DAY_TYPE_COLORS[t]}` : `1px solid ${_A.HAIR}`, background: day.type === t ? `${DAY_TYPE_COLORS[t]}18` : 'transparent', color: day.type === t ? DAY_TYPE_COLORS[t] : _A.MUTED }}>
                                   {DAY_TYPE_LABELS[t]}
                                 </button>
                               ))}
@@ -2287,8 +2288,7 @@ function ProgramsTab() {
                           {day.type !== 'rest' && (
                             <select value={day.contentId}
                               onChange={e => updateDay(week.weekNumber, di, { contentId: e.target.value })}
-                              className="w-full px-2 py-1.5 rounded-lg bg-white/40 border border-white/40 text-xs mb-2"
-                              style={{ color: day.contentId ? colors.textPrimary : colors.textSecondary }}>
+                              style={{ ...inputStyle, marginBottom: 8 }}>
                               <option value="">
                                 {day.type === 'exercise' ? '— Vyber cvičenie (video doplníš neskôr) —' : '— Vyber meditáciu —'}
                               </option>
@@ -2300,7 +2300,7 @@ function ProgramsTab() {
                           )}
                           <input value={day.message} onChange={e => updateDay(week.weekNumber, di, { message: e.target.value })}
                             placeholder="Motivačná správa od Gabi (nepovinné)…"
-                            className="w-full px-2 py-1 rounded-lg bg-white/40 border border-white/40 text-xs" />
+                            style={inputStyle} />
                         </div>
                       ))}
                     </div>
@@ -2310,11 +2310,11 @@ function ProgramsTab() {
             </div>
           </div>
 
-          <div className="flex gap-2 mt-6">
-            <button onClick={save} disabled={saving} className="px-4 py-2 rounded-xl text-sm font-medium text-white" style={{ backgroundColor: colors.telo }}>
+          <div style={{ display: 'flex', gap: 10, marginTop: 22 }}>
+            <button onClick={save} disabled={saving} style={{ ...btnPrimary, opacity: saving ? 0.7 : 1 }}>
               {saving ? 'Ukladám…' : 'Uložiť program'}
             </button>
-            <button onClick={() => setEditing(null)} className="px-4 py-2 rounded-xl text-sm font-medium border border-white/40 bg-white/20" style={{ color: colors.textSecondary }}>
+            <button onClick={() => setEditing(null)} style={btnSecondary}>
               Zrušiť
             </button>
           </div>
@@ -2322,40 +2322,40 @@ function ProgramsTab() {
       )}
 
       {/* Programme list */}
-      <AdminCard title={`Programy (${items.length})`}>
+      <AdminCard>
+        <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 9.5, letterSpacing: '0.18em', textTransform: 'uppercase', color: _A.EYEBROW, fontWeight: 500, marginBottom: 16 }}>Programy ({items.length})</div>
         {loading
-          ? <div className="py-8 text-center text-sm" style={{ color: colors.textSecondary }}>Načítavam…</div>
+          ? <div style={{ padding: '32px 0', textAlign: 'center', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>Načítavam…</div>
           : items.length === 0
             ? (
-              <div className="py-8 text-center">
-                <p className="text-sm mb-3" style={{ color: colors.textSecondary }}>Žiadne programy. Seed 4 základné alebo pridaj nový.</p>
-                <button onClick={seedFromStatic} disabled={seeding} className="px-4 py-2 rounded-xl text-sm font-medium text-white" style={{ backgroundColor: colors.telo }}>
+              <div style={{ padding: '32px 0', textAlign: 'center' }}>
+                <p style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED, marginBottom: 12 }}>Žiadne programy. Seed 4 základné alebo pridaj nový.</p>
+                <button onClick={seedFromStatic} disabled={seeding} style={btnPrimary}>
                   {seeding ? 'Importujem…' : 'Seed 4 programy'}
                 </button>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {items.map(r => {
                   const filled = (r.schedule ?? []).reduce((a, w) => a + w.days.filter(d => d.type !== 'rest' && d.contentId).length, 0);
                   const total = (r.schedule ?? []).reduce((a, w) => a + w.days.filter(d => d.type !== 'rest').length, 0);
                   return (
-                    <div key={r.id} className="flex items-center justify-between p-3 rounded-xl bg-white/20 border border-white/20">
-                      <div className="flex items-center gap-3">
-                        {r.image && <img src={r.image} className="w-12 h-12 rounded-lg object-cover" />}
+                    <div key={r.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', borderRadius: 12, border: `1px solid ${_A.HAIR}`, background: _A.BG }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                        {r.image && <img src={r.image} style={{ width: 48, height: 48, borderRadius: 10, objectFit: 'cover' }} />}
                         <div>
-                          <div className="flex items-center gap-2 mb-0.5">
-                            <span className="font-medium text-sm" style={{ color: colors.textPrimary }}>{r.name}</span>
-                            <button onClick={() => cycleStatus(r)}>{statusBadge(r.status ?? (r.active ? 'published' : 'draft'))}</button>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                            <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 13, fontWeight: 500, color: _A.DEEP }}>{r.name}</span>
+                            <button onClick={() => cycleStatus(r)} style={{ all: 'unset', cursor: 'pointer' }}>{progStatusBadge(r.status ?? (r.active ? 'published' : 'draft'))}</button>
                           </div>
-                          <div className="text-xs" style={{ color: colors.textSecondary }}>
-                            Level {r.level} • {r.weeks} týž •{' '}
-                            {total > 0 ? `${filled}/${total} dní naplnených` : 'Rozvrh prázdny'}
+                          <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED }}>
+                            Level {r.level} · {r.weeks} týž · {total > 0 ? `${filled}/${total} dní naplnených` : 'Rozvrh prázdny'}
                           </div>
                         </div>
                       </div>
-                      <div className="flex gap-1">
-                        <button onClick={() => openEdit(r)} className="p-1.5 rounded-lg hover:bg-white/20"><Pencil className="w-3.5 h-3.5" style={{ color: colors.accent }} /></button>
-                        <button onClick={() => remove(r.id)} className="p-1.5 rounded-lg hover:bg-white/20"><Trash2 className="w-3.5 h-3.5" style={{ color: colors.periodka }} /></button>
+                      <div style={{ display: 'flex', gap: 4 }}>
+                        <button onClick={() => openEdit(r)} style={{ all: 'unset', cursor: 'pointer', padding: 6, borderRadius: 8 }}><Pencil style={{ width: 14, height: 14, color: _A.GOLD }} /></button>
+                        <button onClick={() => remove(r.id)} style={{ all: 'unset', cursor: 'pointer', padding: 6, borderRadius: 8 }}><Trash2 style={{ width: 14, height: 14, color: _A.TERRA }} /></button>
                       </div>
                     </div>
                   );
@@ -2366,6 +2366,17 @@ function ProgramsTab() {
     </div>
   );
 }
+
+// ─────────────────────────────────────────────────────────────────────────
+// A14 design tokens (desktop admin — R14 palette) — alias of _A above
+// ─────────────────────────────────────────────────────────────────────────
+const A = _A;
+
+const cardStyle: React.CSSProperties = {
+  background: A.CARD,
+  borderRadius: 16,
+  border: `1px solid ${A.HAIR}`,
+};
 
 export default function AdminNew() {
   const navigate = useNavigate();
@@ -2383,354 +2394,278 @@ export default function AdminNew() {
   }, [activeTab]);
 
   const renderSidebar = () => (
-    <div className="h-full flex flex-col">
-      {/* Logo/Brand */}
-      <div className="p-6 border-b border-white/20">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: colors.telo }}>
-            <Shield className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <h1 className="font-bold text-lg" style={{ color: colors.textPrimary }}>NeoMe</h1>
-            <p className="text-xs" style={{ color: colors.textSecondary }}>Admin Panel</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-        {navigationItems.map((item) => {
-          const isActive = activeTab === item.id;
-          
-          return (
-            <button
-              key={item.id}
-              onClick={() => setActiveTab(item.id)}
-              className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-left transition-all group ${
-                isActive ? 'bg-gradient-to-r shadow-lg' : 'hover:bg-white/20'
-              }`}
-              style={isActive ? { 
-                background: `linear-gradient(135deg, ${colors.telo}, ${colors.strava})`,
-                color: '#fff'
-              } : {}}
-            >
-              <item.icon className={`w-5 h-5 ${isActive ? 'text-white' : ''}`} style={!isActive ? { color: colors.textSecondary } : {}} />
-              
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <span className={`font-medium text-sm ${isActive ? 'text-white' : ''}`} style={!isActive ? { color: colors.textPrimary } : {}}>
-                    {item.label}
-                  </span>
-                </div>
-                <p className={`text-xs truncate ${isActive ? 'text-white/80' : ''}`} style={!isActive ? { color: colors.textTertiary } : {}}>
-                  {item.description}
-                </p>
-              </div>
-              
-              <ChevronRight className={`w-4 h-4 transition-transform ${isActive ? 'text-white/60' : 'text-transparent group-hover:text-gray-400'}`} />
-            </button>
-          );
-        })}
-      </nav>
-
-      {/* Bottom Actions */}
-      <div className="p-4 border-t border-white/20 space-y-2">
-        <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/20 transition-all">
-          <Bell className="w-4 h-4" style={{ color: colors.textSecondary }} />
-          <span className="text-sm" style={{ color: colors.textPrimary }}>Notifications</span>
-        </button>
-        
-        <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/20 transition-all">
-          <Settings className="w-4 h-4" style={{ color: colors.textSecondary }} />
-          <span className="text-sm" style={{ color: colors.textPrimary }}>Settings</span>
-        </button>
-        
-        <button 
-          onClick={() => navigate('/domov')}
-          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/20 transition-all"
-        >
-          <LogOut className="w-4 h-4" style={{ color: colors.periodka }} />
-          <span className="text-sm" style={{ color: colors.periodka }}>Exit Admin</span>
-        </button>
-      </div>
-    </div>
-  );
-
-  const renderHeader = () => (
-    <div className="flex items-center justify-between">
-      <div className="flex items-center gap-4">
-        <h1 className="text-xl font-bold" style={{ color: colors.textPrimary }}>
-          {navigationItems.find(item => item.id === activeTab)?.label || 'Dashboard'}
-        </h1>
-      </div>
-      <div className="flex items-center gap-3">
-        <div className="text-xs px-3 py-1 bg-green-500 text-white rounded-lg">
-          ✅ Desktop Mode Active
-        </div>
-        <button className="p-2 rounded-lg hover:bg-white/20 transition-all">
-          <Bell className="w-5 h-5" style={{ color: colors.textSecondary }} />
-        </button>
-        <button className="p-2 rounded-lg hover:bg-white/20 transition-all">
-          <Settings className="w-5 h-5" style={{ color: colors.textSecondary }} />
-        </button>
-        <button onClick={() => navigate('/domov')} className="p-2 rounded-lg hover:bg-white/20 transition-all">
-          <LogOut className="w-5 h-5" style={{ color: colors.periodka }} />
-        </button>
-      </div>
-    </div>
-  );
-
-  const renderOverview = () => {
-    const stat = (val: number | undefined) => analyticsLoading ? '…' : (val ?? 0).toString();
-    return (
-    <div className="space-y-6">
-      {/* Welcome Header */}
-      <div className="flex items-center justify-between">
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      {/* Logo */}
+      <div style={{ padding: '22px 20px 20px', display: 'flex', alignItems: 'center', gap: 12, borderBottom: `1px solid ${A.HAIR}` }}>
+        <div style={{ width: 36, height: 36, borderRadius: 10, background: A.DEEP, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Gilda Display, Georgia, serif', fontSize: 17, fontWeight: 500 }}>N</div>
         <div>
-          <h1 className="text-2xl font-bold" style={{ color: colors.textPrimary }}>Vitaj späť, Admin</h1>
-          <p className="text-sm" style={{ color: colors.textSecondary }}>Aktuálny stav NeoMe</p>
-        </div>
-        <div className="text-xs flex items-center gap-2" style={{ color: colors.textTertiary }}>
-          {analyticsLoading && <RefreshCw className="w-3 h-3 animate-spin" />}
-          Aktualizované: {new Date().toLocaleTimeString('sk-SK', { hour: '2-digit', minute: '2-digit' })}
+          <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 18, color: A.DEEP, fontWeight: 500, letterSpacing: '-0.005em', lineHeight: 1.1 }}>NeoMe</div>
+          <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 9.5, letterSpacing: '0.2em', textTransform: 'uppercase', color: A.EYEBROW, fontWeight: 500, marginTop: 3 }}>Admin panel</div>
         </div>
       </div>
 
-      {/* Key Metrics — real data */}
-      <div className="grid grid-cols-4 gap-6">
-        <Card>
-          <div className="flex items-center gap-3 mb-3">
-            <Users className="w-6 h-6" style={{ color: colors.strava }} />
-            <span className="text-sm font-medium" style={{ color: colors.textSecondary }}>Celkovo používateľov</span>
-          </div>
-          <div className="text-2xl font-bold mb-1" style={{ color: colors.textPrimary }}>{stat(analytics?.totalUsers)}</div>
-          <div className="text-sm" style={{ color: colors.textTertiary }}>{stat(analytics?.newUsersMonth)} nových tento mesiac</div>
-          <div className="flex items-center gap-1 mt-2">
-            <TrendingUp className="w-3 h-3" style={{ color: colors.strava }} />
-            <span className="text-xs font-medium" style={{ color: colors.strava }}>Live data</span>
-          </div>
-        </Card>
-
-        <Card>
-          <div className="flex items-center gap-3 mb-3">
-            <Euro className="w-6 h-6" style={{ color: colors.accent }} />
-            <span className="text-sm font-medium" style={{ color: colors.textSecondary }}>Premium predplatitelia</span>
-          </div>
-          <div className="text-2xl font-bold mb-1" style={{ color: colors.textPrimary }}>{stat(analytics?.activeSubscriptions)}</div>
-          <div className="text-sm" style={{ color: colors.textTertiary }}>{stat(analytics?.freeUsers)} free používateľov</div>
-        </Card>
-
-        <Card>
-          <div className="flex items-center gap-3 mb-3">
-            <Gift className="w-6 h-6" style={{ color: colors.periodka }} />
-            <span className="text-sm font-medium" style={{ color: colors.textSecondary }}>Referrals</span>
-          </div>
-          <div className="text-2xl font-bold mb-1" style={{ color: colors.textPrimary }}>{stat(analytics?.referralCount)}</div>
-          <div className="text-sm" style={{ color: colors.textTertiary }}>celkovo odporúčaní</div>
-        </Card>
-
-        <Card>
-          <div className="flex items-center gap-3 mb-3">
-            <Flag className="w-6 h-6" style={{ color: colors.telo }} />
-            <span className="text-sm font-medium" style={{ color: colors.textSecondary }}>Komunita</span>
-          </div>
-          <div className="text-2xl font-bold mb-1" style={{ color: colors.textPrimary }}>{stat(analytics?.postsCount)}</div>
-          <div className="text-sm" style={{ color: colors.textTertiary }}>príspevkov spolu</div>
-        </Card>
-      </div>
-
-      {/* Quick Actions + Recent signups */}
-      <div className="grid grid-cols-2 gap-6">
-        <Card>
-          <h3 className="text-lg font-semibold mb-4" style={{ color: colors.textPrimary }}>Rýchle akcie</h3>
-          <div className="space-y-3">
-            {[
-              { label: 'Users', desc: 'Spravovať účty', icon: Users, tab: 'users' },
-              { label: 'Blog', desc: 'Nový príspevok', icon: BookOpen, tab: 'blog' },
-              { label: 'Community', desc: 'Moderovať príspevky', icon: Flag, tab: 'community' },
-              { label: 'Promo Kódy', desc: 'Stripe zľavové kódy', icon: Percent, tab: 'promo-codes' },
-              { label: 'Content', desc: 'Videá a fotky', icon: FolderOpen, tab: 'content' },
-            ].map((item) => (
+      {/* Primary nav */}
+      <nav style={{ padding: '14px 12px 8px', flex: 1, overflowY: 'auto' }}>
+        <div style={{ paddingLeft: 8, paddingBottom: 10, fontFamily: 'DM Sans, system-ui', fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: A.EYEBROW, fontWeight: 500 }}>Hlavné</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+          {navigationItems.map((item) => {
+            const isActive = activeTab === item.id;
+            return (
               <button
-                key={item.tab}
-                onClick={() => setActiveTab(item.tab)}
-                className="w-full flex items-center gap-3 p-3 rounded-xl bg-white/20 hover:bg-white/30 transition-all text-left"
+                key={item.id}
+                onClick={() => setActiveTab(item.id)}
+                style={{
+                  all: 'unset', cursor: 'pointer',
+                  padding: '9px 12px',
+                  borderRadius: 10,
+                  background: isActive ? A.DEEP : 'transparent',
+                  display: 'flex', alignItems: 'center', gap: 12,
+                  position: 'relative',
+                  width: '100%', boxSizing: 'border-box',
+                }}
               >
-                <item.icon className="w-4 h-4" style={{ color: colors.telo }} />
-                <div>
-                  <div className="text-sm font-medium" style={{ color: colors.textPrimary }}>{item.label}</div>
-                  <div className="text-xs" style={{ color: colors.textSecondary }}>{item.desc}</div>
+                {isActive && <div style={{ position: 'absolute', left: -12, top: 8, bottom: 8, width: 3, borderRadius: 999, background: A.GOLD }} />}
+                <item.icon style={{ width: 15, height: 15, color: isActive ? '#fff' : A.MUTED, flexShrink: 0 }} strokeWidth={1.7} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12.5, fontWeight: 500, color: isActive ? '#fff' : A.DEEP, lineHeight: 1.2 }}>{item.label}</div>
+                  <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10, color: isActive ? 'rgba(255,255,255,0.6)' : A.TERTIARY, fontWeight: 400, marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.description}</div>
                 </div>
               </button>
-            ))}
-          </div>
-        </Card>
+            );
+          })}
+        </div>
 
-        <Card>
-          <h3 className="text-lg font-semibold mb-4" style={{ color: colors.textPrimary }}>Najnovší používatelia</h3>
-          {analyticsLoading ? (
-            <div className="py-4 text-center text-sm" style={{ color: colors.textSecondary }}>Načítavam…</div>
-          ) : (analytics?.recentUsers ?? []).length === 0 ? (
-            <div className="py-4 text-center text-sm" style={{ color: colors.textSecondary }}>Žiadni používatelia. Skontroluj SUPABASE_SERVICE_ROLE_KEY v Netlify.</div>
-          ) : (
-            <div className="space-y-3">
-              {(analytics?.recentUsers ?? []).map((u, i) => (
-                <div key={i} className="flex items-center gap-3 pb-2 border-b border-white/10 last:border-0">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
-                    style={{ background: `linear-gradient(135deg, ${colors.telo}, ${colors.accent})` }}>
-                    {(u.full_name || u.email || '?').charAt(0).toUpperCase()}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium truncate" style={{ color: colors.textPrimary }}>{u.full_name || u.email}</div>
-                    <div className="text-xs" style={{ color: colors.textTertiary }}>{new Date(u.created_at).toLocaleDateString('sk-SK')}</div>
-                  </div>
-                </div>
-              ))}
+        <div style={{ height: 1, background: A.HAIR, margin: '14px 8px' }} />
+
+        {/* Utility */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+          {[{ label: 'Notifikácie', icon: Bell }, { label: 'Nastavenia', icon: Settings }].map(({ label, icon: Icon }) => (
+            <div key={label} style={{ padding: '8px 12px', borderRadius: 10, display: 'flex', alignItems: 'center', gap: 12 }}>
+              <Icon style={{ width: 14, height: 14, color: A.MUTED, flexShrink: 0 }} strokeWidth={1.7} />
+              <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12.5, fontWeight: 500, color: A.DEEP }}>{label}</div>
             </div>
-          )}
-        </Card>
+          ))}
+        </div>
+      </nav>
+
+      {/* Bottom: admin profile */}
+      <div style={{ padding: '14px 16px 18px', borderTop: `1px solid ${A.HAIR}`, display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ width: 32, height: 32, borderRadius: 999, background: A.CREAM2, color: A.DEEP, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Gilda Display, Georgia, serif', fontSize: 14, fontWeight: 500, flexShrink: 0 }}>G</div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: A.DEEP, fontWeight: 500 }}>Gabi</div>
+          <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10, color: A.EYEBROW, fontWeight: 400, marginTop: 1 }}>Owner</div>
+        </div>
+        <button onClick={() => navigate('/domov-new')} style={{ all: 'unset', cursor: 'pointer', width: 28, height: 28, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <LogOut style={{ width: 14, height: 14, color: A.MUTED }} strokeWidth={1.7} />
+        </button>
       </div>
     </div>
   );
+
+  const renderHeader = () => {
+    const navItem = navigationItems.find(item => item.id === activeTab);
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24, width: '100%' }}>
+        <div style={{ minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+            <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 9.5, letterSpacing: '0.18em', textTransform: 'uppercase', color: A.EYEBROW, fontWeight: 500 }}>Admin · NeoMe</div>
+            <div style={{ width: 3, height: 3, borderRadius: 999, background: A.HAIR2 }} />
+            <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 9.5, letterSpacing: '0.18em', textTransform: 'uppercase', color: A.SAGE, fontWeight: 500 }}>Live</div>
+          </div>
+          <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 24, fontWeight: 500, color: A.DEEP, letterSpacing: '-0.01em', lineHeight: 1.15 }}>
+            {navItem?.label || 'Dashboard'}
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+          {/* Search */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '9px 14px', background: A.CARD, border: `1px solid ${A.HAIR}`, borderRadius: 10, minWidth: 240 }}>
+            <Search style={{ width: 14, height: 14, color: A.MUTED, flexShrink: 0 }} strokeWidth={1.7} />
+            <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: A.TERTIARY }}>Hľadať v Admin paneli…</div>
+          </div>
+          {/* Notifications */}
+          <div style={{ width: 38, height: 38, borderRadius: 10, background: A.CARD, border: `1px solid ${A.HAIR}`, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+            <Bell style={{ width: 15, height: 15, color: A.DEEP }} strokeWidth={1.7} />
+            <div style={{ position: 'absolute', top: 9, right: 10, width: 7, height: 7, borderRadius: 999, background: A.GOLD, border: `1.5px solid ${A.CARD}` }} />
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderOverview = () => {
+    const stat = (val: number | undefined) => analyticsLoading ? '…' : (val ?? 0).toLocaleString('sk-SK');
+    const kpis = [
+      { label: 'Celkom používateliek', value: stat(analytics?.totalUsers),          sub: `${stat(analytics?.newUsersMonth)} nových tento mesiac`, color: A.DEEP,  up: true  },
+      { label: 'Plus predplatiteľky',  value: stat(analytics?.activeSubscriptions), sub: `${stat(analytics?.freeUsers)} free používateliek`,      color: A.GOLD,  up: true  },
+      { label: 'Referrals',            value: stat(analytics?.referralCount),        sub: 'celkovo odporúčaní',                                      color: A.SAGE,  up: true  },
+      { label: 'Príspevky',            value: stat(analytics?.postsCount),           sub: 'v komunite',                                              color: A.TERRA, up: true  },
+    ];
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+        {/* KPI row */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14 }}>
+          {kpis.map((k, i) => (
+            <div key={i} style={{ ...cardStyle, padding: '20px 22px' }}>
+              <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 9.5, letterSpacing: '0.18em', textTransform: 'uppercase', color: A.EYEBROW, fontWeight: 500, marginBottom: 14 }}>{k.label}</div>
+              <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 34, fontWeight: 500, color: k.color, letterSpacing: '-0.02em', lineHeight: 1 }}>
+                {analyticsLoading ? <RefreshCw style={{ width: 20, height: 20, color: A.MUTED, animation: 'spin 1s linear infinite' }} /> : k.value}
+              </div>
+              <div style={{ marginTop: 10, fontFamily: 'DM Sans, system-ui', fontSize: 11, color: A.MUTED }}>{k.sub}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Two-column: quick actions + recent users */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: 14 }}>
+          {/* Quick actions */}
+          <div style={{ ...cardStyle, padding: '22px 22px' }}>
+            <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 9.5, letterSpacing: '0.18em', textTransform: 'uppercase', color: A.EYEBROW, fontWeight: 500, marginBottom: 16 }}>Rýchle akcie</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              {[
+                { label: 'Používateľky',  desc: 'Spravovať účty',          icon: Users,    tab: 'users' },
+                { label: 'Blog',           desc: 'Nový príspevok',          icon: BookOpen, tab: 'blog' },
+                { label: 'Komunita',       desc: 'Moderovať príspevky',     icon: Flag,     tab: 'community' },
+                { label: 'Promo kódy',     desc: 'Stripe zľavové kódy',     icon: Percent,  tab: 'promo-codes' },
+                { label: 'Content Manager',desc: 'Videá, fotky, médiá',    icon: FolderOpen, tab: 'content' },
+              ].map((item) => (
+                <button
+                  key={item.tab}
+                  onClick={() => setActiveTab(item.tab)}
+                  style={{ all: 'unset', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px', borderRadius: 10, transition: 'background 0.12s' }}
+                  onMouseEnter={e => (e.currentTarget as HTMLButtonElement).style.background = A.CREAM2}
+                  onMouseLeave={e => (e.currentTarget as HTMLButtonElement).style.background = 'transparent'}
+                >
+                  <item.icon style={{ width: 15, height: 15, color: A.TERRA, flexShrink: 0 }} strokeWidth={1.7} />
+                  <div>
+                    <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, fontWeight: 500, color: A.DEEP }}>{item.label}</div>
+                    <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10.5, color: A.EYEBROW }}>{item.desc}</div>
+                  </div>
+                  <ChevronRight style={{ width: 13, height: 13, color: A.MUTED, marginLeft: 'auto' }} strokeWidth={1.7} />
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Recent users */}
+          <div style={{ ...cardStyle, padding: '22px 22px' }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 18 }}>
+              <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 9.5, letterSpacing: '0.18em', textTransform: 'uppercase', color: A.EYEBROW, fontWeight: 500 }}>Najnovšie používateľky</div>
+              <button onClick={() => setActiveTab('users')} style={{ all: 'unset', cursor: 'pointer', fontFamily: 'DM Sans, system-ui', fontSize: 10.5, color: A.GOLD, fontWeight: 500 }}>Všetky</button>
+            </div>
+            {analyticsLoading ? (
+              <div style={{ padding: '16px 0', textAlign: 'center', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: A.MUTED }}>Načítavam…</div>
+            ) : (analytics?.recentUsers ?? []).length === 0 ? (
+              <div style={{ padding: '16px 0', textAlign: 'center', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: A.MUTED }}>Žiadni používatelia. Skontroluj SUPABASE_SERVICE_ROLE_KEY v Netlify.</div>
+            ) : (
+              (analytics?.recentUsers ?? []).map((u, i, arr) => (
+                <div key={i} style={{ padding: '11px 0', display: 'flex', alignItems: 'center', gap: 12, borderBottom: i < arr.length - 1 ? `1px solid ${A.HAIR}` : 'none' }}>
+                  <div style={{ width: 32, height: 32, borderRadius: 999, background: A.CREAM2, color: A.DEEP, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Gilda Display, Georgia, serif', fontSize: 13, fontWeight: 500, flexShrink: 0 }}>
+                    {(u.full_name || u.email || '?').charAt(0).toUpperCase()}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: A.DEEP, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{u.full_name || u.email}</div>
+                    <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10.5, color: A.EYEBROW, marginTop: 1 }}>{new Date(u.created_at).toLocaleDateString('sk-SK')}</div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+    );
   };
 
 
   const renderCommunity = () => (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold" style={{ color: colors.textPrimary }}>Community Management</h2>
-        <button className="px-4 py-2 rounded-xl text-sm font-medium text-white" style={{ backgroundColor: colors.periodka }}>
-          <Flag className="w-4 h-4 mr-2 inline" />Create Featured Post
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 22, fontWeight: 500, color: A.DEEP }}>Community Management</div>
+        <button style={{ ...btnPrimary, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Flag style={{ width: 14, height: 14 }} />Create Featured Post
         </button>
       </div>
 
       {/* Community Stats */}
-      <div className="grid grid-cols-4 gap-4">
-        <Card>
-          <div className="text-center">
-            <div className="text-2xl font-bold" style={{ color: colors.textPrimary }}>47</div>
-            <div className="text-sm" style={{ color: colors.textSecondary }}>Pending Posts</div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14 }}>
+        {[
+          { val: 47,   label: 'Pending Posts',    color: A.DEEP  },
+          { val: 8,    label: 'Reported Content', color: A.TERRA },
+          { val: 127,  label: 'Active Users',     color: A.SAGE  },
+          { val: '89%',label: 'Approval Rate',    color: A.MAUVE },
+        ].map((s, i) => (
+          <div key={i} style={{ background: A.CARD, borderRadius: 16, border: `1px solid ${A.HAIR}`, padding: '20px 22px' }}>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 28, fontWeight: 500, color: s.color, letterSpacing: '-0.02em', lineHeight: 1 }}>{s.val}</div>
+              <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: A.MUTED, marginTop: 6 }}>{s.label}</div>
+            </div>
           </div>
-        </Card>
-        <Card>
-          <div className="text-center">
-            <div className="text-2xl font-bold" style={{ color: colors.periodka }}>8</div>
-            <div className="text-sm" style={{ color: colors.textSecondary }}>Reported Content</div>
-          </div>
-        </Card>
-        <Card>
-          <div className="text-center">
-            <div className="text-2xl font-bold" style={{ color: colors.strava }}>127</div>
-            <div className="text-sm" style={{ color: colors.textSecondary }}>Active Users</div>
-          </div>
-        </Card>
-        <Card>
-          <div className="text-center">
-            <div className="text-2xl font-bold" style={{ color: colors.mysel }}>89%</div>
-            <div className="text-sm" style={{ color: colors.textSecondary }}>Approval Rate</div>
-          </div>
-        </Card>
+        ))}
       </div>
 
       {/* Moderation Queue */}
-      <Card>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold" style={{ color: colors.textPrimary }}>Moderation Queue</h3>
-            <div className="flex gap-2">
-              <select className="px-3 py-2 rounded-lg bg-white/30 border border-white/30 text-sm">
-                <option>All Posts</option>
-                <option>Pending Review</option>
-                <option>Reported</option>
-                <option>Featured</option>
-              </select>
-              <select className="px-3 py-2 rounded-lg bg-white/30 border border-white/30 text-sm">
-                <option>All Categories</option>
-                <option>Success Stories</option>
-                <option>Questions</option>
-                <option>Tips & Advice</option>
-                <option>Motivation</option>
-              </select>
-            </div>
-          </div>
-          
-          <div className="space-y-4">
-            {[
-              { 
-                author: 'Lucia K.', 
-                content: 'Práve som dokončila svoj prvý týždeň Postpartum programu a cítim sa úžasne! Ďakujem za túto aplikáciu ❤️',
-                category: 'Success Story',
-                time: '2 hours ago',
-                status: 'pending',
-                likes: 0,
-                reports: 0
-              },
-              { 
-                author: 'Andrea M.', 
-                content: 'Má niekto skúsenosť s Level 3 cvičeniami? Sú naozaj náročné alebo je to len môj pocit?',
-                category: 'Question',
-                time: '4 hours ago',
-                status: 'pending',
-                likes: 0,
-                reports: 0
-              },
-              { 
-                author: 'Zuzana H.', 
-                content: 'Tento recept na avokádové toasty je perfektný na raňajky! Určite odporúčam všetkým 🥑',
-                category: 'Tips & Advice',
-                time: '6 hours ago',
-                status: 'reported',
-                likes: 3,
-                reports: 1
-              },
-            ].map((post, i) => (
-              <div key={i} className="p-4 rounded-xl bg-white/20 border border-white/20">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-white/30 flex items-center justify-center">
-                      <Users className="w-5 h-5" style={{ color: colors.telo }} />
-                    </div>
-                    <div>
-                      <div className="font-medium" style={{ color: colors.textPrimary }}>{post.author}</div>
-                      <div className="text-xs" style={{ color: colors.textTertiary }}>{post.time}</div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className={`text-xs px-2 py-1 rounded-full ${
-                      post.status === 'pending' ? 'bg-yellow-500/20 text-yellow-600' : 'bg-red-500/20 text-red-600'
-                    }`}>
-                      {post.status === 'pending' ? 'Pending' : 'Reported'}
-                    </span>
-                    <span className="text-xs px-2 py-1 rounded-full" style={{ backgroundColor: `${colors.accent}20`, color: colors.accent }}>
-                      {post.category}
-                    </span>
-                  </div>
-                </div>
-                
-                <p className="text-sm mb-3" style={{ color: colors.textPrimary }}>{post.content}</p>
-                
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4 text-sm" style={{ color: colors.textTertiary }}>
-                    <span>❤️ {post.likes}</span>
-                    {post.reports > 0 && <span>⚠️ {post.reports} reports</span>}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button className="px-3 py-2 rounded-lg text-sm font-medium" style={{ backgroundColor: `${colors.strava}20`, color: colors.strava }}>
-                      Approve
-                    </button>
-                    <button className="px-3 py-2 rounded-lg text-sm font-medium" style={{ backgroundColor: `${colors.periodka}20`, color: colors.periodka }}>
-                      Reject
-                    </button>
-                    <button className="p-2 rounded-lg hover:bg-white/20 transition-all">
-                      <Eye className="w-4 h-4" style={{ color: colors.textSecondary }} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
+      <div style={{ background: A.CARD, borderRadius: 16, border: `1px solid ${A.HAIR}`, padding: '22px 24px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
+          <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 18, fontWeight: 500, color: A.DEEP }}>Moderation Queue</div>
+          <div style={{ display: 'flex', gap: 10 }}>
+            <select style={inputStyle}>
+              <option>All Posts</option>
+              <option>Pending Review</option>
+              <option>Reported</option>
+              <option>Featured</option>
+            </select>
+            <select style={inputStyle}>
+              <option>All Categories</option>
+              <option>Success Stories</option>
+              <option>Questions</option>
+              <option>Tips &amp; Advice</option>
+              <option>Motivation</option>
+            </select>
           </div>
         </div>
-      </Card>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {[
+            { author: 'Lucia K.',  content: 'Práve som dokončila svoj prvý týždeň Postpartum programu a cítim sa úžasne! Ďakujem za túto aplikáciu.', category: 'Success Story', time: '2 hours ago', status: 'pending', likes: 0, reports: 0 },
+            { author: 'Andrea M.', content: 'Má niekto skúsenosť s Level 3 cvičeniami? Sú naozaj náročné alebo je to len môj pocit?', category: 'Question', time: '4 hours ago', status: 'pending', likes: 0, reports: 0 },
+            { author: 'Zuzana H.', content: 'Tento recept na avokádové toasty je perfektný na raňajky! Určite odporúčam všetkým.', category: 'Tips & Advice', time: '6 hours ago', status: 'reported', likes: 3, reports: 1 },
+          ].map((post, i) => (
+            <div key={i} style={{ padding: '14px 16px', borderRadius: 12, border: `1px solid ${A.HAIR}`, background: A.BG }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 10 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={{ width: 34, height: 34, borderRadius: 999, background: A.CREAM2, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Users style={{ width: 16, height: 16, color: A.TERRA }} />
+                  </div>
+                  <div>
+                    <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 13, fontWeight: 500, color: A.DEEP }}>{post.author}</div>
+                    <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: A.TERTIARY }}>{post.time}</div>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', padding: '3px 8px', borderRadius: 999, background: post.status === 'pending' ? 'rgba(184,134,74,0.15)' : 'rgba(193,133,106,0.15)', color: post.status === 'pending' ? A.GOLD : A.TERRA }}>{post.status === 'pending' ? 'Pending' : 'Reported'}</span>
+                  <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', padding: '3px 8px', borderRadius: 999, background: 'rgba(184,134,74,0.12)', color: A.GOLD }}>{post.category}</span>
+                </div>
+              </div>
+
+              <p style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: A.DEEP, marginBottom: 10, lineHeight: 1.5 }}>{post.content}</p>
+
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14, fontFamily: 'DM Sans, system-ui', fontSize: 11, color: A.TERTIARY }}>
+                  <span>{post.likes} likes</span>
+                  {post.reports > 0 && <span>{post.reports} reports</span>}
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <button style={{ padding: '7px 12px', borderRadius: 8, border: 'none', cursor: 'pointer', fontFamily: 'DM Sans, system-ui', fontSize: 11, fontWeight: 500, background: 'rgba(139,158,136,0.15)', color: A.SAGE }}>Approve</button>
+                  <button style={{ padding: '7px 12px', borderRadius: 8, border: 'none', cursor: 'pointer', fontFamily: 'DM Sans, system-ui', fontSize: 11, fontWeight: 500, background: 'rgba(193,133,106,0.15)', color: A.TERRA }}>Reject</button>
+                  <button style={{ all: 'unset', cursor: 'pointer', padding: 8, borderRadius: 8 }}>
+                    <Eye style={{ width: 15, height: 15, color: A.MUTED }} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 
@@ -2768,33 +2703,23 @@ export default function AdminNew() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50">
-      {/* Success Indicator */}
-      <div className="fixed top-4 right-4 z-50 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg">
-        ✅ v4 — Live
-      </div>
+    <div style={{ display: 'flex', width: '100%', minHeight: '100vh', background: A.BG, fontFamily: 'DM Sans, system-ui, sans-serif' }}>
+      {/* Sidebar */}
+      <aside style={{ width: 248, flexShrink: 0, background: A.SIDEBAR, borderRight: `1px solid ${A.HAIR}`, display: 'flex', flexDirection: 'column', minHeight: '100vh', position: 'sticky', top: 0, height: '100vh', overflowY: 'auto' }}>
+        {renderSidebar()}
+      </aside>
 
-      {/* Desktop Layout */}
-      <div className="flex h-screen">
-        {/* Sidebar */}
-        <div className="w-64 bg-white/40 backdrop-blur-xl border-r border-white/30 flex flex-col">
-          {renderSidebar()}
-        </div>
+      {/* Main area */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden' }}>
+        {/* Top bar */}
+        <header style={{ padding: '18px 36px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24, borderBottom: `1px solid ${A.HAIR}`, background: A.BG, flexShrink: 0 }}>
+          {renderHeader()}
+        </header>
 
-        {/* Main Content Area */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Header */}
-          <div className="h-16 bg-white/30 backdrop-blur-xl border-b border-white/30 flex items-center justify-between px-6">
-            {renderHeader()}
-          </div>
-
-          {/* Main Content */}
-          <div className="flex-1 overflow-auto p-6">
-            <div className="max-w-7xl mx-auto">
-              {renderContent()}
-            </div>
-          </div>
-        </div>
+        {/* Scrollable content */}
+        <main style={{ flex: 1, overflowY: 'auto', padding: '28px 36px 48px' }}>
+          {renderContent()}
+        </main>
       </div>
     </div>
   );

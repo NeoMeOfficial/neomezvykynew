@@ -1,187 +1,116 @@
-import { useState, useEffect } from 'react';
-import { ArrowLeft, Users, UserPlus, Heart } from 'lucide-react';
+import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { Users, UserPlus, Heart } from 'lucide-react';
 import BuddyCodeCard from '../../components/v2/buddy/BuddyCodeCard';
 import BuddyFinder from '../../components/v2/buddy/BuddyFinder';
 import BuddyDashboard from '../../components/v2/buddy/BuddyDashboard';
-import BreadcrumbBack from '../../components/v2/BreadcrumbBack';
 import { useBuddySystem } from '../../hooks/useBuddySystem';
-import { colors, glassCard } from '../../theme/warmDusk';
+import { TopBar } from '@/components/v2/top-bar';
+import { Eyebrow } from '@/components/ui/eyebrow';
+import { BodyText } from '@/components/ui/body-text';
+import { SerifHeader } from '@/components/ui/serif-header';
+
+const TABS = [
+  { key: 'dashboard', label: 'Prehľad', Icon: Users },
+  { key: 'find', label: 'Nájsť buddy', Icon: UserPlus },
+  { key: 'mycode', label: 'Môj kód', Icon: Heart },
+] as const;
+
+type Tab = typeof TABS[number]['key'];
 
 export default function BuddySystem() {
   const navigate = useNavigate();
   const location = useLocation();
   const { stats, hasBuddies } = useBuddySystem();
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'find' | 'mycode'>(
-    hasBuddies ? 'dashboard' : 'mycode'
-  );
+  const [activeTab, setActiveTab] = useState<Tab>(hasBuddies ? 'dashboard' : 'mycode');
 
-  // Determine where user came from for proper back navigation
   const referrer = location.state?.from || '/domov-new';
-  const getBackLabel = () => {
-    switch (referrer) {
-      case '/domov-new':
-        return 'Domov';
-      case '/komunita':
-        return 'Komunita';
-      case '/profil':
-        return 'Profil';
-      default:
-        return 'Späť';
-    }
-  };
+
+  const HOW_IT_WORKS = [
+    { num: '1', label: 'Zdieľaj kód', desc: 'Pošli svoj 6-miestny buddy kód kamarátke.', color: 'bg-gold text-white' },
+    { num: '2', label: 'Pripojte sa', desc: 'Ona zadá tvoj kód a pošle žiadosť o spojenie.', color: 'bg-pillar-strava text-white' },
+    { num: '3', label: 'Motivujte sa', desc: 'Vidíte navzájom úspechy a podporujete sa.', color: 'bg-mauve text-white' },
+  ];
 
   return (
-    <div className="w-full min-h-screen px-3 py-6 pb-28 space-y-6" style={{ background: colors.bgGradient }}>
-      {/* Breadcrumb Back Button */}
-      <BreadcrumbBack to={referrer} label={getBackLabel()} />
+    <div className="min-h-screen bg-cream pb-12">
+      <TopBar title="Buddy System" onBack={() => navigate(referrer)} />
 
-      {/* Nordic Header */}
-      <div className="p-4" style={glassCard}>
-        <div className="flex items-center gap-3 mb-4">
-          <div className="flex items-center gap-2 flex-1">
-            <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(122, 158, 120, 0.14)` }}>
-              <Users className="w-4 h-4" style={{ color: '#7A9E78' }} />
+      <div className="px-5 pt-2 flex flex-col gap-4">
+        {/* Stats strip — visible only if user has buddies/pending */}
+        {(stats.totalBuddies > 0 || stats.pendingRequestsCount > 0) && (
+          <div className="rounded-card bg-white border border-ink/[0.08] shadow-nm-sm p-4">
+            <div className="flex justify-around">
+              {[
+                { value: stats.totalBuddies, label: 'Buddy', color: 'text-pillar-strava' },
+                { value: stats.pendingRequestsCount, label: 'Žiadosti', color: 'text-gold' },
+                { value: stats.unreadNotifications, label: 'Aktivity', color: 'text-mauve' },
+              ].map(({ value, label, color }) => (
+                <div key={label} className="text-center">
+                  <div className={`font-serif text-h2 ${color}`}>{value}</div>
+                  <Eyebrow tone="muted">{label}</Eyebrow>
+                </div>
+              ))}
             </div>
-            <h1 className="text-[16px] font-semibold" style={{ color: '#2E2218' }}>
-              Buddy System • Motivuj sa s kamarátkami
-            </h1>
           </div>
-        </div>
-      </div>
+        )}
 
-      {/* Stats Overview */}
-      {(stats.totalBuddies > 0 || stats.pendingRequestsCount > 0) && (
-        <div className="grid grid-cols-3 gap-4">
-          <div className="p-4 text-center hover:shadow-md transition-all" style={glassCard}>
-            <div className="text-[#7A9E78] font-bold text-2xl">{stats.totalBuddies}</div>
-            <div className="text-[#6B4C3B] text-sm">Buddy</div>
-          </div>
-          <div className="p-4 text-center hover:shadow-md transition-all" style={glassCard}>
-            <div className="text-[#B8864A] font-bold text-2xl">{stats.pendingRequestsCount}</div>
-            <div className="text-[#6B4C3B] text-sm">Žiadosti</div>
-          </div>
-          <div className="p-4 text-center hover:shadow-md transition-all" style={glassCard}>
-            <div className="text-[#A8848B] font-bold text-2xl">{stats.unreadNotifications}</div>
-            <div className="text-[#6B4C3B] text-sm">Nové aktivity</div>
-          </div>
+        {/* Tab toggle */}
+        <div className="flex gap-1 p-1 bg-cream-200 rounded-xl">
+          {TABS.map(({ key, label, Icon }) => (
+            <button
+              key={key}
+              onClick={() => setActiveTab(key)}
+              className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg font-sans text-xs font-medium transition-all ${
+                activeTab === key ? 'bg-white shadow-nm-sm text-ink' : 'text-ink/56'
+              }`}
+            >
+              <Icon className="size-3.5" />
+              {label}
+            </button>
+          ))}
         </div>
-      )}
 
-      {/* Tab Navigation */}
-      <div className="p-4" style={glassCard}>
-        <div className="flex gap-2">
-          <button
-            onClick={() => setActiveTab('dashboard')}
-            className={`flex-1 px-3 py-2 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2 ${
-              activeTab === 'dashboard'
-                ? 'bg-[#7A9E78] text-white' 
-                : 'bg-white/20 text-[#8B7560] hover:bg-white/25'
-            }`}
-          >
-            <Users size={16} />
-            Moje buddy
-          </button>
-          <button
-            onClick={() => setActiveTab('find')}
-            className={`flex-1 px-3 py-2 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2 ${
-              activeTab === 'find'
-                ? 'bg-[#7A9E78] text-white' 
-                : 'bg-white/20 text-[#8B7560] hover:bg-white/25'
-            }`}
-          >
-            <UserPlus size={16} />
-            Nájdi buddy
-          </button>
-          <button
-            onClick={() => setActiveTab('mycode')}
-            className={`flex-1 px-3 py-2 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2 ${
-              activeTab === 'mycode'
-                ? 'bg-[#7A9E78] text-white' 
-                : 'bg-white/20 text-[#8B7560] hover:bg-white/25'
-            }`}
-          >
-            <Heart size={16} />
-            Môj kód
-          </button>
-        </div>
-      </div>
-
-      {/* Tab Content */}
-      <div className="space-y-6">
+        {/* Tab content */}
         {activeTab === 'dashboard' && <BuddyDashboard />}
         {activeTab === 'find' && <BuddyFinder />}
         {activeTab === 'mycode' && <BuddyCodeCard />}
-      </div>
 
-      {/* How It Works */}
-      <div className="p-6" style={glassCard}>
-        <h3 className="text-[16px] font-semibold mb-4 flex items-center gap-2" style={{ color: '#2E2218' }}>
-          <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(184, 134, 74, 0.14)` }}>
-            <Heart className="w-4 h-4" style={{ color: '#B8864A' }} />
-          </div>
-          Ako funguje Buddy System?
-        </h3>
-        
-        <div className="grid gap-4">
-          <div className="flex gap-3">
-            <div className="w-8 h-8 bg-[#B8864A] text-white rounded-full flex items-center justify-center font-bold text-sm">
-              1
-            </div>
-            <div>
-              <h4 className="text-sm font-medium" style={{ color: '#2E2218' }}>Zdieľaj svoj kód</h4>
-              <p className="text-xs" style={{ color: '#6B4C3B' }}>Pošli svoj 6-miestny buddy kód kamarátke</p>
-            </div>
-          </div>
-          
-          <div className="flex gap-3">
-            <div className="w-8 h-8 bg-[#7A9E78] text-white rounded-full flex items-center justify-center font-bold text-sm">
-              2
-            </div>
-            <div>
-              <h4 className="text-sm font-medium" style={{ color: '#2E2218' }}>Pripojte sa</h4>
-              <p className="text-xs" style={{ color: '#6B4C3B' }}>Ona zadá tvoj kód a pošle žiadosť o spojenie</p>
-            </div>
-          </div>
-          
-          <div className="flex gap-3">
-            <div className="w-8 h-8 bg-[#A8848B] text-white rounded-full flex items-center justify-center font-bold text-sm">
-              3
-            </div>
-            <div>
-              <h4 className="text-sm font-medium" style={{ color: '#2E2218' }}>Motivujte sa</h4>
-              <p className="text-xs" style={{ color: '#6B4C3B' }}>Vidíte navzájom úspechy a podporujete sa</p>
-            </div>
+        {/* How it works */}
+        <div className="rounded-card bg-white border border-ink/[0.08] shadow-nm-sm p-5">
+          <SerifHeader as="h3" size="h3" className="mb-4">Ako funguje Buddy System?</SerifHeader>
+          <div className="flex flex-col gap-4">
+            {HOW_IT_WORKS.map(({ num, label, desc, color }) => (
+              <div key={num} className="flex items-start gap-3">
+                <div className={`h-7 w-7 rounded-full flex items-center justify-center font-sans text-xs font-bold flex-shrink-0 ${color}`}>
+                  {num}
+                </div>
+                <div>
+                  <BodyText size="sm" className="font-medium">{label}</BodyText>
+                  <BodyText size="sm" tone="muted">{desc}</BodyText>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-      </div>
 
-      {/* Tips */}
-      <div className="p-4" style={glassCard}>
-        <h4 className="text-sm font-medium mb-3 flex items-center gap-2" style={{ color: '#2E2218' }}>
-          <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ background: `rgba(122, 158, 120, 0.14)` }}>
-            💡
+        {/* Tips */}
+        <div className="rounded-card bg-white border border-ink/[0.08] shadow-nm-sm p-5">
+          <Eyebrow className="mb-3">Tipy pre lepšiu motiváciu</Eyebrow>
+          <div className="flex flex-col gap-2">
+            {[
+              'Dohodnte si spoločné cvičenie o rovnakom čase.',
+              'Gratulujte si navzájom k úspechom.',
+              'Vytvorte si týždenné výzvy.',
+              'Zdieľajte pokrok vo svojich obľúbených receptoch.',
+            ].map((tip, i) => (
+              <div key={i} className="flex items-start gap-2">
+                <span className="text-gold mt-0.5 font-sans text-sm">·</span>
+                <BodyText size="sm" tone="secondary">{tip}</BodyText>
+              </div>
+            ))}
           </div>
-          Tipy pre lepšiu motiváciu
-        </h4>
-        <ul className="text-xs space-y-2" style={{ color: '#6B4C3B' }}>
-          <li className="flex items-start gap-2">
-            <span className="text-[#B8864A] mt-0.5">•</span>
-            <span>Dohodnte si spoločné cvičenie o rovnakom čase</span>
-          </li>
-          <li className="flex items-start gap-2">
-            <span className="text-[#B8864A] mt-0.5">•</span>
-            <span>Gratulujte si navzájom k úspechom</span>
-          </li>
-          <li className="flex items-start gap-2">
-            <span className="text-[#B8864A] mt-0.5">•</span>
-            <span>Vytvorte si týždenné výzvy</span>
-          </li>
-          <li className="flex items-start gap-2">
-            <span className="text-[#B8864A] mt-0.5">•</span>
-            <span>Zdieľajte pokrok vo svojich obľúbených receptoch</span>
-          </li>
-        </ul>
+        </div>
       </div>
     </div>
   );

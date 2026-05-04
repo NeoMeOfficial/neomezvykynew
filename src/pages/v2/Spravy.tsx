@@ -75,8 +75,8 @@ export default function Spravy() {
       <div style={{ padding: 'calc(env(safe-area-inset-top) + 14px) 18px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Eye>Správy</Eye>
         <button
-          onClick={() => navigate('/spravy/new')}
-          aria-label="Nová správa"
+          onClick={() => navigate('/spravy/gabi')}
+          aria-label="Napísať Gabi"
           style={{
             all: 'unset',
             cursor: 'pointer',
@@ -124,9 +124,35 @@ export default function Spravy() {
       </div>
 
       {threads.length === 0 ? (
-        <div style={{ margin: '0 20px', padding: '40px 24px', background: '#fff', borderRadius: 18, border: `1px solid ${NM.HAIR}`, textAlign: 'center' }}>
-          <div style={{ fontFamily: NM.SERIF, fontSize: 18, fontWeight: 500, color: NM.DEEP, marginBottom: 6 }}>Zatiaľ tu nič nie je</div>
-          <div style={{ fontFamily: NM.SANS, fontSize: 12, color: NM.MUTED, lineHeight: 1.5 }}>Tvoja schránka sa otvorí, keď ti Gabi alebo komunita napíše.</div>
+        <div style={{ margin: '0 20px', background: '#fff', borderRadius: 18, border: `1px solid ${NM.HAIR}`, overflow: 'hidden' }}>
+          {/* Gabi CTA — always visible even with no prior messages */}
+          <button
+            onClick={() => navigate('/spravy/gabi')}
+            style={{
+              all: 'unset',
+              cursor: 'pointer',
+              display: 'flex',
+              gap: 14,
+              padding: '16px 16px',
+              alignItems: 'center',
+              width: '100%',
+              boxSizing: 'border-box',
+            }}
+          >
+            <div style={{ position: 'relative', flexShrink: 0 }}>
+              <div style={{ width: 46, height: 46, borderRadius: 999, backgroundImage: 'url(/images/r9/founder-gabi.png)', backgroundSize: 'cover', backgroundPosition: 'center' }} />
+              <div style={{ position: 'absolute', bottom: -2, right: -2, width: 16, height: 16, borderRadius: 999, background: NM.GOLD, border: '2px solid #fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <svg width="8" height="8" viewBox="0 0 24 24" fill="#fff"><path d="M12 2l2 7h7l-5.5 4 2 7L12 16l-5.5 4 2-7L3 9h7l2-7z" /></svg>
+              </div>
+            </div>
+            <div style={{ flex: 1, textAlign: 'left' }}>
+              <div style={{ fontFamily: NM.SANS, fontSize: 13.5, color: NM.DEEP, fontWeight: 500, marginBottom: 3 }}>Gabi Drobová</div>
+              <div style={{ fontFamily: NM.SANS, fontSize: 12, color: NM.MUTED }}>Napíš mi — zvyčajne odpoviem do 24h</div>
+            </div>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={NM.TERTIARY} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 18l6-6-6-6" />
+            </svg>
+          </button>
         </div>
       ) : (
       <div style={{ margin: '0 20px', background: '#fff', borderRadius: 18, border: `1px solid ${NM.HAIR}`, overflow: 'hidden' }}>

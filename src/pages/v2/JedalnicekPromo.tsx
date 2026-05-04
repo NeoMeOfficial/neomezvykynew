@@ -1,204 +1,258 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Check, ChevronRight, Sparkles, Target, Clock, Leaf, ShieldCheck, Star, Zap } from 'lucide-react';
-import { colors } from '../../theme/warmDusk';
+import { Check, Star, ShieldCheck } from 'lucide-react';
+import { TopBar } from '@/components/v2/top-bar';
+import { Eyebrow } from '@/components/ui/eyebrow';
+import { BodyText } from '@/components/ui/body-text';
+import { SerifHeader } from '@/components/ui/serif-header';
+import { FaqAccordion } from '@/components/v2/neome/FaqAccordion';
 
-const BENEFITS = [
-  { icon: Target, title: 'Prispôsobené tvojim cieľom', desc: 'Chudnutie, udržanie váhy alebo budovanie svalov — plán sa prispôsobí.' },
-  { icon: Clock, title: '7-dňový plán jedným klikom', desc: 'Raňajky, obedy, večere a snacky na celý týždeň za pár sekúnd.' },
-  { icon: Leaf, title: 'Rešpektuje tvoje preferencie', desc: 'Vegetariánske, vegánske, bezlepkové — tvoj plán, tvoje pravidlá.' },
-  { icon: ShieldCheck, title: 'Presné makro & kalórie', desc: 'Každý deň je vypočítaný podľa tvojho BMR a úrovne aktivity.' },
-];
-
-const TESTIMONIALS = [
-  { name: 'Katka N.', text: 'Konečne nemusím premýšľať čo variť. Ušetrím hodiny týždenne!', stars: 5 },
-  { name: 'Jana V.', text: 'Po 2 týždňoch s jedálničkom som schudla 2kg bez toho, aby som mala hlad.', stars: 5 },
-  { name: 'Eva S.', text: 'Ako vegánka som mala problém s bielkovinami. Jedálniček to vyriešil.', stars: 5 },
+const COMPARISON = [
+  { diet: 'Zákaz jedál', neome: 'Žiadne zákazy' },
+  { diet: 'Počítanie každého jedla', neome: 'Automatické makrá' },
+  { diet: 'Jeden plán pre všetkých', neome: 'Tvoje ciele & preferencie' },
+  { diet: 'Krátke výsledky', neome: 'Trvalá zmena' },
 ];
 
 const STEPS = [
-  { num: '1', title: 'Vyplň svoj profil', desc: 'Vek, váha, výška, cieľ a aktivita' },
+  { num: '1', title: 'Vyplň profil', desc: 'Vek, váha, výška, cieľ a aktivita' },
   { num: '2', title: 'Nastav preferencie', desc: 'Diéta, alergény, počet jedál denne' },
   { num: '3', title: 'Získaj plán', desc: '7-dňový jedálniček ihneď na obrazovke' },
+  { num: '4', title: 'Jedz a dosahuj', desc: 'Recepty, nákupný zoznam, pokrok' },
+];
+
+const INCLUDED = [
+  '7-dňový personalizovaný jedálniček',
+  'Makrá a kalórie pre každý deň',
+  'Recepty pre každé jedlo',
+  'Nákupný zoznam automaticky',
+  'Vegetariánske, vegánske, bezlepkové varianty',
+  'Vychádza z tvojho BMR a aktivity',
+];
+
+const TESTIMONIALS = [
+  { name: 'Katka N.', text: 'Konečne nemusím premýšľať, čo variť. Ušetrím hodiny týždenne!', stars: 5 },
+  { name: 'Jana V.', text: 'Po 2 týždňoch s jedálničkom som schudla 2 kg bez toho, aby som mala hlad.', stars: 5 },
+  { name: 'Eva S.', text: 'Ako vegánka som mala problém s bielkovinami. Jedálniček to vyriešil.', stars: 5 },
+];
+
+const GOALS = [
+  { id: 'lose', label: 'Schudnúť', hint: 'Deficit −300 kcal, plné jedlá' },
+  { id: 'maintain', label: 'Udržať váhu', hint: 'Udržiavacia kalorická hodnota' },
+  { id: 'gain', label: 'Nabrať svalovú hmotu', hint: 'Prebytok +250 kcal, viac bielkovín' },
+];
+
+const FAQS = [
+  { q: 'Je jedálniček personalizovaný pre mňa?', a: 'Áno — vychádza z tvojho veku, váhy, výšky, cieľa a úrovne aktivity. Každý plán je iný.' },
+  { q: 'Môžem mať vegetariánsky alebo vegánsky plán?', a: 'Samozrejme. Pri nastavovaní preferencií si vyberieš typ stravovania, alergény a počet jedál za deň.' },
+  { q: 'Koľkokrát za mesiac môžem vygenerovať nový plán?', a: 'Jedálniček si môžeš vygenerovať kedykoľvek. Ak sa tvoje ciele zmenia, stačí zmeniť profil a vygenerovať znova.' },
+  { q: 'Sú zahrnuté recepty?', a: 'Áno — ku každému jedlu je priradený recept z knižnice NeoMe s presným zložením a postupom.' },
+];
+
+const SAMPLE_DAY = [
+  { time: 'Raňajky', meal: 'Proteínová kaša s ovocím', cal: '320 kcal' },
+  { time: 'Obed', meal: 'Grilovaný losos so zeleninou', cal: '480 kcal' },
+  { time: 'Snack', meal: 'Hummus so zeleninou', cal: '185 kcal' },
+  { time: 'Večera', meal: 'Quinoa šalát s avokádom', cal: '420 kcal' },
 ];
 
 export default function JedalnicekPromo() {
   const navigate = useNavigate();
   const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
 
-  const handleStart = () => {
-    navigate('/jedalnicek');
-  };
-
   return (
-    <div className="min-h-screen pb-24" style={{ background: colors.bgGradient }}>
-      {/* Header */}
-      <div className="p-4 pt-12 flex items-center gap-3">
-        <button onClick={() => navigate(-1)} className="w-10 h-10 rounded-xl bg-white/30 backdrop-blur-xl flex items-center justify-center">
-          <ArrowLeft className="w-5 h-5" style={{ color: colors.textPrimary }} />
-        </button>
-      </div>
+    <div className="min-h-screen bg-cream pb-28">
+      <TopBar title="Jedálniček na mieru" onBack={() => navigate(-1)} />
 
-      {/* Hero */}
-      <div className="px-6 text-center mb-8">
-        <div className="w-20 h-20 rounded-3xl mx-auto mb-4 flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${colors.strava}, #5A8A58)` }}>
-          <span className="text-4xl">🥗</span>
+      <div className="px-5 pt-2 flex flex-col gap-4">
+        {/* Hero photo card */}
+        <div className="rounded-card overflow-hidden relative" style={{ height: 240 }}>
+          <div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: 'url(/images/jedalnicek-hero.jpg)' }}
+          />
+          <div className="absolute inset-0 bg-ink/35" />
+          <div className="absolute inset-0 flex flex-col justify-end p-5">
+            <Eyebrow className="text-white/70 mb-1">STRAVA</Eyebrow>
+            <SerifHeader as="h2" size="h2" className="text-white mb-1">Jedálniček na mieru</SerifHeader>
+            <BodyText size="sm" className="text-white/80">
+              Personalizovaný výživový plán vytvorený presne pre teba.
+            </BodyText>
+          </div>
         </div>
-        <h1 className="text-2xl font-bold mb-2" style={{ color: colors.textPrimary }}>
-          Jedálniček na mieru
-        </h1>
-        <p className="text-sm" style={{ color: colors.textSecondary }}>
-          Personalizovaný výživový plán vytvorený presne pre teba.
-          <br />Žiadne hádanie, žiadne počítanie — len jedz a dosahuj výsledky.
-        </p>
-      </div>
 
-      <div className="px-4 space-y-6">
-        {/* Social proof */}
-        <div className="flex justify-center gap-6">
-          {[
-            { value: '2,400+', label: 'žien používa' },
-            { value: '116', label: 'receptov' },
-            { value: '4.9★', label: 'hodnotenie' },
-          ].map((s, i) => (
-            <div key={i} className="text-center">
-              <div className="text-lg font-bold" style={{ color: colors.textPrimary }}>{s.value}</div>
-              <div className="text-xs" style={{ color: colors.textTertiary }}>{s.label}</div>
+        {/* Social proof strip */}
+        <div className="rounded-card bg-white border border-ink/[0.08] shadow-nm-sm p-4">
+          <div className="flex justify-around">
+            {[
+              { value: '2 400+', label: 'žien používa' },
+              { value: '116', label: 'receptov' },
+              { value: '4.9', label: 'hodnotenie' },
+            ].map(({ value, label }) => (
+              <div key={label} className="text-center">
+                <div className="font-serif text-h2 text-ink">{value}</div>
+                <Eyebrow tone="muted">{label}</Eyebrow>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* "Toto nie je diéta" */}
+        <div className="rounded-card bg-white border border-ink/[0.08] shadow-nm-sm p-5">
+          <SerifHeader as="h3" size="h3" className="mb-1">Toto nie je diéta</SerifHeader>
+          <BodyText tone="secondary" className="mb-4">Je to inteligentný plán, ktorý funguje dlhodobo.</BodyText>
+          <div className="rounded-xl overflow-hidden border border-ink/[0.08]">
+            <div className="grid grid-cols-2">
+              <div className="bg-cream-200 px-4 py-2">
+                <Eyebrow tone="muted">Diéta</Eyebrow>
+              </div>
+              <div className="bg-pillar-strava/[0.08] px-4 py-2">
+                <Eyebrow className="text-pillar-strava">NeoMe</Eyebrow>
+              </div>
             </div>
-          ))}
+            {COMPARISON.map((row, i) => (
+              <div key={i} className={`grid grid-cols-2 ${i % 2 === 0 ? '' : 'bg-ink/[0.02]'}`}>
+                <div className="px-4 py-2.5 border-r border-ink/[0.06]">
+                  <BodyText size="sm" tone="secondary">{row.diet}</BodyText>
+                </div>
+                <div className="px-4 py-2.5 flex items-center gap-1.5">
+                  <Check className="size-3.5 text-pillar-strava flex-shrink-0" strokeWidth={2.5} />
+                  <BodyText size="sm" className="text-pillar-strava">{row.neome}</BodyText>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Interactive goal selector */}
-        <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-5 border border-white/30">
-          <p className="text-sm font-semibold mb-3" style={{ color: colors.textPrimary }}>Aký je tvoj cieľ?</p>
-          <div className="grid grid-cols-3 gap-2">
-            {[
-              { id: 'lose', emoji: '🔥', label: 'Schudnúť' },
-              { id: 'maintain', emoji: '⚖️', label: 'Udržať' },
-              { id: 'gain', emoji: '💪', label: 'Nabrať' },
-            ].map(g => (
+        <div className="rounded-card bg-white border border-ink/[0.08] shadow-nm-sm p-5">
+          <Eyebrow className="mb-3">Aký je tvoj cieľ?</Eyebrow>
+          <div className="flex flex-col gap-2">
+            {GOALS.map(g => (
               <button
                 key={g.id}
                 onClick={() => setSelectedGoal(g.id)}
-                className="p-3 rounded-xl text-center transition-all"
-                style={{
-                  background: selectedGoal === g.id ? `${colors.strava}20` : 'rgba(255,255,255,0.2)',
-                  border: selectedGoal === g.id ? `2px solid ${colors.strava}` : '2px solid transparent',
-                }}
+                className={`w-full p-3.5 rounded-xl text-left transition-all border-2 ${
+                  selectedGoal === g.id
+                    ? 'border-pillar-strava bg-pillar-strava/[0.06]'
+                    : 'border-ink/[0.08] bg-cream-200'
+                }`}
               >
-                <div className="text-xl mb-1">{g.emoji}</div>
-                <div className="text-xs font-medium" style={{ color: selectedGoal === g.id ? colors.strava : colors.textSecondary }}>{g.label}</div>
+                <div className="flex items-center justify-between">
+                  <BodyText size="sm" className={`font-medium ${selectedGoal === g.id ? 'text-pillar-strava' : ''}`}>
+                    {g.label}
+                  </BodyText>
+                  {selectedGoal === g.id && (
+                    <div className="h-5 w-5 rounded-full bg-pillar-strava flex items-center justify-center">
+                      <Check className="size-3 text-white" strokeWidth={2.5} />
+                    </div>
+                  )}
+                </div>
+                {selectedGoal === g.id && (
+                  <BodyText size="sm" className="text-pillar-strava mt-0.5">{g.hint}</BodyText>
+                )}
               </button>
             ))}
           </div>
-          {selectedGoal && (
-            <div className="mt-3 p-3 rounded-xl" style={{ background: `${colors.strava}10` }}>
-              <p className="text-xs" style={{ color: colors.strava }}>
-                ✓ Tvoj jedálniček bude optimalizovaný na {selectedGoal === 'lose' ? 'chudnutie s -300 kcal deficitom' : selectedGoal === 'gain' ? 'nárast svalov s +250 kcal' : 'udržanie aktuálnej váhy'}
-              </p>
-            </div>
-          )}
         </div>
 
         {/* How it works */}
-        <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-5 border border-white/30">
-          <p className="text-sm font-semibold mb-4" style={{ color: colors.textPrimary }}>Ako to funguje</p>
-          <div className="space-y-4">
-            {STEPS.map((s, i) => (
-              <div key={i} className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-white font-bold text-sm" style={{ backgroundColor: colors.strava }}>
-                  {s.num}
+        <div className="rounded-card bg-white border border-ink/[0.08] shadow-nm-sm p-5">
+          <SerifHeader as="h3" size="h3" className="mb-4">Ako to funguje</SerifHeader>
+          <div className="flex flex-col gap-4">
+            {STEPS.map(({ num, title, desc }) => (
+              <div key={num} className="flex items-start gap-3">
+                <div className="h-7 w-7 rounded-full bg-pillar-strava flex items-center justify-center font-sans text-xs font-bold text-white flex-shrink-0">
+                  {num}
                 </div>
                 <div>
-                  <p className="text-sm font-medium" style={{ color: colors.textPrimary }}>{s.title}</p>
-                  <p className="text-xs" style={{ color: colors.textSecondary }}>{s.desc}</p>
+                  <BodyText size="sm" className="font-medium">{title}</BodyText>
+                  <BodyText size="sm" tone="muted">{desc}</BodyText>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Benefits */}
-        <div className="space-y-3">
-          {BENEFITS.map((b, i) => (
-            <div key={i} className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30 flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: `${colors.strava}15` }}>
-                <b.icon className="w-5 h-5" style={{ color: colors.strava }} />
-              </div>
+        {/* Sample day */}
+        <div className="rounded-card bg-white border border-ink/[0.08] shadow-nm-sm overflow-hidden">
+          <div className="px-5 pt-4 pb-3 border-b border-ink/[0.06]">
+            <Eyebrow>Ukážka dňa</Eyebrow>
+          </div>
+          {SAMPLE_DAY.map((m, i, arr) => (
+            <div key={i} className={`px-5 py-3 flex items-center justify-between ${i < arr.length - 1 ? 'border-b border-ink/[0.06]' : ''}`}>
               <div>
-                <p className="text-sm font-medium" style={{ color: colors.textPrimary }}>{b.title}</p>
-                <p className="text-xs" style={{ color: colors.textSecondary }}>{b.desc}</p>
+                <Eyebrow tone="muted">{m.time}</Eyebrow>
+                <BodyText size="sm">{m.meal}</BodyText>
               </div>
+              <Eyebrow className="text-pillar-strava">{m.cal}</Eyebrow>
             </div>
           ))}
+          <div className="px-5 py-3 bg-cream-200 flex items-center justify-between">
+            <BodyText size="sm" className="font-medium">Celkom</BodyText>
+            <BodyText size="sm" className="font-semibold text-pillar-strava">1 405 kcal</BodyText>
+          </div>
         </div>
 
-        {/* Sample day preview */}
-        <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-5 border border-white/30">
-          <div className="flex items-center gap-2 mb-3">
-            <Sparkles className="w-4 h-4" style={{ color: colors.accent }} />
-            <p className="text-sm font-semibold" style={{ color: colors.textPrimary }}>Ukážka dňa</p>
-          </div>
-          <div className="space-y-2">
-            {[
-              { time: '☀️ Raňajky', meal: 'Proteínová kaša s ovocím', cal: '320 kcal' },
-              { time: '🥗 Obed', meal: 'Grilovaný losos so zeleninou', cal: '480 kcal' },
-              { time: '🍎 Snack', meal: 'Hummus so zeleninou', cal: '185 kcal' },
-              { time: '🌙 Večera', meal: 'Quinoa šalát s avokádom', cal: '420 kcal' },
-            ].map((m, i) => (
-              <div key={i} className="flex items-center justify-between py-2 border-b border-white/20 last:border-0">
-                <div>
-                  <span className="text-xs" style={{ color: colors.textTertiary }}>{m.time}</span>
-                  <p className="text-sm" style={{ color: colors.textPrimary }}>{m.meal}</p>
+        {/* What's included checklist */}
+        <div className="rounded-card bg-white border border-ink/[0.08] shadow-nm-sm p-5">
+          <Eyebrow className="mb-3">Čo dostaneš</Eyebrow>
+          <div className="flex flex-col gap-2.5">
+            {INCLUDED.map((item) => (
+              <div key={item} className="flex items-center gap-3">
+                <div className="h-5 w-5 rounded-full bg-pillar-strava/[0.10] flex items-center justify-center flex-shrink-0">
+                  <Check className="size-3 text-pillar-strava" strokeWidth={2.5} />
                 </div>
-                <span className="text-xs font-medium" style={{ color: colors.strava }}>{m.cal}</span>
+                <BodyText size="sm">{item}</BodyText>
               </div>
             ))}
-            <div className="flex justify-between pt-2">
-              <span className="text-xs font-medium" style={{ color: colors.textPrimary }}>Celkom</span>
-              <span className="text-sm font-bold" style={{ color: colors.strava }}>1,405 kcal</span>
-            </div>
           </div>
         </div>
 
         {/* Testimonials */}
-        <div className="space-y-3">
-          <p className="text-sm font-semibold text-center" style={{ color: colors.textPrimary }}>Čo hovoria naše členky</p>
-          {TESTIMONIALS.map((t, i) => (
-            <div key={i} className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
-              <div className="flex items-center gap-1 mb-2">
-                {Array.from({ length: t.stars }).map((_, j) => (
-                  <Star key={j} className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
-                ))}
+        <div>
+          <Eyebrow className="mb-3 px-1">Čo hovoria naše členky</Eyebrow>
+          <div className="flex flex-col gap-3">
+            {TESTIMONIALS.map((t, i) => (
+              <div key={i} className="rounded-card bg-white border border-ink/[0.08] shadow-nm-sm p-4">
+                <div className="flex gap-0.5 mb-2">
+                  {Array.from({ length: t.stars }).map((_, j) => (
+                    <Star key={j} className="size-3.5 fill-gold text-gold" />
+                  ))}
+                </div>
+                <BodyText size="sm" tone="secondary" className="italic mb-2">„{t.text}"</BodyText>
+                <Eyebrow tone="muted">— {t.name}</Eyebrow>
               </div>
-              <p className="text-xs italic mb-2" style={{ color: colors.textSecondary }}>„{t.text}"</p>
-              <p className="text-xs font-medium" style={{ color: colors.textPrimary }}>— {t.name}</p>
-            </div>
-          ))}
+            ))}
+          </div>
+        </div>
+
+        {/* FAQ */}
+        <div>
+          <Eyebrow className="mb-2 px-1">Časté otázky</Eyebrow>
+          <FaqAccordion items={FAQS} accent="#8B9E88" />
         </div>
 
         {/* Guarantee */}
-        <div className="text-center p-4 rounded-2xl" style={{ background: `${colors.strava}10` }}>
-          <ShieldCheck className="w-6 h-6 mx-auto mb-2" style={{ color: colors.strava }} />
-          <p className="text-xs font-medium" style={{ color: colors.strava }}>
-            100% spokojnosť alebo zmena plánu kedykoľvek
-          </p>
+        <div className="rounded-card bg-pillar-strava/[0.06] border border-pillar-strava/20 p-4 flex items-center gap-3">
+          <ShieldCheck className="size-5 text-pillar-strava flex-shrink-0" />
+          <BodyText size="sm" className="text-pillar-strava">
+            100% spokojnosť alebo zmena plánu kedykoľvek.
+          </BodyText>
         </div>
       </div>
 
       {/* Sticky CTA */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 pb-6" style={{ background: 'linear-gradient(to top, rgba(250,247,242,1) 60%, rgba(250,247,242,0))' }}>
+      <div className="fixed bottom-0 left-0 right-0 z-20 px-5 pb-8 pt-4 bg-cream border-t border-ink/[0.08]">
         <button
-          onClick={handleStart}
-          className="w-full py-4 rounded-2xl text-white font-bold text-base shadow-lg active:scale-[0.97] transition-all flex items-center justify-center gap-2"
-          style={{ background: `linear-gradient(135deg, ${colors.strava}, #5A8A58)` }}
+          onClick={() => navigate('/jedalnicek')}
+          className="w-full py-4 rounded-full bg-pillar-strava text-white font-sans font-semibold transition-all active:scale-[0.98]"
         >
-          <Zap className="w-5 h-5" />
           Vytvoriť môj jedálniček
         </button>
-        <p className="text-center text-xs mt-2" style={{ color: colors.textTertiary }}>
-          Súčasť NeoMe predplatného · Zrušiť kedykoľvek
-        </p>
+        <BodyText size="sm" tone="muted" className="text-center mt-2">
+          Súčasť NeoMe Plus predplatného
+        </BodyText>
       </div>
     </div>
   );
