@@ -3,7 +3,7 @@
 // Schema is informal; the renderer is forgiving of missing fields.
 
 window.TRACKER = {
-  lastUpdated: "2026-05-05",
+  lastUpdated: "2026-05-04",
 
   blockers: [
     {
@@ -20,15 +20,15 @@ window.TRACKER = {
       title: "Admin panel rebuild",
       pillar: "telo",
       status: "in-progress",
-      summary: "Wire admin panel to Supabase end-to-end so changes reach users. Phases 0–2 shipped and committed. Phase 2: exercises + meditations use status enum (draft/published/archived), thumbnail upload, cycleStatus badge. Exercise/meditation video URLs not yet populated — seeding deferred until URLs are ready. Next: Phase 3 (Programmes admin) + wire TeloPrograms user-facing view to Supabase.",
+      summary: "Wire admin panel to Supabase end-to-end so changes reach users. Phases 0–3 shipped. Phase 3: Programmes tab has a full week-by-week schedule builder — each day slot gets a type (exercise/meditation/rest), a content picker from the exercises/meditations library, and an optional Gabi message. Exercise video URLs not yet populated so pickers show names only. Next: seed the 4 programmes, populate exercise URLs, then wire TeloPrograms user-facing view to Supabase.",
       blocker: null,
-      nextAction: "Phase 3: Programmes admin CRUD. Wire TeloPrograms.tsx / ProgramDetail.tsx to programmes table instead of static src/data/programs.ts.",
-      timeline: "~4 weeks remaining (phases 3–5)",
+      nextAction: "Run migration 20260504 in Supabase SQL editor. Seed 4 programmes via Admin → Programy → 'Seed 4 programy'. Build schedule once exercise URLs are populated.",
+      timeline: "~3 weeks remaining (phases 4–5 + wiring user-facing views)",
       phases: [
         { id: 0, label: "Foundation — migrations, Edge Function, Storage bucket, React Query, admin auth", status: "shipped", weeks: "Week 1" },
         { id: 1, label: "Blog posts — rich text editor, image upload, user-facing rendering", status: "shipped", weeks: "Week 2" },
         { id: 2, label: "Exercises + Meditations (status enum, thumbnail upload)", status: "shipped", weeks: "Weeks 3-4", note: "Recipes deferred until recipe pipeline finishes" },
-        { id: 3, label: "Programs + Scheduled inbox messages", status: "pending", weeks: "Week 5" },
+        { id: 3, label: "Programmes schedule builder", status: "shipped", weeks: "Week 5", note: "Week×Day builder with exercise/meditation pickers + Gabi messages" },
         { id: 4, label: "Messaging UI + User management", status: "pending", weeks: "Week 6" },
         { id: 5, label: "Stats dashboard", status: "pending", weeks: "Week 7" },
       ],
@@ -122,7 +122,8 @@ window.TRACKER = {
   ],
 
   recentDecisions: [
-    { date: "2026-05-05", what: "All uncommitted work committed across 5 clean PRs: nutrition onboarding (R7), admin rebuild Phases 0–2, R12 design system rollout, programmes data + periodka paywall removal, tracker + ops docs." },
+    { date: "2026-05-04", what: "Admin Phase 3 shipped: Programmes schedule builder. Week×Day editor with type toggle (exercise/meditation/rest), content pickers from exercises/meditations library, optional Gabi message per day. Status enum + cover image upload. Migration 20260504 adds status column to programmes table." },
+    { date: "2026-05-04", what: "All earlier uncommitted work committed across 5 clean PRs: nutrition onboarding (R7), admin rebuild Phases 0–2, R12 design system rollout, programmes data + periodka paywall removal, tracker + ops docs." },
     { date: "2026-05-05", what: "Nutrition onboarding: energy range replaces single dailyCalories. Life phase radio (regular/postpartum/pregnant) replaces binary isPregnant. Types updated with lifePhase, dailyCaloriesMin, dailyCaloriesMax." },
     { date: "2026-05-04", what: "Phase 2 shipped: ExercisesTab + MeditationsTab migrated to status enum (draft/published/archived), thumbnail image upload, cycleStatus badge. Video URL stays as text input (URLs not yet populated). Sync triggers dropped (migration 20260503)." },
     { date: "2026-05-03", what: "Phase 1 shipped: Tiptap rich text editor with bubble menu, inline image upload (auto WebP), blog list + article wired to Supabase." },
