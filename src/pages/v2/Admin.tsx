@@ -620,12 +620,37 @@ function UsersTab() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/.netlify/functions/admin-get-users');
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to load users');
-      setUsers(data.users);
+      // Query Supabase directly — works in both local dev and production.
+      // Requires the "Admin read all profiles" RLS policy to be applied
+      // (migration 20260505_gdpr_consent.sql).
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, email, full_name, role, created_at')
+        .order('created_at', { ascending: false });
+
+      if (profilesError) throw new Error(profilesError.message);
+
+      const { data: subs } = await supabase
+        .from('subscriptions')
+        .select('user_id, tier, active, stripe_customer_id, stripe_subscription_id, current_period_end, cancel_at_period_end');
+
+      const subMap: Record<string, AdminUser['subscriptions']> = {};
+      for (const s of subs ?? []) {
+        subMap[s.user_id] = {
+          tier: s.tier,
+          active: s.active,
+          stripe_customer_id: s.stripe_customer_id,
+          stripe_subscription_id: s.stripe_subscription_id,
+          current_period_end: s.current_period_end,
+          cancel_at_period_end: s.cancel_at_period_end,
+        };
+      }
+
+      setUsers((profiles ?? []).map(p => ({ ...p, subscriptions: subMap[p.id] ?? null })));
     } catch (err: any) {
-      setError(err.message);
+      // Likely cause: admin RLS policy not applied yet.
+      // Run migration 20260505_gdpr_consent.sql in Supabase dashboard.
+      setError(err.message || 'Failed to load users — check Supabase RLS admin policy');
     } finally {
       setLoading(false);
     }
@@ -659,14 +684,20 @@ function UsersTab() {
   const handleSetTier = async (userId: string, tier: string) => {
     setSettingTier(userId);
     setTierMenuOpen(null);
+    const periodEnd = tier !== 'free' ? new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString() : null;
     try {
-      const res = await fetch('/.netlify/functions/admin-set-user-tier', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, tier }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
+      const { error } = await supabase
+        .from('subscriptions')
+        .upsert({
+          user_id: userId,
+          tier,
+          active: tier !== 'free',
+          stripe_subscription_id: null,
+          current_period_end: periodEnd,
+          cancel_at_period_end: false,
+          updated_at: new Date().toISOString(),
+        }, { onConflict: 'user_id' });
+      if (error) throw new Error(error.message);
       setUsers(prev => prev.map(u => u.id === userId ? {
         ...u,
         subscriptions: {
@@ -674,7 +705,7 @@ function UsersTab() {
           active: tier !== 'free',
           stripe_customer_id: u.subscriptions?.stripe_customer_id ?? null,
           stripe_subscription_id: null,
-          current_period_end: tier !== 'free' ? new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString() : null,
+          current_period_end: periodEnd,
           cancel_at_period_end: false,
         },
       } : u));
