@@ -53,14 +53,48 @@ export default function MyselNew() {
         </div>
       </div>
 
-      {/* Meditations */}
+      {/* Featured meditation hero */}
+      <div className="px-5 mb-5">
+        <div className="flex items-baseline justify-between mb-3">
+          <Eyebrow tone="muted">Meditácie</Eyebrow>
+          <button
+            onClick={() => navigate('/meditacie')}
+            className="font-sans text-[11px] text-ink/40"
+          >
+            Všetky · 28
+          </button>
+        </div>
+        <button
+          onClick={() => navigate('/meditacie')}
+          style={{
+            display: 'block', width: '100%', border: 'none', cursor: 'pointer',
+            borderRadius: 18, overflow: 'hidden', aspectRatio: '16/10', position: 'relative',
+            backgroundImage: 'url(/images/r9/section-mind.jpg)',
+            backgroundSize: 'cover', backgroundPosition: 'center',
+          }}
+        >
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.1) 30%, rgba(0,0,0,0.75) 100%)' }} />
+          <div style={{ position: 'absolute', left: 20, right: 20, bottom: 18, color: '#fff', textAlign: 'left' }}>
+            <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.8)', marginBottom: 8 }}>
+              Ranná meditácia · 10 min
+            </div>
+            <div style={{ fontFamily: 'Gilda Display, serif', fontSize: 22, fontWeight: 500, letterSpacing: '-0.01em', lineHeight: 1.05, marginBottom: 14 }}>
+              Ticho pred dňom
+            </div>
+            <div style={{
+              width: 42, height: 42, borderRadius: 999, background: '#fff',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <svg width="12" height="14" viewBox="0 0 12 14" fill="#3D2921">
+                <path d="M1 1v12l10-6L1 1z"/>
+              </svg>
+            </div>
+          </div>
+        </button>
+      </div>
+
+      {/* Meditation list */}
       <div className="px-5 mb-6">
-        <SectionHeader
-          eyebrow="Meditácie"
-          link="Všetky"
-          onLinkClick={() => navigate('/meditacie')}
-          className="mb-3"
-        />
         <div className="flex flex-col gap-2">
           {MEDITATIONS.map(m => (
             <button

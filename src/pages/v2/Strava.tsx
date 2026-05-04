@@ -6,7 +6,6 @@ import { TopBar } from '@/components/v2/top-bar';
 import { SerifHeader } from '@/components/ui/serif-header';
 import { BodyText } from '@/components/ui/body-text';
 import { Eyebrow } from '@/components/ui/eyebrow';
-import { SectionHeader } from '@/components/ui/section-header';
 import { ChevronRight } from 'lucide-react';
 
 const CATEGORIES = [
@@ -21,9 +20,12 @@ const CAT_LABEL: Record<string, string> = {
   ranajky: 'Raňajky', obed: 'Obed', vecera: 'Večera', snack: 'Snacky', smoothie: 'Nápoje',
 };
 
-const CAT_DOT: Record<string, string> = {
-  ranajky: 'bg-pillar-strava', obed: 'bg-pillar-strava/80', vecera: 'bg-pillar-strava/60',
-  snack: 'bg-pillar-strava/40', smoothie: 'bg-pillar-strava/30',
+const CAT_IMG: Record<string, string> = {
+  ranajky: 'testimonial-recipe.jpg',
+  obed:    'section-nutrition.jpg',
+  vecera:  'lifestyle-core-workout.jpg',
+  snack:   'hero-yoga.jpg',
+  smoothie:'lifestyle-yoga-pose.jpg',
 };
 
 function dayOfYear(d = new Date()): number {
@@ -60,40 +62,52 @@ export default function Strava() {
 
       {featured && (
         <div className="px-5 mb-6">
-          <SectionHeader eyebrow="Recept dňa" className="mb-3" />
+          <Eyebrow tone="gold" className="mb-3">Recept dňa</Eyebrow>
           <button
             onClick={() => navigate(`/recept/${featured.id}`)}
-            className="w-full text-left rounded-card p-5 bg-white border border-ink/[0.08] shadow-nm-sm flex items-center gap-4 transition-all active:scale-[0.99]"
+            style={{
+              display: 'block', width: '100%', border: 'none', cursor: 'pointer',
+              borderRadius: 18, overflow: 'hidden', aspectRatio: '4/3', position: 'relative',
+              backgroundImage: 'url(/images/r9/testimonial-recipe.jpg)',
+              backgroundSize: 'cover', backgroundPosition: 'center',
+            }}
           >
-            <div className="h-14 w-14 rounded-xl bg-pillar-strava/20 flex items-center justify-center flex-shrink-0">
-              <span className="text-2xl">🥗</span>
+            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.05) 30%, rgba(0,0,0,0.78) 100%)' }} />
+            <div style={{ position: 'absolute', left: 20, right: 20, bottom: 20, color: '#fff', textAlign: 'left' }}>
+              <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.8)', marginBottom: 10 }}>
+                {CAT_LABEL[featured.category] ?? featured.category} · {featured.prepTime ?? 25} min
+              </div>
+              <div style={{ fontFamily: 'Gilda Display, serif', fontSize: 26, fontWeight: 500, letterSpacing: '-0.01em', lineHeight: 1.1 }}>
+                {featured.title}
+              </div>
             </div>
-            <div className="flex-1 min-w-0">
-              <Eyebrow tone="muted" className="mb-0.5">
-                {CAT_LABEL[featured.category] ?? featured.category} · {featured.prepTime} min
-              </Eyebrow>
-              <div className="font-serif text-h3 text-ink leading-snug truncate">{featured.title}</div>
-            </div>
-            <ChevronRight className="size-5 text-ink/40 flex-shrink-0" />
           </button>
         </div>
       )}
 
       <div className="px-5 mb-6">
-        <SectionHeader eyebrow="Kategórie" className="mb-3" />
-        <div className="flex flex-col gap-2">
+        <Eyebrow tone="muted" className="mb-4">Kategórie</Eyebrow>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {categories.map(c => (
             <button
               key={c.key}
               onClick={() => navigate(`/recepty?cat=${c.key}`)}
-              className="w-full text-left rounded-card p-4 bg-white border border-ink/[0.08] shadow-nm-sm flex items-center gap-4 transition-all active:scale-[0.99]"
+              style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '2px 0', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}
             >
-              <div className={`h-10 w-10 rounded-full ${CAT_DOT[c.key]} flex-shrink-0`} />
-              <div className="flex-1 min-w-0">
-                <div className="font-serif text-h3 text-ink">{c.label}</div>
-                <BodyText size="sm" tone="muted">{c.count} receptov</BodyText>
+              <div style={{
+                width: 72, height: 72, borderRadius: 14, flexShrink: 0,
+                backgroundImage: `url(/images/r9/${CAT_IMG[c.key]})`,
+                backgroundSize: 'cover', backgroundPosition: 'center',
+              }} />
+              <div style={{ flex: 1 }}>
+                <div style={{ fontFamily: 'Gilda Display, serif', fontSize: 20, fontWeight: 500, color: '#3D2921', letterSpacing: '-0.008em', marginBottom: 4 }}>
+                  {c.label}
+                </div>
+                <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: 'rgba(61,41,33,0.72)' }}>
+                  {c.count} receptov
+                </div>
               </div>
-              <ChevronRight className="size-5 text-ink/40 flex-shrink-0" />
+              <ChevronRight size={16} color="rgba(61,41,33,0.42)" strokeWidth={1.3} />
             </button>
           ))}
         </div>
