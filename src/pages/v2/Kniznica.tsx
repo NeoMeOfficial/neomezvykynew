@@ -2,70 +2,185 @@ import { useNavigate } from 'react-router-dom';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import { BottomNav } from '@/components/v2/bottom-nav';
 import { Eyebrow } from '@/components/ui/eyebrow';
-import { SerifHeader } from '@/components/ui/serif-header';
-import { PlusTag } from '@/components/ui/plus-tag';
-import { ChevronRight } from 'lucide-react';
+import { SlidersHorizontal } from 'lucide-react';
 
-interface PillarItem {
+const DEEP     = '#3D2921';
+const CREAM2   = '#F1ECE3';
+const DEEP2    = '#2A1A14';
+const GOLD     = '#B8864A';
+const HAIR     = 'rgba(61,41,33,0.08)';
+const TERTIARY = 'rgba(61,41,33,0.42)';
+const MUTED    = 'rgba(61,41,33,0.72)';
+
+const IMG = (name: string) => `/images/r9/${name}`;
+
+interface Pillar {
   id: string;
   name: string;
   sub: string;
-  color: string;
+  img: string;
   path: string;
-  num: string;
 }
 
-const PILLARS: PillarItem[] = [
-  { id: 'telo',     name: 'Telo',     sub: 'Pohyb a sila',          color: 'bg-pillar-telo/10 border-pillar-telo/20',     path: '/kniznica/telo',     num: '01' },
-  { id: 'strava',   name: 'Strava',   sub: 'Jedálniček a recepty',  color: 'bg-pillar-strava/10 border-pillar-strava/20', path: '/kniznica/strava',   num: '02' },
-  { id: 'mysel',    name: 'Myseľ',    sub: 'Meditácie a dýchanie',  color: 'bg-pillar-mysel/10 border-pillar-mysel/20',   path: '/kniznica/mysel',    num: '03' },
-  { id: 'cyklus',   name: 'Cyklus',   sub: 'Periodka a fázy',       color: 'bg-pillar-cyklus/10 border-pillar-cyklus/20', path: '/kniznica/periodka', num: '04' },
-  { id: 'dennik',   name: 'Denník',   sub: 'Reflexia a nálady',     color: 'bg-ink/[0.04] border-ink/[0.08]',             path: '/kniznica/dennik',   num: '05' },
-  { id: 'blog',     name: 'Blog',     sub: 'Články od Gabi',        color: 'bg-gold/[0.08] border-gold/20',               path: '/kniznica/blog',     num: '06' },
-  { id: 'komunita', name: 'Komunita', sub: 'Ženy v pohybe',         color: 'bg-ink/[0.04] border-ink/[0.08]',             path: '/komunita',          num: '07' },
+const PILLARS: Pillar[] = [
+  { id: 'telo',     name: 'Telo',     sub: 'Pohyb a sila',          img: 'section-body.jpg',      path: '/kniznica/telo'      },
+  { id: 'strava',   name: 'Strava',   sub: 'Jedálniček a recepty',  img: 'section-nutrition.jpg', path: '/kniznica/strava'    },
+  { id: 'mysel',    name: 'Myseľ',    sub: 'Meditácie a dýchanie',  img: 'section-mind.jpg',      path: '/kniznica/mysel'     },
+  { id: 'periodka', name: 'Periodka', sub: 'Periodka a fázy',       img: 'section-period.jpg',    path: '/kniznica/periodka'  },
+  { id: 'dennik',   name: 'Denník',   sub: 'Reflexia a nálady',     img: 'section-diary.jpg',     path: '/kniznica/dennik'    },
+  { id: 'komunita', name: 'Komunita', sub: 'Ženy v pohybe',         img: 'section-community.jpg', path: '/komunita'           },
 ];
 
-const DOT_COLOR: Record<string, string> = {
-  telo: 'bg-pillar-telo', strava: 'bg-pillar-strava', mysel: 'bg-pillar-mysel',
-  cyklus: 'bg-pillar-cyklus', dennik: 'bg-ink/40', blog: 'bg-gold', komunita: 'bg-ink/40',
+const BLOG: Pillar = {
+  id: 'blog', name: 'Blog', sub: 'Články od Gabi',
+  img: 'blog-cycle-training.jpg', path: '/kniznica/blog',
 };
+
+const GRADIENT = 'linear-gradient(180deg, rgba(42,26,20,0) 35%, rgba(42,26,20,0.82) 100%)';
 
 export default function Kniznica() {
   const navigate = useNavigate();
   const { isPremium } = useSubscription();
 
   return (
-    <div className="min-h-screen bg-cream pb-28">
-      <div className="pt-14 px-5 pb-4">
-        <div className="flex items-center justify-between">
-          <Eyebrow tone="muted">
-            KNIŽNICA{isPremium && <span className="ml-2 text-gold">· Plus</span>}
-          </Eyebrow>
+    <div style={{ background: '#F8F5F0', minHeight: '100vh', paddingBottom: 120 }}>
+
+      {/* Header */}
+      <div style={{ padding: '60px 20px 18px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(61,41,33,0.55)', fontWeight: 500, display: 'flex', alignItems: 'center', gap: 8 }}>
+            Knižnica
+            {isPremium && <>
+              <span style={{ color: TERTIARY }}>·</span>
+              <span style={{ color: GOLD }}>Plus</span>
+            </>}
+          </div>
+          <button
+            style={{ width: 36, height: 36, borderRadius: 999, background: '#fff', border: `1px solid ${HAIR}`, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+            onClick={() => {}}
+          >
+            <SlidersHorizontal size={15} color={DEEP} strokeWidth={1.8} />
+          </button>
         </div>
-        <SerifHeader as="h1" size="hero" className="mt-2">
+        <div style={{ marginTop: 8, fontFamily: 'Gilda Display, serif', fontSize: 34, fontWeight: 500, color: DEEP, lineHeight: 1.1, letterSpacing: '-0.01em' }}>
           Všetko, čo{' '}
-          <em className="text-terra not-italic font-serif italic">potrebuješ</em>.
-        </SerifHeader>
+          <em style={{ color: '#C1856A', fontStyle: 'italic', fontWeight: 500 }}>potrebuješ</em>.
+        </div>
       </div>
 
-      <div className="px-5 mt-2 flex flex-col gap-2">
-        {PILLARS.map(p => (
+      {/* Search bar */}
+      <div style={{ margin: '0 20px 0' }}>
+        <button
+          onClick={() => navigate('/search')}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 12, width: '100%', textAlign: 'left',
+            padding: '13px 16px', background: '#fff', borderRadius: 999,
+            border: `1px solid ${HAIR}`, boxShadow: '0 2px 12px rgba(61,41,33,0.04)', cursor: 'text',
+          }}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={MUTED} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>
+          </svg>
+          <span style={{ flex: 1, fontFamily: 'DM Sans, system-ui', fontSize: 13, color: TERTIARY, fontWeight: 400 }}>
+            Hľadaj v knižnici…
+          </span>
+        </button>
+      </div>
+
+      {/* Oblasti label */}
+      <div style={{ margin: '34px 20px 14px', display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+        <div style={{ fontFamily: 'DM Sans', fontSize: 10, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(61,41,33,0.55)', fontWeight: 500 }}>Oblasti</div>
+        <div style={{ fontFamily: 'DM Sans', fontSize: 10, letterSpacing: '0.24em', textTransform: 'uppercase', color: TERTIARY, fontWeight: 500 }}>7 celkom</div>
+      </div>
+
+      {/* 2-col photo grid */}
+      <div style={{ margin: '0 20px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        {PILLARS.map((p, i) => (
           <button
             key={p.id}
             onClick={() => navigate(p.path)}
-            className={`w-full text-left rounded-card p-4 flex items-center gap-4 border ${p.color} transition-all duration-150 active:scale-[0.99]`}
+            style={{
+              borderRadius: 18, overflow: 'hidden', position: 'relative',
+              aspectRatio: '1 / 1.05',
+              backgroundImage: `url(${IMG(p.img)})`,
+              backgroundSize: 'cover', backgroundPosition: 'center',
+              border: 'none', cursor: 'pointer', display: 'block',
+            }}
           >
-            <div className={`h-10 w-10 rounded-full ${DOT_COLOR[p.id]} flex-shrink-0`} />
-            <div className="flex-1 min-w-0">
-              <Eyebrow tone="muted" className="mb-0.5">Oblasť · {p.num}</Eyebrow>
-              <div className="font-serif text-h3 text-ink leading-snug">{p.name}</div>
-              <div className="font-sans text-sm text-ink/56 mt-0.5">{p.sub}</div>
+            <div style={{ position: 'absolute', inset: 0, background: GRADIENT }} />
+            <div style={{ position: 'absolute', bottom: 14, left: 14, right: 14, color: '#fff', textAlign: 'left' }}>
+              <div style={{ fontFamily: 'DM Sans', fontSize: 9, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.72)', fontWeight: 500, marginBottom: 4 }}>
+                Oblasť · 0{i + 1}
+              </div>
+              <div style={{ fontFamily: 'Gilda Display, serif', fontSize: 22, fontWeight: 500, letterSpacing: '-0.005em', lineHeight: 1.1 }}>{p.name}</div>
+              <div style={{ fontFamily: 'DM Sans', fontSize: 10.5, color: 'rgba(255,255,255,0.7)', marginTop: 3, fontWeight: 400 }}>{p.sub}</div>
             </div>
-            {!isPremium && (p.id === 'telo' || p.id === 'strava') && <PlusTag />}
-            <ChevronRight className="size-5 text-ink/40 flex-shrink-0" />
           </button>
         ))}
       </div>
+
+      {/* Blog — full-width wide tile */}
+      <div style={{ margin: '10px 20px 0' }}>
+        <button
+          onClick={() => navigate(BLOG.path)}
+          style={{
+            borderRadius: 18, overflow: 'hidden', position: 'relative',
+            aspectRatio: '2.1 / 1', width: '100%',
+            backgroundImage: `url(${IMG(BLOG.img)})`,
+            backgroundSize: 'cover', backgroundPosition: 'center',
+            border: 'none', cursor: 'pointer', display: 'block',
+          }}
+        >
+          <div style={{ position: 'absolute', inset: 0, background: GRADIENT }} />
+          <div style={{ position: 'absolute', bottom: 16, left: 18, right: 18, color: '#fff', textAlign: 'left' }}>
+            <div style={{ fontFamily: 'DM Sans', fontSize: 9, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.72)', fontWeight: 500, marginBottom: 4 }}>
+              Oblasť · 07
+            </div>
+            <div style={{ fontFamily: 'Gilda Display, serif', fontSize: 22, fontWeight: 500, letterSpacing: '-0.005em' }}>{BLOG.name}</div>
+            <div style={{ fontFamily: 'DM Sans', fontSize: 10.5, color: 'rgba(255,255,255,0.7)', marginTop: 3, fontWeight: 400 }}>{BLOG.sub}</div>
+          </div>
+        </button>
+      </div>
+
+      {/* Upgrade banner — free only */}
+      {!isPremium && (
+        <div style={{ margin: '36px 20px 0' }}>
+          <div style={{
+            position: 'relative', borderRadius: 24, overflow: 'hidden',
+            background: `linear-gradient(135deg, ${DEEP2} 0%, ${DEEP} 100%)`,
+            color: '#fff', padding: '24px 22px',
+          }}>
+            <div style={{
+              position: 'absolute', top: -60, right: -60, width: 180, height: 180,
+              borderRadius: 999, background: `radial-gradient(circle, ${GOLD}48, transparent 70%)`,
+              pointerEvents: 'none',
+            }} />
+            <div style={{ position: 'relative' }}>
+              <div style={{ fontFamily: 'DM Sans', fontSize: 10, letterSpacing: '0.24em', textTransform: 'uppercase', color: GOLD, fontWeight: 500, marginBottom: 12 }}>NeoMe Plus</div>
+              <div style={{ fontFamily: 'Gilda Display, serif', fontSize: 22, fontWeight: 500, color: '#fff', lineHeight: 1.15 }}>
+                Odomkni celú<br />
+                <em style={{ color: GOLD, fontStyle: 'italic', fontWeight: 500 }}>knižnicu.</em>
+              </div>
+              <div style={{ fontFamily: 'DM Sans', fontSize: 12.5, color: 'rgba(255,255,255,0.72)', marginTop: 12, lineHeight: 1.55 }}>
+                Všetky programy, celý jedálniček, pokročilý cyklus a plný archív meditácií.
+              </div>
+              <button
+                onClick={() => navigate('/paywall')}
+                style={{
+                  marginTop: 18, width: '100%', padding: '13px 20px',
+                  background: GOLD, color: '#fff', border: 'none', borderRadius: 999,
+                  fontFamily: 'DM Sans', fontSize: 13, fontWeight: 500, letterSpacing: '0.02em', cursor: 'pointer',
+                }}
+              >
+                Aktivovať Plus
+              </button>
+              <div style={{ textAlign: 'center', marginTop: 10, fontFamily: 'DM Sans', fontSize: 11, color: 'rgba(255,255,255,0.5)', fontWeight: 300 }}>
+                7 dní zadarmo
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <BottomNav active="kniznica" />
     </div>
