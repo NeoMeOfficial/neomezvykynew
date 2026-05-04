@@ -17,7 +17,6 @@ import { useCommunityPosts } from '../../hooks/useCommunityPosts';
 import { recipes as staticRecipesData } from '../../data/recipes';
 import { TeloExtraStaticData } from '../../data/teloExtraData';
 import { TeloStrecingStaticData } from '../../data/teloStrecingData';
-import { programs } from '../../data/programs';
 
 // A14 tokens (forward-declared for use in tab components before the const A block)
 const _A = {
@@ -673,8 +672,7 @@ function UsersTab() {
     if (userDetails[userId] || loadingDetail === userId) return;
     setLoadingDetail(userId);
     try {
-      const [purchasesRes, pointsRes, lastRes] = await Promise.all([
-        supabase.from('program_purchases').select('program_id, purchased_at, stripe_payment_id').eq('user_id', userId),
+      const [pointsRes, lastRes] = await Promise.all([
         supabase.from('points_ledger').select('event_type, points').eq('user_id', userId),
         supabase.from('points_ledger').select('created_at').eq('user_id', userId).order('created_at', { ascending: false }).limit(1),
       ]);
@@ -693,7 +691,7 @@ function UsersTab() {
       setUserDetails(prev => ({
         ...prev,
         [userId]: {
-          purchases: purchasesRes.data ?? [],
+          purchases: [],
           totalPoints,
           lastActivity,
           activityBreakdown: Object.entries(breakdown)
@@ -870,12 +868,6 @@ function UsersTab() {
             const detail = userDetails[user.id];
             const isLoadingDetail = loadingDetail === user.id;
 
-            // LTV: sum of program purchase prices (from local data)
-            const programLtv = (detail?.purchases ?? []).reduce((sum, p) => {
-              const prog = Object.values(programs).find(pr => pr.slug === p.program_id);
-              return sum + (prog ? 4900 : 0); // fallback €49 if price unknown
-            }, 0);
-
             const EVENT_LABELS: Record<string, string> = {
               workout_completed: 'Tréningy', program_completed: 'Programy',
               post_published: 'Príspevky', comment_published: 'Komentáre',
@@ -996,30 +988,9 @@ function UsersTab() {
                         {/* Programs + LTV block */}
                         <div style={{ background: _A.CARD, borderRadius: 10, border: `1px solid ${_A.HAIR}`, padding: '12px 14px' }}>
                           <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: _A.EYEBROW, fontWeight: 500, marginBottom: 10 }}>Programy & LTV</div>
-                          {detail?.purchases.length === 0 || !detail ? (
-                            <p style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.TERTIARY }}>Žiadne zakúpené programy</p>
-                          ) : (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                              {detail.purchases.map(p => {
-                                const prog = Object.values(programs).find(pr => pr.slug === p.program_id);
-                                return (
-                                  <div key={p.program_id} style={{ display: 'flex', justifyContent: 'space-between', gap: 8, paddingBottom: 6, borderBottom: `1px solid ${_A.HAIR}` }}>
-                                    <div>
-                                      <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, fontWeight: 500, color: _A.DEEP }}>{prog?.name ?? p.program_id}</div>
-                                      <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10, color: _A.TERTIARY }}>{new Date(p.purchased_at).toLocaleDateString('sk-SK')}</div>
-                                    </div>
-                                    <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, fontWeight: 600, color: _A.GOLD }}>€49</span>
-                                  </div>
-                                );
-                              })}
-                              <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: 4 }}>
-                                <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, fontWeight: 600, color: _A.DEEP }}>Celková LTV</span>
-                                <span style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 15, fontWeight: 500, color: _A.GOLD }}>
-                                  €{(programLtv / 100).toFixed(0)}
-                                </span>
-                              </div>
-                            </div>
-                          )}
+                          <p style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.TERTIARY, lineHeight: 1.5 }}>
+                            Tabuľka nákupov programov (program_purchases) ešte nebola vytvorená v databáze. Spustíte po integrácii Stripe platieb.
+                          </p>
                         </div>
 
                         {/* Activity block */}
