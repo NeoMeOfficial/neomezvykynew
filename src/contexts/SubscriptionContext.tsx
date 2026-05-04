@@ -23,6 +23,7 @@ import {
   SUBSCRIPTION_PLANS,
   stripePromise,
 } from '../lib/stripe';
+import { supabase } from '../lib/supabase';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -144,27 +145,50 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  // ------ Load subscription on mount (production only) ------
+  // ------ Load subscription on mount ------
+  // Also retry once after 3 s if returning from Stripe Checkout (webhook may not have fired yet)
   useEffect(() => {
     if (demoMode) return;
     loadSubscription();
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('session_id')) {
+      const t = setTimeout(() => loadSubscription(), 3000);
+      return () => clearTimeout(t);
+    }
   }, [demoMode]);
 
   const loadSubscription = async () => {
     setLoading(true);
     try {
-      // Check localStorage for mock/dev subscription
       const userId = getUserId();
-      if (userId) {
-        const stored = localStorage.getItem(`subscription_${userId}`);
-        if (stored) {
-          setSubscription(JSON.parse(stored));
-          setLoading(false);
-          return;
-        }
+      if (!userId) { setSubscription(null); return; }
+
+      const { data, error } = await supabase
+        .from('subscriptions')
+        .select('tier, active, stripe_customer_id, stripe_subscription_id, current_period_end, cancel_at_period_end')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (error) {
+        console.warn('Could not load subscription from Supabase:', error.message);
+        setSubscription(null);
+        return;
       }
-      // TODO: When Supabase subscription table is ready, fetch from there
-      setSubscription(null);
+
+      if (data?.active) {
+        setSubscription({
+          id: data.stripe_subscription_id || '',
+          status: 'active',
+          current_period_start: 0,
+          current_period_end: data.current_period_end
+            ? new Date(data.current_period_end).getTime() / 1000
+            : 0,
+          cancel_at_period_end: data.cancel_at_period_end ?? false,
+          customer_id: data.stripe_customer_id || '',
+        });
+      } else {
+        setSubscription(null);
+      }
     } catch (error) {
       console.error('Error loading subscription:', error);
       setSubscription(null);
