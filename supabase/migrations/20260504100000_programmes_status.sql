@@ -23,8 +23,9 @@ UPDATE public.programmes
   SET status = CASE WHEN active THEN 'published' ELSE 'draft' END
   WHERE status IS NULL OR status = 'draft';
 
--- Drop the old RLS policy and replace with status-based one
+-- Replace active-based RLS with status-based one
 DROP POLICY IF EXISTS "Active programmes are public" ON public.programmes;
+DROP POLICY IF EXISTS "Published programmes are public" ON public.programmes;
 
 CREATE POLICY "Published programmes are public" ON public.programmes
   FOR SELECT USING (status = 'published');
