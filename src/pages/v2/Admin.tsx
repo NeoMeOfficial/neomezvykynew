@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   Users, Gift, BarChart3, Euro, Dumbbell, Utensils, Music, Flag, MessageSquare,
   Calendar, FolderOpen, Bell, Settings, LogOut, Shield, ChevronRight, Plus,
-  Eye, Trash2, Edit3, TrendingUp, Activity, Send, ArrowLeft,
+  Eye, Trash2, Edit3, Pencil, TrendingUp, Activity, Send, ArrowLeft,
   Tag, Percent, Mail, Play, CheckSquare, Square, X, Check, AlertTriangle,
   BookOpen, RefreshCw, ExternalLink
 } from 'lucide-react';
