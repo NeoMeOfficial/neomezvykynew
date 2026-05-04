@@ -133,6 +133,11 @@ export default {
 				sandy: '#D4C4B0',
 				success: '#6B8C5F',
 				danger: '#B5544A',
+				terra: '#C1856A',
+				rose: '#B08A9A',
+				mauve: '#A395AC',
+				'fg-3': 'rgba(61, 41, 33, 0.40)',
+				hair: 'rgba(61, 41, 33, 0.08)',
 				// Legacy NeoMe brand tokens (kept for any prior callsites)
 				neome: {
 					primary: '#5F3E31',

@@ -23,6 +23,9 @@ const AuthReal = lazy(() => import('./pages/v2/AuthReal'));
 const AuthDemo = lazy(() => import('./pages/v2/AuthDemo'));
 const Welcome = lazy(() => import('./pages/v2/Welcome'));
 const Onboarding = lazy(() => import('./pages/v2/Onboarding'));
+const OnboardingWelcome = lazy(() => import('./pages/v2/OnboardingWelcome'));
+const OnboardingCycle = lazy(() => import('./pages/v2/OnboardingCycle'));
+const OnboardingNotifications = lazy(() => import('./pages/v2/OnboardingNotifications'));
 const DomovNew = lazy(() => import('./pages/v2/DomovNew'));
 const Kniznica = lazy(() => import('./pages/v2/Kniznica'));
 const KniznicaPreview = lazy(() => import('./pages/v2/KniznicaPreview'));
@@ -154,7 +157,11 @@ export default function AppV2() {
             <Route path="/login" element={<AuthReal />} />
             <Route path="/" element={<Welcome />} />
             <Route path="/welcome" element={<Welcome />} />
-            <Route path="/onboarding" element={<Onboarding />} />
+            <Route path="/onboarding" element={<OnboardingWelcome />} />
+            <Route path="/onboarding/welcome" element={<OnboardingWelcome />} />
+            <Route path="/onboarding/cycle" element={<OnboardingCycle />} />
+            <Route path="/onboarding/notifications" element={<OnboardingNotifications />} />
+            <Route path="/onboarding/legacy" element={<Onboarding />} />
             <Route path="/ref/:code" element={<ReferralLanding />} />
 
             {/* Protected routes */}
