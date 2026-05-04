@@ -2006,39 +2006,84 @@ function MeditationsTab() {
 }
 
 // ─── ProgramsTab ─────────────────────────────────────────────────────────────
+const DAYS_SK = ['Pondelok', 'Utorok', 'Streda', 'Štvrtok', 'Piatok'];
+type DayType = 'exercise' | 'meditation' | 'rest';
+const DEFAULT_WEEK_TEMPLATE: DayType[] = ['exercise', 'exercise', 'meditation', 'exercise', 'meditation'];
+interface DaySlot { dayName: string; type: DayType; contentId: string; message: string; }
+interface WeekSlot { weekNumber: number; title: string; days: DaySlot[]; }
+interface ProgItem {
+  id: string; name: string; level: number; weeks: number;
+  description: string; detailed_description: string; image: string;
+  schedule: WeekSlot[];
+  status: 'draft' | 'published' | 'archived'; active: boolean;
+}
+
+function makeDefaultSchedule(n: number): WeekSlot[] {
+  return Array.from({ length: n }, (_, i) => ({
+    weekNumber: i + 1,
+    title: `Týždeň ${i + 1}`,
+    days: DAYS_SK.map((dayName, di) => ({ dayName, type: DEFAULT_WEEK_TEMPLATE[di], contentId: '', message: '' })),
+  }));
+}
+
+function mergeSchedule(existing: WeekSlot[], n: number): WeekSlot[] {
+  const fresh = makeDefaultSchedule(n);
+  return fresh.map(fw => existing.find(w => w.weekNumber === fw.weekNumber) ?? fw);
+}
+
 function ProgramsTab() {
-  type ProgItem = { id: string; name: string; level: number; weeks: number; description: string; detailed_description: string; image: string; schedule: any[]; active: boolean };
-  const empty: ProgItem = { id: '', name: '', level: 1, weeks: 8, description: '', detailed_description: '', image: '', schedule: [], active: true };
+  const empty: ProgItem = { id: '', name: '', level: 1, weeks: 8, description: '', detailed_description: '', image: '', schedule: [], status: 'draft', active: false };
   const [items, setItems] = useState<ProgItem[]>([]);
+  const [exercises, setExercises] = useState<{ id: string; name: string; status: string }[]>([]);
+  const [meditations, setMeditations] = useState<{ id: string; title: string; status: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [seeding, setSeeding] = useState(false);
   const [editing, setEditing] = useState<ProgItem | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [expandedWeek, setExpandedWeek] = useState<number | null>(1);
+  const [uploadingCover, setUploadingCover] = useState(false);
+  const [coverError, setCoverError] = useState<string | null>(null);
+  const coverInputRef = useRef<HTMLInputElement>(null);
 
-  const staticPrograms = [
-    { id: 'postpartum', name: 'Postpartum', level: 1, weeks: 8, description: 'Ak potrebuješ spevniť brušný korzet, vyriešiť diastázu či inkontinenciu', detailed_description: '', image: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&h=500&fit=crop', schedule: [], active: true },
-    { id: 'bodyforming', name: 'BodyForming', level: 2, weeks: 6, description: 'Ak chceš začať spevňovať celé telo a cvičiť s vlastnou váhou.', detailed_description: '', image: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&h=500&fit=crop', schedule: [], active: true },
-    { id: 'shapeforming', name: 'ShapeForming', level: 3, weeks: 6, description: 'Ak chceš formovať postavu a cvičiť s gumami.', detailed_description: '', image: 'https://images.unsplash.com/photo-1598289431512-b97b0917affc?w=800&h=500&fit=crop', schedule: [], active: true },
-    { id: 'strong-sexy', name: 'Strong&Sexy', level: 4, weeks: 6, description: 'Ak snívaš o silnom, vyformovanom a funkčnom sexy tele.', detailed_description: '', image: 'https://images.unsplash.com/photo-1550345332-09e3ac987658?w=800&h=500&fit=crop', schedule: [], active: true },
+  const staticPrograms: ProgItem[] = [
+    { id: 'postpartum',    name: 'Postpartum',    level: 1, weeks: 8, description: 'Ak potrebuješ spevniť brušný korzet, vyriešiť diastázu či inkontinenciu', detailed_description: '', image: '', schedule: [], status: 'published', active: true },
+    { id: 'bodyforming',   name: 'BodyForming',   level: 2, weeks: 6, description: 'Ak chceš začať spevňovať celé telo a cvičiť s vlastnou váhou.', detailed_description: '', image: '', schedule: [], status: 'published', active: true },
+    { id: 'elastic-bands', name: 'ElasticBands',  level: 3, weeks: 6, description: 'Ak chceš formovať postavu a cvičiť s gumami.', detailed_description: '', image: '', schedule: [], status: 'published', active: true },
+    { id: 'strong-sexy',   name: 'Strong&Sexy',   level: 4, weeks: 6, description: 'Ak snívaš o silnom, vyformovanom a funkčnom sexy tele.', detailed_description: '', image: '', schedule: [], status: 'published', active: true },
   ];
 
   const load = async () => {
     setLoading(true);
     try {
-      const res = await adminFetch('programmes');
-      setItems(res.items ?? []);
+      const [progs, exs, meds] = await Promise.all([
+        adminFetch('programmes'),
+        adminFetch('exercises'),
+        adminFetch('meditations'),
+      ]);
+      setItems(progs ?? []);
+      setExercises((exs ?? []).map((e: any) => ({ id: e.id, name: e.name, status: e.status })));
+      setMeditations((meds ?? []).map((m: any) => ({ id: m.id, title: m.title, status: m.status })));
     } catch (e: any) { setError(e.message); }
     setLoading(false);
   };
 
   useEffect(() => { load(); }, []);
 
+  const openEdit = (prog: ProgItem) => {
+    setEditing({ ...prog, schedule: mergeSchedule(prog.schedule ?? [], prog.weeks) });
+    setExpandedWeek(1); setError(null);
+  };
+  const openNew = () => {
+    setEditing({ ...empty, id: `prog-${Date.now()}`, schedule: makeDefaultSchedule(8) });
+    setExpandedWeek(1); setError(null);
+  };
+
   const save = async () => {
     if (!editing) return;
     setSaving(true); setError(null);
     try {
-      await adminUpsert('programmes', editing);
+      await adminUpsert('programmes', { ...editing, active: editing.status === 'published' } as unknown as Record<string, unknown>);
       await load();
       setEditing(null);
     } catch (e: any) { setError(e.message); }
@@ -2053,15 +2098,63 @@ function ProgramsTab() {
     } catch (e: any) { alert(e.message); }
   };
 
+  const cycleStatus = async (prog: ProgItem) => {
+    const next: ProgItem['status'] = prog.status === 'draft' ? 'published' : prog.status === 'published' ? 'archived' : 'draft';
+    try {
+      await adminUpsert('programmes', { ...prog, status: next, active: next === 'published' } as unknown as Record<string, unknown>);
+      setItems(p => p.map(x => x.id === prog.id ? { ...x, status: next, active: next === 'published' } : x));
+    } catch (e: any) { alert(e.message); }
+  };
+
   const seedFromStatic = async () => {
     setSeeding(true); setError(null);
     try {
-      const count = await adminSeed('programmes', staticPrograms);
+      const count = await adminSeed('programmes', staticPrograms as unknown as Record<string, unknown>[]);
       alert(`✅ Importovaných ${count} programov`);
       await load();
     } catch (e: any) { setError(e.message); }
     setSeeding(false);
   };
+
+  const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !editing) return;
+    setUploadingCover(true); setCoverError(null);
+    try {
+      const result = await uploadContentImage(file, 'programmes');
+      setEditing(p => p && ({ ...p, image: result.url }));
+    } catch (err: any) { setCoverError(err.message ?? 'Nahrávanie zlyhalo'); }
+    setUploadingCover(false);
+    e.target.value = '';
+  };
+
+  const setWeeksCount = (n: number) => {
+    if (!editing) return;
+    setEditing(p => p && ({ ...p, weeks: n, schedule: mergeSchedule(p.schedule, n) }));
+  };
+
+  const updateDay = (weekNumber: number, di: number, patch: Partial<DaySlot>) => {
+    setEditing(p => {
+      if (!p) return p;
+      return { ...p, schedule: p.schedule.map(w => w.weekNumber !== weekNumber ? w : { ...w, days: w.days.map((d, i) => i !== di ? d : { ...d, ...patch }) }) };
+    });
+  };
+
+  const updateWeekTitle = (weekNumber: number, title: string) => {
+    setEditing(p => p && ({ ...p, schedule: p.schedule.map(w => w.weekNumber === weekNumber ? { ...w, title } : w) }));
+  };
+
+  const DAY_TYPE_COLORS: Record<DayType, string> = { exercise: colors.telo, meditation: colors.mysel, rest: colors.textSecondary };
+  const DAY_TYPE_LABELS: Record<DayType, string> = { exercise: 'Cvičenie', meditation: 'Meditácia', rest: 'Voľno' };
+
+  const statusBadge = (status: string) => (
+    <span className="px-2 py-0.5 rounded-full text-xs font-medium cursor-pointer" style={{
+      backgroundColor: status === 'published' ? `${colors.strava}20` : status === 'archived' ? `${colors.textSecondary}15` : `${colors.accent}20`,
+      color: status === 'published' ? colors.strava : status === 'archived' ? colors.textSecondary : colors.accent,
+    }}>
+      {status === 'published' ? 'live' : status === 'archived' ? 'arch' : 'draft'}
+    </span>
+  );
 
   return (
     <div className="space-y-6">
@@ -2069,9 +2162,9 @@ function ProgramsTab() {
         <h2 className="text-2xl font-bold" style={{ color: colors.textPrimary }}>Fitness Programy</h2>
         <div className="flex gap-2">
           <button onClick={seedFromStatic} disabled={seeding} className="px-3 py-2 rounded-xl text-sm font-medium text-white" style={{ backgroundColor: colors.accent }}>
-            {seeding ? 'Importujem…' : '⬆ Import statických dát'}
+            {seeding ? 'Importujem…' : '⬆ Seed 4 programy'}
           </button>
-          <button onClick={() => setEditing({ ...empty, id: `prog-${Date.now()}` })} className="px-4 py-2 rounded-xl text-sm font-medium text-white" style={{ backgroundColor: colors.telo }}>
+          <button onClick={openNew} className="px-4 py-2 rounded-xl text-sm font-medium text-white" style={{ backgroundColor: colors.telo }}>
             <Plus className="w-4 h-4 mr-2 inline" />Nový program
           </button>
         </div>
@@ -2079,21 +2172,30 @@ function ProgramsTab() {
 
       {error && <div className="p-3 rounded-xl bg-red-50 text-red-600 text-sm">{error}</div>}
 
-      {/* Edit form */}
+      {/* Edit / Schedule-builder form */}
       {editing && (
         <AdminCard title={editing.name || 'Nový program'}>
-          <div className="grid grid-cols-2 gap-4">
+          {/* Metadata */}
+          <div className="grid grid-cols-2 gap-4 mb-6">
             <div className="col-span-2">
               <label className="text-xs font-medium mb-1 block" style={{ color: colors.textSecondary }}>Názov</label>
               <input value={editing.name} onChange={e => setEditing(p => p && ({ ...p, name: e.target.value }))} className="w-full px-3 py-2 rounded-lg bg-white/40 border border-white/40 text-sm" />
             </div>
             <div>
-              <label className="text-xs font-medium mb-1 block" style={{ color: colors.textSecondary }}>Level (1-4)</label>
+              <label className="text-xs font-medium mb-1 block" style={{ color: colors.textSecondary }}>Level (1–4)</label>
               <input type="number" min={1} max={4} value={editing.level} onChange={e => setEditing(p => p && ({ ...p, level: Number(e.target.value) }))} className="w-full px-3 py-2 rounded-lg bg-white/40 border border-white/40 text-sm" />
             </div>
             <div>
-              <label className="text-xs font-medium mb-1 block" style={{ color: colors.textSecondary }}>Týždne</label>
-              <input type="number" min={1} value={editing.weeks} onChange={e => setEditing(p => p && ({ ...p, weeks: Number(e.target.value) }))} className="w-full px-3 py-2 rounded-lg bg-white/40 border border-white/40 text-sm" />
+              <label className="text-xs font-medium mb-1 block" style={{ color: colors.textSecondary }}>Počet týždňov</label>
+              <input type="number" min={1} max={16} value={editing.weeks} onChange={e => setWeeksCount(Number(e.target.value))} className="w-full px-3 py-2 rounded-lg bg-white/40 border border-white/40 text-sm" />
+            </div>
+            <div className="col-span-2">
+              <label className="text-xs font-medium mb-1 block" style={{ color: colors.textSecondary }}>Status</label>
+              <select value={editing.status} onChange={e => setEditing(p => p && ({ ...p, status: e.target.value as ProgItem['status'] }))} className="w-full px-3 py-2 rounded-lg bg-white/40 border border-white/40 text-sm">
+                <option value="draft">Draft</option>
+                <option value="published">Published (live)</option>
+                <option value="archived">Archived</option>
+              </select>
             </div>
             <div className="col-span-2">
               <label className="text-xs font-medium mb-1 block" style={{ color: colors.textSecondary }}>Krátky popis</label>
@@ -2104,17 +2206,113 @@ function ProgramsTab() {
               <textarea rows={4} value={editing.detailed_description} onChange={e => setEditing(p => p && ({ ...p, detailed_description: e.target.value }))} className="w-full px-3 py-2 rounded-lg bg-white/40 border border-white/40 text-sm resize-none" />
             </div>
             <div className="col-span-2">
-              <label className="text-xs font-medium mb-1 block" style={{ color: colors.textSecondary }}>Obrázok (URL)</label>
-              <input value={editing.image} onChange={e => setEditing(p => p && ({ ...p, image: e.target.value }))} className="w-full px-3 py-2 rounded-lg bg-white/40 border border-white/40 text-sm" />
-            </div>
-            <div className="col-span-2 flex items-center gap-2">
-              <input type="checkbox" checked={editing.active} onChange={e => setEditing(p => p && ({ ...p, active: e.target.checked }))} className="w-4 h-4" />
-              <label className="text-sm" style={{ color: colors.textSecondary }}>Aktívny (viditeľný v aplikácii)</label>
+              <label className="text-xs font-medium mb-1 block" style={{ color: colors.textSecondary }}>Cover obrázok</label>
+              <div className="flex items-center gap-3">
+                {editing.image && <img src={editing.image} className="w-16 h-10 rounded-lg object-cover border border-white/30" />}
+                <button type="button" disabled={uploadingCover} onMouseDown={e => { e.preventDefault(); coverInputRef.current?.click(); }}
+                  className="px-3 py-1.5 rounded-lg text-xs font-medium border border-white/40 bg-white/20 hover:bg-white/30 disabled:opacity-40">
+                  {uploadingCover ? 'Nahrávam…' : editing.image ? 'Zmeniť obrázok' : 'Nahrať obrázok'}
+                </button>
+                <input ref={coverInputRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handleCoverUpload} />
+              </div>
+              {coverError && <p className="text-xs text-red-500 mt-1">{coverError}</p>}
             </div>
           </div>
-          <div className="flex gap-2 mt-4">
+
+          {/* ── Schedule Builder ── */}
+          <div className="border-t border-white/20 pt-5">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold" style={{ color: colors.textPrimary }}>Rozvrh programu</h3>
+              <span className="text-xs" style={{ color: colors.textSecondary }}>{editing.weeks} týž × 5 dní (Po–Pi)</span>
+            </div>
+            <div className="flex gap-3 mb-4 text-xs">
+              {(['exercise', 'meditation', 'rest'] as DayType[]).map(t => (
+                <span key={t} className="flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full inline-block" style={{ backgroundColor: DAY_TYPE_COLORS[t] }} />
+                  <span style={{ color: colors.textSecondary }}>{DAY_TYPE_LABELS[t]}</span>
+                </span>
+              ))}
+            </div>
+
+            <div className="space-y-2">
+              {editing.schedule.map(week => (
+                <div key={week.weekNumber} className="rounded-xl border border-white/20 overflow-hidden">
+                  {/* Week header — click to expand */}
+                  <button type="button"
+                    onClick={() => setExpandedWeek(p => p === week.weekNumber ? null : week.weekNumber)}
+                    className="w-full flex items-center justify-between px-4 py-3 bg-white/20 hover:bg-white/30 text-left">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs font-bold w-7 text-center rounded-full py-0.5" style={{ backgroundColor: `${colors.telo}20`, color: colors.telo }}>
+                        W{week.weekNumber}
+                      </span>
+                      <span className="text-sm font-medium" style={{ color: colors.textPrimary }}>{week.title}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="flex gap-0.5">
+                        {week.days.map((d, di) => (
+                          <span key={di} className="w-2 h-2 rounded-full inline-block" style={{ backgroundColor: DAY_TYPE_COLORS[d.type] }} />
+                        ))}
+                      </div>
+                      <span className="text-xs" style={{ color: colors.textSecondary }}>{expandedWeek === week.weekNumber ? '▲' : '▼'}</span>
+                    </div>
+                  </button>
+
+                  {/* Week body */}
+                  {expandedWeek === week.weekNumber && (
+                    <div className="p-4 space-y-3 bg-white/10">
+                      <div className="flex items-center gap-2">
+                        <label className="text-xs shrink-0" style={{ color: colors.textSecondary }}>Názov týždňa:</label>
+                        <input value={week.title} onChange={e => updateWeekTitle(week.weekNumber, e.target.value)}
+                          className="flex-1 px-2 py-1 rounded-lg bg-white/40 border border-white/40 text-xs" />
+                      </div>
+                      {week.days.map((day, di) => (
+                        <div key={di} className="rounded-lg border border-white/20 bg-white/20 p-3">
+                          <div className="flex flex-wrap items-center gap-2 mb-2">
+                            <span className="text-xs font-semibold w-20 shrink-0" style={{ color: colors.textPrimary }}>{day.dayName}</span>
+                            <div className="flex gap-1">
+                              {(['exercise', 'meditation', 'rest'] as DayType[]).map(t => (
+                                <button key={t} type="button"
+                                  onClick={() => updateDay(week.weekNumber, di, { type: t, contentId: '' })}
+                                  className="px-2 py-0.5 rounded-full text-xs font-medium transition-colors"
+                                  style={{
+                                    backgroundColor: day.type === t ? `${DAY_TYPE_COLORS[t]}30` : 'rgba(255,255,255,0.2)',
+                                    color: day.type === t ? DAY_TYPE_COLORS[t] : colors.textSecondary,
+                                    border: day.type === t ? `1px solid ${DAY_TYPE_COLORS[t]}60` : '1px solid rgba(255,255,255,0.3)',
+                                  }}>
+                                  {DAY_TYPE_LABELS[t]}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                          {day.type !== 'rest' && (
+                            <select value={day.contentId}
+                              onChange={e => updateDay(week.weekNumber, di, { contentId: e.target.value })}
+                              className="w-full px-2 py-1.5 rounded-lg bg-white/40 border border-white/40 text-xs mb-2"
+                              style={{ color: day.contentId ? colors.textPrimary : colors.textSecondary }}>
+                              <option value="">
+                                {day.type === 'exercise' ? '— Vyber cvičenie (video doplníš neskôr) —' : '— Vyber meditáciu —'}
+                              </option>
+                              {day.type === 'exercise'
+                                ? exercises.map(ex => <option key={ex.id} value={ex.id}>{ex.name}{ex.status !== 'published' ? ` (${ex.status})` : ''}</option>)
+                                : meditations.map(m => <option key={m.id} value={m.id}>{m.title}{m.status !== 'published' ? ` (${m.status})` : ''}</option>)
+                              }
+                            </select>
+                          )}
+                          <input value={day.message} onChange={e => updateDay(week.weekNumber, di, { message: e.target.value })}
+                            placeholder="Motivačná správa od Gabi (nepovinné)…"
+                            className="w-full px-2 py-1 rounded-lg bg-white/40 border border-white/40 text-xs" />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex gap-2 mt-6">
             <button onClick={save} disabled={saving} className="px-4 py-2 rounded-xl text-sm font-medium text-white" style={{ backgroundColor: colors.telo }}>
-              {saving ? 'Ukladám…' : 'Uložiť'}
+              {saving ? 'Ukladám…' : 'Uložiť program'}
             </button>
             <button onClick={() => setEditing(null)} className="px-4 py-2 rounded-xl text-sm font-medium border border-white/40 bg-white/20" style={{ color: colors.textSecondary }}>
               Zrušiť
@@ -2123,35 +2321,47 @@ function ProgramsTab() {
         </AdminCard>
       )}
 
-      {/* List */}
+      {/* Programme list */}
       <AdminCard title={`Programy (${items.length})`}>
-        {loading ? <div className="py-8 text-center text-sm" style={{ color: colors.textSecondary }}>Načítavam…</div>
-          : items.length === 0 ? (
-            <div className="py-8 text-center">
-              <p className="text-sm mb-3" style={{ color: colors.textSecondary }}>Žiadne programy. Importuj statické dáta alebo pridaj nový.</p>
-              <button onClick={seedFromStatic} disabled={seeding} className="px-4 py-2 rounded-xl text-sm font-medium text-white" style={{ backgroundColor: colors.telo }}>
-                {seeding ? 'Importujem…' : 'Import statických dát'}
-              </button>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {items.map(r => (
-                <div key={r.id} className="flex items-center justify-between p-3 rounded-xl bg-white/20 border border-white/20">
-                  <div className="flex items-center gap-3">
-                    {r.image && <img src={r.image} className="w-12 h-12 rounded-lg object-cover" />}
-                    <div>
-                      <div className="font-medium text-sm" style={{ color: colors.textPrimary }}>{r.name}</div>
-                      <div className="text-xs" style={{ color: colors.textSecondary }}>Level {r.level} • {r.weeks} týždňov • {r.active ? 'Aktívny' : 'Neaktívny'}</div>
+        {loading
+          ? <div className="py-8 text-center text-sm" style={{ color: colors.textSecondary }}>Načítavam…</div>
+          : items.length === 0
+            ? (
+              <div className="py-8 text-center">
+                <p className="text-sm mb-3" style={{ color: colors.textSecondary }}>Žiadne programy. Seed 4 základné alebo pridaj nový.</p>
+                <button onClick={seedFromStatic} disabled={seeding} className="px-4 py-2 rounded-xl text-sm font-medium text-white" style={{ backgroundColor: colors.telo }}>
+                  {seeding ? 'Importujem…' : 'Seed 4 programy'}
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {items.map(r => {
+                  const filled = (r.schedule ?? []).reduce((a, w) => a + w.days.filter(d => d.type !== 'rest' && d.contentId).length, 0);
+                  const total = (r.schedule ?? []).reduce((a, w) => a + w.days.filter(d => d.type !== 'rest').length, 0);
+                  return (
+                    <div key={r.id} className="flex items-center justify-between p-3 rounded-xl bg-white/20 border border-white/20">
+                      <div className="flex items-center gap-3">
+                        {r.image && <img src={r.image} className="w-12 h-12 rounded-lg object-cover" />}
+                        <div>
+                          <div className="flex items-center gap-2 mb-0.5">
+                            <span className="font-medium text-sm" style={{ color: colors.textPrimary }}>{r.name}</span>
+                            <button onClick={() => cycleStatus(r)}>{statusBadge(r.status ?? (r.active ? 'published' : 'draft'))}</button>
+                          </div>
+                          <div className="text-xs" style={{ color: colors.textSecondary }}>
+                            Level {r.level} • {r.weeks} týž •{' '}
+                            {total > 0 ? `${filled}/${total} dní naplnených` : 'Rozvrh prázdny'}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex gap-1">
+                        <button onClick={() => openEdit(r)} className="p-1.5 rounded-lg hover:bg-white/20"><Pencil className="w-3.5 h-3.5" style={{ color: colors.accent }} /></button>
+                        <button onClick={() => remove(r.id)} className="p-1.5 rounded-lg hover:bg-white/20"><Trash2 className="w-3.5 h-3.5" style={{ color: colors.periodka }} /></button>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex gap-1">
-                    <button onClick={() => setEditing(r)} className="p-1.5 rounded-lg hover:bg-white/20"><Pencil className="w-3.5 h-3.5" style={{ color: colors.accent }} /></button>
-                    <button onClick={() => remove(r.id)} className="p-1.5 rounded-lg hover:bg-white/20"><Trash2 className="w-3.5 h-3.5" style={{ color: colors.periodka }} /></button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+                  );
+                })}
+              </div>
+            )}
       </AdminCard>
     </div>
   );
