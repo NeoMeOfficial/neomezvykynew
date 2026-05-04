@@ -97,7 +97,7 @@ export default function SpravyThread() {
           <div style={{ position: 'absolute', bottom: -1, right: -1, width: 12, height: 12, borderRadius: 999, background: NM.GOLD, border: '2px solid #fff' }} />
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontFamily: NM.SANS, fontSize: 13.5, color: NM.DEEP, fontWeight: 600 }}>Gabi Drobová</div>
+          <div style={{ fontFamily: NM.SANS, fontSize: 13.5, color: NM.DEEP, fontWeight: 600 }}>Gabi</div>
           <div style={{ fontFamily: NM.SANS, fontSize: 10.5, color: NM.EYEBROW, marginTop: 1, fontWeight: 400 }}>Zvyčajne odpovie do 24h</div>
         </div>
       </div>

@@ -59,7 +59,7 @@ export default function Spravy() {
   const gabiThread: Thread | null = last
     ? {
         id: 'gabi',
-        name: 'Gabi Drobová',
+        name: 'Gabi',
         avatar: 'founder-gabi.png',
         msg: last.body,
         time: formatRelative(last.created_at),
@@ -146,7 +146,7 @@ export default function Spravy() {
               </div>
             </div>
             <div style={{ flex: 1, textAlign: 'left' }}>
-              <div style={{ fontFamily: NM.SANS, fontSize: 13.5, color: NM.DEEP, fontWeight: 500, marginBottom: 3 }}>Gabi Drobová</div>
+              <div style={{ fontFamily: NM.SANS, fontSize: 13.5, color: NM.DEEP, fontWeight: 500, marginBottom: 3 }}>Gabi</div>
               <div style={{ fontFamily: NM.SANS, fontSize: 12, color: NM.MUTED }}>Napíš mi — zvyčajne odpoviem do 24h</div>
             </div>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={NM.TERTIARY} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">

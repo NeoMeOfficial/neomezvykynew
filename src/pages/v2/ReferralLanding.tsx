@@ -1,193 +1,153 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Gift, Heart, Users, Star, ArrowRight } from 'lucide-react';
-import { colors } from '../../theme/warmDusk';
-import { useReferral } from '../../hooks/useReferral';
+
+const DEEP   = '#3D2921';
+const DEEP2  = '#2A1A14';
+const TERRA  = '#C1856A';
+const GOLD   = '#B8864A';
+const CREAM  = '#F8F5F0';
+const MUTED  = 'rgba(61,41,33,0.55)';
+const HAIR   = 'rgba(61,41,33,0.08)';
+
+const IMG = (n: string) => `/images/r9/${n}`;
+
+const PILLARS = [
+  { title: 'Pohyb',  img: 'section-body.jpg',      dot: TERRA },
+  { title: 'Výživa', img: 'section-nutrition.jpg',  dot: '#8B9E88' },
+  { title: 'Myseľ',  img: 'section-mind.jpg',       dot: '#A8848B' },
+  { title: 'Cyklus', img: 'section-period.jpg',     dot: '#C27A6E' },
+];
 
 export default function ReferralLanding() {
   const { code } = useParams<{ code: string }>();
   const navigate = useNavigate();
-  const { processReferral } = useReferral();
-  const [validCode, setValidCode] = useState<boolean | null>(null);
 
   useEffect(() => {
-    // Store referral code in localStorage for use after registration
-    if (code) {
-      localStorage.setItem('referralCode', code);
-      
-      // Validate code exists (you could add an API call here)
-      setValidCode(true);
-    }
+    if (code) localStorage.setItem('referralCode', code);
   }, [code]);
 
-  const handleGetStarted = () => {
-    navigate('/auth?mode=register&ref=' + code);
-  };
+  const inviterName = 'Tvoja kamarátka';
 
   return (
-    <div className="min-h-screen pb-20" style={{ background: colors.bgGradient }}>
-      <div className="p-5 space-y-8 pt-16">
-        {/* Hero Section */}
-        <div className="text-center">
-          <div className="w-24 h-24 rounded-full mx-auto mb-6 flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${colors.accent}, ${colors.accent}CC)` }}>
-            <Gift className="w-12 h-12 text-white" />
-          </div>
-          
-          <h1 className="text-3xl font-bold mb-4" style={{ color: colors.textPrimary }}>
-            Vitaj v NeoMe! 🌟
-          </h1>
-          
-          <p className="text-lg mb-6" style={{ color: colors.textSecondary }}>
-            Tvoja priateľka ťa pozvala do holistickej wellness komunity pre ženy
-          </p>
+    <div style={{ background: CREAM, minHeight: '100vh', paddingBottom: 100 }}>
 
-          {code && validCode && (
-            <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 mx-auto max-w-xs mb-8 border border-white/30">
-              <p className="text-sm mb-2" style={{ color: colors.textSecondary }}>Používaš kód:</p>
-              <div className="text-2xl font-black" style={{ color: colors.accent }}>
-                {code}
-              </div>
+      {/* Hero */}
+      <div style={{ height: 300, position: 'relative', backgroundImage: `url(${IMG('hero-yoga.jpg')})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+        <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(180deg, rgba(42,26,20,0.28) 0%, ${CREAM} 100%)` }} />
+
+        {/* Inviter badge */}
+        <div style={{ position: 'absolute', top: 64, left: 20, right: 20, display: 'flex', justifyContent: 'center' }}>
+          <div style={{ padding: '6px 16px 6px 6px', background: 'rgba(255,255,255,0.96)', borderRadius: 999, display: 'inline-flex', alignItems: 'center', gap: 10, boxShadow: '0 6px 20px rgba(61,41,33,0.18)' }}>
+            <div style={{
+              width: 28, height: 28, borderRadius: 999, flexShrink: 0,
+              background: `linear-gradient(135deg, ${TERRA}, ${GOLD})`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <span style={{ fontFamily: 'Gilda Display, serif', fontSize: 12, color: '#fff', fontStyle: 'italic' }}>G</span>
             </div>
-          )}
-        </div>
-
-        {/* Features Preview */}
-        <div className="bg-white/30 backdrop-blur-xl rounded-3xl p-6 border border-white/30">
-          <h2 className="text-xl font-bold mb-6 text-center" style={{ color: colors.textPrimary }}>
-            Čo ťa čaká v NeoMe
-          </h2>
-
-          <div className="grid gap-4">
-            <div className="flex items-center gap-4 p-4 rounded-2xl" style={{ backgroundColor: `${colors.telo}10` }}>
-              <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ backgroundColor: colors.telo }}>
-                <span className="text-white text-xl">💪</span>
-              </div>
-              <div>
-                <h3 className="font-bold" style={{ color: colors.textPrimary }}>Cvičebné programy</h3>
-                <p className="text-sm" style={{ color: colors.textSecondary }}>Postpartum, Body forming, Strong & Sexy</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4 p-4 rounded-2xl" style={{ backgroundColor: `${colors.strava}10` }}>
-              <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ backgroundColor: colors.strava }}>
-                <span className="text-white text-xl">🥗</span>
-              </div>
-              <div>
-                <h3 className="font-bold" style={{ color: colors.textPrimary }}>Jedálne plány</h3>
-                <p className="text-sm" style={{ color: colors.textSecondary }}>108 receptov prispôsobených tvojim potrebám</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4 p-4 rounded-2xl" style={{ backgroundColor: `${colors.mysel}10` }}>
-              <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ backgroundColor: colors.mysel }}>
-                <span className="text-white text-xl">🧘‍♀️</span>
-              </div>
-              <div>
-                <h3 className="font-bold" style={{ color: colors.textPrimary }}>Meditácie</h3>
-                <p className="text-sm" style={{ color: colors.textSecondary }}>Vnútorný pokoj a sebaláska</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4 p-4 rounded-2xl" style={{ backgroundColor: `${colors.periodka}10` }}>
-              <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ backgroundColor: colors.periodka }}>
-                <span className="text-white text-xl">📅</span>
-              </div>
-              <div>
-                <h3 className="font-bold" style={{ color: colors.textPrimary }}>Tracking cyklu</h3>
-                <p className="text-sm" style={{ color: colors.textSecondary }}>Porozumej svojmu telu</p>
-              </div>
+            <div style={{ fontFamily: 'DM Sans', fontSize: 12, color: DEEP, fontWeight: 500 }}>
+              {inviterName} ťa pozvala
             </div>
           </div>
         </div>
 
-        {/* Special Offer */}
-        <div className="bg-white/30 backdrop-blur-xl rounded-3xl p-6 shadow-sm border border-white/30 text-center">
-          <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center" style={{ backgroundColor: colors.periodka }}>
-            <Heart className="w-8 h-8 text-white" />
+        {/* Headline */}
+        <div style={{ position: 'absolute', bottom: 28, left: 20, right: 20 }}>
+          <div style={{ fontFamily: 'Gilda Display, serif', fontSize: 42, fontWeight: 500, color: DEEP, lineHeight: 1.05, letterSpacing: '-0.02em' }}>
+            Vitaj<br />
+            v{' '}<em style={{ color: TERRA, fontStyle: 'italic', fontWeight: 500 }}>NeoMe</em>.
           </div>
-          
-          <h2 className="text-xl font-bold mb-2" style={{ color: colors.textPrimary }}>
-            Špeciálna ponuka
-          </h2>
-          
-          <p className="mb-6" style={{ color: colors.textSecondary }}>
-            Začni svoju wellness cestu už dnes za výhodnú cenu
-          </p>
+        </div>
+      </div>
 
-          <div className="bg-gradient-to-r rounded-2xl p-6 mb-6 text-white" style={{ background: `linear-gradient(135deg, ${colors.accent}, ${colors.periodka})` }}>
-            <div className="text-3xl font-black mb-2">€14.90</div>
-            <div className="text-sm opacity-90">mesačne • prvý mesiac zdarma</div>
+      <div style={{ padding: '0 20px' }}>
+
+        {/* Sub-copy */}
+        <div style={{ fontFamily: 'DM Sans', fontSize: 14.5, color: DEEP, fontWeight: 400, lineHeight: 1.6, maxWidth: 340, marginTop: 2 }}>
+          Aplikácia od Gabi — pohyb, výživa, myseľ a cyklus. Jednoducho a ženskou rukou.
+        </div>
+
+        {/* Welcome bonus card */}
+        <div style={{ marginTop: 24, padding: '20px 22px', background: `linear-gradient(135deg, ${DEEP2}, ${DEEP})`, borderRadius: 20, position: 'relative', overflow: 'hidden' }}>
+          <div style={{ position: 'absolute', top: -50, right: -40, width: 170, height: 170, borderRadius: 999, background: `radial-gradient(circle, ${GOLD}55, transparent 70%)`, pointerEvents: 'none' }} />
+          <div style={{ position: 'relative' }}>
+            <div style={{ fontFamily: 'DM Sans', fontSize: 9, color: GOLD, letterSpacing: '0.22em', textTransform: 'uppercase', fontWeight: 500 }}>
+              Uvítací dar
+            </div>
+            <div style={{ display: 'flex', alignItems: 'flex-end', gap: 14, marginTop: 12 }}>
+              <div style={{ fontFamily: 'Gilda Display, serif', fontSize: 54, color: GOLD, fontWeight: 500, letterSpacing: '-0.02em', lineHeight: 1 }}>+100</div>
+              <div style={{ paddingBottom: 6 }}>
+                <div style={{ fontFamily: 'Gilda Display, serif', fontSize: 18, fontWeight: 500, fontStyle: 'italic', color: '#fff', letterSpacing: '-0.005em' }}>bodov</div>
+                <div style={{ fontFamily: 'DM Sans', fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 2, fontWeight: 400 }}>na katalóg odmien</div>
+              </div>
+            </div>
+            <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid rgba(255,255,255,0.12)', fontFamily: 'DM Sans', fontSize: 11.5, color: 'rgba(255,255,255,0.7)', fontWeight: 400, lineHeight: 1.55 }}>
+              Body sa pripia k tvojmu účtu po registrácii. Môžeš nimi platiť meditačné balíčky alebo ich nechať rásť.
+            </div>
           </div>
+        </div>
 
+        {/* What's inside — 4 pillars */}
+        <div style={{ marginTop: 28 }}>
+          <div style={{ fontFamily: 'DM Sans', fontSize: 9, letterSpacing: '0.22em', textTransform: 'uppercase', color: MUTED, fontWeight: 500, marginBottom: 14 }}>
+            Čo ťa čaká
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+            {PILLARS.map((p) => (
+              <div
+                key={p.title}
+                style={{
+                  height: 92, borderRadius: 14, position: 'relative', overflow: 'hidden',
+                  backgroundImage: `url(${IMG(p.img)})`,
+                  backgroundSize: 'cover', backgroundPosition: 'center',
+                }}
+              >
+                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, transparent 35%, rgba(42,26,20,0.72))' }} />
+                <div style={{ position: 'absolute', bottom: 10, left: 12, right: 12 }}>
+                  <div style={{ width: 6, height: 6, borderRadius: 2, background: p.dot, marginBottom: 5 }} />
+                  <div style={{ fontFamily: 'Gilda Display, serif', fontSize: 17, color: '#fff', fontWeight: 500, letterSpacing: '-0.005em' }}>
+                    {p.title}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Trust strip */}
+        <div style={{ marginTop: 24, padding: '16px 18px', background: '#fff', borderRadius: 16, border: `1px solid ${HAIR}`, display: 'flex', justifyContent: 'space-around' }}>
+          {[['2 400+', 'žien'], ['105', 'receptov'], ['17', 'meditácií']].map(([n, l]) => (
+            <div key={l} style={{ textAlign: 'center' }}>
+              <div style={{ fontFamily: 'Gilda Display, serif', fontSize: 22, color: DEEP, fontWeight: 500, letterSpacing: '-0.01em', lineHeight: 1 }}>{n}</div>
+              <div style={{ fontFamily: 'DM Sans', fontSize: 10, color: MUTED, marginTop: 4, letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 500 }}>{l}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* CTA */}
+        <div style={{ marginTop: 28 }}>
           <button
-            onClick={handleGetStarted}
-            className="w-full py-4 rounded-2xl text-white font-bold text-lg shadow-md transition-transform active:scale-95 flex items-center justify-center gap-2"
-            style={{ background: `linear-gradient(135deg, ${colors.accent}, ${colors.periodka})` }}
+            onClick={() => navigate('/register')}
+            style={{
+              width: '100%', padding: '15px 20px',
+              background: TERRA, color: '#fff', border: 'none', borderRadius: 999,
+              fontFamily: 'DM Sans', fontSize: 14, fontWeight: 500, letterSpacing: '0.01em',
+              cursor: 'pointer',
+            }}
           >
-            Začať zadarmo
-            <ArrowRight className="w-5 h-5" />
+            Vytvoriť si účet
           </button>
-        </div>
-
-        {/* Social Proof */}
-        <div className="bg-white/30 backdrop-blur-xl rounded-3xl p-6 border border-white/30">
-          <h3 className="text-lg font-bold mb-4" style={{ color: colors.textPrimary }}>
-            Už tisíce žien dôverujú NeoMe
-          </h3>
-
-          <div className="space-y-4">
-            <div className="flex gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-400 to-pink-600 flex items-center justify-center text-white font-bold text-sm">
-                M
-              </div>
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="font-medium text-sm" style={{ color: colors.textPrimary }}>Martina K.</span>
-                  <div className="flex">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                    ))}
-                  </div>
-                </div>
-                <p className="text-sm" style={{ color: colors.textSecondary }}>
-                  "Konečne aplikácia, ktorá rozumie ženským potrebám. Postpartum program mi úplne zmenil život!"
-                </p>
-              </div>
-            </div>
-
-            <div className="flex gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-bold text-sm">
-                P
-              </div>
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="font-medium text-sm" style={{ color: colors.textPrimary }}>Petra S.</span>
-                  <div className="flex">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                    ))}
-                  </div>
-                </div>
-                <p className="text-sm" style={{ color: colors.textSecondary }}>
-                  "Recepty sú úžasné a cvičenia perfektne prispôsobené. Odporúčam každej maminke!"
-                </p>
-              </div>
-            </div>
+          <div style={{ marginTop: 14, textAlign: 'center', fontFamily: 'DM Sans', fontSize: 12, color: MUTED, fontWeight: 400 }}>
+            Už mám účet ·{' '}
+            <span
+              onClick={() => navigate('/auth')}
+              style={{ color: DEEP, fontWeight: 500, cursor: 'pointer' }}
+            >
+              Prihlásiť sa
+            </span>
           </div>
         </div>
 
-        {/* Trust Indicators */}
-        <div className="flex justify-center items-center gap-6 text-sm" style={{ color: colors.textTertiary }}>
-          <div className="flex items-center gap-1">
-            <Users className="w-4 h-4" />
-            <span>300+ spokojných klientok</span>
-          </div>
-          <div className="w-1 h-1 rounded-full" style={{ backgroundColor: colors.textTertiary }}></div>
-          <div className="flex items-center gap-1">
-            <Heart className="w-4 h-4" />
-            <span>Slovenský produkt</span>
-          </div>
-        </div>
       </div>
     </div>
   );
