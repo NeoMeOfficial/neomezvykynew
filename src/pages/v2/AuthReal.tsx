@@ -14,7 +14,7 @@ export default function AuthReal() {
 
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({ email: '', password: '', firstName: '', lastName: '', confirmPassword: '' });
+  const [formData, setFormData] = useState({ email: '', password: '', firstName: '', lastName: '', confirmPassword: '', gdprConsent: false });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -33,15 +33,19 @@ export default function AuthReal() {
           setErrors({ confirmPassword: 'Heslá sa nezhodujú' });
           return;
         }
-        if (formData.password.length < 6) {
-          setErrors({ password: 'Heslo musí mať aspoň 6 znakov' });
+        if (formData.password.length < 8) {
+          setErrors({ password: 'Heslo musí mať aspoň 8 znakov' });
           return;
         }
         if (!formData.firstName || !formData.lastName) {
           setErrors({ name: 'Vyplňte prosím meno a priezvisko' });
           return;
         }
-        const { error } = await signUp(formData.email, formData.password, formData.firstName, formData.lastName);
+        if (!formData.gdprConsent) {
+          setErrors({ gdpr: 'Súhlas so spracovaním údajov je povinný' });
+          return;
+        }
+        const { error } = await signUp(formData.email, formData.password, formData.firstName, formData.lastName, true);
         if (error) setErrors({ submit: error.message });
         else setErrors({ success: 'Registrácia úspešná! Skontrolujte email pre potvrdenie.' });
       }
@@ -60,7 +64,7 @@ export default function AuthReal() {
   const switchMode = () => {
     setIsLogin(!isLogin);
     setErrors({});
-    setFormData({ email: '', password: '', firstName: '', lastName: '', confirmPassword: '' });
+    setFormData({ email: '', password: '', firstName: '', lastName: '', confirmPassword: '', gdprConsent: false });
   };
 
   return (
@@ -162,6 +166,28 @@ export default function AuthReal() {
               {errors.confirmPassword && <p className="mt-1 text-[13px] text-red-500">{errors.confirmPassword}</p>}
             </div>
           )}
+
+          {!isLogin && (
+            <div className="flex items-start gap-3 pt-1">
+              <input
+                id="gdpr-consent"
+                type="checkbox"
+                checked={formData.gdprConsent}
+                onChange={e => {
+                  setFormData(p => ({ ...p, gdprConsent: e.target.checked }));
+                  if (errors.gdpr) setErrors(p => ({ ...p, gdpr: '' }));
+                }}
+                className="mt-0.5 h-4 w-4 rounded border-ink/20 accent-ink flex-shrink-0 cursor-pointer"
+              />
+              <label htmlFor="gdpr-consent" className="font-sans text-xs text-ink/60 leading-relaxed cursor-pointer">
+                Súhlasím so{' '}
+                <a href="https://neome.sk/privacy" target="_blank" rel="noreferrer" className="text-ink underline">spracovaním osobných údajov</a>
+                {' '}vrátane zdravotných dát (cyklus, symptómy) v súlade s GDPR.{' '}
+                <a href="https://neome.sk/privacy" target="_blank" rel="noreferrer" className="text-ink underline">Zásady ochrany súkromia</a>
+              </label>
+            </div>
+          )}
+          {errors.gdpr && <p className="text-[13px] text-red-500 -mt-2">{errors.gdpr}</p>}
 
           {errors.submit && (
             <div className="px-4 py-3 rounded-xl bg-red-50 border border-red-200">

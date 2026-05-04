@@ -84,6 +84,9 @@ const WorkoutDemo = lazy(() => import('./pages/v2/WorkoutDemo'));
 const BuddySystem = lazy(() => import('./pages/v2/BuddySystem'));
 const Blog = lazy(() => import('./pages/v2/Blog'));
 const SubscriptionManagement = lazy(() => import('./pages/v2/SubscriptionManagement'));
+const Search = lazy(() => import('./pages/v2/Search'));
+const CyklusInsights = lazy(() => import('./pages/v2/CyklusInsights'));
+const Odznaky = lazy(() => import('./pages/v2/Odznaky'));
 
 function LoadingSpinner() {
   const [loadingText, setLoadingText] = useState('Načítavam...');
@@ -188,6 +191,9 @@ export default function AppV2() {
               <Route path="/settings/cancel" element={<CancelArc />} />
               <Route path="/body" element={<PointsSummary />} />
               <Route path="/body/odmeny" element={<PointsRewards />} />
+              <Route path="/body/odznaky" element={<Odznaky />} />
+              <Route path="/hladat" element={<Search />} />
+              <Route path="/kniznica/periodka/insights" element={<CyklusInsights />} />
               <Route path="/blog/:id" element={<BlogArticle />} />
               <Route path="/kniznica/telo" element={<Telo />} />
               <Route path="/kniznica/telo/programy" element={<TeloPrograms />} />

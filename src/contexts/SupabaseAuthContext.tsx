@@ -7,7 +7,7 @@ interface AuthContextType {
   profile: UserProfile | null;
   session: Session | null;
   loading: boolean;
-  signUp: (email: string, password: string, firstName: string, lastName: string) => Promise<{ error: AuthError | null }>;
+  signUp: (email: string, password: string, firstName: string, lastName: string, gdprConsent?: boolean) => Promise<{ error: AuthError | null }>;
   signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>;
   signOut: () => Promise<{ error: AuthError | null }>;
   updateProfile: (updates: Partial<UserProfile>) => Promise<{ error: any }>;
@@ -149,7 +149,7 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const signUp = async (email: string, password: string, firstName: string, lastName: string) => {
+  const signUp = async (email: string, password: string, firstName: string, lastName: string, gdprConsent = false) => {
     try {
       if (!isSupabaseConfigured()) {
         // Demo mode fallback
@@ -191,6 +191,8 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
           data: {
             first_name: firstName,
             last_name: lastName,
+            gdpr_consent: gdprConsent,
+            gdpr_consent_at: gdprConsent ? new Date().toISOString() : null,
           },
         },
       });
