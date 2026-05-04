@@ -17,6 +17,7 @@ import { useCommunityPosts } from '../../hooks/useCommunityPosts';
 import { recipes as staticRecipesData } from '../../data/recipes';
 import { TeloExtraStaticData } from '../../data/teloExtraData';
 import { TeloStrecingStaticData } from '../../data/teloStrecingData';
+import { programs } from '../../data/programs';
 
 // A14 tokens (forward-declared for use in tab components before the const A block)
 const _A = {
@@ -604,6 +605,13 @@ interface AdminUser {
   subscriptions: { tier: string; active: boolean; stripe_customer_id?: string | null; stripe_subscription_id: string | null; current_period_end: string | null; cancel_at_period_end: boolean } | null;
 }
 
+interface UserDetail {
+  purchases: { program_id: string; purchased_at: string; stripe_payment_id: string | null }[];
+  totalPoints: number;
+  lastActivity: string | null;
+  activityBreakdown: { event_type: string; count: number; points: number }[];
+}
+
 function UsersTab() {
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
@@ -615,6 +623,9 @@ function UsersTab() {
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [settingTier, setSettingTier] = useState<string | null>(null);
   const [tierMenuOpen, setTierMenuOpen] = useState<string | null>(null);
+  const [expandedUser, setExpandedUser] = useState<string | null>(null);
+  const [userDetails, setUserDetails] = useState<Record<string, UserDetail>>({});
+  const [loadingDetail, setLoadingDetail] = useState<string | null>(null);
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -657,6 +668,52 @@ function UsersTab() {
   };
 
   useEffect(() => { fetchUsers(); }, []);
+
+  const fetchUserDetail = async (userId: string) => {
+    if (userDetails[userId] || loadingDetail === userId) return;
+    setLoadingDetail(userId);
+    try {
+      const [purchasesRes, pointsRes, lastRes] = await Promise.all([
+        supabase.from('program_purchases').select('program_id, purchased_at, stripe_payment_id').eq('user_id', userId),
+        supabase.from('points_ledger').select('event_type, points').eq('user_id', userId),
+        supabase.from('points_ledger').select('created_at').eq('user_id', userId).order('created_at', { ascending: false }).limit(1),
+      ]);
+
+      const ledger = pointsRes.data ?? [];
+      const totalPoints = ledger.reduce((sum, r) => sum + (r.points > 0 ? r.points : 0), 0);
+      const lastActivity = lastRes.data?.[0]?.created_at ?? null;
+
+      const breakdown: Record<string, { count: number; points: number }> = {};
+      for (const r of ledger) {
+        if (!breakdown[r.event_type]) breakdown[r.event_type] = { count: 0, points: 0 };
+        breakdown[r.event_type].count++;
+        breakdown[r.event_type].points += r.points;
+      }
+
+      setUserDetails(prev => ({
+        ...prev,
+        [userId]: {
+          purchases: purchasesRes.data ?? [],
+          totalPoints,
+          lastActivity,
+          activityBreakdown: Object.entries(breakdown)
+            .map(([event_type, v]) => ({ event_type, ...v }))
+            .sort((a, b) => b.points - a.points),
+        },
+      }));
+    } finally {
+      setLoadingDetail(null);
+    }
+  };
+
+  const toggleExpand = (userId: string) => {
+    if (expandedUser === userId) {
+      setExpandedUser(null);
+    } else {
+      setExpandedUser(userId);
+      fetchUserDetail(userId);
+    }
+  };
 
   const handleCancelSubscription = async (user: AdminUser) => {
     const subId = user.subscriptions?.stripe_subscription_id;
@@ -802,88 +859,200 @@ function UsersTab() {
           </select>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           {filtered.length === 0 && <p style={{ textAlign: 'center', padding: '24px 0', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>Žiadni používatelia.</p>}
           {filtered.map(user => {
             const sub = user.subscriptions;
             const tier = sub?.tier ?? 'free';
             const isSettingThis = settingTier === user.id;
             const menuOpen = tierMenuOpen === user.id;
+            const isExpanded = expandedUser === user.id;
+            const detail = userDetails[user.id];
+            const isLoadingDetail = loadingDetail === user.id;
+
+            // LTV: sum of program purchase prices (from local data)
+            const programLtv = (detail?.purchases ?? []).reduce((sum, p) => {
+              const prog = Object.values(programs).find(pr => pr.slug === p.program_id);
+              return sum + (prog ? 4900 : 0); // fallback €49 if price unknown
+            }, 0);
+
+            const EVENT_LABELS: Record<string, string> = {
+              workout_completed: 'Tréningy', program_completed: 'Programy',
+              post_published: 'Príspevky', comment_published: 'Komentáre',
+              journal_entry: 'Denník', referral_approved: 'Odporúčania',
+              heart_received: 'Srdcia', reward_redeemed: 'Odmeny',
+            };
+
             return (
-              <div key={user.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px', borderRadius: 12, border: `1px solid ${_A.HAIR}`, background: _A.BG }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1, minWidth: 0 }}>
-                  <div style={{ width: 36, height: 36, borderRadius: 999, background: _A.CREAM2, color: _A.DEEP, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Gilda Display, Georgia, serif', fontSize: 15, fontWeight: 500, flexShrink: 0 }}>
-                    {(user.full_name || user.email || '?').charAt(0).toUpperCase()}
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 13, fontWeight: 500, color: _A.DEEP }}>{user.full_name || '—'}</div>
-                    <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED }}>{user.email}</div>
-                    <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10, color: _A.TERTIARY, marginTop: 2 }}>
-                      Registrovaný: {new Date(user.created_at).toLocaleDateString('sk-SK')}
-                      {sub?.current_period_end && ` · Predplatné do: ${new Date(sub.current_period_end).toLocaleDateString('sk-SK')}`}
-                      {sub?.cancel_at_period_end && ' · Ruší sa'}
+              <div key={user.id} style={{ borderRadius: 12, border: `1px solid ${isExpanded ? _A.HAIR2 : _A.HAIR}`, background: isExpanded ? _A.CARD : _A.BG, overflow: 'hidden' }}>
+                {/* Row header — click to expand */}
+                <div
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px', cursor: 'pointer' }}
+                  onClick={() => toggleExpand(user.id)}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1, minWidth: 0 }}>
+                    <div style={{ width: 36, height: 36, borderRadius: 999, background: _A.CREAM2, color: _A.DEEP, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Gilda Display, Georgia, serif', fontSize: 15, fontWeight: 500, flexShrink: 0 }}>
+                      {(user.full_name || user.email || '?').charAt(0).toUpperCase()}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 13, fontWeight: 500, color: _A.DEEP }}>{user.full_name || '—'}</div>
+                      <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED }}>{user.email}</div>
+                      <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10, color: _A.TERTIARY, marginTop: 2 }}>
+                        Registrovaná: {new Date(user.created_at).toLocaleDateString('sk-SK')}
+                        {sub?.current_period_end && ` · Predplatné do: ${new Date(sub.current_period_end).toLocaleDateString('sk-SK')}`}
+                        {sub?.cancel_at_period_end && ' · Ruší sa'}
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-                  <span style={tierBadgeStyle(tier)}>{tierLabel(tier)}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }} onClick={e => e.stopPropagation()}>
+                    <span style={tierBadgeStyle(tier)}>{tierLabel(tier)}</span>
 
-                  {/* Tier picker */}
-                  <div style={{ position: 'relative' }} onClick={e => e.stopPropagation()}>
-                    <button
-                      onClick={() => setTierMenuOpen(menuOpen ? null : user.id)}
-                      disabled={isSettingThis}
-                      style={{ ...btnSecondary, padding: '6px 10px', fontSize: 11, display: 'flex', alignItems: 'center', gap: 5, opacity: isSettingThis ? 0.5 : 1 }}
-                    >
-                      {isSettingThis ? <RefreshCw style={{ width: 11, height: 11 }} /> : <Edit3 style={{ width: 11, height: 11 }} />}
-                      Tarifa
-                    </button>
-                    {menuOpen && (
-                      <div style={{ position: 'absolute', right: 0, top: '100%', marginTop: 4, background: _A.CARD, border: `1px solid ${_A.HAIR}`, borderRadius: 10, zIndex: 100, minWidth: 160, boxShadow: '0 4px 20px rgba(61,41,33,0.10)', overflow: 'hidden' }}>
-                        {[
-                          { value: 'free',           label: 'Free',    color: _A.MUTED },
-                          { value: 'neome_plus',      label: 'Premium', color: _A.SAGE },
-                          { value: 'program_bundle',  label: 'Bundle',  color: _A.GOLD },
-                        ].map(opt => (
-                          <button
-                            key={opt.value}
-                            onClick={() => handleSetTier(user.id, opt.value)}
-                            style={{ all: 'unset', display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '10px 14px', cursor: 'pointer', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.DEEP, background: tier === opt.value ? _A.CREAM2 : 'transparent', boxSizing: 'border-box' }}
-                            onMouseEnter={e => { if (tier !== opt.value) (e.currentTarget as HTMLButtonElement).style.background = _A.CREAM2; }}
-                            onMouseLeave={e => { if (tier !== opt.value) (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
-                          >
-                            <span style={{ width: 8, height: 8, borderRadius: 999, background: opt.color, display: 'inline-block', flexShrink: 0 }} />
-                            {opt.label}
-                            {tier === opt.value && <Check style={{ width: 12, height: 12, color: _A.SAGE, marginLeft: 'auto' }} />}
-                          </button>
-                        ))}
+                    {/* Access picker */}
+                    <div style={{ position: 'relative' }}>
+                      <button
+                        onClick={() => setTierMenuOpen(menuOpen ? null : user.id)}
+                        disabled={isSettingThis}
+                        style={{ ...btnSecondary, padding: '6px 10px', fontSize: 11, display: 'flex', alignItems: 'center', gap: 5, opacity: isSettingThis ? 0.5 : 1 }}
+                      >
+                        {isSettingThis ? <RefreshCw style={{ width: 11, height: 11 }} /> : <Edit3 style={{ width: 11, height: 11 }} />}
+                        Prístup
+                      </button>
+                      {menuOpen && (
+                        <div style={{ position: 'absolute', right: 0, top: '100%', marginTop: 4, background: _A.CARD, border: `1px solid ${_A.HAIR}`, borderRadius: 10, zIndex: 100, minWidth: 160, boxShadow: '0 4px 20px rgba(61,41,33,0.10)', overflow: 'hidden' }}>
+                          {[
+                            { value: 'free',           label: 'Free',    color: _A.MUTED },
+                            { value: 'neome_plus',      label: 'Premium', color: _A.SAGE },
+                            { value: 'program_bundle',  label: 'Bundle',  color: _A.GOLD },
+                          ].map(opt => (
+                            <button
+                              key={opt.value}
+                              onClick={() => handleSetTier(user.id, opt.value)}
+                              style={{ all: 'unset', display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '10px 14px', cursor: 'pointer', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.DEEP, background: tier === opt.value ? _A.CREAM2 : 'transparent', boxSizing: 'border-box' }}
+                              onMouseEnter={e => { if (tier !== opt.value) (e.currentTarget as HTMLButtonElement).style.background = _A.CREAM2; }}
+                              onMouseLeave={e => { if (tier !== opt.value) (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
+                            >
+                              <span style={{ width: 8, height: 8, borderRadius: 999, background: opt.color, display: 'inline-block', flexShrink: 0 }} />
+                              {opt.label}
+                              {tier === opt.value && <Check style={{ width: 12, height: 12, color: _A.SAGE, marginLeft: 'auto' }} />}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {sub?.stripe_subscription_id && !sub?.cancel_at_period_end && (
+                      <button
+                        onClick={() => handleCancelSubscription(user)}
+                        disabled={cancelling === user.id}
+                        style={{ ...btnDanger, padding: '7px 12px', fontSize: 11, opacity: cancelling === user.id ? 0.6 : 1 }}
+                      >
+                        {cancelling === user.id ? '...' : 'Zrušiť'}
+                      </button>
+                    )}
+                    {confirmDelete === user.id ? (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.TERRA }}>Naozaj?</span>
+                        <button onClick={() => handleDeleteUser(user.id)} disabled={deleting === user.id} style={{ ...btnDanger, padding: '6px 10px', fontSize: 11 }}>
+                          {deleting === user.id ? '...' : 'Áno'}
+                        </button>
+                        <button onClick={() => setConfirmDelete(null)} style={{ ...btnSecondary, padding: '6px 10px', fontSize: 11 }}>Nie</button>
+                      </div>
+                    ) : (
+                      <button onClick={e => { e.stopPropagation(); setConfirmDelete(user.id); }} style={{ all: 'unset', cursor: 'pointer', padding: 8, borderRadius: 8 }}>
+                        <Trash2 style={{ width: 14, height: 14, color: _A.TERRA }} />
+                      </button>
+                    )}
+                    <ChevronRight style={{ width: 14, height: 14, color: _A.TERTIARY, transform: isExpanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s' }} />
+                  </div>
+                </div>
+
+                {/* Expanded detail panel */}
+                {isExpanded && (
+                  <div style={{ borderTop: `1px solid ${_A.HAIR}`, padding: '16px 14px', background: _A.BG, display: 'flex', flexDirection: 'column', gap: 14 }}>
+                    {isLoadingDetail ? (
+                      <div style={{ padding: '12px 0', textAlign: 'center', fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED }}>Načítavam…</div>
+                    ) : (
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
+
+                        {/* Subscription block */}
+                        <div style={{ background: _A.CARD, borderRadius: 10, border: `1px solid ${_A.HAIR}`, padding: '12px 14px' }}>
+                          <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: _A.EYEBROW, fontWeight: 500, marginBottom: 10 }}>Predplatné</div>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                            {[
+                              { label: 'Tarif', value: tierLabel(tier) },
+                              { label: 'Stav', value: sub?.active ? 'Aktívne' : 'Neaktívne' },
+                              { label: 'Platí do', value: sub?.current_period_end ? new Date(sub.current_period_end).toLocaleDateString('sk-SK') : '—' },
+                              { label: 'Stripe Sub', value: sub?.stripe_subscription_id ? sub.stripe_subscription_id.slice(0, 18) + '…' : '—' },
+                              { label: 'Ruší sa', value: sub?.cancel_at_period_end ? 'Áno' : 'Nie' },
+                            ].map(({ label, value }) => (
+                              <div key={label} style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
+                                <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10.5, color: _A.EYEBROW }}>{label}</span>
+                                <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10.5, color: _A.DEEP, fontWeight: 500, textAlign: 'right' }}>{value}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Programs + LTV block */}
+                        <div style={{ background: _A.CARD, borderRadius: 10, border: `1px solid ${_A.HAIR}`, padding: '12px 14px' }}>
+                          <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: _A.EYEBROW, fontWeight: 500, marginBottom: 10 }}>Programy & LTV</div>
+                          {detail?.purchases.length === 0 || !detail ? (
+                            <p style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.TERTIARY }}>Žiadne zakúpené programy</p>
+                          ) : (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                              {detail.purchases.map(p => {
+                                const prog = Object.values(programs).find(pr => pr.slug === p.program_id);
+                                return (
+                                  <div key={p.program_id} style={{ display: 'flex', justifyContent: 'space-between', gap: 8, paddingBottom: 6, borderBottom: `1px solid ${_A.HAIR}` }}>
+                                    <div>
+                                      <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, fontWeight: 500, color: _A.DEEP }}>{prog?.name ?? p.program_id}</div>
+                                      <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10, color: _A.TERTIARY }}>{new Date(p.purchased_at).toLocaleDateString('sk-SK')}</div>
+                                    </div>
+                                    <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, fontWeight: 600, color: _A.GOLD }}>€49</span>
+                                  </div>
+                                );
+                              })}
+                              <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: 4 }}>
+                                <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, fontWeight: 600, color: _A.DEEP }}>Celková LTV</span>
+                                <span style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 15, fontWeight: 500, color: _A.GOLD }}>
+                                  €{(programLtv / 100).toFixed(0)}
+                                </span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Activity block */}
+                        <div style={{ background: _A.CARD, borderRadius: 10, border: `1px solid ${_A.HAIR}`, padding: '12px 14px' }}>
+                          <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: _A.EYEBROW, fontWeight: 500, marginBottom: 10 }}>Aktivita</div>
+                          {!detail || detail.totalPoints === 0 ? (
+                            <p style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.TERTIARY }}>Žiadna zaznamenaná aktivita</p>
+                          ) : (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: 6, borderBottom: `1px solid ${_A.HAIR}`, marginBottom: 2 }}>
+                                <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10.5, color: _A.EYEBROW }}>Celkové body</span>
+                                <span style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 15, color: _A.TERRA }}>{detail.totalPoints}</span>
+                              </div>
+                              {detail.lastActivity && (
+                                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                  <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10.5, color: _A.EYEBROW }}>Posledná aktivita</span>
+                                  <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10.5, color: _A.DEEP, fontWeight: 500 }}>{new Date(detail.lastActivity).toLocaleDateString('sk-SK')}</span>
+                                </div>
+                              )}
+                              {detail.activityBreakdown.slice(0, 5).map(ev => (
+                                <div key={ev.event_type} style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                  <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10.5, color: _A.EYEBROW }}>{EVENT_LABELS[ev.event_type] ?? ev.event_type}</span>
+                                  <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10.5, color: _A.DEEP, fontWeight: 500 }}>{ev.count}×</span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+
                       </div>
                     )}
                   </div>
-
-                  {sub?.stripe_subscription_id && !sub?.cancel_at_period_end && (
-                    <button
-                      onClick={() => handleCancelSubscription(user)}
-                      disabled={cancelling === user.id}
-                      style={{ ...btnDanger, padding: '7px 12px', fontSize: 11, opacity: cancelling === user.id ? 0.6 : 1 }}
-                    >
-                      {cancelling === user.id ? '...' : 'Zrušiť'}
-                    </button>
-                  )}
-                  {confirmDelete === user.id ? (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.TERRA }}>Naozaj?</span>
-                      <button onClick={() => handleDeleteUser(user.id)} disabled={deleting === user.id} style={{ ...btnDanger, padding: '6px 10px', fontSize: 11 }}>
-                        {deleting === user.id ? '...' : 'Áno'}
-                      </button>
-                      <button onClick={() => setConfirmDelete(null)} style={{ ...btnSecondary, padding: '6px 10px', fontSize: 11 }}>Nie</button>
-                    </div>
-                  ) : (
-                    <button onClick={() => setConfirmDelete(user.id)} style={{ all: 'unset', cursor: 'pointer', padding: 8, borderRadius: 8 }}>
-                      <Trash2 style={{ width: 14, height: 14, color: _A.TERRA }} />
-                    </button>
-                  )}
-                </div>
+                )}
               </div>
             );
           })}
