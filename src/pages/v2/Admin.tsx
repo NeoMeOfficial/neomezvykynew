@@ -601,7 +601,7 @@ interface AdminUser {
   full_name: string | null;
   role: string;
   created_at: string;
-  subscriptions: { tier: string; active: boolean; stripe_subscription_id: string | null; current_period_end: string | null; cancel_at_period_end: boolean } | null;
+  subscriptions: { tier: string; active: boolean; stripe_customer_id?: string | null; stripe_subscription_id: string | null; current_period_end: string | null; cancel_at_period_end: boolean } | null;
 }
 
 function UsersTab() {
@@ -613,6 +613,8 @@ function UsersTab() {
   const [cancelling, setCancelling] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [settingTier, setSettingTier] = useState<string | null>(null);
+  const [tierMenuOpen, setTierMenuOpen] = useState<string | null>(null);
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -643,7 +645,6 @@ function UsersTab() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
-      // Update local state
       setUsers(prev => prev.map(u => u.id === user.id ? {
         ...u,
         subscriptions: u.subscriptions ? { ...u.subscriptions, cancel_at_period_end: true } : null,
@@ -652,6 +653,35 @@ function UsersTab() {
       alert('Chyba pri rušení predplatného: ' + err.message);
     } finally {
       setCancelling(null);
+    }
+  };
+
+  const handleSetTier = async (userId: string, tier: string) => {
+    setSettingTier(userId);
+    setTierMenuOpen(null);
+    try {
+      const res = await fetch('/.netlify/functions/admin-set-user-tier', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, tier }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setUsers(prev => prev.map(u => u.id === userId ? {
+        ...u,
+        subscriptions: {
+          tier,
+          active: tier !== 'free',
+          stripe_customer_id: u.subscriptions?.stripe_customer_id ?? null,
+          stripe_subscription_id: null,
+          current_period_end: tier !== 'free' ? new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString() : null,
+          cancel_at_period_end: false,
+        },
+      } : u));
+    } catch (err: any) {
+      alert('Chyba pri zmene tarifu: ' + err.message);
+    } finally {
+      setSettingTier(null);
     }
   };
 
@@ -682,7 +712,16 @@ function UsersTab() {
   });
 
   const tierLabel = (tier: string) => ({ free: 'Free', neome_plus: 'Premium', program_bundle: 'Bundle' }[tier] ?? tier);
-  const tierColor = (tier: string) => ({ free: '#A0907E', neome_plus: '#7A9E78', program_bundle: '#B8864A' }[tier] ?? '#A0907E');
+
+  const tierBadgeStyle = (t: string): React.CSSProperties => {
+    const map: Record<string, { bg: string; col: string }> = {
+      neome_plus: { bg: 'rgba(139,158,136,0.15)', col: _A.SAGE },
+      program_bundle: { bg: 'rgba(184,134,74,0.15)', col: _A.GOLD },
+      free: { bg: `rgba(61,41,33,0.07)`, col: _A.MUTED },
+    };
+    const s = map[t] ?? map.free;
+    return { fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', padding: '3px 8px', borderRadius: 999, background: s.bg, color: s.col, fontFamily: 'DM Sans, system-ui' };
+  };
 
   if (loading) return <div style={{ padding: '60px 0', textAlign: 'center', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>Načítavam používateľov…</div>;
   if (error) return (
@@ -705,7 +744,7 @@ function UsersTab() {
   const freeUsers = users.filter(u => !u.subscriptions || u.subscriptions.tier === 'free').length;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }} onClick={() => setTierMenuOpen(null)}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 22, fontWeight: 500, color: _A.DEEP }}>User Management</div>
         <button onClick={fetchUsers} style={{ ...btnSecondary, display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -737,15 +776,8 @@ function UsersTab() {
           {filtered.map(user => {
             const sub = user.subscriptions;
             const tier = sub?.tier ?? 'free';
-            const tierBadgeStyle = (t: string): React.CSSProperties => {
-              const map: Record<string, { bg: string; col: string }> = {
-                neome_plus: { bg: 'rgba(139,158,136,0.15)', col: _A.SAGE },
-                program_bundle: { bg: 'rgba(184,134,74,0.15)', col: _A.GOLD },
-                free: { bg: `rgba(61,41,33,0.07)`, col: _A.MUTED },
-              };
-              const s = map[t] ?? map.free;
-              return { fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', padding: '3px 8px', borderRadius: 999, background: s.bg, color: s.col };
-            };
+            const isSettingThis = settingTier === user.id;
+            const menuOpen = tierMenuOpen === user.id;
             return (
               <div key={user.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px', borderRadius: 12, border: `1px solid ${_A.HAIR}`, background: _A.BG }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1, minWidth: 0 }}>
@@ -764,13 +796,47 @@ function UsersTab() {
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
                   <span style={tierBadgeStyle(tier)}>{tierLabel(tier)}</span>
+
+                  {/* Tier picker */}
+                  <div style={{ position: 'relative' }} onClick={e => e.stopPropagation()}>
+                    <button
+                      onClick={() => setTierMenuOpen(menuOpen ? null : user.id)}
+                      disabled={isSettingThis}
+                      style={{ ...btnSecondary, padding: '6px 10px', fontSize: 11, display: 'flex', alignItems: 'center', gap: 5, opacity: isSettingThis ? 0.5 : 1 }}
+                    >
+                      {isSettingThis ? <RefreshCw style={{ width: 11, height: 11 }} /> : <Edit3 style={{ width: 11, height: 11 }} />}
+                      Tarifa
+                    </button>
+                    {menuOpen && (
+                      <div style={{ position: 'absolute', right: 0, top: '100%', marginTop: 4, background: _A.CARD, border: `1px solid ${_A.HAIR}`, borderRadius: 10, zIndex: 100, minWidth: 160, boxShadow: '0 4px 20px rgba(61,41,33,0.10)', overflow: 'hidden' }}>
+                        {[
+                          { value: 'free',           label: 'Free',    color: _A.MUTED },
+                          { value: 'neome_plus',      label: 'Premium', color: _A.SAGE },
+                          { value: 'program_bundle',  label: 'Bundle',  color: _A.GOLD },
+                        ].map(opt => (
+                          <button
+                            key={opt.value}
+                            onClick={() => handleSetTier(user.id, opt.value)}
+                            style={{ all: 'unset', display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '10px 14px', cursor: 'pointer', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.DEEP, background: tier === opt.value ? _A.CREAM2 : 'transparent', boxSizing: 'border-box' }}
+                            onMouseEnter={e => { if (tier !== opt.value) (e.currentTarget as HTMLButtonElement).style.background = _A.CREAM2; }}
+                            onMouseLeave={e => { if (tier !== opt.value) (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
+                          >
+                            <span style={{ width: 8, height: 8, borderRadius: 999, background: opt.color, display: 'inline-block', flexShrink: 0 }} />
+                            {opt.label}
+                            {tier === opt.value && <Check style={{ width: 12, height: 12, color: _A.SAGE, marginLeft: 'auto' }} />}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
                   {sub?.stripe_subscription_id && !sub?.cancel_at_period_end && (
                     <button
                       onClick={() => handleCancelSubscription(user)}
                       disabled={cancelling === user.id}
                       style={{ ...btnDanger, padding: '7px 12px', fontSize: 11, opacity: cancelling === user.id ? 0.6 : 1 }}
                     >
-                      {cancelling === user.id ? '...' : 'Zrušiť predplatné'}
+                      {cancelling === user.id ? '...' : 'Zrušiť'}
                     </button>
                   )}
                   {confirmDelete === user.id ? (
@@ -1055,11 +1121,34 @@ function MessagesTab() {
     thread, sendReply, totalUnread,
   } = useAdminMessages();
   const [reply, setReply] = React.useState('');
+  const [userNames, setUserNames] = React.useState<Record<string, string>>({});
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  // Fetch display names for conversation user IDs
+  React.useEffect(() => {
+    if (conversations.length === 0) return;
+    const ids = conversations.map(c => c.user_id).filter(id => id !== 'demo' && !userNames[id]);
+    if (ids.length === 0) return;
+    supabase.from('profiles').select('id, full_name, email').in('id', ids).then(({ data }) => {
+      if (data) {
+        setUserNames(prev => {
+          const next = { ...prev };
+          for (const p of data) next[p.id] = p.full_name || p.email || p.id.slice(0, 8);
+          return next;
+        });
+      }
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conversations]);
 
   React.useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [thread]);
+
+  const displayName = (userId: string) => {
+    if (userId === 'demo') return 'Demo User';
+    return userNames[userId] || userId.slice(0, 8) + '…';
+  };
 
   const formatTime = (iso: string) => {
     const d = new Date(iso);
@@ -1100,11 +1189,11 @@ function MessagesTab() {
                   style={{ all: 'unset', cursor: 'pointer', display: 'block', width: '100%', padding: '12px 16px', borderBottom: `1px solid ${_A.HAIR}`, background: selectedUserId === conv.user_id ? `rgba(184,134,74,0.10)` : 'transparent', boxSizing: 'border-box' }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <div style={{ width: 30, height: 30, borderRadius: 999, background: _A.CREAM2, color: _A.DEEP, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Gilda Display, Georgia, serif', fontSize: 13, fontWeight: 500, flexShrink: 0 }}>U</div>
+                    <div style={{ width: 30, height: 30, borderRadius: 999, background: _A.CREAM2, color: _A.DEEP, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Gilda Display, Georgia, serif', fontSize: 13, fontWeight: 500, flexShrink: 0 }}>{displayName(conv.user_id).charAt(0).toUpperCase()}</div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, fontWeight: 500, color: _A.DEEP, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {conv.user_id === 'demo' ? 'Demo User' : conv.user_id.slice(0, 8) + '…'}
+                          {displayName(conv.user_id)}
                         </span>
                         <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10, color: _A.TERTIARY, flexShrink: 0 }}>{formatTime(conv.last_time)}</span>
                       </div>
@@ -1136,9 +1225,9 @@ function MessagesTab() {
                 <button onClick={() => setSelectedUserId(null)} style={{ all: 'unset', cursor: 'pointer', padding: 6, borderRadius: 8 }}>
                   <ArrowLeft style={{ width: 15, height: 15, color: _A.MUTED }} />
                 </button>
-                <div style={{ width: 28, height: 28, borderRadius: 999, background: _A.CREAM2, color: _A.DEEP, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Gilda Display, Georgia, serif', fontSize: 13, fontWeight: 500 }}>U</div>
+                <div style={{ width: 28, height: 28, borderRadius: 999, background: _A.CREAM2, color: _A.DEEP, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Gilda Display, Georgia, serif', fontSize: 13, fontWeight: 500 }}>{displayName(selectedUserId!).charAt(0).toUpperCase()}</div>
                 <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 13, fontWeight: 500, color: _A.DEEP }}>
-                  {selectedUserId === 'demo' ? 'Demo User' : selectedUserId.slice(0, 8) + '…'}
+                  {displayName(selectedUserId)}
                 </span>
               </div>
 
