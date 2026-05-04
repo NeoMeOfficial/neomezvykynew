@@ -1,0 +1,4636 @@
+[
+  {
+    "name": "Jednoduché praktické jedlo v podobe ovocného jogurtu.",
+    "slot": "desiata",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "1 x balenie jogurt gazdovský čučoriedkový napr. Hollandia",
+        "name": "jogurt gazdovský čučoriedkový",
+        "grams": 180
+      }
+    ],
+    "sourceClients": [
+      "Eva BAr.",
+      "Ivana S",
+      "Lenka Or",
+      "Radka D",
+      "konvetovany str.p Veroniak T",
+      "Andrea F",
+      "Dominika K",
+      "Emilia S"
+    ],
+    "sourceFiles": [
+      "10.konvertovany strav.p Eva BAr..csv",
+      "13.konvertovany strav.p Ivana S.csv",
+      "14.konvertovnay strav.pl Lenka Or.csv",
+      "15.konvertovany strav.pl Radka D.csv",
+      "20.konvetovany str.p Veroniak T.csv",
+      "3.konvertovany strav.plan Andrea F.csv",
+      "8.konvertovany strav.plan Dominika K.csv",
+      "9.konvertovany strav.p. Emilia S.csv"
+    ],
+    "usageCount": 12
+  },
+  {
+    "name": "Jednoduché praktické jedlo v podobe ovocného jogurtu.",
+    "slot": "desiata",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "1 x balenie jogurt jahodový napr. Jogobella",
+        "name": "jogurt jahodový",
+        "grams": 150
+      }
+    ],
+    "sourceClients": [
+      "konvertovany str.p Gabika Wenh",
+      "Hanna B",
+      "Stanislava J",
+      "konvertovany str.p. Veronika S",
+      "konvetovany strav.plan Andrea P",
+      "Dana K"
+    ],
+    "sourceFiles": [
+      "11.konvertovany str.p Gabika Wenh.csv",
+      "12.konvertovany strav.p Hanna B.csv",
+      "18.konvertovany strav.p Stanislava J.csv",
+      "19.konvertovany str.p. Veronika S.csv",
+      "4.konvetovany strav.plan Andrea P.csv",
+      "7.konvertovany strav.plan Dana K.csv"
+    ],
+    "usageCount": 9
+  },
+  {
+    "name": "Recept pripravte podľa návodu uvedeného nižšie. Konzumujte predpísanú porciu.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "1 kus pomarančový koláč s karobom",
+        "name": "pomarančový koláč s karobom",
+        "grams": 90
+      }
+    ],
+    "sourceClients": [
+      "Eva BAr.",
+      "Ivana S",
+      "Lenka Or",
+      "Beata Tr",
+      "Dana K"
+    ],
+    "sourceFiles": [
+      "10.konvertovany strav.p Eva BAr..csv",
+      "13.konvertovany strav.p Ivana S.csv",
+      "14.konvertovnay strav.pl Lenka Or.csv",
+      "5.konvertovany strav. p. Beata Tr.csv",
+      "7.konvertovany strav.plan Dana K.csv"
+    ],
+    "usageCount": 5
+  },
+  {
+    "name": "Do mixéra vložte zmrazené jahody, banán, kešu, pridajte trochu vody a rozmixujte.",
+    "slot": "desiata",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "1 a ½ menší kus banány",
+        "name": "banány",
+        "grams": 97.5
+      },
+      {
+        "raw": "9 ks orechy kešu",
+        "name": "orechy kešu",
+        "grams": 13.5
+      },
+      {
+        "raw": "65 g mrazené jahody banány mrazené jahody orechy kešu",
+        "name": "mrazené jahody banány mrazené jahody orechy kešu",
+        "grams": 65
+      }
+    ],
+    "sourceClients": [
+      "Radka D",
+      "Stanislava J",
+      "konvetovany strav.plan Andrea P",
+      "Dana K"
+    ],
+    "sourceFiles": [
+      "15.konvertovany strav.pl Radka D.csv",
+      "18.konvertovany strav.p Stanislava J.csv",
+      "4.konvetovany strav.plan Andrea P.csv",
+      "7.konvertovany strav.plan Dana K.csv"
+    ],
+    "usageCount": 5
+  },
+  {
+    "name": "Recept pripravte podľa návodu uvedeného nižšie. Konzumujte predpísanú porciu.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "2 x porcia Banánovo-tvarohová bábovka",
+        "name": "banánovo-tvarohová bábovka",
+        "grams": 156
+      }
+    ],
+    "sourceClients": [
+      "Eva BAr.",
+      "Ivana S",
+      "Simona H"
+    ],
+    "sourceFiles": [
+      "10.konvertovany strav.p Eva BAr..csv",
+      "13.konvertovany strav.p Ivana S.csv",
+      "17.konvertovany strav.p Simona H.csv"
+    ],
+    "usageCount": 4
+  },
+  {
+    "name": "Recept pripravte podľa návodu uvedeného nižšie.",
+    "slot": "vecera",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "2 a ½ x porcia Pečená brokolica a špargľa",
+        "name": "pečená brokolica a špargľa",
+        "grams": 500
+      }
+    ],
+    "sourceClients": [
+      "Eva BAr.",
+      "Ivana S",
+      "Simona H",
+      "Emilia S"
+    ],
+    "sourceFiles": [
+      "10.konvertovany strav.p Eva BAr..csv",
+      "13.konvertovany strav.p Ivana S.csv",
+      "17.konvertovany strav.p Simona H.csv",
+      "9.konvertovany strav.p. Emilia S.csv"
+    ],
+    "usageCount": 4
+  },
+  {
+    "name": "Melón nakrájajte a konzumujte spolu s orechami.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "2 a ½ plátok veľký melón červený",
+        "name": "melón červený",
+        "grams": 500
+      },
+      {
+        "raw": "9 ks mandle",
+        "name": "mandle",
+        "grams": 9
+      }
+    ],
+    "sourceClients": [
+      "Hanna B",
+      "Stanislava J",
+      "konvetovany strav.plan Andrea P"
+    ],
+    "sourceFiles": [
+      "12.konvertovany strav.p Hanna B.csv",
+      "18.konvertovany strav.p Stanislava J.csv",
+      "4.konvetovany strav.plan Andrea P.csv"
+    ],
+    "usageCount": 4
+  },
+  {
+    "name": "Ovocie konzumujte spolu s orechami, pokiaľ recept uvádza.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "1 a ½ plátok veľký melón červený",
+        "name": "melón červený",
+        "grams": 300
+      },
+      {
+        "raw": "10 ks mandle",
+        "name": "mandle",
+        "grams": 10
+      }
+    ],
+    "sourceClients": [
+      "Simona H",
+      "konvetovany strav.plan Andrea P",
+      "Beata Tr",
+      "Emilia S"
+    ],
+    "sourceFiles": [
+      "17.konvertovany strav.p Simona H.csv",
+      "4.konvetovany strav.plan Andrea P.csv",
+      "5.konvertovany strav. p. Beata Tr.csv",
+      "9.konvertovany strav.p. Emilia S.csv"
+    ],
+    "usageCount": 4
+  },
+  {
+    "name": "Kvalitná horká čokoláda. Konzumujte maximálne 3-krát v priebehu 7 dní.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "čokoláda horká 71 % napr. Madagascar",
+        "name": "čokoláda horká",
+        "grams": 30
+      }
+    ],
+    "sourceClients": [
+      "Eva BAr.",
+      "Radka D",
+      "Emilia S",
+      "konvetovany strav.plan Andrea P"
+    ],
+    "sourceFiles": [
+      "10.konvertovany strav.p Eva BAr..csv",
+      "15.konvertovany strav.pl Radka D.csv",
+      "9.konvertovany strav.p. Emilia S.csv",
+      "4.konvetovany strav.plan Andrea P.csv"
+    ],
+    "usageCount": 4
+  },
+  {
+    "name": "Kvalitná čokoláda - sladká pochúťka. Konzumujte maximálne 3-krát v priebehu 7 dní.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "čokoláda horká 71 % napr. Madagascar",
+        "name": "čokoláda horká",
+        "grams": 40
+      }
+    ],
+    "sourceClients": [
+      "konvertovany str.p. Veronika S",
+      "konvetovany str.p Veroniak T",
+      "Dana K",
+      "Lenka Or"
+    ],
+    "sourceFiles": [
+      "19.konvertovany str.p. Veronika S.csv",
+      "20.konvetovany str.p Veroniak T.csv",
+      "7.konvertovany strav.plan Dana K.csv",
+      "14.konvertovnay strav.pl Lenka Or.csv"
+    ],
+    "usageCount": 4
+  },
+  {
+    "name": "Karob/kakao primiešajte do kefírového mlieka a vypite.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "3 dl kefír",
+        "name": "kefír",
+        "grams": 300
+      }
+    ],
+    "sourceClients": [
+      "Hanna B",
+      "Radka D",
+      "konvetovany strav.plan Andrea P"
+    ],
+    "sourceFiles": [
+      "12.konvertovany strav.p Hanna B.csv",
+      "15.konvertovany strav.pl Radka D.csv",
+      "4.konvetovany strav.plan Andrea P.csv"
+    ],
+    "usageCount": 3
+  },
+  {
+    "name": "Jednoduché praktické jedlo pozostávajúce z proteínového keksu/tyčinky.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "½ x tyčinka proteínová tyčinka 25 % napr. Excelent Protein Bar",
+        "name": "tyčinka proteínová tyčinka",
+        "grams": 42.5
+      }
+    ],
+    "sourceClients": [
+      "Hanna B",
+      "Radka D",
+      "Dominika K"
+    ],
+    "sourceFiles": [
+      "12.konvertovany strav.p Hanna B.csv",
+      "15.konvertovany strav.pl Radka D.csv",
+      "8.konvertovany strav.plan Dominika K.csv"
+    ],
+    "usageCount": 3
+  },
+  {
+    "name": "Tyčinku pripravte podľa receptu uvedeného nižšie. Pokiaľ máte uvedené, zapíjajte mliekom.",
+    "slot": "desiata",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "2 a ½ dl mlieko polotučné 1,5 %",
+        "name": "mlieko polotučné",
+        "grams": 250
+      },
+      {
+        "raw": "½ x kus Kakaová raw tyčinka",
+        "name": "kakaová raw tyčinka",
+        "grams": 16
+      }
+    ],
+    "sourceClients": [
+      "Ivana S",
+      "Simona H",
+      "Beata Tr"
+    ],
+    "sourceFiles": [
+      "13.konvertovany strav.p Ivana S.csv",
+      "17.konvertovany strav.p Simona H.csv",
+      "5.konvertovany strav. p. Beata Tr.csv"
+    ],
+    "usageCount": 3
+  },
+  {
+    "name": "Guličky pripravte podľa receptu a konzumujte spolu s jogurtom.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "2 x gulička Raw sladké guličky",
+        "name": "raw sladké guličky",
+        "grams": 30
+      }
+    ],
+    "sourceClients": [
+      "Ivana S",
+      "Beata Tr",
+      "Emilia S"
+    ],
+    "sourceFiles": [
+      "13.konvertovany strav.p Ivana S.csv",
+      "5.konvertovany strav. p. Beata Tr.csv",
+      "9.konvertovany strav.p. Emilia S.csv"
+    ],
+    "usageCount": 3
+  },
+  {
+    "name": "Recept pripravte podľa návodu na prípravu uvedeného nižšie.",
+    "slot": "obed",
+    "prepMinutes": null,
+    "instructions": "Pokiaľ recept uvádza, pridajte do cestovín aj na jemno nakrájané, na miernom ohni opečené kuracie prsia posypané\nčiernym korením a soľou. Dezert pripravte podľa návodu nižšie.\nsoľ, čierne korenie, chilli (ak na prísady nie ste alergická)",
+    "ingredients": [
+      {
+        "raw": "1 x porcia Cestoviny Aglio E Olio",
+        "name": "cestoviny aglio e olio",
+        "grams": 129
+      }
+    ],
+    "sourceClients": [
+      "Lenka Or",
+      "konvetovany str.p Veroniak T",
+      "Dana K"
+    ],
+    "sourceFiles": [
+      "14.konvertovnay strav.pl Lenka Or.csv",
+      "20.konvetovany str.p Veroniak T.csv",
+      "7.konvertovany strav.plan Dana K.csv"
+    ],
+    "usageCount": 3
+  },
+  {
+    "name": "Jogurt vylejte do misky, pridajte chia semienka a ovocie.",
+    "slot": "ranajky",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "2 x balenie jogurt biely napr. Rajo Active Protein",
+        "name": "jogurt biely",
+        "grams": 360
+      },
+      {
+        "raw": "2 a ½ ks kiwi",
+        "name": "kiwi",
+        "grams": 222.5
+      },
+      {
+        "raw": "2 ČL chia semienka",
+        "name": "chia semienka",
+        "grams": 6
+      }
+    ],
+    "sourceClients": [
+      "Radka D",
+      "andrea demkova",
+      "Andrea F"
+    ],
+    "sourceFiles": [
+      "15.konvertovany strav.pl Radka D.csv",
+      "2.konvertovany stravovaci plan _ andrea demkova.csv",
+      "3.konvertovany strav.plan Andrea F.csv"
+    ],
+    "usageCount": 3
+  },
+  {
+    "name": "Ovocie na desiatu konzumujte spolu s orechami, pokiaľ ich recept uvádza.",
+    "slot": "desiata",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "1 a ½ plátok veľký melón červený",
+        "name": "melón červený",
+        "grams": 300
+      },
+      {
+        "raw": "11 ks mandle",
+        "name": "mandle",
+        "grams": 11
+      }
+    ],
+    "sourceClients": [
+      "Radka D",
+      "konvetovany strav.plan Andrea P",
+      "Dominika K"
+    ],
+    "sourceFiles": [
+      "15.konvertovany strav.pl Radka D.csv",
+      "4.konvetovany strav.plan Andrea P.csv",
+      "8.konvertovany strav.plan Dominika K.csv"
+    ],
+    "usageCount": 3
+  },
+  {
+    "name": "Karob/kakao primiešajte do kefírového mlieka a vypite.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "3 dl kefír",
+        "name": "kefír",
+        "grams": 300
+      },
+      {
+        "raw": "1 a ½ ČL kakaový prášok, 12 % obsah tuku",
+        "name": "kakaový prášok,",
+        "grams": 12
+      }
+    ],
+    "sourceClients": [
+      "Stanislava J",
+      "Andrea F",
+      "Dominika K"
+    ],
+    "sourceFiles": [
+      "18.konvertovany strav.p Stanislava J.csv",
+      "3.konvertovany strav.plan Andrea F.csv",
+      "8.konvertovany strav.plan Dominika K.csv"
+    ],
+    "usageCount": 3
+  },
+  {
+    "name": "Chlebíček (jeden váži približne 8 gramov) zapite mliekom.",
+    "slot": "desiata",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "2 a ½ dl mlieko polotučné 1,5 %",
+        "name": "mlieko polotučné",
+        "grams": 250
+      },
+      {
+        "raw": "2 a ½ x krúžok celozrnné chlebíčky - pšenično-ražné napr. Bona Vita Active",
+        "name": "celozrnné chlebíčky - pšenično-ražné",
+        "grams": 22.5
+      }
+    ],
+    "sourceClients": [
+      "konvetovany str.p Veroniak T",
+      "Dana K"
+    ],
+    "sourceFiles": [
+      "20.konvetovany str.p Veroniak T.csv",
+      "7.konvertovany strav.plan Dana K.csv"
+    ],
+    "usageCount": 3
+  },
+  {
+    "name": "Marhule umyte, odkôstkujte a rozmixujte spolu s ostatnými ingredienciami.",
+    "slot": "desiata",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "2 x veľký kus marhule",
+        "name": "marhule",
+        "grams": 200
+      },
+      {
+        "raw": "2 ČL konopné semienka lúpané napr. Bio Nebio",
+        "name": "konopné semienka lúpané",
+        "grams": 7
+      },
+      {
+        "raw": "½ dl sójové mlieko",
+        "name": "sójové mlieko",
+        "grams": 50
+      },
+      {
+        "raw": "špenát",
+        "name": "špenát",
+        "grams": 40
+      }
+    ],
+    "sourceClients": [
+      "Eva BAr.",
+      "Ivana S"
+    ],
+    "sourceFiles": [
+      "10.konvertovany strav.p Eva BAr..csv",
+      "13.konvertovany strav.p Ivana S.csv"
+    ],
+    "usageCount": 2
+  },
+  {
+    "name": "Cesto pripravte podľa návodu nižšie (hmotnosť cesta je uvádzaná v surovom stave).",
+    "slot": "obed",
+    "prepMinutes": 3,
+    "instructions": "Do keramickej misy na dno rozdrobte čerstvý kozí syr a hotové, scedené halušky naň položte a premiešajte. Na panvici na tuku orestujte pretlačený cesnak. Pridajte umyté osušené špenátové listy nasekané na drobno a krátko orestujte cca 3 minúty. Dochuťte štipkou soli a mletým korením z mlynčeka. Halušky presuňte na panvicu a zmiešajte so špenátom. Konzumujte teplé, posypané nasekaným čerstvým medvedím cesnakom (ak nemáte k dispozíci medvedí cesnak, použite pažitku alebo vňať). Pokiaľ recept uvádza, zapite mliekom.\nbylinky, korenie, vňať, pažitka (ak na prísady nie ste alergická)",
+    "ingredients": [
+      {
+        "raw": "1 x porcia Zeleninová krémová polievka",
+        "name": "zeleninová krémová polievka",
+        "grams": 330
+      },
+      {
+        "raw": "špenát",
+        "name": "špenát",
+        "grams": 40
+      },
+      {
+        "raw": "35 g medvedí cesnak 1 strúčik cesnak",
+        "name": "g medvedí cesnak 1 strúčik cesnak",
+        "grams": 3
+      }
+    ],
+    "sourceClients": [
+      "Eva BAr.",
+      "Radka I"
+    ],
+    "sourceFiles": [
+      "10.konvertovany strav.p Eva BAr..csv",
+      "16.konvertovany strav.p Radka I.csv"
+    ],
+    "usageCount": 2
+  },
+  {
+    "name": "Zeleninu môžete deň vopred očistiť, nakrájať a uložiť v miske do chladničky.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "1 a ½ ks kaleráb",
+        "name": "kaleráb",
+        "grams": 405
+      },
+      {
+        "raw": "9 ks mandle",
+        "name": "mandle",
+        "grams": 9
+      }
+    ],
+    "sourceClients": [
+      "Eva BAr.",
+      "konvertovany str.p. Veronika S"
+    ],
+    "sourceFiles": [
+      "10.konvertovany strav.p Eva BAr..csv",
+      "19.konvertovany str.p. Veronika S.csv"
+    ],
+    "usageCount": 2
+  },
+  {
+    "name": "Jahodovú proteínovú zmrzlinu pripravte podľa receptu nižšie.",
+    "slot": "desiata",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "130 g jahodová zmrzlina ( postup prípravy nižšie) 1.8 jahodová zmrzlina",
+        "name": "jahodová zmrzlina 1.8 jahodová zmrzlina",
+        "grams": 130
+      }
+    ],
+    "sourceClients": [
+      "konvertovany str.p Gabika Wenh"
+    ],
+    "sourceFiles": [
+      "11.konvertovany str.p Gabika Wenh.csv"
+    ],
+    "usageCount": 2
+  },
+  {
+    "name": "Nátierku pripravte podľa receptu nižšie. Podávajte s pečivom.",
+    "slot": "desiata",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "2 a ½ kus knäckebrot",
+        "name": "knäckebrot",
+        "grams": 25
+      },
+      {
+        "raw": "25 g švédska nátierka ( postup prípravy nižšie) knäckebrot švédska nátierka",
+        "name": "švédska nátierka knäckebrot švédska nátierka",
+        "grams": 25
+      }
+    ],
+    "sourceClients": [
+      "konvertovany str.p Gabika Wenh",
+      "konvetovany str.p Veroniak T"
+    ],
+    "sourceFiles": [
+      "11.konvertovany str.p Gabika Wenh.csv",
+      "20.konvetovany str.p Veroniak T.csv"
+    ],
+    "usageCount": 2
+  },
+  {
+    "name": "Mrkvu nastrúhajte a jemne premiešajte s ostatnými ingredienciami.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "2 a ½ ks mrkva",
+        "name": "mrkva",
+        "grams": 212.5
+      },
+      {
+        "raw": "1 ČL kokos mletý",
+        "name": "kokos mletý",
+        "grams": 5
+      },
+      {
+        "raw": "1 ČL med včelí",
+        "name": "med včelí",
+        "grams": 7
+      },
+      {
+        "raw": "2 x 5 kusov hrozienka",
+        "name": "hrozienka",
+        "grams": 4.5
+      }
+    ],
+    "sourceClients": [
+      "konvertovany str.p Gabika Wenh",
+      "konvertovany str.p. Veronika S"
+    ],
+    "sourceFiles": [
+      "11.konvertovany str.p Gabika Wenh.csv",
+      "19.konvertovany str.p. Veronika S.csv"
+    ],
+    "usageCount": 2
+  },
+  {
+    "name": "Recept pripravte podľa návodu nižšie. Konzumujte predpísanú porciu.",
+    "slot": "vecera",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "1 a ½ x porcia Polievka z červenej šošovice",
+        "name": "polievka z červenej šošovice",
+        "grams": 495
+      }
+    ],
+    "sourceClients": [
+      "konvertovany str.p Gabika Wenh",
+      "Lenka Or"
+    ],
+    "sourceFiles": [
+      "11.konvertovany str.p Gabika Wenh.csv",
+      "14.konvertovnay strav.pl Lenka Or.csv"
+    ],
+    "usageCount": 2
+  },
+  {
+    "name": "Koláč konzumujte spolu s nápojom, ak je v recepte uvedený.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "1 a ½ x kus Cuketový koláč s marhuľami",
+        "name": "cuketový koláč s marhuľami",
+        "grams": 150
+      },
+      {
+        "raw": "1 a ½ dl mlieko polotučné 1,5 %",
+        "name": "mlieko polotučné",
+        "grams": 150
+      }
+    ],
+    "sourceClients": [
+      "Ivana S",
+      "Simona H"
+    ],
+    "sourceFiles": [
+      "13.konvertovany strav.p Ivana S.csv",
+      "17.konvertovany strav.p Simona H.csv"
+    ],
+    "usageCount": 2
+  },
+  {
+    "name": "Mango, ľadový šalát a slnečnicové semienka rozmixujte na hustý krém a posypte mandľami.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "165 g mango 5 ks mandle",
+        "name": "g mango 5 ks mandle",
+        "grams": 5
+      },
+      {
+        "raw": "1 ČL slnečnicové semená",
+        "name": "slnečnicové semená",
+        "grams": 4
+      },
+      {
+        "raw": "ľadový šalát",
+        "name": "ľadový šalát",
+        "grams": 40
+      }
+    ],
+    "sourceClients": [
+      "Lenka Or",
+      "Dana K"
+    ],
+    "sourceFiles": [
+      "14.konvertovnay strav.pl Lenka Or.csv",
+      "7.konvertovany strav.plan Dana K.csv"
+    ],
+    "usageCount": 2
+  },
+  {
+    "name": "Jahodovú proteínovú zmrzlinu pripravte podľa receptu nižšie.",
+    "slot": "desiata",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "175 g jahodová zmrzlina ( postup prípravy nižšie) 2.5 jahodová zmrzlina",
+        "name": "jahodová zmrzlina 2.5 jahodová zmrzlina",
+        "grams": 175
+      }
+    ],
+    "sourceClients": [
+      "Radka D",
+      "Stanislava J"
+    ],
+    "sourceFiles": [
+      "15.konvertovany strav.pl Radka D.csv",
+      "18.konvertovany strav.p Stanislava J.csv"
+    ],
+    "usageCount": 2
+  },
+  {
+    "name": "Jogurt vylejte do misky, pridajte chia semienka a ovocie.",
+    "slot": "ranajky",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "2 a ½ x balenie jogurt biely napr. Rajo Active Protein",
+        "name": "jogurt biely",
+        "grams": 450
+      },
+      {
+        "raw": "175 g mrazené maliny 2 ČL chia semienka",
+        "name": "g mrazené maliny 2 čl chia semienka",
+        "grams": 6
+      }
+    ],
+    "sourceClients": [
+      "Stanislava J",
+      "Bibiana S"
+    ],
+    "sourceFiles": [
+      "18.konvertovany strav.p Stanislava J.csv",
+      "6.konvertovany strav.plan Bibiana S.csv"
+    ],
+    "usageCount": 2
+  },
+  {
+    "name": "Všetky ingrediencie vložte do mixéra a pomixujte, pridajte vodu podľa potreby.",
+    "slot": "desiata",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "12 ks jahody záhradné",
+        "name": "jahody záhradné",
+        "grams": 156
+      },
+      {
+        "raw": "1 dl acidko biele plnotučné napr. Rajo",
+        "name": "acidko biele plnotučné",
+        "grams": 100
+      },
+      {
+        "raw": "2 a ½ PL tvaroh jemný hrudkový 2,5 % napr. Pilos",
+        "name": "tvaroh jemný hrudkový",
+        "grams": 42.5
+      }
+    ],
+    "sourceClients": [
+      "Stanislava J",
+      "konvetovany strav.plan Andrea P"
+    ],
+    "sourceFiles": [
+      "18.konvertovany strav.p Stanislava J.csv",
+      "4.konvetovany strav.plan Andrea P.csv"
+    ],
+    "usageCount": 2
+  },
+  {
+    "name": "Guľky pripravte podľa receptu nižšie. Ak je uvedené, zapite mliekom.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "1 ks Pšenové guľky",
+        "name": "pšenové guľky",
+        "grams": 40
+      },
+      {
+        "raw": "2 dl mlieko polotučné 1,5 %",
+        "name": "mlieko polotučné",
+        "grams": 200
+      }
+    ],
+    "sourceClients": [
+      "konvetovany str.p Veroniak T",
+      "Dana K"
+    ],
+    "sourceFiles": [
+      "20.konvetovany str.p Veroniak T.csv",
+      "7.konvertovany strav.plan Dana K.csv"
+    ],
+    "usageCount": 2
+  },
+  {
+    "name": "Do mixéra vložte banány spolu s avokádom a karobom. Rozmixujte na puding. Pridajte tvaroh.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "4 PL tvaroh jemný hrudkovitý 2,5 %",
+        "name": "tvaroh jemný hrudkovitý",
+        "grams": 68
+      },
+      {
+        "raw": "30 g avokádo ½ menší kus banány",
+        "name": "g avokádo ½ menší kus banány",
+        "grams": 32.5
+      }
+    ],
+    "sourceClients": [
+      "Andrea F",
+      "Dominika K"
+    ],
+    "sourceFiles": [
+      "3.konvertovany strav.plan Andrea F.csv",
+      "8.konvertovany strav.plan Dominika K.csv"
+    ],
+    "usageCount": 2
+  },
+  {
+    "name": "Jahodovú proteínovú zmrzlinu pripravte podľa receptu nižšie.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "150 g jahodová zmrzlina ( postup prípravy nižšie) 2.1 jahodová zmrzlina",
+        "name": "jahodová zmrzlina 2.1 jahodová zmrzlina",
+        "grams": 150
+      }
+    ],
+    "sourceClients": [
+      "Dana K",
+      "Dominika K"
+    ],
+    "sourceFiles": [
+      "7.konvertovany strav.plan Dana K.csv",
+      "8.konvertovany strav.plan Dominika K.csv"
+    ],
+    "usageCount": 2
+  },
+  {
+    "name": "Jednoduché praktické jedlo pozostávajúce z proteínovej tyčinky/keksu.",
+    "slot": "desiata",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "½ x tyčinka proteínová tyčinka 25 % napr. Excelent Protein Bar",
+        "name": "tyčinka proteínová tyčinka",
+        "grams": 42.5
+      }
+    ],
+    "sourceClients": [
+      "Stanislava J",
+      "konvetovany strav.plan Andrea P"
+    ],
+    "sourceFiles": [
+      "18.konvertovany strav.p Stanislava J.csv",
+      "4.konvetovany strav.plan Andrea P.csv"
+    ],
+    "usageCount": 2
+  },
+  {
+    "name": "Všetky ingrediencie vložte do mixéra a pomixujte, pridajte vodu podľa potreby.",
+    "slot": "desiata",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "4 PL tvaroh jemný hrudkovitý 2,5 %",
+        "name": "tvaroh jemný hrudkovitý",
+        "grams": 68
+      },
+      {
+        "raw": "4 a ½ x PL maliny",
+        "name": "maliny",
+        "grams": 94.5
+      },
+      {
+        "raw": "½ x dl acidko biele plnotučné napr. Rajo",
+        "name": "acidko biele plnotučné",
+        "grams": 50
+      }
+    ],
+    "sourceClients": [
+      "Eva BAr."
+    ],
+    "sourceFiles": [
+      "10.konvertovany strav.p Eva BAr..csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Guľky pripravte podľa receptu uvedeného nižšie.",
+    "slot": "ranajky",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "2 a ½ ks Pšenové guľky",
+        "name": "pšenové guľky",
+        "grams": 100
+      },
+      {
+        "raw": "2 a ½ dl sójové mlieko",
+        "name": "sójové mlieko",
+        "grams": 250
+      },
+      {
+        "raw": "NÁPOJE 2 a ½ dl sójové mlieko",
+        "name": "sójové mlieko",
+        "grams": 250
+      }
+    ],
+    "sourceClients": [
+      "konvertovany str.p Gabika Wenh"
+    ],
+    "sourceFiles": [
+      "11.konvertovany str.p Gabika Wenh.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Ovocie na desiatu. Konzumujte spolu s orechami, pokiaľ ich recept uvádza.",
+    "slot": "desiata",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "1 kus pomaranče",
+        "name": "pomaranče",
+        "grams": 210
+      },
+      {
+        "raw": "7 ks mandle",
+        "name": "mandle",
+        "grams": 7
+      }
+    ],
+    "sourceClients": [
+      "konvertovany str.p Gabika Wenh"
+    ],
+    "sourceFiles": [
+      "11.konvertovany str.p Gabika Wenh.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Guľky pripravte podľa receptu nižšie. Pokiaľ recept uvádza, zapíjajte mliekom.",
+    "slot": "desiata",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "1 ks Pšenové guľky",
+        "name": "pšenové guľky",
+        "grams": 40
+      },
+      {
+        "raw": "1 dl sójové mlieko",
+        "name": "sójové mlieko",
+        "grams": 100
+      },
+      {
+        "raw": "NÁPOJE 1 dl sójové mlieko",
+        "name": "sójové mlieko",
+        "grams": 100
+      }
+    ],
+    "sourceClients": [
+      "konvertovany str.p Gabika Wenh"
+    ],
+    "sourceFiles": [
+      "11.konvertovany str.p Gabika Wenh.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Marhule umyte, odkôstkujte a rozmixujte spolu s ostatnými ingredienciami v recepte.",
+    "slot": "desiata",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "3 x stredný kus marhule",
+        "name": "marhule",
+        "grams": 180
+      },
+      {
+        "raw": "1 a ½ ČL ľanové semená",
+        "name": "ľanové semená",
+        "grams": 4.5
+      },
+      {
+        "raw": "½ dl sójové mlieko",
+        "name": "sójové mlieko",
+        "grams": 50
+      },
+      {
+        "raw": "40 g rímsky šalát rímsky šalát sójové mlieko marhule",
+        "name": "rímsky šalát rímsky šalát sójové mlieko marhule",
+        "grams": 40
+      }
+    ],
+    "sourceClients": [
+      "konvertovany str.p Gabika Wenh"
+    ],
+    "sourceFiles": [
+      "11.konvertovany str.p Gabika Wenh.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Konzumujte dané množstvo zmrzliny. Ak uvádza recept, pridajte orechy.",
+    "slot": "desiata",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "1 a ½ x porcia zmrzlina bielkovinová napr. Breyers Cookie",
+        "name": "zmrzlina bielkovinová",
+        "grams": 75
+      },
+      {
+        "raw": "6 ks mandle",
+        "name": "mandle",
+        "grams": 6
+      }
+    ],
+    "sourceClients": [
+      "konvertovany str.p Gabika Wenh"
+    ],
+    "sourceFiles": [
+      "11.konvertovany str.p Gabika Wenh.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Konzumujte dané množstvo zmrzliny. Ak recept uvádza, pridajte orechy.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "2 x porcia zmrzlina bielkovinová napr. Breyers Cookie",
+        "name": "zmrzlina bielkovinová",
+        "grams": 100
+      }
+    ],
+    "sourceClients": [
+      "konvertovany str.p Gabika Wenh"
+    ],
+    "sourceFiles": [
+      "11.konvertovany str.p Gabika Wenh.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Do mixéra vložte zmrazené jahody, banán, kešu, pridajte trochu vody a rozmixujte.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "7 ks orechy kešu",
+        "name": "orechy kešu",
+        "grams": 10.5
+      },
+      {
+        "raw": "1 menší kus banány",
+        "name": "banány",
+        "grams": 65
+      },
+      {
+        "raw": "65 g mrazené jahody orechy kešu mrazené jahody banány",
+        "name": "mrazené jahody orechy kešu mrazené jahody banány",
+        "grams": 65
+      }
+    ],
+    "sourceClients": [
+      "konvertovany str.p Gabika Wenh"
+    ],
+    "sourceFiles": [
+      "11.konvertovany str.p Gabika Wenh.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Ovocie konzumujte spolu s orechami, ak sú v recepte uvedené.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "2 a ½ ks mandarínky",
+        "name": "mandarínky",
+        "grams": 210
+      },
+      {
+        "raw": "6 ks orechy kešu",
+        "name": "orechy kešu",
+        "grams": 9
+      }
+    ],
+    "sourceClients": [
+      "konvertovany str.p Gabika Wenh"
+    ],
+    "sourceFiles": [
+      "11.konvertovany str.p Gabika Wenh.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Zeleninu môžete deň vopred očistiť, nakrájať a uložiť v miske do chladničky.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "1 ks kaleráb",
+        "name": "kaleráb",
+        "grams": 270
+      },
+      {
+        "raw": "6 ks mandle",
+        "name": "mandle",
+        "grams": 6
+      },
+      {
+        "raw": "3 ks orechy kešu",
+        "name": "orechy kešu",
+        "grams": 4.5
+      }
+    ],
+    "sourceClients": [
+      "konvertovany str.p Gabika Wenh"
+    ],
+    "sourceFiles": [
+      "11.konvertovany str.p Gabika Wenh.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Chlebíček (jeden váži približne 8 gramov) zapite mliekom.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "2 a ½ x krúžok celozrnné chlebíčky - pšenično-ražné napr. Bona Vita Active",
+        "name": "celozrnné chlebíčky - pšenično-ražné",
+        "grams": 22.5
+      },
+      {
+        "raw": "1 x dl acidko biele plnotučné napr. Rajo",
+        "name": "acidko biele plnotučné",
+        "grams": 100
+      },
+      {
+        "raw": "celozrnné... NÁPOJE 1 x dl acidko biele plnotučné napr. Rajo",
+        "name": "celozrnné... nápoje 1 x dl acidko biele plnotučné",
+        "grams": 100
+      }
+    ],
+    "sourceClients": [
+      "konvertovany str.p Gabika Wenh"
+    ],
+    "sourceFiles": [
+      "11.konvertovany str.p Gabika Wenh.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Všetky ingrediencie zmixujte a vylejte do pohára.",
+    "slot": "ranajky",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "5 a ½ dl mlieko polotučné",
+        "name": "mlieko polotučné",
+        "grams": 550
+      },
+      {
+        "raw": "1 a ½ PL arašidové maslo",
+        "name": "arašidové maslo",
+        "grams": 25.5
+      },
+      {
+        "raw": "1 a ½ menší kus banány",
+        "name": "banány",
+        "grams": 97.5
+      },
+      {
+        "raw": "8 ks orechy kešu",
+        "name": "orechy kešu",
+        "grams": 12
+      },
+      {
+        "raw": "mlieko polotučné 1 ČL med včelí",
+        "name": "mlieko polotučné 1 čl med včelí",
+        "grams": 7
+      }
+    ],
+    "sourceClients": [
+      "Hanna B"
+    ],
+    "sourceFiles": [
+      "12.konvertovany strav.p Hanna B.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Na pečivo natrite nátierku, obložte plátkom syra a konzumujte so zeleninou.",
+    "slot": "ranajky",
+    "prepMinutes": null,
+    "instructions": "bylinky (ak na prísady nie ste alergická)",
+    "ingredients": [
+      {
+        "raw": "syr eidam, 30 % t. v s. neúdený",
+        "name": "syr eidam,",
+        "grams": 55
+      },
+      {
+        "raw": "5 a ½ ČL nátierka s cícerom a červenou repou napr. Lidl",
+        "name": "nátierka s cícerom a červenou repou",
+        "grams": 44
+      },
+      {
+        "raw": "7 ks reďkovka",
+        "name": "reďkovka",
+        "grams": 119
+      },
+      {
+        "raw": "INGREDIENCIE 2 x kus rožok grahamový",
+        "name": "ingrediencie 2 x kus rožok grahamový",
+        "grams": 84
+      },
+      {
+        "raw": "5 x plátok hydinová šunka",
+        "name": "hydinová šunka",
+        "grams": 100
+      },
+      {
+        "raw": "1 ks slepačie vajce",
+        "name": "slepačie vajce",
+        "grams": 55
+      },
+      {
+        "raw": "2 ks paprika zeleninová",
+        "name": "paprika zeleninová",
+        "grams": 150
+      },
+      {
+        "raw": "1 x ČL živočíšne maslo",
+        "name": "živočíšne maslo",
+        "grams": 5
+      }
+    ],
+    "sourceClients": [
+      "Hanna B"
+    ],
+    "sourceFiles": [
+      "12.konvertovany strav.p Hanna B.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Jogurt vylejte do misky, pridajte chia semienka a ovocie.",
+    "slot": "ranajky",
+    "prepMinutes": 3,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "3 x balenie jogurt biely napr. Rajo Active Protein",
+        "name": "jogurt biely",
+        "grams": 540
+      },
+      {
+        "raw": "2 a ½ ks kiwi",
+        "name": "kiwi",
+        "grams": 222.5
+      },
+      {
+        "raw": "2 ČL chia semienka",
+        "name": "chia semienka",
+        "grams": 6
+      },
+      {
+        "raw": "INGREDIENCIE 3 ks slepačie vajce",
+        "name": "slepačie vajce",
+        "grams": 165
+      },
+      {
+        "raw": "3 a ½ PL špaldová múka hladká",
+        "name": "špaldová múka hladká",
+        "grams": 42
+      },
+      {
+        "raw": "10 a ½ x 10 bobúľ čučoriedky",
+        "name": "čučoriedky",
+        "grams": 189
+      },
+      {
+        "raw": "½ dl mlieko polotučné 1,5 %",
+        "name": "mlieko polotučné",
+        "grams": 50
+      }
+    ],
+    "sourceClients": [
+      "Hanna B"
+    ],
+    "sourceFiles": [
+      "12.konvertovany strav.p Hanna B.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Pokrájajte ananás, pridajte mlieko/jogurt, tvaroh, semienka a rozmixujte dohladka.",
+    "slot": "ranajky",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "13 PL jogurt bielkovinový napr. Skyr Pilos",
+        "name": "jogurt bielkovinový",
+        "grams": 260
+      },
+      {
+        "raw": "7 a ½ PL tvaroh tučný",
+        "name": "tvaroh tučný",
+        "grams": 127.5
+      },
+      {
+        "raw": "1 a ½ koliesko ananás",
+        "name": "ananás",
+        "grams": 210
+      },
+      {
+        "raw": "½ ČL ľanové semená",
+        "name": "ľanové semená",
+        "grams": 1.5
+      },
+      {
+        "raw": "½ ČL chia semienka",
+        "name": "chia semienka",
+        "grams": 1.5
+      },
+      {
+        "raw": "INGREDIENCIE 1 ks mozzarella",
+        "name": "ingrediencie 1 ks mozzarella",
+        "grams": 125
+      },
+      {
+        "raw": "11 ks cherry paradajky",
+        "name": "cherry paradajky",
+        "grams": 132
+      }
+    ],
+    "sourceClients": [
+      "Hanna B"
+    ],
+    "sourceFiles": [
+      "12.konvertovany strav.p Hanna B.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Do mixéra vložte banány spolu s avokádom a karobom. Rozmixujte na puding. Pridajte tvaroh.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "4 a ½ PL tvaroh jemný hrudkový 2,5 % napr. Pilos",
+        "name": "tvaroh jemný hrudkový",
+        "grams": 76.5
+      },
+      {
+        "raw": "1 menší kus banány",
+        "name": "banány",
+        "grams": 65
+      },
+      {
+        "raw": "INGREDIENCIE 1 x krajec chlieb pohánkový",
+        "name": "ingrediencie 1 x krajec chlieb pohánkový",
+        "grams": 50
+      }
+    ],
+    "sourceClients": [
+      "Hanna B"
+    ],
+    "sourceFiles": [
+      "12.konvertovany strav.p Hanna B.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Proteínový šejk vypite. V prípade, že recept uvádza, konzumujte spolu s banánom.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "½ dávka protein milkshake čokoláda napr. Maxsport",
+        "name": "protein milkshake čokoláda",
+        "grams": 155
+      },
+      {
+        "raw": "1 stredný kus banány",
+        "name": "banány",
+        "grams": 90
+      }
+    ],
+    "sourceClients": [
+      "Hanna B"
+    ],
+    "sourceFiles": [
+      "12.konvertovany strav.p Hanna B.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Do mixéra vložte zmrazené jahody, banán, kešu, pridajte trochu vody a rozmixujte.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "1 a ½ menší kus banány",
+        "name": "banány",
+        "grams": 97.5
+      },
+      {
+        "raw": "8 ks orechy kešu",
+        "name": "orechy kešu",
+        "grams": 12
+      },
+      {
+        "raw": "INGREDIENCIE 1 ks broskyne",
+        "name": "ingrediencie 1 ks broskyne",
+        "grams": 135
+      },
+      {
+        "raw": "½ balenie jogurt bielkovinový napr. Skyr Pilos",
+        "name": "jogurt bielkovinový",
+        "grams": 70
+      },
+      {
+        "raw": "9 ks mandle",
+        "name": "mandle",
+        "grams": 9
+      }
+    ],
+    "sourceClients": [
+      "Hanna B"
+    ],
+    "sourceFiles": [
+      "12.konvertovany strav.p Hanna B.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Pokrájajte ananás, pridajte mlieko/jogurt, tvaroh, semienka a rozmixujte dohladka.",
+    "slot": "ranajky",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "7 PL tvaroh tučný",
+        "name": "tvaroh tučný",
+        "grams": 119
+      },
+      {
+        "raw": "2 koliesko ananás",
+        "name": "ananás",
+        "grams": 280
+      },
+      {
+        "raw": "3 a ½ dl mlieko odtučnené/odstredené",
+        "name": "mlieko odtučnené/odstredené",
+        "grams": 350
+      },
+      {
+        "raw": "½ ČL ľanové semená",
+        "name": "ľanové semená",
+        "grams": 1.5
+      },
+      {
+        "raw": "½ ČL chia semienka",
+        "name": "chia semienka",
+        "grams": 1.5
+      }
+    ],
+    "sourceClients": [
+      "Ivana S"
+    ],
+    "sourceFiles": [
+      "13.konvertovany strav.p Ivana S.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Nátierku pripravte podľa receptu nižšie. Podávajte s pečivom.",
+    "slot": "desiata",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "3 a ½ kus knäckebrot",
+        "name": "knäckebrot",
+        "grams": 35
+      }
+    ],
+    "sourceClients": [
+      "Ivana S"
+    ],
+    "sourceFiles": [
+      "13.konvertovany strav.p Ivana S.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Uhorky odšťavte spoločne s ananásom a zázvorom. Na záver primiešajte trocha oleja.",
+    "slot": "desiata",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "1 koliesko ananás",
+        "name": "ananás",
+        "grams": 140
+      },
+      {
+        "raw": "½ PL avokádový olej",
+        "name": "avokádový olej",
+        "grams": 6
+      },
+      {
+        "raw": "1 ks uhorky",
+        "name": "uhorky",
+        "grams": 300
+      },
+      {
+        "raw": "6 g ďumbier (zázvor) ananás ďumbier avokádový olej Banánovo-tvarohová bábovka",
+        "name": "ďumbier ananás ďumbier avokádový olej banánovo-tvarohová bábovka",
+        "grams": 6
+      }
+    ],
+    "sourceClients": [
+      "Ivana S"
+    ],
+    "sourceFiles": [
+      "13.konvertovany strav.p Ivana S.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Všetky ingrediencie vložte do mixéra a pomixujte, pridajte vodu podľa potreby.",
+    "slot": "desiata",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "4 a ½ PL tvaroh jemný hrudkový 2,5 % napr. Pilos",
+        "name": "tvaroh jemný hrudkový",
+        "grams": 76.5
+      },
+      {
+        "raw": "9 ks jahody záhradné",
+        "name": "jahody záhradné",
+        "grams": 117
+      },
+      {
+        "raw": "½ x dl acidko biele plnotučné napr. Rajo",
+        "name": "acidko biele plnotučné",
+        "grams": 50
+      },
+      {
+        "raw": "tvaroh jemný... javorový sirup ½ ČL javorový sirup",
+        "name": "tvaroh jemný... javorový sirup ½ čl javorový sirup",
+        "grams": 2
+      }
+    ],
+    "sourceClients": [
+      "Ivana S"
+    ],
+    "sourceFiles": [
+      "13.konvertovany strav.p Ivana S.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Nátierku pripravte podľa receptu nižšie. Podávajte s pečivom.",
+    "slot": "ranajky",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "2 x krajec chlieb zemiakový",
+        "name": "chlieb zemiakový",
+        "grams": 100
+      },
+      {
+        "raw": "65 g švédska nátierka ( postup prípravy nižšie) chlieb zemiakový švédska nátierka",
+        "name": "švédska nátierka chlieb zemiakový švédska nátierka",
+        "grams": 65
+      }
+    ],
+    "sourceClients": [
+      "Lenka Or"
+    ],
+    "sourceFiles": [
+      "14.konvertovnay strav.pl Lenka Or.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Marhule umyte, odkôstkujte a rozmixujte spolu s ostatnými ingredienciami v recepte.",
+    "slot": "desiata",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "3 x stredný kus marhule",
+        "name": "marhule",
+        "grams": 180
+      },
+      {
+        "raw": "½ dl mlieko ovčie",
+        "name": "mlieko ovčie",
+        "grams": 50
+      },
+      {
+        "raw": "1 a ½ ČL ľanové semená",
+        "name": "ľanové semená",
+        "grams": 4.5
+      },
+      {
+        "raw": "špenát",
+        "name": "špenát",
+        "grams": 30
+      }
+    ],
+    "sourceClients": [
+      "Lenka Or"
+    ],
+    "sourceFiles": [
+      "14.konvertovnay strav.pl Lenka Or.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Ovocie na desiatu. Konzumujte spolu s orechami, pokiaľ ich recept uvádza.",
+    "slot": "desiata",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "1 kus pomaranče",
+        "name": "pomaranče",
+        "grams": 210
+      },
+      {
+        "raw": "11 ks mandle",
+        "name": "mandle",
+        "grams": 11
+      },
+      {
+        "raw": "INGREDIENCIE ½ balenie grécky jogurt napr. Bakoma",
+        "name": "ingrediencie ½ balenie grécky jogurt",
+        "grams": 90
+      },
+      {
+        "raw": "1 stredný kus banány",
+        "name": "banány",
+        "grams": 90
+      }
+    ],
+    "sourceClients": [
+      "Lenka Or"
+    ],
+    "sourceFiles": [
+      "14.konvertovnay strav.pl Lenka Or.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Chlebíček (jeden váži približne 8 gramov) zapite mliekom.",
+    "slot": "desiata",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "1 a ½ dl mlieko plnotučné 3,5 %",
+        "name": "mlieko plnotučné",
+        "grams": 150
+      },
+      {
+        "raw": "3 x krúžok celozrnné chlebíčky - ryžové so sójou napr. Bona Vita Active",
+        "name": "krúžok celozrnné chlebíčky - ryžové so sójou",
+        "grams": 24
+      }
+    ],
+    "sourceClients": [
+      "Lenka Or"
+    ],
+    "sourceFiles": [
+      "14.konvertovnay strav.pl Lenka Or.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Karob primiešajte do kefírového mlieka.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "3 dl kefír",
+        "name": "kefír",
+        "grams": 300
+      }
+    ],
+    "sourceClients": [
+      "Lenka Or"
+    ],
+    "sourceFiles": [
+      "14.konvertovnay strav.pl Lenka Or.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Ovocie konzumujte spolu s orechami, ak sú v recepte uvedené.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "1 kus pomaranče",
+        "name": "pomaranče",
+        "grams": 210
+      },
+      {
+        "raw": "12 ks arašidy",
+        "name": "arašidy",
+        "grams": 12
+      }
+    ],
+    "sourceClients": [
+      "Lenka Or"
+    ],
+    "sourceFiles": [
+      "14.konvertovnay strav.pl Lenka Or.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Do mixéra vložte zmrazené jahody, banán, kešu, pridajte trochu vody a rozmixujte.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "1 a ½ menší kus banány",
+        "name": "banány",
+        "grams": 97.5
+      },
+      {
+        "raw": "7 ks orechy kešu",
+        "name": "orechy kešu",
+        "grams": 10.5
+      },
+      {
+        "raw": "75 g mrazené jahody mrazené jahody banány orechy kešu",
+        "name": "mrazené jahody mrazené jahody banány orechy kešu",
+        "grams": 75
+      }
+    ],
+    "sourceClients": [
+      "Lenka Or"
+    ],
+    "sourceFiles": [
+      "14.konvertovnay strav.pl Lenka Or.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Na pečivo natrite nátierku, obložte plátkom syra a konzumujte so zeleninou.",
+    "slot": "ranajky",
+    "prepMinutes": null,
+    "instructions": "bylinky (ak na prísady nie ste alergická)",
+    "ingredients": [
+      {
+        "raw": "syr eidam, 30 % t. v s. neúdený",
+        "name": "syr eidam,",
+        "grams": 33
+      },
+      {
+        "raw": "5 ČL nátierka s cícerom a červenou repou napr. Lidl",
+        "name": "nátierka s cícerom a červenou repou",
+        "grams": 40
+      },
+      {
+        "raw": "5 ks reďkovka",
+        "name": "reďkovka",
+        "grams": 85
+      },
+      {
+        "raw": "INGREDIENCIE 5 a ½ kus knäckebrot",
+        "name": "ingrediencie 5 a ½ kus knäckebrot",
+        "grams": 55
+      },
+      {
+        "raw": "1 balenie cottage cheese biely",
+        "name": "cottage cheese biely",
+        "grams": 180
+      },
+      {
+        "raw": "1 ČL pesto bazalkové BIO",
+        "name": "pesto bazalkové bio",
+        "grams": 9
+      }
+    ],
+    "sourceClients": [
+      "Radka D"
+    ],
+    "sourceFiles": [
+      "15.konvertovany strav.pl Radka D.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Pokrájajte ananás, pridajte mlieko/jogurt, tvaroh, semienka a rozmixujte dohladka.",
+    "slot": "ranajky",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "6 PL tvaroh tučný",
+        "name": "tvaroh tučný",
+        "grams": 102
+      },
+      {
+        "raw": "9 a ½ PL jogurt bielkovinový napr. Skyr Pilos",
+        "name": "jogurt bielkovinový",
+        "grams": 190
+      },
+      {
+        "raw": "1 koliesko ananás",
+        "name": "ananás",
+        "grams": 140
+      },
+      {
+        "raw": "tvaroh tučný chia semienka ½ ČL chia semienka",
+        "name": "tvaroh tučný chia semienka ½ čl chia semienka",
+        "grams": 1.5
+      },
+      {
+        "raw": "INGREDIENCIE 1 a ½ stredný kus banány",
+        "name": "ingrediencie 1 a ½ stredný kus banány",
+        "grams": 135
+      },
+      {
+        "raw": "6 ks orechy vlašské",
+        "name": "orechy vlašské",
+        "grams": 18
+      },
+      {
+        "raw": "½ balenie jogurt bielkovinový napr. Skyr Pilos",
+        "name": "jogurt bielkovinový",
+        "grams": 70
+      },
+      {
+        "raw": "2 ČL chia semienka",
+        "name": "chia semienka",
+        "grams": 6
+      }
+    ],
+    "sourceClients": [
+      "Radka D"
+    ],
+    "sourceFiles": [
+      "15.konvertovany strav.pl Radka D.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Pomaranč, pomelo a banán nakrájajte na kúsky. Posypte semienkami/mandľami a hrozienkami.",
+    "slot": "desiata",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "12 ks mandle",
+        "name": "mandle",
+        "grams": 12
+      },
+      {
+        "raw": "½ kus pomaranče",
+        "name": "pomaranče",
+        "grams": 105
+      },
+      {
+        "raw": "½ menší kus banány",
+        "name": "banány",
+        "grams": 32.5
+      },
+      {
+        "raw": "60 g pomelo 7 x kus hrozienka",
+        "name": "g pomelo 7 x kus hrozienka",
+        "grams": 3.85
+      }
+    ],
+    "sourceClients": [
+      "Radka D"
+    ],
+    "sourceFiles": [
+      "15.konvertovany strav.pl Radka D.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Melón nakrájajte a konzumujte spolu s orechami.",
+    "slot": "desiata",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "2 plátok veľký melón červený",
+        "name": "melón červený",
+        "grams": 400
+      },
+      {
+        "raw": "4 ks orechy vlašské",
+        "name": "orechy vlašské",
+        "grams": 12
+      },
+      {
+        "raw": ". INGREDIENCIE 2 a ½ ks mrkva",
+        "name": "ingrediencie 2 a ½ ks mrkva",
+        "grams": 212.5
+      },
+      {
+        "raw": "6 ks mandle",
+        "name": "mandle",
+        "grams": 6
+      },
+      {
+        "raw": "1 ČL kokos mletý",
+        "name": "kokos mletý",
+        "grams": 5
+      },
+      {
+        "raw": "½ PL med včelí",
+        "name": "med včelí",
+        "grams": 9
+      },
+      {
+        "raw": "10 x kus hrozienka",
+        "name": "hrozienka",
+        "grams": 5.5
+      }
+    ],
+    "sourceClients": [
+      "Radka D"
+    ],
+    "sourceFiles": [
+      "15.konvertovany strav.pl Radka D.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Ovocie konzumujte spolu s orechami, pokiaľ recept uvádza.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "10 ks orechy kešu",
+        "name": "orechy kešu",
+        "grams": 15
+      },
+      {
+        "raw": "1 a ½ plátok veľký melón červený",
+        "name": "melón červený",
+        "grams": 300
+      }
+    ],
+    "sourceClients": [
+      "Radka D"
+    ],
+    "sourceFiles": [
+      "15.konvertovany strav.pl Radka D.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Do mixéra vložte zmrazené jahody, banán, kešu, pridajte trochu vody a rozmixujte.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "1 a ½ menší kus banány",
+        "name": "banány",
+        "grams": 97.5
+      },
+      {
+        "raw": "9 ks orechy kešu",
+        "name": "orechy kešu",
+        "grams": 13.5
+      },
+      {
+        "raw": "11 ks mandle",
+        "name": "mandle",
+        "grams": 11
+      }
+    ],
+    "sourceClients": [
+      "Radka D"
+    ],
+    "sourceFiles": [
+      "15.konvertovany strav.pl Radka D.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Proteínový šejk vypite. V prípade, že recept uvádza, konzumujte spolu s banánom.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "½ dávka protein milk shake vanilka napr. Maxsport",
+        "name": "protein milk shake vanilka",
+        "grams": 155
+      },
+      {
+        "raw": "1 stredný kus banány",
+        "name": "banány",
+        "grams": 90
+      }
+    ],
+    "sourceClients": [
+      "Radka D"
+    ],
+    "sourceFiles": [
+      "15.konvertovany strav.pl Radka D.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Zavináče konzumujte s pečivom. Prípadne aj spolu s cibuľou, ak uvádza recept.",
+    "slot": "vecera",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "3 x kus zavináče napr. ALBERT",
+        "name": "zavináče",
+        "grams": 321
+      },
+      {
+        "raw": "1 a ½ x krajec chlieb celozrnný pšeničný “graham”",
+        "name": "chlieb celozrnný pšeničný “graham”",
+        "grams": 75
+      },
+      {
+        "raw": "½ x stredne veľká cibuľa",
+        "name": "cibuľa",
+        "grams": 37.5
+      }
+    ],
+    "sourceClients": [
+      "Radka D"
+    ],
+    "sourceFiles": [
+      "15.konvertovany strav.pl Radka D.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Nátierku pripravte podľa receptu nižšie. Podávajte s pečivom. Konzumujte so zeleninou.",
+    "slot": "ranajky",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "1 ks uhorky",
+        "name": "uhorky",
+        "grams": 300
+      },
+      {
+        "raw": "6 ks reďkovka",
+        "name": "reďkovka",
+        "grams": 102
+      }
+    ],
+    "sourceClients": [
+      "Radka I"
+    ],
+    "sourceFiles": [
+      "16.konvertovany strav.p Radka I.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Cesto pripravte podľa návodu nižšie (hmotnosť cesta je uvádzaná v surovom stave).",
+    "slot": "vecera",
+    "prepMinutes": 3,
+    "instructions": "Do keramickej misy na dno rozdrobte čerstvý kozí syr a hotové scedené halušky naň položte a premiešajte. Na panvici rozpustite maslo a orestujte prelisovaný cesnak. Pridajte umyté osušené špenátové listy nasekané na drobno a krátko orestujte cca 3 minúty. Dochuťte štipkou soli a mletým korením z mlynčeka. Halušky presuňte na panvicu  a zmiešajte so špenátom. Konzumujte teplé, posypané nasekaným čerstvým medvedím cesnakom (ak nemáte k dispozíci medvedí cesnak, použite pažitku alebo vňať). Pokiaľ recept uvádza, zapite mliekom.\nbylinky, korenie, medvedí cesnak, vňať, pažitka (ak na prísady nie ste alergická)",
+    "ingredients": [
+      {
+        "raw": "1 a ½ x ČL živočíšne maslo",
+        "name": "živočíšne maslo",
+        "grams": 7.5
+      },
+      {
+        "raw": "špenát",
+        "name": "špenát",
+        "grams": 60
+      },
+      {
+        "raw": "1 strúčik cesnak",
+        "name": "cesnak",
+        "grams": 3
+      }
+    ],
+    "sourceClients": [
+      "Radka I"
+    ],
+    "sourceFiles": [
+      "16.konvertovany strav.p Radka I.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Recept pripavte podľa návodu nižšie. Pridajte nastrúhaný syr (ak uvádza recept).",
+    "slot": "vecera",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "2 x porcia Ľahká zemiaková polievka",
+        "name": "ľahká zemiaková polievka",
+        "grams": 660
+      }
+    ],
+    "sourceClients": [
+      "Radka I"
+    ],
+    "sourceFiles": [
+      "16.konvertovany strav.p Radka I.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Všetky ingrediencie zmixujte, vylejte do pohára.",
+    "slot": "ranajky",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "6 dl mlieko polotučné",
+        "name": "mlieko polotučné",
+        "grams": 600
+      },
+      {
+        "raw": "1 PL arašidové maslo",
+        "name": "arašidové maslo",
+        "grams": 17
+      },
+      {
+        "raw": "½ ks banány",
+        "name": "banány",
+        "grams": 65
+      },
+      {
+        "raw": "5 ks orechy kešu",
+        "name": "orechy kešu",
+        "grams": 7.5
+      },
+      {
+        "raw": "½ PL med včelí",
+        "name": "med včelí",
+        "grams": 9
+      }
+    ],
+    "sourceClients": [
+      "Simona H"
+    ],
+    "sourceFiles": [
+      "17.konvertovany strav.p Simona H.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Pokrájajte ananás, pridajte mlieko/jogurt, tvaroh, semienka a rozmixujte dohladka.",
+    "slot": "ranajky",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "6 a ½ PL tvaroh tučný",
+        "name": "tvaroh tučný",
+        "grams": 110.5
+      },
+      {
+        "raw": "2 koliesko ananás",
+        "name": "ananás",
+        "grams": 280
+      },
+      {
+        "raw": "3 a ½ dl mlieko odtučnené/odstredené",
+        "name": "mlieko odtučnené/odstredené",
+        "grams": 350
+      },
+      {
+        "raw": "½ ČL konopné semienka lúpané napr. Bio Nebio",
+        "name": "konopné semienka lúpané",
+        "grams": 1.75
+      }
+    ],
+    "sourceClients": [
+      "Simona H"
+    ],
+    "sourceFiles": [
+      "17.konvertovany strav.p Simona H.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Cesto pripravte podľa návodu nižšie (hmotnosť cesta je uvádzaná v surovom stave).",
+    "slot": "obed",
+    "prepMinutes": 3,
+    "instructions": "Do keramickej misy na dno rozdrobte čerstvý kozí syr a hotové, scedené halušky naň položte a premiešajte. Na panvici na tuku orestujte pretlačený cesnak. Pridajte umyté osušené špenátové listy nasekané na drobno a krátko orestujte cca 3 minúty. Dochuťte štipkou soli a mletým korením z mlynčeka. Halušky presuňte na panvicu a zmiešajte so špenátom. Konzumujte teplé, posypané nasekaným čerstvým medvedím cesnakom (ak nemáte k dispozíci medvedí cesnak, použite pažitku alebo vňať). Pokiaľ recept uvádza, zapite mliekom.\nbylinky, korenie, vňať, pažitka (ak na prísady nie ste alergická)",
+    "ingredients": [
+      {
+        "raw": "špenát",
+        "name": "špenát",
+        "grams": 40
+      },
+      {
+        "raw": "35 g medvedí cesnak 1 strúčik cesnak",
+        "name": "g medvedí cesnak 1 strúčik cesnak",
+        "grams": 3
+      }
+    ],
+    "sourceClients": [
+      "Simona H"
+    ],
+    "sourceFiles": [
+      "17.konvertovany strav.p Simona H.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Ľanové semienka, mak a oriešky pomeľte a zmiešajte s medom. Nechajte stuhnúť v chladničke.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "1 PL med včelí",
+        "name": "med včelí",
+        "grams": 18
+      },
+      {
+        "raw": "8 ks mandle",
+        "name": "mandle",
+        "grams": 8
+      },
+      {
+        "raw": "7 g mak 1 a ½ ČL ľanové semená",
+        "name": "g mak 1 a ½ čl ľanové semená",
+        "grams": 4.5
+      }
+    ],
+    "sourceClients": [
+      "Simona H"
+    ],
+    "sourceFiles": [
+      "17.konvertovany strav.p Simona H.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Na pečivo natrite nátierku, obložte plátkom syra a konzumujte so zeleninou.",
+    "slot": "ranajky",
+    "prepMinutes": null,
+    "instructions": "bylinky (ak na prísady nie ste alergická)",
+    "ingredients": [
+      {
+        "raw": "syr eidam, 30 % t. v s. neúdený",
+        "name": "syr eidam,",
+        "grams": 44
+      },
+      {
+        "raw": "5 ČL nátierka s cícerom a červenou repou napr. Lidl",
+        "name": "nátierka s cícerom a červenou repou",
+        "grams": 40
+      },
+      {
+        "raw": "6 ks reďkovka",
+        "name": "reďkovka",
+        "grams": 102
+      }
+    ],
+    "sourceClients": [
+      "Stanislava J"
+    ],
+    "sourceFiles": [
+      "18.konvertovany strav.p Stanislava J.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Ovocie na desiatu konzumujte spolu s orechami, pokiaľ ich recept uvádza.",
+    "slot": "desiata",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "2 plátok veľký melón červený",
+        "name": "melón červený",
+        "grams": 400
+      },
+      {
+        "raw": "9 ks orechy kešu",
+        "name": "orechy kešu",
+        "grams": 13.5
+      }
+    ],
+    "sourceClients": [
+      "Stanislava J"
+    ],
+    "sourceFiles": [
+      "18.konvertovany strav.p Stanislava J.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Jednoduché praktické jedlo v podobe ovocného jogurtu.",
+    "slot": "desiata",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "1 x balenie jogurt smotanový čučoriedkový napr. Choceňský",
+        "name": "jogurt smotanový čučoriedkový",
+        "grams": 150
+      }
+    ],
+    "sourceClients": [
+      "Stanislava J"
+    ],
+    "sourceFiles": [
+      "18.konvertovany strav.p Stanislava J.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Vypite proteínový šejk spolu s banánom (pokiaľ recept banán uvádza).",
+    "slot": "desiata",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "1 ks banány",
+        "name": "banány",
+        "grams": 130
+      },
+      {
+        "raw": "½ dávka protein milk shake vanilka napr. Maxsport",
+        "name": "protein milk shake vanilka",
+        "grams": 155
+      },
+      {
+        "raw": "INGREDIENCIE 1 stredný kus banány",
+        "name": "ingrediencie 1 stredný kus banány",
+        "grams": 90
+      },
+      {
+        "raw": "1 a ½ PL mliečny proteín napr. WHEY",
+        "name": "mliečny proteín",
+        "grams": 15
+      },
+      {
+        "raw": "1 ČL olivový olej",
+        "name": "olivový olej",
+        "grams": 5
+      },
+      {
+        "raw": "špenát napr. Chef menu",
+        "name": "špenát",
+        "grams": 20
+      }
+    ],
+    "sourceClients": [
+      "Stanislava J"
+    ],
+    "sourceFiles": [
+      "18.konvertovany strav.p Stanislava J.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Melón nakrájajte a konzumujte spolu s orechami.",
+    "slot": "desiata",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "2 a ½ plátok veľký melón červený",
+        "name": "melón červený",
+        "grams": 500
+      },
+      {
+        "raw": "9 ks mandle",
+        "name": "mandle",
+        "grams": 9
+      },
+      {
+        "raw": "8 ks orechy kešu",
+        "name": "orechy kešu",
+        "grams": 12
+      }
+    ],
+    "sourceClients": [
+      "Stanislava J"
+    ],
+    "sourceFiles": [
+      "18.konvertovany strav.p Stanislava J.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Pomaranč, pomelo a banán nakrájajte na kúsky. Posypte semienkami/mandľami a hrozienkami.",
+    "slot": "desiata",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "10 ks mandle",
+        "name": "mandle",
+        "grams": 10
+      },
+      {
+        "raw": "½ kus pomaranče",
+        "name": "pomaranče",
+        "grams": 105
+      },
+      {
+        "raw": "100 g pomelo ½ menší kus banány",
+        "name": "g pomelo ½ menší kus banány",
+        "grams": 32.5
+      },
+      {
+        "raw": "5 x kus hrozienka",
+        "name": "hrozienka",
+        "grams": 3.3
+      }
+    ],
+    "sourceClients": [
+      "Stanislava J"
+    ],
+    "sourceFiles": [
+      "18.konvertovany strav.p Stanislava J.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Do mixéra vložte banán spolu s avokádom a karobom. Rozmixujte na puding.",
+    "slot": "desiata",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "1 a ½ menší kus banány",
+        "name": "banány",
+        "grams": 97.5
+      }
+    ],
+    "sourceClients": [
+      "Stanislava J"
+    ],
+    "sourceFiles": [
+      "18.konvertovany strav.p Stanislava J.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Jednoduché praktické jedlo pozostávajúce z proteínového keksu/tyčinky.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "½ x tyčinka proteínová tyčinka 25 % napr. Excelent Protein Bar",
+        "name": "tyčinka proteínová tyčinka",
+        "grams": 42.5
+      },
+      {
+        "raw": "7 ks orechy lieskové",
+        "name": "orechy lieskové",
+        "grams": 7
+      },
+      {
+        "raw": "2 ČL med včelí",
+        "name": "med včelí",
+        "grams": 14
+      },
+      {
+        "raw": "1 ČL ľanové semená",
+        "name": "ľanové semená",
+        "grams": 3
+      }
+    ],
+    "sourceClients": [
+      "Stanislava J"
+    ],
+    "sourceFiles": [
+      "18.konvertovany strav.p Stanislava J.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Proteínový šejk vypite. V prípade, že recept uvádza, konzumujte spolu s banánom.",
+    "slot": "olovrant",
+    "prepMinutes": 15,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "½ dávka protein milkshake čokoláda napr. Maxsport",
+        "name": "protein milkshake čokoláda",
+        "grams": 155
+      },
+      {
+        "raw": "1 stredný kus banány",
+        "name": "banány",
+        "grams": 90
+      },
+      {
+        "raw": "INGREDIENCIE 2 a ½ kus knäckebrot",
+        "name": "ingrediencie 2 a ½ kus knäckebrot",
+        "grams": 25
+      },
+      {
+        "raw": "1 ČL olivový olej",
+        "name": "olivový olej",
+        "grams": 5
+      }
+    ],
+    "sourceClients": [
+      "Stanislava J"
+    ],
+    "sourceFiles": [
+      "18.konvertovany strav.p Stanislava J.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Do mixéra vložte banány spolu s avokádom a karobom. Rozmixujte na puding. Pridajte tvaroh.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "4 a ½ PL tvaroh jemný hrudkový 2,5 % napr. Pilos",
+        "name": "tvaroh jemný hrudkový",
+        "grams": 76.5
+      },
+      {
+        "raw": "1 menší kus banány",
+        "name": "banány",
+        "grams": 65
+      },
+      {
+        "raw": "INGREDIENCIE 30 g avokádo 8 ks jahody záhradné",
+        "name": "ingrediencie 30 g avokádo 8 ks jahody záhradné",
+        "grams": 104
+      },
+      {
+        "raw": "½ stredný kus banány",
+        "name": "banány",
+        "grams": 45
+      },
+      {
+        "raw": "1 PL hrachový proteín - prášok",
+        "name": "hrachový proteín",
+        "grams": 10
+      },
+      {
+        "raw": "1 dl kokosový nápoj",
+        "name": "kokosový nápoj",
+        "grams": 100
+      }
+    ],
+    "sourceClients": [
+      "Stanislava J"
+    ],
+    "sourceFiles": [
+      "18.konvertovany strav.p Stanislava J.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Ovocie konzumujte spolu s orechami, ak sú v recepte uvedené.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "1 ks grapefruity",
+        "name": "grapefruity",
+        "grams": 282
+      },
+      {
+        "raw": "15 ks arašidy",
+        "name": "arašidy",
+        "grams": 15
+      }
+    ],
+    "sourceClients": [
+      "konvertovany str.p. Veronika S"
+    ],
+    "sourceFiles": [
+      "19.konvertovany str.p. Veronika S.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Chlebíček (jeden váži približne 8 gramov) zapite mliekom.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "3 a ½ dl sójové mlieko",
+        "name": "sójové mlieko",
+        "grams": 350
+      },
+      {
+        "raw": "2 a ½ x krúžok celozrnné chlebíčky - ryžové so sójou napr. Bona Vita Active",
+        "name": "krúžok celozrnné chlebíčky - ryžové so sójou",
+        "grams": 20
+      },
+      {
+        "raw": "NÁPOJE 3 a ½ dl sójové mlieko",
+        "name": "nápoje 3 a ½ dl sójové mlieko",
+        "grams": 350
+      }
+    ],
+    "sourceClients": [
+      "konvertovany str.p. Veronika S"
+    ],
+    "sourceFiles": [
+      "19.konvertovany str.p. Veronika S.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Do mixéra vložte zmrazené jahody, banán, kešu, pridajte trochu vody a rozmixujte.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "14 ks orechy kešu",
+        "name": "orechy kešu",
+        "grams": 21
+      },
+      {
+        "raw": "1 menší kus banány",
+        "name": "banány",
+        "grams": 65
+      },
+      {
+        "raw": "INGREDIENCIE 1 kus pomaranče",
+        "name": "pomaranč",
+        "grams": 210
+      },
+      {
+        "raw": "1 ČL olivový olej",
+        "name": "olivový olej",
+        "grams": 5
+      },
+      {
+        "raw": "1 ks mrkva",
+        "name": "mrkva",
+        "grams": 85
+      },
+      {
+        "raw": "2 ČL chia semienka",
+        "name": "chia semienka",
+        "grams": 6
+      },
+      {
+        "raw": "špenát listový",
+        "name": "špenát listový",
+        "grams": 40
+      }
+    ],
+    "sourceClients": [
+      "konvertovany str.p. Veronika S"
+    ],
+    "sourceFiles": [
+      "19.konvertovany str.p. Veronika S.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Recept pripravte podľa návodu uvedeného nižšie. Konzumujte predpísanú porciu.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "1 kus pomarančový koláč s kakaom",
+        "name": "pomarančový koláč s kakaom",
+        "grams": 90
+      }
+    ],
+    "sourceClients": [
+      "konvertovany str.p. Veronika S"
+    ],
+    "sourceFiles": [
+      "19.konvertovany str.p. Veronika S.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Pokrájajte ananás, pridajte mlieko/jogurt, tvaroh, semienka a rozmixujte dohladka.",
+    "slot": "ranajky",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "10 a ½ PL jogurt bielkovinový napr. Skyr Pilos",
+        "name": "jogurt bielkovinový",
+        "grams": 210
+      },
+      {
+        "raw": "6 a ½ PL tvaroh tučný",
+        "name": "tvaroh tučný",
+        "grams": 110.5
+      },
+      {
+        "raw": "1 koliesko ananás",
+        "name": "ananás",
+        "grams": 140
+      },
+      {
+        "raw": "jogurt bielkovinový chia semienka ½ ČL chia semienka",
+        "name": "jogurt bielkovinový chia semienka ½ čl chia semienka",
+        "grams": 1.5
+      }
+    ],
+    "sourceClients": [
+      "andrea demkova"
+    ],
+    "sourceFiles": [
+      "2.konvertovany stravovaci plan _ andrea demkova.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Všetky ingrediencie zmixujte a vylejte do pohára.",
+    "slot": "ranajky",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "4 a ½ dl mandľové mlieko",
+        "name": "mandľové mlieko",
+        "grams": 450
+      },
+      {
+        "raw": "1 PL arašidové maslo",
+        "name": "arašidové maslo",
+        "grams": 17
+      },
+      {
+        "raw": "1 menší kus banány",
+        "name": "banány",
+        "grams": 65
+      },
+      {
+        "raw": "6 ks orechy kešu",
+        "name": "orechy kešu",
+        "grams": 9
+      },
+      {
+        "raw": "mandľové mlieko ½ PL javorový sirup",
+        "name": "mandľové mlieko ½ pl javorový sirup",
+        "grams": 6
+      }
+    ],
+    "sourceClients": [
+      "andrea demkova"
+    ],
+    "sourceFiles": [
+      "2.konvertovany stravovaci plan _ andrea demkova.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Všetky ingrediencie dajte do misky a jemne premiešajte.",
+    "slot": "ranajky",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "2 x balenie jogurt kozí biely napr. Leeb",
+        "name": "jogurt kozí biely",
+        "grams": 250
+      },
+      {
+        "raw": "8 PL maliny",
+        "name": "maliny",
+        "grams": 168
+      },
+      {
+        "raw": "1 a ½ ČL kakaový prášok, 12 % obsah tuku",
+        "name": "kakaový prášok,",
+        "grams": 12
+      },
+      {
+        "raw": "2 ČL javorový sirup",
+        "name": "javorový sirup",
+        "grams": 8
+      }
+    ],
+    "sourceClients": [
+      "andrea demkova"
+    ],
+    "sourceFiles": [
+      "2.konvertovany stravovaci plan _ andrea demkova.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Nátierku pripravte podľa receptu nižšie. Podávajte s pečivom.",
+    "slot": "ranajky",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "3 x krajec chlieb celozrnný pšeničný “graham”",
+        "name": "chlieb celozrnný pšeničný “graham”",
+        "grams": 150
+      },
+      {
+        "raw": "70 g švédska nátierka ( postup prípravy nižšie) švédska nátierka chlieb celozrnný...",
+        "name": "švédska nátierka švédska nátierka chlieb celozrnný...",
+        "grams": 70
+      }
+    ],
+    "sourceClients": [
+      "konvetovany str.p Veroniak T"
+    ],
+    "sourceFiles": [
+      "20.konvetovany str.p Veroniak T.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Marhule umyte, odkôstkujte a rozmixujte spolu s ostatnými ingredienciami v recepte.",
+    "slot": "desiata",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "1 dl mlieko ovčie",
+        "name": "mlieko ovčie",
+        "grams": 100
+      },
+      {
+        "raw": "3 x stredný kus marhule",
+        "name": "marhule",
+        "grams": 180
+      },
+      {
+        "raw": "špenát",
+        "name": "špenát",
+        "grams": 20
+      }
+    ],
+    "sourceClients": [
+      "konvetovany str.p Veroniak T"
+    ],
+    "sourceFiles": [
+      "20.konvetovany str.p Veroniak T.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Ovocie konzumujte spolu s orechami, ak sú v recepte uvedené.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "2 plátok veľký melón červený",
+        "name": "melón červený",
+        "grams": 400
+      },
+      {
+        "raw": "15 ks arašidy",
+        "name": "arašidy",
+        "grams": 15
+      }
+    ],
+    "sourceClients": [
+      "konvetovany str.p Veroniak T"
+    ],
+    "sourceFiles": [
+      "20.konvetovany str.p Veroniak T.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Do mixéra vložte zmrazené jahody, banán, kešu, pridajte trochu vody a rozmixujte.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "1 a ½ menší kus banány",
+        "name": "banány",
+        "grams": 97.5
+      },
+      {
+        "raw": "9 ks orechy kešu",
+        "name": "orechy kešu",
+        "grams": 13.5
+      },
+      {
+        "raw": "INGREDIENCIE 1 kus pomaranče",
+        "name": "pomaranč",
+        "grams": 210
+      },
+      {
+        "raw": "½ PL ľanový olej lisovaný za studena",
+        "name": "ľanový olej lisovaný za studena",
+        "grams": 6
+      },
+      {
+        "raw": "1 ks mrkva",
+        "name": "mrkva",
+        "grams": 85
+      },
+      {
+        "raw": "½ ČL chia semienka",
+        "name": "chia semienka",
+        "grams": 1.5
+      },
+      {
+        "raw": "špenát napr. Chef menu",
+        "name": "špenát",
+        "grams": 10
+      }
+    ],
+    "sourceClients": [
+      "konvetovany str.p Veroniak T"
+    ],
+    "sourceFiles": [
+      "20.konvetovany str.p Veroniak T.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Mango, ľadový šalát a slnečnicové semienka rozmixujte na hustý krém a posypte mandľami.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "190 g mango 6 ks mandle",
+        "name": "g mango 6 ks mandle",
+        "grams": 6
+      },
+      {
+        "raw": "1 ČL slnečnicové semená",
+        "name": "slnečnicové semená",
+        "grams": 4
+      },
+      {
+        "raw": "ľadový šalát",
+        "name": "ľadový šalát",
+        "grams": 40
+      }
+    ],
+    "sourceClients": [
+      "konvetovany str.p Veroniak T"
+    ],
+    "sourceFiles": [
+      "20.konvetovany str.p Veroniak T.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Ľanové semienka, mak, oriešky pomeľte a zmiešajte s medom. Nechajte stuhnúť v chladničke.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "17 ks orechy lieskové",
+        "name": "orechy lieskové",
+        "grams": 17
+      },
+      {
+        "raw": "1 PL med včelí",
+        "name": "med včelí",
+        "grams": 18
+      },
+      {
+        "raw": "½ PL - zarovnaná mak",
+        "name": "mak",
+        "grams": 7.5
+      },
+      {
+        "raw": "2 ČL ľanové semená",
+        "name": "ľanové semená",
+        "grams": 6
+      }
+    ],
+    "sourceClients": [
+      "konvertovany str.p Zuzana M"
+    ],
+    "sourceFiles": [
+      "21.konvertovany str.p Zuzana M.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Chlebíček (jeden váži približne 8 gramov) zapite mliekom.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "4 dl sójové mlieko",
+        "name": "sójové mlieko",
+        "grams": 400
+      }
+    ],
+    "sourceClients": [
+      "konvertovany str.p Zuzana M"
+    ],
+    "sourceFiles": [
+      "21.konvertovany str.p Zuzana M.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Do mixéru vložte zmrazené jahody, banán, kešu, pridajte trochu vody a rozmixujte.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "2 a ½ menší kus banány",
+        "name": "banány",
+        "grams": 162.5
+      },
+      {
+        "raw": "11 ks orechy kešu",
+        "name": "orechy kešu",
+        "grams": 16.5
+      },
+      {
+        "raw": "7 x kus mrazené jahody",
+        "name": "mrazené jahody",
+        "grams": 100
+      }
+    ],
+    "sourceClients": [
+      "konvertovany str.p Zuzana M"
+    ],
+    "sourceFiles": [
+      "21.konvertovany str.p Zuzana M.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Ovocie konzumujte spolu s orechami a jogurtom, pokiaľ recept uvádza.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "16 a ½ PL jogurt sójovo-kokosový napr. Provamel",
+        "name": "jogurt sójovo-kokosový",
+        "grams": 330
+      },
+      {
+        "raw": "2 plátok veľký melón cukrový",
+        "name": "melón cukrový",
+        "grams": 400
+      }
+    ],
+    "sourceClients": [
+      "konvertovany str.p Zuzana M"
+    ],
+    "sourceFiles": [
+      "21.konvertovany str.p Zuzana M.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Zeleninu môžete deň vopred očistiť, nakrájať a uložiť v miske do chladničky.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "2 ks kaleráb",
+        "name": "kaleráb",
+        "grams": 540
+      },
+      {
+        "raw": "14 ks orechy kešu",
+        "name": "orechy kešu",
+        "grams": 21
+      },
+      {
+        "raw": "2 ks mrkva",
+        "name": "mrkva",
+        "grams": 170
+      },
+      {
+        "raw": "INGREDIENCIE 1 a ½ ks jablká",
+        "name": "ingrediencie 1 a ½ ks jablká",
+        "grams": 255
+      },
+      {
+        "raw": "12 ks orechy lieskové",
+        "name": "orechy lieskové",
+        "grams": 12
+      },
+      {
+        "raw": "1 ks mrkva",
+        "name": "mrkva",
+        "grams": 85
+      },
+      {
+        "raw": "½ PL med",
+        "name": "med",
+        "grams": 9
+      }
+    ],
+    "sourceClients": [
+      "konvertovany str.p Zuzana M"
+    ],
+    "sourceFiles": [
+      "21.konvertovany str.p Zuzana M.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Na pečivo natrite nátierku, obložte plátkom syra a konzumujte so zeleninou.",
+    "slot": "ranajky",
+    "prepMinutes": 3,
+    "instructions": "bylinky (ak na prísady nie ste alergická)",
+    "ingredients": [
+      {
+        "raw": "syr eidam, 30 % t. v s. neúdený",
+        "name": "syr eidam,",
+        "grams": 33
+      },
+      {
+        "raw": "5 ČL nátierka s cícerom a červenou repou napr. Lidl",
+        "name": "nátierka s cícerom a červenou repou",
+        "grams": 40
+      },
+      {
+        "raw": "5 ks cherry paradajky",
+        "name": "cherry paradajky",
+        "grams": 60
+      },
+      {
+        "raw": "INGREDIENCIE 2 ks slepačie vajce",
+        "name": "ingrediencie 2 ks slepačie vajce",
+        "grams": 110
+      },
+      {
+        "raw": "2 a ½ PL špaldová múka hladká",
+        "name": "špaldová múka hladká",
+        "grams": 30
+      },
+      {
+        "raw": "7 a ½ x 10 bobúľ čučoriedky",
+        "name": "čučoriedky",
+        "grams": 135
+      },
+      {
+        "raw": "½ dl mlieko polotučné 1,5 %",
+        "name": "mlieko polotučné",
+        "grams": 50
+      }
+    ],
+    "sourceClients": [
+      "Andrea F"
+    ],
+    "sourceFiles": [
+      "3.konvertovany strav.plan Andrea F.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Pokrájajte ananás, pridajte mlieko/jogurt, tvaroh, semienka a rozmixujte dohladka.",
+    "slot": "ranajky",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "6 PL tvaroh tučný",
+        "name": "tvaroh tučný",
+        "grams": 102
+      },
+      {
+        "raw": "9 a ½ PL jogurt bielkovinový napr. Skyr Pilos",
+        "name": "jogurt bielkovinový",
+        "grams": 190
+      },
+      {
+        "raw": "1 koliesko ananás",
+        "name": "ananás",
+        "grams": 140
+      },
+      {
+        "raw": "tvaroh tučný chia semienka ½ ČL chia semienka",
+        "name": "tvaroh tučný chia semienka ½ čl chia semienka",
+        "grams": 1.5
+      }
+    ],
+    "sourceClients": [
+      "Andrea F"
+    ],
+    "sourceFiles": [
+      "3.konvertovany strav.plan Andrea F.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Ovocie konzumujte spolu s orechami, pokiaľ recept uvádza.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "4 ks orechy vlašské",
+        "name": "orechy vlašské",
+        "grams": 12
+      },
+      {
+        "raw": "1 plátok veľký melón cukrový",
+        "name": "melón cukrový",
+        "grams": 200
+      }
+    ],
+    "sourceClients": [
+      "Andrea F"
+    ],
+    "sourceFiles": [
+      "3.konvertovany strav.plan Andrea F.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Melón nakrájajte a konzumujte spolu s orechami.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "5 ks orechy vlašské",
+        "name": "orechy vlašské",
+        "grams": 15
+      },
+      {
+        "raw": "1 plátok veľký melón červený",
+        "name": "melón červený",
+        "grams": 200
+      }
+    ],
+    "sourceClients": [
+      "Andrea F"
+    ],
+    "sourceFiles": [
+      "3.konvertovany strav.plan Andrea F.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Do mixéra vložte zmrazené jahody, banán, kešu, pridajte trochu vody a rozmixujte.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "9 ks orechy kešu",
+        "name": "orechy kešu",
+        "grams": 13.5
+      },
+      {
+        "raw": "1 menší kus banány",
+        "name": "banány",
+        "grams": 65
+      },
+      {
+        "raw": "INGREDIENCIE ½ x balenie cottage cheese",
+        "name": "ingrediencie ½ x balenie cottage cheese",
+        "grams": 90
+      },
+      {
+        "raw": "1 a ½ kus knäckebrot",
+        "name": "knäckebrot",
+        "grams": 15
+      },
+      {
+        "raw": "½ ČL pesto bazalkové BIO",
+        "name": "pesto bazalkové bio",
+        "grams": 4.5
+      }
+    ],
+    "sourceClients": [
+      "Andrea F"
+    ],
+    "sourceFiles": [
+      "3.konvertovany strav.plan Andrea F.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Pokrájajte ananás, pridajte mlieko/jogurt, tvaroh, semienka a rozmixujte dohladka.",
+    "slot": "ranajky",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "9 a ½ PL jogurt bielkovinový napr. Skyr Pilos",
+        "name": "jogurt bielkovinový",
+        "grams": 190
+      },
+      {
+        "raw": "5 a ½ PL tvaroh tučný",
+        "name": "tvaroh tučný",
+        "grams": 93.5
+      },
+      {
+        "raw": "1 koliesko ananás",
+        "name": "ananás",
+        "grams": 140
+      },
+      {
+        "raw": "2 a ½ x malá konzerva tuniak vo vlastnej šťave",
+        "name": "konzerva tuniak vo vlastnej šťave",
+        "grams": 140
+      },
+      {
+        "raw": "1 a ½ ČL živočíšne maslo",
+        "name": "živočíšne maslo",
+        "grams": 10.5
+      },
+      {
+        "raw": "jarná cibuľka",
+        "name": "jarná cibuľka",
+        "grams": 66
+      },
+      {
+        "raw": "2 ČL horčica plnotučná",
+        "name": "horčica plnotučná",
+        "grams": 18
+      }
+    ],
+    "sourceClients": [
+      "konvetovany strav.plan Andrea P"
+    ],
+    "sourceFiles": [
+      "4.konvetovany strav.plan Andrea P.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Všetky ingrediencie dajte do misky a jemne premiešajte.",
+    "slot": "ranajky",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "2 x balenie jogurt kozí biely napr. Leeb",
+        "name": "jogurt kozí biely",
+        "grams": 250
+      },
+      {
+        "raw": "7 PL maliny",
+        "name": "maliny",
+        "grams": 147
+      },
+      {
+        "raw": "1 a ½ ČL med včelí",
+        "name": "med včelí",
+        "grams": 10.5
+      },
+      {
+        "raw": "1 ČL kakaový prášok, 12 % obsah tuku",
+        "name": "kakaový prášok,",
+        "grams": 8
+      }
+    ],
+    "sourceClients": [
+      "konvetovany strav.plan Andrea P"
+    ],
+    "sourceFiles": [
+      "4.konvetovany strav.plan Andrea P.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Jogurt vylejte do misky, pridajte chia semienka a ovocie.",
+    "slot": "ranajky",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "2 x balenie jogurt biely napr. Rajo Active Protein",
+        "name": "jogurt biely",
+        "grams": 360
+      },
+      {
+        "raw": "2 ks kiwi",
+        "name": "kiwi",
+        "grams": 178
+      },
+      {
+        "raw": "2 ČL chia semienka",
+        "name": "chia semienka",
+        "grams": 6
+      },
+      {
+        "raw": "3 a ½ dl mlieko polotučné",
+        "name": "mlieko polotučné",
+        "grams": 350
+      },
+      {
+        "raw": "1 a ½ PL tvaroh jemný hrudkový 2,5 % napr. Pilos",
+        "name": "tvaroh jemný hrudkový",
+        "grams": 25.5
+      },
+      {
+        "raw": "2 x 5 bobúľ čučoriedky",
+        "name": "čučoriedky",
+        "grams": 18
+      }
+    ],
+    "sourceClients": [
+      "konvetovany strav.plan Andrea P"
+    ],
+    "sourceFiles": [
+      "4.konvetovany strav.plan Andrea P.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Na pečivo natrite nátierku, obložte plátkom syra a konzumujte so zeleninou.",
+    "slot": "ranajky",
+    "prepMinutes": 2,
+    "instructions": "bylinky (ak na prísady nie ste alergická)",
+    "ingredients": [
+      {
+        "raw": "syr eidam, 30 % t. v s. neúdený",
+        "name": "syr eidam,",
+        "grams": 33
+      },
+      {
+        "raw": "5 ks reďkovka",
+        "name": "reďkovka",
+        "grams": 85
+      },
+      {
+        "raw": "INGREDIENCIE 4 PL pohánkové vločky napr. Bioharmonie",
+        "name": "ingrediencie 4 pl pohánkové vločky",
+        "grams": 44
+      },
+      {
+        "raw": "1 a ½ dl acidofilné mlieko plnotučné napr. Fidko Zvolenský",
+        "name": "acidofilné mlieko plnotučné",
+        "grams": 150
+      },
+      {
+        "raw": "1 a ½ ČL kokos mletý",
+        "name": "kokos mletý",
+        "grams": 7.5
+      },
+      {
+        "raw": "1 a ½ PL vegánsky proteín napr. Weider brownie pohánkové vločky maliny 23% acidofilné mlieko... chocolate",
+        "name": "vegánsky proteín",
+        "grams": 15
+      },
+      {
+        "raw": "2 PL maliny",
+        "name": "maliny",
+        "grams": 42
+      }
+    ],
+    "sourceClients": [
+      "konvetovany strav.plan Andrea P"
+    ],
+    "sourceFiles": [
+      "4.konvetovany strav.plan Andrea P.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Vypite proteínový šejk spolu s banánom (pokiaľ recept banán uvádza).",
+    "slot": "desiata",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "1 dávka protein milkshake čokoláda napr. Maxsport",
+        "name": "protein milkshake čokoláda",
+        "grams": 310
+      }
+    ],
+    "sourceClients": [
+      "konvetovany strav.plan Andrea P"
+    ],
+    "sourceFiles": [
+      "4.konvetovany strav.plan Andrea P.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Do mixéra vložte banány spolu s avokádom a karobom. Rozmixujte na puding. Pridajte tvaroh.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "5 a ½ PL tvaroh jemný hrudkovitý 2,5 %",
+        "name": "tvaroh jemný hrudkovitý",
+        "grams": 93.5
+      },
+      {
+        "raw": "½ menší kus banány",
+        "name": "banány",
+        "grams": 32.5
+      }
+    ],
+    "sourceClients": [
+      "konvetovany strav.plan Andrea P"
+    ],
+    "sourceFiles": [
+      "4.konvetovany strav.plan Andrea P.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Proteínový šejk vypite. V prípade, že recept uvádza, konzumujte spolu s banánom.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "1 dávka protein milkshake čokoláda napr. Maxsport",
+        "name": "protein milkshake čokoláda",
+        "grams": 310
+      },
+      {
+        "raw": "INGREDIENCIE 2 dl mlieko plnotučné",
+        "name": "ingrediencie 2 dl mlieko plnotučné",
+        "grams": 200
+      },
+      {
+        "raw": "½ stredný kus banány",
+        "name": "banány",
+        "grams": 45
+      },
+      {
+        "raw": "40 g mrazené jahody mrazené jahod mlieko plnotučné",
+        "name": "mrazené jahody mrazené jahod mlieko plnotučné",
+        "grams": 40
+      }
+    ],
+    "sourceClients": [
+      "konvetovany strav.plan Andrea P"
+    ],
+    "sourceFiles": [
+      "4.konvetovany strav.plan Andrea P.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Jahodovú proteínovú zmrzlinu pripravte podľa receptu nižšie.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "155 g jahodová zmrzlina ( postup prípravy nižšie) 2.2 jahodová zmrzlina",
+        "name": "jahodová zmrzlina 2.2 jahodová zmrzlina",
+        "grams": 155
+      }
+    ],
+    "sourceClients": [
+      "konvetovany strav.plan Andrea P"
+    ],
+    "sourceFiles": [
+      "4.konvetovany strav.plan Andrea P.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Jednoduché praktické jedlo pozostávajúce z proteínového keksu/tyčinky.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "1 kus proteínová tyčinka 37 % napr. Nupo lieskový oriešok",
+        "name": "proteínová tyčinka",
+        "grams": 60
+      }
+    ],
+    "sourceClients": [
+      "konvetovany strav.plan Andrea P"
+    ],
+    "sourceFiles": [
+      "4.konvetovany strav.plan Andrea P.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Cesto pripravte podľa návodu nižšie (hmotnosť cesta je uvádzaná v surovom stave).",
+    "slot": "obed",
+    "prepMinutes": 3,
+    "instructions": "Do keramickej misy na dno rozdrobte čerstvý kozí syr a hotové, scedené halušky naň položte a premiešajte. Na panvici na tuku orestujte pretlačený cesnak. Pridajte umyté osušené špenátové listy nasekané na drobno a krátko orestujte cca 3 minúty. Dochuťte štipkou soli a mletým korením z mlynčeka. Halušky presuňte na panvicu a zmiešajte so špenátom. Konzumujte teplé, posypané nasekaným čerstvým medvedím cesnakom (ak nemáte k dispozíci medvedí cesnak, použite pažitku alebo vňať). Pokiaľ recept uvádza, zapite mliekom.\nbylinky, korenie, vňať, pažitka (ak na prísady nie ste alergická)",
+    "ingredients": [
+      {
+        "raw": "1 PL ghee maslo",
+        "name": "ghee maslo",
+        "grams": 17
+      },
+      {
+        "raw": "špenát",
+        "name": "špenát",
+        "grams": 20
+      },
+      {
+        "raw": "25 g medvedí cesnak ½ strúčik cesnak",
+        "name": "g medvedí cesnak ½ strúčik cesnak",
+        "grams": 1.5
+      }
+    ],
+    "sourceClients": [
+      "Beata Tr"
+    ],
+    "sourceFiles": [
+      "5.konvertovany strav. p. Beata Tr.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Koláč konzumujte spolu s nápojom, ak je v recepte uvedený.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "5 dl mlieko polotučné 1,5 %",
+        "name": "mlieko polotučné",
+        "grams": 500
+      },
+      {
+        "raw": "2 x kus Cuketový koláč s marhuľami",
+        "name": "cuketový koláč s marhuľami",
+        "grams": 200
+      },
+      {
+        "raw": "NÁPOJE 5 dl mlieko polotučné 1,5 %",
+        "name": "nápoje 5 dl mlieko polotučné",
+        "grams": 500
+      }
+    ],
+    "sourceClients": [
+      "Beata Tr"
+    ],
+    "sourceFiles": [
+      "5.konvertovany strav. p. Beata Tr.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Guľky pripravte podľa receptu nižšie. Zapite mliekom, pokiaľ máte uvedené.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "2 ks Pšenové guľky",
+        "name": "pšenové guľky",
+        "grams": 80
+      },
+      {
+        "raw": "3 dl mlieko polotučné 1,5 %",
+        "name": "mlieko polotučné",
+        "grams": 300
+      },
+      {
+        "raw": "NÁPOJE 3 dl mlieko polotučné 1,5 %",
+        "name": "mlieko polotučné",
+        "grams": 300
+      }
+    ],
+    "sourceClients": [
+      "Beata Tr"
+    ],
+    "sourceFiles": [
+      "5.konvertovany strav. p. Beata Tr.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Cesto pripravte podľa návodu nižšie (hmotnosť cesta je uvádzaná v surovom stave).",
+    "slot": "vecera",
+    "prepMinutes": 3,
+    "instructions": "Do keramickej misy na dno rozdrobte čerstvý kozí syr a hotové scedené halušky naň položte a premiešajte. Na panvici rozpustite maslo a orestujte prelisovaný cesnak. Pridajte umyté osušené špenátové listy nasekané na drobno a krátko orestujte cca 3 minúty. Dochuťte štipkou soli a mletým korením z mlynčeka. Halušky presuňte na panvicu  a zmiešajte so špenátom. Konzumujte teplé, posypané nasekaným čerstvým medvedím cesnakom (ak nemáte k dispozíci medvedí cesnak, použite pažitku alebo vňať). Pokiaľ recept uvádza, zapite mliekom.\nbylinky, korenie, medvedí cesnak, vňať, pažitka (ak na prísady nie ste alergická)",
+    "ingredients": [
+      {
+        "raw": "špenát",
+        "name": "špenát",
+        "grams": 50
+      },
+      {
+        "raw": "½ strúčik cesnak",
+        "name": "cesnak",
+        "grams": 1.5
+      }
+    ],
+    "sourceClients": [
+      "Beata Tr"
+    ],
+    "sourceFiles": [
+      "5.konvertovany strav. p. Beata Tr.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Na pečivo natrite nátierku, obložte plátkom syra a konzumujte so zeleninou.",
+    "slot": "ranajky",
+    "prepMinutes": null,
+    "instructions": "bylinky (ak na prísady nie ste alergická)",
+    "ingredients": [
+      {
+        "raw": "syr eidam, 45 % t. v s. neúdený",
+        "name": "syr eidam,",
+        "grams": 44
+      },
+      {
+        "raw": "4 a ½ ČL nátierka s cícerom a červenou repou napr. Lidl",
+        "name": "nátierka s cícerom a červenou repou",
+        "grams": 36
+      },
+      {
+        "raw": "6 ks reďkovka",
+        "name": "reďkovka",
+        "grams": 102
+      },
+      {
+        "raw": "INGREDIENCIE 3 PL hrachový proteín - prášok",
+        "name": "ingrediencie 3 pl hrachový proteín - prášok",
+        "grams": 30
+      },
+      {
+        "raw": "2 a ½ dl mlieko polotučné",
+        "name": "mlieko polotučné",
+        "grams": 250
+      },
+      {
+        "raw": "1 stredný kus banány",
+        "name": "banány",
+        "grams": 90
+      },
+      {
+        "raw": "55 g avokádo 3 PL maliny",
+        "name": "g avokádo 3 pl maliny",
+        "grams": 63
+      }
+    ],
+    "sourceClients": [
+      "Bibiana S"
+    ],
+    "sourceFiles": [
+      "6.konvertovany strav.plan Bibiana S.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Všetky ingrediencie dajte do misky a jemne premiešajte.",
+    "slot": "ranajky",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "2 a ½ x balenie jogurt kozí biely napr. Leeb",
+        "name": "jogurt kozí biely",
+        "grams": 312.5
+      },
+      {
+        "raw": "8 PL maliny",
+        "name": "maliny",
+        "grams": 168
+      },
+      {
+        "raw": "1 a ½ ČL kakaový prášok",
+        "name": "kakaový prášok",
+        "grams": 12
+      },
+      {
+        "raw": "2 ČL med včelí",
+        "name": "med včelí",
+        "grams": 14
+      }
+    ],
+    "sourceClients": [
+      "Bibiana S"
+    ],
+    "sourceFiles": [
+      "6.konvertovany strav.plan Bibiana S.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Všetky ingrediencie zmixujte a vylejte do pohára.",
+    "slot": "ranajky",
+    "prepMinutes": 20,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "5 dl mlieko polotučné",
+        "name": "mlieko polotučné",
+        "grams": 500
+      },
+      {
+        "raw": "1 PL arašidové maslo",
+        "name": "arašidové maslo",
+        "grams": 17
+      },
+      {
+        "raw": "1 menší kus banány",
+        "name": "banány",
+        "grams": 65
+      },
+      {
+        "raw": "9 ks mandle",
+        "name": "mandle",
+        "grams": 9
+      },
+      {
+        "raw": "mlieko polotučné 1 ČL med včelí",
+        "name": "mlieko polotučné 1 čl med včelí",
+        "grams": 7
+      },
+      {
+        "raw": "INGREDIENCIE 65 g fazuľa biela napr. ALBERT BIO 1 krajec chlieb hypoalergénny",
+        "name": "ingrediencie 65 g fazuľa biela",
+        "grams": 50
+      },
+      {
+        "raw": "ľadový šalát",
+        "name": "ľadový šalát",
+        "grams": 40
+      }
+    ],
+    "sourceClients": [
+      "Bibiana S"
+    ],
+    "sourceFiles": [
+      "6.konvertovany strav.plan Bibiana S.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Marhule umyte, odkôstkujte a rozmixujte spolu s ostatnými ingredienciami v recepte.",
+    "slot": "desiata",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "3 x stredný kus marhule",
+        "name": "marhule",
+        "grams": 180
+      },
+      {
+        "raw": "2 ČL ľanové semená",
+        "name": "ľanové semená",
+        "grams": 6
+      },
+      {
+        "raw": "½ dl mlieko polotučné 1,5 %",
+        "name": "mlieko polotučné",
+        "grams": 50
+      },
+      {
+        "raw": "špenát",
+        "name": "špenát",
+        "grams": 40
+      }
+    ],
+    "sourceClients": [
+      "Dana K"
+    ],
+    "sourceFiles": [
+      "7.konvertovany strav.plan Dana K.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Cuketové placky pripravte podľa receptu nižšie. Zapite mliekom.",
+    "slot": "obed",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "5 ks cuketové placky s ovsenými vločkami",
+        "name": "cuketové placky s ovsenými vločkami",
+        "grams": 265
+      },
+      {
+        "raw": "3 dl mlieko polotučné 1,5 %",
+        "name": "mlieko polotučné",
+        "grams": 300
+      },
+      {
+        "raw": "NÁPOJE 3 dl mlieko polotučné 1,5 %",
+        "name": "mlieko polotučné",
+        "grams": 300
+      }
+    ],
+    "sourceClients": [
+      "Dana K"
+    ],
+    "sourceFiles": [
+      "7.konvertovany strav.plan Dana K.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Chlebíček (jeden váži približne 8 gramov) zapite mliekom.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "1 a ½ x dl acidko biele plnotučné napr. Rajo",
+        "name": "acidko biele plnotučné",
+        "grams": 150
+      },
+      {
+        "raw": "2 x krúžok celozrnné chlebíčky - pšenično-ražné napr. Bona Vita Active",
+        "name": "celozrnné chlebíčky - pšenično-ražné",
+        "grams": 18
+      }
+    ],
+    "sourceClients": [
+      "Dana K"
+    ],
+    "sourceFiles": [
+      "7.konvertovany strav.plan Dana K.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Recept pripavte podľa návodu nižšie.",
+    "slot": "vecera",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "2 x porcia Ľahká zemiaková polievka",
+        "name": "ľahká zemiaková polievka",
+        "grams": 660
+      }
+    ],
+    "sourceClients": [
+      "Dana K"
+    ],
+    "sourceFiles": [
+      "7.konvertovany strav.plan Dana K.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Na pečivo natrite nátierku, obložte plátkom syra a konzumujte so zeleninou.",
+    "slot": "ranajky",
+    "prepMinutes": null,
+    "instructions": "bylinky (ak na prísady nie ste alergická)",
+    "ingredients": [
+      {
+        "raw": "5 a ½ ČL nátierka s cícerom a červenou repou napr. Lidl",
+        "name": "nátierka s cícerom a červenou repou",
+        "grams": 44
+      },
+      {
+        "raw": "syr eidam, 30 % t. v s. neúdený",
+        "name": "syr eidam,",
+        "grams": 22
+      },
+      {
+        "raw": "3 ks cherry paradajky",
+        "name": "cherry paradajky",
+        "grams": 36
+      }
+    ],
+    "sourceClients": [
+      "Dominika K"
+    ],
+    "sourceFiles": [
+      "8.konvertovany strav.plan Dominika K.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Jogurt vylejte do misky, pridajte chia semienka a ovocie.",
+    "slot": "ranajky",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "1 a ½ x balenie jogurt biely napr. Rajo Active Protein",
+        "name": "jogurt biely",
+        "grams": 270
+      },
+      {
+        "raw": "1 a ½ ks kiwi",
+        "name": "kiwi",
+        "grams": 133.5
+      },
+      {
+        "raw": "2 ČL chia semienka",
+        "name": "chia semienka",
+        "grams": 6
+      },
+      {
+        "raw": "½ strúčik cesnak",
+        "name": "cesnak",
+        "grams": 1.5
+      },
+      {
+        "raw": "½ PL šťava citrónová",
+        "name": "šťava citrónová",
+        "grams": 6
+      }
+    ],
+    "sourceClients": [
+      "Dominika K"
+    ],
+    "sourceFiles": [
+      "8.konvertovany strav.plan Dominika K.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Do mixéra vložte banán spolu s avokádom a karobom. Rozmixujte na puding.",
+    "slot": "desiata",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "45 g avokádo 1 menší kus banány",
+        "name": "g avokádo 1 menší kus banány",
+        "grams": 65
+      },
+      {
+        "raw": "INGREDIENCIE 3 ks mrkva",
+        "name": "ingrediencie 3 ks mrkva",
+        "grams": 255
+      },
+      {
+        "raw": "1 ČL sezamový olej",
+        "name": "sezamový olej",
+        "grams": 5
+      }
+    ],
+    "sourceClients": [
+      "Dominika K"
+    ],
+    "sourceFiles": [
+      "8.konvertovany strav.plan Dominika K.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Do mixéra vložte zmrazené jahody, banán, kešu, pridajte trochu vody a rozmixujte.",
+    "slot": "desiata",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "1 a ½ menší kus banány",
+        "name": "banány",
+        "grams": 97.5
+      },
+      {
+        "raw": "6 ks orechy kešu",
+        "name": "orechy kešu",
+        "grams": 9
+      },
+      {
+        "raw": "NÁPOJE 2 a ½ dl mlieko acidofilné",
+        "name": "nápoje 2 a ½ dl mlieko acidofilné",
+        "grams": 250
+      }
+    ],
+    "sourceClients": [
+      "Dominika K"
+    ],
+    "sourceFiles": [
+      "8.konvertovany strav.plan Dominika K.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Vypite proteínový šejk spolu s banánom (pokiaľ recept banán uvádza).",
+    "slot": "desiata",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "½ dávka protein milk shake vanilka napr. Maxsport",
+        "name": "protein milk shake vanilka",
+        "grams": 155
+      },
+      {
+        "raw": "½ ks banány",
+        "name": "banány",
+        "grams": 65
+      }
+    ],
+    "sourceClients": [
+      "Dominika K"
+    ],
+    "sourceFiles": [
+      "8.konvertovany strav.plan Dominika K.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Všetky ingrediencie vložte do mixéra a pomixujte, pridajte vodu podľa potreby.",
+    "slot": "desiata",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "4 PL tvaroh jemný hrudkový 2,5 % napr. Pilos",
+        "name": "tvaroh jemný hrudkový",
+        "grams": 68
+      },
+      {
+        "raw": "6 ks jahody záhradné",
+        "name": "jahody záhradné",
+        "grams": 78
+      },
+      {
+        "raw": "½ dl acidko biele plnotučné napr. Rajo",
+        "name": "acidko biele plnotučné",
+        "grams": 50
+      },
+      {
+        "raw": "½ PL čakankový sirup",
+        "name": "čakankový sirup",
+        "grams": 9
+      }
+    ],
+    "sourceClients": [
+      "Dominika K"
+    ],
+    "sourceFiles": [
+      "8.konvertovany strav.plan Dominika K.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Pomaranč, pomelo a banán nakrájajte na kúsky. Posypte semienkami/mandľami a hrozienkami.",
+    "slot": "desiata",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "½ kus pomaranče",
+        "name": "pomaranče",
+        "grams": 105
+      },
+      {
+        "raw": "8 ks mandle",
+        "name": "mandle",
+        "grams": 8
+      },
+      {
+        "raw": "½ menší kus banány",
+        "name": "banány",
+        "grams": 32.5
+      },
+      {
+        "raw": "55 g pomelo 5 x kus hrozienka",
+        "name": "g pomelo 5 x kus hrozienka",
+        "grams": 2.75
+      }
+    ],
+    "sourceClients": [
+      "Dominika K"
+    ],
+    "sourceFiles": [
+      "8.konvertovany strav.plan Dominika K.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Proteínový šejk vypite. V prípade, že recept uvádza, konzumujte spolu s banánom.",
+    "slot": "olovrant",
+    "prepMinutes": 5,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "½ dávka protein milk shake vanilka napr. Maxsport",
+        "name": "protein milk shake vanilka",
+        "grams": 155
+      },
+      {
+        "raw": "1 stredný kus banány",
+        "name": "banány",
+        "grams": 90
+      },
+      {
+        "raw": "2 PL mliečny proteín napr. WHEY",
+        "name": "mliečny proteín",
+        "grams": 20
+      }
+    ],
+    "sourceClients": [
+      "Dominika K"
+    ],
+    "sourceFiles": [
+      "8.konvertovany strav.plan Dominika K.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Kvalitná horká čokoláda. Konzumujte maximálne 3-krát v priebehu 7 dní.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "čokoláda horká 71 % napr. Madagascar",
+        "name": "čokoláda horká",
+        "grams": 30
+      },
+      {
+        "raw": "NÁPOJE 2 a ½ dl acidko biele plnotučné napr. Rajo",
+        "name": "nápoje 2 a ½ dl acidko biele plnotučné",
+        "grams": 250
+      }
+    ],
+    "sourceClients": [
+      "Dominika K"
+    ],
+    "sourceFiles": [
+      "8.konvertovany strav.plan Dominika K.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Ovocie konzumujte spolu s orechami, pokiaľ recept uvádza.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "1 a ½ plátok veľký melón cukrový",
+        "name": "melón cukrový",
+        "grams": 300
+      },
+      {
+        "raw": "9 ks orechy lieskové",
+        "name": "orechy lieskové",
+        "grams": 9
+      }
+    ],
+    "sourceClients": [
+      "Dominika K"
+    ],
+    "sourceFiles": [
+      "8.konvertovany strav.plan Dominika K.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Melón nakrájajte a konzumujte spolu s orechami.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "1 plátok veľký žltý melón",
+        "name": "žltý melón",
+        "grams": 200
+      },
+      {
+        "raw": "3 ks orechy para",
+        "name": "orechy para",
+        "grams": 9
+      }
+    ],
+    "sourceClients": [
+      "Dominika K"
+    ],
+    "sourceFiles": [
+      "8.konvertovany strav.plan Dominika K.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Do mixéra vložte zmrazené jahody, banán, kešu, pridajte trochu vody a rozmixujte.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "9 ks orechy kešu",
+        "name": "orechy kešu",
+        "grams": 13.5
+      },
+      {
+        "raw": "1 menší kus banány",
+        "name": "banány",
+        "grams": 65
+      },
+      {
+        "raw": "INGREDIENCIE 2 a ½ PL konopný proteín napr. My protein",
+        "name": "ingrediencie 2 a ½ pl konopný proteín",
+        "grams": 25
+      },
+      {
+        "raw": "1 menší kus banány",
+        "name": "banány",
+        "grams": 65
+      },
+      {
+        "raw": "špenát listový",
+        "name": "špenát listový",
+        "grams": 40
+      }
+    ],
+    "sourceClients": [
+      "Dominika K"
+    ],
+    "sourceFiles": [
+      "8.konvertovany strav.plan Dominika K.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Cuketové placky pripravte podľa receptu nižšie. Zapite mliekom.",
+    "slot": "obed",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "5 ks cuketové placky s ovsenými vločkami",
+        "name": "cuketové placky s ovsenými vločkami",
+        "grams": 265
+      },
+      {
+        "raw": "4 dl mlieko polotučné 1,5 %",
+        "name": "mlieko polotučné",
+        "grams": 400
+      },
+      {
+        "raw": "NÁPOJE 4 dl mlieko polotučné 1,5 %",
+        "name": "nápoje 4 dl mlieko polotučné",
+        "grams": 400
+      }
+    ],
+    "sourceClients": [
+      "Emilia S"
+    ],
+    "sourceFiles": [
+      "9.konvertovany strav.p. Emilia S.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Guľky pripravte podľa receptu nižšie. Zapite mliekom, pokiaľ máte uvedené.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "1 ks Pšenové guľky",
+        "name": "pšenové guľky",
+        "grams": 40
+      },
+      {
+        "raw": "1 a ½ dl mlieko polotučné 1,5 %",
+        "name": "mlieko polotučné",
+        "grams": 150
+      }
+    ],
+    "sourceClients": [
+      "Emilia S"
+    ],
+    "sourceFiles": [
+      "9.konvertovany strav.p. Emilia S.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Karob/kakao primiešajte do kefírového mlieka.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "2 a ½ dl kefír",
+        "name": "kefír",
+        "grams": 250
+      },
+      {
+        "raw": "1 a ½ ČL kakaový prášok, 12 % obsah tuku",
+        "name": "kakaový prášok,",
+        "grams": 12
+      }
+    ],
+    "sourceClients": [
+      "Emilia S"
+    ],
+    "sourceFiles": [
+      "9.konvertovany strav.p. Emilia S.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Zeleninu môžete deň vopred očistiť, nakrájať a uložiť v miske do chladničky.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "18 ks mandle",
+        "name": "mandle",
+        "grams": 18
+      },
+      {
+        "raw": "2 ks mrkva",
+        "name": "mrkva",
+        "grams": 170
+      },
+      {
+        "raw": "mandle INGREDIENCIE 1 a ½ ks kaleráb",
+        "name": "mandle ingrediencie 1 a ½ ks kaleráb",
+        "grams": 405
+      },
+      {
+        "raw": "7 ks orechy lieskové",
+        "name": "orechy lieskové",
+        "grams": 7
+      },
+      {
+        "raw": "INGREDIENCIE 1 x krajec Kokosovo-banánový chlieb",
+        "name": "ingrediencie 1 x krajec kokosovo-banánový chlieb",
+        "grams": 60
+      },
+      {
+        "raw": "1 PL med",
+        "name": "med",
+        "grams": 18
+      }
+    ],
+    "sourceClients": [
+      "Emilia S"
+    ],
+    "sourceFiles": [
+      "9.konvertovany strav.p. Emilia S.csv"
+    ],
+    "usageCount": 1
+  },
+  {
+    "name": "Do mixéra vložte zmrazené jahody, banán, kešu, pridajte trochu vody a rozmixujte.",
+    "slot": "olovrant",
+    "prepMinutes": null,
+    "instructions": "",
+    "ingredients": [
+      {
+        "raw": "10 ks orechy kešu",
+        "name": "orechy kešu",
+        "grams": 15
+      },
+      {
+        "raw": "1 menší kus banány",
+        "name": "banány",
+        "grams": 65
+      },
+      {
+        "raw": "5 x kus mrazené jahody",
+        "name": "mrazené jahody",
+        "grams": 65
+      }
+    ],
+    "sourceClients": [
+      "Emilia S"
+    ],
+    "sourceFiles": [
+      "9.konvertovany strav.p. Emilia S.csv"
+    ],
+    "usageCount": 1
+  }
+]

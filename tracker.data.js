@@ -3,15 +3,9 @@
 // Schema is informal; the renderer is forgiving of missing fields.
 
 window.TRACKER = {
-  lastUpdated: "2026-05-04",
+  lastUpdated: "2026-05-05",
 
   blockers: [
-    {
-      what: "Recipe schema decision",
-      blockedOn: "Gabi",
-      action: "Review nutrition-curated.csv (top 150 ingredients)",
-      since: "2026-04-30",
-    },
     {
       what: "Exercise video URLs",
       blockedOn: "Gabi",
@@ -68,11 +62,11 @@ window.TRACKER = {
       id: "recipe-pipeline",
       title: "Recipe parser pipeline",
       pillar: "strava",
-      status: "blocked",
-      owner: "Gabi",
-      summary: "Convert Gabi's 20 client meal-plan CSVs into a curated NeoMe recipe library. 1913 recipes parsed and deduped, ingredient normalisation done. Currently waiting on Gabi's nutrition values review.",
-      blocker: "Gabi reviewing nutrition-curated.csv",
-      nextAction: "Gabi saves nutrition-reviewed.csv → Claude applies values + runs authoring gate",
+      status: "in-progress",
+      owner: "Dev",
+      summary: "nutrition-reviewed.csv is complete (148 ingredients). SUB_RECIPE items resolved: chlieb hypoalergénny/zemiakový/pohánkový → celozrnný values; pesto → 421 kcal/5.2g/4.7g/43g; proteínové muffiny removed. Ready to apply nutrition to all 1913 recipes and run authoring gate.",
+      blocker: null,
+      nextAction: "Dev: apply nutrition-reviewed.csv to recipes-final.json → compute macros → run authoring gate (30/40/30 ±5%) → generate pass/adjust/skip report",
       stages: [
         { label: "Parse 20 CSVs", status: "done", note: "2763 raw blocks" },
         { label: "Clean + dedup", status: "done", note: "2085 recipes, 1170 ingredients" },
@@ -80,9 +74,8 @@ window.TRACKER = {
         { label: "Apply Gabi's normalisation", status: "done", note: "54 edits, 47 IGNOREs" },
         { label: "Strip false-positive titles", status: "done", note: "1913 recipes" },
         { label: "OpenFoodFacts auto-match", status: "abandoned", note: "16% — pivoted to hand-curated" },
-        { label: "Hand-curated nutrition table (top 150)", status: "blocked", note: "Awaiting Gabi review" },
+        { label: "Hand-curated nutrition table (top 150)", status: "done", note: "148 ingredients in nutrition-reviewed.csv" },
         { label: "Apply nutrition to all recipes", status: "pending" },
-        { label: "Compute sub-recipe nutrition", status: "pending" },
         { label: "Authoring gate (30/40/30 ± 5%)", status: "pending" },
         { label: "Send pass/adjust/skip report", status: "pending" },
         { label: "Define recipes table schema", status: "pending", note: "Locks recipes admin tab" },
@@ -92,7 +85,7 @@ window.TRACKER = {
         { label: "Pipeline state (memory)", href: "memory/project_recipe_pipeline_state.md" },
         { label: "Nutrition strategy", href: "memory/project_nutrition_strategy_2026.md" },
         { label: "Output: recipes-final.json", href: "data/parsed/recipes-final.json" },
-        { label: "Pending: nutrition-curated.csv", href: "data/parsed/nutrition-curated.csv" },
+        { label: "Ready: nutrition-reviewed.csv", href: "data/parsed/nutrition-reviewed.csv" },
       ],
     },
     {

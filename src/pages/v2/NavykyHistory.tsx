@@ -1,9 +1,10 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Pencil, Flame } from 'lucide-react';
-import GlassCard from '../../components/v2/GlassCard';
-import EmptyStateHabits from '../../components/v2/EmptyStateHabits';
-import { colors, glassCard } from '../../theme/warmDusk';
+import { Flame, Plus } from 'lucide-react';
+import { TopBar } from '@/components/v2/top-bar';
+import { Eyebrow } from '@/components/ui/eyebrow';
+import { BodyText } from '@/components/ui/body-text';
+import { SerifHeader } from '@/components/ui/serif-header';
 
 interface Habit {
   id?: string;
@@ -29,66 +30,65 @@ export default function NavykyHistory() {
   }, []);
 
   return (
-    <div className="min-h-screen px-4 pt-5 pb-8 space-y-4" style={{ background: colors.bgGradient }}>
-      {/* Header */}
-      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/20 flex items-center gap-3">
-        <button onClick={() => navigate('/kniznica')} className="p-1">
-          <ArrowLeft className="w-5 h-5 text-[#2E2218]" strokeWidth={1.5} />
-        </button>
-        <h1 className="text-[22px] font-medium leading-tight text-[#2E2218]" style={{ fontFamily: '"Bodoni Moda", Georgia, serif' }}>Denník návykov</h1>
-      </div>
+    <div className="min-h-screen bg-cream pb-12">
+      <TopBar title="História návykov" backHref="/kniznica/navyky" />
 
-      {habits.length === 0 ? (
-        <EmptyStateHabits onCreateHabit={() => console.log('Creating habit...')} />
-      ) : (
-        habits.map((habit, idx) => {
-          const completed = getCompletedDays(habit);
-          const streak = calcStreak(completed);
-          const last30 = getLast30Days();
+      <div className="px-5 pt-2 pb-6 flex flex-col gap-3">
+        {habits.length === 0 ? (
+          <div className="mt-12 text-center px-8">
+            <div className="h-16 w-16 rounded-full bg-gold/10 flex items-center justify-center mx-auto mb-4">
+              <Flame className="size-7 text-gold" />
+            </div>
+            <SerifHeader as="h2" size="h2" className="mb-2">Žiadne návyky</SerifHeader>
+            <BodyText tone="secondary" className="mb-6 max-w-xs mx-auto">
+              Pridaj si prvý návyk a sleduj svoj pokrok v čase.
+            </BodyText>
+            <button
+              onClick={() => navigate('/navyky/new')}
+              className="flex items-center gap-2 px-6 py-3 bg-ink text-cream rounded-full font-sans text-sm font-medium mx-auto"
+            >
+              <Plus className="size-4" /> Pridať návyk
+            </button>
+          </div>
+        ) : (
+          habits.map((habit, idx) => {
+            const completed = getCompletedDays(habit);
+            const streak = calcStreak(completed);
+            const last30 = getLast30Days();
+            const name = habit.name || habit.label || `Návyk ${idx + 1}`;
 
-          return (
-            <GlassCard key={habit.id || idx}>
-              <div className="flex items-center gap-2 mb-3">
-                {habit.icon && <span className="text-lg">{habit.icon}</span>}
-                <p className="text-[15px] font-semibold text-[#2E2218]">{habit.name || habit.label || `Návyk ${idx + 1}`}</p>
-                <div className="ml-auto flex items-center gap-2">
+            return (
+              <div key={habit.id || idx} className="rounded-card bg-white border border-ink/[0.08] shadow-nm-sm p-5">
+                <div className="flex items-center gap-2 mb-4">
+                  {habit.icon && <span className="text-base">{habit.icon}</span>}
+                  <div className="font-serif text-h3 text-ink flex-1 leading-snug">{name}</div>
                   {streak > 0 && (
-                    <span className="text-[12px] font-medium text-[#B8864A] flex items-center gap-0.5"><Flame size={11} /> {streak} dní</span>
+                    <div className="flex items-center gap-1 font-sans text-xs font-medium text-terra">
+                      <Flame className="size-3.5" />
+                      {streak} dní
+                    </div>
                   )}
-                  <button
-                    onClick={() => navigate('/navyky')}
-                    className="w-7 h-7 rounded-lg flex items-center justify-center"
-                    style={{ background: 'rgba(184,134,74,0.1)' }}
-                    title="Upraviť návyk"
-                  >
-                    <Pencil size={12} style={{ color: '#B8864A' }} />
-                  </button>
                 </div>
+
+                <div className="grid grid-cols-10 gap-1 mb-2">
+                  {last30.map(date => {
+                    const done = completed.has(date);
+                    return (
+                      <div
+                        key={date}
+                        title={date}
+                        className={`aspect-square rounded-sm ${done ? 'bg-gold' : 'bg-cream-200'}`}
+                      />
+                    );
+                  })}
+                </div>
+
+                <Eyebrow tone="muted">Posledných 30 dní · {completed.size} splnených</Eyebrow>
               </div>
-              {/* Heatmap grid - last 30 days */}
-              <div className="grid grid-cols-10 gap-1">
-                {last30.map(date => {
-                  const done = completed.has(date);
-                  return (
-                    <div
-                      key={date}
-                      title={date}
-                      className="aspect-square rounded-sm"
-                      style={{
-                        background: done ? '#B8864A' : '#F0EBE6',
-                        opacity: done ? 1 : 0.5,
-                      }}
-                    />
-                  );
-                })}
-              </div>
-              <p className="text-[12px] text-[#888] mt-2">
-                Posledných 30 dní • {completed.size} splnených
-              </p>
-            </GlassCard>
-          );
-        })
-      )}
+            );
+          })
+        )}
+      </div>
     </div>
   );
 }

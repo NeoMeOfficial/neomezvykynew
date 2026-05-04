@@ -1,179 +1,120 @@
 import { useState } from 'react';
-import { ArrowLeft, Calendar, BarChart3, Award, TrendingUp } from 'lucide-react';
+import { Calendar, BarChart3, Award, TrendingUp, Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import WorkoutStatsWidget from '../../components/v2/workouts/WorkoutStatsWidget';
 import WorkoutCalendar from '../../components/v2/workouts/WorkoutCalendar';
 import { useWorkoutHistory } from '../../hooks/useWorkoutHistory';
-import { colors, glassCard } from '../../theme/warmDusk';
+import { TopBar } from '@/components/v2/top-bar';
+import { Eyebrow } from '@/components/ui/eyebrow';
+import { BodyText } from '@/components/ui/body-text';
+import { SerifHeader } from '@/components/ui/serif-header';
 
 export default function WorkoutHistory() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'stats' | 'calendar'>('stats');
-  const { stats, streak, workoutHistory } = useWorkoutHistory();
+  const { stats } = useWorkoutHistory() as { stats: { totalWorkouts: number; currentStreak: number; longestStreak: number; recentSessions: Array<{ id: string; workoutTitle: string; workoutType: string; completedAt: string; duration: number; program?: string }> } };
 
   return (
-    <div className="w-full min-h-screen px-3 py-6 pb-28 space-y-6" style={{ background: colors.bgGradient }}>
-      {/* Nordic Header */}
-      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20">
-        <div className="flex items-center gap-3 mb-4">
-          <button onClick={() => navigate('/profil')} className="p-1">
-            <ArrowLeft className="w-5 h-5 text-[#8B7560]" strokeWidth={1.5} />
-          </button>
-          <div className="flex items-center gap-2 flex-1">
-            <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(122, 158, 120, 0.14)` }}>
-              <BarChart3 className="w-4 h-4" style={{ color: '#7A9E78' }} />
-            </div>
-            <h1 className="text-[22px] font-medium leading-tight" style={{ color: '#2E2218', fontFamily: '"Bodoni Moda", Georgia, serif' }}>Cvičebná história</h1>
-          </div>
+    <div className="min-h-screen bg-cream pb-12">
+      <TopBar title="Cvičebná história" backHref="/profil" />
+
+      <div className="px-5 pt-2 flex flex-col gap-4">
+        {/* Tab toggle */}
+        <div className="flex gap-2 p-1 bg-cream-200 rounded-xl">
+          {([['stats', 'Štatistiky', BarChart3], ['calendar', 'Kalendár', Calendar]] as const).map(([key, label, Icon]) => (
+            <button
+              key={key}
+              onClick={() => setActiveTab(key)}
+              className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg font-sans text-sm font-medium transition-all ${
+                activeTab === key ? 'bg-white shadow-nm-sm text-ink' : 'text-ink/56'
+              }`}
+            >
+              <Icon className="size-4" />
+              {label}
+            </button>
+          ))}
         </div>
 
-        {/* Sub-header */}
-        <div className="text-center">
-          <p className="text-sm font-medium" style={{ color: '#6B4C3B' }}>
-            Sleduj svoj pokrok a úspechy
-          </p>
-        </div>
-      </div>
+        {activeTab === 'stats' && (
+          <>
+            <WorkoutStatsWidget variant="full" />
 
-      {/* Tab Navigation */}
-      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20">
-        <div className="flex gap-2">
-          <button
-            onClick={() => setActiveTab('stats')}
-            className={`flex-1 px-3 py-2 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2 ${
-              activeTab === 'stats'
-                ? 'bg-[#7A9E78] text-white' 
-                : 'bg-white/20 text-[#8B7560] hover:bg-white/25'
-            }`}
-          >
-            <BarChart3 size={16} />
-            Štatistiky
-          </button>
-          <button
-            onClick={() => setActiveTab('calendar')}
-            className={`flex-1 px-3 py-2 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2 ${
-              activeTab === 'calendar'
-                ? 'bg-[#7A9E78] text-white' 
-                : 'bg-white/20 text-[#8B7560] hover:bg-white/25'
-            }`}
-          >
-            <Calendar size={16} />
-            Kalendár
-          </button>
-        </div>
-      </div>
-
-      {/* Content based on active tab */}
-      {activeTab === 'stats' && (
-        <div className="space-y-6">
-          {/* Overview Stats */}
-          <WorkoutStatsWidget variant="full" />
-
-          {/* Quick Achievement Summary */}
-          {(stats.currentStreak > 0 || stats.longestStreak > 0) && (
-            <div className="bg-white/30 backdrop-blur-[40px] border border-white/20 rounded-2xl p-6">
-              <h3 className="text-[#6B4C3B] font-bold text-lg mb-4 flex items-center gap-2">
-                <Award size={20} />
-                Tvoje úspechy
-              </h3>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div className="text-center p-4 bg-[#7A9E78]/20 rounded-xl">
-                  <div className="text-[#7A9E78] font-bold text-2xl">{stats.currentStreak}</div>
-                  <div className="text-[#6B4C3B] text-sm font-medium">Aktuálna séria</div>
-                  <div className="text-[#8B7560] text-xs mt-1">
-                    {stats.currentStreak === 1 ? 'deň' : stats.currentStreak < 5 ? 'dni' : 'dní'} v rade
+            {(stats?.currentStreak > 0 || stats?.longestStreak > 0) && (
+              <div className="rounded-card bg-white border border-ink/[0.08] shadow-nm-sm p-5">
+                <div className="flex items-center gap-2 mb-4">
+                  <Award className="size-4 text-gold" />
+                  <SerifHeader as="h3" size="h3">Tvoje úspechy</SerifHeader>
+                </div>
+                <div className="flex gap-3">
+                  <div className="flex-1 rounded-xl bg-pillar-strava/10 py-4 px-3 text-center">
+                    <div className="font-serif text-h1 text-pillar-strava leading-none">{stats.currentStreak}</div>
+                    <BodyText size="sm" tone="secondary" className="mt-1">Aktuálna séria</BodyText>
+                  </div>
+                  <div className="flex-1 rounded-xl bg-terra/10 py-4 px-3 text-center">
+                    <div className="font-serif text-h1 text-terra leading-none">{stats.longestStreak}</div>
+                    <BodyText size="sm" tone="secondary" className="mt-1">Osobný rekord</BodyText>
                   </div>
                 </div>
-                
-                <div className="text-center p-4 bg-[#B8864A]/20 rounded-xl">
-                  <div className="text-[#B8864A] font-bold text-2xl">{stats.longestStreak}</div>
-                  <div className="text-[#6B4C3B] text-sm font-medium">Najdlhšia séria</div>
-                  <div className="text-[#8B7560] text-xs mt-1">osobný rekord</div>
-                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Recent Workouts List */}
-          {stats.recentSessions.length > 0 && (
-            <div className="bg-white/30 backdrop-blur-[40px] border border-white/20 rounded-2xl p-6">
-              <h3 className="text-[#6B4C3B] font-bold text-lg mb-4 flex items-center gap-2">
-                <TrendingUp size={20} />
-                Posledné cvičenia
-              </h3>
-              
-              <div className="space-y-3">
-                {stats.recentSessions.slice(0, 5).map((session) => (
-                  <div key={session.id} className="flex items-center gap-4 p-3 bg-white/20 rounded-xl">
-                    <div className="w-10 h-10 rounded-lg bg-[#7A9E78]/30 flex items-center justify-center">
-                      <span className="text-[#6B4C3B] font-bold text-sm">
-                        {session.workoutType === 'telo' ? 'T' : session.workoutType === 'strava' ? 'S' : 'M'}
+            {stats?.recentSessions?.length > 0 && (
+              <div className="rounded-card bg-white border border-ink/[0.08] shadow-nm-sm overflow-hidden">
+                <div className="px-5 pt-4 pb-3 border-b border-ink/[0.06] flex items-center gap-2">
+                  <TrendingUp className="size-4 text-ink/40" />
+                  <Eyebrow>Posledné cvičenia</Eyebrow>
+                </div>
+                {stats.recentSessions.slice(0, 5).map((s, i, arr) => (
+                  <div key={s.id} className={`px-5 py-4 flex items-center gap-3 ${i < arr.length - 1 ? 'border-b border-ink/[0.06]' : ''}`}>
+                    <div className="h-9 w-9 rounded-lg bg-pillar-strava/15 flex items-center justify-center flex-shrink-0">
+                      <span className="font-sans text-xs font-bold text-pillar-strava">
+                        {s.workoutType === 'telo' ? 'T' : s.workoutType === 'strava' ? 'S' : 'M'}
                       </span>
                     </div>
-                    
                     <div className="flex-1 min-w-0">
-                      <h4 className="text-[#6B4C3B] font-medium text-sm line-clamp-1">
-                        {session.workoutTitle}
-                      </h4>
-                      <div className="flex items-center gap-2 text-xs text-[#8B7560]">
-                        <span>{new Date(session.completedAt).toLocaleDateString('sk-SK')}</span>
-                        <span>•</span>
-                        <span>{session.duration} min</span>
-                        {session.program && (
-                          <>
-                            <span>•</span>
-                            <span>{session.program}</span>
-                          </>
-                        )}
-                      </div>
+                      <div className="font-sans text-sm font-medium text-ink truncate">{s.workoutTitle}</div>
+                      <Eyebrow tone="muted">
+                        {new Date(s.completedAt).toLocaleDateString('sk-SK')} · {s.duration} min
+                        {s.program && ` · ${s.program}`}
+                      </Eyebrow>
                     </div>
-                    
-                    <div className="text-[#7A9E78] text-xs font-medium">
-                      ✓ Dokončené
-                    </div>
+                    <Check className="size-4 text-pillar-strava flex-shrink-0" />
                   </div>
                 ))}
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Empty state */}
-          {stats.totalWorkouts === 0 && (
-            <div className="bg-white/30 backdrop-blur-[40px] border border-white/20 rounded-2xl p-8 text-center">
-              <div className="w-16 h-16 bg-[#7A9E78]/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <BarChart3 size={32} className="text-[#7A9E78]" />
+            {stats?.totalWorkouts === 0 && (
+              <div className="rounded-card bg-white border border-ink/[0.08] shadow-nm-sm p-8 text-center">
+                <div className="h-16 w-16 rounded-full bg-pillar-strava/10 flex items-center justify-center mx-auto mb-4">
+                  <BarChart3 className="size-7 text-pillar-strava" />
+                </div>
+                <SerifHeader as="h3" size="h3" className="mb-2">Žiadne cvičenia zatiaľ</SerifHeader>
+                <BodyText tone="secondary" className="max-w-xs mx-auto">
+                  Keď dokončíš svoje prvé cvičenie, tu uvidíš štatistiky a pokrok.
+                </BodyText>
               </div>
-              <h3 className="text-[#6B4C3B] font-semibold text-lg mb-2">
-                Žiadne cvičenia zatiaľ
-              </h3>
-              <p className="text-[#8B7560] text-sm max-w-sm mx-auto">
-                Keď dokončíš svoje prvé cvičenie, tu uvidíš štatistiky a pokrok.
-              </p>
-            </div>
-          )}
-        </div>
-      )}
+            )}
+          </>
+        )}
 
-      {activeTab === 'calendar' && (
-        <div className="space-y-6">
-          <WorkoutCalendar />
-          
-          {stats.totalWorkouts === 0 && (
-            <div className="bg-white/30 backdrop-blur-[40px] border border-white/20 rounded-2xl p-8 text-center">
-              <div className="w-16 h-16 bg-[#7A9E78]/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Calendar size={32} className="text-[#7A9E78]" />
+        {activeTab === 'calendar' && (
+          <>
+            <WorkoutCalendar />
+            {stats?.totalWorkouts === 0 && (
+              <div className="rounded-card bg-white border border-ink/[0.08] shadow-nm-sm p-8 text-center">
+                <div className="h-16 w-16 rounded-full bg-pillar-strava/10 flex items-center justify-center mx-auto mb-4">
+                  <Calendar className="size-7 text-pillar-strava" />
+                </div>
+                <SerifHeader as="h3" size="h3" className="mb-2">Kalendár bude plný po prvom cvičení</SerifHeader>
+                <BodyText tone="secondary" className="max-w-xs mx-auto">
+                  Každé dokončené cvičenie sa zobrazí v kalendári.
+                </BodyText>
               </div>
-              <h3 className="text-[#6B4C3B] font-semibold text-lg mb-2">
-                Kalendár bude plný po prvom cvičení
-              </h3>
-              <p className="text-[#8B7560] text-sm max-w-sm mx-auto">
-                Každé dokončené cvičenie sa zobrazí v kalendári ako farebnú bodku.
-              </p>
-            </div>
-          )}
-        </div>
-      )}
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 }

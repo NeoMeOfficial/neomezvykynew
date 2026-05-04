@@ -1,0 +1,129 @@
+# Recipe parse report — v2 (cleaned + deduped)
+
+- Files: **20**
+- Raw recipe blocks: **2717**
+- Unique recipes (after dedup): **2085**
+- Unique ingredients: **1170**
+
+## Slot distribution (unique recipes)
+- vecera: 590
+- obed: 542
+- ranajky: 497
+- olovrant: 266
+- desiata: 190
+
+## Top 30 most-reused recipes (your evergreen library)
+- **Jednoduché praktické jedlo v podobe ovocného jogurtu.** (desiata) — used 12× across 8 clients
+- **Domáca müsli tyčinka** (olovrant) — used 12× across 9 clients
+- **Cestovinový šalát s kuracími kúskami a mangom** (obed) — used 10× across 9 clients
+- **Hráškovo-brokolicová nátierka s pečivom** (vecera) — used 10× across 9 clients
+- **Chlieb s tvarohom a ovocím** (ranajky) — used 9× across 9 clients
+- **Jednoduché praktické jedlo v podobe ovocného jogurtu.** (desiata) — used 9× across 6 clients
+- **Cestoviny s kyslou kapustou** (vecera) — used 7× across 5 clients
+- **Batátové nepečené brownies** (olovrant) — used 6× across 6 clients
+- **Šalát z hrozna** (desiata) — used 6× across 6 clients
+- **Avokádové cestoviny** (obed) — used 6× across 6 clients
+- **Kuracie mäso na marináde s prílohou** (obed) — used 6× across 6 clients
+- **Mandľovo-ovsená bábovka** (olovrant) — used 6× across 5 clients
+- **Kokosovo-banánový chlieb** (olovrant) — used 6× across 6 clients
+- **Špargľový šalát s cottage cheese, cícerom a avokádom** (vecera) — used 6× across 6 clients
+- **Cestoviny s kyslou kapustou** (vecera) — used 6× across 5 clients
+- **Zeleninovo-ovocné smoothie** (desiata) — used 5× across 4 clients
+- **Recept pripravte podľa návodu uvedeného nižšie. Konzumujte predpísanú porciu.** (olovrant) — used 5× across 5 clients
+- **Nepravá jablková štrúdľa** (olovrant) — used 5× across 5 clients
+- **Muffiny** (olovrant) — used 5× across 4 clients
+- **Pečené kuracie stehno s kapustou a zemiakmi** (vecera) — used 5× across 4 clients
+- **Tekvicová nátierka s pečivom a zeleninou** (vecera) — used 5× across 5 clients
+- **Zeleninovo-ovocné smoothie** (desiata) — used 5× across 4 clients
+- **Ryžové rezance so zelenými fazuľkami** (obed) — used 5× across 5 clients
+- **Paprikovo-cuketová nátierka s pečivom** (vecera) — used 5× across 5 clients
+- **Paprikovo-paradajková nátierka s pečivom** (vecera) — used 5× across 5 clients
+- **Pstruh s prílohou** (vecera) — used 5× across 4 clients
+- **Zapečené zemiaky s ricottou** (obed) — used 5× across 4 clients
+- **Zeleninové tagliatelle s krevetami** (obed) — used 5× across 5 clients
+- **Šošovicová polievka s kokosovým mliekom** (vecera) — used 5× across 5 clients
+- **Do mixéra vložte zmrazené jahody, banán, kešu, pridajte trochu vody a rozmixujte.** (desiata) — used 5× across 4 clients
+
+## Top 50 ingredients by frequency
+- **olivový olej** — 418× (418 with grams). e.g. "1 PL olivový olej"
+- **cesnak** — 263× (263 with grams). e.g. "½ strúčik cesnak"
+- **rajčiny** — 195× (195 with grams). e.g. "1 ks rajčiny"
+- **jarná cibuľka** — 181× (181 with grams). e.g. "jarná cibuľka"
+- **mrkva** — 146× (146 with grams). e.g. "2 ks mrkva"
+- **stredne veľká cibuľa** — 143× (143 with grams). e.g. "1 x stredne veľká cibuľa"
+- **banány** — 136× (136 with grams). e.g. "½ stredný kus banány"
+- **slepačie vajce** — 134× (134 with grams). e.g. "1 ks slepačie vajce"
+- **ľadový šalát** — 128× (128 with grams). e.g. "ľadový šalát"
+- **špenát** — 124× (124 with grams). e.g. "špenát napr. Chef menu"
+- **tvaroh jemný hrudkovitý 2,5 %** — 108× (108 with grams). e.g. "8 PL tvaroh jemný hrudkovitý 2,5 %"
+- **jahody záhradné** — 108× (108 with grams). e.g. "5 ks jahody záhradné"
+- **jogurt bielkovinový** — 98× (98 with grams). e.g. "2 a ½ PL jogurt bielkovinový napr. Skyr Pilos"
+- **mandle** — 98× (98 with grams). e.g. "7 ks mandle"
+- **cottage cheese biely** — 91× (91 with grams). e.g. "½ balenie cottage cheese biely"
+- **cherry paradajky** — 89× (89 with grams). e.g. "3 ks cherry paradajky"
+- **reďkovka** — 89× (89 with grams). e.g. "7 ks reďkovka"
+- **menší kus banány** — 86× (86 with grams). e.g. "1 a ½ menší kus banány"
+- **ovsené vločky** — 80× (80 with grams). e.g. "4 PL ovsené vločky"
+- **konzerva tuniak vo vlastnej šťave** — 79× (79 with grams). e.g. "1 x malá konzerva tuniak vo vlastnej šťave"
+- **paprika červená** — 78× (78 with grams). e.g. "½ ks paprika červená"
+- **cottage cheese** — 77× (77 with grams). e.g. "½ x balenie cottage cheese"
+- **špenát listový** — 76× (76 with grams). e.g. "špenát listový"
+- **živočíšne maslo** — 76× (76 with grams). e.g. "½ ČL živočíšne maslo"
+- **pór** — 76× (76 with grams). e.g. "pór"
+- **uhorky** — 73× (73 with grams). e.g. "½ ks uhorky"
+- **orechy vlašské** — 73× (73 with grams). e.g. "4 ks orechy vlašské"
+- **tofu biele** — 72× (72 with grams). e.g. "½ x balenie tofu biele"
+- **konopné semienka lúpané** — 71× (71 with grams). e.g. "2 ČL konopné semienka lúpané napr. Bio Nebio"
+- **med včelí** — 68× (68 with grams). e.g. "1 ČL med včelí"
+- **mlieko polotučné** — 63× (63 with grams). e.g. "2 a ½ dl mlieko polotučné"
+- **sezamové semená** — 62× (62 with grams). e.g. "2 ČL sezamové semená"
+- **vaječný bielok** — 61× (61 with grams). e.g. "3 x ks vaječný bielok"
+- **ľanové semená** — 59× (59 with grams). e.g. "1 a ½ ČL ľanové semená"
+- **knäckebrot** — 59× (59 with grams). e.g. "2 a ½ kus knäckebrot"
+- **átok hydinová šunka** — 57× (57 with grams). e.g. "6 x plátok hydinová šunka"
+- **mlieko polotučné 1,5 %** — 57× (57 with grams). e.g. "2 a ½ dl mlieko polotučné 1,5 %"
+- **rukola** — 57× (57 with grams). e.g. "rukola"
+- **orechy kešu** — 56× (56 with grams). e.g. "9 ks orechy kešu"
+- **bobúľ čučoriedky** — 56× (56 with grams). e.g. "3 x 5 bobúľ čučoriedky"
+- **paprika zelená** — 52× (52 with grams). e.g. "2 ks paprika zelená"
+- **repkový olej rafinovaný** — 50× (50 with grams). e.g. "½ PL repkový olej rafinovaný"
+- **maliny** — 50× (50 with grams). e.g. "2 PL maliny"
+- **cukina** — 49× (49 with grams). e.g. "cukina"
+- **vajce na tvrdo** — 49× (49 with grams). e.g. "1 ks vajce na tvrdo"
+- **ks uhorky zavárané kyslé** — 49× (49 with grams). e.g. "ks uhorky zavárané kyslé"
+- **čakankový sirup** — 48× (48 with grams). e.g. "½ PL čakankový sirup"
+- **priemerný kus zeler buľvový** — 47× (47 with grams). e.g. "1 x priemerný kus zeler buľvový"
+- **paprika zeleninová** — 46× (46 with grams). e.g. "1 ks paprika zeleninová"
+- **tvaroh jemný hrudkový 2,5 %** — 45× (45 with grams). e.g. "1 a ½ PL tvaroh jemný hrudkový 2,5 % napr. Pilos"
+
+## Tail check — 30 rarest ingredients (sanity check for parser misses)
+- bryndzová polievka so zemiakmi — 1×. e.g. "2 x porcia Bryndzová polievka so zemiakmi"
+- chlieb pohánkový cesnak 1 a ½ strúčik cesnak — 1×. e.g. "chlieb pohánkový cesnak 1 a ½ strúčik cesnak"
+- karfiol 27% kukurica 1 čl olivový olej — 1×. e.g. "karfiol 27% kukurica 1 ČL olivový olej"
+- bageta celozrnná rukola 3 x miska rukola — 1×. e.g. "bageta celozrnná rukola 3 x miska rukola"
+- losos obyčajný cesnak ½ strúčik cesnak — 1×. e.g. "losos obyčajný cesnak ½ strúčik cesnak"
+- horčica rožky grahamové 1 ks paprika žltá — 1×. e.g. "horčica rožky grahamové 1 ks paprika žltá"
+- tvaroh jemný... maliny 25% banány 3 pl maliny — 1×. e.g. "tvaroh jemný... maliny 25% banány 3 PL maliny"
+- ingrediencie 2 stredný kus banány — 1×. e.g. "INGREDIENCIE 2 stredný kus banány"
+- ingrediencie 3 a ½ x kus tofu muffiny — 1×. e.g. ". INGREDIENCIE 3 a ½ x kus Tofu muffiny"
+- ingrediencie 2 x krajec chlieb zemiakový — 1×. e.g. "INGREDIENCIE 2 x krajec chlieb zemiakový"
+- ingrediencie 1 a ½ ks banány — 1×. e.g. "INGREDIENCIE 1 a ½ ks banány"
+- ingrediencie 4 dl mlieko polotučné — 1×. e.g. "INGREDIENCIE 4 dl mlieko polotučné"
+- g avokádo ½ pl olivový olej — 1×. e.g. "40 g avokádo ½ PL olivový olej"
+- tvaroh tučný hrudkovitý — 1×. e.g. "1 a ½ PL tvaroh tučný hrudkovitý napr. Bánovecký"
+- ingrediencie 90 g tvrdý syr 20 %, — 1×. e.g. "INGREDIENCIE 90 g tvrdý syr 20 %, napr. Madeland 1 a ½ x stredný kus zemiaky neskoré"
+- brokolica mrazená — 1×. e.g. "110 g brokolica mrazená napr. Bonduelle 10 x g uhorky tvrdý syr 20 %"
+- g kapary 10 ks cherry paradajky — 1×. e.g. "10 g kapary 10 ks cherry paradajky"
+- víno biele — 1×. e.g. "20 x ml víno biele"
+- nápoje 4 dl mlieko polotučné 1,5 % — 1×. e.g. "NÁPOJE 4 dl mlieko polotučné 1,5 %"
+- g hrášok 1 ks mrkva — 1×. e.g. "50 g hrášok 1 ks mrkva"
+- mrazená zeleninová... ½ strúčik cesnak — 1×. e.g. "mrazená zeleninová... ½ strúčik cesnak"
+- g šošovica 2 pl ovsené vločky — 1×. e.g. "55 g šošovica 2 PL ovsené vločky"
+- mrkva ½ x stredne veľká cibuľa — 1×. e.g. "mrkva ½ x stredne veľká cibuľa"
+- ingrediencie 10 x pl cícer varený — 1×. e.g. "INGREDIENCIE 10 x PL cícer varený"
+- g brokolica ½ dl mlieko polotučné — 1×. e.g. "265 g brokolica ½ dl mlieko polotučné"
+- ingrediencie 1 x krajec kokosovo-banánový chlieb — 1×. e.g. "INGREDIENCIE 1 x krajec Kokosovo-banánový chlieb"
+- g mrazené maliny ½ x čl med včelí — 1×. e.g. "30 g mrazené maliny ½ x ČL med včelí"
+- ingrediencie 7 a ½ x lyžica polievková quinoa — 1×. e.g. "INGREDIENCIE 7 a ½ x lyžica polievková quinoa napr. Country life"
+- ingrediencie 1 a ½ x krajec chlieb rascový — 1×. e.g. "INGREDIENCIE 1 a ½ x krajec chlieb rascový"
+- hrach 1 čl chia olej — 1×. e.g. "hrach 1 ČL chia olej"

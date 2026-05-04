@@ -1,0 +1,5327 @@
+[
+  {
+    "name": "olivový olej",
+    "count": 418,
+    "withGrams": 418
+  },
+  {
+    "name": "cesnak",
+    "count": 264,
+    "withGrams": 264
+  },
+  {
+    "name": "banány",
+    "count": 222,
+    "withGrams": 222
+  },
+  {
+    "name": "rajčiny",
+    "count": 194,
+    "withGrams": 194
+  },
+  {
+    "name": "jarná cibuľka",
+    "count": 180,
+    "withGrams": 180
+  },
+  {
+    "name": "mrkva",
+    "count": 147,
+    "withGrams": 147
+  },
+  {
+    "name": "cibuľa",
+    "count": 143,
+    "withGrams": 143
+  },
+  {
+    "name": "slepačie vajce",
+    "count": 138,
+    "withGrams": 138
+  },
+  {
+    "name": "mlieko polotučné",
+    "count": 131,
+    "withGrams": 131
+  },
+  {
+    "name": "ľadový šalát",
+    "count": 127,
+    "withGrams": 127
+  },
+  {
+    "name": "špenát",
+    "count": 124,
+    "withGrams": 124
+  },
+  {
+    "name": "cottage cheese biely",
+    "count": 109,
+    "withGrams": 109
+  },
+  {
+    "name": "tvaroh jemný hrudkovitý",
+    "count": 108,
+    "withGrams": 108
+  },
+  {
+    "name": "jahody záhradné",
+    "count": 108,
+    "withGrams": 108
+  },
+  {
+    "name": "jogurt bielkovinový",
+    "count": 100,
+    "withGrams": 100
+  },
+  {
+    "name": "mandle",
+    "count": 98,
+    "withGrams": 98
+  },
+  {
+    "name": "reďkovka",
+    "count": 89,
+    "withGrams": 89
+  },
+  {
+    "name": "cherry paradajky",
+    "count": 88,
+    "withGrams": 88
+  },
+  {
+    "name": "cottage cheese",
+    "count": 83,
+    "withGrams": 83
+  },
+  {
+    "name": "ovsené vločky",
+    "count": 80,
+    "withGrams": 80
+  },
+  {
+    "name": "konzerva tuniak vo vlastnej šťave",
+    "count": 79,
+    "withGrams": 79
+  },
+  {
+    "name": "tofu biele",
+    "count": 77,
+    "withGrams": 77
+  },
+  {
+    "name": "paprika červená",
+    "count": 77,
+    "withGrams": 77
+  },
+  {
+    "name": "špenát listový",
+    "count": 76,
+    "withGrams": 76
+  },
+  {
+    "name": "živočíšne maslo",
+    "count": 76,
+    "withGrams": 76
+  },
+  {
+    "name": "pór",
+    "count": 76,
+    "withGrams": 76
+  },
+  {
+    "name": "orechy vlašské",
+    "count": 73,
+    "withGrams": 73
+  },
+  {
+    "name": "uhorky",
+    "count": 72,
+    "withGrams": 72
+  },
+  {
+    "name": "konopné semienka lúpané",
+    "count": 71,
+    "withGrams": 71
+  },
+  {
+    "name": "med včelí",
+    "count": 68,
+    "withGrams": 68
+  },
+  {
+    "name": "sezamové semená",
+    "count": 61,
+    "withGrams": 61
+  },
+  {
+    "name": "vaječný bielok",
+    "count": 59,
+    "withGrams": 59
+  },
+  {
+    "name": "ľanové semená",
+    "count": 59,
+    "withGrams": 59
+  },
+  {
+    "name": "knäckebrot",
+    "count": 59,
+    "withGrams": 59
+  },
+  {
+    "name": "orechy kešu",
+    "count": 58,
+    "withGrams": 58
+  },
+  {
+    "name": "hydinová šunka",
+    "count": 56,
+    "withGrams": 56
+  },
+  {
+    "name": "čučoriedky",
+    "count": 56,
+    "withGrams": 56
+  },
+  {
+    "name": "rukola",
+    "count": 56,
+    "withGrams": 56
+  },
+  {
+    "name": "paprika zelená",
+    "count": 52,
+    "withGrams": 52
+  },
+  {
+    "name": "repkový olej rafinovaný",
+    "count": 50,
+    "withGrams": 50
+  },
+  {
+    "name": "maliny",
+    "count": 50,
+    "withGrams": 50
+  },
+  {
+    "name": "cukina",
+    "count": 49,
+    "withGrams": 49
+  },
+  {
+    "name": "vajce na tvrdo",
+    "count": 49,
+    "withGrams": 49
+  },
+  {
+    "name": "uhorky zavárané kyslé",
+    "count": 49,
+    "withGrams": 49
+  },
+  {
+    "name": "čakankový sirup",
+    "count": 48,
+    "withGrams": 48
+  },
+  {
+    "name": "zeler buľvový",
+    "count": 47,
+    "withGrams": 47
+  },
+  {
+    "name": "paprika zeleninová",
+    "count": 46,
+    "withGrams": 46
+  },
+  {
+    "name": "tvaroh jemný hrudkový",
+    "count": 45,
+    "withGrams": 45
+  },
+  {
+    "name": "sójové mlieko",
+    "count": 44,
+    "withGrams": 44
+  },
+  {
+    "name": "kokos mletý",
+    "count": 44,
+    "withGrams": 44
+  },
+  {
+    "name": "červená repa",
+    "count": 43,
+    "withGrams": 43
+  },
+  {
+    "name": "kokosový nápoj",
+    "count": 43,
+    "withGrams": 43
+  },
+  {
+    "name": "chlieb hypoalergénny",
+    "count": 42,
+    "withGrams": 42
+  },
+  {
+    "name": "orechy lieskové",
+    "count": 42,
+    "withGrams": 42
+  },
+  {
+    "name": "citróny",
+    "count": 42,
+    "withGrams": 42
+  },
+  {
+    "name": "pesto bazalkové bio",
+    "count": 42,
+    "withGrams": 42
+  },
+  {
+    "name": "chia semienka",
+    "count": 41,
+    "withGrams": 41
+  },
+  {
+    "name": "tvrdý syr",
+    "count": 41,
+    "withGrams": 41
+  },
+  {
+    "name": "paprika žltá",
+    "count": 41,
+    "withGrams": 41
+  },
+  {
+    "name": "jablká",
+    "count": 40,
+    "withGrams": 40
+  },
+  {
+    "name": "zemiaky skoré",
+    "count": 38,
+    "withGrams": 38
+  },
+  {
+    "name": "špargľa",
+    "count": 37,
+    "withGrams": 37
+  },
+  {
+    "name": "chlieb celozrnný pšeničný “graham”",
+    "count": 37,
+    "withGrams": 37
+  },
+  {
+    "name": "jogurt sójový biely bio",
+    "count": 36,
+    "withGrams": 36
+  },
+  {
+    "name": "šťava citrónová",
+    "count": 36,
+    "withGrams": 36
+  },
+  {
+    "name": "sójová omáčka",
+    "count": 36,
+    "withGrams": 36
+  },
+  {
+    "name": "cícer varený",
+    "count": 34,
+    "withGrams": 34
+  },
+  {
+    "name": "fazuľa biela",
+    "count": 34,
+    "withGrams": 34
+  },
+  {
+    "name": "petržlen",
+    "count": 34,
+    "withGrams": 34
+  },
+  {
+    "name": "arašidové maslo",
+    "count": 33,
+    "withGrams": 33
+  },
+  {
+    "name": "slnečnicové semená",
+    "count": 33,
+    "withGrams": 33
+  },
+  {
+    "name": "javorový sirup",
+    "count": 33,
+    "withGrams": 33
+  },
+  {
+    "name": "med",
+    "count": 32,
+    "withGrams": 32
+  },
+  {
+    "name": "quinoa",
+    "count": 32,
+    "withGrams": 32
+  },
+  {
+    "name": "ľanový olej lisovaný za studena",
+    "count": 31,
+    "withGrams": 31
+  },
+  {
+    "name": "morčacia šunka",
+    "count": 31,
+    "withGrams": 31
+  },
+  {
+    "name": "mliečny proteín",
+    "count": 30,
+    "withGrams": 30
+  },
+  {
+    "name": "žemľa viaczrnná hamburgerová",
+    "count": 30,
+    "withGrams": 30
+  },
+  {
+    "name": "vegánsky proteín",
+    "count": 30,
+    "withGrams": 30
+  },
+  {
+    "name": "horčica plnotučná",
+    "count": 30,
+    "withGrams": 30
+  },
+  {
+    "name": "ryža varená",
+    "count": 30,
+    "withGrams": 30
+  },
+  {
+    "name": "hrušky",
+    "count": 29,
+    "withGrams": 29
+  },
+  {
+    "name": "jablko",
+    "count": 29,
+    "withGrams": 29
+  },
+  {
+    "name": "mozzarella",
+    "count": 29,
+    "withGrams": 29
+  },
+  {
+    "name": "zemiaky neskoré",
+    "count": 29,
+    "withGrams": 29
+  },
+  {
+    "name": "sezamový olej",
+    "count": 28,
+    "withGrams": 28
+  },
+  {
+    "name": "rajčiny/paradajky",
+    "count": 28,
+    "withGrams": 28
+  },
+  {
+    "name": "paprika biela",
+    "count": 26,
+    "withGrams": 26
+  },
+  {
+    "name": "rožky grahamové",
+    "count": 25,
+    "withGrams": 25
+  },
+  {
+    "name": "konopný proteín",
+    "count": 25,
+    "withGrams": 25
+  },
+  {
+    "name": "ananás",
+    "count": 25,
+    "withGrams": 25
+  },
+  {
+    "name": "pomaranče",
+    "count": 25,
+    "withGrams": 25
+  },
+  {
+    "name": "amarantové perličky",
+    "count": 22,
+    "withGrams": 22
+  },
+  {
+    "name": "mak",
+    "count": 22,
+    "withGrams": 22
+  },
+  {
+    "name": "horčica",
+    "count": 22,
+    "withGrams": 22
+  },
+  {
+    "name": "chlieb zemiakový",
+    "count": 22,
+    "withGrams": 22
+  },
+  {
+    "name": "cícer v konzerve",
+    "count": 21,
+    "withGrams": 21
+  },
+  {
+    "name": "grécky jogurt",
+    "count": 21,
+    "withGrams": 21
+  },
+  {
+    "name": "smotana 12 %",
+    "count": 20,
+    "withGrams": 20
+  },
+  {
+    "name": "smotana kyslá pochúťková",
+    "count": 20,
+    "withGrams": 20
+  },
+  {
+    "name": "hrozienka",
+    "count": 20,
+    "withGrams": 20
+  },
+  {
+    "name": "syr eidam,",
+    "count": 20,
+    "withGrams": 20
+  },
+  {
+    "name": "kokosový olej",
+    "count": 19,
+    "withGrams": 19
+  },
+  {
+    "name": "olivy zelené marinované",
+    "count": 19,
+    "withGrams": 19
+  },
+  {
+    "name": "sójový syr tofu",
+    "count": 19,
+    "withGrams": 19
+  },
+  {
+    "name": "pečiarka poľná/šampiňóny",
+    "count": 18,
+    "withGrams": 18
+  },
+  {
+    "name": "broskyne",
+    "count": 18,
+    "withGrams": 18
+  },
+  {
+    "name": "jogurt biely",
+    "count": 17,
+    "withGrams": 17
+  },
+  {
+    "name": "väčšia naberačka zemiaky neskoré",
+    "count": 17,
+    "withGrams": 17
+  },
+  {
+    "name": "červené fazuľky v konzerve",
+    "count": 17,
+    "withGrams": 17
+  },
+  {
+    "name": "mandľové mlieko",
+    "count": 17,
+    "withGrams": 17
+  },
+  {
+    "name": "mlieko plnotučné",
+    "count": 17,
+    "withGrams": 17
+  },
+  {
+    "name": "slepačie bielko",
+    "count": 17,
+    "withGrams": 17
+  },
+  {
+    "name": "kaleráb",
+    "count": 17,
+    "withGrams": 17
+  },
+  {
+    "name": "šťava pomarančová",
+    "count": 16,
+    "withGrams": 16
+  },
+  {
+    "name": "čokoláda horká",
+    "count": 15,
+    "withGrams": 15
+  },
+  {
+    "name": "bryndza plnotučná",
+    "count": 15,
+    "withGrams": 15
+  },
+  {
+    "name": "pretlak paradajkový sterilizovaný",
+    "count": 15,
+    "withGrams": 15
+  },
+  {
+    "name": "chlieb pohánkový",
+    "count": 14,
+    "withGrams": 14
+  },
+  {
+    "name": "cottage cheese s pažitkou",
+    "count": 14,
+    "withGrams": 14
+  },
+  {
+    "name": "šampiňóny čerstvé",
+    "count": 14,
+    "withGrams": 14
+  },
+  {
+    "name": "kakaový prášok",
+    "count": 14,
+    "withGrams": 14
+  },
+  {
+    "name": "bageta celozrnná",
+    "count": 14,
+    "withGrams": 14
+  },
+  {
+    "name": "hrozno",
+    "count": 13,
+    "withGrams": 13
+  },
+  {
+    "name": "syr eidam",
+    "count": 13,
+    "withGrams": 13
+  },
+  {
+    "name": "arašidy",
+    "count": 13,
+    "withGrams": 13
+  },
+  {
+    "name": "ghee maslo",
+    "count": 13,
+    "withGrams": 13
+  },
+  {
+    "name": "mäkký nezrejúci syr",
+    "count": 13,
+    "withGrams": 13
+  },
+  {
+    "name": "bataty",
+    "count": 12,
+    "withGrams": 12
+  },
+  {
+    "name": "ryžová smotana",
+    "count": 12,
+    "withGrams": 12
+  },
+  {
+    "name": "hrozienka sušené",
+    "count": 12,
+    "withGrams": 12
+  },
+  {
+    "name": "avokádo",
+    "count": 11,
+    "withGrams": 11
+  },
+  {
+    "name": "trstinový cukor",
+    "count": 11,
+    "withGrams": 11
+  },
+  {
+    "name": "orechy para",
+    "count": 11,
+    "withGrams": 11
+  },
+  {
+    "name": "baklažán",
+    "count": 11,
+    "withGrams": 11
+  },
+  {
+    "name": "acidko biele plnotučné",
+    "count": 11,
+    "withGrams": 11
+  },
+  {
+    "name": "hrachový proteín",
+    "count": 11,
+    "withGrams": 11
+  },
+  {
+    "name": "pohánkové vločky",
+    "count": 10,
+    "withGrams": 10
+  },
+  {
+    "name": "sójová smotana bio",
+    "count": 10,
+    "withGrams": 10
+  },
+  {
+    "name": "kiwi",
+    "count": 10,
+    "withGrams": 10
+  },
+  {
+    "name": "proteínové muffiny",
+    "count": 10,
+    "withGrams": 10
+  },
+  {
+    "name": "marhule",
+    "count": 10,
+    "withGrams": 10
+  },
+  {
+    "name": "tvaroh tučný",
+    "count": 10,
+    "withGrams": 10
+  },
+  {
+    "name": "bageta špaldová",
+    "count": 10,
+    "withGrams": 10
+  },
+  {
+    "name": "limetka",
+    "count": 10,
+    "withGrams": 10
+  },
+  {
+    "name": "prosciutto crudo",
+    "count": 9,
+    "withGrams": 9
+  },
+  {
+    "name": "melón červený",
+    "count": 9,
+    "withGrams": 9
+  },
+  {
+    "name": "kakaový prášok,",
+    "count": 9,
+    "withGrams": 9
+  },
+  {
+    "name": "zemiaky nové varené",
+    "count": 9,
+    "withGrams": 9
+  },
+  {
+    "name": "pečiarka záhradná/šampiňóny",
+    "count": 9,
+    "withGrams": 9
+  },
+  {
+    "name": "kakaový prášok bio",
+    "count": 9,
+    "withGrams": 9
+  },
+  {
+    "name": "kuracie stehno",
+    "count": 8,
+    "withGrams": 8
+  },
+  {
+    "name": "špaldové palacinky s ovocím",
+    "count": 8,
+    "withGrams": 8
+  },
+  {
+    "name": "paradajkový pretlak",
+    "count": 8,
+    "withGrams": 8
+  },
+  {
+    "name": "káva",
+    "count": 8,
+    "withGrams": 8
+  },
+  {
+    "name": "sušené figy",
+    "count": 8,
+    "withGrams": 8
+  },
+  {
+    "name": "špaldová múka polohrubá",
+    "count": 8,
+    "withGrams": 8
+  },
+  {
+    "name": "horčica kremžská",
+    "count": 8,
+    "withGrams": 8
+  },
+  {
+    "name": "lučina skyr",
+    "count": 8,
+    "withGrams": 8
+  },
+  {
+    "name": "eidam údený",
+    "count": 7,
+    "withGrams": 7
+  },
+  {
+    "name": "špaldová krupica",
+    "count": 7,
+    "withGrams": 7
+  },
+  {
+    "name": "zemiaky neskoré varené",
+    "count": 7,
+    "withGrams": 7
+  },
+  {
+    "name": "balkánsky syr",
+    "count": 7,
+    "withGrams": 7
+  },
+  {
+    "name": "granátové jablká",
+    "count": 7,
+    "withGrams": 7
+  },
+  {
+    "name": "mandarínky",
+    "count": 7,
+    "withGrams": 7
+  },
+  {
+    "name": "nátierka s cícerom a červenou repou",
+    "count": 7,
+    "withGrams": 7
+  },
+  {
+    "name": "špaldová múka hladká",
+    "count": 7,
+    "withGrams": 7
+  },
+  {
+    "name": "tvarohová štrúdľa s čučoriedkami",
+    "count": 6,
+    "withGrams": 6
+  },
+  {
+    "name": "chlieb rascový",
+    "count": 6,
+    "withGrams": 6
+  },
+  {
+    "name": "špaldové cesto na pizzu",
+    "count": 6,
+    "withGrams": 6
+  },
+  {
+    "name": "kečup bez cukru",
+    "count": 6,
+    "withGrams": 6
+  },
+  {
+    "name": "pohánková krupica",
+    "count": 6,
+    "withGrams": 6
+  },
+  {
+    "name": "seitan natural",
+    "count": 6,
+    "withGrams": 6
+  },
+  {
+    "name": "mäsové guľky",
+    "count": 6,
+    "withGrams": 6
+  },
+  {
+    "name": "tortilla špaldová domáca",
+    "count": 6,
+    "withGrams": 6
+  },
+  {
+    "name": "tekvica",
+    "count": 6,
+    "withGrams": 6
+  },
+  {
+    "name": "pšenové guľky",
+    "count": 6,
+    "withGrams": 6
+  },
+  {
+    "name": "sušené brusnice",
+    "count": 6,
+    "withGrams": 6
+  },
+  {
+    "name": "bezkvasové pečivo",
+    "count": 6,
+    "withGrams": 6
+  },
+  {
+    "name": "bravčová šunka",
+    "count": 6,
+    "withGrams": 6
+  },
+  {
+    "name": "čerešne",
+    "count": 6,
+    "withGrams": 6
+  },
+  {
+    "name": "domáca müsli tyčinka",
+    "count": 5,
+    "withGrams": 5
+  },
+  {
+    "name": "kefír",
+    "count": 5,
+    "withGrams": 5
+  },
+  {
+    "name": "kečup",
+    "count": 5,
+    "withGrams": 5
+  },
+  {
+    "name": "tekvica hokkaido",
+    "count": 5,
+    "withGrams": 5
+  },
+  {
+    "name": "acidofilné mlieko plnotučné",
+    "count": 5,
+    "withGrams": 5
+  },
+  {
+    "name": "tofu",
+    "count": 5,
+    "withGrams": 5
+  },
+  {
+    "name": "voda",
+    "count": 5,
+    "withGrams": 5
+  },
+  {
+    "name": "krupica ryžová",
+    "count": 5,
+    "withGrams": 5
+  },
+  {
+    "name": "rožok grahamový",
+    "count": 5,
+    "withGrams": 5
+  },
+  {
+    "name": "feta syr",
+    "count": 5,
+    "withGrams": 5
+  },
+  {
+    "name": "ryžové mlieko",
+    "count": 5,
+    "withGrams": 5
+  },
+  {
+    "name": "baklažánová nátierka",
+    "count": 4,
+    "withGrams": 4
+  },
+  {
+    "name": "zemiakovo-kelové komíny",
+    "count": 4,
+    "withGrams": 4
+  },
+  {
+    "name": "batátovo-mandľové koláčiky",
+    "count": 4,
+    "withGrams": 4
+  },
+  {
+    "name": "múka pšeničná hladká",
+    "count": 4,
+    "withGrams": 4
+  },
+  {
+    "name": "rastlinná nátierka hummus",
+    "count": 4,
+    "withGrams": 4
+  },
+  {
+    "name": "špaldové vločky",
+    "count": 4,
+    "withGrams": 4
+  },
+  {
+    "name": "slivky",
+    "count": 4,
+    "withGrams": 4
+  },
+  {
+    "name": "červená cibuľa",
+    "count": 4,
+    "withGrams": 4
+  },
+  {
+    "name": "pohánková múka celozrnná",
+    "count": 4,
+    "withGrams": 4
+  },
+  {
+    "name": "džem jahodový",
+    "count": 4,
+    "withGrams": 4
+  },
+  {
+    "name": "baby šalát",
+    "count": 4,
+    "withGrams": 4
+  },
+  {
+    "name": "brokolica brokolica",
+    "count": 4,
+    "withGrams": 4
+  },
+  {
+    "name": "acidofilné mlieko jahodové",
+    "count": 4,
+    "withGrams": 4
+  },
+  {
+    "name": "protein milkshake čokoláda",
+    "count": 4,
+    "withGrams": 4
+  },
+  {
+    "name": "ryžové vločky",
+    "count": 4,
+    "withGrams": 4
+  },
+  {
+    "name": "mlieko ovčie",
+    "count": 4,
+    "withGrams": 4
+  },
+  {
+    "name": "hrachová polievka",
+    "count": 4,
+    "withGrams": 4
+  },
+  {
+    "name": "protein milk shake vanilka",
+    "count": 4,
+    "withGrams": 4
+  },
+  {
+    "name": "pšeničná krupica",
+    "count": 4,
+    "withGrams": 4
+  },
+  {
+    "name": "batátové nepečené brownies",
+    "count": 3,
+    "withGrams": 3
+  },
+  {
+    "name": "marináda na mäso - kuracie prsia",
+    "count": 3,
+    "withGrams": 3
+  },
+  {
+    "name": "mandľovo-ovsená bábovka",
+    "count": 3,
+    "withGrams": 3
+  },
+  {
+    "name": "kokosová múka",
+    "count": 3,
+    "withGrams": 3
+  },
+  {
+    "name": "škorica",
+    "count": 3,
+    "withGrams": 3
+  },
+  {
+    "name": "tyčinka proteínová tyčinka",
+    "count": 3,
+    "withGrams": 3
+  },
+  {
+    "name": "quinoa varená",
+    "count": 3,
+    "withGrams": 3
+  },
+  {
+    "name": "celozrnné chlebíčky - pšenično-ražné",
+    "count": 3,
+    "withGrams": 3
+  },
+  {
+    "name": "zeleninová krémová polievka",
+    "count": 3,
+    "withGrams": 3
+  },
+  {
+    "name": "parmezán",
+    "count": 3,
+    "withGrams": 3
+  },
+  {
+    "name": "naklíčené slnečnicové semienka",
+    "count": 3,
+    "withGrams": 3
+  },
+  {
+    "name": "hrach mrazený",
+    "count": 3,
+    "withGrams": 3
+  },
+  {
+    "name": "slepačí bujón",
+    "count": 3,
+    "withGrams": 3
+  },
+  {
+    "name": "palacinky",
+    "count": 3,
+    "withGrams": 3
+  },
+  {
+    "name": "pšeničná múka hladká",
+    "count": 3,
+    "withGrams": 3
+  },
+  {
+    "name": "pomaranč",
+    "count": 3,
+    "withGrams": 3
+  },
+  {
+    "name": "boloňská omáčka z vlašských orechov",
+    "count": 3,
+    "withGrams": 3
+  },
+  {
+    "name": "kukurica z konzervy",
+    "count": 3,
+    "withGrams": 3
+  },
+  {
+    "name": "džem čučoriedkový",
+    "count": 3,
+    "withGrams": 3
+  },
+  {
+    "name": "ovos, klíčky",
+    "count": 3,
+    "withGrams": 3
+  },
+  {
+    "name": "chlieb celozrnný pšeničný graham",
+    "count": 3,
+    "withGrams": 3
+  },
+  {
+    "name": "džús pomarančový",
+    "count": 3,
+    "withGrams": 3
+  },
+  {
+    "name": "avokádový olej",
+    "count": 3,
+    "withGrams": 3
+  },
+  {
+    "name": "palacinka špaldové palacinky",
+    "count": 3,
+    "withGrams": 3
+  },
+  {
+    "name": "sušené paradajky v oleji",
+    "count": 3,
+    "withGrams": 3
+  },
+  {
+    "name": "g červená cibuľa ½ pl grécky jogurt",
+    "count": 3,
+    "withGrams": 3
+  },
+  {
+    "name": "g špaldové cestoviny ½ pl olivový olej",
+    "count": 3,
+    "withGrams": 3
+  },
+  {
+    "name": "šošovica červená cesnak jarná cibuľka 1 strúčik cesnak",
+    "count": 3,
+    "withGrams": 3
+  },
+  {
+    "name": "ingrediencie 2 x krajec chlieb pohánkový",
+    "count": 3,
+    "withGrams": 3
+  },
+  {
+    "name": "ingrediencie 4 pl jogurt bielkovinový",
+    "count": 3,
+    "withGrams": 3
+  },
+  {
+    "name": "ingrediencie 7 x kus sushi nigiri - losos",
+    "count": 3,
+    "withGrams": 3
+  },
+  {
+    "name": "hovädzia sviečkovica 3 a ½ ks paprika červená",
+    "count": 3,
+    "withGrams": 3
+  },
+  {
+    "name": "tofu syr údený",
+    "count": 3,
+    "withGrams": 3
+  },
+  {
+    "name": "g kapusta hlávková červená ½ čl med včelí",
+    "count": 3,
+    "withGrams": 3
+  },
+  {
+    "name": "šampiňóny v konzerve",
+    "count": 3,
+    "withGrams": 3
+  },
+  {
+    "name": "napr. lagris ½ ks mozzarella",
+    "count": 3,
+    "withGrams": 3
+  },
+  {
+    "name": "g pstruh dúhový 1 čl olivový olej",
+    "count": 3,
+    "withGrams": 3
+  },
+  {
+    "name": "jogurt kozí biely",
+    "count": 3,
+    "withGrams": 3
+  },
+  {
+    "name": "g tofu biele 6 x bobuľa hrozno",
+    "count": 3,
+    "withGrams": 3
+  },
+  {
+    "name": "melón cukrový",
+    "count": 3,
+    "withGrams": 3
+  },
+  {
+    "name": "ingrediencie 1 a ½ ks tortilla celozrnná",
+    "count": 3,
+    "withGrams": 3
+  },
+  {
+    "name": "ingrediencie 1 a ½ x kus rožky grahamové",
+    "count": 3,
+    "withGrams": 3
+  },
+  {
+    "name": "kokosovo-banánový chlieb",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "zapečené zemiaky s ricottou",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "nepravá jablková štrúdľa",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "šošovicová polievka s kokosovým mliekom",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "bezlepková hraška",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "g losos obyčajný 1 čl repkový olej rafinovaný",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "banánovo-tvarohová bábovka",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "pečená brokolica a špargľa",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "g šalát hlávkový ½ x čl majonéza jogurtová",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "porcia mrkvový koláč",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "boloňská omáčka",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "raw sladké guličky",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "yžica polievková horčica",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "tofu muffiny",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "g avokádo ½ x stredne veľká cibuľa",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "g medvedí cesnak 1 strúčik cesnak",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "šalát hlávkový jogurt biely",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "g polníček ½ x pl vínny ocot",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "rajčiny losos obyčajný 1 ks rajčiny",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "pšeničná múka celozrnná",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "g kuriatko jedlé 1 strúčik cesnak",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "g červená cibuľa ½ čl horčica plnotučná",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "g mungo klíčky 1 čl slnečnicové semená",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "červená cibuľa olivový olej",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "g šošovica varená ½ x balenie cottage cheese",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "cuketový koláč s marhuľami",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "paradajková omáčka paradajková omáčka mäsové guľky",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "kukuričný škrob",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "lieskové oriešky bio",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "hubovo-zemiaková polievka",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "napr. lagris 70 g tvrdý syr",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "g kapusta hlávková červená 1 čl olivový olej",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "paradajkové pyré",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "g fazuľa 1 pl repkový olej rafinovaný",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "chilli paprička med včelí avokádo parmezán",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "chlieb celozrnný... cherry paradajky 3 ks cherry paradajky",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "g polotvrdý syr halloumi 1 čl olivový olej",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "pečiarka ovčia / šampiňón",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "g mango 1 pl med",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "ovsené vločky 4 ks jahody záhradné",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "g avokádo ½ menší kus banány",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "g kapusta čínska ½ strúčik cesnak",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "hmotnosť pevného podielu tuniak vo vlastnej šťave giana",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "ingrediencie 4 x kus sushi nigiri - losos",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "g hovädzia sviečkovica 1 čl olivový olej",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "olej tekvicový",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "zmrzlina bielkovinová",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "jogurt biely gazdovský bio s kultúrou bifi",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "tekvicová hokkaido polievka",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "g bielkovinový chlieb večerný",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "g panko strúhanka 7 ks mandle",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "g brokolica 1 x pl pšeničná krupica",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "g hríb smrekový sušený 1 čl olivový olej",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "g šošovica 2 čl olivový olej",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "g morčacie prsia bez kostí 2 ks mrkva",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "cícer varený špenát 3 ks rajčiny",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "g avokádo 10 ks cherry paradajky",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "ingrediencie 6 pl ovsené vločky",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "mlieko polotučné 1 čl med včelí",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "chlieb celozrnný... rajčiny 2 ks rajčiny",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "ingrediencie 3 dl mlieko polotučné",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "ingrediencie 2 x kus rožok grahamový",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "ingrediencie 9 a ½ x lyžica polievková quinoa",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "ingrediencie 1 a ½ menší kus banány",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "mrazené jahody mrazené jahody banány mlieko polotučné",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "mandle ingrediencie 1 a ½ ks kaleráb",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "ingrediencie ½ kus pomaranče",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "ingrediencie 2 balenie cottage cheese biely",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "kukurica kukurica uhorky olivový olej cottage cheese biely",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "ingrediencie 6 a ½ pl cícer varený",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "mlieko odtučnené/odstredené",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "kokos strúhaný nepražený",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "bataty - sladké zemiaky",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "chlieb celozrnný... rajčiny/paradajky ½ pl olivový olej",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "g parmezán ½ pl olivový olej",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "špargľovo-karfiolová polievka",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "g hrášok ½ x stredne veľká cibuľa",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "chlieb celozrnný... 2 čl sezamové semená",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "nápoje 2 a ½ dl mandľové mlieko",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "ingrediencie ½ balenie grécky jogurt",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "krúžok celozrnné chlebíčky - ryžové so sójou",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "jogurt kozí",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "g fazuľky edamame 1 čl repkový olej rafinovaný",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "špaldová celozrnná hrubá múka",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "šalát hlávkový olivový olej slepačie vajce",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "pstruh atlantický cesnak živočíšne maslo ½ strúčik cesnak",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "g karfiol 30 g balkánsky syr",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "g tofu 1 čl olivový olej",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "tvaroh tučný chia semienka ½ čl chia semienka",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "ingrediencie 1 a ½ stredný kus banány",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "chlieb celozrnný... 2 ks paprika zeleninová",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "ingrediencie 4 a ½ pl ovsené vločky",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "ingrediencie 1 stredný kus banány",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "ingrediencie 3 x stredný kus zemiaky skoré",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "g kukurica ½ ks uhorky",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "bezkvasové pečivo paprika zelená uhorky ½ ks uhorky",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "pstruh atlantický cesnak citróny ½ x kus citróny",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "g brokolica mrazená",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "cibuľa cícer varený ½ x stredne veľká cibuľa",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "ľahká zemiaková polievka",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "kapusta hlávková biela slnečnicové semená olivový olej",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "bazalkový dressing",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "g baby špenát 4 ks cherry paradajky",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "ingrediencie 7 x kus sushi nigiri - tuniak",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "polievka mrkvová s kokosovým mliekom",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "ingrediencie 2 krajec chlieb hypoalergénny",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "ingrediencie 2 a ½ x krajec chlieb pohánkový",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "g mango 2 čl slnečnicové semená",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "g pomelo ½ menší kus banány",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "ingrediencie 30 g avokádo 8 ks jahody záhradné",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "ingrediencie 3 ks mrkva",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "ingrediencie 2 a ½ kus knäckebrot",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "g tekvica hokkaido 1 kus knäckebrot",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "g špaldové cestoviny 5 x plátok hydinová šunka",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "g tekvica hokkaido 1 čl olivový olej",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "g parmezán 1 a ½ čl olivový olej",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "kukuričné vločky",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "g avokádo 15 ks jahody záhradné",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "napr. alnatura 1 a ½ ks mrkva",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "g avokádo 6 ks jahody záhradné",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "cesnak červená repa chlieb celozrnný... 1 strúčik cesnak",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "g avokádo 3 pl maliny",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "chia olej",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "olivový olej 1 strúčik cesnak",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "mrazené jahody",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "g tofu biele 2 ks mrkva",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "jogurt sójovo-kokosový",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "ingrediencie 2 ks slepačie vajce",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "ingrediencie 60 g fazuľa biela",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "cestoviny... ½ pl olivový olej",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "g šošovica červená ½ x balenie tofu biele",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "g avokádo ½ ks rajčiny",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "g marhule 2 čl konopné semienka lúpané",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "nápoje 2 a ½ dl acidko biele plnotučné",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "ingrediencie 2 dl mlieko plnotučné",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "ingrediencie 10 ks mandle",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "feta feta rajčiny/paradajky slepačie vajce",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "cestoviny... cesnak 1 strúčik cesnak",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "ingrediencie 6 x kus sushi nigiri - losos",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "ingrediencie 1 balenie cottage cheese biely",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "ingrediencie 1 a ½ x krajec chlieb pohánkový",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "cuketové placky s ovsenými vločkami",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "ingrediencie 1 x krajec chlieb zemiakový",
+    "count": 2,
+    "withGrams": 2
+  },
+  {
+    "name": "jogurt gazdovský čučoriedkový",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "jogurt jahodový",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "pomarančový koláč s karobom",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "muffiny ovsené",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "mrazené jahody banány mrazené jahody orechy kešu",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "mozzarella cukina",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "tyčinka bryndzové tyčinky s hokkaido tekvicou",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "raňajkový fitness koláč",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "nápoje 3 dl mlieko plnotučné",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "banány pohánka lúpaná ½ menší kus banány",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g cibuľa 1 strúčik cesnak",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g konopný proteín 4 ks jahody záhradné",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g mozzarella ½ x kus slepačie vajce",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g šalát hlávkový ½ strúčik cesnak",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "cestoviny,... cesnak ½ x stredne veľká cibuľa",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "chlebíček bio kamutový",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g losos obyčajný 3 a ½ ks mrkva",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "hrachová polievka s bulgurom",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "polníček med včelí avokádo parmezán",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g polníček ½ pl vínny ocot",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "kakaová raw tyčinka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g šampiňóny portobello ½ strúčik cesnak",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "cestoviny aglio e olio",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g kuracie stehno 6 x pl paradajkový pretlak",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g pšeno 1 a ½ pl arašidové maslo",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g mrazené jahody ½ pl čakankový sirup",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g cibuľa ½ ks rajčiny/paradajky",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "syr eidam údený,",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "kapusta hlávková... ½ čl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g hovädzie zadné - surové ½ ks kaleráb",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g brokolica ½ balenie cottage cheese biely",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "jahodová zmrzlina 1.8 jahodová zmrzlina",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "švédska nátierka knäckebrot švédska nátierka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g hrach 2 čl pesto bazalkové bio",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "bataty - sladké... šošovica červená 1 ks mrkva",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g kukurica 1 čl slnečnicové semená",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g hrášok ½ ks mrkva",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g fazuľa 1 pl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "napr. lagris ½ x balenie tofu biele",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g hrášok 1 čl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g polníček 1 strúčik cesnak",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g cottage cheese 3 kus knäckebrot",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g krevety varené 1 čl živočíšne maslo",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "polievka z červenej šošovice",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g kuracie stehno 20 g feta syr",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "pór feta syr 1 čl horčica",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "cottage cheese biely reďkovka 6 ks šampiňóny čerstvé",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g šampiňóny portobello 1 a ½ strúčik cesnak",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "karfiol brokolica",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "paradajková omáčka paradajková omáčka mäsové guľky zemiaky neskoré...",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "tarhoňa pór ½ pl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "olivový olej ½ x čl živočíšne maslo",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "mango kokos mletý mango tvaroh jemný...",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g sardinky vo vlastnej šťave 1 ks uhorky",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ovsené vločky vaječný bielok 2 dl kokosový nápoj",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "šalát hlávkový 50 x g uhorky hliva ustricová",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g avokádo 1 pl vegánsky proteín",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g avokádo 1 a ½ pl vegánsky proteín",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g mango 5 ks mandle",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g baby špenát 2 a ½ strúčik cesnak",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "jahodová zmrzlina 2.5 jahodová zmrzlina",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g mango 3 pl jogurt bielkovinový",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "horčica 2 čl horčica",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "cesnak sezamové semená quinoa 1 strúčik cesnak",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g cibuľa ½ ks paprika žltá",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "avokádová polievka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "uhorky brokolica olivový olej zemiaky neskoré",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "mrazené jahody mrazené jahody mlieko polotučné",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g šampiňóny portobello cestoviny... cesnak ½ strúčik cesnak",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g mrazené maliny 2 čl chia semienka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "nápoje 3 dl mlieko polotučné",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "sumček africký olivový olej ½ čl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "tvaroh tučný jemný",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g špaldové cestoviny ½ x porcia boloňská omáčka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g šampiňóny portobello 1 strúčik cesnak",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "jahodová zmrzlina 2.1 jahodová zmrzlina",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g pór 1 strúčik cesnak",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g šošovica 1 x ks vajce na tvrdo",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "polníček cuketa olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g hovädzie mäso varené 1 pl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "mandľové maslo mandľové maslo palacinky",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g pšeno 11 ks orechy kešu",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "chlieb celozrnný... cibuľa ½ ks uhorky",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "mango man tvaroh jemný...",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g avokádo 1 dl mlieko polotučné",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "repkový olej... fazuľky edamame 1 strúčik cesnak",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "parmezán cestoviny... parmezán boloňská omáčka...",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g lahôdkové droždie ½ čl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g nakladané/kvasené uhorky ½ x stredne veľká cibuľa",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g tekvicové semená sušené ½ čl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "avokádo mlieko polotučné jahody záhradné čokoláda",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "paradajková omáčka paradajková omáčka zemiaky neskoré... mäsové guľky",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ovsené vločky špenát ½ čl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "quinoa slnečnicové semená brokolica ½ čl slnečnicové semená",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g brokolica ½ čl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "uhorky brokolica zemiaky neskoré",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "dressing s tekvicovým olejom a čiernym korením",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "cottage cheese biely cesnak rajčiny 1 ks rajčiny",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g avokádo 1 x čl med včelí",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "cícer varený cherry paradajky 4 ks cherry paradajky",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g ricotta 1 x krajec chlieb zemiakový",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "cícer varený cibuľa 3 ks rajčiny",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g kapusta hlávková červená ½ x miska rukola",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "avokádo 9 ks jahody záhradné",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "voda čučoriedky pohánka lúpaná 100 ml voda",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g avokádo 2 čl sezamové semená",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "jahody záhradné chlieb celozrnný... 4 ks jahody záhradné",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g pšeno 3 dl sójové mlieko",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g tekvica hokkaido 5 ks mandle",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "sušené figy sezamové semená jablká",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "sušené marhule",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "pohánkové vločky med orechy lieskové ½ pl med",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "čakankový sirup maliny pohánkové vločky 2 pl maliny",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g pšeno 1 a ½ dl mandľové mlieko",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "čakankový sirup pšeno 2 pl maliny",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g cottage cheese ½ x menší kus jablká",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g pečiarka poľná/šampiňóny ½ ks paprika žltá",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "rímsky šalát rímsky šalát sójové mlieko marhule",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g tofu biele 1 a ½ ks mrkva",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ocot jablčný",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g pomelo 8 x kus hrozienka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g cottage cheese ½ ks paprika zeleninová",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g tekvicové semená sušené 2 pl jogurt kozí",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g kukurica v konzerve 1 strúčik cesnak",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 3 x kus sushi nigiri - losos",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "sushi nigiri - tuniak",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g kukurica ½ x stredne veľká cibuľa",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "hrozno tofu biele 4 x bobuľa hrozno",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "zeleninová polievka s karfiolom",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g mango 1 pl vegánsky proteín",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "banány ½ čl kokos mletý",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "mrazené jahody orechy kešu mrazené jahody banány",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g mrazené maliny ½ čl med včelí",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "chia semienka hrozienka jablká 4 x kus hrozienka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "karob jogurt sójový... ½ čl chia semienka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "červená repa konopné semienka... ½ čl med včelí",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "celozrnné... nápoje 1 x dl acidko biele plnotučné",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g pomelo 1 x 5 kusov hrozienka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "uhorky zavárané kyslé tvrdý syr",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g tekvica hokkaido ½ čl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g kvasená/kyslá kapusta 1 x stredne veľký petržlen",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g parmezán 3 a ½ pl jogurt bielkovinový",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "losos obyčajný rajčiny 1 ks rajčiny",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g šošovica červená 1 čl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "cesnak 1 a ½ strúčik cesnak",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "šalát hlávkový olivový olej rajčiny cuketa",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 4 a ½ pl krupica ryžová",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g avokádo 7 pl maliny",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ovsené vločky jahody záhradné 3 ks jahody záhradné",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 3 a ½ x palacinka cottage palacinky",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 1 ks mozzarella",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g pečiarka poľná/šampiňóny 1 strúčik cesnak",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g tofu biele 5 ks orechy kešu",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g špaldové cestoviny ½ ks avokádo",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie ½ x krajec chlieb celozrnný pšeničný “graham”",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 1 x krajec chlieb pohánkový",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g mango 3 a ½ pl jogurt bielkovinový",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g avokádo ½ stredný kus banány",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 5 pl jogurt bielkovinový",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 1 ks broskyne",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 5 pl quinoa",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g cibuľa 2 x miska rukola",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 8 a ½ x lyžica polievková quinoa",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 13 a ½ pl cícer v konzerve",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g špaldové cestoviny 1 x balenie cottage cheese",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "cottage cheese rajčiny 2 ks rajčiny",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "toastový chlieb celozrnný",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "jarná cibuľka reďkovka chlieb celozrnný... 12 koliesko uhorky",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g granátové jablká 4 ks mandle",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "- kopcovitá cereálna kaša pohánková",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "jogurt gazdovský biely bio",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "pohánková krupica hrozienka 13 ks mandle",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ríbezle červené",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "knäckebrot reďkovka 6 ks reďkovka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "- kopcovitá cereálna kaša špaldová",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "orechy kešu 6 ks orechy kešu",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "bagel",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "nápoje 3 x 100 ml acidko biele plnotučné",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "slepačie vajce banány ½ pl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "džem višňový",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g pšeno 3 a ½ dl mlieko polotučné",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "chlieb celozrnný... cesnak rukola 2 x miska rukola",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "mliečny proteín avokádo 2 dl sójové mlieko",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g mango 2 x pl ríbezle červené",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "baby špenát jablká banány",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "hurmikaki",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "strúhaný kokos",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "nápoje 2 a ½ dl mlieko plnotučné",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ovsené vločky maliny 2 pl maliny",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "% whey protein scitec nutrition",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "nápoje 1 dl mlieko polotučné",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ďumbier mrkva ďumbier",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ďumbier ananás ďumbier avokádový olej banánovo-tvarohová bábovka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "tvaroh jemný... javorový sirup ½ čl javorový sirup",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "mango tvaroh jemný... mango kokos mletý",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "hydinová šunka parmezán 1 x plátok hydinová šunka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "mrazená zeleninová... olivový olej 1 strúčik cesnak",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "napr. lagris 75 g tvrdý syr",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g losos obyčajný 3 väčšia naberačka ryža varená",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g sterilizovaný hrášok 1 x čl parmezán",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g cibuľa ½ x čl horčica kremžská",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g kukurica ½ guľôčka batátovo-mandľové koláčiky",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g šampiňóny portobello 21 g pór ks mrkva",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "chilli paprička sezamovsezé saemmoevnýáolej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g brokolica 1 x ks vajce na tvrdo",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g kuracie stehno 4 x pl paradajkový pretlak",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "kvasená/kyslá kapusta kuracie stehno 185chol kvasená/kyslá... zemiaky skoré",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "sumček africký limetka ½ x kus limetka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g chlebíčky extrudované ryžové 1 ks slepačie vajce",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "polníček tarhoňa polníček cibuľa kuracie stehno olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "pstruh atlantický cesnak ½ x kus citróny",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g morčacie prsia bez kostí 10 ks mandle",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "rajčiny horčica kremžská chlieb celozrnný... ½ ks rajčiny",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "napr. alnatura 1 ks mrkva",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g pomelo ½ pl hrozienka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "džem čerešňový",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g avokádo 8 ks cherry paradajky",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "švédska nátierka chlieb zemiakový švédska nátierka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "chlieb celozrnný... cesnak 2 ks paprika zeleninová",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "olej kokosový extra panenský lisovaný za studena",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "rožky grahamové cibuľa ½ x stredne veľká cibuľa",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g parmezán ½ čl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "chlieb hypoalergénny ľanové semená 2 ks paprika zelená",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "napr. alnatura ½ čl sezamový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "banány 1 a ½ čl chia semienka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "figy 0.7 chol jogurt biely fig orechy lieskové",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g brokolica ½ x pl cukor trstinový",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "tofu syr údený 2 x stredne veľký petržlen",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "hrozno krémový... 5 x bobuľa hrozno",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "basmati 2 čl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "väčšia naberačka cestoviny varené",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "petržlen červená repa olivový olej 1 strúčik cesnak",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "cibuľa hovädzí vývar ½ x stredne veľká cibuľa",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "tofu biele cesnak cibuľa 1 strúčik cesnak",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "uhorky zavárané kyslé brokolica strúhanka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "rybacia omáčka zemiaky skoré",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "mrazené jahody mrazené jahody banány orechy kešu",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g mango 1 pl mliečny proteín",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ľadový šalát uhorky jogurt bielkovinový ½ ks rajčiny",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g hrach ½ x balenie cottage cheese biely",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "šošovica cesnak zeler buľvový ½ ks mrkva",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g kuracie prsia bez kostí 2 ks mrkva",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 9 a ½ pl jogurt bielkovinový",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 5 a ½ kus knäckebrot",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 1 a ½ x krajec chlieb zemiakový",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g parmezán 1 čl horčica plnotučná",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 4 pl ovsené vločky",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 1 x balenie jogurt biely",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 11 a ½ pl jogurt bielkovinový",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g pomelo 7 x kus hrozienka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie ½ kus granátové jablko",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "mango tvaroh jemný... mango",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "nápoje 3 dl acidko biele plnotučné",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "figy mandle figy jogurt bielkovinový",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 11 ks mandle",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 2 a ½ ks mrkva",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g brokolica 50 g tvrdý syr",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "cestoviny... brokolica 3 x plátok hydinová šunka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "kuracie prsia bez... quinoa 1 pl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 4 ks mrkva",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g mango 2 pl jogurt bielkovinový",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie ½ balenie cottage cheese biely",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "zavináče",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "tofu biele ½ pl hrozienka sušené nesírené bio",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "cestoviny... cukina krevety varené cukina",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 4 pl quinoa",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "chlieb celozrnný... paprika červená 7 ks reďkovka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "puding vanilka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "bez kôstky datle sušené",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g pšeno 4 a ½ dl mlieko polotučné",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "brusnice med včelí hrozienka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "chlieb celozrnný... cherry paradajky 10 ks cherry paradajky",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g cottage cheese 2 čl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g mandľové maslo 5 ks orechy kešu",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "mandle ½ pl javorový sirup",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "pšenové vločky",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "med mak ovsené vločky ½ čl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "tvaroh jemný... citróny ½ pl med",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "med banány mandľové mlieko ½ x kus citróny",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g avokádo 4 a ½ pl jogurt bielkovinový",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "chlieb celozrnný... ľadový šalát ½ pl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "napr. alnatura ½ pl sezamový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "banány ½ pl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "jablká amarantové perličky 2 čl konopné semienka lúpané",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "chlieb celozrnný... cibuľa 1 ks uhorky",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ryža nelúpaná morčacia šunka 1 ks slepačie vajce",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g šošovica 2 a ½ pl ovsené vločky",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "trstinový cukor polievka slepačia 6 ks arašidy",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "chilli paprička cibuľa balsamico kalamata ďumbier sezamový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g kozí syr mäkký ½ pl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g šošovica 1 pl repkový olej rafinovaný",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "amarant bio",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g morčacie prsia bez kostí 17 ks mandle",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "reďkovka rajčiny 1 x miska rukola",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g kvasená/kyslá kapusta 1 čl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "cesnak rukola med včelí 3 x bobuľa hrozno",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "quinoa 250 g brokolica 1 čl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "citróny losos obyčajný 2 ks rajčiny",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g králik domáci 1 pl marináda na králika",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "džem z červených ríbezlí",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "brusnice karob hrozienka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "tvaroh jemný... 5 x 5 bobúľ čučoriedky",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ovsený nápoj",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "nápoje 3 dl ovsený nápoj",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g pšeno 15 ks mandle",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "červená cibuľa ½ x stredne veľká červená cibuľa",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g mrazené jahody ½ čl kakaový prášok",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g mak 1 a ½ čl ľanové semená",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ricotta reďkovka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "slnečnicové semienka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "cestoviny... mrkva",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 2 a ½ stredný kus banány",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 3 x palacinka cottage palacinky",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 5 pl ovsené vločky",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g parmezán 1 a ½ čl horčica plnotučná",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g pečiarka poľná/šampiňóny 2 ks paprika zelená",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "nápoje 1 a ½ dl sójové mlieko",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "nápoje 3 dl mlieko acidofilné",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "jogurt smotanový čučoriedkový",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "figy jogurt bielkovinový figy mandle",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ďumbier ananás",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g pečiarka poľná/šampiňóny cestoviny... cesnak 2 strúčik cesnak",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g krevety varené 2 čl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "chlieb celozrnný... olivový olej ½ čl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "mrazené jahody mrazené jahod mlieko polotučné",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g pečiarka poľná/šampiňóny ½ ks paprika zelená",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 1 menší kus banány",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 5 pl maliny",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "orechy lieskové ingrediencie 1 a ½ ks kaleráb",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 11 pl cícer v konzerve",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g špaldové cestoviny 1 pl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "chlieb celozrnný... reďkovka 3 ks reďkovka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g morčacie prsia bez kostí 15 ks mandle",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 7 x pl cícer v konzerve",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "zelené fazuľové struky v konzerve tofu ryžové rezance...",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "kapusta hlávková... 1 a ½ čl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g avokádo 11 ks jahody záhradné",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "amarantové perličky kiwi ½ ks kiwi",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "čučoriedky banány ½ pl čakankový sirup",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "chlieb celozrnný... cibuľa 2 ks rajčiny",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ryžové vločky tvaroh jemný... 1 čl kokos mletý",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "konopné semienka...",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "tvaroh jemný...",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g brokolica ½ čl sezamový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "väčšia naberačka pšeno - proso varené",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "basmati 4 x plátok hydinová šunka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g fazuľa varená 1 čl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "basmati 1 ks slepačie vajce",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 3 x väčšia naberačka zemiaky neskoré varené",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "grapefruity",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "nápoje 3 a ½ dl sójové mlieko",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "nápoje 1 a ½ dl mlieko polotučné",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "pomarančový koláč s kakaom",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g kuracie prsia bez kostí 9 ks mandle",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "cesnak jarná cibuľka cícer varený 1 strúčik cesnak",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 5 x kus sushi nigiri - losos",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "kapusta hlávková... 1 čl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g tekvica hokkaido 8 ks reďkovka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g šošovica červená 2 čl sezamové semená",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "šošovica červená cesnak cibuľa 1 strúčik cesnak",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g brokolica ½ x priemerný kus zeler buľvový",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "jogurt bielkovinový chia semienka ½ čl chia semienka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "chlieb hypoalergénny 8 ks reďkovka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "mandľové mlieko ½ pl javorový sirup",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "amarantové perličky čučoriedky 4 x 5 bobúľ čučoriedky",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "jahody záhradné tvaroh jemný... 5 ks jahody záhradné",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g avokádo 1 a ½ dl mandľové mlieko",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "hrachový proteín -... banány 3 pl maliny",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g kuracie prsia bez kostí 3 ks rajčiny",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "chlieb hypoalergénny rukola 6 ks mandle",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g biela fazuľa v rajčinovej omáčke",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 3 x väčšia naberačka zemiaky nové varené",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g parmezán ½ x porcia boloňská omáčka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g morčacie prsia bez kostí 3 ks rajčiny",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "chlieb hypoalergénny rukola 4 ks mandle",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "chlieb hypoalergénny rajčiny 1 a ½ ks rajčiny",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g kuracie prsia bez kostí 3 pl quinoa",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "kuracie prsia bez... červená repa ½ ks uhorky",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "cesnak pstruh atlantický ½ strúčik cesnak",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "pohánka lúpaná jarná cibuľka 2 čl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g pšeno 5 dl sójové mlieko",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g tekvica hokkaido 8 ks mandle",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "rajčiny chlieb celozrnný... 2 ks rajčiny",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "napr. alnatura 2 dl mlieko polotučné",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "nápoje 3 dl sójové mlieko",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "jarná cibuľka reďkovka chlieb celozrnný... 6 ks reďkovka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "napr. alnatura 7 pl cícer v konzerve",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "čučoriedky 9 x 5 bobúľ čučoriedky",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "kokosový olej banány ½ pl čakankový sirup",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "broskyne ½ pl džem jahodový",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "mandľové mlieko mandle 7 pl maliny",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g avokádo 1 a ½ ks rajčiny",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "cícer varený cibuľa ½ x stredne veľká cibuľa",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "švédska nátierka švédska nátierka chlieb celozrnný...",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g proso ½ pl hrozienka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "proso ľanové semená",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g cottage cheese 1 ks paprika zeleninová",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "knäckebrot cesnak ½ strúčik cesnak",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "polníček vaječný bielok olivový olej kozí syr tvrdý",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g fazuľky edamame 1 čl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g mozzarella 3 ks rajčiny",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g šampiňóny portobello 30 g pór ks mrkva",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "kukuričná múka 2 x stredne veľký petržlen",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g šošovica 3 čl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g pstruh atlantický 1 čl živočíšne maslo",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g šošovica červená 3 čl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g cibuľa 1 x pl kečup bez cukru",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g šampiňóny portobello ½ x stredne veľká cibuľa",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g kukurica 7 ks šampiňóny čerstvé",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g hrášok 26 g pór ks mrkva",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "cuketa baklažán rajčiny vaječný bielok olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g pečiarka poľná/šampiňóny ½ ks mrkva",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "uhorky brokolica pohánková krupica",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ryža nelúpaná ½ pl repkový olej rafinovaný",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g mango 6 ks mandle",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "tvaroh jemný... 1 pl maliny",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g tofu biele ½ pl repkový olej rafinovaný",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g baby špenát 3 strúčik cesnak",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "živočíšne maslo ½ x menší kus jablká",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g cestoviny bezvaječné ½ x balenie tofu biele",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g kozí syr mäkký 1 ks hrušky",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g tofu biele ½ pl olej tekvicový",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g cibuľa ½ x miska rukola",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g parmezán 2 čl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "slnečnicové semená quinoa 1 čl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "uhorky rajčiny cottage cheese ½ čl javorový sirup",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "cesnak špenát chlieb zemiakový ½ strúčik cesnak",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g losos obyčajný 4 ks mrkva",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "rajčiny tuniak vo vlastnej... 4 ks reďkovka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "chlieb celozrnný... paprika zelená cukina",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g tekvica hokkaido 7 ks reďkovka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g cibuľa ½ ks paprika červená",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "múka cícerová",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "olivový olej 3 ks cherry paradajky",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g slzovka obecná ½ pl ghee maslo",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g ryžová smotana",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "repkový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g tekvicové semená sušené ½ pl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g hrach 1 ks mrkva",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "špargľa olivový olej zemiaky skoré 1 strúčik cesnak",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "quinoa špenát 2 čl sezamové semená",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g lahôdkové droždie 1 ks mrkva",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g pšeno 5 x pl cícer v konzerve",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g fazuľa mungo",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g kvasená/kyslá kapusta 1 pl pretlak paradajkový sterilizovaný",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g šošovica červená 1 x balenie tofu biele",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "pohánka lúpaná ingrediencie 1 x balenie tofu biele",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "banány rukola ½ x miska rukola",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g mrazené čierne ríbezle 3 ks orechy vlašské",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g tofu biele 3 a ½ ks mrkva",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 1 a ½ ks hrušky",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g marhule 14 ks mandle",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 1 a ½ ks jablká",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 1 a ½ kus pomaranče",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g mango 2 pl konopný proteín",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g brokolica 1 a ½ čl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "hrach mrazený knäckebrot hrach mrazený kolica",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "rukola 9 x bobuľa hrozno",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "pre 1 osobu baklažánové pyré",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "špargľa olivový olej zemiaky neskoré 1 strúčik cesnak",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "tofu syr údený 11 ks šampiňóny čerstvé",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g tekvicové semená sušené 1 čl slnečnicové semená",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g červená cibuľa 7 ks cherry paradajky",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g tofu biele 4 x pl cícer varený",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g pšeno 2 a ½ čl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g tofu biele 8 x kus pečiarka poľná/šampiňóny",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g hríb smrekový sušený 1 pl repkový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 5 a ½ pl ovsené vločky",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g mrazené maliny ½ čl kokos mletý",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "chlieb celozrnný... 2 ks rajčiny",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 2 a ½ x palacinka cottage palacinky",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g avokádo 4 ks cherry paradajky",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g brokolica 7 ks arašidy",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "bageta špaldová cesnak ½ strúčik cesnak",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g krevety varené ½ pl ghee maslo",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 4 a ½ pl quinoa",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "quinoa ½ pl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g šošovica červená 3 x lyžica polievková quinoa",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g hríb smrekový 1 ks paprika biela",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 65 x g cottage cheese biely",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 2 kus knäckebrot",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g sardinky vo vlastnej šťave",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g mango 8 ks mandle",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 4 ks orechy vlašské",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie ½ x balenie cottage cheese",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g cottage cheese 2 kus knäckebrot",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 6 ks orechy vlašské",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "tofu biele cesnak ½ strúčik cesnak",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g hrach mrazený",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "chlieb celozrnný... 5 ks reďkovka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g avokádo ½ pl repkový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 4 pl pohánkové vločky",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "granátové jablko",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 2 x stredný kus marhule",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ďumbier ananás ďumbier sezamový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 4 a ½ pl jogurt bielkovinový",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 2 pl vegánsky proteín",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "tortilla celozrnná",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g kuracie prsia bez kostí 4 pl quinoa",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g avokádo 1 pl maliny",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "mrazené jahody mrazené jahod mlieko plnotučné",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "jahodová zmrzlina 2.2 jahodová zmrzlina",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "proteínová tyčinka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "cottage cheese rajčiny 1 a ½ ks rajčiny",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g hríb smrekový 2 ks paprika zelená",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "cottage cheese olivový olej ½ čl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g tekvica hokkaido 4 pl ovsené vločky",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "tvaroh jemný... 6 x 5 bobúľ čučoriedky",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "knäckebrot špenát jarná cibuľka reďkovka 4 ks reďkovka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "chlieb celozrnný... horčica kremžská rajčiny 1 ks rajčiny",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "napr. alnatura 6 x pl cícer v konzerve",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "chlieb celozrnný... 3 ks slepačie vajce",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g baby špenát 3 ks cherry paradajky",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "kukurica v konzerve hydinová šunka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "chlieb celozrnný... rukola 9 ks reďkovka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "chlieb celozrnný... lučina skyr 12 ks cherry paradajky",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "napr. lagris 85 g tvrdý syr",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g parmezán 1 kus tvarohová štrúdľa s čučoriedkami",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g hrach 40 g tvrdý syr",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g pstruh atlantický 1 x porcia hrachová polievka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g fazuľka 1 x malý kus zemiaky skoré",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "rybacia omáčka zemiaky skoré trstinový cukor ryža nelúpaná",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g červená cibuľa ½ x pl paradajkový pretlak",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "šalát hlávkový 20 x g uhorky hliva ustricová",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g baby špenát 5 ks cherry paradajky",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g medvedí cesnak ½ strúčik cesnak",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "cuketa polníček sezamové semená bulgur 5 ks arašidy",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "basmati 1 a ½ pl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g morčacie stehno bez kostí 1 ks mrkva",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g kuracie prsia bez kostí 2 ks rajčiny",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g kuracie stehno 35 g feta syr",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "batátovo-mandľové... nápoje 3 dl mlieko polotučné",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "mrkvový koláč",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "cookies sušienky 0 cookies sušienky",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "nápoje 5 dl mlieko polotučné",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g konopný proteín 1 a ½ ks banány",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g mrazené maliny 2 pl maliny",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g marhule ½ pl med včelí",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "mango tvaroh jemný... man kokos mletý",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g mango 4 čl slnečnicové semená",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ovsené vločky špenát 1 čl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "% chudé/",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "sumček africký citróny",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g paradajkový pretlak 1 pl kukurica z konzervy",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 3 pl hrachový proteín - prášok",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g avokádo 1 ks rajčiny",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 65 g fazuľa biela",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g hrach mrazený 2 čl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 4 pl pšeničná krupica",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g brokolica 35 g tvrdý syr",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "cestoviny...",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "cesnak cestoviny grahamové 1 a ½ strúčik cesnak",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 3 x menšia naberačka quinoa varená",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "cestoviny,... paprika zeleninová 2 čl ľanové semená",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie ½ x kus bageta špaldová",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g tuniak modroplutvý 2 x čajová lyžička avokádo",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "bageta špaldová limetka ½ x kus limetka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 2 a ½ väčšia naberačka ryža varená",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "chlieb celozrnný... cesnak ½ čl živočíšne maslo",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g sójový syr tofu 1 čl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "nátierka s cícerom... 4 ks cherry paradajky",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g baklažán 3 ks paprika červená",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g hovädzie mäso varené 2 čl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "chlieb celozrnný... jarná cibuľka 6 ks reďkovka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "napr. alnatura 1 čl sezamový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "rožky grahamové cesnak rajčiny 1 strúčik cesnak",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g šmakoun ½ čl med včelí",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "pohánková múka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "tvaroh jemný... 4 čl javorový sirup",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "chlieb celozrnný... 2 a ½ dl mlieko polotučné",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g kukurica 1 ks vajce na tvrdo",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "chlieb celozrnný... rajčiny 2 čl horčica kremžská",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "chlieb celozrnný... 1 ks hrušky",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "džem marhuľový",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "mandľové maslo špaldové palacinky mandľové maslo džem marhuľový",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "pohánkové vločky banány 2 čl chia semienka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "kvasená/kyslá kapusta kvasená/kyslá... olivový olej domáca müsli...",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "basmati 5 x plátok hydinová šunka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "brokolicová polievka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "syr cottage cheese",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "napr. lagris 1 čl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "pstruh atlantický cesnak 1 čl živočíšne maslo",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "citróny živočíšne maslo zemiaky neskoré ½ strúčik cesnak",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g panko strúhanka ½ čl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g panko strúhanka 8 ks mandle",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "petržlen 1 strúčik cesnak",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "zemiaky skoré 1 x malý kus zemiaky skoré",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g kukurica 2 čl slnečnicové semená",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g šampiňóny portobello 22 g pór ks mrkva",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g hrášok 2 ks šampiňóny čerstvé",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g tofu biele 5 x bobuľa hrozno",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "tofu syr údený 1 čl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "basmati slepačie vajce 1 ks slepačie vajce",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g šampiňóny portobello ½ ks mrkva",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 2 väčšia naberačka ryža varená",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g karfiol 25 g balkánsky syr",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g krab piesočný 1 čl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g kvasená/kyslá kapusta ½ čl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g šošovica 1 a ½ čl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g fazuľa 1 a ½ čl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g pšeno 1 a ½ čl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g tofu biele 4 x kus pečiarka poľná/šampiňóny",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "%",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g šošovica varená ½ balenie cottage cheese biely",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g krevety varené 1 a ½ ks mrkva",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g tekvica hokkaido 1 ks slepačie vajce",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g cibuľa 1 ks paprika červená",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "chlieb hypoalergénny grécky jogurt 1 pl grécky jogurt",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "šošovica červená rukola 3 x bobuľa hrozno",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "cottage cheese 1 čl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "cesnak 1 ks paprika zeleninová",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "rajčiny 1 ks rajčiny",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "konopné semienka... sezamové semená ½ ks rajčiny",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "cibuľa tekvicové semená... jogurt biely",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g cottage cheese 2 a ½ kus knäckebrot",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g losos obyčajný 3 ks mrkva",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g hrach mrazený 1 čl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g losos údený 1 x krajec chlieb pohánkový",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g cottage cheese 2 ks paprika žltá",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g avokádo 2 a ½ pl jogurt bielkovinový",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 4 kus knäckebrot",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "tvaroh jemný... cesnak paprika červená ½ strúčik cesnak",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 3 pl ovsené vločky",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g mandľové maslo 3 ks jahody záhradné",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "palacinka cottage palacinky",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g avokádo 1 menší kus banány",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "nápoje 2 a ½ dl mlieko acidofilné",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 10 x bobuľa hrozno",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie ½ x balenie cottage cheese biely",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "mango banány",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g pomelo 5 x kus hrozienka",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 8 x lyžica polievková quinoa",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ryžové rezance... cesnak 1 a ½ strúčik cesnak",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "orechy kešu ingrediencie 13 ks mandle",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "žltý melón",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 2 a ½ pl konopný proteín",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 1 pl hrachový proteín - prášok",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g avokádo ½ dl mlieko polotučné",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g mango 2 a ½ pl jogurt bielkovinový",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "bryndzová polievka so zemiakmi",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "chlieb pohánkový cesnak 1 a ½ strúčik cesnak",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "karfiol",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "bageta celozrnná rukola 3 x miska rukola",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "losos obyčajný cesnak ½ strúčik cesnak",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "horčica rožky grahamové 1 ks paprika žltá",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "tvaroh jemný... maliny",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 2 stredný kus banány",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 3 a ½ x kus tofu muffiny",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 2 x krajec chlieb zemiakový",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 1 a ½ ks banány",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 4 dl mlieko polotučné",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g avokádo ½ pl olivový olej",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "tvaroh tučný hrudkovitý",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 90 g tvrdý syr",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "brokolica mrazená",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g kapary 10 ks cherry paradajky",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "víno biele",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "nápoje 4 dl mlieko polotučné",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g hrášok 1 ks mrkva",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "mrazená zeleninová... ½ strúčik cesnak",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g šošovica 2 pl ovsené vločky",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "mrkva ½ x stredne veľká cibuľa",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 10 x pl cícer varený",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g brokolica ½ dl mlieko polotučné",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 1 x krajec kokosovo-banánový chlieb",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "g mrazené maliny ½ x čl med včelí",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 7 a ½ x lyžica polievková quinoa",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "ingrediencie 1 a ½ x krajec chlieb rascový",
+    "count": 1,
+    "withGrams": 1
+  },
+  {
+    "name": "hrach 1 čl chia olej",
+    "count": 1,
+    "withGrams": 1
+  }
+]

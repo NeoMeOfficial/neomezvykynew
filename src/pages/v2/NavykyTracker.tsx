@@ -1,250 +1,180 @@
 import { useState, useEffect } from 'react';
-import { Droplets, Moon, BookOpen, Dumbbell, Apple, Plus, Check, ArrowLeft, GlassWater } from 'lucide-react';
+import { Droplets, Moon, BookOpen, Dumbbell, Apple, Plus, Check, GlassWater, Flame } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../contexts/AuthContext';
 import { useSubscription } from '../../contexts/SubscriptionContext';
-import { colors, glassCard } from '../../theme/warmDusk';
+import { TopBar } from '@/components/v2/top-bar';
+import { Eyebrow } from '@/components/ui/eyebrow';
+import { BodyText } from '@/components/ui/body-text';
+import { SectionHeader } from '@/components/ui/section-header';
 
 const DAYS = ['Po', 'Ut', 'St', 'Št', 'Pi', 'So', 'Ne'];
 
 interface HabitData {
-  icon: any;
+  icon: React.ElementType;
   name: string;
   progress: string;
   done: boolean;
 }
 
-const defaultHabitsData = [
-  { icon: Droplets, name: 'Piť 8 pohárov vody', progress: '6/8', done: false },
-  { icon: Dumbbell, name: 'Cvičenie', progress: '1/1', done: true },
-  { icon: Moon, name: 'Spánok 8h', progress: '7.5h', done: true },
-  { icon: BookOpen, name: 'Čítanie 20 min', progress: '20/20', done: true },
-  { icon: Apple, name: '5 porcií ovocia', progress: '3/5', done: false },
+const defaultHabitsData: HabitData[] = [
+  { icon: Droplets,  name: 'Piť 8 pohárov vody', progress: '6/8',    done: false },
+  { icon: Dumbbell,  name: 'Cvičenie',            progress: '1/1',    done: true  },
+  { icon: Moon,      name: 'Spánok 8h',           progress: '7.5h',   done: true  },
+  { icon: BookOpen,  name: 'Čítanie 20 min',      progress: '20/20',  done: true  },
+  { icon: Apple,     name: '5 porcií ovocia',     progress: '3/5',    done: false },
 ];
 
 export default function NavykyTracker() {
   const { user } = useAuthContext();
   const { isPremium } = useSubscription();
-  const isSubscribed = isPremium;
+  const navigate = useNavigate();
+
   const [habits, setHabits] = useState<HabitData[]>([]);
   const [weekDots, setWeekDots] = useState([true, true, true, false, false, false, false]);
-  const [showPaywall, setShowPaywall] = useState(false);
+  const [waterCount, setWaterCount] = useState(6);
 
-  // Load habits from localStorage on mount
   useEffect(() => {
     if (!user?.id) return;
-    
     const today = new Date().toISOString().split('T')[0];
-    const storageKey = `navyky_${user.id}_${today}`;
-    const weekDotsKey = `navyky_week_${user.id}`;
-    
-    const savedHabits = localStorage.getItem(storageKey);
-    const savedWeekDots = localStorage.getItem(weekDotsKey);
-    
-    if (savedHabits) {
-      setHabits(JSON.parse(savedHabits));
-    } else {
-      setHabits(defaultHabitsData);
-    }
-    
-    if (savedWeekDots) {
-      setWeekDots(JSON.parse(savedWeekDots));
-    }
+    const savedHabits = localStorage.getItem(`navyky_${user.id}_${today}`);
+    const savedDots = localStorage.getItem(`navyky_week_${user.id}`);
+    setHabits(savedHabits ? JSON.parse(savedHabits) : defaultHabitsData);
+    if (savedDots) setWeekDots(JSON.parse(savedDots));
   }, [user?.id]);
 
-  // For non-subscribers, reset habits daily
   useEffect(() => {
-    if (!user?.id || isSubscribed) return;
-    
+    if (!user?.id || isPremium) return;
     const today = new Date().toISOString().split('T')[0];
     const lastResetKey = `navyky_last_reset_${user.id}`;
-    const lastReset = localStorage.getItem(lastResetKey);
-    
-    if (lastReset !== today) {
-      // Reset to default habits for new day
+    if (localStorage.getItem(lastResetKey) !== today) {
       setHabits(defaultHabitsData);
       localStorage.setItem(lastResetKey, today);
-      
-      // Save reset habits
-      const storageKey = `navyky_${user.id}_${today}`;
-      localStorage.setItem(storageKey, JSON.stringify(defaultHabitsData));
+      localStorage.setItem(`navyky_${user.id}_${today}`, JSON.stringify(defaultHabitsData));
     }
-  }, [user?.id, isSubscribed]);
+  }, [user?.id, isPremium]);
 
-  const saveHabits = (newHabits: HabitData[]) => {
+  const saveHabits = (next: HabitData[]) => {
     if (!user?.id) return;
-    
-    // For non-subscribers, show paywall but still allow saving for current session
-    if (!isSubscribed) {
-      setShowPaywall(true);
-    }
-    
     const today = new Date().toISOString().split('T')[0];
-    const storageKey = `navyky_${user.id}_${today}`;
-    localStorage.setItem(storageKey, JSON.stringify(newHabits));
-    setHabits(newHabits);
+    localStorage.setItem(`navyky_${user.id}_${today}`, JSON.stringify(next));
+    setHabits(next);
   };
 
   const toggleHabit = (i: number) => {
-    const newHabits = [...habits];
-    newHabits[i] = { ...newHabits[i], done: !newHabits[i].done };
-    saveHabits(newHabits);
+    const next = [...habits];
+    next[i] = { ...next[i], done: !next[i].done };
+    saveHabits(next);
   };
 
-  const navigate = useNavigate();
+  const streak = weekDots.filter(Boolean).length;
+  const todayIdx = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
 
   return (
-    <div className="w-full min-h-screen px-3 py-6 pb-28 space-y-6" style={{ background: colors.bgGradient }}>
-      {/* Nordic Header */}
-      <div className="p-4" style={glassCard}>
-        <div className="flex items-center gap-3 mb-4">
-          <button onClick={() => navigate('/domov')} className="p-1">
-            <ArrowLeft className="w-5 h-5 text-[#8B7560]" strokeWidth={1.5} />
-          </button>
-          <div className="flex items-center gap-2 flex-1">
-            <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(122, 158, 120, 0.14)` }}>
-              <Check className="w-4 h-4" style={{ color: '#7A9E78' }} />
-            </div>
-            <h1 className="text-[22px] font-medium leading-tight" style={{ color: '#2E2218', fontFamily: '"Bodoni Moda", Georgia, serif' }}>Návyky</h1>
-          </div>
-        </div>
+    <div className="min-h-screen bg-cream pb-12">
+      <TopBar title="Návyky" backHref="/domov-new" right={
+        <button
+          onClick={() => navigate('/navyky/new')}
+          className="h-9 w-9 rounded-full bg-white border border-ink/[0.08] flex items-center justify-center"
+        >
+          <Plus className="size-4 text-ink/60" />
+        </button>
+      } />
 
-        {/* Sub-header */}
-        <div className="text-center">
-          <p className="text-sm font-medium" style={{ color: '#6B4C3B' }}>
-            Buduj zdravé návyky každý deň
-          </p>
-        </div>
-      </div>
-
-      {/* Streak */}
-      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20 flex items-center gap-3 hover:shadow-md transition-all">
-        <span className="text-2xl">🔥</span>
-        <div>
-          <p className="text-sm font-medium" style={{ color: '#2E2218' }}>12 dní v rade</p>
-          <p className="text-xs" style={{ color: '#6B4C3B' }}>Tvoja najdlhšia séria!</p>
-        </div>
-      </div>
-
-      {/* Weekly Dots */}
-      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20">
-        <div className="flex justify-between">
-          {DAYS.map((d, i) => (
-            <div key={d} className="flex flex-col items-center gap-1.5">
-              <span className="text-xs" style={{ color: '#6B4C3B' }}>{d}</span>
-              <div
-                className={`w-6 h-6 rounded-full ${
-                  weekDots[i] ? 'bg-[#7A9E78]' : 'border-2 border-white/35'
-                }`}
-              />
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Habit Items */}
-      <div className="space-y-3">
-        {habits.map((h, i) => (
-          <div key={h.name} className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20 flex items-center gap-3 hover:shadow-md transition-all">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: 'rgba(184, 134, 74, 0.14)' }}>
-              <h.icon className="w-4 h-4" style={{ color: '#B8864A' }} strokeWidth={1.5} />
-            </div>
-            <div className="flex-1">
-              <p className="text-sm font-medium" style={{ color: '#2E2218' }}>{h.name}</p>
-              <p className="text-xs" style={{ color: '#6B4C3B' }}>{h.progress}</p>
-            </div>
-            <button
-              onClick={() => toggleHabit(i)}
-              className={`w-7 h-7 rounded-full flex items-center justify-center transition-all ${
-                h.done ? 'bg-[#7A9E78] text-white' : 'border-2 border-white/35 hover:border-[#7A9E78]'
-              }`}
-            >
-              {h.done && <Check className="w-4 h-4" />}
-            </button>
-          </div>
-        ))}
-      </div>
-
-      {/* Water Tracker */}
-      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20">
-        <div className="flex items-center gap-2 mb-4">
-          <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(122, 158, 120, 0.14)` }}>
-            <GlassWater className="w-4 h-4" style={{ color: '#7A9E78' }} strokeWidth={1.5} />
-          </div>
-          <h2 className="text-sm font-medium" style={{ color: '#2E2218' }}>Pitný režim</h2>
-        </div>
-        <div className="flex gap-2">
-          {Array.from({ length: 8 }, (_, i) => (
-            <div
-              key={i}
-              className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
-                i < 6 ? 'bg-[#7A9E78]/10 border-2 border-[#7A9E78]' : 'border-2 border-white/35'
-              }`}
-            >
-              {i < 6 && <GlassWater className="w-3.5 h-3.5" style={{ color: '#7A9E78' }} strokeWidth={1.5} />}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Non-subscriber daily reset warning */}
-      {!isSubscribed && (
-        <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(184, 134, 74, 0.14)` }}>
-              <span style={{ color: '#B8864A' }} className="text-sm">⏰</span>
+      <div className="px-5 pt-2 flex flex-col gap-4">
+        {/* Streak + week */}
+        <div className="rounded-card bg-white border border-ink/[0.08] shadow-nm-sm p-5">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="h-11 w-11 rounded-xl bg-terra/10 flex items-center justify-center flex-shrink-0">
+              <Flame className="size-5 text-terra" />
             </div>
             <div>
-              <p className="font-medium text-sm" style={{ color: '#2E2218' }}>Bezplatná verzia</p>
-              <p className="text-xs" style={{ color: '#6B4C3B' }}>Návyky sa resetujú každý deň. Pre trvalé uloženie si aktivuj predplatné.</p>
+              <div className="flex items-baseline gap-1.5">
+                <span className="font-serif text-h1 text-ink leading-none">{streak}</span>
+                <span className="font-sans text-sm text-ink/56">dní v rade</span>
+              </div>
+              <Eyebrow tone="muted" className="mt-0.5">Tento týždeň</Eyebrow>
             </div>
           </div>
-        </div>
-      )}
 
-      {/* Paywall Modal */}
-      {showPaywall && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-6 shadow-lg max-w-sm w-full">
-            <div className="text-center space-y-4">
-              <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto" style={{ background: `rgba(184, 134, 74, 0.14)` }}>
-                <span className="text-2xl">💾</span>
+          <div className="flex justify-between">
+            {DAYS.map((d, i) => (
+              <div key={d} className="flex flex-col items-center gap-1.5">
+                <span className={`font-sans text-[10px] uppercase tracking-[0.12em] ${i === todayIdx ? 'text-ink' : 'text-ink/40'}`}>{d}</span>
+                <div className={`h-6 w-6 rounded-full ${weekDots[i] ? 'bg-terra' : 'border border-ink/[0.12] bg-cream-200'}`} />
               </div>
-              <div>
-                <h3 className="font-semibold text-lg mb-2" style={{ color: '#2E2218' }}>Uložiť návyky natrvalo?</h3>
-                <p className="text-sm mb-4" style={{ color: '#6B4C3B' }}>
-                  Bez predplatného sa tvoje návyky resetujú každý deň. Aktiváciou predplatného si zachováš pokrok a históriu.
-                </p>
-              </div>
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setShowPaywall(false)}
-                  className="flex-1 py-3 rounded-xl bg-white/25 font-medium text-sm hover:bg-white/30 transition-all"
-                  style={{ color: '#6B4C3B' }}
-                >
-                  Zatiaľ nie
-                </button>
-                <button
-                  onClick={() => {
-                    setShowPaywall(false);
-                    // Navigate to subscription page
-                    window.location.href = '/subscribe';
-                  }}
-                  className="flex-1 py-3 rounded-xl bg-[#B8864A] text-white font-medium text-sm hover:bg-[#A67B42] transition-all"
-                >
-                  Aktivovať
-                </button>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
-      )}
 
-      {/* Add Habit */}
-      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/20">
-        <button className="w-full flex items-center justify-center gap-2 text-sm font-medium py-2 rounded-xl border-2 border-dashed border-white/35 hover:border-[#7A9E78] transition-all" style={{ color: '#6B4C3B' }}>
-          <Plus className="w-4 h-4" /> Pridať návyk
-        </button>
+        {/* Habits */}
+        <SectionHeader eyebrow="Dnešné návyky" className="mt-1" />
+
+        <div className="flex flex-col gap-2">
+          {habits.map((h, i) => {
+            const Icon = h.icon;
+            return (
+              <button
+                key={h.name}
+                onClick={() => toggleHabit(i)}
+                className="w-full text-left rounded-card p-4 bg-white border border-ink/[0.08] shadow-nm-sm flex items-center gap-3 transition-all active:scale-[0.99]"
+              >
+                <div className={`h-10 w-10 rounded-xl flex items-center justify-center flex-shrink-0 ${h.done ? 'bg-pillar-strava/15' : 'bg-cream-200'}`}>
+                  <Icon className={`size-4 ${h.done ? 'text-pillar-strava' : 'text-ink/40'}`} strokeWidth={1.5} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className={`font-sans text-sm font-medium ${h.done ? 'line-through text-ink/40' : 'text-ink'}`}>{h.name}</div>
+                  <BodyText size="sm" tone="muted">{h.progress}</BodyText>
+                </div>
+                <div className={`h-7 w-7 rounded-full flex items-center justify-center flex-shrink-0 transition-all ${h.done ? 'bg-pillar-strava' : 'border border-ink/[0.15]'}`}>
+                  {h.done && <Check className="size-3.5 text-white" strokeWidth={2.5} />}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Water tracker */}
+        <div className="rounded-card bg-white border border-ink/[0.08] shadow-nm-sm p-5">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="h-10 w-10 rounded-xl bg-pillar-mysel/10 flex items-center justify-center flex-shrink-0">
+              <GlassWater className="size-4 text-pillar-mysel" strokeWidth={1.5} />
+            </div>
+            <div className="flex-1">
+              <div className="font-sans text-sm font-medium text-ink">Pitný režim</div>
+              <Eyebrow tone="muted">{waterCount} / 8 pohárov</Eyebrow>
+            </div>
+          </div>
+          <div className="flex gap-1.5">
+            {Array.from({ length: 8 }, (_, i) => (
+              <button
+                key={i}
+                onClick={() => setWaterCount(i < waterCount ? i : i + 1)}
+                className={`flex-1 h-8 rounded-lg flex items-center justify-center transition-all ${
+                  i < waterCount ? 'bg-pillar-mysel/20 border border-pillar-mysel/30' : 'bg-cream-200 border border-ink/[0.06]'
+                }`}
+              >
+                <GlassWater className={`size-3 ${i < waterCount ? 'text-pillar-mysel' : 'text-ink/20'}`} strokeWidth={1.5} />
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Free tier note */}
+        {!isPremium && (
+          <button
+            onClick={() => navigate('/profil/predplatne')}
+            className="rounded-card bg-gold/[0.08] border border-gold/20 p-4 flex items-center gap-3 text-left transition-all active:scale-[0.99]"
+          >
+            <div className="h-8 w-8 rounded-full bg-gold/15 flex items-center justify-center flex-shrink-0">
+              <span className="font-sans text-sm font-bold text-gold">+</span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="font-sans text-sm font-medium text-ink">Bezplatná verzia</div>
+              <BodyText size="sm" tone="muted">Návyky sa resetujú každý deň. Plus zachová celú históriu.</BodyText>
+            </div>
+          </button>
+        )}
       </div>
     </div>
   );

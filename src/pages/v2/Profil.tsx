@@ -1,410 +1,149 @@
 import { useNavigate } from 'react-router-dom';
-import { useSupabaseAuth } from '../../contexts/SupabaseAuthContext';
-import { useSubscription } from '../../contexts/SubscriptionContext';
-import { useWorkoutHistory } from '../../hooks/useWorkoutHistory';
-import { useFavorites } from '../../hooks/useFavorites';
-import { useUserProgram } from '../../hooks/useUserProgram';
-import { useReflections } from '../../hooks/useDailyRituals';
-import { Page, Eye, Ser, Body, PlusTag, AdminTierToggle, NM } from '../../components/v2/neome';
-
-function useReflectionsCount(): number {
-  const { count } = useReflections();
-  return count;
-}
-
-/**
- * Profil — R7 variant B (editorial dashboard)
- *
- * Hero photo + avatar, progress card with streak + 3 stats,
- * active programs (Plus) / upgrade hint (Free), subscription card,
- * settings rows, logout.
- *
- * Wired:
- * - User name from useSupabaseAuth
- * - isPremium from useSubscription
- * - signOut() wired
- *
- * TODO data: real streak, exercise/reflection/recipe counts, active
- * programs from existing services. Static placeholders match design.
- *
- * Old version: Profil.old.tsx.
- */
-
-interface IconProps {
-  color: string;
-}
-
-function IFlame({ color }: IconProps) {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
-    </svg>
-  );
-}
-
-function IPencil({ color }: IconProps) {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 20h9" />
-      <path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
-    </svg>
-  );
-}
-
-function ITarget({ color }: IconProps) {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10" />
-      <circle cx="12" cy="12" r="6" />
-      <circle cx="12" cy="12" r="2" />
-    </svg>
-  );
-}
-
-function IHeart({ color }: IconProps) {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-    </svg>
-  );
-}
-
-function IBell({ color }: IconProps) {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-      <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-    </svg>
-  );
-}
-
-function IShield({ color }: IconProps) {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-    </svg>
-  );
-}
-
-function IHelp({ color }: IconProps) {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10" />
-      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
-      <path d="M12 17h.01" />
-    </svg>
-  );
-}
-
-function ILogOut({ color }: IconProps) {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-      <polyline points="16 17 21 12 16 7" />
-      <line x1="21" y1="12" x2="9" y2="12" />
-    </svg>
-  );
-}
-
-function SectionHead({ children }: { children: string }) {
-  return (
-    <div style={{ padding: '26px 22px 12px' }}>
-      <Eye size={10}>{children}</Eye>
-    </div>
-  );
-}
-
-function Row({ icon, label, value, onClick, last }: { icon: { bg: string; el: React.ReactNode }; label: string; value?: string; onClick?: () => void; last?: boolean }) {
-  return (
-    <button
-      onClick={onClick}
-      style={{
-        all: 'unset',
-        cursor: onClick ? 'pointer' : 'default',
-        display: 'flex',
-        width: '100%',
-        alignItems: 'center',
-        gap: 14,
-        padding: '14px 18px',
-        borderBottom: last ? 'none' : `1px solid ${NM.HAIR}`,
-        boxSizing: 'border-box',
-      }}
-    >
-      <div style={{ width: 36, height: 36, borderRadius: 10, background: icon.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-        {icon.el}
-      </div>
-      <div style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
-        <div style={{ fontFamily: NM.SANS, fontSize: 13, color: NM.DEEP, fontWeight: 500 }}>{label}</div>
-        {value && <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.EYEBROW, marginTop: 2, fontWeight: 400 }}>{value}</div>}
-      </div>
-      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={NM.TERTIARY} strokeWidth="2" strokeLinecap="round">
-        <path d="M9 6l6 6-6 6" />
-      </svg>
-    </button>
-  );
-}
+import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
+import { useSubscription } from '@/contexts/SubscriptionContext';
+import { useWorkoutHistory } from '@/hooks/useWorkoutHistory';
+import { useFavorites } from '@/hooks/useFavorites';
+import { useReflections } from '@/hooks/useDailyRituals';
+import { BottomNav } from '@/components/v2/bottom-nav';
+import { Eyebrow } from '@/components/ui/eyebrow';
+import { SerifHeader } from '@/components/ui/serif-header';
+import { BodyText } from '@/components/ui/body-text';
+import { PlusTag } from '@/components/ui/plus-tag';
+import { SectionHeader } from '@/components/ui/section-header';
+import { SettingsGroup, SettingsRow } from '@/components/v2/settings-row';
+import { Flame, ChevronRight } from 'lucide-react';
 
 export default function Profil() {
   const navigate = useNavigate();
   const { user, profile, signOut } = useSupabaseAuth();
-  const { isPremium, subscription } = useSubscription();
+  const { isPremium } = useSubscription();
   const { stats } = useWorkoutHistory() as { stats: { totalWorkouts: number; currentStreak: number; longestStreak: number } };
   const { favoritesCount } = useFavorites();
-  const { userProgram } = useUserProgram();
+  const { count: reflectionCount } = useReflections();
 
   const meta = (user?.user_metadata ?? {}) as { full_name?: string; name?: string };
-  // Prefer the profiles row (what SettingsProfile.tsx writes via updateProfile),
-  // fall back to user_metadata, then to email-derived, then static placeholder.
   const fullName = profile?.full_name ?? meta.full_name ?? meta.name ?? user?.email?.split('@')[0] ?? 'Eva Nová';
-  const avatarUrl = profile?.avatar_url ?? '/images/r9/testimonial-lucia.jpg';
+  const initials = fullName.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase();
 
   const streak = stats?.currentStreak ?? 0;
   const longest = stats?.longestStreak ?? 0;
   const totalWorkouts = stats?.totalWorkouts ?? 0;
-  // F-003: account-scoped reflection count via useReflections (reads
-  // diary_entries by user.id; demo localStorage fallback).
-  const reflectionCount: number | null = useReflectionsCount();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/auth');
+  };
 
   return (
-    <Page>
-      {/* Hero */}
-      <div
-        style={{
-          position: 'relative',
-          paddingTop: 'calc(env(safe-area-inset-top) + 8px)',
-          paddingBottom: 28,
-          backgroundImage: `linear-gradient(180deg, rgba(248,245,240,0) 20%, rgba(248,245,240,0.7) 80%, ${NM.BG} 100%), url(/images/r9/lifestyle-yoga-pose.jpg)`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center 30%',
-        }}
-      >
-        <div style={{ padding: '0 22px' }}>
-          <Eye color="rgba(61,41,33,0.65)">Môj profil</Eye>
-          <div style={{ marginTop: 40, display: 'flex', alignItems: 'flex-end', gap: 14 }}>
-            <div
-              style={{
-                width: 76,
-                height: 76,
-                borderRadius: 999,
-                background: `url(${avatarUrl}) center/cover`,
-                border: '3px solid #fff',
-                boxShadow: '0 10px 30px rgba(61,41,33,0.18)',
-                flexShrink: 0,
-              }}
-            />
-            <div style={{ flex: 1, paddingBottom: 4 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                <Ser size={26}>{fullName}</Ser>
-                {isPremium && <PlusTag />}
-              </div>
-              {/* TODO data: life stage from user_metadata */}
-              <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.MUTED, fontWeight: 400, display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ display: 'inline-block', width: 6, height: 6, borderRadius: 999, background: NM.SAGE }} />
-                Postpartum · 14. týždeň
-              </div>
-            </div>
+    <div className="min-h-screen bg-cream pb-28">
+      {/* Header */}
+      <div className="pt-14 px-5 pb-6">
+        <Eyebrow tone="muted" className="mb-3">MÔJ PROFIL</Eyebrow>
+        <div className="flex items-center gap-4">
+          <div className="h-16 w-16 rounded-full bg-pillar-telo/20 flex items-center justify-center flex-shrink-0 border-2 border-white shadow-nm-sm">
+            {profile?.avatar_url
+              ? <img src={profile.avatar_url} alt={fullName} className="h-full w-full rounded-full object-cover" />
+              : <span className="font-serif text-h2 text-pillar-telo">{initials}</span>
+            }
           </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <SerifHeader as="h1" size="h2" className="truncate">{fullName}</SerifHeader>
+              {isPremium && <PlusTag />}
+            </div>
+            <BodyText size="sm" tone="muted" className="mt-0.5">
+              {user?.email ?? ''}
+            </BodyText>
+          </div>
+          <button
+            onClick={() => navigate('/settings/profile')}
+            className="h-9 w-9 rounded-full bg-white border border-ink/[0.08] flex items-center justify-center flex-shrink-0"
+          >
+            <ChevronRight className="size-4 text-ink/40" />
+          </button>
         </div>
       </div>
 
       {/* Progress card */}
-      <div style={{ margin: '-6px 20px 0' }}>
-        <div style={{ background: '#fff', borderRadius: 20, padding: '16px 18px', border: `1px solid ${NM.HAIR}`, boxShadow: '0 12px 36px rgba(61,41,33,0.08)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-            <Eye size={10}>Tvoj pokrok</Eye>
-            <button onClick={() => navigate('/profil/stats')} style={{ all: 'unset', cursor: 'pointer', fontFamily: NM.SANS, fontSize: 10.5, color: NM.TERRA, fontWeight: 500 }}>
+      <div className="px-5 mb-6">
+        <div className="rounded-card p-5 bg-white border border-ink/[0.08] shadow-nm-sm">
+          <div className="flex items-center justify-between mb-4">
+            <Eyebrow tone="muted">Tvoj pokrok</Eyebrow>
+            <button
+              onClick={() => navigate('/body')}
+              className="font-sans text-[11px] text-terra font-medium"
+            >
               Detaily ›
             </button>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{ width: 46, height: 46, borderRadius: 14, background: `${NM.TERRA}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <IFlame color={NM.TERRA} />
+
+          {/* Streak */}
+          <div className="flex items-center gap-3 mb-4">
+            <div className="h-11 w-11 rounded-xl bg-terra/10 flex items-center justify-center flex-shrink-0">
+              <Flame className="size-5 text-terra" />
             </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div>
-                <span style={{ fontFamily: NM.SERIF, fontSize: 22, fontWeight: 500, color: NM.DEEP, letterSpacing: '-0.02em' }}>{streak}</span>
-                <span style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.EYEBROW, marginLeft: 5, fontWeight: 400 }}>dní v rade</span>
+            <div>
+              <div className="flex items-baseline gap-1.5">
+                <span className="font-serif text-h1 text-ink leading-none">{streak}</span>
+                <span className="font-sans text-sm text-ink/56">dní v rade</span>
               </div>
-              <div style={{ fontFamily: NM.SANS, fontSize: 10.5, color: NM.TERTIARY, marginTop: 2, fontWeight: 400 }}>
+              <div className="font-sans text-[11px] text-ink/40 mt-0.5">
                 {longest > 0 ? `Rekord: ${longest} dní` : 'Začiatok cesty'}
               </div>
             </div>
           </div>
-          <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>
+
+          {/* Stats row */}
+          <div className="flex gap-2">
             {[
-              { n: totalWorkouts, l: 'cvičení', c: NM.SAGE },
-              { n: reflectionCount ?? '—', l: 'reflexií', c: NM.MAUVE },
-              { n: favoritesCount, l: 'receptov', c: NM.GOLD },
-            ].map((s) => (
-              <div key={s.l} style={{ flex: 1, padding: '10px 4px', borderRadius: 12, background: NM.CREAM_2 ?? '#F1ECE3', textAlign: 'center' }}>
-                <div style={{ fontFamily: NM.SERIF, fontSize: 17, fontWeight: 500, color: s.c, lineHeight: 1, letterSpacing: '-0.01em' }}>{s.n}</div>
-                <div style={{ fontFamily: NM.SANS, fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: NM.EYEBROW, marginTop: 5, fontWeight: 500 }}>{s.l}</div>
+              { n: totalWorkouts, label: 'cvičení',   color: 'text-pillar-strava' },
+              { n: reflectionCount ?? 0, label: 'reflexií', color: 'text-pillar-mysel' },
+              { n: favoritesCount, label: 'receptov', color: 'text-gold' },
+            ].map(s => (
+              <div key={s.label} className="flex-1 rounded-xl bg-cream-200 py-3 px-2 text-center">
+                <div className={`font-serif text-h2 leading-none ${s.color}`}>{s.n}</div>
+                <div className="font-sans text-[9px] uppercase tracking-[0.18em] text-ink/40 mt-1.5">{s.label}</div>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      {/* Programs */}
-      <div style={{ margin: '20px 20px 0' }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 10 }}>
-          <Eye size={10}>Moje programy</Eye>
-          <button onClick={() => navigate('/kniznica/telo/programy')} style={{ all: 'unset', cursor: 'pointer', fontFamily: NM.SANS, fontSize: 10.5, color: NM.TERRA, fontWeight: 500 }}>
-            Všetky ›
-          </button>
-        </div>
-        {userProgram ? (
-          <div style={{ display: 'flex', gap: 10 }}>
-            <div
-              style={{
-                flex: 1,
-                borderRadius: 18,
-                overflow: 'hidden',
-                aspectRatio: '3/4',
-                position: 'relative',
-                backgroundImage: `url(${userProgram.todaysExercise?.thumbnail ?? '/images/r9/program-body-forming.jpg'})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-              }}
-            >
-              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, transparent 40%, rgba(42,26,20,0.78) 100%)' }} />
-              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '14px' }}>
-                <div style={{ fontFamily: NM.SANS, fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.75)', fontWeight: 500 }}>
-                  Týždeň {userProgram.week} / {userProgram.totalWeeks}
-                </div>
-                <div style={{ fontFamily: NM.SERIF, fontSize: 15, fontWeight: 500, color: '#fff', marginTop: 3, letterSpacing: '-0.005em' }}>{userProgram.name}</div>
-              </div>
-            </div>
-          </div>
-        ) : isPremium ? (
-          <div style={{ borderRadius: 18, padding: '22px 20px', background: NM.CREAM_2 ?? '#F1ECE3', border: `1px solid ${NM.HAIR}`, textAlign: 'center' }}>
-            <Ser size={18} style={{ marginBottom: 6 }}>Zatiaľ bez programu</Ser>
-            <Body size={12}>Vyber si jeden zo 4 programov v <span style={{ color: NM.TERRA, fontWeight: 500 }}>Telo · Programy</span>.</Body>
-          </div>
-        ) : (
-          <div style={{ borderRadius: 18, padding: '22px 20px', background: NM.CREAM_2 ?? '#F1ECE3', border: `1px solid ${NM.HAIR}`, textAlign: 'center' }}>
-            <Ser size={18} style={{ marginBottom: 6 }}>Bez aktívneho programu</Ser>
-            <Body size={12}>
-              Vyber si z 4 programov po prechode na <strong style={{ color: NM.GOLD, fontWeight: 500 }}>Plus</strong>.
-            </Body>
-          </div>
-        )}
-      </div>
-
       {/* Subscription */}
-      <div style={{ margin: '22px 20px 0' }}>
-        {isPremium ? (
-          <button
-            onClick={() => navigate('/profil/subscription')}
-            style={{
-              all: 'unset',
-              cursor: 'pointer',
-              display: 'block',
-              width: '100%',
-              padding: '18px 20px',
-              borderRadius: 18,
-              background: `linear-gradient(135deg, ${NM.DEEP_2} 0%, ${NM.DEEP} 100%)`,
-              color: '#fff',
-              position: 'relative',
-              overflow: 'hidden',
-              boxSizing: 'border-box',
-            }}
-          >
-            <div style={{ position: 'absolute', top: -50, right: -50, width: 160, height: 160, borderRadius: 999, background: `radial-gradient(circle, ${NM.GOLD}40, transparent 70%)` }} />
-            <div style={{ position: 'relative' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-                <Eye color={NM.GOLD} size={10}>NeoMe Plus · aktívne</Eye>
-                <div style={{ fontFamily: NM.SANS, fontSize: 10, color: 'rgba(255,255,255,0.5)', fontWeight: 400 }}>Spravovať ›</div>
-              </div>
-              <div style={{ fontFamily: NM.SERIF, fontSize: 17, fontStyle: 'italic', fontWeight: 500, letterSpacing: '-0.005em', marginBottom: 4 }}>
-                {(() => {
-                  if (!subscription?.current_period_end) return 'Aktívne predplatné';
-                  const d = new Date(subscription.current_period_end * 1000);
-                  const sk = ['januára', 'februára', 'marca', 'apríla', 'mája', 'júna', 'júla', 'augusta', 'septembra', 'októbra', 'novembra', 'decembra'];
-                  return `Ďalšia platba ${d.getDate()}. ${sk[d.getMonth()]}`;
-                })()}
-              </div>
-              {/* FEATURE-NEEDED-PROFIL-PAYMENT-METHOD: surface card brand
-                  + last4 via Stripe customer.payment_methods. Currently
-                  not pulled into SubscriptionData. */}
-              <div style={{ fontFamily: NM.SANS, fontSize: 11, color: 'rgba(255,255,255,0.55)', fontWeight: 400 }}>9,99 € / mes · zrušíš kedykoľvek</div>
-            </div>
-          </button>
-        ) : (
-          <div style={{ padding: '22px 20px', borderRadius: 20, background: `linear-gradient(135deg, ${NM.CREAM_3 ?? '#EAE3D6'} 0%, ${NM.CREAM_2 ?? '#F1ECE3'} 100%)`, border: `1px solid ${NM.HAIR}`, position: 'relative', overflow: 'hidden' }}>
-            <Eye color={NM.GOLD} size={10} style={{ marginBottom: 10 }}>NeoMe Plus</Eye>
-            <Ser size={22} style={{ lineHeight: 1.2 }}>
-              Odomkni <em style={{ color: NM.GOLD, fontStyle: 'italic', fontWeight: 500 }}>celú cestu</em>
-            </Ser>
-            <Body size={12} style={{ marginTop: 8 }}>Programy Telo, plný cyklus, návyky a reflexia s históriou.</Body>
-            <button
-              onClick={() => navigate('/paywall')}
-              style={{
-                marginTop: 14,
-                padding: '12px 22px',
-                background: NM.DEEP,
-                color: '#fff',
-                border: 'none',
-                borderRadius: 999,
-                fontFamily: NM.SANS,
-                fontSize: 13,
-                fontWeight: 500,
-                letterSpacing: '0.02em',
-                cursor: 'pointer',
-              }}
-            >
-              Prejsť na Plus
-            </button>
-            <div style={{ marginTop: 8, fontFamily: NM.SANS, fontSize: 10.5, color: NM.TERTIARY, fontWeight: 400 }}>Prvý mesiac 4,99 € · potom 9,99 € / mes</div>
-          </div>
-        )}
-      </div>
-
-      {/* Admin-only Free/Plus tier toggle (renders nothing for non-admins) */}
-      <AdminTierToggle />
-
-      {/* Settings */}
-      <SectionHead>Nastavenia</SectionHead>
-      <div style={{ margin: '0 20px', background: NM.CREAM_2 ?? '#F1ECE3', borderRadius: 18, overflow: 'hidden' }}>
-        <Row icon={{ bg: 'rgba(255,255,255,0.7)', el: <IPencil color={NM.TERRA} /> }} label="Upraviť profil" value="Meno, fotka, bio" onClick={() => navigate('/settings/profile')} />
-        <Row icon={{ bg: 'rgba(255,255,255,0.7)', el: <ITarget color={NM.SAGE} /> }} label="Ciele a životná fáza" value="Postpartum · 14. týždeň" onClick={() => navigate('/settings/goals')} />
-        <Row icon={{ bg: 'rgba(255,255,255,0.7)', el: <IHeart color={NM.TERRA} /> }} label="Uložené" value="12 receptov · 8 meditácií" onClick={() => navigate('/oblubene')} />
-        <Row icon={{ bg: 'rgba(255,255,255,0.7)', el: <IBell color={NM.DUSTY} /> }} label="Upozornenia" value="Ráno 7:30 · Reflexia 21:00" onClick={() => navigate('/settings/notifications')} />
-        <Row icon={{ bg: 'rgba(255,255,255,0.7)', el: <IShield color={NM.MAUVE} /> }} label="Súkromie a údaje" onClick={() => navigate('/settings/privacy')} />
-        <Row icon={{ bg: 'rgba(255,255,255,0.7)', el: <IHelp color={NM.DEEP} /> }} label="Pomoc a spätná väzba" onClick={() => navigate('/settings/help')} last />
-      </div>
-
-      {/* Sign out */}
-      <div style={{ margin: '22px 20px 0', textAlign: 'center' }}>
+      <div className="px-5 mb-6">
+        <SectionHeader eyebrow="Predplatné" className="mb-3" />
         <button
-          onClick={async () => {
-            await signOut();
-            navigate('/');
-          }}
-          style={{
-            all: 'unset',
-            cursor: 'pointer',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 8,
-            padding: '12px 26px',
-            borderRadius: 999,
-            background: 'transparent',
-            border: `1px solid ${NM.HAIR_2}`,
-            fontFamily: NM.SANS,
-            fontSize: 12,
-            color: NM.MUTED,
-            fontWeight: 400,
-          }}
+          onClick={() => navigate('/profil/predplatne')}
+          className="w-full text-left rounded-card p-5 bg-white border border-ink/[0.08] shadow-nm-sm flex items-center gap-4 transition-all active:scale-[0.99]"
         >
-          <ILogOut color={NM.MUTED} />
-          <span style={{ marginLeft: 2 }}>Odhlásiť sa</span>
+          <div className="h-10 w-10 rounded-full bg-gold/15 flex items-center justify-center flex-shrink-0">
+            <span className="font-sans text-sm font-bold text-gold">+</span>
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="font-serif text-h3 text-ink">
+              {isPremium ? 'NeoMe Plus' : 'Bezplatný plán'}
+            </div>
+            <BodyText size="sm" tone="muted" className="mt-0.5">
+              {isPremium ? 'Aktívne predplatné' : 'Upgrade na Plus'}
+            </BodyText>
+          </div>
+          <ChevronRight className="size-5 text-ink/40 flex-shrink-0" />
         </button>
       </div>
 
-      <div style={{ textAlign: 'center', marginTop: 18, padding: '0 20px' }}>
-        <Body size={10.5} color={NM.TERTIARY}>NeoMe · v2.4.0</Body>
-      </div>
-    </Page>
+      {/* Settings */}
+      <SettingsGroup label="Nastavenia">
+        <SettingsRow label="Profil a údaje" onClick={() => navigate('/settings/profile')} />
+        <SettingsRow label="Upozornenia" onClick={() => navigate('/settings/notifications')} />
+        <SettingsRow label="Súkromie" onClick={() => navigate('/settings/privacy')} />
+        <SettingsRow label="Všetky nastavenia" onClick={() => navigate('/settings')} />
+      </SettingsGroup>
+
+      <SettingsGroup>
+        <SettingsRow label="Odhlásiť sa" tone="danger" onClick={handleSignOut} />
+      </SettingsGroup>
+
+      <BottomNav active="profil" />
+    </div>
   );
 }

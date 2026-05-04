@@ -1,69 +1,81 @@
 import { useNavigate } from 'react-router-dom';
-import { useSubscription } from '../../contexts/SubscriptionContext';
-import { Page, BackHeader, Eye, Ser, Body, PlusTag, NM } from '../../components/v2/neome';
+import { useSubscription } from '@/contexts/SubscriptionContext';
+import { TopBar } from '@/components/v2/top-bar';
+import { SerifHeader } from '@/components/ui/serif-header';
+import { BodyText } from '@/components/ui/body-text';
+import { Eyebrow } from '@/components/ui/eyebrow';
+import { PlusTag } from '@/components/ui/plus-tag';
+import { ChevronRight } from 'lucide-react';
 
-/**
- * Telo · R9 hub
- * Three equal editorial cards: Programy, Cvičenia, Strečing.
- * The Programy card carries a Plus chip for free users.
- */
+const CARDS = [
+  {
+    id: 'programy',
+    eyebrow: 'Telo · 01',
+    name: 'Programy',
+    sub: 'Niekoľkotýždenná cesta',
+    meta: '4 programy',
+    path: '/kniznica/telo/programy',
+    requiresPlus: true,
+    dotColor: 'bg-pillar-telo',
+  },
+  {
+    id: 'cvicenia',
+    eyebrow: 'Telo · 02',
+    name: 'Cvičenia',
+    sub: 'Jednotlivé tréningy',
+    meta: '32 cvičení · 5–30 min',
+    path: '/kniznica/telo/extra',
+    requiresPlus: false,
+    dotColor: 'bg-pillar-telo/60',
+  },
+  {
+    id: 'strecing',
+    eyebrow: 'Telo · 03',
+    name: 'Strečing',
+    sub: 'Uvoľnenie a mobilita',
+    meta: '18 zostáv · 5–20 min',
+    path: '/kniznica/telo/strecing',
+    requiresPlus: false,
+    dotColor: 'bg-pillar-telo/40',
+  },
+];
+
 export default function Telo() {
   const navigate = useNavigate();
   const { isPremium } = useSubscription();
 
-  const cards = [
-    { id: 'programy', name: 'Programy', sub: 'Niekoľkotýždenná cesta', img: '/images/r9/program-body-forming.jpg', count: isPremium ? '4 programy' : '4 programy · Plus', locked: !isPremium, path: '/kniznica/telo/programy' },
-    { id: 'cvicenia', name: 'Cvičenia', sub: 'Jednotlivé tréningy', img: '/images/r9/lifestyle-core-workout.jpg', count: '32 cvičení · 5–30 min', locked: false, path: '/kniznica/telo/extra' },
-    { id: 'strecing', name: 'Strečing', sub: 'Uvoľnenie a mobilita', img: '/images/r9/lifestyle-yoga-pose.jpg', count: '18 zostáv · 5–20 min', locked: false, path: '/kniznica/telo/strecing' },
-  ];
-
   return (
-    <Page>
-      <BackHeader title="Telo" />
-      <div style={{ padding: '0 20px' }}>
-        <Ser size={36}>
-          Pohyb a <em style={{ color: NM.TERRA, fontWeight: 500, fontStyle: 'italic' }}>sila</em>.
-        </Ser>
-        <Body style={{ marginTop: 10, maxWidth: 320 }}>
+    <div className="min-h-screen bg-cream pb-12">
+      <TopBar title="Telo" backHref="/kniznica" />
+
+      <div className="px-5 pb-6">
+        <SerifHeader as="h1" size="h1">
+          Pohyb a <em className="text-terra not-italic font-serif italic">sila</em>.
+        </SerifHeader>
+        <BodyText tone="secondary" className="mt-2 max-w-[320px]">
           Programy pre dlhodobú premenu, jednotlivé cvičenia pre dnešný deň a strečing na každú chvíľu.
-        </Body>
+        </BodyText>
       </div>
 
-      <div style={{ margin: '30px 20px 0', display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {cards.map((c, i) => (
+      <div className="px-5 flex flex-col gap-3">
+        {CARDS.map(c => (
           <button
             key={c.id}
             onClick={() => navigate(c.path)}
-            style={{
-              all: 'unset',
-              cursor: 'pointer',
-              display: 'block',
-              width: '100%',
-              borderRadius: 22,
-              overflow: 'hidden',
-              position: 'relative',
-              aspectRatio: '16/10',
-              backgroundImage: `url(${c.img})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              boxShadow: '0 12px 32px rgba(61,41,33,0.08)',
-            }}
+            className="w-full text-left rounded-card p-5 flex items-center gap-4 bg-white border border-ink/[0.08] shadow-nm-sm transition-all duration-150 active:scale-[0.99]"
           >
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(42,26,20,0) 30%, rgba(42,26,20,0.85) 100%)' }} />
-            {c.locked && (
-              <div style={{ position: 'absolute', top: 14, right: 14 }}>
-                <PlusTag />
-              </div>
-            )}
-            <div style={{ position: 'absolute', bottom: 18, left: 20, right: 20, color: '#fff' }}>
-              <Eye color="rgba(255,255,255,0.72)" size={9}>Telo · 0{i + 1}</Eye>
-              <div style={{ fontFamily: NM.SERIF, fontSize: 28, fontWeight: 500, marginTop: 5, letterSpacing: '-0.01em' }}>{c.name}</div>
-              <div style={{ fontFamily: NM.SANS, fontSize: 12, color: 'rgba(255,255,255,0.75)', marginTop: 4, fontWeight: 400 }}>{c.sub}</div>
-              <div style={{ fontFamily: NM.SANS, fontSize: 10.5, color: 'rgba(255,255,255,0.55)', marginTop: 10, letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 500 }}>{c.count}</div>
+            <div className={`h-12 w-1 rounded-full flex-shrink-0 ${c.dotColor}`} />
+            <div className="flex-1 min-w-0">
+              <Eyebrow tone="muted" className="mb-0.5">{c.eyebrow}</Eyebrow>
+              <div className="font-serif text-h3 text-ink leading-snug">{c.name}</div>
+              <BodyText size="sm" tone="muted" className="mt-0.5">{c.sub}</BodyText>
+              <div className="font-sans text-[10px] uppercase tracking-[0.12em] text-ink/40 mt-1">{c.meta}</div>
             </div>
+            {c.requiresPlus && !isPremium && <PlusTag />}
+            <ChevronRight className="size-5 text-ink/40 flex-shrink-0" />
           </button>
         ))}
       </div>
-    </Page>
+    </div>
   );
 }

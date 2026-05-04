@@ -1,25 +1,25 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PlayCircle, ArrowLeft, Pause, Clock, User, Heart } from 'lucide-react';
-import GlassCard from '../../components/v2/GlassCard';
-import AudioPlayer from '../../components/v2/AudioPlayer';
+import { Play, ChevronRight } from 'lucide-react';
 import FavoriteButton from '../../components/v2/favorites/FavoriteButton';
-import { colors } from '../../theme/warmDusk';
+import { TopBar } from '@/components/v2/top-bar';
+import { Eyebrow } from '@/components/ui/eyebrow';
+import { SerifHeader } from '@/components/ui/serif-header';
+import { BodyText } from '@/components/ui/body-text';
+import { SectionHeader } from '@/components/ui/section-header';
 
-const categories = [
-  { name: 'Všetko', filter: null },
-  { name: 'Spánok', filter: 'sleep' },
-  { name: 'Fokus', filter: 'focus' },
-  { name: 'Stres', filter: 'stress' },
-  { name: 'Ráno', filter: 'morning' }
+const CATEGORIES = [
+  { label: 'Všetko', filter: null },
+  { label: 'Spánok', filter: 'sleep' },
+  { label: 'Fokus', filter: 'focus' },
+  { label: 'Stres', filter: 'stress' },
+  { label: 'Ráno', filter: 'morning' },
 ];
-
-const durations = ['Všetko', '5 min', '10 min', '15 min', '20 min+'];
 
 interface MeditationSession {
   id: string;
   title: string;
-  duration: number; // in minutes
+  duration: number;
   instructor: string;
   category: string;
   audioUrl: string;
@@ -28,304 +28,142 @@ interface MeditationSession {
   featured: boolean;
 }
 
+const CAT_LABEL: Record<string, string> = {
+  sleep: 'Spánok', focus: 'Fokus', stress: 'Stres', morning: 'Ráno',
+};
+
 const sessions: MeditationSession[] = [
-  { 
-    id: '1',
-    title: 'Ranná meditácia', 
-    duration: 10, 
-    instructor: 'Eva Kováčová', 
-    category: 'morning',
-    audioUrl: '/audio/morning-meditation.mp3',
-    description: 'Začni deň s jasnou mysľou a pozitívnou energiou',
-    thumbnail: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300&h=200&fit=crop',
-    featured: true 
+  {
+    id: '1', title: 'Ranná meditácia', duration: 10, instructor: 'Gabi',
+    category: 'morning', audioUrl: '/audio/morning-meditation.mp3',
+    description: 'Začni deň s jasnou mysľou a pozitívnou energiou', thumbnail: '', featured: true,
   },
-  { 
-    id: '2',
-    title: 'Hlboký spánok', 
-    duration: 20, 
-    instructor: 'NeoMe', 
-    category: 'sleep',
-    audioUrl: '/audio/deep-sleep.mp3',
-    description: 'Uvoľni sa a priprav sa na regeneračný spánok',
-    thumbnail: 'https://images.unsplash.com/photo-1515894203077-9cd36514e75c?w=300&h=200&fit=crop',
-    featured: false 
+  {
+    id: '2', title: 'Hlboký spánok', duration: 20, instructor: 'Gabi',
+    category: 'sleep', audioUrl: '/audio/deep-sleep.mp3',
+    description: 'Uvoľni sa a priprav sa na regeneračný spánok', thumbnail: '', featured: false,
   },
-  { 
-    id: '3',
-    title: 'Zvládanie stresu', 
-    duration: 15, 
-    instructor: 'Eva Kováčová', 
-    category: 'stress',
-    audioUrl: '/audio/stress-relief.mp3',
-    description: 'Techniky na zvládnutie každodenného stresu',
-    thumbnail: 'https://images.unsplash.com/photo-1499728603263-13726abce5ca?w=300&h=200&fit=crop',
-    featured: false 
+  {
+    id: '3', title: 'Zvládanie stresu', duration: 15, instructor: 'Gabi',
+    category: 'stress', audioUrl: '/audio/stress-relief.mp3',
+    description: 'Techniky na zvládnutie každodenného stresu', thumbnail: '', featured: false,
   },
-  { 
-    id: '4',
-    title: 'Fokus a koncentrácia', 
-    duration: 12, 
-    instructor: 'NeoMe', 
-    category: 'focus',
-    audioUrl: '/audio/focus-concentration.mp3',
-    description: 'Zlepši svoju koncentráciu a produktivitu',
-    thumbnail: 'https://images.unsplash.com/photo-1447452001602-7090c7ab2db3?w=300&h=200&fit=crop',
-    featured: false 
+  {
+    id: '4', title: 'Fokus a koncentrácia', duration: 12, instructor: 'Gabi',
+    category: 'focus', audioUrl: '/audio/focus-concentration.mp3',
+    description: 'Zlepši svoju koncentráciu a produktivitu', thumbnail: '', featured: false,
   },
-  { 
-    id: '5',
-    title: 'Večerné uvoľnenie', 
-    duration: 18, 
-    instructor: 'Eva Kováčová', 
-    category: 'sleep',
-    audioUrl: '/audio/evening-relaxation.mp3',
-    description: 'Ukončí deň s pokojom a vďačnosťou',
-    thumbnail: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=300&h=200&fit=crop',
-    featured: false 
+  {
+    id: '5', title: 'Večerné uvoľnenie', duration: 18, instructor: 'Gabi',
+    category: 'sleep', audioUrl: '/audio/evening-relaxation.mp3',
+    description: 'Ukončí deň s pokojom a vďačnosťou', thumbnail: '', featured: false,
   },
-  { 
-    id: '6',
-    title: 'Dýchanie 4-7-8', 
-    duration: 8, 
-    instructor: 'NeoMe', 
-    category: 'stress',
-    audioUrl: '/audio/breathing-4-7-8.mp3',
-    description: 'Efektívna technika pre okamžité upokojenie',
-    thumbnail: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=300&h=200&fit=crop',
-    featured: false 
+  {
+    id: '6', title: 'Dýchanie 4-7-8', duration: 8, instructor: 'Gabi',
+    category: 'stress', audioUrl: '/audio/breathing-4-7-8.mp3',
+    description: 'Efektívna technika pre okamžité upokojenie', thumbnail: '', featured: false,
+  },
+  {
+    id: '7', title: 'Upokojenie úzkosti', duration: 12, instructor: 'Gabi',
+    category: 'stress', audioUrl: '/audio/anxiety-relief.mp3',
+    description: 'Jemné vedené dýchanie pre chvíle úzkosti', thumbnail: '', featured: false,
+  },
+  {
+    id: '8', title: 'Prijatie tela', duration: 8, instructor: 'Gabi',
+    category: 'morning', audioUrl: '/audio/body-acceptance.mp3',
+    description: 'Meditácia o láskyplnom vzťahu k vlastnému telu', thumbnail: '', featured: false,
   },
 ];
 
 export default function Meditacie() {
   const navigate = useNavigate();
-  const [activeCategory, setActiveCategory] = useState(0);
-  const [activeDuration, setActiveDuration] = useState(0);
-  const [playingId, setPlayingId] = useState<string | null>(null);
-  
+  const [activeCat, setActiveCat] = useState<string | null>(null);
+
   const featured = sessions.find(s => s.featured) || sessions[0];
+  const list = sessions.filter(s => !s.featured && (activeCat === null || s.category === activeCat));
 
-  // Filter sessions based on selected category and duration
-  const filteredSessions = sessions.filter(session => {
-    if (!session.featured) { // Don't include featured in main list
-      const categoryMatch = categories[activeCategory].filter === null || 
-                           session.category === categories[activeCategory].filter;
-      
-      const durationMatch = activeDuration === 0 || // "Všetko"
-        (activeDuration === 1 && session.duration <= 5) ||
-        (activeDuration === 2 && session.duration <= 10) ||
-        (activeDuration === 3 && session.duration <= 15) ||
-        (activeDuration === 4 && session.duration > 15);
-      
-      return categoryMatch && durationMatch;
-    }
-    return false;
-  });
-
-  const handlePlayMeditation = (meditation: MeditationSession) => {
-    // Navigate to full-screen meditation player
-    navigate('/meditation-player', { state: { session: meditation } });
-  };
+  const goTo = (s: MeditationSession) => navigate(`/meditacia/${s.id}`);
 
   return (
-    <div className="w-full min-h-screen px-3 py-6 pb-28 space-y-6">
-      {/* Nordic Header */}
-      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
-        <div className="flex items-center gap-3">
-          <button onClick={() => navigate('/kniznica/mysel')} className="p-1">
-            <ArrowLeft className="w-5 h-5 text-gray-600" strokeWidth={1.5} />
-          </button>
-          <div className="flex items-center gap-2 flex-1">
-            <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `rgba(168, 132, 139, 0.14)` }}>
-              <PlayCircle className="w-4 h-4" style={{ color: '#A8848B' }} />
-            </div>
-            <h1 className="text-[22px] font-medium leading-tight" style={{ color: '#2E2218', fontFamily: '"Bodoni Moda", Georgia, serif' }}>Meditácie</h1>
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen bg-cream pb-12">
+      <TopBar title="Meditácie" backHref="/kniznica/mysel" />
 
-      {/* Featured Meditation */}
-      <div className="bg-white/30 backdrop-blur-xl rounded-2xl shadow-sm border border-white/20 overflow-hidden">
+      {/* Featured */}
+      <div className="px-5 mb-6">
+        <SectionHeader eyebrow="Odporúčané" className="mb-3" />
         <button
-          onClick={() => handlePlayMeditation(featured)}
-          className="relative w-full h-32 block active:scale-[0.98] transition-transform text-left"
+          onClick={() => goTo(featured)}
+          className="w-full text-left rounded-card p-5 bg-white border border-ink/[0.08] shadow-nm-sm flex items-center gap-4 transition-all active:scale-[0.99]"
         >
-          <img 
-            src={featured.thumbnail} 
-            alt={featured.title} 
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-            <div className="w-16 h-16 rounded-full bg-white/95 flex items-center justify-center shadow-lg">
-              {playingId === featured.id ? (
-                <Pause size={24} style={{ color: '#A8848B' }} fill="#A8848B" />
-              ) : (
-                <PlayCircle size={24} style={{ color: '#A8848B' }} fill="#A8848B" strokeWidth={0} />
-              )}
-            </div>
+          <div className="h-14 w-14 rounded-xl bg-pillar-mysel/15 flex items-center justify-center flex-shrink-0">
+            <Play className="size-5 text-pillar-mysel fill-pillar-mysel" />
           </div>
-          <div className="absolute top-2 left-2 bg-black/50 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
-            Odporúčané
+          <div className="flex-1 min-w-0">
+            <Eyebrow tone="muted" className="mb-0.5">
+              {CAT_LABEL[featured.category] ?? featured.category} · {featured.duration} min
+            </Eyebrow>
+            <div className="font-serif text-h3 text-ink leading-snug truncate">{featured.title}</div>
+            <BodyText size="sm" tone="secondary" className="mt-0.5 line-clamp-1">{featured.description}</BodyText>
           </div>
-          <div className="absolute top-2 right-2">
-            <FavoriteButton
-              itemId={featured.id}
-              type="meditation"
-              title={featured.title}
-              image={featured.thumbnail}
-              duration={`${featured.duration} min`}
-              category={featured.category}
-              metadata={{ instructor: featured.instructor }}
-              size="sm"
-              className="bg-black/60 backdrop-blur-[10px] text-white hover:bg-black/70"
-            />
-          </div>
+          <ChevronRight className="size-5 text-ink/40 flex-shrink-0" />
         </button>
-        
-        <div className="p-4">
-          <h3 className="text-lg font-semibold text-gray-800">
-            {featured.title}
-          </h3>
-          <p className="text-sm mt-1 text-gray-600">
-            {featured.description}
-          </p>
-          <div className="flex items-center gap-3 mt-3">
-            <span className="text-xs flex items-center gap-1 text-gray-500">
-              <Clock size={12} />
-              {featured.duration} min
-            </span>
-            <span className="text-xs flex items-center gap-1 text-gray-500">
-              <User size={12} />
-              {featured.instructor}
-            </span>
-          </div>
-          
+      </div>
+
+      {/* Category filter */}
+      <div className="px-5 mb-5">
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide -mx-5 px-5">
+          {CATEGORIES.map(c => (
+            <button
+              key={c.label}
+              onClick={() => setActiveCat(c.filter)}
+              className={`flex-shrink-0 px-4 py-2 rounded-full font-sans text-sm font-medium transition-all ${
+                activeCat === c.filter
+                  ? 'bg-pillar-mysel text-white'
+                  : 'bg-white border border-ink/[0.08] text-ink/72'
+              }`}
+            >
+              {c.label}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/30">
-        {/* Category Filter */}
-        <div className="mb-4">
-          <h3 className="text-sm font-semibold mb-3 text-gray-800">Kategória</h3>
-          <div className="flex gap-2 overflow-x-auto scrollbar-hide">
-            {categories.map((c, i) => (
-              <button
-                key={c.name}
-                onClick={() => setActiveCategory(i)}
-                className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${
-                  activeCategory === i 
-                    ? 'bg-[#A8848B] text-white' 
-                    : 'bg-white/25 text-gray-600 hover:bg-gray-200'
-                }`}
-              >
-                {c.name}
-              </button>
-            ))}
+      {/* Meditation list */}
+      <div className="px-5 flex flex-col gap-2">
+        {list.length === 0 ? (
+          <div className="rounded-card bg-white border border-ink/[0.08] shadow-nm-sm p-8 text-center">
+            <BodyText tone="secondary">Žiadne meditácie pre túto kategóriu.</BodyText>
           </div>
-        </div>
-
-        {/* Duration Filter */}
-        <div>
-          <h3 className="text-sm font-semibold mb-3 text-gray-800">Dĺžka</h3>
-          <div className="flex gap-2 overflow-x-auto scrollbar-hide">
-            {durations.map((d, i) => (
-              <button
-                key={d}
-                onClick={() => setActiveDuration(i)}
-                className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${
-                  activeDuration === i 
-                    ? 'bg-[#A8848B] text-white' 
-                    : 'bg-white/25 text-gray-600 hover:bg-gray-200'
-                }`}
-              >
-                {d}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Favourites hint */}
-      <div className="bg-white/20 backdrop-blur-sm rounded-xl px-3 py-2 flex items-center gap-2 border border-white/20">
-        <Heart size={11} style={{ color: '#A8848B' }} />
-        <p className="text-[11px]" style={{ color: '#8B7560' }}>
-          Obľúbené meditácie nájdeš v <span className="font-medium" style={{ color: '#A8848B' }}>Obľúbené</span> v Knižnici
-        </p>
-      </div>
-
-      {/* Filtered Session List */}
-      <div className="space-y-3">
-        {filteredSessions.map((session) => (
-          <div
-            key={session.id}
-            className="bg-white/30 backdrop-blur-xl rounded-2xl shadow-sm border border-white/20 overflow-hidden"
-          >
-            <div className="flex items-center gap-3 p-3">
-              {/* Thumbnail — tappable */}
-              <button
-                onClick={() => handlePlayMeditation(session)}
-                className="relative w-14 h-14 flex-shrink-0 rounded-xl overflow-hidden active:scale-95 transition-transform"
-              >
-                <img
-                  src={session.thumbnail}
-                  alt={session.title}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                  {playingId === session.id ? (
-                    <Pause size={14} className="text-white" fill="white" />
-                  ) : (
-                    <PlayCircle size={14} className="text-white" fill="white" strokeWidth={0} />
-                  )}
-                </div>
-              </button>
-
-              {/* Info — tappable */}
-              <button
-                onClick={() => handlePlayMeditation(session)}
-                className="flex-1 text-left min-w-0"
-              >
-                <h4 className="text-[13px] font-semibold text-gray-800 leading-snug">
-                  {session.title}
-                </h4>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="text-[11px] flex items-center gap-0.5 text-gray-500">
-                    <Clock size={10} />
-                    {session.duration} min
-                  </span>
-                  <span className="text-gray-300">·</span>
-                  <span className="text-[11px] text-gray-500">{session.instructor}</span>
-                  {playingId === session.id && (
-                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-[#A8848B] text-white">Hrá</span>
-                  )}
-                </div>
-              </button>
-
-              {/* Actions — stacked vertically, compact */}
+        ) : (
+          list.map(session => (
+            <button
+              key={session.id}
+              onClick={() => goTo(session)}
+              className="w-full text-left rounded-card p-4 bg-white border border-ink/[0.08] shadow-nm-sm flex items-center gap-4 transition-all active:scale-[0.99]"
+            >
+              <div className="h-10 w-10 rounded-full bg-pillar-mysel/15 flex items-center justify-center flex-shrink-0">
+                <Play className="size-4 text-pillar-mysel fill-pillar-mysel" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <Eyebrow tone="muted" className="mb-0.5">
+                  {CAT_LABEL[session.category] ?? session.category} · {session.duration} min
+                </Eyebrow>
+                <div className="font-serif text-h3 text-ink leading-snug">{session.title}</div>
+              </div>
               <FavoriteButton
                 itemId={session.id}
                 type="meditation"
                 title={session.title}
-                image={session.thumbnail}
                 duration={`${session.duration} min`}
                 category={session.category}
                 metadata={{ instructor: session.instructor }}
                 size="sm"
                 variant="minimal"
               />
-            </div>
-          </div>
-        ))}
+            </button>
+          ))
+        )}
       </div>
-      
-      {filteredSessions.length === 0 && (
-        <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-8 shadow-sm border border-white/20 text-center">
-          <p className="text-sm text-gray-600">
-            Žiadne meditácie sa nenašli pre vybrané filtre.
-          </p>
-        </div>
-      )}
     </div>
   );
 }

@@ -1,9 +1,10 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
-import GlassCard from '../../components/v2/GlassCard';
-import EmptyStateDiary from '../../components/v2/EmptyStateDiary';
-import { colors, glassCard } from '../../theme/warmDusk';
+import { PenLine } from 'lucide-react';
+import { TopBar } from '@/components/v2/top-bar';
+import { Eyebrow } from '@/components/ui/eyebrow';
+import { BodyText } from '@/components/ui/body-text';
+import { SerifHeader } from '@/components/ui/serif-header';
 
 interface DiaryEntry {
   id?: string;
@@ -24,10 +25,10 @@ export default function DennikHistory() {
       const entries: DiaryEntry[] = JSON.parse(raw);
       const groups: Record<string, DiaryEntry[]> = {};
       for (const e of entries) {
-        const raw = e.date || e.timestamp || e.createdAt || '';
-        const date = raw.length >= 10 ? raw.slice(0, 10) : (raw || 'Neznámy dátum');
-        if (!groups[date]) groups[date] = [];
-        groups[date].push(e);
+        const rawDate = e.date || e.timestamp || e.createdAt || '';
+        const key = rawDate.length >= 10 ? rawDate.slice(0, 10) : (rawDate || 'Neznámy dátum');
+        if (!groups[key]) groups[key] = [];
+        groups[key].push(e);
       }
       return groups;
     } catch {
@@ -38,38 +39,55 @@ export default function DennikHistory() {
   const sortedDates = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
 
   return (
-    <div className="min-h-screen px-4 pt-5 pb-8 space-y-4" style={{ background: colors.bgGradient }}>
-      <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-4 border border-white/20 flex items-center gap-3">
-        <button onClick={() => navigate('/kniznica')} className="p-1">
-          <ArrowLeft className="w-5 h-5 text-[#2E2218]" strokeWidth={1.5} />
+    <div className="min-h-screen bg-cream pb-12">
+      <TopBar title="Osobný denník" backHref="/kniznica/dennik" right={
+        <button
+          onClick={() => navigate('/dennik/new')}
+          className="h-9 w-9 rounded-full bg-white border border-ink/[0.08] flex items-center justify-center"
+        >
+          <PenLine className="size-4 text-ink/60" />
         </button>
-        <h1 className="text-[22px] font-medium leading-tight text-[#2E2218]" style={{ fontFamily: '"Bodoni Moda", Georgia, serif' }}>Osobný denník</h1>
-      </div>
+      } />
 
-      {sortedDates.length === 0 ? (
-        <EmptyStateDiary onCreateEntry={() => console.log('Creating diary entry...')} />
-      ) : (
-        sortedDates.map(date => (
-          <GlassCard key={date}>
-            <p className="text-[15px] font-semibold text-[#2E2218] mb-3">{formatDateLabel(date)}</p>
-            <div className="space-y-3">
+      <div className="px-5 pt-2 pb-6 flex flex-col gap-3">
+        {sortedDates.length === 0 ? (
+          <div className="mt-12 text-center px-8">
+            <div className="h-16 w-16 rounded-full bg-pillar-mysel/10 flex items-center justify-center mx-auto mb-4">
+              <PenLine className="size-7 text-pillar-mysel" />
+            </div>
+            <SerifHeader as="h2" size="h2" className="mb-2">Ešte nič tu nie je</SerifHeader>
+            <BodyText tone="secondary" className="mb-6 max-w-xs mx-auto">
+              Začni písať — denník je tvoj priestor na reflexiu bez súdenia.
+            </BodyText>
+            <button
+              onClick={() => navigate('/dennik/new')}
+              className="px-6 py-3 bg-ink text-cream rounded-full font-sans text-sm font-medium"
+            >
+              Napísať prvý záznam
+            </button>
+          </div>
+        ) : (
+          sortedDates.map(date => (
+            <div key={date} className="rounded-card bg-white border border-ink/[0.08] shadow-nm-sm overflow-hidden">
+              <div className="px-5 pt-4 pb-3 border-b border-ink/[0.06]">
+                <Eyebrow tone="muted">{formatDateLabel(date)}</Eyebrow>
+              </div>
               {grouped[date].map((entry, i) => (
-                <div key={i}>
-                  {i > 0 && <div className="border-t border-[#D0BCA8] my-2" />}
-                  <p className="text-[12px] text-[#888] mb-1">
-                    {(entry.date || entry.timestamp || entry.createdAt)
-                      ? new Date(entry.date || entry.timestamp || entry.createdAt!).toLocaleTimeString('sk-SK', { hour: '2-digit', minute: '2-digit' })
-                      : ''}
-                  </p>
-                  <p className="text-[13px] text-[#8B7560] leading-relaxed whitespace-pre-wrap">
+                <div key={i} className={`px-5 py-4 ${i < grouped[date].length - 1 ? 'border-b border-ink/[0.06]' : ''}`}>
+                  {(entry.date || entry.timestamp || entry.createdAt) && (
+                    <Eyebrow tone="muted" className="mb-1">
+                      {new Date(entry.date || entry.timestamp || entry.createdAt!).toLocaleTimeString('sk-SK', { hour: '2-digit', minute: '2-digit' })}
+                    </Eyebrow>
+                  )}
+                  <BodyText size="sm" tone="secondary" className="whitespace-pre-wrap leading-relaxed">
                     {entry.text || entry.content || ''}
-                  </p>
+                  </BodyText>
                 </div>
               ))}
             </div>
-          </GlassCard>
-        ))
-      )}
+          ))
+        )}
+      </div>
     </div>
   );
 }

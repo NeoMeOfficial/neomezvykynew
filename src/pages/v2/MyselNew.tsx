@@ -1,170 +1,109 @@
 import { useNavigate } from 'react-router-dom';
-import { Page, BackHeader, Eye, Ser, Body, NM } from '../../components/v2/neome';
-
-/**
- * Myseľ — R3 hub
- *
- * Editorial header, "Dnešné zamyslenie" reflection prompt, featured
- * meditation full-bleed card, short meditation list, recent reflections.
- *
- * TODO data: meditation list from existing media catalog, reflections
- * from diary table.
- *
- * Old version: MyselNew.old.tsx.
- */
+import { TopBar } from '@/components/v2/top-bar';
+import { SerifHeader } from '@/components/ui/serif-header';
+import { BodyText } from '@/components/ui/body-text';
+import { Eyebrow } from '@/components/ui/eyebrow';
+import { SectionHeader } from '@/components/ui/section-header';
+import { ChevronRight, Play, Check } from 'lucide-react';
 
 const MEDITATIONS = [
   { id: 'upokojenie', name: 'Upokojenie úzkosti', dur: '12 min', cat: 'Emócie', done: true },
-  { id: 'spanok', name: 'Dych pre spánok', dur: '15 min', cat: 'Večer', done: false },
-  { id: 'prijatie', name: 'Prijatie tela', dur: '8 min', cat: 'Telo', done: false },
+  { id: 'spanok',     name: 'Dych pre spánok',    dur: '15 min', cat: 'Večer',  done: false },
+  { id: 'prijatie',   name: 'Prijatie tela',       dur: '8 min',  cat: 'Telo',   done: false },
 ];
 
 export default function MyselNew() {
   const navigate = useNavigate();
   const today = new Date();
-  const dateLabel = `${['Nedeľa', 'Pondelok', 'Utorok', 'Streda', 'Štvrtok', 'Piatok', 'Sobota'][today.getDay()]} · ${today.getDate()}. ${today.getMonth() + 1}.`;
+  const dateLabel = `${['Nedeľa','Pondelok','Utorok','Streda','Štvrtok','Piatok','Sobota'][today.getDay()]} · ${today.getDate()}. ${today.getMonth() + 1}.`;
 
   return (
-    <Page>
-      <BackHeader title="Myseľ" showSearch={false} />
+    <div className="min-h-screen bg-cream pb-12">
+      <TopBar title="Myseľ" backHref="/kniznica" />
 
-      <div style={{ padding: '6px 24px 24px' }}>
-        <Eye color={NM.SAGE} style={{ marginBottom: 10 }}>Ticho · prítomnosť · slová</Eye>
-        <Ser size={32} style={{ lineHeight: 1.04, marginBottom: 12 }}>
-          Priestor
-          <br />
-          pre seba.
-        </Ser>
-        <Body style={{ maxWidth: 310 }}>Meditácie pre ranné stíšenie aj večerný oddych. Reflexie, keď potrebuješ niekoho vypočuť — aj keď si to ty sama.</Body>
+      <div className="px-5 pb-6">
+        <SerifHeader as="h1" size="h1">
+          Priestor{' '}
+          <em className="text-mauve not-italic font-serif italic">pre seba</em>.
+        </SerifHeader>
+        <BodyText tone="secondary" className="mt-2 max-w-[320px]">
+          Meditácie pre ranné stíšenie aj večerný oddych. Reflexie, keď potrebuješ niekoho vypočuť.
+        </BodyText>
       </div>
 
-      <div style={{ padding: '0 24px 24px' }}>
-        <div style={{ background: NM.CREAM_2 ?? '#F1ECE3', borderRadius: 18, padding: '22px 22px 20px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-            <Eye color={NM.GOLD}>Dnešné zamyslenie</Eye>
-            <div style={{ fontFamily: NM.SANS, fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: NM.TERTIARY }}>{dateLabel}</div>
+      {/* Daily reflection prompt */}
+      <div className="px-5 mb-6">
+        <div className="rounded-card p-5 bg-cream-200 border border-ink/[0.06]">
+          <div className="flex items-center justify-between mb-3">
+            <Eyebrow tone="gold">Dnešné zamyslenie</Eyebrow>
+            <span className="font-sans text-[10px] uppercase tracking-[0.18em] text-ink/40">{dateLabel}</span>
           </div>
-          <div style={{ fontFamily: NM.SERIF, fontSize: 22, fontWeight: 400, color: NM.DEEP, letterSpacing: '-0.008em', lineHeight: 1.25, marginBottom: 20 }}>
+          <SerifHeader as="div" size="h2" className="leading-snug mb-4">
             Za čo si dnes vďačná — aj keď je to len malý moment?
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          </SerifHeader>
+          <div className="flex items-center gap-3">
             <button
-              onClick={() => navigate('/dennik')}
-              style={{
-                padding: '10px 18px',
-                background: NM.DEEP,
-                color: '#fff',
-                border: 'none',
-                borderRadius: 999,
-                cursor: 'pointer',
-                fontFamily: NM.SANS,
-                fontSize: 12,
-                fontWeight: 500,
-                letterSpacing: '0.02em',
-              }}
+              onClick={() => navigate('/dennik/new')}
+              className="px-4 py-2 bg-ink text-cream rounded-full font-sans text-sm font-medium transition-all active:scale-95"
             >
               Napísať
             </button>
-            <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.MUTED }}>~3 minúty</div>
+            <span className="font-sans text-sm text-ink/40">~3 minúty</span>
           </div>
         </div>
       </div>
 
-      <div style={{ padding: '0 24px 8px', display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 16 }}>
-        <Eye>Meditácie</Eye>
-        <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.TERTIARY }}>Všetko · 28</div>
-      </div>
-
-      <div style={{ padding: '0 24px 16px' }}>
-        <button
-          onClick={() => navigate('/meditacie')}
-          style={{
-            all: 'unset',
-            cursor: 'pointer',
-            display: 'block',
-            width: '100%',
-            borderRadius: 18,
-            overflow: 'hidden',
-            aspectRatio: '16/10',
-            backgroundImage: 'url(/images/r9/section-mind.jpg)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            position: 'relative',
-          }}
-        >
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.1) 30%, rgba(0,0,0,0.75) 100%)' }} />
-          <div style={{ position: 'absolute', left: 20, right: 20, bottom: 18, color: '#fff' }}>
-            <div style={{ fontFamily: NM.SANS, fontSize: 10, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.8)', marginBottom: 8 }}>
-              Ranná meditácia · 10 min
-            </div>
-            <div style={{ fontFamily: NM.SERIF, fontSize: 24, fontWeight: 500, letterSpacing: '-0.01em', lineHeight: 1.05, marginBottom: 14 }}>
-              Ticho pred dňom
-            </div>
-            <div style={{ width: 42, height: 42, borderRadius: 999, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <svg width="14" height="14" viewBox="0 0 14 14" fill={NM.DEEP}>
-                <path d="M3 2l9 5-9 5V2z" />
-              </svg>
-            </div>
-          </div>
-        </button>
-      </div>
-
-      <div style={{ padding: '8px 24px 24px', display: 'flex', flexDirection: 'column', gap: 14 }}>
-        {MEDITATIONS.map((m) => (
-          <button
-            key={m.id}
-            onClick={() => navigate(`/meditation-player/${m.id}`)}
-            style={{
-              all: 'unset',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 14,
-              width: '100%',
-            }}
-          >
-            <div style={{ width: 56, height: 56, borderRadius: 14, background: NM.CREAM_3 ?? '#EAE3D6', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-                <path d="M4 11v0M7 8v6M10 5v12M13 8v6M16 10v2M19 11v0" stroke={NM.DEEP} strokeWidth="1.6" strokeLinecap="round" />
-              </svg>
-            </div>
-            <div style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
-              <Eye size={9} style={{ marginBottom: 4 }}>
-                {m.cat} · {m.dur}
-              </Eye>
-              <div style={{ fontFamily: NM.SERIF, fontSize: 16, fontWeight: 500, color: NM.DEEP, letterSpacing: '-0.005em', lineHeight: 1.25 }}>{m.name}</div>
-            </div>
-            {m.done && (
-              <div style={{ width: 22, height: 22, borderRadius: 999, background: NM.SAGE, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                  <path d="M2 5l2 2 4-4" stroke="#fff" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
+      {/* Meditations */}
+      <div className="px-5 mb-6">
+        <SectionHeader
+          eyebrow="Meditácie"
+          link="Všetky"
+          onLinkClick={() => navigate('/meditacie')}
+          className="mb-3"
+        />
+        <div className="flex flex-col gap-2">
+          {MEDITATIONS.map(m => (
+            <button
+              key={m.id}
+              onClick={() => navigate(`/meditacia/${m.id}`)}
+              className="w-full text-left rounded-card p-4 bg-white border border-ink/[0.08] shadow-nm-sm flex items-center gap-4 transition-all active:scale-[0.99]"
+            >
+              <div className="h-10 w-10 rounded-full bg-pillar-mysel/15 flex items-center justify-center flex-shrink-0">
+                <Play className="size-4 text-pillar-mysel fill-pillar-mysel" />
               </div>
-            )}
-          </button>
-        ))}
+              <div className="flex-1 min-w-0">
+                <Eyebrow tone="muted" className="mb-0.5">{m.cat} · {m.dur}</Eyebrow>
+                <div className="font-serif text-h3 text-ink leading-snug">{m.name}</div>
+              </div>
+              {m.done
+                ? <div className="h-6 w-6 rounded-full bg-pillar-strava flex items-center justify-center flex-shrink-0"><Check className="size-3 text-white" /></div>
+                : <ChevronRight className="size-5 text-ink/40 flex-shrink-0" />
+              }
+            </button>
+          ))}
+        </div>
       </div>
 
-      <div style={{ padding: '24px 24px 16px', borderTop: `1px solid ${NM.HAIR}`, display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-        <Eye>Tvoje reflexie</Eye>
-        <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.TERTIARY }}>24 zápisov</div>
-      </div>
-
-      <div style={{ padding: '0 24px 20px', display: 'flex', flexDirection: 'column', gap: 16 }}>
-        {[
-          { date: '11. 3.', prompt: 'Čo ti dnes dalo silu?', preview: 'Dlhá prechádzka s Luciou. Rozhovor o tom, že nemusím mať všetko pod kontrolou…' },
-          { date: '10. 3.', prompt: 'Kedy si sa dnes cítila najviac sama sebou?', preview: 'Pri ranom pilatese. Bolo to len o mne a tele, bez nikoho kto ma pozoruje…' },
-        ].map((r, i, arr) => (
-          <div key={r.date} style={{ padding: '16px 0', borderBottom: i < arr.length - 1 ? `1px solid ${NM.HAIR}` : 'none' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-              <Eye size={10}>{r.date}</Eye>
-              <div style={{ width: 3, height: 3, borderRadius: 999, background: NM.TERTIARY }} />
-              <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.MUTED }}>{r.prompt}</div>
+      {/* Reflections */}
+      <div className="px-5">
+        <SectionHeader
+          eyebrow="Tvoje reflexie"
+          link="História"
+          onLinkClick={() => navigate('/kniznica/dennik')}
+          className="mb-3"
+        />
+        <div className="rounded-card bg-white border border-ink/[0.08] shadow-nm-sm overflow-hidden">
+          {[
+            { date: '11. 3.', preview: 'Dlhá prechádzka s Luciou. Rozhovor o tom, že nemusím mať všetko pod kontrolou…' },
+            { date: '10. 3.', preview: 'Pri ranom pilatese. Bolo to len o mne a tele, bez nikoho kto ma pozoruje…' },
+          ].map((r, i, arr) => (
+            <div key={r.date} className={`px-5 py-4 ${i < arr.length - 1 ? 'border-b border-ink/[0.06]' : ''}`}>
+              <Eyebrow tone="muted" className="mb-1">{r.date}</Eyebrow>
+              <BodyText size="sm" tone="secondary" className="line-clamp-2">{r.preview}</BodyText>
             </div>
-            <div style={{ fontFamily: NM.SANS, fontSize: 14, color: NM.DEEP, lineHeight: 1.5 }}>{r.preview}</div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
-    </Page>
+    </div>
   );
 }

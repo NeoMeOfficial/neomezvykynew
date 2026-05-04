@@ -1,124 +1,73 @@
 import { useNavigate } from 'react-router-dom';
-import { useSubscription } from '../../contexts/SubscriptionContext';
-import {
-  Page,
-  Eye,
-  Ser,
-  SearchBar,
-  PillarTile,
-  PaywallCard,
-  NM,
-  type Pillar,
-} from '../../components/v2/neome';
+import { useSubscription } from '@/contexts/SubscriptionContext';
+import { BottomNav } from '@/components/v2/bottom-nav';
+import { Eyebrow } from '@/components/ui/eyebrow';
+import { SerifHeader } from '@/components/ui/serif-header';
+import { PlusTag } from '@/components/ui/plus-tag';
+import { ChevronRight } from 'lucide-react';
 
 interface PillarItem {
-  id: Pillar;
+  id: string;
   name: string;
   sub: string;
-  img: string;
+  color: string;
   path: string;
+  num: string;
 }
 
 const PILLARS: PillarItem[] = [
-  { id: 'telo',     name: 'Telo',     sub: 'Pohyb a sila',         img: '/images/r9/section-body.jpg',        path: '/kniznica/telo' },
-  { id: 'strava',   name: 'Strava',   sub: 'Jedálniček a recepty', img: '/images/r9/section-nutrition.jpg',   path: '/kniznica/strava' },
-  { id: 'mysel',    name: 'Myseľ',    sub: 'Meditácie a dýchanie', img: '/images/r9/section-mind.jpg',        path: '/kniznica/mysel' },
-  { id: 'cyklus',   name: 'Cyklus',   sub: 'Periodka a fázy',      img: '/images/r9/section-period.jpg',      path: '/kniznica/periodka' },
-  { id: 'dennik',   name: 'Denník',   sub: 'Reflexia a nálady',    img: '/images/r9/section-diary.jpg',       path: '/kniznica/dennik' },
-  { id: 'komunita', name: 'Komunita', sub: 'Ženy v pohybe',        img: '/images/r9/section-community.jpg',   path: '/komunita' },
-  { id: 'blog',     name: 'Blog',     sub: 'Články od Gabi',       img: '/images/r9/blog-cycle-training.jpg', path: '/kniznica/blog' },
+  { id: 'telo',     name: 'Telo',     sub: 'Pohyb a sila',          color: 'bg-pillar-telo/10 border-pillar-telo/20',     path: '/kniznica/telo',     num: '01' },
+  { id: 'strava',   name: 'Strava',   sub: 'Jedálniček a recepty',  color: 'bg-pillar-strava/10 border-pillar-strava/20', path: '/kniznica/strava',   num: '02' },
+  { id: 'mysel',    name: 'Myseľ',    sub: 'Meditácie a dýchanie',  color: 'bg-pillar-mysel/10 border-pillar-mysel/20',   path: '/kniznica/mysel',    num: '03' },
+  { id: 'cyklus',   name: 'Cyklus',   sub: 'Periodka a fázy',       color: 'bg-pillar-cyklus/10 border-pillar-cyklus/20', path: '/kniznica/periodka', num: '04' },
+  { id: 'dennik',   name: 'Denník',   sub: 'Reflexia a nálady',     color: 'bg-ink/[0.04] border-ink/[0.08]',             path: '/kniznica/dennik',   num: '05' },
+  { id: 'blog',     name: 'Blog',     sub: 'Články od Gabi',        color: 'bg-gold/[0.08] border-gold/20',               path: '/kniznica/blog',     num: '06' },
+  { id: 'komunita', name: 'Komunita', sub: 'Ženy v pohybe',         color: 'bg-ink/[0.04] border-ink/[0.08]',             path: '/komunita',          num: '07' },
 ];
 
-/**
- * Knižnica — R9 variant C ("equal tiles, all areas same size")
- *
- * 6 square pillar tiles in a 2-col grid + 1 wide Blog tile at the bottom.
- * Free users see a dark editorial paywall card under the grid.
- *
- * Wired to live useSubscription() — Plus eyebrow chip and paywall
- * visibility track real subscription state. Pillar route destinations
- * stay identical to the old design so navigation keeps working as we
- * port other pillars one-by-one.
- */
+const DOT_COLOR: Record<string, string> = {
+  telo: 'bg-pillar-telo', strava: 'bg-pillar-strava', mysel: 'bg-pillar-mysel',
+  cyklus: 'bg-pillar-cyklus', dennik: 'bg-ink/40', blog: 'bg-gold', komunita: 'bg-ink/40',
+};
+
 export default function Kniznica() {
   const navigate = useNavigate();
   const { isPremium } = useSubscription();
-  // ?free=1 forces the free-tier preview regardless of real subscription state
-  const forceFree = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('free');
-  const showPlus = isPremium && !forceFree;
-
-  const grid = PILLARS.slice(0, 6);
-  const blog = PILLARS[6];
 
   return (
-    <Page>
-      <div style={{ padding: 'calc(env(safe-area-inset-top) + 16px) 18px 14px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Eye>
-            Knižnica
-            {showPlus && <span style={{ margin: '0 8px', color: NM.TERTIARY }}>·</span>}
-            {showPlus && <span style={{ color: NM.GOLD }}>Plus</span>}
-          </Eye>
+    <div className="min-h-screen bg-cream pb-28">
+      <div className="pt-14 px-5 pb-4">
+        <div className="flex items-center justify-between">
+          <Eyebrow tone="muted">
+            KNIŽNICA{isPremium && <span className="ml-2 text-gold">· Plus</span>}
+          </Eyebrow>
+        </div>
+        <SerifHeader as="h1" size="hero" className="mt-2">
+          Všetko, čo{' '}
+          <em className="text-terra not-italic font-serif italic">potrebuješ</em>.
+        </SerifHeader>
+      </div>
+
+      <div className="px-5 mt-2 flex flex-col gap-2">
+        {PILLARS.map(p => (
           <button
-            aria-label="Filtre"
-            style={{
-              all: 'unset',
-              cursor: 'pointer',
-              width: 36,
-              height: 36,
-              borderRadius: 999,
-              background: '#fff',
-              border: `1px solid ${NM.HAIR}`,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={NM.DEEP} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M3 6h18M6 12h12M10 18h4" />
-            </svg>
-          </button>
-        </div>
-        <div style={{ marginTop: 8 }}>
-          <Ser size={34}>
-            Všetko, čo{' '}
-            <em style={{ color: NM.TERRA, fontWeight: 500, fontStyle: 'italic' }}>potrebuješ</em>.
-          </Ser>
-        </div>
-      </div>
-
-      <SearchBar onClick={() => navigate('/kniznica?search=1')} />
-
-      <div style={{ margin: '34px 20px 14px', display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-        <Eye size={10}>Oblasti</Eye>
-        <Eye size={10} color={NM.TERTIARY}>{PILLARS.length} celkom</Eye>
-      </div>
-
-      <div style={{ margin: '0 20px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-        {grid.map((p, i) => (
-          <PillarTile
             key={p.id}
-            name={p.name}
-            sub={p.sub}
-            imgSrc={p.img}
-            eyebrow={`Oblasť · 0${i + 1}`}
             onClick={() => navigate(p.path)}
-          />
+            className={`w-full text-left rounded-card p-4 flex items-center gap-4 border ${p.color} transition-all duration-150 active:scale-[0.99]`}
+          >
+            <div className={`h-10 w-10 rounded-full ${DOT_COLOR[p.id]} flex-shrink-0`} />
+            <div className="flex-1 min-w-0">
+              <Eyebrow tone="muted" className="mb-0.5">Oblasť · {p.num}</Eyebrow>
+              <div className="font-serif text-h3 text-ink leading-snug">{p.name}</div>
+              <div className="font-sans text-sm text-ink/56 mt-0.5">{p.sub}</div>
+            </div>
+            {!isPremium && (p.id === 'telo' || p.id === 'strava') && <PlusTag />}
+            <ChevronRight className="size-5 text-ink/40 flex-shrink-0" />
+          </button>
         ))}
       </div>
 
-      <div style={{ margin: '10px 20px 0' }}>
-        <PillarTile
-          name={blog.name}
-          sub={blog.sub}
-          imgSrc={blog.img}
-          eyebrow="Oblasť · 07"
-          aspectRatio="2.1 / 1"
-          onClick={() => navigate(blog.path)}
-        />
-      </div>
-
-      {!showPlus && <PaywallCard />}
-    </Page>
+      <BottomNav active="kniznica" />
+    </div>
   );
 }

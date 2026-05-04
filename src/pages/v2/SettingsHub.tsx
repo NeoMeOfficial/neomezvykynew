@@ -23,7 +23,7 @@ export default function SettingsHub() {
           <SettingsRow label="Profil" onClick={() => navigate('/settings/profile')} />
           <SettingsRow
             label="Predplatné"
-            hint={user.tier === 'plus' ? 'Plus' : 'Free'}
+            value={user.tier === 'plus' ? 'Plus' : 'Free'}
             onClick={() => navigate('/profil/predplatne')}
           />
           <SettingsRow label="Spôsob platby" onClick={() => navigate('/settings/payment')} />
@@ -32,7 +32,7 @@ export default function SettingsHub() {
         <SettingsGroup label="App">
           <SettingsRow label="Upozornenia" onClick={() => navigate('/settings/notifications')} />
           <SettingsRow label="Súkromie" onClick={() => navigate('/settings/privacy')} />
-          <SettingsRow label="Jazyk" hint="Slovenčina" onClick={() => {}} />
+          <SettingsRow label="Jazyk" value="Slovenčina" onClick={() => {}} />
           <SettingsRow label="Stiahnuť moje dáta" onClick={() => {}} />
         </SettingsGroup>
 
@@ -40,7 +40,7 @@ export default function SettingsHub() {
           <SettingsRow label="Podpora" onClick={() => {}} />
           <SettingsRow label="Podmienky" onClick={() => {}} />
           <SettingsRow label="Zásady súkromia" onClick={() => navigate('/settings/privacy')} />
-          <SettingsRow label="O aplikácii" hint="v1.0" onClick={() => {}} />
+          <SettingsRow label="O aplikácii" value="v1.0" onClick={() => {}} />
         </SettingsGroup>
 
         <SettingsGroup>
