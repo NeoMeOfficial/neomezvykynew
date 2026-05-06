@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { useAuthContext } from '../contexts/AuthContext';
+import { useSupabaseAuth } from '../contexts/SupabaseAuthContext';
 
 interface Habit {
   id: string;
@@ -28,7 +28,7 @@ interface HabitCompletion {
 }
 
 export function useSupabaseHabits() {
-  const { user } = useAuthContext();
+  const { user } = useSupabaseAuth();
   const [habits, setHabits] = useState<Habit[]>([]);
   const [loading, setLoading] = useState(true);
 
