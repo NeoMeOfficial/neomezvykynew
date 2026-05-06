@@ -10,7 +10,7 @@ const mountedAt = Date.now();
 function getRunningHash(): string | null {
   const scripts = Array.from(document.querySelectorAll<HTMLScriptElement>('script[src]'));
   for (const s of scripts) {
-    const m = s.src.match(/\/assets\/index-([a-f0-9]+)\.js/);
+    const m = s.src.match(/\/assets\/index-([A-Za-z0-9_-]+)\.js/);
     if (m) return m[1];
   }
   return null;
@@ -20,7 +20,7 @@ async function fetchDeployedHash(): Promise<string | null> {
   try {
     const res = await fetch(`/?_v=${Date.now()}`, { cache: 'no-store' });
     const html = await res.text();
-    const m = html.match(/\/assets\/index-([a-f0-9]+)\.js/);
+    const m = html.match(/\/assets\/index-([A-Za-z0-9_-]+)\.js/);
     return m ? m[1] : null;
   } catch {
     return null;
