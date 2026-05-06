@@ -10,7 +10,8 @@ import { BodyText } from '@/components/ui/body-text';
 import { PlusTag } from '@/components/ui/plus-tag';
 import { SectionHeader } from '@/components/ui/section-header';
 import { SettingsGroup, SettingsRow } from '@/components/v2/settings-row';
-import { Flame, ChevronRight } from 'lucide-react';
+import { Flame, ChevronRight, Star } from 'lucide-react';
+import { usePointsLedger, useNextMilestone } from '@/hooks/usePointsLedger';
 
 export default function Profil() {
   const navigate = useNavigate();
@@ -27,6 +28,9 @@ export default function Profil() {
   const streak = stats?.currentStreak ?? 0;
   const longest = stats?.longestStreak ?? 0;
   const totalWorkouts = stats?.totalWorkouts ?? 0;
+
+  const { balance } = usePointsLedger();
+  const milestone = useNextMilestone(balance);
 
   const handleSignOut = async () => {
     await signOut();
@@ -105,6 +109,60 @@ export default function Profil() {
               </div>
             ))}
           </div>
+        </div>
+      </div>
+
+      {/* Points card */}
+      <div className="px-5 mb-6">
+        <div className="rounded-card p-5 bg-white border border-ink/[0.08] shadow-nm-sm">
+          <div className="flex items-center justify-between mb-4">
+            <Eyebrow tone="muted">Body a odmeny</Eyebrow>
+            <button
+              onClick={() => navigate('/body/odmeny')}
+              className="font-sans text-[11px] text-terra font-medium"
+            >
+              Vymeniť ›
+            </button>
+          </div>
+
+          {/* Balance */}
+          <div className="flex items-center gap-3 mb-4">
+            <div className="h-11 w-11 rounded-xl bg-gold/15 flex items-center justify-center flex-shrink-0">
+              <Star className="size-5 text-gold fill-gold/30" />
+            </div>
+            <div>
+              <div className="flex items-baseline gap-1.5">
+                <span className="font-serif text-h1 text-ink leading-none">{balance}</span>
+                <span className="font-sans text-sm text-ink/56">bodov</span>
+              </div>
+              <button
+                onClick={() => navigate('/body')}
+                className="font-sans text-[11px] text-ink/40 mt-0.5 text-left"
+              >
+                Zobraziť históriu ›
+              </button>
+            </div>
+          </div>
+
+          {/* Next milestone */}
+          {milestone ? (
+            <div>
+              <div className="flex items-baseline justify-between mb-1.5">
+                <span className="font-sans text-[11px] text-ink/56 font-medium">{milestone.name}</span>
+                <span className="font-sans text-[11px] text-ink/40">{milestone.remaining} bodov</span>
+              </div>
+              <div className="h-1.5 rounded-full bg-cream-200 overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-gold transition-all duration-500"
+                  style={{ width: `${milestone.pct}%` }}
+                />
+              </div>
+            </div>
+          ) : (
+            <div className="font-sans text-[12px] text-ink/40 text-center py-1">
+              Všetky odmeny splnené 🎉
+            </div>
+          )}
         </div>
       </div>
 
