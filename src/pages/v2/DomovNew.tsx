@@ -142,14 +142,14 @@ function CardBody({ week, day, title, duration, href }: { week: number; day: num
   const navigate = useNavigate();
   return (
     <div style={{ padding: '0 18px', marginBottom: 12 }}>
-      <div onClick={() => navigate(href)} style={{ background: WHITE, borderRadius: 20, border: `1px solid ${HAIR}`, overflow: 'hidden', cursor: 'pointer' }}>
+      <div onClick={() => navigate(href)} style={{ background: WHITE, borderRadius: 20, border: `1px solid ${HAIR}`, overflow: 'hidden', cursor: 'pointer', touchAction: 'manipulation' }}>
         <div style={{ position: 'relative', aspectRatio: '16/10', background: `url(/images/r9/section-body.jpg) center/cover` }}>
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(0,0,0,0.5) 100%)' }} />
-          <div style={{ position: 'absolute', top: 14, left: 16, fontSize: 9.5, letterSpacing: '0.22em', textTransform: 'uppercase' as const, fontWeight: 500, color: '#fff' }}>Telo · pokračuj</div>
-          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: 54, height: 54, borderRadius: 999, background: 'rgba(255,255,255,0.95)', display: 'grid', placeItems: 'center' }}>
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(0,0,0,0.5) 100%)', pointerEvents: 'none' }} />
+          <div style={{ position: 'absolute', top: 14, left: 16, fontSize: 9.5, letterSpacing: '0.22em', textTransform: 'uppercase' as const, fontWeight: 500, color: '#fff', pointerEvents: 'none' }}>Telo · pokračuj</div>
+          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: 54, height: 54, borderRadius: 999, background: 'rgba(255,255,255,0.95)', display: 'grid', placeItems: 'center', pointerEvents: 'none' }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill={INK}><path d="M8 5v14l11-7z"/></svg>
           </div>
-          {duration && <div style={{ position: 'absolute', bottom: 10, right: 10, padding: '4px 10px', borderRadius: 999, background: 'rgba(0,0,0,0.55)', color: '#fff', fontSize: 10.5, fontWeight: 500 }}>{duration}</div>}
+          {duration && <div style={{ position: 'absolute', bottom: 10, right: 10, padding: '4px 10px', borderRadius: 999, background: 'rgba(0,0,0,0.55)', color: '#fff', fontSize: 10.5, fontWeight: 500, pointerEvents: 'none' }}>{duration}</div>}
         </div>
         <div style={{ padding: 18 }}>
           <div style={{ fontFamily: SERIF, fontSize: 20, lineHeight: 1.2, color: INK }}>{title} · Týž. {week}, Deň {day}</div>
@@ -173,12 +173,12 @@ function CardBodyLocked({ href, free }: { href: string; free: boolean }) {
     <div style={{ padding: '0 18px', marginBottom: 12 }}>
       <div
         onClick={() => navigate(cardHref)}
-        style={{ background: WHITE, borderRadius: 20, border: `1px solid ${HAIR}`, overflow: 'hidden', cursor: 'pointer' }}
+        style={{ background: WHITE, borderRadius: 20, border: `1px solid ${HAIR}`, overflow: 'hidden', cursor: 'pointer', touchAction: 'manipulation' }}
       >
         <div style={{ position: 'relative', aspectRatio: '16/10', background: `url(/images/r9/section-body.jpg) center/cover`, filter: 'saturate(0.85)' }}>
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.6) 100%)' }} />
-          <div style={{ position: 'absolute', top: 14, left: 16, fontSize: 9.5, letterSpacing: '0.22em', textTransform: 'uppercase' as const, fontWeight: 500, color: '#fff' }}>Telo · navrhnutý cvik</div>
-          <div style={{ position: 'absolute', bottom: 12, left: 16, right: 16 }}>
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.6) 100%)', pointerEvents: 'none' }} />
+          <div style={{ position: 'absolute', top: 14, left: 16, fontSize: 9.5, letterSpacing: '0.22em', textTransform: 'uppercase' as const, fontWeight: 500, color: '#fff', pointerEvents: 'none' }}>Telo · navrhnutý cvik</div>
+          <div style={{ position: 'absolute', bottom: 12, left: 16, right: 16, pointerEvents: 'none' }}>
             <div style={{ fontFamily: SERIF, fontSize: 18, color: '#fff', lineHeight: 1.2 }}>Ranná energia · 12 min</div>
             <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.8)', marginTop: 2 }}>Rýchly štart na dnešok</div>
           </div>
