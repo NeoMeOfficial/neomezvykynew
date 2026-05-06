@@ -954,7 +954,6 @@ function AddHabitSheet({ onClose }: { onClose: () => void }) {
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function DomovNew() {
-  const [showAddHabit,  setShowAddHabit]  = useState(false);
   const [showDiary,     setShowDiary]     = useState(false);
   const [showPointsInfo, setShowPointsInfo] = useState(false);
   const user = useUser();
@@ -1018,7 +1017,7 @@ export default function DomovNew() {
       <CardMindset title={meditationTitle} subtitle={meditationSub} href="/meditacie" />
 
       {/* Návyky */}
-      <CardHabits free={!isPlus} onAddHabit={() => setShowAddHabit(true)} />
+      <CardHabits free={!isPlus} onAddHabit={() => navigate('/navyky/new')} />
 
       {/* Reflexie */}
       <CardReflections free={!isPlus} onOpen={() => setShowDiary(true)} />
@@ -1039,7 +1038,6 @@ export default function DomovNew() {
       {/* Subscription upsell for free users; referral only for Plus */}
       {!isPlus ? <CardSubscriptionUpsell /> : <CardReferral code={code} />}
 
-      {showAddHabit   && <AddHabitSheet onClose={() => setShowAddHabit(false)} />}
       {showDiary      && <DiarySheet free={!isPlus} onClose={() => setShowDiary(false)} />}
       {showPointsInfo && <PointsInfoSheet points={points} onClose={() => setShowPointsInfo(false)} />}
     </div>
