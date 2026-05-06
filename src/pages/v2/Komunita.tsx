@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Shield, Flame } from 'lucide-react';
 import { useCommunityPosts } from '../../hooks/useCommunityPosts';
+import { useAuthContext } from '../../contexts/AuthContext';
+import { usePointsLedger } from '../../hooks/usePointsLedger';
 import { Page, Eye, Ser, Body, NM } from '../../components/v2/neome';
-import { getShieldTier, getShieldInfo, SHIELD_TIERS } from '../../data/achievements';
+import { getShieldTier, getShieldInfo, SHIELD_TIERS, DAILY_COMMUNITY_LIKE_CAP } from '../../data/achievements';
 
 /**
  * Komunita — R2 feed
@@ -105,7 +107,7 @@ interface DisplayPost {
   isQuestion?: boolean;
 }
 
-function FeedPost({ post, followedIds, onToggleFollow }: { post: DisplayPost; followedIds: Set<string>; onToggleFollow: (id: string) => void }) {
+function FeedPost({ post, followedIds, onToggleFollow, onToggleLike }: { post: DisplayPost; followedIds: Set<string>; onToggleFollow: (id: string) => void; onToggleLike: (id: string) => void }) {
   const navigate = useNavigate();
   const following = followedIds.has(post.id);
   return (
@@ -149,12 +151,16 @@ function FeedPost({ post, followedIds, onToggleFollow }: { post: DisplayPost; fo
         />
       )}
       <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <button
+          onClick={(e) => { e.stopPropagation(); onToggleLike(post.id); }}
+          style={{ all: 'unset', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
+          aria-label={post.liked ? 'Odlajkovať' : 'Lajkovať'}
+        >
           <svg width="16" height="16" viewBox="0 0 17 17" fill={post.liked ? NM.TERRA : 'none'}>
             <path d="M8.5 14.5s-5.5-3.5-5.5-8a3 3 0 015.5-1.5 3 3 0 015.5 1.5c0 4.5-5.5 8-5.5 8z" stroke={post.liked ? NM.TERRA : NM.MUTED} strokeWidth="1.3" strokeLinejoin="round" />
           </svg>
           <span style={{ fontFamily: NM.SANS, fontSize: 12, color: post.liked ? NM.TERRA : NM.MUTED }}>{post.likes}</span>
-        </div>
+        </button>
         <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={NM.MUTED} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
             <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
@@ -185,10 +191,37 @@ function loadFollowed(): Set<string> {
   catch { return new Set(); }
 }
 
+function communityLikePtsToday(userId: string): number {
+  const key = `community_like_pts_${userId}_${new Date().toISOString().slice(0, 10)}`;
+  return parseInt(localStorage.getItem(key) ?? '0', 10);
+}
+
+function incrementCommunityLikePts(userId: string): void {
+  const key = `community_like_pts_${userId}_${new Date().toISOString().slice(0, 10)}`;
+  const current = parseInt(localStorage.getItem(key) ?? '0', 10);
+  localStorage.setItem(key, String(current + 1));
+}
+
 export default function Komunita() {
   const navigate = useNavigate();
-  const { posts, likedIds } = useCommunityPosts();
+  const { user } = useAuthContext();
+  const { addEntry } = usePointsLedger();
+  const { posts, likedIds, toggleLike } = useCommunityPosts();
   const [followedIds, setFollowedIds] = useState<Set<string>>(loadFollowed);
+
+  const handleToggleLike = (postId: string) => {
+    const wasLiked = likedIds.has(postId);
+    toggleLike(postId, user?.id);
+    // Award 1 pt only when liking (not unliking), subject to 5pt daily sub-cap
+    if (!wasLiked && user?.id) {
+      const todayPts = communityLikePtsToday(user.id);
+      if (todayPts < DAILY_COMMUNITY_LIKE_CAP) {
+        const today = new Date().toISOString().slice(0, 10);
+        addEntry('community_like', 1, `like_${postId}_${today}`, 'community');
+        incrementCommunityLikePts(user.id);
+      }
+    }
+  };
 
   const toggleFollow = (id: string) => {
     setFollowedIds(prev => {
@@ -338,7 +371,7 @@ export default function Komunita() {
       </div>
 
       {feed.map((p) => (
-        <FeedPost key={p.id} post={p} followedIds={followedIds} onToggleFollow={toggleFollow} />
+        <FeedPost key={p.id} post={p} followedIds={followedIds} onToggleFollow={toggleFollow} onToggleLike={handleToggleLike} />
       ))}
     </Page>
   );

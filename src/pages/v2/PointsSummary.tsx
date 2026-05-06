@@ -22,22 +22,33 @@ import { Page, BackHeader, Eye, NM } from '../../components/v2/neome';
  */
 
 const EARN_RULES = [
-  { a: 'Príspevok v komunite', p: '+10' },
-  { a: 'Komentár', p: '+5' },
-  { a: 'Prejavenie srdcom', p: '+2' },
-  { a: 'Dokončený program', p: '+50' },
-  { a: 'Denný zápis v denníku', p: '+3' },
+  { a: 'Dokončené cvičenie', p: '+10' },
+  { a: 'Meditácia', p: '+8' },
+  { a: 'Reflexia / denník', p: '+6' },
+  { a: 'Záznam cyklu', p: '+4' },
+  { a: 'Dokončený návyk', p: '+3' },
+  { a: 'Lajk v komunite', p: '+1 (max 5/deň)' },
+  { a: 'Príspevok v komunite', p: '+20' },
+  { a: 'Odporúčanie · registrácia', p: '+50' },
+  { a: 'Odporúčanie · predplatné', p: '+300' },
 ];
 
 const ACTIVITY_LABELS: Record<string, string> = {
   workout_completed: 'Dokončené cvičenie',
-  program_completed: 'Dokončený program',
-  post_published: 'Príspevok v komunite',
-  comment_published: 'Komentár',
-  heart_received: 'Prejavenie srdcom',
-  journal_entry: 'Zápis v denníku',
-  referral_approved: 'Pozvaná priateľka · schválené',
-  reward_redeemed: 'Vymenená odmena',
+  meditation_complete: 'Meditácia',
+  reflection_write: 'Reflexia / denník',
+  cycle_log: 'Záznam cyklu',
+  habit_checkin: 'Dokončený návyk',
+  community_like: 'Lajk v komunite',
+  first_post: 'Príspevok v komunite',
+  program_day1: 'Prvý deň programu',
+  program_week1: 'Týždeň 1 programu',
+  program_week2: 'Týždeň 2 programu',
+  program_week3: 'Týždeň 3 programu',
+  program_complete: 'Program dokončený',
+  referral_signup: 'Odporúčanie · registrácia',
+  referral_sub: 'Odporúčanie · predplatné',
+  reward_redeem: 'Vymenená odmena',
 };
 
 const NM_COLORS: Record<string, string> = {

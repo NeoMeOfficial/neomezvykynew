@@ -94,6 +94,7 @@ export const ACTIVITY_POINTS: Record<string, number> = {
   program_perfect_week:  60,  // all scheduled workouts done in a programme week
 
   // Community
+  community_like:        1,   // liking a post; daily sub-cap of 5 pts enforced in UI
   first_post:            20,
   receive_10_hearts:     10,  // once per post
   help_member:           20,
@@ -110,6 +111,8 @@ export const ACTIVITY_POINTS: Record<string, number> = {
 
 // Daily cap — prevents alarm-clock gaming
 export const DAILY_POINTS_CAP = 40;
+// Sub-cap for community likes specifically — prevents like-spamming
+export const DAILY_COMMUNITY_LIKE_CAP = 5;
 
 // ── Achievement badges ────────────────────────────────────────────────────────
 export const ACHIEVEMENTS: Achievement[] = [

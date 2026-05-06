@@ -223,7 +223,7 @@ export default function PointsRewards() {
       <div style={{ margin: '20px 18px 0', padding: '14px 16px', background: `${NM.GOLD}10`, borderRadius: 14, border: `1px solid ${NM.GOLD}25` }}>
         <div style={{ fontFamily: NM.SANS, fontSize: 12, color: NM.DEEP, fontWeight: 500 }}>Ako zarobiť viac bodov?</div>
         <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.MUTED, marginTop: 4, lineHeight: 1.5 }}>
-          Cvičenie +10 · Meditácia +8 · Reflexia +6 · Cyklus log +4 · Návyk +3 · Odporúčanie +50–300
+          Cvičenie +10 · Meditácia +8 · Reflexia +6 · Cyklus log +4 · Návyk +3 · Lajk v komunite +1 (max 5/deň) · Odporúčanie +50–300
         </div>
         <button
           onClick={() => navigate('/body/odznaky')}
