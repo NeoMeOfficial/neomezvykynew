@@ -142,7 +142,7 @@ function CardBody({ week, day, title, duration, href }: { week: number; day: num
   const navigate = useNavigate();
   return (
     <div style={{ padding: '0 18px', marginBottom: 12 }}>
-      <div style={{ background: WHITE, borderRadius: 20, border: `1px solid ${HAIR}`, overflow: 'hidden' }}>
+      <div onClick={() => navigate(href)} style={{ background: WHITE, borderRadius: 20, border: `1px solid ${HAIR}`, overflow: 'hidden', cursor: 'pointer' }}>
         <div style={{ position: 'relative', aspectRatio: '16/10', background: `url(/images/r9/section-body.jpg) center/cover` }}>
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(0,0,0,0.5) 100%)' }} />
           <div style={{ position: 'absolute', top: 14, left: 16, fontSize: 9.5, letterSpacing: '0.22em', textTransform: 'uppercase' as const, fontWeight: 500, color: '#fff' }}>Telo · pokračuj</div>
@@ -154,10 +154,10 @@ function CardBody({ week, day, title, duration, href }: { week: number; day: num
         <div style={{ padding: 18 }}>
           <div style={{ fontFamily: SERIF, fontSize: 20, lineHeight: 1.2, color: INK }}>{title} · Týž. {week}, Deň {day}</div>
           <div style={{ fontSize: 12.5, color: FG2, marginTop: 4, lineHeight: 1.45, fontWeight: 300 }}>Pokračuj tam, kde si skončila</div>
-          <button onClick={() => navigate(href)} style={{ marginTop: 12, background: 'transparent', border: 0, padding: 0, display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: 12, fontWeight: 500, color: TELO }}>
+          <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 500, color: TELO }}>
             Spustiť tréning
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={TELO} strokeWidth="2" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
-          </button>
+          </div>
         </div>
       </div>
     </div>
@@ -197,7 +197,7 @@ function CardBodyLocked({ href, free }: { href: string; free: boolean }) {
         {/* Upsell strip — free users only */}
         {free && (
           <button
-            onClick={() => navigate('/paywall')}
+            onClick={(e) => { e.stopPropagation(); navigate('/paywall'); }}
             style={{ all: 'unset', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, width: '100%', boxSizing: 'border-box', padding: '12px 16px', background: `rgba(107,76,59,0.07)`, borderTop: `1px solid rgba(107,76,59,0.10)` }}
           >
             <div style={{ flex: 1, minWidth: 0 }}>
@@ -258,7 +258,7 @@ function CardRecipeOnly({ href }: { href: string }) {
   const navigate = useNavigate();
   return (
     <div style={{ padding: '0 18px', marginBottom: 12 }}>
-      <div style={{ background: WHITE, borderRadius: 20, border: `1px solid ${HAIR}`, overflow: 'hidden' }}>
+      <div onClick={() => navigate(href)} style={{ background: WHITE, borderRadius: 20, border: `1px solid ${HAIR}`, overflow: 'hidden', cursor: 'pointer' }}>
         <div style={{ height: 130, position: 'relative', background: `url(/images/r9/testimonial-recipe.jpg) center/cover` }}>
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.55) 100%)' }} />
           <div style={{ position: 'absolute', top: 14, left: 16, fontSize: 9.5, letterSpacing: '0.22em', textTransform: 'uppercase' as const, fontWeight: 500, color: '#fff' }}>Výživa · recept dňa</div>
@@ -276,7 +276,7 @@ function CardRecipeOnly({ href }: { href: string }) {
           </button>
           {/* Tappable meal plan upsell — full row clickable */}
           <button
-            onClick={() => navigate('/jedalnicek-promo')}
+            onClick={(e) => { e.stopPropagation(); navigate('/jedalnicek-promo'); }}
             style={{ marginTop: 14, width: '100%', padding: '12px 14px', borderRadius: 14, background: 'rgba(122,158,120,0.10)', border: `1px solid rgba(122,158,120,0.32)`, display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', textAlign: 'left' as const }}
           >
             <div style={{ flex: 1, minWidth: 0 }}>
@@ -298,7 +298,7 @@ function CardNutritionFree({ href }: { href: string }) {
   const navigate = useNavigate();
   return (
     <div style={{ padding: '0 18px', marginBottom: 12 }}>
-      <div style={{ background: WHITE, borderRadius: 20, border: `1px solid ${HAIR}`, overflow: 'hidden' }}>
+      <div onClick={() => navigate(href)} style={{ background: WHITE, borderRadius: 20, border: `1px solid ${HAIR}`, overflow: 'hidden', cursor: 'pointer' }}>
         <div style={{ height: 110, position: 'relative', background: `url(/images/r9/section-nutrition.jpg) center/cover` }}>
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.5) 100%)' }} />
           <div style={{ position: 'absolute', top: 14, left: 16, fontSize: 9.5, letterSpacing: '0.22em', textTransform: 'uppercase' as const, fontWeight: 500, color: '#fff' }}>Výživa · z knižnice</div>
@@ -315,7 +315,7 @@ function CardNutritionFree({ href }: { href: string }) {
         </div>
         {/* Upsell strip */}
         <button
-          onClick={() => navigate('/paywall')}
+          onClick={(e) => { e.stopPropagation(); navigate('/paywall'); }}
           style={{ all: 'unset', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, width: '100%', boxSizing: 'border-box', padding: '12px 16px', background: 'rgba(122,158,120,0.08)', borderTop: `1px solid rgba(122,158,120,0.18)` }}
         >
           <div style={{ flex: 1, minWidth: 0 }}>
