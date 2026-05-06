@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SupabaseAuthProvider, useSupabaseAuth } from './contexts/SupabaseAuthContext';
 import { SubscriptionProvider } from './contexts/SubscriptionContext';
@@ -167,6 +167,11 @@ export default function AppV2() {
             <Route path="/onboarding/legacy" element={<Onboarding />} />
             <Route path="/ref/:code" element={<ReferralLanding />} />
 
+            {/* Full-screen protected routes — no BottomNav */}
+            <Route element={<RequireAuth><Outlet /></RequireAuth>}>
+              <Route path="/paywall" element={<Paywall />} />
+            </Route>
+
             {/* Protected routes */}
             <Route element={<RequireAuth><AppLayout /></RequireAuth>}>
               <Route path="/domov" element={<Navigate to="/domov-new" replace />} />
@@ -174,7 +179,6 @@ export default function AppV2() {
               <Route path="/new-home" element={<DomovNew />} />
               <Route path="/kniznica" element={<Kniznica />} />
               <Route path="/kniznica/preview" element={<KniznicaPreview />} />
-              <Route path="/paywall" element={<Paywall />} />
               <Route path="/completion/workout" element={<CompletionWorkout />} />
               <Route path="/completion/program" element={<CompletionProgram />} />
               <Route path="/dennik/new" element={<ReflectionEntry />} />

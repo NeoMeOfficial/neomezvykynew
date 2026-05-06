@@ -167,9 +167,14 @@ function CardBody({ week, day, title, duration, href }: { week: number; day: num
 // ─── Telo card — Free / no program ────────────────────────────────────────────
 function CardBodyLocked({ href, free }: { href: string; free: boolean }) {
   const navigate = useNavigate();
+  // Free users click anywhere on the card → exercise library (free exercises available there)
+  const cardHref = free ? '/kniznica/telo' : href;
   return (
     <div style={{ padding: '0 18px', marginBottom: 12 }}>
-      <div style={{ background: WHITE, borderRadius: 20, border: `1px solid ${HAIR}`, overflow: 'hidden' }}>
+      <div
+        onClick={() => navigate(cardHref)}
+        style={{ background: WHITE, borderRadius: 20, border: `1px solid ${HAIR}`, overflow: 'hidden', cursor: 'pointer' }}
+      >
         <div style={{ position: 'relative', aspectRatio: '16/10', background: `url(/images/r9/section-body.jpg) center/cover`, filter: 'saturate(0.85)' }}>
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.6) 100%)' }} />
           <div style={{ position: 'absolute', top: 14, left: 16, fontSize: 9.5, letterSpacing: '0.22em', textTransform: 'uppercase' as const, fontWeight: 500, color: '#fff' }}>Telo · navrhnutý cvik</div>
@@ -184,10 +189,10 @@ function CardBodyLocked({ href, free }: { href: string; free: boolean }) {
               ? 'Jeden cvik denne je voľný. Štruktúrované programy — BodyForming, Postpartum a ďalšie — sú súčasťou predplatného.'
               : 'Vyber si program a začni trénovať s Gabi.'}
           </div>
-          <button onClick={() => navigate(href)} style={{ background: 'transparent', border: 0, padding: 0, cursor: 'pointer', fontSize: 12, fontWeight: 500, color: TELO, display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 500, color: TELO }}>
             {free ? 'Spustiť cvik' : 'Vybrať program'}
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={TELO} strokeWidth="2" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
-          </button>
+          </div>
         </div>
         {/* Upsell strip — free users only */}
         {free && (
@@ -308,6 +313,17 @@ function CardNutritionFree({ href }: { href: string }) {
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={STRAVA} strokeWidth="2" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
           </button>
         </div>
+        {/* Upsell strip */}
+        <button
+          onClick={() => navigate('/paywall')}
+          style={{ all: 'unset', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, width: '100%', boxSizing: 'border-box', padding: '12px 16px', background: 'rgba(122,158,120,0.08)', borderTop: `1px solid rgba(122,158,120,0.18)` }}
+        >
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 11, fontWeight: 500, color: STRAVA, letterSpacing: '0.01em' }}>NeoMe Plus · Jedálniček</div>
+            <div style={{ fontSize: 10.5, color: FG2, fontWeight: 300, marginTop: 1 }}>Personalizovaný plán, nákupný zoznam, Gabine recepty.</div>
+          </div>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={STRAVA} strokeWidth="2" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
       </div>
     </div>
   );
