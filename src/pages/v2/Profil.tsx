@@ -11,7 +11,7 @@ import { PlusTag } from '@/components/ui/plus-tag';
 import { SectionHeader } from '@/components/ui/section-header';
 import { SettingsGroup, SettingsRow } from '@/components/v2/settings-row';
 import { Flame, ChevronRight, Star } from 'lucide-react';
-import { usePointsLedger, useNextMilestone } from '@/hooks/usePointsLedger';
+import { usePointsLedger, useNextMilestone, useUserBadges } from '@/hooks/usePointsLedger';
 
 export default function Profil() {
   const navigate = useNavigate();
@@ -31,6 +31,13 @@ export default function Profil() {
 
   const { balance } = usePointsLedger();
   const milestone = useNextMilestone(balance);
+  const { badges } = useUserBadges();
+  const earnedBadges = badges.filter(b => b.earned);
+
+  const BADGE_COLORS: Record<string, string> = {
+    TERRA: '#6B4C3B', SAGE: '#7A9E78', DUSTY: '#A8848B',
+    MAUVE: '#C27A6E', GOLD: '#B8864A',
+  };
 
   const handleSignOut = async () => {
     await signOut();
@@ -160,9 +167,56 @@ export default function Profil() {
             </div>
           ) : (
             <div className="font-sans text-[12px] text-ink/40 text-center py-1">
-              Všetky odmeny splnené 🎉
+              Všetky odmeny splnené
             </div>
           )}
+
+          {/* Badges */}
+          {badges.length > 0 && (
+            <div className="mt-4 pt-4 border-t border-ink/[0.06]">
+              <div className="flex items-baseline justify-between mb-3">
+                <Eyebrow tone="muted" className="text-[10px]">Odznaky</Eyebrow>
+                <span className="font-sans text-[11px] text-ink/40">{earnedBadges.length} / {badges.length}</span>
+              </div>
+              <div className="flex gap-2.5 overflow-x-auto pb-0.5" style={{ scrollbarWidth: 'none' }}>
+                {badges.map((b) => {
+                  const color = BADGE_COLORS[b.color_token] ?? '#6B4C3B';
+                  return (
+                    <div key={b.slug} className="flex-shrink-0 flex flex-col items-center gap-1.5" style={{ width: 52 }}>
+                      <div
+                        className="h-10 w-10 rounded-full flex items-center justify-center"
+                        style={{
+                          background: b.earned ? color : '#F1ECE3',
+                          border: `1.5px solid ${b.earned ? 'transparent' : '#E8E0D4'}`,
+                          opacity: b.earned ? 1 : 0.5,
+                        }}
+                      >
+                        <Star
+                          className="size-4"
+                          style={{
+                            stroke: b.earned ? '#fff' : '#A0907E',
+                            fill: b.earned ? 'rgba(255,255,255,0.25)' : 'none',
+                          }}
+                        />
+                      </div>
+                      <span className="font-sans text-center leading-tight" style={{ fontSize: 9, color: b.earned ? '#3D2921' : '#A0907E', fontWeight: b.earned ? 500 : 400 }}>
+                        {b.name}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* All rewards row */}
+          <button
+            onClick={() => navigate('/body/odmeny')}
+            className="mt-4 pt-4 border-t border-ink/[0.06] w-full flex items-center justify-between"
+          >
+            <span className="font-sans text-[13px] text-ink font-medium">Všetky odmeny a zľavy</span>
+            <ChevronRight className="size-4 text-ink/40" />
+          </button>
         </div>
       </div>
 
