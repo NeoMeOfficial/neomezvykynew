@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react';
 
 const CHECK_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
+// If the app just loaded (within this window) and is already stale, reload silently
+// rather than showing the banner — user hasn't done anything yet so it's invisible.
+const SILENT_RELOAD_WINDOW_MS = 8 * 1000; // 8 seconds after mount
 
-// Read the hash of the JS bundle that is currently running in this tab,
-// by inspecting the <script src="..."> tags Vite injected into index.html.
+const mountedAt = Date.now();
+
 function getRunningHash(): string | null {
   const scripts = Array.from(document.querySelectorAll<HTMLScriptElement>('script[src]'));
   for (const s of scripts) {
@@ -13,8 +16,6 @@ function getRunningHash(): string | null {
   return null;
 }
 
-// Fetch a fresh copy of index.html from the server (bypassing cache) and
-// extract the bundle hash from the <script> tag inside it.
 async function fetchDeployedHash(): Promise<string | null> {
   try {
     const res = await fetch(`/?_v=${Date.now()}`, { cache: 'no-store' });
@@ -31,20 +32,24 @@ export function useAppVersion() {
 
   useEffect(() => {
     const runningHash = getRunningHash();
-
-    // Can't determine running hash (e.g. local dev with no fingerprinting) — skip
     if (!runningHash) return;
 
     const check = async () => {
       const deployedHash = await fetchDeployedHash();
-      if (deployedHash && deployedHash !== runningHash) {
-        setUpdateAvailable(true);
+      if (!deployedHash || deployedHash === runningHash) return;
+
+      // If the mismatch is detected within a few seconds of mount, the user
+      // just loaded a stale cached bundle. Reload silently — they won't notice.
+      if (Date.now() - mountedAt < SILENT_RELOAD_WINDOW_MS) {
+        window.location.reload();
+        return;
       }
+
+      // Otherwise show the banner so the user can choose when to reload.
+      setUpdateAvailable(true);
     };
 
-    // Check once on mount (catches users who had the tab open during a deploy)
     check();
-
     const id = setInterval(check, CHECK_INTERVAL_MS);
     return () => clearInterval(id);
   }, []);
