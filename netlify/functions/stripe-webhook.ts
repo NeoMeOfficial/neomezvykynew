@@ -32,6 +32,7 @@ export async function handler(event: any) {
         const sub = stripeEvent.data.object as Stripe.Subscription;
         const active = sub.status === 'active' || sub.status === 'trialing';
         await upsertSubscription(sub, active);
+        if (active) await handleReferralConversion(sub);
         break;
       }
       case 'customer.subscription.deleted': {
@@ -47,6 +48,45 @@ export async function handler(event: any) {
   } catch (error: any) {
     console.error('Webhook processing error:', error);
     return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
+  }
+}
+
+// When a new subscription goes active, check if the user was referred and award
+// points to the referrer (300 pts) if not already issued.
+async function handleReferralConversion(sub: Stripe.Subscription) {
+  const userId = sub.metadata?.userId;
+  if (!userId) return;
+
+  // Only fire once per subscription (guard via sub_reward_issued)
+  const { data: referral } = await supabase
+    .from('referrals')
+    .select('id, referrer_id, sub_reward_issued')
+    .eq('referred_id', userId)
+    .maybeSingle();
+
+  if (!referral || referral.sub_reward_issued) return;
+
+  const now = new Date().toISOString();
+
+  // Mark conversion timestamps + issued flags
+  await supabase
+    .from('referrals')
+    .update({ subscribed_at: now, sub_reward_issued: true })
+    .eq('id', referral.id);
+
+  // Award 300 points to the referrer
+  const { error } = await supabase.from('points_ledger').insert({
+    user_id: referral.referrer_id,
+    event_type: 'referral_sub',
+    points: 300,
+    ref_id: referral.id,
+    ref_type: 'referral',
+  });
+
+  if (error) {
+    console.error('Failed to award referral sub points:', error);
+  } else {
+    console.log(`Referral sub reward (300 pts) awarded to ${referral.referrer_id} for converting ${userId}`);
   }
 }
 

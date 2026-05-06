@@ -18,7 +18,7 @@ export default function TodayMealPlan() {
         </div>
         <GlassCard
           className="!p-4 cursor-pointer"
-          onClick={() => navigate('/strava')}
+          onClick={() => navigate('/kniznica/strava')}
           style={{ background: 'linear-gradient(135deg, rgba(196,149,106,0.12), rgba(95,62,49,0.06))' }}
         >
           <div className="flex items-center justify-between">
@@ -45,7 +45,7 @@ export default function TodayMealPlan() {
       <div className="flex items-center justify-between mb-2">
         <h2 className="text-[15px] font-semibold text-[#2E2218]">Tvoj dnešný jedálniček</h2>
         <button
-          onClick={() => navigate('/strava')}
+          onClick={() => navigate('/kniznica/strava')}
           className="text-xs text-[#B8864A] font-medium"
         >
           Celý plán →
@@ -63,7 +63,7 @@ export default function TodayMealPlan() {
             // Featured next meal — big image card
             <button
               key={meal.type}
-              onClick={() => navigate('/strava')}
+              onClick={() => navigate('/kniznica/strava')}
               className="relative w-full h-36 rounded-2xl overflow-hidden active:scale-[0.98] transition-transform text-left"
             >
               <img src={recipe.image} alt={recipe.title} className="absolute inset-0 w-full h-full object-cover" />
@@ -87,7 +87,7 @@ export default function TodayMealPlan() {
             </button>
           ) : (
             // Compact row for other meals
-            <GlassCard key={meal.type} className="!p-3 cursor-pointer" onClick={() => navigate('/strava')}>
+            <GlassCard key={meal.type} className="!p-3 cursor-pointer" onClick={() => navigate('/kniznica/strava')}>
               <div className="flex items-center gap-3">
                 <img src={recipe.image} alt={recipe.title} className="w-12 h-12 rounded-xl object-cover flex-shrink-0" />
                 <div className="flex-1 min-w-0">

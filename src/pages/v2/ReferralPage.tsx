@@ -189,7 +189,7 @@ export default function ReferralPage() {
 
       {/* Tracking teaser */}
       <button
-        onClick={() => navigate('/referral/tracking')}
+        onClick={() => navigate('/referral')}
         style={{
           all: 'unset',
           cursor: 'pointer',

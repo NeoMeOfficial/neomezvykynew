@@ -10,6 +10,7 @@ export interface CycleInfo {
   note: string;
 }
 
+// DerivedState.currentPhase is a PhaseRange object with a .key string field
 const PHASE_MAP: Record<string, CyclePhase> = {
   menstrual:  'menstrual',
   follicular: 'folicular',
@@ -33,14 +34,19 @@ const PHASE_NOTE: Record<CyclePhase, string> = {
 };
 
 export function useCycle(): CycleInfo | null {
-  const { derivedState } = useCycleData();
+  const { cycleData, derivedState } = useCycleData();
 
-  if (!derivedState?.lastPeriodStart) return null;
+  if (!derivedState || !cycleData?.lastPeriodStart) return null;
 
-  const rawPhase = derivedState.currentPhase ?? 'follicular';
+  // currentPhase is a PhaseRange object; read .key for the phase identifier
+  const rawPhase = derivedState.currentPhase?.key ?? 'follicular';
   const phase = PHASE_MAP[rawPhase] ?? 'folicular';
-  const dayOfCycle = derivedState.currentCycleDay ?? 1;
-  const totalDays = derivedState.averageCycleLength ?? 28;
+
+  // DerivedState uses currentDay (not currentCycleDay)
+  const dayOfCycle = derivedState.currentDay ?? 1;
+
+  // cycleLength lives on cycleData, not derivedState
+  const totalDays = cycleData.cycleLength ?? 28;
 
   return {
     phase,

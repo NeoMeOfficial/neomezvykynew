@@ -560,7 +560,7 @@ export default function ProgramDetail() {
                   Aktivuj Plus a začni v pondelok.
                 </div>
                 <button
-                  onClick={() => navigate('/paywall')}
+                  onClick={() => navigate(`/paywall?returnTo=${encodeURIComponent(location.pathname)}`)}
                   style={{
                     marginTop: 14,
                     width: '100%',

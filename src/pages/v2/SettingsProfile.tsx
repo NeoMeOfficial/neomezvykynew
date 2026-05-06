@@ -44,15 +44,19 @@ export default function SettingsProfile() {
 
   const onSave = async () => {
     setSaving(true);
+    // Update profiles table
     const { error } = await updateProfile({
       full_name: name,
       bio,
     } as Partial<typeof profile>);
-    setSaving(false);
     if (error) {
+      setSaving(false);
       toast({ title: 'Nepodarilo sa uložiť', description: 'Skús to ešte raz.', variant: 'destructive' });
       return;
     }
+    // Also sync to auth user_metadata so the name shows everywhere immediately
+    await supabase.auth.updateUser({ data: { full_name: name } });
+    setSaving(false);
     toast({ title: 'Uložené' });
     navigate('/settings');
   };

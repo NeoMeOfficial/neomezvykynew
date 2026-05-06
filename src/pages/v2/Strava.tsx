@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { recipes } from '@/data/recipes';
 import { useDailyRecipe } from '@/hooks/useDailyContent';
+import { useSubscription } from '@/contexts/SubscriptionContext';
 import { TopBar } from '@/components/v2/top-bar';
 import { SerifHeader } from '@/components/ui/serif-header';
 import { BodyText } from '@/components/ui/body-text';
@@ -34,6 +35,7 @@ function dayOfYear(d = new Date()): number {
 
 export default function Strava() {
   const navigate = useNavigate();
+  const { hasMealPlanner } = useSubscription();
   const { recipe: serverRecipe } = useDailyRecipe();
 
   const categories = useMemo(() =>
@@ -59,6 +61,23 @@ export default function Strava() {
           Recepty s celými potravinami, jednoduchou prípravou a chuťou, ktorú budeš mať rada.
         </BodyText>
       </div>
+
+      {/* Meal plan shortcut at top — only if purchased */}
+      {hasMealPlanner && (
+        <div className="px-5 mb-6">
+          <button
+            onClick={() => navigate('/jedalnicek')}
+            className="w-full text-left rounded-card p-4 flex items-center gap-3 transition-all active:scale-[0.99]"
+            style={{ background: '#3D2921', border: 'none', cursor: 'pointer', borderRadius: 16 }}
+          >
+            <div style={{ flex: 1 }}>
+              <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 9.5, letterSpacing: '0.22em', textTransform: 'uppercase' as const, color: '#7A9E78', fontWeight: 500, marginBottom: 4 }}>Môj jedálniček</div>
+              <div style={{ fontFamily: 'Gilda Display, serif', fontSize: 18, color: '#F5EFE5', lineHeight: 1.2 }}>Plán na tento týždeň</div>
+            </div>
+            <ChevronRight size={18} color="rgba(245,239,229,0.5)" strokeWidth={1.5} />
+          </button>
+        </div>
+      )}
 
       {featured && (
         <div className="px-5 mb-6">
@@ -113,17 +132,57 @@ export default function Strava() {
         </div>
       </div>
 
-      <div className="px-5">
-        <button
-          onClick={() => navigate('/jedalnicek')}
-          className="w-full text-left rounded-card p-5 bg-ink text-cream flex items-center gap-4 transition-all active:scale-[0.99]"
-        >
-          <div className="flex-1 min-w-0">
-            <Eyebrow tone="muted" className="text-cream/50 mb-1">Jedálniček na týždeň</Eyebrow>
-            <div className="font-serif text-h2 text-cream leading-snug">Pripravené každú nedeľu</div>
-            <div className="font-sans text-sm text-cream/72 mt-1">Otvoriť môj plán →</div>
-          </div>
-        </button>
+      {/* Meal plan section — shows active plan or upsell depending on purchase */}
+      <div className="px-5 pb-8">
+        {hasMealPlanner ? (
+          <button
+            onClick={() => navigate('/jedalnicek')}
+            className="w-full text-left rounded-card p-5 bg-ink text-cream flex items-center gap-4 transition-all active:scale-[0.99]"
+          >
+            <div className="flex-1 min-w-0">
+              <Eyebrow tone="muted" className="text-cream/50 mb-1">Tvoj jedálniček</Eyebrow>
+              <div className="font-serif text-h2 text-cream leading-snug">Plán na tento týždeň</div>
+              <div className="font-sans text-sm text-cream/72 mt-1">Otvoriť môj plán →</div>
+            </div>
+          </button>
+        ) : (
+          <button
+            onClick={() => navigate('/jedalnicek-promo')}
+            className="w-full text-left transition-all active:scale-[0.99]"
+            style={{
+              borderRadius: 20, overflow: 'hidden', border: 'none', cursor: 'pointer', padding: 0,
+              background: 'linear-gradient(135deg, #3D2921 0%, #5C3D2E 100%)',
+            }}
+          >
+            <div style={{ padding: '22px 20px 20px', position: 'relative' }}>
+              <div style={{ position: 'absolute', top: -12, right: 12, fontFamily: 'Gilda Display, serif', fontSize: 110, fontStyle: 'italic', lineHeight: 0.9, color: '#7A9E78', opacity: 0.18, userSelect: 'none', pointerEvents: 'none' }}>7</div>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '3px 9px', borderRadius: 999, background: 'rgba(122,158,120,0.25)', border: '1px solid rgba(122,158,120,0.45)', marginBottom: 12 }}>
+                <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 9.5, letterSpacing: '0.22em', textTransform: 'uppercase' as const, fontWeight: 500, color: '#7A9E78' }}>Jedálniček</span>
+              </div>
+              <div style={{ fontFamily: 'Gilda Display, serif', fontSize: 22, lineHeight: 1.2, color: '#F5EFE5', marginBottom: 6 }}>
+                7-dňový plán <em style={{ color: '#7A9E78', fontStyle: 'italic' }}>na mieru</em>
+              </div>
+              <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: 'rgba(245,239,229,0.65)', lineHeight: 1.5, fontWeight: 300, marginBottom: 16, maxWidth: 280 }}>
+                Personalizovaný jedálniček s nákupným zoznamom a Gabinými receptami — každý týždeň nový.
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap' as const, gap: '6px 14px', marginBottom: 18 }}>
+                {['Nákupný zoznam', 'Makrá + kalórie', 'Gabine recepty', 'Cyklus-vedomé'].map(p => (
+                  <div key={p} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#7A9E78" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12l5 5 9-11"/></svg>
+                    <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11.5, color: 'rgba(245,239,229,0.82)' }}>{p}</span>
+                  </div>
+                ))}
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ background: '#7A9E78', color: '#fff', padding: '11px 20px', borderRadius: 999, fontFamily: 'DM Sans, system-ui', fontSize: 13, fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                  Zistiť viac
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
+                </div>
+                <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: 'rgba(245,239,229,0.55)', fontWeight: 300 }}>od 57 €</div>
+              </div>
+            </div>
+          </button>
+        )}
       </div>
     </div>
   );

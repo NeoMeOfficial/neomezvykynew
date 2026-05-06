@@ -56,7 +56,7 @@ export default function PaywallModal({ isOpen, onClose, feature, title }: Paywal
   const handleUpgrade = () => {
     setIsAnimating(true);
     setTimeout(() => {
-      navigate('/subscribe');
+      navigate('/paywall');
       onClose();
     }, 200);
   };
@@ -111,7 +111,7 @@ export default function PaywallModal({ isOpen, onClose, feature, title }: Paywal
               <span className="text-sm font-bold">Len pre predplatiteľky</span>
             </div>
             <div className="text-xs opacity-90">
-              Odomknúť všetky funkcie už za €14.90/mesiac
+              Odomknúť všetky funkcie už za €24.90/mesiac
             </div>
           </div>
         </div>
@@ -137,7 +137,7 @@ export default function PaywallModal({ isOpen, onClose, feature, title }: Paywal
         <div className="grid grid-cols-2 gap-3 mb-6">
           <div className="text-center p-3 rounded-2xl border-2 border-white/35">
             <div className="text-lg font-bold" style={{ color: colors.textPrimary }}>
-              €14.90
+              €24.90
             </div>
             <div className="text-xs" style={{ color: colors.textSecondary }}>
               mesačne

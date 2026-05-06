@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCycleData } from '../../features/cycle/useCycleData';
 import { Page, Eye, Ser, NM } from '../../components/v2/neome';
+import { useAchievements } from '../../hooks/useAchievements';
+import { usePointsLedger } from '../../hooks/usePointsLedger';
 
 /**
  * Cyklus log — R11 sheet (rendered as full-page screen here)
@@ -56,6 +58,8 @@ function energyLabel(v: number): string {
 export default function CyklusLog() {
   const navigate = useNavigate();
   const { derivedState } = useCycleData();
+  const { addActivity } = useAchievements();
+  const { addEntry } = usePointsLedger();
   const today = derivedState?.today ?? new Date();
   const dateLabel = `${SK_DAYS[today.getDay()]} · ${today.getDate()}. ${SK_MONTHS[today.getMonth()]}`;
   const phaseLabel = derivedState?.currentPhase ? PHASE_LABEL[derivedState.currentPhase.key] : 'Folikulárna fáza';
@@ -76,7 +80,9 @@ export default function CyklusLog() {
   };
 
   const onSave = () => {
-    // FEATURE-NEEDED-PERIODKA-SYMPTOMS — currently navigate back only
+    const today = new Date();
+    addEntry('cycle_log', 4, `cycle_${today.toISOString().slice(0, 10)}`, 'cycle');
+    addActivity('cycle_log');
     navigate('/kniznica/periodka');
   };
 

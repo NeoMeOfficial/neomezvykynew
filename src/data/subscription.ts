@@ -5,7 +5,7 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
     id: 'monthly',
     name: 'Mesačné predplatné',
     description: 'Mesačný prístup k všetkým funkciám',
-    price_monthly: 14.90,
+    price_monthly: 24.90,
     currency: 'EUR',
     trial_days: 7,
     features: [

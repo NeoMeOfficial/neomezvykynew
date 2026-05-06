@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { usePointsLedger } from '../../hooks/usePointsLedger';
 import { useWorkoutHistory } from '../../hooks/useWorkoutHistory';
+import { useAchievements } from '../../hooks/useAchievements';
+import { ACTIVITY_POINTS } from '../../data/achievements';
 import { Page, Eye, Ser, Body, NM } from '../../components/v2/neome';
 
 /**
@@ -42,6 +44,7 @@ export default function CompletionWorkout() {
   const [mood, setMood] = useState<string | null>(null);
   const { addEntry } = usePointsLedger();
   const { completeWorkout } = useWorkoutHistory();
+  const { addActivity } = useAchievements();
   const state = (location.state ?? {}) as { exerciseId?: string; title?: string; type?: string; duration?: number; program?: string };
   const exerciseId = state.exerciseId ?? 'preview';
   const title = state.title ?? 'Cvičenie';
@@ -55,6 +58,39 @@ export default function CompletionWorkout() {
     loggedRef.current = true;
     addEntry('workout_completed', WORKOUT_POINTS, exerciseId, 'exercise');
     completeWorkout(exerciseId, title, type, duration, program);
+    addActivity('workout_complete', { ref_id: exerciseId, ref_type: 'exercise' });
+
+    // Programme week milestone: award points when user completes N workouts
+    // within the current calendar week for this programme.
+    if (program) {
+      const weekStart = new Date();
+      weekStart.setDate(weekStart.getDate() - ((weekStart.getDay() + 6) % 7)); // Monday
+      weekStart.setHours(0, 0, 0, 0);
+
+      try {
+        const userId = JSON.parse(
+          localStorage.getItem('sb-' + new URL(import.meta.env.VITE_SUPABASE_URL ?? 'http://x').hostname.split('.')[0] + '-auth-token') ?? '{}'
+        )?.user?.id;
+        const historyRaw = userId ? localStorage.getItem(`neome_workout_history_${userId}`) : null;
+        const history: { completedAt: string; program?: string }[] = historyRaw ? JSON.parse(historyRaw) : [];
+
+        const thisWeekProgramCount = history.filter(w =>
+          w.program === program && new Date(w.completedAt) >= weekStart
+        ).length + 1; // +1 for the workout just logged
+
+        if ([1, 5, 9, 13].includes(thisWeekProgramCount)) {
+          const weekNum = Math.ceil(thisWeekProgramCount / 1); // simple weekly grouping
+          const eventType = thisWeekProgramCount === 1
+            ? 'program_day1'
+            : thisWeekProgramCount === 5 ? 'program_week1'
+            : thisWeekProgramCount === 9 ? 'program_week2'
+            : 'program_week3';
+          const pts = ACTIVITY_POINTS[eventType] ?? 80;
+          addEntry(eventType, pts, `${program}_${eventType}`, 'program');
+          addActivity(eventType, { ref_id: program, ref_type: 'program', week: weekNum });
+        }
+      } catch { /* ignore — milestone is best-effort */ }
+    }
   }, [addEntry, completeWorkout, exerciseId, title, type, duration, program]);
 
   return (
@@ -175,7 +211,7 @@ export default function CompletionWorkout() {
           Zavrieť
         </button>
         <button
-          onClick={() => navigate('/dennik')}
+          onClick={() => navigate('/kniznica/dennik')}
           style={{
             all: 'unset',
             cursor: 'pointer',

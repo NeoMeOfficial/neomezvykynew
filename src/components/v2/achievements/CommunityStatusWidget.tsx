@@ -146,7 +146,7 @@ export default function CommunityStatusWidget({ variant = 'compact' }: Community
         </div>
         
         <button
-          onClick={() => navigate('/profil?tab=achievements')}
+          onClick={() => navigate('/body/odznaky')}
           className="text-[#B8864A] text-sm font-medium flex items-center gap-1 hover:gap-2 transition-all"
         >
           Zobraziť všetko

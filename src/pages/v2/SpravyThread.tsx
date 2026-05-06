@@ -102,7 +102,7 @@ export default function SpravyThread() {
         </div>
       </div>
 
-      <div ref={scrollRef} style={{ flex: 1, overflowY: 'auto', padding: '18px 14px', display: 'flex', flexDirection: 'column', gap: 10, paddingBottom: 100 }}>
+      <div ref={scrollRef} style={{ flex: 1, overflowY: 'auto', padding: '18px 14px', display: 'flex', flexDirection: 'column', gap: 10, paddingBottom: 'calc(64px + 72px + env(safe-area-inset-bottom, 0px))' }}>
         {messages.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '40px 24px', color: NM.MUTED, fontSize: 13 }}>
             Zatiaľ žiadne správy. Napíš Gabi prvú vetu nižšie.
@@ -147,15 +147,20 @@ export default function SpravyThread() {
         )}
       </div>
 
-      {/* Composer */}
+      {/* Composer — fixed above BottomNav */}
       <div
         style={{
-          padding: `10px 14px calc(env(safe-area-inset-bottom) + 16px)`,
+          position: 'fixed',
+          left: 0,
+          right: 0,
+          bottom: 'calc(64px + env(safe-area-inset-bottom, 0px))',
+          padding: '10px 14px 10px',
           borderTop: `1px solid ${NM.HAIR}`,
           background: '#fff',
           display: 'flex',
           gap: 10,
           alignItems: 'center',
+          zIndex: 40,
         }}
       >
         <input

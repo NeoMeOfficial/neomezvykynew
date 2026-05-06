@@ -7,7 +7,7 @@ export const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_
 export const SUBSCRIPTION_PLANS = {
   premium: {
     priceId: 'price_1TM4KREpPqBqxo4m0Swf5F88',
-    price: 14.90,
+    price: 24.90,
     currency: 'EUR',
     interval: 'month',
     name: 'NeoMe Premium',

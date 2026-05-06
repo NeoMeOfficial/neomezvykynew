@@ -1,73 +1,161 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { usePointsLedger } from '../../hooks/usePointsLedger';
+import { useAuthContext } from '../../contexts/AuthContext';
 import { Page, BackHeader, Eye, Ser, NM } from '../../components/v2/neome';
 
 /**
- * Points rewards catalog — R10
+ * Points rewards catalog — /body/odmeny
  *
- * Header w/ current balance card, list of rewards (image + cost +
- * Získať CTA or 'Ešte N bodov' state).
+ * Balance card, reward rows with live cooldown state, confirm sheet,
+ * and code/confirmation reveal after redemption.
  *
- * Wired (F-017 / F-020):
- * - Balance from usePointsLedger
- * - Catalog from public.rewards (active only, sort_order asc); falls
- *   back to the original 5 hardcoded rows pre-migration.
- *
- * FEATURE-NEEDED-REWARDS-REDEEM (F-021): actual redemption flow that
- * debits the balance via points_ledger and calls Stripe to attach a
- * Promotion Code to the user's customer. Currently the 'Získať' CTA
- * still navigates to /profil as a placeholder.
- *
- * Mounted at /body/odmeny.
+ * Redemption calls the `redeem-reward` Supabase Edge Function which:
+ * - Verifies balance, enforces per-reward cooldown + max cap
+ * - For subscription rewards: applies Stripe coupon automatically
+ * - For partner rewards: serves a code from the partner_reward_codes pool
+ * - Deducts points from points_ledger and logs reward_redemptions
  */
 
 interface Reward {
   slug: string;
   name: string;
+  description: string;
   point_cost: number;
   color_token: string;
+  stripe_coupon_id: string | null;
   image_key: string | null;
 }
 
+interface Redemption {
+  reward_slug: string;
+  next_eligible_at: string;
+}
+
 const FALLBACK: Reward[] = [
-  { slug: 'plus-month',      name: 'Mesiac Plus zdarma',                point_cost: 500, color_token: 'GOLD',  image_key: 'hero-yoga.jpg' },
-  { slug: 'mealplan-20',     name: '20% zľava na jedálniček',           point_cost: 250, color_token: 'SAGE',  image_key: 'section-nutrition.jpg' },
-  { slug: 'plus-15',         name: '15% na ďalšiu platbu Plus',         point_cost: 150, color_token: 'TERRA', image_key: 'section-body.jpg' },
-  { slug: 'partner-yoga',    name: 'Partnerská zľava · jóga štúdio',    point_cost: 100, color_token: 'DUSTY', image_key: 'lifestyle-yoga-pose.jpg' },
-  { slug: 'partner-recipes', name: 'Partnerská zľava · recepty',        point_cost: 80,  color_token: 'MAUVE', image_key: 'testimonial-recipe.jpg' },
+  { slug: 'sub-50pct',        name: '50% zľava na ďalší mesiac',       description: 'Tvoja ďalšia platba NeoMe Plus bude o polovicu lacnejšia. Aplikuje sa automaticky.', point_cost: 2000, color_token: 'TERRA', stripe_coupon_id: 'NEOME_50PCT',    image_key: 'section-body.jpg' },
+  { slug: 'sub-month-free',   name: 'Mesiac NeoMe Plus zadarmo',        description: 'Tvoja ďalšia platba bude plne odpustená. Aplikuje sa automaticky na Stripe.',       point_cost: 3500, color_token: 'GOLD',  stripe_coupon_id: 'NEOME_MONTH_FREE', image_key: 'hero-yoga.jpg' },
+  { slug: 'partner-gymwear',  name: '20% zľava na športové oblečenie',  description: 'Jednorázový zľavový kód poslaný priamo do apky.',                                    point_cost: 800,  color_token: 'SAGE',  stripe_coupon_id: null,               image_key: 'section-nutrition.jpg' },
+  { slug: 'partner-wellness', name: 'Vstup do wellness zadarmo',        description: 'Jednorázový kód pre partnerskú saunu / wellness centrum.',                           point_cost: 1200, color_token: 'DUSTY', stripe_coupon_id: null,               image_key: 'lifestyle-yoga-pose.jpg' },
 ];
 
 const NM_COLORS: Record<string, string> = {
-  TERRA: NM.TERRA,
-  SAGE: NM.SAGE,
-  DUSTY: NM.DUSTY,
-  MAUVE: NM.MAUVE,
-  GOLD: NM.GOLD,
+  TERRA: NM.TERRA, SAGE: NM.SAGE, DUSTY: NM.DUSTY, MAUVE: NM.MAUVE, GOLD: NM.GOLD,
 };
+
+type ModalState =
+  | { type: 'idle' }
+  | { type: 'confirm'; reward: Reward }
+  | { type: 'loading'; reward: Reward }
+  | { type: 'success'; reward: Reward; code: string | null; isStripe: boolean }
+  | { type: 'error'; message: string };
 
 export default function PointsRewards() {
   const navigate = useNavigate();
-  const { balance } = usePointsLedger();
+  const { user } = useAuthContext();
+  const { balance, refresh: refreshBalance } = usePointsLedger();
   const [rewards, setRewards] = useState<Reward[]>(FALLBACK);
+  const [redemptions, setRedemptions] = useState<Redemption[]>([]);
+  const [modal, setModal] = useState<ModalState>({ type: 'idle' });
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       const { data } = await supabase
         .from('rewards')
-        .select('slug, name, point_cost, color_token, image_key')
+        .select('slug, name, description, point_cost, color_token, stripe_coupon_id, image_key')
         .eq('active', true)
         .order('sort_order', { ascending: true });
-      if (!cancelled && data && data.length > 0) {
-        setRewards(data as Reward[]);
-      }
+      if (!cancelled && data && data.length > 0) setRewards(data as Reward[]);
     })();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, []);
+
+  const loadRedemptions = useCallback(async () => {
+    if (!user?.id) return;
+    const { data } = await supabase
+      .from('reward_redemptions')
+      .select('reward_slug, next_eligible_at')
+      .eq('user_id', user.id)
+      .order('redeemed_at', { ascending: false });
+    if (data) {
+      // Keep only the most recent redemption per slug
+      const seen = new Set<string>();
+      const deduped: Redemption[] = [];
+      for (const row of data) {
+        if (!seen.has(row.reward_slug)) {
+          seen.add(row.reward_slug);
+          deduped.push(row);
+        }
+      }
+      setRedemptions(deduped);
+    }
+  }, [user?.id]);
+
+  useEffect(() => { loadRedemptions(); }, [loadRedemptions]);
+
+  const cooldownFor = (slug: string): Date | null => {
+    const r = redemptions.find(d => d.reward_slug === slug);
+    if (!r) return null;
+    const d = new Date(r.next_eligible_at);
+    return d > new Date() ? d : null;
+  };
+
+  const formatCooldown = (d: Date): string => {
+    const diffMs = d.getTime() - Date.now();
+    const days = Math.ceil(diffMs / 86400000);
+    if (days > 30) return `${Math.ceil(days / 30)} mes.`;
+    return `${days} d`;
+  };
+
+  const onRedeem = async (reward: Reward) => {
+    setModal({ type: 'loading', reward });
+
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      setModal({ type: 'error', message: 'Nie si prihlásená.' });
+      return;
+    }
+
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/redeem-reward`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({ reward_slug: reward.slug }),
+        }
+      );
+
+      const body = await res.json();
+
+      if (!res.ok) {
+        const msg =
+          body.error === 'insufficient_points' ? `Nemáš dostatok bodov. Zostatok: ${body.balance}` :
+          body.error === 'cooldown_active' ? 'Tento reward si už uplatnila. Počkaj na koniec cooldownu.' :
+          body.error === 'no_active_subscription' ? 'Zľava sa vzťahuje len na aktívne predplatné.' :
+          body.error === 'no_codes_available' ? 'Momentálne nie sú dostupné žiadne kódy. Skús neskôr.' :
+          body.error === 'max_redemptions_reached' ? 'Dosiahla si maximálny počet uplatnení tohto rewardu.' :
+          'Niečo sa pokazilo. Skús znova.';
+        setModal({ type: 'error', message: msg });
+        return;
+      }
+
+      await Promise.all([refreshBalance?.(), loadRedemptions()]);
+      setModal({
+        type: 'success',
+        reward,
+        code: body.code ?? null,
+        isStripe: !!reward.stripe_coupon_id,
+      });
+    } catch {
+      setModal({ type: 'error', message: 'Chyba siete. Skontroluj pripojenie.' });
+    }
+  };
 
   return (
     <Page>
@@ -87,42 +175,147 @@ export default function PointsRewards() {
 
       <div style={{ margin: '24px 18px 0', display: 'flex', flexDirection: 'column', gap: 12 }}>
         {rewards.map((r) => {
-          const avail = balance >= r.point_cost;
           const tone = NM_COLORS[r.color_token] ?? NM.TERRA;
+          const canAfford = balance >= r.point_cost;
+          const cooldown = cooldownFor(r.slug);
+          const isOnCooldown = !!cooldown;
+          const isAvailable = canAfford && !isOnCooldown;
+
           return (
-            <div key={r.slug} style={{ background: '#fff', borderRadius: 18, border: `1px solid ${NM.HAIR}`, overflow: 'hidden', display: 'flex' }}>
-              <div style={{ width: 110, backgroundImage: `url(/images/r9/${r.image_key ?? 'hero-yoga.jpg'})`, backgroundSize: 'cover', backgroundPosition: 'center', flexShrink: 0 }} />
-              <div style={{ padding: '14px 16px', flex: 1, minWidth: 0 }}>
-                <div style={{ fontFamily: NM.SANS, fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: tone, fontWeight: 600 }}>{r.point_cost} bodov</div>
-                <div style={{ fontFamily: NM.SERIF, fontSize: 15, fontWeight: 500, color: NM.DEEP, marginTop: 5, letterSpacing: '-0.005em', lineHeight: 1.25 }}>{r.name}</div>
-                <button
-                  onClick={() => {
-                    if (avail) {
-                      // FEATURE-NEEDED-REWARDS-REDEEM
-                      navigate('/profil');
-                    }
-                  }}
-                  disabled={!avail}
-                  style={{
-                    all: 'unset',
-                    cursor: avail ? 'pointer' : 'not-allowed',
-                    marginTop: 10,
-                    padding: '7px 14px',
-                    background: avail ? NM.DEEP : NM.CREAM_2 ?? '#F1ECE3',
-                    color: avail ? '#fff' : NM.TERTIARY,
-                    borderRadius: 999,
-                    fontFamily: NM.SANS,
-                    fontSize: 11,
-                    fontWeight: 500,
-                  }}
-                >
-                  {avail ? 'Získať' : `Ešte ${r.point_cost - balance} bodov`}
-                </button>
+            <div key={r.slug} style={{ background: '#fff', borderRadius: 18, border: `1px solid ${NM.HAIR}`, overflow: 'hidden' }}>
+              <div style={{ display: 'flex' }}>
+                <div style={{ width: 100, minHeight: 110, backgroundImage: `url(/images/r9/${r.image_key ?? 'hero-yoga.jpg'})`, backgroundSize: 'cover', backgroundPosition: 'center', flexShrink: 0 }} />
+                <div style={{ padding: '14px 16px', flex: 1, minWidth: 0 }}>
+                  <div style={{ fontFamily: NM.SANS, fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: tone, fontWeight: 600 }}>{r.point_cost} bodov</div>
+                  <div style={{ fontFamily: NM.SERIF, fontSize: 15, fontWeight: 500, color: NM.DEEP, marginTop: 5, letterSpacing: '-0.005em', lineHeight: 1.25 }}>{r.name}</div>
+                  <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.MUTED, marginTop: 4, lineHeight: 1.4 }}>{r.description}</div>
+                  <button
+                    onClick={() => isAvailable && setModal({ type: 'confirm', reward: r })}
+                    disabled={!isAvailable}
+                    style={{
+                      all: 'unset',
+                      cursor: isAvailable ? 'pointer' : 'not-allowed',
+                      marginTop: 10,
+                      padding: '7px 14px',
+                      background: isOnCooldown ? `${tone}18` : isAvailable ? NM.DEEP : '#F1ECE3',
+                      color: isOnCooldown ? tone : isAvailable ? '#fff' : NM.TERTIARY,
+                      border: isOnCooldown ? `1px solid ${tone}40` : 'none',
+                      borderRadius: 999,
+                      fontFamily: NM.SANS,
+                      fontSize: 11,
+                      fontWeight: 500,
+                    }}
+                  >
+                    {isOnCooldown
+                      ? `Znovu za ${formatCooldown(cooldown!)}`
+                      : canAfford
+                        ? 'Získať'
+                        : `Ešte ${r.point_cost - balance} bodov`}
+                  </button>
+                </div>
               </div>
             </div>
           );
         })}
       </div>
+
+      {/* Earn-more nudge */}
+      <div style={{ margin: '20px 18px 0', padding: '14px 16px', background: `${NM.GOLD}10`, borderRadius: 14, border: `1px solid ${NM.GOLD}25` }}>
+        <div style={{ fontFamily: NM.SANS, fontSize: 12, color: NM.DEEP, fontWeight: 500 }}>Ako zarobiť viac bodov?</div>
+        <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.MUTED, marginTop: 4, lineHeight: 1.5 }}>
+          Cvičenie +10 · Meditácia +8 · Reflexia +6 · Cyklus log +4 · Návyk +3 · Odporúčanie +50–300
+        </div>
+        <button
+          onClick={() => navigate('/body/odznaky')}
+          style={{ all: 'unset', cursor: 'pointer', marginTop: 8, fontFamily: NM.SANS, fontSize: 11, color: NM.GOLD, fontWeight: 500 }}
+        >
+          Pozri odznaky a hodnosti →
+        </button>
+      </div>
+
+      {/* ── Modal sheet ───────────────────────────────────────────── */}
+      {modal.type !== 'idle' && (
+        <div
+          onClick={() => modal.type !== 'loading' && setModal({ type: 'idle' })}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(42,26,20,0.5)', zIndex: 100, display: 'flex', alignItems: 'flex-end' }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{ width: '100%', background: '#FDFAF7', borderRadius: '24px 24px 0 0', padding: '28px 24px 40px', boxShadow: '0 -8px 40px rgba(42,26,20,0.18)' }}
+          >
+            {modal.type === 'confirm' && (
+              <>
+                <div style={{ fontFamily: NM.SERIF, fontSize: 22, color: NM.DEEP, fontWeight: 500, marginBottom: 8 }}>{modal.reward.name}</div>
+                <div style={{ fontFamily: NM.SANS, fontSize: 13, color: NM.MUTED, lineHeight: 1.5, marginBottom: 20 }}>{modal.reward.description}</div>
+                <div style={{ padding: '12px 16px', background: '#fff', borderRadius: 12, border: `1px solid ${NM.HAIR}`, display: 'flex', justifyContent: 'space-between', marginBottom: 20 }}>
+                  <span style={{ fontFamily: NM.SANS, fontSize: 12, color: NM.MUTED }}>Cena</span>
+                  <span style={{ fontFamily: NM.SERIF, fontSize: 16, color: NM.GOLD, fontWeight: 500 }}>{modal.reward.point_cost} bodov</span>
+                </div>
+                <button
+                  onClick={() => onRedeem(modal.reward)}
+                  style={{ all: 'unset', cursor: 'pointer', width: '100%', textAlign: 'center', padding: '14px 0', background: NM.DEEP, color: '#fff', borderRadius: 999, fontFamily: NM.SANS, fontSize: 14, fontWeight: 500, boxSizing: 'border-box', display: 'block' }}
+                >
+                  Potvrdiť výmenu
+                </button>
+                <button
+                  onClick={() => setModal({ type: 'idle' })}
+                  style={{ all: 'unset', cursor: 'pointer', width: '100%', textAlign: 'center', marginTop: 12, fontFamily: NM.SANS, fontSize: 13, color: NM.MUTED, display: 'block' }}
+                >
+                  Zrušiť
+                </button>
+              </>
+            )}
+
+            {modal.type === 'loading' && (
+              <div style={{ textAlign: 'center', padding: '20px 0' }}>
+                <div style={{ fontFamily: NM.SANS, fontSize: 14, color: NM.MUTED }}>Spracovávam…</div>
+              </div>
+            )}
+
+            {modal.type === 'success' && (
+              <>
+                <div style={{ textAlign: 'center', marginBottom: 20 }}>
+                  <div style={{ fontFamily: NM.SERIF, fontSize: 26, color: NM.TERRA, fontWeight: 500, marginBottom: 6 }}>Hotovo!</div>
+                  <div style={{ fontFamily: NM.SANS, fontSize: 13, color: NM.MUTED, lineHeight: 1.5 }}>{modal.reward.name}</div>
+                </div>
+
+                {modal.isStripe ? (
+                  <div style={{ padding: '16px', background: `${NM.GOLD}12`, borderRadius: 14, border: `1px solid ${NM.GOLD}30`, marginBottom: 20, textAlign: 'center' }}>
+                    <div style={{ fontFamily: NM.SANS, fontSize: 12, color: NM.GOLD, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 4 }}>Zľava aplikovaná</div>
+                    <div style={{ fontFamily: NM.SANS, fontSize: 12, color: NM.MUTED, lineHeight: 1.5 }}>Zľava bola automaticky aplikovaná na tvoje predplatné. Uvidíš ju na najbližšej platbe.</div>
+                  </div>
+                ) : (
+                  <div style={{ padding: '16px', background: '#fff', borderRadius: 14, border: `1px solid ${NM.HAIR}`, marginBottom: 20, textAlign: 'center' }}>
+                    <div style={{ fontFamily: NM.SANS, fontSize: 10, color: NM.EYEBROW, letterSpacing: '0.18em', textTransform: 'uppercase', marginBottom: 8 }}>Tvoj kód</div>
+                    <div style={{ fontFamily: NM.SERIF, fontSize: 24, color: NM.DEEP, fontWeight: 600, letterSpacing: '0.08em' }}>{modal.code ?? '—'}</div>
+                    <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.MUTED, marginTop: 8 }}>Platnosť 7 dní · jednorazové použitie</div>
+                  </div>
+                )}
+
+                <button
+                  onClick={() => setModal({ type: 'idle' })}
+                  style={{ all: 'unset', cursor: 'pointer', width: '100%', textAlign: 'center', padding: '14px 0', background: NM.DEEP, color: '#fff', borderRadius: 999, fontFamily: NM.SANS, fontSize: 14, fontWeight: 500, boxSizing: 'border-box', display: 'block' }}
+                >
+                  Zavrieť
+                </button>
+              </>
+            )}
+
+            {modal.type === 'error' && (
+              <>
+                <div style={{ fontFamily: NM.SERIF, fontSize: 20, color: NM.DEEP, fontWeight: 500, marginBottom: 10 }}>Ups</div>
+                <div style={{ fontFamily: NM.SANS, fontSize: 13, color: NM.MUTED, marginBottom: 24, lineHeight: 1.5 }}>{modal.message}</div>
+                <button
+                  onClick={() => setModal({ type: 'idle' })}
+                  style={{ all: 'unset', cursor: 'pointer', width: '100%', textAlign: 'center', padding: '14px 0', background: NM.DEEP, color: '#fff', borderRadius: 999, fontFamily: NM.SANS, fontSize: 14, fontWeight: 500, boxSizing: 'border-box', display: 'block' }}
+                >
+                  Zavrieť
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </Page>
   );
 }

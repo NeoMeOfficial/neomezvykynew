@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CreditCard, Calendar, AlertCircle, Check, X, Gift, Settings, ExternalLink, ChevronRight } from 'lucide-react';
 import { useSubscription } from '../../contexts/SubscriptionContext';
 import { SUBSCRIPTION_PLANS, formatPrice } from '../../lib/stripe';
@@ -12,6 +12,8 @@ import { SettingsGroup, SettingsRow } from '@/components/v2/settings-row';
 
 export default function SubscriptionManagement() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const returnTo = searchParams.get('returnTo');
   const {
     subscription, isPremium, isTrialing, daysLeft,
     startCheckout, manageBilling, cancelSubscription, isLoading,
@@ -53,7 +55,11 @@ export default function SubscriptionManagement() {
 
   const handleStart = async () => {
     setActionLoading(true);
-    try { await startCheckout(SUBSCRIPTION_PLANS.premium.priceId); }
+    try {
+      await startCheckout(SUBSCRIPTION_PLANS.premium.priceId);
+      // In demo mode startCheckout stays in-app; redirect back to the originating page if provided
+      if (returnTo) navigate(returnTo, { replace: true });
+    }
     catch { /* handled by context */ }
     finally { setActionLoading(false); }
   };
@@ -171,6 +177,21 @@ export default function SubscriptionManagement() {
           message="Demo Mode: V produkčnej verzii by tu boli skutočné platby cez Stripe."
           type="demo"
         />
+
+        {/* Return to program banner — shown when navigated here from a program page */}
+        {returnTo && (
+          <button
+            onClick={() => navigate(returnTo)}
+            className="w-full text-left rounded-card bg-white border border-ink/[0.08] shadow-nm-sm p-4 flex items-center gap-3 transition-all active:scale-[0.99]"
+          >
+            <ChevronRight className="size-4 text-ink/40 rotate-180 flex-shrink-0" />
+            <div className="flex-1 min-w-0">
+              <div className="font-sans text-sm font-medium text-ink">Späť na program</div>
+              <div className="font-sans text-xs text-ink/56 mt-0.5 truncate">{returnTo}</div>
+            </div>
+            <ChevronRight className="size-4 text-ink/40 flex-shrink-0" />
+          </button>
+        )}
 
         {/* Trial ending warning */}
         {isTrialing && daysLeft <= 3 && (

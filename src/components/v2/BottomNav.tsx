@@ -3,18 +3,18 @@ import { Home, BookOpen, Users, MessageCircle, User } from 'lucide-react';
 import { useMessages } from '../../hooks/useMessages';
 
 const TABS = [
-  { path: '/domov-new', icon: Home,          label: 'Domov' },
+  { path: '/domov-new', icon: Home,          label: 'Domov'    },
   { path: '/kniznica',  icon: BookOpen,       label: 'Knižnica' },
   { path: '/komunita',  icon: Users,          label: 'Komunita' },
-  { path: '/spravy',    icon: MessageCircle,  label: 'Správy', badge: true },
-  { path: '/profil',    icon: User,           label: 'Profil' },
+  { path: '/spravy',    icon: MessageCircle,  label: 'Správy',  badge: true },
+  { path: '/profil',    icon: User,           label: 'Profil'   },
 ] as const;
 
-const DEEP   = '#3D2921';
-const MUTED  = 'rgba(61,41,33,0.42)';
-const HAIR   = 'rgba(61,41,33,0.08)';
-const TERRA  = '#C1856A';
-const CREAM  = '#F8F5F0';
+const DEEP  = '#3D2921';
+const MUTED = 'rgba(255,255,255,0.50)';
+const TERRA = '#C1856A';
+const WHITE = '#FFFFFF';
+const ACTIVE = '#FFFFFF';
 
 export default function BottomNav() {
   const location = useLocation();
@@ -25,17 +25,19 @@ export default function BottomNav() {
     <nav
       style={{
         position: 'fixed',
-        bottom: 0,
-        left: 0,
-        right: 0,
+        bottom: 'calc(env(safe-area-inset-bottom, 0px) + 10px)',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        width: 'calc(100% - 32px)',
+        maxWidth: 420,
         zIndex: 50,
         display: 'flex',
-        alignItems: 'flex-start',
+        alignItems: 'center',
         justifyContent: 'space-around',
-        paddingTop: 10,
-        paddingBottom: `calc(env(safe-area-inset-bottom) + 10px)`,
-        background: CREAM,
-        borderTop: `1px solid ${HAIR}`,
+        padding: '10px 6px',
+        background: '#2A1A14',
+        borderRadius: 28,
+        boxShadow: 'none',
       }}
     >
       {TABS.map((tab) => {
@@ -53,22 +55,21 @@ export default function BottomNav() {
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              gap: 4,
-              padding: '4px 10px',
+              gap: 3,
+              padding: '4px 12px',
+              borderRadius: 20,
               position: 'relative',
-              color: active ? DEEP : MUTED,
+              color: active ? ACTIVE : MUTED,
+              transition: 'color 0.15s ease',
             }}
           >
-            <Icon
-              size={18}
-              strokeWidth={active ? 2 : 1.5}
-            />
+            <Icon size={18} strokeWidth={active ? 2 : 1.5} />
             <span
               style={{
                 fontFamily: '"DM Sans", system-ui, sans-serif',
                 fontSize: 10,
-                letterSpacing: '0.04em',
-                fontWeight: active ? 500 : 400,
+                letterSpacing: '0.03em',
+                fontWeight: active ? 600 : 400,
               }}
             >
               {tab.label}
@@ -78,21 +79,21 @@ export default function BottomNav() {
                 style={{
                   position: 'absolute',
                   top: 2,
-                  right: 4,
-                  minWidth: 16,
-                  height: 16,
+                  right: 6,
+                  minWidth: 15,
+                  height: 15,
                   borderRadius: 999,
                   background: TERRA,
-                  border: `2px solid ${CREAM}`,
+                  border: '2px solid #2A1A14',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   fontFamily: '"DM Sans", system-ui, sans-serif',
-                  fontSize: 9,
+                  fontSize: 8,
                   fontWeight: 700,
                   color: '#fff',
                   lineHeight: 1,
-                  padding: '0 3px',
+                  padding: '0 2px',
                 }}
               >
                 {unreadCount > 9 ? '9+' : unreadCount}

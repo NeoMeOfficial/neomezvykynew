@@ -105,7 +105,7 @@ export function useAdmin() {
           avg_engagement: 0.78
         },
         revenue: {
-          mrr: ((users?.length || 0) * 0.6) * 14.90, // Estimated MRR
+          mrr: ((users?.length || 0) * 0.6) * 24.90, // Estimated MRR
           churn_rate: 0.05,
           ltv: 179.00, // Estimated LTV
           credits_applied: 0

@@ -227,7 +227,7 @@ export default function RecipeDetail() {
           </svg>
         </button>
         <button
-          onClick={() => navigate('/kniznica/strava/jedalnicek')}
+          onClick={() => navigate('/jedalnicek')}
           style={{
             flex: 1,
             padding: '16px 20px',

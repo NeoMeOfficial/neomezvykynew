@@ -27,7 +27,7 @@ export default function WorkoutStatsWidget({ variant = 'compact' }: WorkoutStats
     return (
       <div className="bg-white/30 backdrop-blur-[40px] border border-white/20 rounded-2xl p-4">
         <button
-          onClick={() => navigate('/profil?tab=workouts')}
+          onClick={() => navigate('/workout-history')}
           className="w-full flex items-center gap-3 text-left"
         >
           <div className="w-12 h-12 bg-[#7A9E78]/20 rounded-xl flex items-center justify-center">
@@ -83,7 +83,7 @@ export default function WorkoutStatsWidget({ variant = 'compact' }: WorkoutStats
         </div>
         
         <button
-          onClick={() => navigate('/profil?tab=workouts')}
+          onClick={() => navigate('/workout-history')}
           className="text-[#B8864A] text-sm font-medium flex items-center gap-1 hover:gap-2 transition-all"
         >
           Zobraziť všetko

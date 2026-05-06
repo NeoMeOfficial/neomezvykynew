@@ -13,7 +13,7 @@ const LABEL =
 
 export default function AuthReal() {
   const navigate = useNavigate();
-  const { signUp, signIn } = useSupabaseAuth();
+  const { signUp, signIn, resetPassword } = useSupabaseAuth();
 
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
@@ -229,7 +229,12 @@ export default function AuthReal() {
           {isLogin && (
             <button
               type="button"
-              onClick={() => navigate('/reset-password')}
+              onClick={async () => {
+                if (!formData.email) { setErrors({ submit: 'Zadajte email pre reset hesla.' }); return; }
+                const { error } = await resetPassword(formData.email);
+                if (error) setErrors({ submit: error.message });
+                else setErrors({ success: 'Email na reset hesla bol odoslaný.' });
+              }}
               className="text-center font-sans text-xs text-ink/40"
             >
               Zabudnuté heslo?

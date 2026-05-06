@@ -355,8 +355,9 @@ export default function Paywall() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const variant = (params.get('v') ?? 'dark') as 'warm' | 'dark' | 'compare';
+  const returnTo = params.get('returnTo');
 
-  const onActivate = () => navigate('/checkout');
+  const onActivate = () => navigate(returnTo ? `/profil/predplatne?returnTo=${encodeURIComponent(returnTo)}` : '/profil/predplatne');
   const onClose = () => navigate(-1);
   const onContinueFree = () => navigate('/domov-new');
 

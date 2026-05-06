@@ -3,6 +3,36 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useCommunityPosts } from '../../hooks/useCommunityPosts';
 import { Page, Eye, NM } from '../../components/v2/neome';
 
+function LikeButton({ count }: { count: number }) {
+  const [liked, setLiked] = useState(false);
+  const [n, setN] = useState(count);
+  const toggle = () => { setLiked(v => !v); setN(c => liked ? c - 1 : c + 1); };
+  return (
+    <button onClick={toggle} style={{ all: 'unset', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }}>
+      <svg width="16" height="16" viewBox="0 0 17 17" fill={liked ? NM.MAUVE : 'none'}>
+        <path d="M8.5 14.5s-5.5-3.5-5.5-8a3 3 0 015.5-1.5 3 3 0 015.5 1.5c0 4.5-5.5 8-5.5 8z" stroke={liked ? NM.MAUVE : NM.MUTED} strokeWidth="1.3" strokeLinejoin="round" />
+      </svg>
+      <span style={{ fontFamily: NM.SANS, fontSize: 12, color: liked ? NM.MAUVE : NM.MUTED }}>{n}</span>
+    </button>
+  );
+}
+
+function FireButton() {
+  const [fired, setFired] = useState(false);
+  const [n, setN] = useState(5);
+  const toggle = () => { setFired(v => !v); setN(c => fired ? c - 1 : c + 1); };
+  const color = fired ? '#E07A3A' : NM.MUTED;
+  return (
+    <button onClick={toggle} style={{ all: 'unset', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
+      {/* Lucide-style Flame path */}
+      <svg width="15" height="15" viewBox="0 0 24 24" fill={fired ? '#E07A3A' : 'none'} stroke={color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
+      </svg>
+      <span style={{ fontFamily: NM.SANS, fontSize: 12, color }}>{n}</span>
+    </button>
+  );
+}
+
 /**
  * Komunita post detail / thread — R2
  *
@@ -49,7 +79,7 @@ export default function KomunitaPostDetail() {
   const [reply, setReply] = useState('');
 
   return (
-    <Page paddingBottom={40}>
+    <Page paddingBottom={150}>
       <div style={{ padding: 'calc(env(safe-area-inset-top) + 14px) 18px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <button onClick={() => navigate(-1)} aria-label="Späť" style={{ all: 'unset', cursor: 'pointer', width: 36, height: 36, borderRadius: 999, background: '#fff', border: `1px solid ${NM.HAIR}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={NM.DEEP} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -77,13 +107,9 @@ export default function KomunitaPostDetail() {
             {post.type === 'question' && <Eye color={NM.GOLD} size={10}>Otázka</Eye>}
           </div>
           <div style={{ fontFamily: NM.SANS, fontSize: 17, fontWeight: 400, color: NM.DEEP, lineHeight: 1.5, letterSpacing: '-0.003em', marginBottom: 16 }}>{post.text}</div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <svg width="16" height="16" viewBox="0 0 17 17" fill="none">
-                <path d="M8.5 14.5s-5.5-3.5-5.5-8a3 3 0 015.5-1.5 3 3 0 015.5 1.5c0 4.5-5.5 8-5.5 8z" stroke={NM.MUTED} strokeWidth="1.3" strokeLinejoin="round" />
-              </svg>
-              <span style={{ fontFamily: NM.SANS, fontSize: 12, color: NM.MUTED }}>{post.likes}</span>
-            </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <LikeButton count={post.likes} />
+            <FireButton />
             <span style={{ fontFamily: NM.SANS, fontSize: 12, color: NM.MUTED }}>{post.comments} odpovedí</span>
           </div>
         </div>
@@ -114,13 +140,9 @@ export default function KomunitaPostDetail() {
                 <span style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.TERTIARY }}>· {r.time}</span>
               </div>
               <div style={{ fontFamily: NM.SANS, fontSize: 13.5, fontWeight: 300, color: NM.DEEP, lineHeight: 1.55, marginBottom: 8 }}>{r.txt}</div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                  <svg width="13" height="13" viewBox="0 0 17 17" fill="none">
-                    <path d="M8.5 14.5s-5.5-3.5-5.5-8a3 3 0 015.5-1.5 3 3 0 015.5 1.5c0 4.5-5.5 8-5.5 8z" stroke={NM.TERTIARY} strokeWidth="1.3" strokeLinejoin="round" />
-                  </svg>
-                  <span style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.TERTIARY }}>{r.likes}</span>
-                </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                <LikeButton count={r.likes} />
+                <FireButton />
                 <span style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.TERTIARY, cursor: 'pointer' }}>Odpovedať</span>
               </div>
             </div>
@@ -128,15 +150,15 @@ export default function KomunitaPostDetail() {
         </div>
       ))}
 
-      {/* Sticky reply composer */}
+      {/* Sticky reply composer — sits above the BottomNav (~64px) */}
       <div
         style={{
           position: 'fixed',
           left: 0,
           right: 0,
-          bottom: 0,
-          padding: `14px 18px calc(env(safe-area-inset-bottom) + 16px)`,
-          background: 'rgba(248,245,240,0.92)',
+          bottom: 'calc(64px + env(safe-area-inset-bottom, 0px))',
+          padding: '10px 18px 10px',
+          background: 'rgba(248,245,240,0.96)',
           backdropFilter: 'blur(20px)',
           borderTop: `1px solid ${NM.HAIR}`,
           zIndex: 50,

@@ -26,7 +26,7 @@ export default function SettingsHub() {
             value={user.tier === 'plus' ? 'Plus' : 'Free'}
             onClick={() => navigate('/profil/predplatne')}
           />
-          <SettingsRow label="Spôsob platby" onClick={() => navigate('/settings/payment')} />
+          <SettingsRow label="Spôsob platby" onClick={() => navigate('/profil/predplatne')} />
         </SettingsGroup>
 
         <SettingsGroup label="App">

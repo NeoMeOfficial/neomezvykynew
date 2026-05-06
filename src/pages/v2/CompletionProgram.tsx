@@ -88,7 +88,7 @@ export default function CompletionProgram() {
       <div style={{ margin: '22px 18px 0' }}>
         <Eye size={10} style={{ marginBottom: 10 }}>Kam ďalej</Eye>
         <button
-          onClick={() => navigate('/program/body-forming')}
+          onClick={() => navigate('/program/bodyforming')}
           style={{
             all: 'unset',
             cursor: 'pointer',
@@ -112,7 +112,7 @@ export default function CompletionProgram() {
 
       <div style={{ margin: '22px 18px 0' }}>
         <button
-          onClick={() => navigate('/program/body-forming')}
+          onClick={() => navigate('/program/bodyforming')}
           style={{
             width: '100%',
             padding: '15px 20px',

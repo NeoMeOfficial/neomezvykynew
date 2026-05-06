@@ -200,7 +200,7 @@ export default function JedalnicekPlanner() {
 
       <div style={{ padding: '4px 18px 20px' }}>
         <button
-          onClick={() => navigate('/kniznica/strava/jedalnicek/shopping')}
+          onClick={() => navigate('/kniznica/strava')}
           style={{
             all: 'unset',
             cursor: 'pointer',

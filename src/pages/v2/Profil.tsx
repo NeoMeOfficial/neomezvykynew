@@ -4,7 +4,6 @@ import { useSubscription } from '@/contexts/SubscriptionContext';
 import { useWorkoutHistory } from '@/hooks/useWorkoutHistory';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useReflections } from '@/hooks/useDailyRituals';
-import { BottomNav } from '@/components/v2/bottom-nav';
 import { Eyebrow } from '@/components/ui/eyebrow';
 import { SerifHeader } from '@/components/ui/serif-header';
 import { BodyText } from '@/components/ui/body-text';
@@ -143,7 +142,6 @@ export default function Profil() {
         <SettingsRow label="Odhlásiť sa" tone="danger" onClick={handleSignOut} />
       </SettingsGroup>
 
-      <BottomNav active="profil" />
     </div>
   );
 }

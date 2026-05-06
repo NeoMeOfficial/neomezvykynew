@@ -1,26 +1,247 @@
+import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useSubscription } from '@/contexts/SubscriptionContext';
-import { BottomNav } from '@/components/v2/bottom-nav';
-import { Eyebrow } from '@/components/ui/eyebrow';
-import { SlidersHorizontal } from 'lucide-react';
+import { SlidersHorizontal, ChevronRight, Salad, Dumbbell, Brain, BookOpen } from 'lucide-react';
+import { recipes } from '@/data/recipes';
+import { programList } from '@/data/programs';
 
 const DEEP     = '#3D2921';
+const CREAM    = '#F8F5F0';
+const WHITE    = '#FFFFFF';
 const CREAM2   = '#F1ECE3';
 const DEEP2    = '#2A1A14';
 const GOLD     = '#B8864A';
 const HAIR     = 'rgba(61,41,33,0.08)';
+const HAIR2    = 'rgba(61,41,33,0.16)';
 const TERTIARY = 'rgba(61,41,33,0.42)';
 const MUTED    = 'rgba(61,41,33,0.72)';
+const SERIF    = "'Gilda Display', Georgia, serif";
+const SANS     = "'DM Sans', system-ui, sans-serif";
 
 const IMG = (name: string) => `/images/r9/${name}`;
 
-interface Pillar {
-  id: string;
-  name: string;
-  sub: string;
-  img: string;
-  path: string;
+// ─── Search logic (mirrors Search.tsx) ────────────────────────────────────────
+
+const MEDITATIONS = [
+  { id: '1', title: 'Ranná meditácia',       category: 'Ráno'   },
+  { id: '2', title: 'Hlboký spánok',          category: 'Spánok' },
+  { id: '3', title: 'Zvládanie stresu',       category: 'Stres'  },
+  { id: '4', title: 'Fokus a koncentrácia',   category: 'Fokus'  },
+  { id: '5', title: 'Večerné uvoľnenie',      category: 'Spánok' },
+  { id: '6', title: 'Dýchanie 4-7-8',         category: 'Stres'  },
+  { id: '7', title: 'Upokojenie úzkosti',     category: 'Stres'  },
+  { id: '8', title: 'Prijatie tela',          category: 'Ráno'   },
+];
+
+const CAT_LABELS: Record<string, string> = {
+  ranajky: 'Raňajky', obed: 'Obed', vecera: 'Večera', snack: 'Snack', smoothie: 'Smoothie',
+};
+
+type ResultType = 'recipe' | 'program' | 'meditation';
+interface Result { id: string; type: ResultType; title: string; subtitle: string; path: string; }
+
+const TYPE_LABEL: Record<ResultType, string> = { recipe: 'Recept', program: 'Program', meditation: 'Meditácia' };
+const TYPE_COLOR: Record<ResultType, string> = { recipe: '#8B9E88', program: '#C1856A', meditation: '#A8848B' };
+
+const SHORTCUTS = [
+  { label: 'Recepty',   icon: Salad,    accent: '#8B9E88', path: '/recepty'               },
+  { label: 'Programy',  icon: Dumbbell, accent: '#C1856A', path: '/kniznica/telo/programy' },
+  { label: 'Meditácie', icon: Brain,    accent: '#A8848B', path: '/meditacie'              },
+  { label: 'Knižnica',  icon: BookOpen, accent: '#B8864A', path: '/kniznica'               },
+];
+
+function runSearch(q: string): Result[] {
+  const term = q.toLowerCase().trim();
+  if (!term) return [];
+  const out: Result[] = [];
+  recipes.forEach((r) => {
+    if (r.title.toLowerCase().includes(term) || r.description?.toLowerCase().includes(term) ||
+        r.tags?.some((t) => t.toLowerCase().includes(term)) || CAT_LABELS[r.category]?.toLowerCase().includes(term))
+      out.push({ id: r.id, type: 'recipe', title: r.title, subtitle: CAT_LABELS[r.category] ?? r.category, path: `/recept/${r.id}` });
+  });
+  programList.forEach((p) => {
+    if (p.name.toLowerCase().includes(term) || (p as any).tagline?.toLowerCase().includes(term))
+      out.push({ id: (p as any).slug ?? p.name, type: 'program', title: p.name, subtitle: 'Program', path: `/program/${(p as any).slug ?? p.name}/info` });
+  });
+  MEDITATIONS.forEach((m) => {
+    if (m.title.toLowerCase().includes(term) || m.category.toLowerCase().includes(term))
+      out.push({ id: m.id, type: 'meditation', title: m.title, subtitle: `Meditácia · ${m.category}`, path: `/meditacia/${m.id}` });
+  });
+  return out.slice(0, 30);
 }
+
+// ─── Search sheet ──────────────────────────────────────────────────────────────
+function SearchSheet({ onClose }: { onClose: () => void }) {
+  const navigate   = useNavigate();
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const inputRef   = useRef<HTMLInputElement>(null);
+  const [query, setQuery] = useState('');
+  const [bottomOffset, setBottomOffset] = useState(0);
+  const [maxH, setMaxH] = useState('92dvh');
+
+  const results = runSearch(query);
+  const grouped = results.reduce<Record<ResultType, Result[]>>((acc, r) => {
+    if (!acc[r.type]) acc[r.type] = [];
+    acc[r.type].push(r);
+    return acc;
+  }, {} as Record<ResultType, Result[]>);
+
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const overlay = overlayRef.current;
+    const blockScroll = (e: TouchEvent) => e.preventDefault();
+    overlay?.addEventListener('touchmove', blockScroll, { passive: false });
+
+    // Shift sheet up when keyboard opens
+    const vv = window.visualViewport;
+    const onVVChange = () => {
+      if (!vv) return;
+      const kb = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+      setBottomOffset(kb);
+      setMaxH(`${Math.round(vv.height * 0.96)}px`);
+    };
+    vv?.addEventListener('resize', onVVChange);
+    vv?.addEventListener('scroll', onVVChange);
+
+    // Auto-focus the input once the sheet has animated in
+    setTimeout(() => inputRef.current?.focus(), 180);
+
+    return () => {
+      document.body.style.overflow = prev;
+      overlay?.removeEventListener('touchmove', blockScroll);
+      vv?.removeEventListener('resize', onVVChange);
+      vv?.removeEventListener('scroll', onVVChange);
+    };
+  }, []);
+
+  const goTo = (path: string) => { onClose(); navigate(path); };
+
+  return createPortal(
+    <div style={{ position: 'fixed', inset: 0, zIndex: 200 }}>
+      <div
+        ref={overlayRef}
+        style={{ position: 'absolute', inset: 0, background: 'rgba(42,26,20,0.45)', backdropFilter: 'blur(4px)' }}
+        onClick={onClose}
+      />
+      <div
+        style={{
+          position: 'absolute', bottom: bottomOffset, left: 0, right: 0,
+          background: CREAM, borderRadius: '24px 24px 0 0',
+          display: 'flex', flexDirection: 'column',
+          maxHeight: maxH, overflow: 'hidden',
+          transition: 'bottom 0.22s ease, max-height 0.22s ease',
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Search input row — always visible at top */}
+        <div style={{ flexShrink: 0, padding: '16px 16px 12px', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{
+            flex: 1, display: 'flex', alignItems: 'center', gap: 10,
+            padding: '11px 14px', background: WHITE, borderRadius: 999,
+            border: `1px solid ${HAIR2}`,
+          }}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={MUTED} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>
+            </svg>
+            <input
+              ref={inputRef}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Hľadaj recepty, programy, meditácie…"
+              style={{ flex: 1, border: 'none', outline: 'none', background: 'transparent', fontFamily: SANS, fontSize: 14, color: DEEP }}
+            />
+            {query.length > 0 && (
+              <button
+                onClick={() => setQuery('')}
+                style={{ all: 'unset', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={MUTED} strokeWidth="2" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+              </button>
+            )}
+          </div>
+          <button
+            onClick={onClose}
+            style={{ all: 'unset', cursor: 'pointer', fontFamily: SANS, fontSize: 13, color: MUTED, whiteSpace: 'nowrap', padding: '0 2px' }}
+          >
+            Zrušiť
+          </button>
+        </div>
+
+        {/* Scrollable results */}
+        <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch' as any, overscrollBehavior: 'contain', padding: '0 16px 32px' }}>
+
+          {/* Empty state — shortcuts */}
+          {query.length === 0 && (
+            <>
+              <div style={{ fontFamily: SANS, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: TERTIARY, fontWeight: 500, marginBottom: 12 }}>Rýchly prístup</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                {SHORTCUTS.map((s) => {
+                  const Icon = s.icon;
+                  return (
+                    <button
+                      key={s.label}
+                      onClick={() => goTo(s.path)}
+                      style={{ all: 'unset', cursor: 'pointer', boxSizing: 'border-box', padding: '14px 14px', background: WHITE, borderRadius: 16, border: `1px solid ${HAIR}`, display: 'flex', alignItems: 'center', gap: 10 }}
+                    >
+                      <div style={{ width: 36, height: 36, borderRadius: 10, background: `${s.accent}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        <Icon size={16} color={s.accent} strokeWidth={1.6} />
+                      </div>
+                      <span style={{ fontFamily: SANS, fontSize: 13, fontWeight: 500, color: DEEP }}>{s.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
+
+          {/* No results */}
+          {query.length > 0 && results.length === 0 && (
+            <div style={{ paddingTop: 40, textAlign: 'center' }}>
+              <div style={{ fontFamily: SANS, fontSize: 14, color: MUTED }}>Žiadne výsledky pre „{query}"</div>
+              <div style={{ fontFamily: SANS, fontSize: 12, color: TERTIARY, marginTop: 4 }}>Skús iný výraz</div>
+            </div>
+          )}
+
+          {/* Grouped results */}
+          {results.length > 0 && (Object.entries(grouped) as [ResultType, Result[]][]).map(([type, items]) => (
+            <div key={type} style={{ marginBottom: 20 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                <div style={{ fontFamily: SANS, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: TYPE_COLOR[type], fontWeight: 500 }}>{TYPE_LABEL[type]}y</div>
+                <div style={{ padding: '1px 7px', borderRadius: 999, background: `${TYPE_COLOR[type]}18`, fontFamily: SANS, fontSize: 10, fontWeight: 500, color: TYPE_COLOR[type] }}>{items.length}</div>
+              </div>
+              <div style={{ background: WHITE, borderRadius: 16, overflow: 'hidden', border: `1px solid ${HAIR}` }}>
+                {items.map((r, i) => (
+                  <button
+                    key={r.id}
+                    onClick={() => goTo(r.path)}
+                    style={{ all: 'unset', cursor: 'pointer', boxSizing: 'border-box', width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', borderBottom: i < items.length - 1 ? `1px solid ${HAIR}` : 'none' }}
+                  >
+                    <div style={{ width: 28, height: 28, borderRadius: 8, background: `${TYPE_COLOR[r.type]}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <div style={{ width: 8, height: 8, borderRadius: 999, background: TYPE_COLOR[r.type] }} />
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontFamily: SANS, fontSize: 13, fontWeight: 500, color: DEEP, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{r.title}</div>
+                      <div style={{ fontFamily: SANS, fontSize: 10.5, color: TERTIARY, marginTop: 1 }}>{r.subtitle}</div>
+                    </div>
+                    <ChevronRight size={14} color={MUTED} strokeWidth={1.5} style={{ flexShrink: 0 }} />
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>,
+    document.body
+  );
+}
+
+// ─── Pillar grid ───────────────────────────────────────────────────────────────
+
+interface Pillar { id: string; name: string; sub: string; img: string; path: string; }
 
 const PILLARS: Pillar[] = [
   { id: 'telo',     name: 'Telo',     sub: 'Pohyb a sila',          img: 'section-body.jpg',      path: '/kniznica/telo'      },
@@ -38,9 +259,12 @@ const BLOG: Pillar = {
 
 const GRADIENT = 'linear-gradient(180deg, rgba(42,26,20,0) 35%, rgba(42,26,20,0.82) 100%)';
 
+// ─── Page ──────────────────────────────────────────────────────────────────────
+
 export default function Kniznica() {
   const navigate = useNavigate();
   const { isPremium } = useSubscription();
+  const [showSearch, setShowSearch] = useState(false);
 
   return (
     <div style={{ background: '#F8F5F0', minHeight: '100vh', paddingBottom: 120 }}>
@@ -68,14 +292,15 @@ export default function Kniznica() {
         </div>
       </div>
 
-      {/* Search bar */}
+      {/* Search bar — tapping opens the sheet */}
       <div style={{ margin: '0 20px 0' }}>
         <button
-          onClick={() => navigate('/search')}
+          onClick={() => setShowSearch(true)}
           style={{
             display: 'flex', alignItems: 'center', gap: 12, width: '100%', textAlign: 'left',
             padding: '13px 16px', background: '#fff', borderRadius: 999,
             border: `1px solid ${HAIR}`, boxShadow: '0 2px 12px rgba(61,41,33,0.04)', cursor: 'text',
+            boxSizing: 'border-box',
           }}
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={MUTED} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -182,7 +407,7 @@ export default function Kniznica() {
         </div>
       )}
 
-      <BottomNav active="kniznica" />
+      {showSearch && <SearchSheet onClose={() => setShowSearch(false)} />}
     </div>
   );
 }

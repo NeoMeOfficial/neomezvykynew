@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Droplets, Moon, BookOpen, Dumbbell, Apple, Plus, Check, GlassWater, Flame } from 'lucide-react';
+import { useAchievements } from '../../hooks/useAchievements';
+import { usePointsLedger } from '../../hooks/usePointsLedger';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../contexts/AuthContext';
 import { useSubscription } from '../../contexts/SubscriptionContext';
@@ -29,6 +31,8 @@ export default function NavykyTracker() {
   const { user } = useAuthContext();
   const { isPremium } = useSubscription();
   const navigate = useNavigate();
+  const { addActivity } = useAchievements();
+  const { addEntry } = usePointsLedger();
 
   const [habits, setHabits] = useState<HabitData[]>([]);
   const [weekDots, setWeekDots] = useState([true, true, true, false, false, false, false]);
@@ -63,7 +67,20 @@ export default function NavykyTracker() {
 
   const toggleHabit = (i: number) => {
     const next = [...habits];
+    const wasUndone = !next[i].done;
     next[i] = { ...next[i], done: !next[i].done };
+    saveHabits(next);
+    // Only award points when checking in (not when unchecking)
+    if (wasUndone) {
+      const today = new Date().toISOString().slice(0, 10);
+      addEntry('habit_checkin', 3, `habit_${i}_${today}`, 'habit');
+      addActivity('habit_checkin');
+    }
+  };
+
+  const [editMode, setEditMode] = useState(false);
+  const deleteHabit = (i: number) => {
+    const next = habits.filter((_, idx) => idx !== i);
     saveHabits(next);
   };
 
@@ -73,12 +90,20 @@ export default function NavykyTracker() {
   return (
     <div className="min-h-screen bg-cream pb-12">
       <TopBar title="Návyky" backHref="/domov-new" right={
-        <button
-          onClick={() => navigate('/navyky/new')}
-          className="h-9 w-9 rounded-full bg-white border border-ink/[0.08] flex items-center justify-center"
-        >
-          <Plus className="size-4 text-ink/60" />
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setEditMode(v => !v)}
+            className={`h-9 px-3 rounded-full border text-xs font-medium transition-colors ${editMode ? 'bg-ink text-cream border-ink' : 'bg-white border-ink/[0.08] text-ink/60'}`}
+          >
+            {editMode ? 'Hotovo' : 'Upraviť'}
+          </button>
+          <button
+            onClick={() => navigate('/navyky/new')}
+            className="h-9 w-9 rounded-full bg-white border border-ink/[0.08] flex items-center justify-center"
+          >
+            <Plus className="size-4 text-ink/60" />
+          </button>
+        </div>
       } />
 
       <div className="px-5 pt-2 flex flex-col gap-4">
@@ -114,22 +139,37 @@ export default function NavykyTracker() {
           {habits.map((h, i) => {
             const Icon = h.icon;
             return (
-              <button
-                key={h.name}
-                onClick={() => toggleHabit(i)}
-                className="w-full text-left rounded-card p-4 bg-white border border-ink/[0.08] shadow-nm-sm flex items-center gap-3 transition-all active:scale-[0.99]"
-              >
-                <div className={`h-10 w-10 rounded-xl flex items-center justify-center flex-shrink-0 ${h.done ? 'bg-pillar-strava/15' : 'bg-cream-200'}`}>
-                  <Icon className={`size-4 ${h.done ? 'text-pillar-strava' : 'text-ink/40'}`} strokeWidth={1.5} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className={`font-sans text-sm font-medium ${h.done ? 'line-through text-ink/40' : 'text-ink'}`}>{h.name}</div>
-                  <BodyText size="sm" tone="muted">{h.progress}</BodyText>
-                </div>
-                <div className={`h-7 w-7 rounded-full flex items-center justify-center flex-shrink-0 transition-all ${h.done ? 'bg-pillar-strava' : 'border border-ink/[0.15]'}`}>
-                  {h.done && <Check className="size-3.5 text-white" strokeWidth={2.5} />}
-                </div>
-              </button>
+              <div key={h.name} className="flex items-center gap-2">
+                {editMode && (
+                  <button
+                    onClick={() => deleteHabit(i)}
+                    className="h-9 w-9 rounded-full bg-red-50 border border-red-200 flex items-center justify-center flex-shrink-0 transition-all active:scale-95"
+                    aria-label="Vymazať"
+                  >
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#E05A5A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>
+                    </svg>
+                  </button>
+                )}
+                <button
+                  onClick={() => !editMode && toggleHabit(i)}
+                  className="flex-1 text-left rounded-card p-4 bg-white border border-ink/[0.08] shadow-nm-sm flex items-center gap-3 transition-all active:scale-[0.99]"
+                  style={{ cursor: editMode ? 'default' : 'pointer' }}
+                >
+                  <div className={`h-10 w-10 rounded-xl flex items-center justify-center flex-shrink-0 ${h.done ? 'bg-pillar-strava/15' : 'bg-cream-200'}`}>
+                    <Icon className={`size-4 ${h.done ? 'text-pillar-strava' : 'text-ink/40'}`} strokeWidth={1.5} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className={`font-sans text-sm font-medium ${h.done ? 'line-through text-ink/40' : 'text-ink'}`}>{h.name}</div>
+                    <BodyText size="sm" tone="muted">{h.progress}</BodyText>
+                  </div>
+                  {!editMode && (
+                    <div className={`h-7 w-7 rounded-full flex items-center justify-center flex-shrink-0 transition-all ${h.done ? 'bg-pillar-strava' : 'border border-ink/[0.15]'}`}>
+                      {h.done && <Check className="size-3.5 text-white" strokeWidth={2.5} />}
+                    </div>
+                  )}
+                </button>
+              </div>
             );
           })}
         </div>

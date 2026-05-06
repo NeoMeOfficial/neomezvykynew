@@ -1,6 +1,9 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Shield, Flame } from 'lucide-react';
 import { useCommunityPosts } from '../../hooks/useCommunityPosts';
 import { Page, Eye, Ser, Body, NM } from '../../components/v2/neome';
+import { getShieldTier, getShieldInfo, SHIELD_TIERS } from '../../data/achievements';
 
 /**
  * Komunita — R2 feed
@@ -77,6 +80,17 @@ function Avatar({ size = 36, initial, tone }: { size?: number; initial: string; 
   );
 }
 
+// Deterministic shield tier for seed posts — gives each author a stable shield
+// based on their name hash so the UI always looks populated.
+function shieldForAuthor(name: string): { tier: ReturnType<typeof getShieldTier>; active: boolean } {
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) | 0;
+  const idx = Math.abs(h) % (SHIELD_TIERS.length + 2); // +2 so ~25% have no shield
+  const tier = idx < SHIELD_TIERS.length ? SHIELD_TIERS[idx].slug : null;
+  const active = Math.abs(h) % 3 !== 0; // ~67% are recently active
+  return { tier, active };
+}
+
 interface DisplayPost {
   id: string;
   who: string;
@@ -91,17 +105,31 @@ interface DisplayPost {
   isQuestion?: boolean;
 }
 
-function FeedPost({ post, onToggleLike }: { post: DisplayPost; onToggleLike?: (id: string) => void }) {
+function FeedPost({ post, followedIds, onToggleFollow }: { post: DisplayPost; followedIds: Set<string>; onToggleFollow: (id: string) => void }) {
   const navigate = useNavigate();
+  const following = followedIds.has(post.id);
   return (
-    <button
+    <div
       onClick={() => navigate(`/komunita/${post.id}`)}
-      style={{ all: 'unset', cursor: 'pointer', display: 'block', width: '100%', padding: '6px 24px 22px', borderBottom: `1px solid ${NM.HAIR}` }}
+      style={{ cursor: 'pointer', display: 'block', width: '100%', boxSizing: 'border-box', padding: '6px 24px 22px', borderBottom: `1px solid ${NM.HAIR}` }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
         <Avatar size={36} initial={post.initial} tone={post.tone} />
         <div style={{ flex: 1 }}>
-          <div style={{ fontFamily: NM.SANS, fontSize: 13, fontWeight: 500, color: NM.DEEP }}>{post.who}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+            <span style={{ fontFamily: NM.SANS, fontSize: 13, fontWeight: 500, color: NM.DEEP }}>{post.who}</span>
+            {(() => {
+              const { tier, active } = shieldForAuthor(post.who);
+              const info = getShieldInfo(tier);
+              if (!info) return null;
+              return (
+                <span style={{ display: 'flex', alignItems: 'center', gap: 2 }} title={info.label}>
+                  <Shield size={11} color={info.color} strokeWidth={2} fill={info.color} style={{ opacity: 0.9 }} />
+                  {active && <Flame size={10} color={NM.TERRA} strokeWidth={2} fill={NM.TERRA} style={{ opacity: 0.85 }} />}
+                </span>
+              );
+            })()}
+          </div>
           <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.TERTIARY }}>{post.time}</div>
         </div>
         {post.isQuestion && <Eye color={NM.GOLD} size={10}>Otázka</Eye>}
@@ -120,28 +148,56 @@ function FeedPost({ post, onToggleLike }: { post: DisplayPost; onToggleLike?: (i
           }}
         />
       )}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <svg width="17" height="17" viewBox="0 0 17 17" fill={post.liked ? NM.TERRA : 'none'}>
+          <svg width="16" height="16" viewBox="0 0 17 17" fill={post.liked ? NM.TERRA : 'none'}>
             <path d="M8.5 14.5s-5.5-3.5-5.5-8a3 3 0 015.5-1.5 3 3 0 015.5 1.5c0 4.5-5.5 8-5.5 8z" stroke={post.liked ? NM.TERRA : NM.MUTED} strokeWidth="1.3" strokeLinejoin="round" />
           </svg>
           <span style={{ fontFamily: NM.SANS, fontSize: 12, color: post.liked ? NM.TERRA : NM.MUTED }}>{post.likes}</span>
         </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={NM.MUTED} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
+          </svg>
+          <span style={{ fontFamily: NM.SANS, fontSize: 12, color: NM.MUTED }}>5</span>
+        </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <svg width="17" height="17" viewBox="0 0 17 17" fill="none">
+          <svg width="16" height="16" viewBox="0 0 17 17" fill="none">
             <path d="M3 7a4 4 0 014-4h3a4 4 0 014 4v2a4 4 0 01-4 4H7l-3 2v-2a4 4 0 01-1-4V7z" stroke={NM.MUTED} strokeWidth="1.3" strokeLinejoin="round" />
           </svg>
           <span style={{ fontFamily: NM.SANS, fontSize: 12, color: NM.MUTED }}>{post.comments}</span>
         </div>
-        <div style={{ marginLeft: 'auto', fontFamily: NM.SANS, fontSize: 11, color: NM.SAGE, fontWeight: 500, letterSpacing: '0.02em' }}>Sledovať</div>
+        <button
+          onClick={(e) => { e.stopPropagation(); onToggleFollow(post.id); }}
+          style={{ all: 'unset', cursor: 'pointer', marginLeft: 'auto', fontFamily: NM.SANS, fontSize: 11, color: following ? NM.TERRA : NM.SAGE, fontWeight: 500, letterSpacing: '0.02em', flexShrink: 0 }}
+        >
+          {following ? 'Sledujem ✓' : 'Sledovať'}
+        </button>
       </div>
-    </button>
+    </div>
   );
+}
+
+const FOLLOW_KEY = 'komunita_followed_posts';
+
+function loadFollowed(): Set<string> {
+  try { return new Set(JSON.parse(localStorage.getItem(FOLLOW_KEY) ?? '[]')); }
+  catch { return new Set(); }
 }
 
 export default function Komunita() {
   const navigate = useNavigate();
   const { posts, likedIds } = useCommunityPosts();
+  const [followedIds, setFollowedIds] = useState<Set<string>>(loadFollowed);
+
+  const toggleFollow = (id: string) => {
+    setFollowedIds(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      localStorage.setItem(FOLLOW_KEY, JSON.stringify([...next]));
+      return next;
+    });
+  };
 
   // Map raw posts → display posts (assign tone + photo)
   const display: DisplayPost[] = posts.map((p) => ({
@@ -217,7 +273,11 @@ export default function Komunita() {
         <Eye color={NM.GOLD} style={{ marginBottom: 14 }}>Najviac rezonovalo dnes</Eye>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {resonated.map((p) => (
-            <div key={p.id} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+            <button
+              key={p.id}
+              onClick={() => navigate(`/komunita/${p.id}`)}
+              style={{ all: 'unset', cursor: 'pointer', display: 'flex', gap: 12, alignItems: 'flex-start', boxSizing: 'border-box', width: '100%', padding: '12px 14px', background: 'rgba(255,255,255,0.65)', borderRadius: 16, border: `1px solid ${NM.HAIR}` }}
+            >
               <Avatar size={36} initial={p.initial} tone={p.tone} />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
@@ -225,12 +285,23 @@ export default function Komunita() {
                   <span style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.TERTIARY }}>· {p.time}</span>
                 </div>
                 <div style={{ fontFamily: NM.SANS, fontSize: 13.5, fontWeight: 400, color: NM.DEEP, lineHeight: 1.55, letterSpacing: '-0.002em', marginBottom: 6 }}>{p.text}</div>
-                <div style={{ display: 'flex', gap: 14, fontFamily: NM.SANS, fontSize: 11, color: NM.TERTIARY }}>
-                  <span>♡ {p.likes}</span>
-                  <span>{p.comments} komentárov</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <svg width="13" height="13" viewBox="0 0 17 17" fill="none">
+                      <path d="M8.5 14.5s-5.5-3.5-5.5-8a3 3 0 015.5-1.5 3 3 0 015.5 1.5c0 4.5-5.5 8-5.5 8z" stroke={NM.MUTED} strokeWidth="1.3" strokeLinejoin="round" />
+                    </svg>
+                    <span style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.TERTIARY }}>{p.likes}</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={NM.MUTED} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
+                    </svg>
+                    <span style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.TERTIARY }}>5</span>
+                  </div>
+                  <span style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.TERTIARY }}>{p.comments} odpovedí</span>
                 </div>
               </div>
-            </div>
+            </button>
           ))}
         </div>
       </div>
@@ -267,7 +338,7 @@ export default function Komunita() {
       </div>
 
       {feed.map((p) => (
-        <FeedPost key={p.id} post={p} />
+        <FeedPost key={p.id} post={p} followedIds={followedIds} onToggleFollow={toggleFollow} />
       ))}
     </Page>
   );

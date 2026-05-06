@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Page, Eye, NM } from '../../components/v2/neome';
+import { useAchievements } from '../../hooks/useAchievements';
+import { usePointsLedger } from '../../hooks/usePointsLedger';
 
 /**
  * Reflection / journal entry — R3
@@ -36,15 +38,19 @@ function dayPromptIndex(d = new Date()): number {
 export default function ReflectionEntry() {
   const navigate = useNavigate();
   const [text, setText] = useState('');
+  const { addActivity } = useAchievements();
+  const { addEntry } = usePointsLedger();
   const today = new Date();
   const dateLabel = `${SK_DAYS[today.getDay()]} · ${today.getDate()}. ${SK_MONTHS_SHORT[today.getMonth()]}`;
   const prompt = PROMPTS[dayPromptIndex(today)];
   const wordCount = text.trim().length === 0 ? 0 : text.trim().split(/\s+/).length;
 
   const onSave = () => {
-    // FEATURE-NEEDED-DOMOV-REFLECTIONS: actually persist this entry.
-    // Currently a no-op aside from navigation.
-    navigate('/dennik');
+    if (text.trim().length > 0) {
+      addEntry('reflection_write', 6, `reflection_${today.toISOString().slice(0, 10)}`, 'reflection');
+      addActivity('reflection_write');
+    }
+    navigate('/kniznica/dennik');
   };
 
   return (

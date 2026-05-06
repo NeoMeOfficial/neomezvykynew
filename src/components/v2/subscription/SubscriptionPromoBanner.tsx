@@ -25,7 +25,7 @@ export default function SubscriptionPromoBanner({
   };
 
   const handleSubscribe = () => {
-    navigate('/subscribe');
+    navigate('/paywall');
   };
 
   if (variant === 'compact') {
@@ -99,7 +99,7 @@ export default function SubscriptionPromoBanner({
         <div className="bg-gradient-to-r rounded-2xl p-4 mb-6 text-white text-center"
           style={{ background: `linear-gradient(135deg, ${colors.accent}, ${colors.periodka})` }}
         >
-          <div className="text-2xl font-bold mb-1">€14.90/mesiac</div>
+          <div className="text-2xl font-bold mb-1">€24.90/mesiac</div>
           <div className="text-sm opacity-90">7-dňová bezplatná skúška</div>
         </div>
 

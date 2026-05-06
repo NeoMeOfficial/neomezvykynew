@@ -84,7 +84,7 @@ function TeloSection({ showPromoBanner }: { showPromoBanner: boolean }) {
   const handleCtaClick = () => {
     if (hasProgram) {
       // Go to program library
-      navigate('/program/dashboard');
+      navigate('/kniznica/telo/programy');
     } else {
       // Go to Telo library  
       navigate('/kniznica/telo');

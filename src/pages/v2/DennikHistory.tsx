@@ -40,7 +40,7 @@ export default function DennikHistory() {
 
   return (
     <div className="min-h-screen bg-cream pb-12">
-      <TopBar title="Osobný denník" backHref="/kniznica/dennik" right={
+      <TopBar title="Osobný denník" backHref="/kniznica" right={
         <button
           onClick={() => navigate('/dennik/new')}
           className="h-9 w-9 rounded-full bg-white border border-ink/[0.08] flex items-center justify-center"

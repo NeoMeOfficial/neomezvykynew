@@ -155,7 +155,7 @@ export default function KniznicaPreview() {
                 <em style={{ color: R9.GOLD, fontStyle: 'italic', fontWeight: 500 }}>knižnicu.</em>
               </Ser>
               <button
-                onClick={() => navigate('/checkout')}
+                onClick={() => navigate('/paywall')}
                 style={{ marginTop: 18, width: '100%', padding: '13px 20px', background: R9.GOLD, color: '#fff', border: 'none', borderRadius: 999, fontSize: 13, fontWeight: 500, letterSpacing: '0.02em', cursor: 'pointer' }}
               >
                 Aktivovať Plus

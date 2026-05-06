@@ -82,7 +82,7 @@ export default function Telo() {
             Telo
           </div>
           <button
-            onClick={() => navigate('/search')}
+            onClick={() => navigate('/hladat')}
             style={{
               width: 36, height: 36, borderRadius: 999,
               background: '#fff', border: `1px solid ${HAIR}`,

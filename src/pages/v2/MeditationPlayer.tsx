@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { NM } from '../../components/v2/neome';
+import { useAchievements } from '../../hooks/useAchievements';
+import { usePointsLedger } from '../../hooks/usePointsLedger';
 
 /**
  * Meditation player — R3 ambient
@@ -64,6 +66,18 @@ export default function MeditationPlayer() {
   const navigate = useNavigate();
   const { meditationId } = useParams<{ meditationId: string }>();
   const m = (meditationId && MEDITATIONS[meditationId]) || MEDITATIONS['rann-pokoj'];
+  const { addActivity } = useAchievements();
+  const { addEntry } = usePointsLedger();
+  const completedRef = useRef(false);
+
+  function handleComplete() {
+    if (!completedRef.current) {
+      completedRef.current = true;
+      addEntry('meditation_complete', 8, meditationId ?? 'unknown', 'meditation');
+      addActivity('meditation_complete', { ref_id: meditationId, ref_type: 'meditation' });
+    }
+    navigate(-1);
+  }
 
   // FEATURE-NEEDED-MYSEL-AUDIO-PLAYER — currently fake state for visual only
   const [playedSec] = useState(222); // 3:42 — matches design
@@ -197,7 +211,7 @@ export default function MeditationPlayer() {
             borderRadius: 999,
             border: '1px solid rgba(255,255,255,0.12)',
             backdropFilter: 'blur(10px)',
-            marginBottom: 'calc(env(safe-area-inset-bottom) + 20px)',
+            marginBottom: 12,
             boxSizing: 'border-box',
           }}
         >
@@ -211,6 +225,31 @@ export default function MeditationPlayer() {
             </svg>
           </div>
         </div>
+
+        {/* Complete button */}
+        <button
+          onClick={handleComplete}
+          style={{
+            all: 'unset',
+            cursor: 'pointer',
+            display: 'block',
+            width: '100%',
+            padding: '15px 0',
+            background: 'rgba(255,255,255,0.12)',
+            border: '1px solid rgba(255,255,255,0.20)',
+            borderRadius: 999,
+            textAlign: 'center',
+            fontFamily: NM.SANS,
+            fontSize: 14,
+            fontWeight: 600,
+            color: '#fff',
+            letterSpacing: '0.02em',
+            marginBottom: 'calc(env(safe-area-inset-bottom) + 20px)',
+            boxSizing: 'border-box',
+          }}
+        >
+          Dokončiť meditáciu · +8 bodov
+        </button>
       </div>
     </div>
   );
