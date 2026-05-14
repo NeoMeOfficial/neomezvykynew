@@ -118,7 +118,7 @@ function FeedPost({ post, followedIds, onToggleFollow, onToggleLike }: { post: D
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
         <Avatar size={36} initial={post.initial} tone={post.tone} />
         <div style={{ flex: 1 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexWrap: 'wrap' }}>
             <span style={{ fontFamily: NM.SANS, fontSize: 13, fontWeight: 500, color: NM.DEEP }}>{post.who}</span>
             {(() => {
               const { tier, active } = shieldForAuthor(post.who);
@@ -131,6 +131,24 @@ function FeedPost({ post, followedIds, onToggleFollow, onToggleLike }: { post: D
                 </span>
               );
             })()}
+            {post.id.startsWith('seed-') && (
+              <span
+                style={{
+                  fontFamily: NM.SANS,
+                  fontSize: 9,
+                  letterSpacing: '0.16em',
+                  textTransform: 'uppercase',
+                  fontWeight: 500,
+                  color: NM.GOLD,
+                  background: 'rgba(184,134,74,0.10)',
+                  padding: '2px 7px',
+                  borderRadius: 999,
+                  marginLeft: 4,
+                }}
+              >
+                Ukážka
+              </span>
+            )}
           </div>
           <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.TERTIARY }}>{post.time}</div>
         </div>
