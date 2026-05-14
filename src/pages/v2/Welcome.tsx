@@ -25,8 +25,8 @@ export default function Welcome() {
     <div
       style={{
         minHeight: '100vh', position: 'relative',
-        backgroundImage: 'linear-gradient(180deg, rgba(42,26,20,0.18) 0%, rgba(42,26,20,0.62) 52%, #2A1A14 100%), url(/images/r9/lifestyle-mother-baby.jpg)',
-        backgroundSize: 'cover', backgroundPosition: 'center top',
+        backgroundImage: 'linear-gradient(180deg, rgba(42,26,20,0.18) 0%, rgba(42,26,20,0.62) 52%, #2A1A14 100%), url(/images/r9/welcome-hero.webp)',
+        backgroundSize: 'cover', backgroundPosition: 'center 25%',
         color: '#fff', paddingBottom: 0,
       }}
     >
