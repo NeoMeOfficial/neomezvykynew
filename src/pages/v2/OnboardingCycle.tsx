@@ -22,7 +22,7 @@ export default function OnboardingCycle() {
       setCycleLength(cycleLength);
       setPeriodLength(periodLength);
     }
-    navigate('/onboarding/notifications');
+    navigate('/onboarding/programs');
   };
 
   return (
@@ -72,7 +72,7 @@ export default function OnboardingCycle() {
         skipLabel="Preskočiť — nateraz nesledujem"
         disabled={!lastPeriod}
         onClick={handleContinue}
-        onSkip={() => navigate('/onboarding/notifications')}
+        onSkip={() => navigate('/onboarding/programs')}
       />
     </OnbShell>
   );

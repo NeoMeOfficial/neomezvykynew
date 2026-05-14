@@ -13,7 +13,7 @@ export default function OnboardingNotifications() {
   const { prefs, update } = useNotificationPrefs();
 
   return (
-    <OnbShell step={3} totalSteps={3} onBack={() => navigate('/onboarding/cycle')}>
+    <OnbShell step={3} totalSteps={3} onBack={() => navigate('/onboarding/programs')}>
       <div className="pt-4">
         <Eyebrow>KROK 3 Z 3 · UPOZORNENIA</Eyebrow>
 
