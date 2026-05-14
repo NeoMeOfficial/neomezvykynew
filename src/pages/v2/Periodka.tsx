@@ -292,7 +292,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart }: Paid
 
   return (
     <>
-      <TopBar title="Cyklus" onBack={() => navigate('/domov-new')} onSettings={() => navigate('/profil')} />
+      <TopBar title="Cyklus" onBack={() => navigate('/domov-new')} onSettings={() => navigate('/kniznica/periodka/nastavenia')} />
       <div style={{ padding: '2px 20px 6px' }}>
         <Eye color={NM.GOLD}>{head.eye}</Eye>
         <Ser size={30} style={{ marginTop: 10, lineHeight: 1.02 }}>

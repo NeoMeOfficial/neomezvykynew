@@ -32,15 +32,10 @@ export default function SettingsHub() {
         <SettingsGroup label="App">
           <SettingsRow label="Upozornenia" onClick={() => navigate('/settings/notifications')} />
           <SettingsRow label="Súkromie" onClick={() => navigate('/settings/privacy')} />
-          <SettingsRow label="Jazyk" value="Slovenčina" onClick={() => {}} />
-          <SettingsRow label="Stiahnuť moje dáta" onClick={() => {}} />
         </SettingsGroup>
 
         <SettingsGroup label="Pomoc">
-          <SettingsRow label="Podpora" onClick={() => {}} />
-          <SettingsRow label="Podmienky" onClick={() => {}} />
           <SettingsRow label="Zásady súkromia" onClick={() => navigate('/settings/privacy')} />
-          <SettingsRow label="O aplikácii" value="v1.0" onClick={() => {}} />
         </SettingsGroup>
 
         <SettingsGroup>

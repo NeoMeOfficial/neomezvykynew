@@ -280,12 +280,6 @@ export default function Kniznica() {
               <span style={{ color: GOLD }}>Plus</span>
             </>}
           </div>
-          <button
-            style={{ width: 36, height: 36, borderRadius: 999, background: '#fff', border: `1px solid ${HAIR}`, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
-            onClick={() => {}}
-          >
-            <SlidersHorizontal size={15} color={DEEP} strokeWidth={1.8} />
-          </button>
         </div>
         <div style={{ marginTop: 8, fontFamily: 'Gilda Display, serif', fontSize: 34, fontWeight: 500, color: DEEP, lineHeight: 1.1, letterSpacing: '-0.01em' }}>
           Všetko, čo{' '}

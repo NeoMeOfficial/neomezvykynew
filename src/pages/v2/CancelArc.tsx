@@ -112,47 +112,11 @@ export default function CancelArc() {
           </div>
         </div>
 
-        {/* Save offer */}
-        <div style={{ margin: '24px 18px 0', padding: '20px 22px', borderRadius: 22, background: `linear-gradient(135deg, ${NM.DEEP_2}, ${NM.DEEP})`, color: '#fff', position: 'relative', overflow: 'hidden' }}>
-          <div style={{ position: 'absolute', top: -50, right: -40, width: 160, height: 160, borderRadius: 999, background: `radial-gradient(circle, ${NM.GOLD}55, transparent 70%)` }} />
-          <div style={{ position: 'relative' }}>
-            <Eye color={NM.GOLD} size={10}>Pre teba · ponuka</Eye>
-            <div style={{ fontFamily: NM.SERIF, fontSize: 24, fontWeight: 500, fontStyle: 'italic', marginTop: 10, letterSpacing: '-0.005em' }}>50% zľava na 3 mesiace</div>
-            <div style={{ fontFamily: NM.SANS, fontSize: 12, color: 'rgba(255,255,255,0.65)', marginTop: 6, fontWeight: 400 }}>Namiesto odchodu, pokračuj za 4,99 € / mesiac</div>
-            <button
-              // FEATURE-NEEDED-CANCEL-RETENTION-COUPON
-              onClick={() => navigate('/profil')}
-              style={{ marginTop: 16, width: '100%', padding: '13px 20px', background: NM.GOLD, color: '#fff', border: 'none', borderRadius: 999, fontFamily: NM.SANS, fontSize: 13, fontWeight: 500, cursor: 'pointer' }}
-            >
-              Prijať ponuku
-            </button>
-          </div>
-        </div>
-
-        <button
-          // FEATURE-NEEDED-CANCEL-PAUSE
-          onClick={() => navigate('/profil')}
-          style={{
-            all: 'unset',
-            cursor: 'pointer',
-            display: 'flex',
-            margin: '16px 18px 0',
-            padding: '16px 18px',
-            borderRadius: 16,
-            background: '#fff',
-            border: `1px solid ${NM.HAIR}`,
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            width: 'calc(100% - 36px)',
-            boxSizing: 'border-box',
-          }}
-        >
-          <div style={{ flex: 1, textAlign: 'left' }}>
-            <div style={{ fontFamily: NM.SERIF, fontSize: 15, color: NM.DEEP, fontWeight: 500, letterSpacing: '-0.005em' }}>Pauznúť na mesiac</div>
-            <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.EYEBROW, marginTop: 3, fontWeight: 400 }}>Platba sa odloží, všetko ostane</div>
-          </div>
-          <div style={{ color: NM.TERTIARY, fontSize: 16 }}>›</div>
-        </button>
+        {/* Retention "50% off" and "Pause subscription" alternatives were
+            empty promises — both buttons navigated to /profil without
+            applying a coupon or initiating a pause. Removed until the
+            real Stripe coupon + pause flows are wired (FEATURE-NEEDED-
+            CANCEL-RETENTION-COUPON / -CANCEL-PAUSE). */}
 
         <div style={{ margin: '24px 18px 0', textAlign: 'center' }}>
           <button onClick={() => setStep(1)} style={{ all: 'unset', cursor: 'pointer', fontFamily: NM.SANS, fontSize: 12.5, color: NM.MUTED, textDecoration: 'underline', fontWeight: 400 }}>

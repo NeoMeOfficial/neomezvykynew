@@ -269,8 +269,7 @@ export default function SubscriptionManagement() {
         </SettingsGroup>
 
         {/* Help + cancel */}
-        <SettingsGroup label="Pomoc">
-          <SettingsRow label="Kontaktovať podporu" onClick={() => {}} />
+        <SettingsGroup>
           <SettingsRow label="Zrušiť predplatné" tone="danger" onClick={() => setShowCancelDialog(true)} />
         </SettingsGroup>
       </div>
