@@ -269,12 +269,13 @@ export default function Komunita() {
           <br />
           Jedna komunita.
         </Ser>
-        <Body style={{ maxWidth: 310 }}>Zdieľaj, pýtaj sa, vypočuj. Ticho aj smiech. Tu si doma.</Body>
+        <Body style={{ maxWidth: 310 }}>Tvoj priestor. Zdieľaj, inšpiruj, buď vypočutá.</Body>
       </div>
 
       <div style={{ padding: '0 24px 6px', display: 'flex', gap: 22, borderBottom: `1px solid ${NM.HAIR}` }}>
         {[
           { k: 'posts', label: 'Príspevky', active: true },
+          { k: 'following', label: 'Sledujem', active: false },
           { k: 'disc', label: 'Zľavy partnerov', active: false },
         ].map((t) => (
           <div
