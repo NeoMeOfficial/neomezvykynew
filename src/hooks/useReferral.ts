@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
-import { useAuth } from './useAuth';
+import { useSupabaseAuth } from '../contexts/SupabaseAuthContext';
 import { ReferralCode, ReferralStats } from '../types/referral';
 
 /**
@@ -61,7 +61,7 @@ function useDemoFallback() {
 }
 
 export function useReferral() {
-  const { user } = useAuth();
+  const { user } = useSupabaseAuth();
   const [loading, setLoading] = useState(false);
   const [isDemo, setIsDemo] = useState(false);
   const [referralCode, setReferralCode] = useState<ReferralCode | null>(null);

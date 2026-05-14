@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { useAuth } from './useAuth';
+import { useSupabaseAuth } from '../contexts/SupabaseAuthContext';
 
 /**
  * Points ledger — F-017
@@ -75,7 +75,7 @@ function saveDemoLedger(rows: LedgerEntry[]) {
 }
 
 export function usePointsLedger() {
-  const { user } = useAuth();
+  const { user } = useSupabaseAuth();
   const [entries, setEntries] = useState<LedgerEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDemo, setIsDemo] = useState(false);
@@ -203,7 +203,7 @@ export function useNextMilestone(balance: number) {
  * current user's user_badges rows.
  */
 export function useUserBadges() {
-  const { user } = useAuth();
+  const { user } = useSupabaseAuth();
   const [rows, setRows] = useState<UserBadgeRow[]>([]);
   const [loading, setLoading] = useState(true);
 

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { useAuth } from './useAuth';
+import { useSupabaseAuth } from '../contexts/SupabaseAuthContext';
 
 /**
  * Daily-ritual hooks — F-003 / F-004 / F-006
@@ -49,7 +49,7 @@ function saveDemoReflections(rows: ReflectionEntry[]) {
 }
 
 export function useReflections() {
-  const { user } = useAuth();
+  const { user } = useSupabaseAuth();
   const [entries, setEntries] = useState<ReflectionEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const real = isRealUser(user?.id);
@@ -125,7 +125,7 @@ function saveDemoSymptoms(days: SymptomDay[]) {
 }
 
 export function useCycleSymptoms() {
-  const { user } = useAuth();
+  const { user } = useSupabaseAuth();
   const [days, setDays] = useState<SymptomDay[]>([]);
   const [loading, setLoading] = useState(true);
   const real = isRealUser(user?.id);
@@ -211,7 +211,7 @@ export interface ActiveProgram {
 const ACTIVE_PROGRAM_DEMO_KEY = 'neome_active_program_demo';
 
 export function useActiveProgram() {
-  const { user } = useAuth();
+  const { user } = useSupabaseAuth();
   const [program, setProgram] = useState<ActiveProgram | null>(null);
   const [loading, setLoading] = useState(true);
   const real = isRealUser(user?.id);
