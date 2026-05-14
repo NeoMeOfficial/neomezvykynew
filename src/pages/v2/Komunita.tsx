@@ -326,7 +326,23 @@ export default function Komunita() {
         <div style={{ padding: '20px 24px 18px' }}>
           <Eye style={{ marginBottom: 8 }}>Dnes v komunite</Eye>
           <div style={{ fontFamily: NM.SERIF, fontSize: 17, fontWeight: 400, color: NM.DEEP, lineHeight: 1.45, letterSpacing: '-0.005em' }}>
-            47 žien cvičilo · 89 dokončilo návyk · 23 meditovalo
+            {(() => {
+              // Pseudo-dynamic counters — deterministic per day, with a floor so
+              // the room never feels empty. Stable across all users on a given
+              // day. Will be replaced by real aggregate stats from points_ledger
+              // once volume justifies it (TODO: KOMUNITA-LIVE-STATS).
+              const today = new Date();
+              const seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+              const rand = (offset: number, min: number, max: number) => {
+                const x = Math.sin(seed + offset) * 10000;
+                const frac = x - Math.floor(x);
+                return Math.floor(min + frac * (max - min + 1));
+              };
+              const exercised = rand(1, 40, 110);
+              const habits    = rand(2, 70, 180);
+              const meditated = rand(3, 20, 60);
+              return `${exercised} žien cvičilo · ${habits} dokončilo návyk · ${meditated} meditovalo`;
+            })()}
           </div>
         </div>
       )}
