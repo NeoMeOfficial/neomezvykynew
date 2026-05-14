@@ -1,68 +1,64 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSubscription } from '../../contexts/SubscriptionContext';
+import { useExercises, DbExercise } from '../../hooks/useExercises';
 import { Page, BackHeader, Eye, Ser, Body, PlusTag, NM } from '../../components/v2/neome';
 
 /**
- * Telo · Cvičenia — R9 sectioned list
+ * Telo · Cvičenia — R9 sectioned list, now Supabase-backed.
  *
- * Body-part filter chips + duration sub-chips, then 3 sections grouped
- * by length (Krátke / Stredné / Dlhé). Each row: thumbnail w/ play
- * glyph + title + meta + Plus chip if locked.
+ * Reads from useExercises (public.exercises table). Filters by body
+ * target chips + duration band sub-chips, then groups results into
+ * three sections by duration (Krátke ≤10, Stredné 11-20, Dlhé 20+).
  *
- * FEATURE-NEEDED-TELO-EXERCISES-CATALOG: Supabase-backed exercise
- * catalog. Currently 8 hardcoded entries; admin-curated list lets
- * Gabi add/remove without redeploying.
- *
- * Old version: TeloExtra.old.tsx.
+ * Closes FEATURE-NEEDED-TELO-EXERCISES-CATALOG. Add new rows by
+ * inserting directly into public.exercises (or via the admin UI
+ * when one ships).
  */
 
 const FILTERS = ['Všetko', 'Celé telo', 'Brucho', 'Panvové dno', 'Chrbát', 'Nohy', 'Ruky'] as const;
 const DURATIONS = ['Krátke', 'Stredné', 'Dlhé'] as const;
 
-interface ExItem {
-  id: string;
-  title: string;
-  meta: string;
-  img: string;
-  locked: boolean;
-}
-
 interface ExSection {
   eye: string;
-  items: ExItem[];
+  items: DbExercise[];
 }
 
-const SECTIONS: ExSection[] = [
-  {
-    eye: 'Krátke · do 10 min',
-    items: [
-      { id: 'ranne-prebudenie', title: 'Ranné prebudenie', meta: '8 min · celé telo', img: 'lifestyle-yoga-pose.jpg', locked: false },
-      { id: 'panvove-dno-zaklad', title: 'Panvové dno · základ', meta: '6 min · jemné', img: 'program-postpartum.jpg', locked: true },
-      { id: 'aktivacia-stredu', title: 'Aktivácia stredu', meta: '10 min · stredné', img: 'lifestyle-core-workout.jpg', locked: true },
-    ],
-  },
-  {
-    eye: 'Stredné · 10–20 min',
-    items: [
-      { id: 'jemny-core', title: 'Jemný core', meta: '15 min · jemné', img: 'lifestyle-core-workout.jpg', locked: false },
-      { id: 'funkcny-trening', title: 'Funkčný tréning', meta: '18 min · stredné', img: 'program-body-forming.jpg', locked: true },
-    ],
-  },
-  {
-    eye: 'Dlhé · 20+ min',
-    items: [
-      { id: 'celotelova-tonizacia', title: 'Celotelová tonizácia', meta: '28 min · stredné', img: 'program-body-forming.jpg', locked: true },
-      { id: 'joga-pre-silu', title: 'Joga pre silu', meta: '25 min · jemné', img: 'program-hormonal.jpg', locked: true },
-    ],
-  },
+const SECTION_DEFS: { eye: string; key: typeof DURATIONS[number]; min: number; max: number }[] = [
+  { eye: 'Krátke · do 10 min', key: 'Krátke',  min: 0,  max: 10 },
+  { eye: 'Stredné · 10–20 min', key: 'Stredné', min: 11, max: 20 },
+  { eye: 'Dlhé · 20+ min',     key: 'Dlhé',    min: 21, max: 999 },
 ];
 
 export default function TeloExtra() {
   const navigate = useNavigate();
   const { isPremium } = useSubscription();
+  const { exercises, loading } = useExercises();
   const [activeFilter, setActiveFilter] = useState<string>('Všetko');
   const [activeDuration, setActiveDuration] = useState<string | null>(null);
+
+  // Skip the legacy 'strength-N' demo rows on this curated catalog
+  // surface — they're kept in the table for ExercisePlayer fallback but
+  // aren't part of the editorial library.
+  const curated = useMemo(
+    () => exercises.filter((e) => !e.id.startsWith('strength-')),
+    [exercises],
+  );
+
+  const sections: ExSection[] = useMemo(() => {
+    return SECTION_DEFS
+      .filter((s) => activeDuration === null || activeDuration === s.key)
+      .map((s) => ({
+        eye: s.eye,
+        items: curated.filter((e) => {
+          const inBand = e.duration_min >= s.min && e.duration_min <= s.max;
+          if (!inBand) return false;
+          if (activeFilter === 'Všetko') return true;
+          return e.body_target === activeFilter;
+        }),
+      }))
+      .filter((s) => s.items.length > 0);
+  }, [curated, activeFilter, activeDuration]);
 
   return (
     <Page>
@@ -133,59 +129,76 @@ export default function TeloExtra() {
         })}
       </div>
 
-      {SECTIONS.map((sec) => (
+      {loading && (
+        <div style={{ margin: '26px 18px', color: NM.MUTED, fontFamily: NM.SANS, fontSize: 13 }}>
+          Načítavam…
+        </div>
+      )}
+
+      {!loading && sections.length === 0 && (
+        <div style={{ margin: '26px 18px', color: NM.MUTED, fontFamily: NM.SANS, fontSize: 13 }}>
+          Žiadne cvičenia pre tieto filtre.
+        </div>
+      )}
+
+      {sections.map((sec) => (
         <div key={sec.eye} style={{ margin: '26px 18px 0' }}>
           <Eye size={10} color={NM.TERRA} style={{ marginBottom: 10 }}>{sec.eye}</Eye>
           <div style={{ background: '#fff', borderRadius: 18, border: `1px solid ${NM.HAIR}`, overflow: 'hidden' }}>
-            {sec.items.map((it, i, arr) => (
-              <button
-                key={it.id}
-                onClick={() => {
-                  if (it.locked && !isPremium) {
-                    navigate('/paywall');
-                  } else {
-                    navigate(`/exercise/extra/${it.id}`);
-                  }
-                }}
-                style={{
-                  all: 'unset',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  width: '100%',
-                  gap: 14,
-                  padding: '12px 14px',
-                  alignItems: 'center',
-                  borderBottom: i < arr.length - 1 ? `1px solid ${NM.HAIR}` : 'none',
-                  boxSizing: 'border-box',
-                }}
-              >
-                <div
+            {sec.items.map((it, i, arr) => {
+              const locked = !it.free;
+              const meta = `${it.duration_min} min · ${it.body_target}`;
+              return (
+                <button
+                  key={it.id}
+                  onClick={() => {
+                    if (locked && !isPremium) {
+                      navigate('/paywall');
+                    } else {
+                      navigate(`/exercise/extra/${it.id}`);
+                    }
+                  }}
                   style={{
-                    width: 60,
-                    height: 60,
-                    borderRadius: 12,
-                    flexShrink: 0,
-                    backgroundImage: `url(/images/r9/${it.img})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    position: 'relative',
+                    all: 'unset',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    width: '100%',
+                    gap: 14,
+                    padding: '12px 14px',
+                    alignItems: 'center',
+                    borderBottom: i < arr.length - 1 ? `1px solid ${NM.HAIR}` : 'none',
+                    boxSizing: 'border-box',
                   }}
                 >
-                  <div style={{ position: 'absolute', inset: 0, borderRadius: 12, background: 'rgba(42,26,20,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <div style={{ width: 24, height: 24, borderRadius: 999, background: 'rgba(255,255,255,0.92)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <svg width="8" height="9" viewBox="0 0 8 9" fill="none">
-                        <path d="M1 1v7l6-3.5L1 1z" fill={NM.DEEP} />
-                      </svg>
+                  <div
+                    style={{
+                      width: 60,
+                      height: 60,
+                      borderRadius: 12,
+                      flexShrink: 0,
+                      backgroundImage: it.thumb_url ? `url(${it.thumb_url})` : undefined,
+                      backgroundColor: it.thumb_url ? undefined : NM.HAIR,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center',
+                      position: 'relative',
+                    }}
+                  >
+                    <div style={{ position: 'absolute', inset: 0, borderRadius: 12, background: 'rgba(42,26,20,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <div style={{ width: 24, height: 24, borderRadius: 999, background: 'rgba(255,255,255,0.92)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <svg width="8" height="9" viewBox="0 0 8 9" fill="none">
+                          <path d="M1 1v7l6-3.5L1 1z" fill={NM.DEEP} />
+                        </svg>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
-                  <div style={{ fontFamily: NM.SERIF, fontSize: 15, fontWeight: 500, color: NM.DEEP, letterSpacing: '-0.005em' }}>{it.title}</div>
-                  <div style={{ fontFamily: NM.SANS, fontSize: 10.5, color: NM.EYEBROW, marginTop: 3, fontWeight: 400 }}>{it.meta}</div>
-                </div>
-                {it.locked && !isPremium ? <PlusTag /> : <div style={{ color: NM.TERTIARY, fontSize: 14 }}>›</div>}
-              </button>
-            ))}
+                  <div style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
+                    <div style={{ fontFamily: NM.SERIF, fontSize: 15, fontWeight: 500, color: NM.DEEP, letterSpacing: '-0.005em' }}>{it.name}</div>
+                    <div style={{ fontFamily: NM.SANS, fontSize: 10.5, color: NM.EYEBROW, marginTop: 3, fontWeight: 400 }}>{meta}</div>
+                  </div>
+                  {locked && !isPremium ? <PlusTag /> : <div style={{ color: NM.TERTIARY, fontSize: 14 }}>›</div>}
+                </button>
+              );
+            })}
           </div>
         </div>
       ))}
