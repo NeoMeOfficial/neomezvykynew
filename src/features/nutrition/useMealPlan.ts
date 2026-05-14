@@ -1,9 +1,11 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import type { NutritionProfile, MealPlan, DayPlan } from './types';
 import { generateMealPlan } from './mealPlanGenerator';
 import { recipes } from '../../data/recipes';
+import { syncToSupabase, loadFromSupabase } from '../supabaseSync';
 
 const STORAGE_KEY = 'neome-meal-plan';
+const SUPABASE_KEY = 'meal_plan';
 
 function loadPlan(): MealPlan | null {
   try {
@@ -19,6 +21,10 @@ function loadPlan(): MealPlan | null {
   } catch {
     return null;
   }
+}
+
+function isValidPlan(p: MealPlan | null | undefined): p is MealPlan {
+  return !!p && p.totalDays === 42 && !!p.weeks && p.weeks.length === 6;
 }
 
 function savePlan(plan: MealPlan): void {
@@ -63,14 +69,52 @@ export function useMealPlan() {
   const [plan, setPlan] = useState<MealPlan | null>(initialPlan);
   const [activeDay, setActiveDay] = useState<number>(initialDayIndex);
   const [activeWeek, setActiveWeek] = useState<number>(initialWeek);
+  const syncTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+
+  // Hydrate from Supabase in the background. If the remote plan is valid and
+  // either we have no local plan OR the local plan was generated for an older
+  // start date, accept the remote one. Fire-and-forget — silent no-op in demo.
+  useEffect(() => {
+    loadFromSupabase<MealPlan>(SUPABASE_KEY)
+      .then((remote) => {
+        if (!isValidPlan(remote)) return;
+        setPlan((current) => {
+          if (!current) return remote;
+          // Prefer remote if it starts on or after the current plan (i.e. newer).
+          const remoteStart = new Date(remote.days[0]?.date ?? 0).getTime();
+          const currentStart = new Date(current.days[0]?.date ?? 0).getTime();
+          if (remoteStart >= currentStart) {
+            savePlan(remote);
+            const todayIdx = getTodayDayIndex(remote);
+            setActiveDay(todayIdx);
+            setActiveWeek(getWeekForDay(todayIdx));
+            return remote;
+          }
+          return current;
+        });
+      })
+      .catch((err) => console.warn('Failed to hydrate meal plan from Supabase:', err));
+    // Run once on mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Debounced Supabase sync. Called whenever the local plan changes.
+  const queueSync = useCallback((p: MealPlan) => {
+    if (syncTimeoutRef.current) clearTimeout(syncTimeoutRef.current);
+    syncTimeoutRef.current = setTimeout(() => {
+      syncToSupabase(SUPABASE_KEY, p);
+    }, 500);
+  }, []);
 
   const generatePlan = useCallback((profile: NutritionProfile, startDate?: Date) => {
     const newPlan = generateMealPlan(profile, startDate);
     setPlan(newPlan);
+    savePlan(newPlan);
+    queueSync(newPlan);
     const todayIdx = getTodayDayIndex(newPlan);
     setActiveDay(todayIdx);
     setActiveWeek(getWeekForDay(todayIdx));
-  }, []);
+  }, [queueSync]);
 
   const swapMeal = useCallback((dayIndex: number, mealIndex: number) => {
     setPlan((prev) => {
@@ -95,9 +139,10 @@ export function useMealPlan() {
       day.meals[mealIndex] = meal;
       newPlan.days[dayIndex] = recalculateDayTotals(day);
       savePlan(newPlan);
+      queueSync(newPlan);
       return newPlan;
     });
-  }, []);
+  }, [queueSync]);
 
   const handleWeekChange = useCallback((weekIndex: number) => {
     setActiveWeek(weekIndex);
