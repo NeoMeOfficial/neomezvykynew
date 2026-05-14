@@ -8,6 +8,9 @@ import { useMealPlan } from '@/features/nutrition/useMealPlan';
 import { useDailyMeditation } from '@/hooks/useDailyContent';
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { useReferral } from '@/hooks/useReferral';
+import { usePointsLedger } from '@/hooks/usePointsLedger';
+import SectionEyebrow from '@/components/v2/home/SectionEyebrow';
+import UpsellBanner from '@/components/v2/home/UpsellBanner';
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 const CREAM  = '#F8F5F0';
@@ -145,7 +148,6 @@ function CardBody({ week, day, title, duration, href }: { week: number; day: num
       <div onClick={() => navigate(href)} style={{ background: WHITE, borderRadius: 20, border: `1px solid ${HAIR}`, overflow: 'hidden', cursor: 'pointer', touchAction: 'manipulation' }}>
         <div style={{ position: 'relative', aspectRatio: '16/10', background: `url(/images/r9/section-body.jpg) center/cover` }}>
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(0,0,0,0.5) 100%)', pointerEvents: 'none' }} />
-          <div style={{ position: 'absolute', top: 14, left: 16, fontSize: 9.5, letterSpacing: '0.22em', textTransform: 'uppercase' as const, fontWeight: 500, color: '#fff', pointerEvents: 'none' }}>Telo · pokračuj</div>
           <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: 54, height: 54, borderRadius: 999, background: 'rgba(255,255,255,0.95)', display: 'grid', placeItems: 'center', pointerEvents: 'none' }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill={INK}><path d="M8 5v14l11-7z"/></svg>
           </div>
@@ -177,7 +179,6 @@ function CardBodyLocked({ href, free }: { href: string; free: boolean }) {
       >
         <div style={{ position: 'relative', aspectRatio: '16/10', background: `url(/images/r9/section-body.jpg) center/cover`, filter: 'saturate(0.85)' }}>
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.6) 100%)', pointerEvents: 'none' }} />
-          <div style={{ position: 'absolute', top: 14, left: 16, fontSize: 9.5, letterSpacing: '0.22em', textTransform: 'uppercase' as const, fontWeight: 500, color: '#fff', pointerEvents: 'none' }}>Telo · navrhnutý cvik</div>
           <div style={{ position: 'absolute', bottom: 12, left: 16, right: 16, pointerEvents: 'none' }}>
             <div style={{ fontFamily: SERIF, fontSize: 18, color: '#fff', lineHeight: 1.2 }}>Ranná energia · 12 min</div>
             <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.8)', marginTop: 2 }}>Rýchly štart na dnešok</div>
@@ -194,19 +195,6 @@ function CardBodyLocked({ href, free }: { href: string; free: boolean }) {
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={TELO} strokeWidth="2" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
           </div>
         </div>
-        {/* Upsell strip — free users only */}
-        {free && (
-          <button
-            onClick={(e) => { e.stopPropagation(); navigate('/paywall'); }}
-            style={{ all: 'unset', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, width: '100%', boxSizing: 'border-box', padding: '12px 16px', background: `rgba(107,76,59,0.07)`, borderTop: `1px solid rgba(107,76,59,0.10)` }}
-          >
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 11, fontWeight: 500, color: TELO, letterSpacing: '0.01em' }}>NeoMe Plus · Programy</div>
-              <div style={{ fontSize: 10.5, color: FG2, fontWeight: 300, marginTop: 1 }}>BodyForming, Postpartum, Pohybový začiatok a ďalšie.</div>
-            </div>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={TELO} strokeWidth="2" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
-          </button>
-        )}
       </div>
     </div>
   );
@@ -225,10 +213,7 @@ function CardNutrition({ href }: { href: string }) {
       <div style={{ background: WHITE, borderRadius: 20, border: `1px solid ${HAIR}`, overflow: 'hidden' }}>
         <div style={{ height: 110, position: 'relative', background: `url(/images/r9/section-nutrition.jpg) center/cover` }}>
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.55) 100%)' }} />
-          <div style={{ position: 'absolute', top: 14, left: 16, right: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-            <div style={{ fontSize: 9.5, letterSpacing: '0.22em', textTransform: 'uppercase' as const, fontWeight: 500, color: '#fff' }}>Jedálniček · dnes</div>
-            <div style={{ fontSize: 10, color: '#fff', opacity: 0.85, fontWeight: 500 }}>1 620 kcal</div>
-          </div>
+          <div style={{ position: 'absolute', top: 14, right: 16, fontSize: 10, color: '#fff', opacity: 0.85, fontWeight: 500 }}>1 620 kcal</div>
           <div style={{ position: 'absolute', bottom: 12, left: 16, fontFamily: SERIF, fontSize: 18, color: '#fff' }}>Dnešné jedlá</div>
         </div>
         <div style={{ padding: '6px 16px 14px' }}>
@@ -261,7 +246,6 @@ function CardRecipeOnly({ href }: { href: string }) {
       <div onClick={() => navigate(href)} style={{ background: WHITE, borderRadius: 20, border: `1px solid ${HAIR}`, overflow: 'hidden', cursor: 'pointer' }}>
         <div style={{ height: 130, position: 'relative', background: `url(/images/r9/testimonial-recipe.jpg) center/cover` }}>
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.55) 100%)' }} />
-          <div style={{ position: 'absolute', top: 14, left: 16, fontSize: 9.5, letterSpacing: '0.22em', textTransform: 'uppercase' as const, fontWeight: 500, color: '#fff' }}>Výživa · recept dňa</div>
           <div style={{ position: 'absolute', bottom: 12, left: 16, right: 16 }}>
             <div style={{ fontFamily: SERIF, fontSize: 19, color: '#fff', lineHeight: 1.2 }}>Buddha bowl s batátou</div>
             <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.85)', marginTop: 3, display: 'flex', gap: 10, letterSpacing: '0.08em', textTransform: 'uppercase' as const, fontWeight: 500 }}>
@@ -273,19 +257,6 @@ function CardRecipeOnly({ href }: { href: string }) {
           <button onClick={() => navigate(href)} style={{ background: 'transparent', border: 0, padding: 0, cursor: 'pointer', fontSize: 12, fontWeight: 500, color: STRAVA, display: 'flex', alignItems: 'center', gap: 6 }}>
             Otvoriť recept
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={STRAVA} strokeWidth="2" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
-          </button>
-          {/* Tappable meal plan upsell — full row clickable */}
-          <button
-            onClick={(e) => { e.stopPropagation(); navigate('/jedalnicek-promo'); }}
-            style={{ marginTop: 14, width: '100%', padding: '12px 14px', borderRadius: 14, background: 'rgba(122,158,120,0.10)', border: `1px solid rgba(122,158,120,0.32)`, display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', textAlign: 'left' as const }}
-          >
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 11.5, color: INK, fontWeight: 500, letterSpacing: '0.04em' }}>Plánuj celý týždeň</div>
-              <div style={{ fontSize: 11, color: FG2, marginTop: 2, fontWeight: 300, lineHeight: 1.4 }}>Personalizovaný jedálniček, nákupný zoznam, Gabine recepty.</div>
-            </div>
-            <div style={{ background: STRAVA, color: '#fff', padding: '8px 14px', borderRadius: 999, fontSize: 11, fontWeight: 500, whiteSpace: 'nowrap' as const, flexShrink: 0 }}>
-              +57 €
-            </div>
           </button>
         </div>
       </div>
@@ -301,7 +272,6 @@ function CardNutritionFree({ href }: { href: string }) {
       <div onClick={() => navigate(href)} style={{ background: WHITE, borderRadius: 20, border: `1px solid ${HAIR}`, overflow: 'hidden', cursor: 'pointer' }}>
         <div style={{ height: 110, position: 'relative', background: `url(/images/r9/section-nutrition.jpg) center/cover` }}>
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.5) 100%)' }} />
-          <div style={{ position: 'absolute', top: 14, left: 16, fontSize: 9.5, letterSpacing: '0.22em', textTransform: 'uppercase' as const, fontWeight: 500, color: '#fff' }}>Výživa · z knižnice</div>
           <div style={{ position: 'absolute', bottom: 12, left: 16, fontFamily: SERIF, fontSize: 18, color: '#fff' }}>3 voľné recepty od Gabi</div>
         </div>
         <div style={{ padding: 16 }}>
@@ -313,7 +283,7 @@ function CardNutritionFree({ href }: { href: string }) {
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={STRAVA} strokeWidth="2" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
           </button>
         </div>
-        {/* Upsell strip */}
+        {/* Upsell strip (kept for free users — points back to /paywall) */}
         <button
           onClick={(e) => { e.stopPropagation(); navigate('/paywall'); }}
           style={{ all: 'unset', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, width: '100%', boxSizing: 'border-box', padding: '12px 16px', background: 'rgba(122,158,120,0.08)', borderTop: `1px solid rgba(122,158,120,0.18)` }}
@@ -337,7 +307,6 @@ function CardMindset({ title, subtitle, href }: { title: string; subtitle: strin
       <div style={{ background: WHITE, borderRadius: 20, border: `1px solid ${HAIR}`, overflow: 'hidden' }}>
         <div style={{ height: 130, position: 'relative', background: `url(/images/r9/testimonial-meditation.jpg) center/cover` }}>
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.45) 100%)' }} />
-          <div style={{ position: 'absolute', top: 14, left: 16, fontSize: 9.5, letterSpacing: '0.22em', textTransform: 'uppercase' as const, fontWeight: 500, color: '#fff' }}>Myseľ · meditácia dňa</div>
         </div>
         <div style={{ padding: 18 }}>
           <div style={{ fontFamily: SERIF, fontSize: 20, lineHeight: 1.2, color: INK }}>{title}</div>
@@ -367,10 +336,9 @@ function CardHabits({ free, onAddHabit }: { free: boolean; onAddHabit: () => voi
       <div style={{ background: WHITE, borderRadius: 20, border: `1px solid ${HAIR}`, overflow: 'hidden' }}>
         <div style={{ height: 100, position: 'relative', background: `url(/images/r9/lifestyle-yoga-pose.jpg) center/cover` }}>
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.5) 100%)' }} />
-          <div style={{ position: 'absolute', top: 14, left: 16, right: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ fontSize: 9.5, letterSpacing: '0.22em', textTransform: 'uppercase' as const, fontWeight: 500, color: '#fff' }}>Návyky · {done} z {habits.length}</div>
-            {free && <div style={{ fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase' as const, color: 'rgba(255,255,255,0.85)', fontWeight: 500, fontStyle: 'italic' }}>neukladá sa</div>}
-          </div>
+          {free && (
+            <div style={{ position: 'absolute', top: 14, right: 16, fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase' as const, color: 'rgba(255,255,255,0.85)', fontWeight: 500, fontStyle: 'italic' }}>neukladá sa</div>
+          )}
           <div style={{ position: 'absolute', bottom: 12, left: 16, fontFamily: SERIF, fontSize: 18, color: '#fff' }}>Malé kroky, veľký rozdiel</div>
         </div>
         <div style={{ padding: '6px 16px 10px' }}>
@@ -408,11 +376,9 @@ function CardReflections({ free, onOpen }: { free: boolean; onOpen: () => void }
       <div style={{ background: WHITE, borderRadius: 20, border: `1px solid ${HAIR}`, overflow: 'hidden', cursor: 'pointer' }} onClick={onOpen}>
         <div style={{ height: 110, position: 'relative', background: `url(/images/r9/section-diary.jpg) center/cover` }}>
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.5) 100%)' }} />
-          <div style={{ position: 'absolute', top: 14, left: 16, right: 16, display: 'flex', justifyContent: 'space-between' }}>
-            <div style={{ fontSize: 9.5, letterSpacing: '0.22em', textTransform: 'uppercase' as const, fontWeight: 500, color: '#fff' }}>
-              Dnešné zamyslenie {free && <span style={{ fontStyle: 'italic', opacity: 0.85, marginLeft: 8 }}>· neukladá sa</span>}
-            </div>
-          </div>
+          {free && (
+            <div style={{ position: 'absolute', top: 14, right: 16, fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase' as const, color: 'rgba(255,255,255,0.85)', fontWeight: 500, fontStyle: 'italic' }}>neukladá sa</div>
+          )}
           <div style={{ position: 'absolute', bottom: 12, left: 16, right: 16, fontFamily: SERIF, fontSize: 18, color: '#fff', lineHeight: 1.25 }}>Čo ti dnes dalo najviac energie?</div>
         </div>
         <div style={{ padding: 18 }}>
@@ -440,10 +406,7 @@ function CardCyklus({ day, total, phaseName, note }: { day: number; total: numbe
       <div style={{ background: WHITE, borderRadius: 22, border: `1px solid ${HAIR}`, overflow: 'hidden' }}>
         <div style={{ height: 130, position: 'relative', background: `url(/images/r9/section-period.jpg) center/cover` }}>
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.55) 100%)' }} />
-          <div style={{ position: 'absolute', top: 14, left: 16, right: 16, display: 'flex', justifyContent: 'space-between' }}>
-            <div style={{ fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase' as const, fontWeight: 500, color: '#fff' }}>Cyklus</div>
-            <div style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.85)' }}>Deň {day} / {total}</div>
-          </div>
+          <div style={{ position: 'absolute', top: 14, right: 16, fontSize: 10.5, color: 'rgba(255,255,255,0.85)' }}>Deň {day} / {total}</div>
           <div style={{ position: 'absolute', bottom: 12, left: 16, right: 16, display: 'flex', alignItems: 'flex-end', gap: 10 }}>
             <div style={{ fontFamily: SERIF, fontSize: 56, lineHeight: 0.9, color: '#fff', fontWeight: 500, letterSpacing: '-0.04em' }}>{day}</div>
             <div style={{ paddingBottom: 4 }}>
@@ -483,7 +446,6 @@ function CardCyklusSetup() {
       <div style={{ background: WHITE, borderRadius: 22, border: `1px solid ${HAIR}`, overflow: 'hidden' }}>
         <div style={{ height: 110, position: 'relative', background: `url(/images/r9/section-period.jpg) center/cover`, filter: 'saturate(0.9)' }}>
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.55) 100%)' }} />
-          <div style={{ position: 'absolute', top: 14, left: 16, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase' as const, fontWeight: 500, color: '#fff' }}>Cyklus · zatiaľ vypnuté</div>
           <div style={{ position: 'absolute', bottom: 12, left: 16, right: 16, fontFamily: SERIF, fontSize: 19, fontStyle: 'italic', color: '#fff', lineHeight: 1.2 }}>Trénuj v rytme svojho tela</div>
         </div>
         <div style={{ padding: 18 }}>
@@ -506,7 +468,6 @@ function CardCyklusFree() {
       <div style={{ background: WHITE, borderRadius: 22, border: `1px solid ${HAIR}`, overflow: 'hidden' }}>
         <div style={{ height: 110, position: 'relative', background: `url(/images/r9/section-period.jpg) center/cover` }}>
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.55) 100%)' }} />
-          <div style={{ position: 'absolute', top: 14, left: 16, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase' as const, fontWeight: 500, color: '#fff' }}>Cyklus</div>
           <div style={{ position: 'absolute', bottom: 12, left: 16, fontFamily: SERIF, fontSize: 19, color: '#fff', lineHeight: 1.2 }}>Tvoj rytmus, zaznamenaný</div>
         </div>
         <div style={{ padding: 16 }}>
@@ -529,13 +490,10 @@ function CardCommunity() {
   return (
     <div style={{ padding: '0 18px', marginBottom: 12 }}>
       <div style={{ background: WHITE, borderRadius: 20, border: `1px solid ${HAIR}`, overflow: 'hidden' }}>
-        <div style={{ padding: '14px 16px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ fontSize: 9.5, letterSpacing: '0.22em', textTransform: 'uppercase' as const, fontWeight: 500, color: FG3 }}>
-            Komunita · <span style={{ color: GOLD }}>vybrala Gabi</span>
-          </div>
+        <div style={{ padding: '14px 16px 0', display: 'flex', justifyContent: 'flex-end' }}>
           <div style={{ fontSize: 10, color: FG3, letterSpacing: '0.06em' }}>pred 2 h</div>
         </div>
-        <div style={{ padding: '10px 16px 14px' }}>
+        <div style={{ padding: '4px 16px 14px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
             <div style={{ width: 36, height: 36, borderRadius: 999, background: `url(/images/r9/testimonial-anna.jpg) center/cover`, flexShrink: 0 }} />
             <div style={{ flex: 1, minWidth: 0 }}>
@@ -954,6 +912,7 @@ function AddHabitSheet({ onClose }: { onClose: () => void }) {
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function DomovNew() {
+  const navigate = useNavigate();
   const [showDiary,     setShowDiary]     = useState(false);
   const [showPointsInfo, setShowPointsInfo] = useState(false);
   const user = useUser();
@@ -963,14 +922,13 @@ export default function DomovNew() {
   const { meditation } = useDailyMeditation();
   const { profile } = useSupabaseAuth();
   const { referralCode } = useReferral();
+  const { balance: points } = usePointsLedger();
 
   const isPlus    = user.tier === 'plus';
   const hasCycle  = isPlus && user.hasCycleData;
   const hasMealPlan = isPlus && user.hasMealPlan;
   const code = referralCode?.code ?? 'NEOME';
   const streakDays = getDaysSince((profile as any)?.created_at);
-  const storedPoints = user?.id ? localStorage.getItem(`neome_points_${user.id}`) : null;
-  const points = storedPoints ? parseInt(storedPoints, 10) : 0;
 
   const meditationTitle = meditation?.title ?? 'Ranný pokoj';
   const meditationSub   = meditation?.category ?? 'Krátka ranná meditácia na uzemnenie pred dňom.';
@@ -989,9 +947,8 @@ export default function DomovNew() {
 
       <WeekCalendar />
 
-      <SectionHeader>Dnes</SectionHeader>
-
       {/* Telo */}
+      <SectionEyebrow color={TELO}>Telo · rýchly štart na dnes</SectionEyebrow>
       {isPlus && userProgram ? (
         <CardBody
           week={userProgram.week}
@@ -1003,8 +960,17 @@ export default function DomovNew() {
       ) : (
         <CardBodyLocked href={isPlus ? '/kniznica/telo/programy' : '/paywall'} free={!isPlus} />
       )}
+      <UpsellBanner
+        color={TELO}
+        eyebrow="Plus · Programy"
+        title="Pridaj sa k programu"
+        sub="8-týždňová cesta s Gabi · krok za krokom."
+        cta="Pozrieť"
+        onClick={() => navigate('/paywall')}
+      />
 
-      {/* Strava */}
+      {/* Výživa */}
+      <SectionEyebrow color={STRAVA}>Výživa · dnes</SectionEyebrow>
       {hasMealPlan ? (
         <CardNutrition href="/jedalnicek" />
       ) : isPlus ? (
@@ -1012,18 +978,24 @@ export default function DomovNew() {
       ) : (
         <CardNutritionFree href="/kniznica/strava" />
       )}
+      {!hasMealPlan && (
+        <UpsellBanner
+          color={STRAVA}
+          eyebrow="Doplnok · Jedálniček"
+          title="Naplánuj celý týždeň"
+          sub="Jedlá na mieru + nákupný zoznam."
+          cta="Pridať"
+          price="57 €"
+          onClick={() => navigate('/jedalnicek-promo')}
+        />
+      )}
 
       {/* Myseľ */}
+      <SectionEyebrow color={MYSEL}>Myseľ</SectionEyebrow>
       <CardMindset title={meditationTitle} subtitle={meditationSub} href="/meditacie" />
 
-      {/* Návyky */}
-      <CardHabits free={!isPlus} onAddHabit={() => navigate('/navyky/new')} />
-
-      {/* Reflexie */}
-      <CardReflections free={!isPlus} onOpen={() => setShowDiary(true)} />
-
-      {/* Cyklus */}
-      <SectionHeader right={new Date().toLocaleString('sk', { month: 'long' })}>Tento týždeň</SectionHeader>
+      {/* Periodka */}
+      <SectionEyebrow color={CYKLUS}>Periodka</SectionEyebrow>
       {hasCycle && cycle ? (
         <CardCyklus day={cycle.dayOfCycle} total={cycle.totalDays} phaseName={cycle.phaseName} note={cycle.note} />
       ) : isPlus ? (
@@ -1032,7 +1004,19 @@ export default function DomovNew() {
         <CardCyklusFree />
       )}
 
-      <SectionHeader>Z komunity</SectionHeader>
+      {/* Návyky */}
+      <SectionEyebrow color={GOLD}>Návyky</SectionEyebrow>
+      <CardHabits free={!isPlus} onAddHabit={() => navigate('/navyky/new')} />
+
+      {/* Denník */}
+      <SectionEyebrow color={GOLD}>Denník</SectionEyebrow>
+      <CardReflections free={!isPlus} onOpen={() => setShowDiary(true)} />
+
+      {/* Komunita divider — plain, no bullet (visual separator between personal and community sections) */}
+      <div style={{ padding: '0 22px', margin: '32px 0 0', fontSize: 10.5, letterSpacing: '0.24em', textTransform: 'uppercase' as const, fontWeight: 500, color: FG3, fontFamily: SANS }}>Komunita</div>
+
+      {/* Vybrala Gabi */}
+      <SectionEyebrow color={TELO}>Vybrala Gabi</SectionEyebrow>
       <CardCommunity />
 
       {/* Subscription upsell for free users; referral only for Plus */}
