@@ -1,87 +1,131 @@
-import { useState, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { NM } from '../../components/v2/neome';
 import { useAchievements } from '../../hooks/useAchievements';
+import { useMeditation } from '../../hooks/useMeditations';
 
 /**
- * Meditation player — R3 ambient
+ * Meditation player — real HTML5 audio backed by the `meditations` table.
  *
- * Dark warm gradient with two soft orbs, serif title centered, fake
- * waveform with progress, time labels, transport controls, ambient
- * sound toggle row.
+ * Resolves the meditation by slug from useMeditation(:meditationId).
  *
- * FEATURE-NEEDED-MYSEL-AUDIO-PLAYER: real audio playback. The design
- * shows transport (play/skip/±15s) and a live waveform; the live app
- * has SecureVideoService but no audio-meditation pipeline. Build:
- *   - Storage bucket for meditation audio (signed URLs)
- *   - <audio> element + useState for playing/time
- *   - Update waveform via animationframe based on currentTime
- *   - Persist 'last position' per meditation in user_progress table
- * Currently the controls are static affordances.
+ * When meditation.audio_url is present: renders a real <audio> element,
+ * binds play/pause/seek to standard transport, and drives the waveform
+ * + time display from currentTime. When audio_url is null (audio file
+ * not yet uploaded for this slug), falls back to the previous visual-
+ * only stub with an inline "Audio dostupné čoskoro" notice so the page
+ * still renders gracefully.
  *
- * FEATURE-NEEDED-MYSEL-AMBIENT-MIX: ambient-sound layering (rain,
- * ocean, etc.) on top of the guided audio. Needs a separate buffer
- * per ambient track + volume mix UI.
+ * Completion (via the Dokončiť meditáciu button) records an achievement
+ * but no longer awards points — per product decision; points were
+ * removable via free-tier replay farming.
  *
- * Old version: MeditationPlayer.old.tsx.
+ * Mounted at /meditacia/:meditationId.
  */
-
-const MEDITATIONS: Record<string, { title: string; eyebrow: string; subtitle: string; durationSec: number }> = {
-  'rann-pokoj': {
-    title: 'Ticho pred dňom',
-    eyebrow: 'Ranná meditácia',
-    subtitle: '10-minútové ranné stíšenie s Gabi. Zamestnaj dych, nechaj myseľ spomaliť.',
-    durationSec: 600,
-  },
-  upokojenie: {
-    title: 'Upokojenie úzkosti',
-    eyebrow: 'Emócie',
-    subtitle: '12 minút na uzemnenie keď cítiš nepokoj. Postupné uvedomenie tela a dychu.',
-    durationSec: 720,
-  },
-  spanok: {
-    title: 'Dych pre spánok',
-    eyebrow: 'Večer',
-    subtitle: '15 minút pomalého dychu pre prechod do spánku.',
-    durationSec: 900,
-  },
-  prijatie: {
-    title: 'Prijatie tela',
-    eyebrow: 'Telo',
-    subtitle: '8 minút body-scan praxe.',
-    durationSec: 480,
-  },
-};
 
 const HEIGHTS = [20, 10, 28, 16, 32, 22, 14, 30, 18, 26, 12, 34, 20];
 
 function fmtTime(s: number): string {
+  if (!Number.isFinite(s) || s < 0) s = 0;
   const m = Math.floor(s / 60);
-  const sec = s % 60;
+  const sec = Math.floor(s % 60);
   return `${m}:${sec.toString().padStart(2, '0')}`;
 }
 
 export default function MeditationPlayer() {
   const navigate = useNavigate();
   const { meditationId } = useParams<{ meditationId: string }>();
-  const m = (meditationId && MEDITATIONS[meditationId]) || MEDITATIONS['rann-pokoj'];
+  const { meditation, loading } = useMeditation(meditationId);
   const { addActivity } = useAchievements();
+
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const completedRef = useRef(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentSec, setCurrentSec] = useState(0);
+  const [durationSec, setDurationSec] = useState(0);
+
+  // Reset transport when the meditation changes.
+  useEffect(() => {
+    setIsPlaying(false);
+    setCurrentSec(0);
+    if (meditation) setDurationSec(meditation.duration_sec);
+  }, [meditation?.id]);
+
+  // Wire audio events when the element + url exist.
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const onTime = () => setCurrentSec(audio.currentTime);
+    const onMeta = () => {
+      if (audio.duration && Number.isFinite(audio.duration)) {
+        setDurationSec(audio.duration);
+      }
+    };
+    const onEnd = () => setIsPlaying(false);
+
+    audio.addEventListener('timeupdate', onTime);
+    audio.addEventListener('loadedmetadata', onMeta);
+    audio.addEventListener('ended', onEnd);
+    return () => {
+      audio.removeEventListener('timeupdate', onTime);
+      audio.removeEventListener('loadedmetadata', onMeta);
+      audio.removeEventListener('ended', onEnd);
+    };
+  }, [meditation?.audio_url]);
+
+  const handlePlayPause = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (audio.paused) {
+      audio.play().then(() => setIsPlaying(true)).catch((err) => {
+        console.warn('Audio play failed:', err);
+      });
+    } else {
+      audio.pause();
+      setIsPlaying(false);
+    }
+  };
+
+  const seekRelative = (delta: number) => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.currentTime = Math.max(0, Math.min(audio.duration || durationSec, audio.currentTime + delta));
+  };
 
   function handleComplete() {
     if (!completedRef.current) {
       completedRef.current = true;
-      // Achievement tracking only — no points awarded for meditation
-      // (would otherwise be farmable via free-tier playback).
       addActivity('meditation_complete', { ref_id: meditationId, ref_type: 'meditation' });
     }
     navigate(-1);
   }
 
-  // FEATURE-NEEDED-MYSEL-AUDIO-PLAYER — currently fake state for visual only
-  const [playedSec] = useState(222); // 3:42 — matches design
-  const remaining = m.durationSec - playedSec;
-  const playedRatio = playedSec / m.durationSec;
+  if (loading) {
+    return (
+      <div style={{ minHeight: '100vh', background: NM.DEEP_2, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: NM.SANS }}>
+        <div>Načítavam meditáciu…</div>
+      </div>
+    );
+  }
+
+  if (!meditation) {
+    return (
+      <div style={{ minHeight: '100vh', background: NM.DEEP_2, color: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14, fontFamily: NM.SANS, padding: '0 32px', textAlign: 'center' }}>
+        <div>Meditácia sa nenašla.</div>
+        <button
+          onClick={() => navigate(-1)}
+          style={{ all: 'unset', cursor: 'pointer', padding: '10px 18px', borderRadius: 999, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.20)' }}
+        >
+          Späť
+        </button>
+      </div>
+    );
+  }
+
+  const hasAudio = !!meditation.audio_url;
+  const remaining = Math.max(0, durationSec - currentSec);
+  const playedRatio = durationSec > 0 ? currentSec / durationSec : 0;
   const totalBars = 48;
   const playedBars = Math.floor(totalBars * playedRatio);
 
@@ -95,6 +139,10 @@ export default function MeditationPlayer() {
         fontFamily: NM.SANS,
       }}
     >
+      {hasAudio && (
+        <audio ref={audioRef} src={meditation.audio_url!} preload="metadata" />
+      )}
+
       <div
         style={{
           position: 'absolute',
@@ -148,15 +196,19 @@ export default function MeditationPlayer() {
 
       <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', minHeight: 'calc(100vh - 100px)', padding: '0 28px 32px', boxSizing: 'border-box' }}>
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
-          <div style={{ fontFamily: NM.SANS, fontSize: 10, letterSpacing: '0.28em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)', marginBottom: 18 }}>
-            {m.eyebrow}
-          </div>
+          {meditation.eyebrow && (
+            <div style={{ fontFamily: NM.SANS, fontSize: 10, letterSpacing: '0.28em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)', marginBottom: 18 }}>
+              {meditation.eyebrow}
+            </div>
+          )}
           <div style={{ fontFamily: NM.SERIF, fontSize: 42, fontWeight: 400, color: '#fff', letterSpacing: '-0.015em', lineHeight: 1.05, marginBottom: 16 }}>
-            {m.title}
+            {meditation.title}
           </div>
-          <div style={{ fontFamily: NM.SANS, fontSize: 13, color: 'rgba(255,255,255,0.65)', lineHeight: 1.5, maxWidth: 280, margin: '0 auto' }}>
-            {m.subtitle}
-          </div>
+          {meditation.subtitle && (
+            <div style={{ fontFamily: NM.SANS, fontSize: 13, color: 'rgba(255,255,255,0.65)', lineHeight: 1.5, maxWidth: 280, margin: '0 auto' }}>
+              {meditation.subtitle}
+            </div>
+          )}
         </div>
 
         <div style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 3, justifyContent: 'center', height: 40, marginBottom: 14 }}>
@@ -170,60 +222,51 @@ export default function MeditationPlayer() {
         </div>
 
         <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', fontFamily: NM.SANS, fontSize: 11, color: 'rgba(255,255,255,0.6)', fontVariantNumeric: 'tabular-nums', marginBottom: 28 }}>
-          <span>{fmtTime(playedSec)}</span>
+          <span>{fmtTime(currentSec)}</span>
           <span>−{fmtTime(remaining)}</span>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 22, marginBottom: 22 }}>
-          <button aria-label="Predošlá" style={{ all: 'unset', cursor: 'pointer', padding: 8 }}>
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <path d="M12 4L6 10l6 6M15 4v12" stroke="#fff" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
-          <button aria-label="O 15 sekúnd späť" style={{ all: 'unset', cursor: 'pointer', border: '1px solid rgba(255,255,255,0.35)', padding: '10px 14px', borderRadius: 999, color: '#fff', fontFamily: NM.SANS, fontSize: 12 }}>
+          <button
+            aria-label="O 15 sekúnd späť"
+            onClick={() => seekRelative(-15)}
+            disabled={!hasAudio}
+            style={{ all: 'unset', cursor: hasAudio ? 'pointer' : 'not-allowed', border: '1px solid rgba(255,255,255,0.35)', padding: '10px 14px', borderRadius: 999, color: '#fff', fontFamily: NM.SANS, fontSize: 12, opacity: hasAudio ? 1 : 0.4 }}
+          >
             −15s
           </button>
-          <button aria-label="Pauza / prehrať" style={{ all: 'unset', cursor: 'pointer', background: '#fff', width: 72, height: 72, borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-              <rect x="6" y="4" width="3" height="14" rx="1" fill={NM.DEEP} />
-              <rect x="13" y="4" width="3" height="14" rx="1" fill={NM.DEEP} />
-            </svg>
+          <button
+            aria-label={isPlaying ? 'Pauza' : 'Prehrať'}
+            onClick={handlePlayPause}
+            disabled={!hasAudio}
+            style={{ all: 'unset', cursor: hasAudio ? 'pointer' : 'not-allowed', background: '#fff', width: 72, height: 72, borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: hasAudio ? 1 : 0.5 }}
+          >
+            {isPlaying ? (
+              <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+                <rect x="6" y="4" width="3" height="14" rx="1" fill={NM.DEEP} />
+                <rect x="13" y="4" width="3" height="14" rx="1" fill={NM.DEEP} />
+              </svg>
+            ) : (
+              <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+                <path d="M7 4l11 7-11 7V4z" fill={NM.DEEP} />
+              </svg>
+            )}
           </button>
-          <button aria-label="O 15 sekúnd dopredu" style={{ all: 'unset', cursor: 'pointer', border: '1px solid rgba(255,255,255,0.35)', padding: '10px 14px', borderRadius: 999, color: '#fff', fontFamily: NM.SANS, fontSize: 12 }}>
+          <button
+            aria-label="O 15 sekúnd dopredu"
+            onClick={() => seekRelative(15)}
+            disabled={!hasAudio}
+            style={{ all: 'unset', cursor: hasAudio ? 'pointer' : 'not-allowed', border: '1px solid rgba(255,255,255,0.35)', padding: '10px 14px', borderRadius: 999, color: '#fff', fontFamily: NM.SANS, fontSize: 12, opacity: hasAudio ? 1 : 0.4 }}
+          >
             +15s
-          </button>
-          <button aria-label="Ďalšia" style={{ all: 'unset', cursor: 'pointer', padding: 8 }}>
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <path d="M8 4l6 6-6 6M5 4v12" stroke="#fff" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
           </button>
         </div>
 
-        <div
-          style={{
-            width: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '12px 16px',
-            background: 'rgba(255,255,255,0.08)',
-            borderRadius: 999,
-            border: '1px solid rgba(255,255,255,0.12)',
-            backdropFilter: 'blur(10px)',
-            marginBottom: 12,
-            boxSizing: 'border-box',
-          }}
-        >
-          <div style={{ fontFamily: NM.SANS, fontSize: 11, color: 'rgba(255,255,255,0.75)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
-            Ambientný zvuk
+        {!hasAudio && (
+          <div style={{ marginBottom: 18, padding: '10px 16px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.18)', borderRadius: 14, fontFamily: NM.SANS, fontSize: 12, color: 'rgba(255,255,255,0.75)', textAlign: 'center' }}>
+            Audio nahrávka pre túto meditáciu sa pripravuje.
           </div>
-          <div style={{ fontFamily: NM.SANS, fontSize: 12, color: '#fff', display: 'flex', alignItems: 'center', gap: 6 }}>
-            Jemný dážď
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-              <path d="M2 3l3 3 3-3" stroke="rgba(255,255,255,0.6)" strokeWidth="1.3" strokeLinecap="round" />
-            </svg>
-          </div>
-        </div>
+        )}
 
         {/* Complete button */}
         <button
@@ -247,7 +290,7 @@ export default function MeditationPlayer() {
             boxSizing: 'border-box',
           }}
         >
-          Dokončiť meditáciu · +8 bodov
+          Dokončiť meditáciu
         </button>
       </div>
     </div>
