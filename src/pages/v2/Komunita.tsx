@@ -208,6 +208,7 @@ export default function Komunita() {
   const { addEntry } = usePointsLedger();
   const { posts, likedIds, toggleLike } = useCommunityPosts();
   const [followedIds, setFollowedIds] = useState<Set<string>>(loadFollowed);
+  const [activeTab, setActiveTab] = useState<'posts' | 'following' | 'disc'>('posts');
 
   const handleToggleLike = (postId: string) => {
     const wasLiked = likedIds.has(postId);
@@ -247,9 +248,11 @@ export default function Komunita() {
     isQuestion: p.type === 'question',
   }));
 
-  // "Najviac rezonovalo dnes" — top 2 by likes
+  // "Najviac rezonovalo dnes" — top 2 by likes (only shown on Príspevky tab)
   const resonated = [...display].sort((a, b) => b.likes - a.likes).slice(0, 2);
-  const feed = display;
+  const feed = activeTab === 'following'
+    ? display.filter((p) => followedIds.has(p.id))
+    : display;
 
   return (
     <Page>
@@ -273,36 +276,44 @@ export default function Komunita() {
       </div>
 
       <div style={{ padding: '0 24px 6px', display: 'flex', gap: 22, borderBottom: `1px solid ${NM.HAIR}` }}>
-        {[
-          { k: 'posts', label: 'Príspevky', active: true },
-          { k: 'following', label: 'Sledujem', active: false },
-          { k: 'disc', label: 'Zľavy partnerov', active: false },
-        ].map((t) => (
-          <div
-            key={t.k}
-            style={{
-              padding: '10px 0 14px',
-              fontFamily: NM.SANS,
-              fontSize: 13,
-              fontWeight: t.active ? 500 : 300,
-              color: t.active ? NM.DEEP : NM.TERTIARY,
-              borderBottom: t.active ? `1.5px solid ${NM.DEEP}` : '1.5px solid transparent',
-              marginBottom: -1,
-              cursor: 'pointer',
-            }}
-          >
-            {t.label}
+        {([
+          { k: 'posts', label: 'Príspevky' },
+          { k: 'following', label: 'Sledujem' },
+          { k: 'disc', label: 'Zľavy partnerov' },
+        ] as const).map((t) => {
+          const active = activeTab === t.k;
+          return (
+            <button
+              key={t.k}
+              onClick={() => setActiveTab(t.k)}
+              style={{
+                all: 'unset',
+                padding: '10px 0 14px',
+                fontFamily: NM.SANS,
+                fontSize: 13,
+                fontWeight: active ? 500 : 300,
+                color: active ? NM.DEEP : NM.TERTIARY,
+                borderBottom: active ? `1.5px solid ${NM.DEEP}` : '1.5px solid transparent',
+                marginBottom: -1,
+                cursor: 'pointer',
+              }}
+            >
+              {t.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {activeTab === 'posts' && (
+        <div style={{ padding: '20px 24px 18px' }}>
+          <Eye style={{ marginBottom: 8 }}>Dnes v komunite</Eye>
+          <div style={{ fontFamily: NM.SERIF, fontSize: 17, fontWeight: 400, color: NM.DEEP, lineHeight: 1.45, letterSpacing: '-0.005em' }}>
+            47 žien cvičilo · 89 dokončilo návyk · 23 meditovalo
           </div>
-        ))}
-      </div>
-
-      <div style={{ padding: '20px 24px 18px' }}>
-        <Eye style={{ marginBottom: 8 }}>Dnes v komunite</Eye>
-        <div style={{ fontFamily: NM.SERIF, fontSize: 17, fontWeight: 400, color: NM.DEEP, lineHeight: 1.45, letterSpacing: '-0.005em' }}>
-          47 žien cvičilo · 89 dokončilo návyk · 23 meditovalo
         </div>
-      </div>
+      )}
 
+      {activeTab === 'posts' && (
       <div style={{ padding: '0 24px 24px' }}>
         <Eye color={NM.GOLD} style={{ marginBottom: 14 }}>Najviac rezonovalo dnes</Eye>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -339,7 +350,9 @@ export default function Komunita() {
           ))}
         </div>
       </div>
+      )}
 
+      {activeTab === 'posts' && (
       <div style={{ padding: '0 24px 26px' }}>
         <button
           onClick={() => navigate('/komunita/new')}
@@ -366,12 +379,28 @@ export default function Komunita() {
           </div>
         </button>
       </div>
+      )}
 
-      <div style={{ padding: '0 24px 10px' }}>
-        <Eye>Novinky</Eye>
-      </div>
+      {activeTab === 'posts' && (
+        <div style={{ padding: '0 24px 10px' }}>
+          <Eye>Novinky</Eye>
+        </div>
+      )}
 
-      {feed.map((p) => (
+      {activeTab === 'following' && feed.length === 0 && (
+        <div style={{ padding: '40px 24px 32px', textAlign: 'center' }}>
+          <Body style={{ color: NM.TERTIARY, marginBottom: 6 }}>Zatiaľ nesleduješ žiadne príspevky.</Body>
+          <Body style={{ color: NM.TERTIARY, fontSize: 12 }}>Označ srdiečkom na záložke <strong style={{ color: NM.DEEP }}>Príspevky</strong> tie, ktoré ťa zaujímajú.</Body>
+        </div>
+      )}
+
+      {activeTab === 'disc' && (
+        <div style={{ padding: '40px 24px 32px', textAlign: 'center' }}>
+          <Body style={{ color: NM.TERTIARY }}>Zľavy partnerov pripravujeme — pozri sa neskôr.</Body>
+        </div>
+      )}
+
+      {activeTab !== 'disc' && feed.map((p) => (
         <FeedPost key={p.id} post={p} followedIds={followedIds} onToggleFollow={toggleFollow} onToggleLike={handleToggleLike} />
       ))}
     </Page>
