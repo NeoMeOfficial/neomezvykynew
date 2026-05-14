@@ -185,7 +185,7 @@ export default function JedalnicekPlanner() {
                 </div>
                 <div style={{ width: 10, height: 10, borderRadius: 999, background: NM.BG, border: `2px solid ${NM.TERRA}`, flexShrink: 0, marginTop: 6, zIndex: 1 }} />
                 <button
-                  onClick={() => r && navigate(`/recipe/${r.id}`)}
+                  onClick={() => r && navigate(`/recept/${r.id}`)}
                   style={{ all: 'unset', cursor: 'pointer', flex: 1, display: 'flex', gap: 12, alignItems: 'center', textAlign: 'left' }}
                 >
                   <div
