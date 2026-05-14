@@ -2,7 +2,6 @@ import { useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { NM } from '../../components/v2/neome';
 import { useAchievements } from '../../hooks/useAchievements';
-import { usePointsLedger } from '../../hooks/usePointsLedger';
 
 /**
  * Meditation player — R3 ambient
@@ -67,13 +66,13 @@ export default function MeditationPlayer() {
   const { meditationId } = useParams<{ meditationId: string }>();
   const m = (meditationId && MEDITATIONS[meditationId]) || MEDITATIONS['rann-pokoj'];
   const { addActivity } = useAchievements();
-  const { addEntry } = usePointsLedger();
   const completedRef = useRef(false);
 
   function handleComplete() {
     if (!completedRef.current) {
       completedRef.current = true;
-      addEntry('meditation_complete', 8, meditationId ?? 'unknown', 'meditation');
+      // Achievement tracking only — no points awarded for meditation
+      // (would otherwise be farmable via free-tier playback).
       addActivity('meditation_complete', { ref_id: meditationId, ref_type: 'meditation' });
     }
     navigate(-1);
