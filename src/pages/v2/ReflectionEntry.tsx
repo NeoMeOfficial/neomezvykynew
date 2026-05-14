@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Page, Eye, NM } from '../../components/v2/neome';
 import { useAchievements } from '../../hooks/useAchievements';
 import { usePointsLedger } from '../../hooks/usePointsLedger';
+import { useReflections } from '../../hooks/useDailyRituals';
 
 /**
  * Reflection / journal entry — R3
@@ -11,11 +12,8 @@ import { usePointsLedger } from '../../hooks/usePointsLedger';
  * serif prompt, 3 divider dots, large serif writing area, word-count
  * footer.
  *
- * FEATURE-NEEDED-DOMOV-REFLECTIONS / -PROFIL-REFLECTION-COUNT:
- * see FEATURES_TO_BUILD.md F-003. Account-scoped reflection store
- * is needed for save to persist; current useReflectionData uses
- * access-code scoping. The Uložiť button currently navigates back
- * without persisting — flagged.
+ * Saves via useReflections.addReflection — writes to the diary_entries
+ * Supabase table for real users, localStorage demo fallback otherwise.
  *
  * Mounted at /dennik/new.
  */
@@ -38,19 +36,31 @@ function dayPromptIndex(d = new Date()): number {
 export default function ReflectionEntry() {
   const navigate = useNavigate();
   const [text, setText] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { addActivity } = useAchievements();
   const { addEntry } = usePointsLedger();
+  const { addReflection } = useReflections();
   const today = new Date();
   const dateLabel = `${SK_DAYS[today.getDay()]} · ${today.getDate()}. ${SK_MONTHS_SHORT[today.getMonth()]}`;
   const prompt = PROMPTS[dayPromptIndex(today)];
   const wordCount = text.trim().length === 0 ? 0 : text.trim().split(/\s+/).length;
 
-  const onSave = () => {
-    if (text.trim().length > 0) {
+  const onSave = async () => {
+    const trimmed = text.trim();
+    if (trimmed.length === 0 || saving) return;
+    setSaving(true);
+    setError(null);
+    try {
+      await addReflection(trimmed);
       addEntry('reflection_write', 6, `reflection_${today.toISOString().slice(0, 10)}`, 'reflection');
       addActivity('reflection_write');
+      navigate('/kniznica/dennik');
+    } catch (err) {
+      console.error('Reflection save failed:', err);
+      setError('Nepodarilo sa uložiť. Skús to ešte raz.');
+      setSaving(false);
     }
-    navigate('/kniznica/dennik');
   };
 
   return (
@@ -65,9 +75,10 @@ export default function ReflectionEntry() {
         <Eye>{dateLabel}</Eye>
         <button
           onClick={onSave}
+          disabled={text.trim().length === 0 || saving}
           style={{
             all: 'unset',
-            cursor: 'pointer',
+            cursor: text.trim().length === 0 || saving ? 'not-allowed' : 'pointer',
             background: NM.TERRA,
             color: '#fff',
             padding: '8px 16px',
@@ -75,11 +86,18 @@ export default function ReflectionEntry() {
             fontFamily: NM.SANS,
             fontSize: 13,
             fontWeight: 500,
+            opacity: text.trim().length === 0 || saving ? 0.5 : 1,
           }}
         >
-          Uložiť
+          {saving ? 'Ukladám…' : 'Uložiť'}
         </button>
       </div>
+
+      {error && (
+        <div role="alert" style={{ margin: '0 24px 8px', padding: '10px 14px', background: 'rgba(224, 90, 90, 0.10)', border: '1px solid rgba(224, 90, 90, 0.32)', borderRadius: 12, fontFamily: NM.SANS, fontSize: 13, color: '#A03A3A' }}>
+          {error}
+        </div>
+      )}
 
       <div style={{ padding: '16px 24px 0' }}>
         <Eye color={NM.GOLD} style={{ marginBottom: 14 }}>Zamyslenie</Eye>
