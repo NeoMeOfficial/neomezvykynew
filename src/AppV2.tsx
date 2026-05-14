@@ -29,6 +29,7 @@ const OnboardingNotifications = lazy(() => import('./pages/v2/OnboardingNotifica
 const DomovNew = lazy(() => import('./pages/v2/DomovNew'));
 const Kniznica = lazy(() => import('./pages/v2/Kniznica'));
 const KniznicaPreview = lazy(() => import('./pages/v2/KniznicaPreview'));
+const PostpartumLanding = lazy(() => import('./pages/v2/PostpartumLanding'));
 const Paywall = lazy(() => import('./pages/v2/Paywall'));
 const CompletionWorkout = lazy(() => import('./pages/v2/CompletionWorkout'));
 const CompletionProgram = lazy(() => import('./pages/v2/CompletionProgram'));
@@ -240,6 +241,7 @@ export default function AppV2() {
               <Route path="/jedalnicek" element={<JedalnicekPlanner />} />
               <Route path="/jedalnicek-promo" element={<JedalnicekPromo />} />
               <Route path="/navyky" element={<NavykyTracker />} />
+              <Route path="/postpartum" element={<PostpartumLanding />} />
             </Route>
             
             {/* Catch-all route for unknown paths */}

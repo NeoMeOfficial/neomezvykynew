@@ -192,13 +192,13 @@ export default function PostpartumLanding() {
           <div className="space-y-3">
             <button 
               className="w-full py-3 rounded-2xl border-2 border-orange-200 text-orange-600 font-semibold bg-orange-50"
-              onClick={() => alert('Program pozastavený')}
+              onClick={() => navigate('/profil/predplatne')}
             >
-              ⏸️ Pozastaviť program
+              ⚙️ Spravovať predplatné
             </button>
-            <button 
+            <button
               className="w-full py-3 rounded-2xl border-2 border-white/35 text-gray-600 font-semibold"
-              onClick={() => navigate('/program/postpartum/schedule')}
+              onClick={() => navigate('/program/postpartum/info')}
             >
               📅 Zobraziť rozpis týždňov
             </button>
@@ -474,7 +474,7 @@ export default function PostpartumLanding() {
               
               <button 
                 className="w-full py-4 bg-[#6B4C3B] text-white font-bold text-lg rounded-2xl shadow-lg active:scale-[0.98] transition-transform"
-                onClick={() => navigate('/checkout/postpartum')}
+                onClick={() => navigate('/paywall')}
               >
                 Pridať do košíka
               </button>
@@ -510,7 +510,7 @@ export default function PostpartumLanding() {
           </p>
           <button 
             className="bg-white text-[#6B4C3B] font-bold py-4 px-8 rounded-2xl shadow-lg active:scale-[0.98] transition-transform"
-            onClick={() => navigate('/checkout/postpartum')}
+            onClick={() => navigate('/paywall')}
           >
             Začať program za €97
           </button>
