@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
+import { VitePWA } from "vite-plugin-pwa";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -31,6 +32,33 @@ export default defineConfig(({ mode }) => ({
     react(),
     mode === 'development' &&
     componentTagger(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      includeAssets: [
+        'favicon.ico',
+        'favicon-32.png',
+        'favicon-source.svg',
+        'apple-touch-icon.png',
+      ],
+      manifest: {
+        name: 'NeoMe — Wellness pre ženy',
+        short_name: 'NeoMe',
+        description:
+          'Tvoj osobný wellness sprievodca. Cvičenia, výživa, menštruačný cyklus a meditácie.',
+        start_url: '/domov-new',
+        display: 'standalone',
+        background_color: '#F0E6DA',
+        theme_color: '#F0E6DA',
+        lang: 'sk',
+        scope: '/',
+        orientation: 'portrait',
+        icons: [
+          { src: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+          { src: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+          { src: '/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+        ],
+      },
+    }),
   ].filter(Boolean),
   resolve: {
     alias: {

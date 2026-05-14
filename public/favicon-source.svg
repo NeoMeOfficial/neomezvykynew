@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="38%" r="78%">
+      <stop offset="0%" stop-color="#8a5544"/>
+      <stop offset="36%" stop-color="#6a3d2e"/>
+      <stop offset="74%" stop-color="#4a2719"/>
+      <stop offset="100%" stop-color="#2e160e"/>
+    </radialGradient>
+    <linearGradient id="sheen" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.22"/>
+      <stop offset="35%" stop-color="#ffffff" stop-opacity="0.04"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="warm" cx="50%" cy="100%" r="60%">
+      <stop offset="0%" stop-color="#E4C9A5" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#E4C9A5" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="cream" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#FFFBEF"/>
+      <stop offset="50%" stop-color="#F4EFE3"/>
+      <stop offset="100%" stop-color="#D9CFB9"/>
+    </linearGradient>
+    <linearGradient id="creamTop" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.9"/>
+      <stop offset="35%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="dot" cx="38%" cy="32%" r="70%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="55%" stop-color="#F4EFE3"/>
+      <stop offset="100%" stop-color="#C9B998"/>
+    </radialGradient>
+    <filter id="mGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="14"/>
+    </filter>
+    <clipPath id="mFloor">
+      <rect x="0" y="0" width="1024" height="760"/>
+    </clipPath>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+  <rect width="1024" height="1024" fill="url(#warm)"/>
+  <rect width="1024" height="1024" fill="url(#sheen)"/>
+
+  <!-- M glow -->
+  <g filter="url(#mGlow)" opacity="0.5" clip-path="url(#mFloor)">
+    <path d="M 297 780 L 297 270 L 512 583 L 647 780 M 727 780 L 727 270 L 512 583"
+          fill="none" stroke="#F4EFE3" stroke-width="44"
+          stroke-linejoin="miter" stroke-linecap="butt"/>
+  </g>
+
+  <!-- M shadow -->
+  <g clip-path="url(#mFloor)">
+    <path d="M 297 780 L 297 270 L 512 583 L 647 780 M 727 780 L 727 270 L 512 583"
+          fill="none" stroke="#1c0d07" stroke-opacity="0.55" stroke-width="50"
+          stroke-linejoin="miter" stroke-linecap="butt" transform="translate(0,9)"/>
+    <!-- M cream -->
+    <path d="M 297 780 L 297 270 L 512 583 L 647 780 M 727 780 L 727 270 L 512 583"
+          fill="none" stroke="url(#cream)" stroke-width="48"
+          stroke-linejoin="miter" stroke-linecap="butt"/>
+    <!-- M highlight -->
+    <path d="M 297 780 L 297 270 L 512 583 L 647 780 M 727 780 L 727 270 L 512 583"
+          fill="none" stroke="url(#creamTop)" stroke-width="48"
+          stroke-linejoin="miter" stroke-linecap="butt" opacity="0.95"/>
+  </g>
+
+  <!-- Dot -->
+  <circle cx="512" cy="445" r="26" fill="#1c0d07" opacity="0.55" transform="translate(0,5)" filter="url(#mGlow)"/>
+  <circle cx="512" cy="445" r="24" fill="url(#dot)"/>
+  <ellipse cx="504" cy="436" rx="8" ry="4.5" fill="#ffffff" opacity="0.9"/>
+
+  <!-- Top sheen line -->
+  <rect x="0" y="0" width="1024" height="3" fill="#ffffff" opacity="0.5"/>
+</svg>
