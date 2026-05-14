@@ -4,9 +4,10 @@ import { Eyebrow } from '@/components/ui/eyebrow';
 import { SerifHeader } from '@/components/ui/serif-header';
 import { BodyText } from '@/components/ui/body-text';
 import { useCycleData, calculateAverageCycleLength } from '@/features/cycle/useCycleData';
+import { useCycleLogs } from '@/features/cycle/useCycleLogs';
 import { PHASE_LABELS } from '@/features/cycle/insights';
 import { getNextPeriodDate } from '@/features/cycle/utils';
-import { TrendingUp, Calendar, Activity } from 'lucide-react';
+import { TrendingUp, Calendar, Activity, BookOpen } from 'lucide-react';
 
 const PHASE_COLORS: Record<string, string> = {
   menstrual:  '#C1856A',
@@ -36,7 +37,13 @@ function daysBetween(a: string, b: string): number {
 export default function CyklusInsights() {
   const navigate = useNavigate();
   const { cycleData } = useCycleData();
+  const { logs } = useCycleLogs();
   const { lastPeriodStart, cycleLength, history = [] } = cycleData;
+
+  // Most recent 10 daily logs, newest first
+  const sortedLogs = Object.entries(logs)
+    .sort(([a], [b]) => (a < b ? 1 : -1))
+    .slice(0, 10);
 
   const avgResult = calculateAverageCycleLength(history);
   const avgLength = avgResult?.average ?? cycleLength;
@@ -157,6 +164,52 @@ export default function CyklusInsights() {
                 })}
               </div>
             </div>
+
+            {/* Daily log history */}
+            {sortedLogs.length > 0 && (
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <Eyebrow>Záznamy denníka</Eyebrow>
+                  <BookOpen className="size-3.5 text-ink/40" strokeWidth={1.5} />
+                </div>
+                <div className="rounded-card bg-white border border-ink/[0.08] overflow-hidden">
+                  {sortedLogs.map(([date, entry], i, arr) => {
+                    const chips = [
+                      ...entry.symptoms.slice(0, 3),
+                      ...entry.moods.slice(0, 2),
+                    ];
+                    return (
+                      <div
+                        key={date}
+                        className="px-4 py-3"
+                        style={{ borderBottom: i < arr.length - 1 ? '1px solid rgba(61,41,33,0.06)' : 'none' }}
+                      >
+                        <div className="flex items-baseline justify-between mb-1.5">
+                          <BodyText size="sm" className="font-medium">{fmtDate(date)}</BodyText>
+                          <Eyebrow tone="muted">{entry.sleep} · {entry.energy}%</Eyebrow>
+                        </div>
+                        {chips.length > 0 && (
+                          <div className="flex flex-wrap gap-1.5">
+                            {chips.map((c) => (
+                              <div
+                                key={c}
+                                className="px-2 py-0.5 rounded-full font-sans text-[11px]"
+                                style={{ background: 'rgba(168,132,139,0.10)', color: '#A8848B' }}
+                              >
+                                {c}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        {entry.note && (
+                          <BodyText size="sm" className="text-ink/60 italic mt-2">"{entry.note}"</BodyText>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Cycle history */}
             {sortedHistory.length > 0 && (

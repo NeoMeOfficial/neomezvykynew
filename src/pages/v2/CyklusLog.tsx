@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCycleData } from '../../features/cycle/useCycleData';
+import { useCycleLogs, toDateKey } from '../../features/cycle/useCycleLogs';
 import { Page, Eye, Ser, NM } from '../../components/v2/neome';
 import { useAchievements } from '../../hooks/useAchievements';
 import { usePointsLedger } from '../../hooks/usePointsLedger';
@@ -58,6 +59,7 @@ function energyLabel(v: number): string {
 export default function CyklusLog() {
   const navigate = useNavigate();
   const { derivedState } = useCycleData();
+  const { logs, saveLog } = useCycleLogs();
   const { addActivity } = useAchievements();
   const { addEntry } = usePointsLedger();
   const today = derivedState?.today ?? new Date();
@@ -72,6 +74,22 @@ export default function CyklusLog() {
   const [mucus, setMucus] = useState<string>('Krémový');
   const [note, setNote] = useState<string>('');
 
+  // Prefill from today's saved log (if any) — runs once when logs hydrate
+  const hydratedRef = useState({ done: false })[0];
+  useEffect(() => {
+    if (hydratedRef.done) return;
+    const existing = logs[toDateKey(today)];
+    if (!existing) return;
+    hydratedRef.done = true;
+    setFlow(existing.flow);
+    setSymptoms(new Set(existing.symptoms));
+    setMoods(new Set(existing.moods));
+    setEnergy(existing.energy);
+    setSleep(existing.sleep);
+    setMucus(existing.mucus);
+    setNote(existing.note);
+  }, [logs, today, hydratedRef]);
+
   const toggle = (set: Set<string>, fn: (s: Set<string>) => void) => (k: string) => {
     const next = new Set(set);
     if (next.has(k)) next.delete(k);
@@ -80,8 +98,17 @@ export default function CyklusLog() {
   };
 
   const onSave = () => {
-    const today = new Date();
-    addEntry('cycle_log', 4, `cycle_${today.toISOString().slice(0, 10)}`, 'cycle');
+    const now = new Date();
+    saveLog(now, {
+      flow,
+      symptoms: [...symptoms],
+      moods: [...moods],
+      energy,
+      sleep,
+      mucus,
+      note,
+    });
+    addEntry('cycle_log', 4, `cycle_${toDateKey(now)}`, 'cycle');
     addActivity('cycle_log');
     navigate('/kniznica/periodka');
   };
