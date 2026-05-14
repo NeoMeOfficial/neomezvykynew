@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
-import { Droplets, Moon, BookOpen, Dumbbell, Apple, Plus, Check, GlassWater, Flame } from 'lucide-react';
+import { useState } from 'react';
+import { Plus, Check, GlassWater, Flame, Sparkles } from 'lucide-react';
 import { useAchievements } from '../../hooks/useAchievements';
 import { usePointsLedger } from '../../hooks/usePointsLedger';
 import { useNavigate } from 'react-router-dom';
-import { useAuthContext } from '../../contexts/AuthContext';
+import { useSupabaseHabits } from '../../hooks/useSupabaseHabits';
 import { useSubscription } from '../../contexts/SubscriptionContext';
 import { TopBar } from '@/components/v2/top-bar';
 import { Eyebrow } from '@/components/ui/eyebrow';
@@ -12,94 +12,76 @@ import { SectionHeader } from '@/components/ui/section-header';
 
 const DAYS = ['Po', 'Ut', 'St', 'Št', 'Pi', 'So', 'Ne'];
 
-interface HabitData {
-  icon: React.ElementType;
-  name: string;
-  progress: string;
-  done: boolean;
-}
-
-const defaultHabitsData: HabitData[] = [
-  { icon: Droplets,  name: 'Piť 8 pohárov vody', progress: '6/8',    done: false },
-  { icon: Dumbbell,  name: 'Cvičenie',            progress: '1/1',    done: true  },
-  { icon: Moon,      name: 'Spánok 8h',           progress: '7.5h',   done: true  },
-  { icon: BookOpen,  name: 'Čítanie 20 min',      progress: '20/20',  done: true  },
-  { icon: Apple,     name: '5 porcií ovocia',     progress: '3/5',    done: false },
-];
-
+/**
+ * NavykyTracker — daily habits dashboard at /navyky.
+ *
+ * Reads from useSupabaseHabits (real Supabase: `habits` + `habit_completions`
+ * tables). Completions and streaks come from the server so they sync across
+ * devices and survive sign-out / sign-in.
+ *
+ * Empty state: a single suggestion card ("Piť 8 pohárov vody") that links
+ * to the /navyky/new wizard. The suggestion disappears as soon as the user
+ * adds any habit of their own.
+ */
 export default function NavykyTracker() {
-  const { user } = useAuthContext();
   const { isPremium } = useSubscription();
   const navigate = useNavigate();
+  const { habits, loading, toggleHabitCompletion, removeHabit } = useSupabaseHabits();
   const { addActivity } = useAchievements();
   const { addEntry } = usePointsLedger();
-
-  const [habits, setHabits] = useState<HabitData[]>([]);
-  const [weekDots, setWeekDots] = useState([true, true, true, false, false, false, false]);
+  const [editMode, setEditMode] = useState(false);
   const [waterCount, setWaterCount] = useState(6);
 
-  useEffect(() => {
-    if (!user?.id) return;
-    const today = new Date().toISOString().split('T')[0];
-    const savedHabits = localStorage.getItem(`navyky_${user.id}_${today}`);
-    const savedDots = localStorage.getItem(`navyky_week_${user.id}`);
-    setHabits(savedHabits ? JSON.parse(savedHabits) : defaultHabitsData);
-    if (savedDots) setWeekDots(JSON.parse(savedDots));
-  }, [user?.id]);
+  const today = new Date().toISOString().split('T')[0];
+  const todayIdx = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
 
-  useEffect(() => {
-    if (!user?.id || isPremium) return;
-    const today = new Date().toISOString().split('T')[0];
-    const lastResetKey = `navyky_last_reset_${user.id}`;
-    if (localStorage.getItem(lastResetKey) !== today) {
-      setHabits(defaultHabitsData);
-      localStorage.setItem(lastResetKey, today);
-      localStorage.setItem(`navyky_${user.id}_${today}`, JSON.stringify(defaultHabitsData));
+  // Build last-7-days dots: a day is "lit" if any habit has at least one
+  // completion on that date. Falls back to empty array while loading.
+  const weekDots = (() => {
+    const dots: boolean[] = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const key = d.toISOString().split('T')[0];
+      const anyDone = habits.some((h) => (h.completions?.[key] ?? 0) > 0);
+      dots.push(anyDone);
     }
-  }, [user?.id, isPremium]);
+    return dots;
+  })();
+  const streak = weekDots.filter(Boolean).length;
 
-  const saveHabits = (next: HabitData[]) => {
-    if (!user?.id) return;
-    const today = new Date().toISOString().split('T')[0];
-    localStorage.setItem(`navyky_${user.id}_${today}`, JSON.stringify(next));
-    setHabits(next);
-  };
-
-  const toggleHabit = (i: number) => {
-    const next = [...habits];
-    const wasUndone = !next[i].done;
-    next[i] = { ...next[i], done: !next[i].done };
-    saveHabits(next);
-    // Only award points when checking in (not when unchecking)
-    if (wasUndone) {
-      const today = new Date().toISOString().slice(0, 10);
-      addEntry('habit_checkin', 3, `habit_${i}_${today}`, 'habit');
+  const handleToggle = async (habitId: string) => {
+    const habit = habits.find((h) => h.id === habitId);
+    if (!habit) return;
+    const wasUndone = (habit.completions?.[today] ?? 0) === 0;
+    const ok = await toggleHabitCompletion(habitId);
+    // Only award points on the check-in transition, not the un-check.
+    if (ok && wasUndone) {
+      addEntry('habit_checkin', 3, `habit_${habitId}_${today}`, 'habit');
       addActivity('habit_checkin');
     }
   };
 
-  const [editMode, setEditMode] = useState(false);
-  const deleteHabit = (i: number) => {
-    const next = habits.filter((_, idx) => idx !== i);
-    saveHabits(next);
+  const handleDelete = async (habitId: string) => {
+    await removeHabit(habitId);
   };
-
-  const streak = weekDots.filter(Boolean).length;
-  const todayIdx = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
 
   return (
     <div className="min-h-screen bg-cream pb-12">
       <TopBar title="Návyky" backHref="/domov-new" right={
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => setEditMode(v => !v)}
-            className={`h-9 px-3 rounded-full border text-xs font-medium transition-colors ${editMode ? 'bg-ink text-cream border-ink' : 'bg-white border-ink/[0.08] text-ink/60'}`}
-          >
-            {editMode ? 'Hotovo' : 'Upraviť'}
-          </button>
+          {habits.length > 0 && (
+            <button
+              onClick={() => setEditMode(v => !v)}
+              className={`h-9 px-3 rounded-full border text-xs font-medium transition-colors ${editMode ? 'bg-ink text-cream border-ink' : 'bg-white border-ink/[0.08] text-ink/60'}`}
+            >
+              {editMode ? 'Hotovo' : 'Upraviť'}
+            </button>
+          )}
           <button
             onClick={() => navigate('/navyky/new')}
             className="h-9 w-9 rounded-full bg-white border border-ink/[0.08] flex items-center justify-center"
+            aria-label="Pridať návyk"
           >
             <Plus className="size-4 text-ink/60" />
           </button>
@@ -132,17 +114,39 @@ export default function NavykyTracker() {
           </div>
         </div>
 
-        {/* Habits */}
         <SectionHeader eyebrow="Dnešné návyky" className="mt-1" />
 
+        {/* Habit list — either real habits, or a single suggestion */}
         <div className="flex flex-col gap-2">
-          {habits.map((h, i) => {
-            const Icon = h.icon;
+          {loading && (
+            <div className="rounded-card bg-white border border-ink/[0.08] p-4">
+              <BodyText size="sm" tone="muted">Načítavam…</BodyText>
+            </div>
+          )}
+
+          {!loading && habits.length === 0 && (
+            <button
+              onClick={() => navigate('/navyky/new')}
+              className="text-left rounded-card p-4 bg-white border border-dashed border-ink/[0.18] flex items-center gap-3 transition-all active:scale-[0.99]"
+            >
+              <div className="h-10 w-10 rounded-xl bg-pillar-mysel/10 flex items-center justify-center flex-shrink-0">
+                <Sparkles className="size-4 text-pillar-mysel" strokeWidth={1.5} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="font-sans text-sm font-medium text-ink">Piť 8 pohárov vody</div>
+                <BodyText size="sm" tone="muted">Pridaj ako svoj prvý návyk →</BodyText>
+              </div>
+            </button>
+          )}
+
+          {!loading && habits.map((h) => {
+            const todayCount = h.completions?.[today] ?? 0;
+            const done = todayCount >= h.targetPerDay;
             return (
-              <div key={h.name} className="flex items-center gap-2">
+              <div key={h.id} className="flex items-center gap-2">
                 {editMode && (
                   <button
-                    onClick={() => deleteHabit(i)}
+                    onClick={() => handleDelete(h.id)}
                     className="h-9 w-9 rounded-full bg-red-50 border border-red-200 flex items-center justify-center flex-shrink-0 transition-all active:scale-95"
                     aria-label="Vymazať"
                   >
@@ -152,20 +156,20 @@ export default function NavykyTracker() {
                   </button>
                 )}
                 <button
-                  onClick={() => !editMode && toggleHabit(i)}
+                  onClick={() => !editMode && handleToggle(h.id)}
                   className="flex-1 text-left rounded-card p-4 bg-white border border-ink/[0.08] shadow-nm-sm flex items-center gap-3 transition-all active:scale-[0.99]"
                   style={{ cursor: editMode ? 'default' : 'pointer' }}
                 >
-                  <div className={`h-10 w-10 rounded-xl flex items-center justify-center flex-shrink-0 ${h.done ? 'bg-pillar-strava/15' : 'bg-cream-200'}`}>
-                    <Icon className={`size-4 ${h.done ? 'text-pillar-strava' : 'text-ink/40'}`} strokeWidth={1.5} />
+                  <div className={`h-10 w-10 rounded-xl flex items-center justify-center flex-shrink-0 ${done ? 'bg-pillar-strava/15' : 'bg-cream-200'}`}>
+                    <Sparkles className={`size-4 ${done ? 'text-pillar-strava' : 'text-ink/40'}`} strokeWidth={1.5} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className={`font-sans text-sm font-medium ${h.done ? 'line-through text-ink/40' : 'text-ink'}`}>{h.name}</div>
-                    <BodyText size="sm" tone="muted">{h.progress}</BodyText>
+                    <div className={`font-sans text-sm font-medium ${done ? 'line-through text-ink/40' : 'text-ink'}`}>{h.name}</div>
+                    <BodyText size="sm" tone="muted">{todayCount}/{h.targetPerDay} {h.unit}</BodyText>
                   </div>
                   {!editMode && (
-                    <div className={`h-7 w-7 rounded-full flex items-center justify-center flex-shrink-0 transition-all ${h.done ? 'bg-pillar-strava' : 'border border-ink/[0.15]'}`}>
-                      {h.done && <Check className="size-3.5 text-white" strokeWidth={2.5} />}
+                    <div className={`h-7 w-7 rounded-full flex items-center justify-center flex-shrink-0 transition-all ${done ? 'bg-pillar-strava' : 'border border-ink/[0.15]'}`}>
+                      {done && <Check className="size-3.5 text-white" strokeWidth={2.5} />}
                     </div>
                   )}
                 </button>
@@ -174,7 +178,7 @@ export default function NavykyTracker() {
           })}
         </div>
 
-        {/* Water tracker */}
+        {/* Water tracker — separate quick widget, not a Supabase habit */}
         <div className="rounded-card bg-white border border-ink/[0.08] shadow-nm-sm p-5">
           <div className="flex items-center gap-3 mb-4">
             <div className="h-10 w-10 rounded-xl bg-pillar-mysel/10 flex items-center justify-center flex-shrink-0">
@@ -211,7 +215,7 @@ export default function NavykyTracker() {
             </div>
             <div className="flex-1 min-w-0">
               <div className="font-sans text-sm font-medium text-ink">Bezplatná verzia</div>
-              <BodyText size="sm" tone="muted">Návyky sa resetujú každý deň. Plus zachová celú históriu.</BodyText>
+              <BodyText size="sm" tone="muted">Návyky sa ukladajú a synchronizujú medzi zariadeniami.</BodyText>
             </div>
           </button>
         )}
