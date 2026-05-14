@@ -29,18 +29,24 @@ export default function KomunitaCompose() {
   const { user } = useSupabaseAuth();
   const [type, setType] = useState<'post' | 'question'>('post');
   const [text, setText] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const meta = (user?.user_metadata ?? {}) as { full_name?: string; name?: string };
   const author = meta.full_name?.split(' ')[0] ?? meta.name?.split(' ')[0] ?? user?.email?.split('@')[0] ?? 'Eva';
   const initial = author.charAt(0).toUpperCase();
 
   const onShare = async () => {
-    if (text.trim().length === 0) return;
+    if (text.trim().length === 0 || submitting) return;
+    setSubmitting(true);
+    setError(null);
     try {
       await submitPost(text.trim(), type, author);
       navigate('/komunita');
-    } catch {
-      // FEATURE-NEEDED-KOMUNITA-ERROR-HANDLING
+    } catch (err) {
+      console.error('Komunita compose failed:', err);
+      setError('Nepodarilo sa odoslať príspevok. Skús to ešte raz.');
+      setSubmitting(false);
     }
   };
 
@@ -53,10 +59,10 @@ export default function KomunitaCompose() {
         <div style={{ fontFamily: NM.SERIF, fontSize: 16, fontWeight: 500, color: NM.DEEP }}>Nový príspevok</div>
         <button
           onClick={onShare}
-          disabled={text.trim().length === 0}
+          disabled={text.trim().length === 0 || submitting}
           style={{
             all: 'unset',
-            cursor: text.trim().length === 0 ? 'not-allowed' : 'pointer',
+            cursor: text.trim().length === 0 || submitting ? 'not-allowed' : 'pointer',
             background: NM.TERRA,
             color: '#fff',
             padding: '8px 16px',
@@ -64,12 +70,30 @@ export default function KomunitaCompose() {
             fontFamily: NM.SANS,
             fontSize: 13,
             fontWeight: 500,
-            opacity: text.trim().length === 0 ? 0.5 : 1,
+            opacity: text.trim().length === 0 || submitting ? 0.5 : 1,
           }}
         >
-          Zdieľať
+          {submitting ? 'Posielam…' : 'Zdieľať'}
         </button>
       </div>
+
+      {error && (
+        <div
+          role="alert"
+          style={{
+            margin: '8px 18px 0',
+            padding: '10px 14px',
+            background: 'rgba(224, 90, 90, 0.10)',
+            border: '1px solid rgba(224, 90, 90, 0.32)',
+            borderRadius: 12,
+            fontFamily: NM.SANS,
+            fontSize: 13,
+            color: '#A03A3A',
+          }}
+        >
+          {error}
+        </div>
+      )}
 
       <div style={{ padding: '8px 18px 0' }}>
         <Eye style={{ marginBottom: 10 }}>Typ príspevku</Eye>
