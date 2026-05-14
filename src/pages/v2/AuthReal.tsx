@@ -1,267 +1,459 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Eye, EyeOff } from 'lucide-react';
 import { useSupabaseAuth } from '../../contexts/SupabaseAuthContext';
-import { Eyebrow } from '@/components/ui/eyebrow';
-import { SerifHeader } from '@/components/ui/serif-header';
-import { BodyText } from '@/components/ui/body-text';
+import { supabase, isSupabaseConfigured } from '../../lib/supabase';
 
-const INPUT =
-  'w-full px-4 py-3.5 rounded-2xl bg-white border border-ink/[0.08] font-sans text-sm text-ink placeholder:text-ink/32 focus:outline-none focus:border-ink/24 transition-colors';
-const LABEL =
-  'font-sans text-[10px] font-medium text-ink/48 uppercase tracking-[0.14em] mb-1.5 block';
+/**
+ * Auth screen — Round 19 redesign (claude.ai/design).
+ *
+ * Full-bleed editorial photo with white gradient fade. Brand monogram
+ * + serif "Vitaj späť · domov." headline with GOLD italic em. Three
+ * stacked buttons (Apple · Google · Pokračovať e-mailom). Tapping the
+ * email option swaps to email + password fields with a back link.
+ *
+ * Registration kept on the same component as a third mode — the new
+ * design only covers login, so register reuses the same chrome but
+ * adds name + confirm-password + GDPR-consent fields and uses signUp.
+ *
+ * Mounted at /auth and /auth-real.
+ */
+
+// ─── Design tokens (mirrors round19-login.jsx) ─────────────────────
+const T = {
+  BG: '#F8F5F0',
+  CARD: '#FFFFFF',
+  INK: '#3D2921',
+  INK_2: '#2A1A14',
+  FG_2: 'rgba(61,41,33,0.72)',
+  FG_3: 'rgba(61,41,33,0.56)',
+  FG_MUTED: 'rgba(61,41,33,0.40)',
+  HAIR: 'rgba(61,41,33,0.08)',
+  HAIR_2: 'rgba(61,41,33,0.14)',
+  GOLD: '#B8965A',
+  TERRA: '#C1856A',
+  SERIF: "'Gilda Display', Georgia, serif",
+  SANS: "'DM Sans', system-ui, -apple-system, sans-serif",
+} as const;
+
+type Mode = 'choose' | 'email' | 'register';
 
 export default function AuthReal() {
   const navigate = useNavigate();
   const { signUp, signIn, resetPassword } = useSupabaseAuth();
 
-  const [isLogin, setIsLogin] = useState(true);
+  const [mode, setMode] = useState<Mode>('choose');
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: '', password: '', firstName: '', lastName: '',
     confirmPassword: '', gdprConsent: false,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const set = (field: string, value: string) => {
+    setFormData((p) => ({ ...p, [field]: value }));
+    if (errors[field]) setErrors((p) => ({ ...p, [field]: '' }));
+  };
+
+  const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
-    setIsSubmitting(true);
+    setSubmitting(true);
     try {
-      if (isLogin) {
-        const { error } = await signIn(formData.email, formData.password);
-        if (error) setErrors({ submit: error.message });
-        else navigate('/domov-new');
-      } else {
-        if (formData.password !== formData.confirmPassword) {
-          setErrors({ confirmPassword: 'Heslá sa nezhodujú' });
-          return;
-        }
-        if (formData.password.length < 8) {
-          setErrors({ password: 'Heslo musí mať aspoň 8 znakov' });
-          return;
-        }
-        if (!formData.firstName || !formData.lastName) {
-          setErrors({ name: 'Vyplňte prosím meno a priezvisko' });
-          return;
-        }
-        if (!formData.gdprConsent) {
-          setErrors({ gdpr: 'Súhlas so spracovaním údajov je povinný' });
-          return;
-        }
-        const { error } = await signUp(
-          formData.email, formData.password,
-          formData.firstName, formData.lastName, true
-        );
-        if (error) setErrors({ submit: error.message });
-        else setErrors({ success: 'Registrácia úspešná! Skontrolujte email.' });
-      }
-    } catch (err: unknown) {
+      const { error } = await signIn(formData.email, formData.password);
+      if (error) setErrors({ submit: error.message });
+      else navigate('/domov-new');
+    } catch (err) {
       setErrors({ submit: err instanceof Error ? err.message : 'Nastala chyba' });
     } finally {
-      setIsSubmitting(false);
+      setSubmitting(false);
     }
   };
 
-  const set = (field: string, value: string) => {
-    setFormData(p => ({ ...p, [field]: value }));
-    if (errors[field]) setErrors(p => ({ ...p, [field]: '' }));
-  };
-
-  const switchMode = () => {
-    setIsLogin(v => !v);
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
     setErrors({});
-    setFormData({ email: '', password: '', firstName: '', lastName: '', confirmPassword: '', gdprConsent: false });
+    if (formData.password !== formData.confirmPassword) {
+      setErrors({ confirmPassword: 'Heslá sa nezhodujú' });
+      return;
+    }
+    if (formData.password.length < 8) {
+      setErrors({ password: 'Heslo musí mať aspoň 8 znakov' });
+      return;
+    }
+    if (!formData.firstName || !formData.lastName) {
+      setErrors({ name: 'Vyplňte meno a priezvisko' });
+      return;
+    }
+    if (!formData.gdprConsent) {
+      setErrors({ gdpr: 'Súhlas so spracovaním údajov je povinný' });
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const { error } = await signUp(formData.email, formData.password, formData.firstName, formData.lastName, true);
+      if (error) setErrors({ submit: error.message });
+      else setErrors({ success: 'Registrácia úspešná! Skontroluj e-mail.' });
+    } catch (err) {
+      setErrors({ submit: err instanceof Error ? err.message : 'Nastala chyba' });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  return (
-    <div className="min-h-screen bg-cream flex flex-col">
-      <div className="flex-1 px-5 pt-14 pb-10">
+  const handleOAuth = async (provider: 'apple' | 'google') => {
+    if (!isSupabaseConfigured()) {
+      setErrors({ submit: 'Prihlásenie cez sociálne siete je v príprave.' });
+      return;
+    }
+    setErrors({});
+    setSubmitting(true);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: { redirectTo: `${window.location.origin}/domov-new` },
+      });
+      if (error) setErrors({ submit: error.message });
+    } catch (err) {
+      setErrors({ submit: err instanceof Error ? err.message : 'Nastala chyba' });
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
-        {/* Wordmark */}
-        <div className="mb-10">
-          <Eyebrow tone="muted">NEOME</Eyebrow>
+  const handleForgotPassword = async () => {
+    if (!formData.email) {
+      setErrors({ submit: 'Zadaj e-mail pre reset hesla.' });
+      return;
+    }
+    const { error } = await resetPassword(formData.email);
+    if (error) setErrors({ submit: error.message });
+    else setErrors({ success: 'E-mail na reset hesla bol odoslaný.' });
+  };
+
+  // ─── Render ──────────────────────────────────────────────────────
+  return (
+    <div style={{ position: 'relative', minHeight: '100vh', background: T.BG, overflow: 'hidden', fontFamily: T.SANS, color: T.INK }}>
+      {/* Background photo */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        backgroundImage: 'url(/images/r9/welcome-hero.webp)',
+        backgroundSize: 'cover',
+        backgroundPosition: '75% top',
+      }} />
+      {/* White gradient — photo fades out around 58% from the top */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: 'linear-gradient(180deg, rgba(248,245,240,0) 0%, rgba(248,245,240,0) 28%, rgba(248,245,240,0.6) 45%, rgba(248,245,240,0.95) 58%, rgba(248,245,240,1) 70%)',
+      }} />
+
+      <div style={{ position: 'relative', minHeight: '100vh', padding: 'calc(env(safe-area-inset-top) + 28px) 24px calc(env(safe-area-inset-bottom) + 32px)', display: 'flex', flexDirection: 'column' }}>
+        {/* Brand mark */}
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10 }}>
+          <div style={{
+            width: 26, height: 26, borderRadius: 999,
+            background: T.INK, color: '#fff',
+            display: 'grid', placeItems: 'center',
+            fontFamily: T.SERIF, fontSize: 14,
+          }}>N</div>
+          <div style={{
+            fontFamily: T.SANS, fontSize: 11.5, letterSpacing: '0.32em',
+            textTransform: 'uppercase', color: T.INK, fontWeight: 500,
+          }}>NeoMe</div>
         </div>
+
+        {/* Spacer so headline sits below the photo's focal point */}
+        <div style={{ height: 'min(380px, 42vh)' }} />
 
         {/* Headline */}
-        <div className="mb-8">
-          <SerifHeader as="h1" size="h1" className="mb-2">
-            {isLogin ? 'Vitaj späť' : 'Začni svoju cestu'}
-          </SerifHeader>
-          <BodyText tone="secondary">
-            {isLogin ? 'Prihláste sa do svojho účtu.' : 'Vytvorte si bezplatný účet.'}
-          </BodyText>
+        <div style={{ fontFamily: T.SERIF, fontSize: 40, lineHeight: 1.04, letterSpacing: '-0.015em', color: T.INK }}>
+          {mode === 'register' ? (
+            <>Začni svoju<br /><em style={{ color: T.GOLD, fontWeight: 400 }}>cestu.</em></>
+          ) : (
+            <>Vitaj späť<br /><em style={{ color: T.GOLD, fontWeight: 400 }}>domov.</em></>
+          )}
+        </div>
+        <div style={{ marginTop: 10, fontSize: 13, color: T.FG_2, fontWeight: 300, maxWidth: 280, lineHeight: 1.55 }}>
+          {mode === 'register'
+            ? 'Vytvor si bezplatný účet a začni dnes.'
+            : 'Pokračuj v ceste, kde si naposledy skončila.'}
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        {/* === mode: choose === */}
+        {mode === 'choose' && (
+          <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 9 }}>
+            <button onClick={() => handleOAuth('apple')} disabled={submitting} style={socialBtnDark()}>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="#fff">
+                <path d="M17.05 12.04c-.03-3.15 2.57-4.66 2.69-4.74-1.47-2.15-3.76-2.45-4.57-2.48-1.94-.2-3.79 1.14-4.78 1.14-.99 0-2.51-1.11-4.13-1.08-2.12.03-4.08 1.24-5.17 3.14-2.21 3.83-.56 9.48 1.58 12.58 1.05 1.52 2.31 3.23 3.96 3.17 1.59-.06 2.19-1.03 4.11-1.03 1.92 0 2.46 1.03 4.14.99 1.71-.03 2.79-1.55 3.83-3.08 1.21-1.77 1.71-3.5 1.74-3.59-.04-.02-3.34-1.28-3.37-5.06zM13.85 3.7c.88-1.07 1.47-2.55 1.31-4.03-1.27.05-2.81.85-3.72 1.91-.81.95-1.52 2.46-1.33 3.91 1.41.11 2.86-.72 3.74-1.79z"/>
+              </svg>
+              <span>Pokračovať cez Apple</span>
+            </button>
+            <button onClick={() => handleOAuth('google')} disabled={submitting} style={socialBtnLight()}>
+              <svg width="15" height="15" viewBox="0 0 24 24">
+                <path d="M22 12.2c0-.8-.1-1.4-.2-2H12v3.8h5.6c-.2 1.4-1 2.6-2.2 3.4l3.5 2.7c2-1.9 3.1-4.6 3.1-7.9z" fill="#4285F4"/>
+                <path d="M12 22c2.8 0 5.2-.9 6.9-2.5l-3.5-2.7c-1 .7-2.2 1.1-3.4 1.1-2.6 0-4.9-1.8-5.7-4.2L2.7 16.4C4.4 19.7 8 22 12 22z" fill="#34A853"/>
+                <path d="M6.3 13.7c-.2-.7-.4-1.4-.4-2.2 0-.8.1-1.5.4-2.2L2.7 6.6C2.2 7.5 2 8.7 2 10s.2 2.5.7 3.4l3.6-2.7z" fill="#FBBC05"/>
+                <path d="M12 5.8c1.5 0 2.8.5 3.8 1.5l2.9-2.9C16.8 2.8 14.5 2 12 2 8 2 4.4 4.3 2.7 7.6l3.6 2.7C7.1 7.9 9.4 5.8 12 5.8z" fill="#EA4335"/>
+              </svg>
+              <span>Pokračovať cez Google</span>
+            </button>
+            <button onClick={() => setMode('email')} style={socialBtnOutline()}>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={T.INK} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="5" width="18" height="14" rx="2"/>
+                <path d="M3 7l9 6 9-6"/>
+              </svg>
+              <span>Pokračovať e-mailom</span>
+            </button>
+          </div>
+        )}
 
-          {!isLogin && (
-            <div className="flex gap-3">
-              <div className="flex-1">
-                <label className={LABEL}>Meno</label>
-                <input
-                  type="text"
+        {/* === mode: email login === */}
+        {mode === 'email' && (
+          <form onSubmit={handleEmailLogin}>
+            <button type="button" onClick={() => { setMode('choose'); setErrors({}); }} style={backLink()}>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={T.FG_3} strokeWidth="2" strokeLinecap="round"><path d="M15 6l-6 6 6 6"/></svg>
+              Iné možnosti
+            </button>
+            <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <Field
+                label="E-mail"
+                type="email"
+                value={formData.email}
+                onChange={(v) => set('email', v)}
+                placeholder="tvoj@email.sk"
+                autoComplete="email"
+              />
+              <Field
+                label="Heslo"
+                type={showPassword ? 'text' : 'password'}
+                value={formData.password}
+                onChange={(v) => set('password', v)}
+                placeholder="Tvoje heslo"
+                autoComplete="current-password"
+                trailingButton={
+                  <button type="button" onClick={() => setShowPassword((v) => !v)} aria-label="Zobraziť heslo" style={{ background: 'transparent', border: 0, padding: 0, cursor: 'pointer', color: T.FG_3 }}>
+                    {showPassword ? (
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={T.FG_3} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/>
+                        <line x1="1" y1="1" x2="23" y2="23"/>
+                      </svg>
+                    ) : (
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={T.FG_3} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                      </svg>
+                    )}
+                  </button>
+                }
+              />
+            </div>
+            <div style={{ marginTop: 12, textAlign: 'right' }}>
+              <button type="button" onClick={handleForgotPassword} style={textLink()}>Zabudnuté heslo?</button>
+            </div>
+            {errors.submit && <Banner tone="error">{errors.submit}</Banner>}
+            {errors.success && <Banner tone="info">{errors.success}</Banner>}
+            <button type="submit" disabled={submitting} style={primaryPill(submitting)}>
+              {submitting ? 'Prihlasujem…' : 'Prihlásiť sa'}
+            </button>
+          </form>
+        )}
+
+        {/* === mode: register === */}
+        {mode === 'register' && (
+          <form onSubmit={handleRegister}>
+            <button type="button" onClick={() => { setMode('choose'); setErrors({}); }} style={backLink()}>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={T.FG_3} strokeWidth="2" strokeLinecap="round"><path d="M15 6l-6 6 6 6"/></svg>
+              Späť
+            </button>
+            <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div style={{ display: 'flex', gap: 14 }}>
+                <Field
+                  label="Meno"
                   value={formData.firstName}
-                  onChange={e => set('firstName', e.target.value)}
-                  className={INPUT}
+                  onChange={(v) => set('firstName', v)}
                   placeholder="Meno"
-                  required={!isLogin}
                   autoComplete="given-name"
                 />
-              </div>
-              <div className="flex-1">
-                <label className={LABEL}>Priezvisko</label>
-                <input
-                  type="text"
+                <Field
+                  label="Priezvisko"
                   value={formData.lastName}
-                  onChange={e => set('lastName', e.target.value)}
-                  className={INPUT}
+                  onChange={(v) => set('lastName', v)}
                   placeholder="Priezvisko"
-                  required={!isLogin}
                   autoComplete="family-name"
                 />
               </div>
-            </div>
-          )}
-          {errors.name && <BodyText size="sm" className="text-terra -mt-2">{errors.name}</BodyText>}
-
-          <div>
-            <label className={LABEL}>Email</label>
-            <input
-              type="email"
-              value={formData.email}
-              onChange={e => set('email', e.target.value)}
-              className={INPUT}
-              placeholder="tvoj@email.sk"
-              required
-              autoComplete="email"
-            />
-          </div>
-
-          <div>
-            <label className={LABEL}>Heslo</label>
-            <div className="relative">
-              <input
-                type={showPassword ? 'text' : 'password'}
-                value={formData.password}
-                onChange={e => set('password', e.target.value)}
-                className={`${INPUT} pr-12`}
-                placeholder={isLogin ? 'Tvoje heslo' : 'Minimálne 8 znakov'}
-                required
-                autoComplete={isLogin ? 'current-password' : 'new-password'}
+              {errors.name && <FieldError>{errors.name}</FieldError>}
+              <Field
+                label="E-mail"
+                type="email"
+                value={formData.email}
+                onChange={(v) => set('email', v)}
+                placeholder="tvoj@email.sk"
+                autoComplete="email"
               />
-              <button
-                type="button"
-                onClick={() => setShowPassword(v => !v)}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 text-ink/36"
-              >
-                {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-              </button>
-            </div>
-            {errors.password && <BodyText size="sm" className="mt-1 text-terra">{errors.password}</BodyText>}
-          </div>
-
-          {!isLogin && (
-            <div>
-              <label className={LABEL}>Potvrdiť heslo</label>
-              <input
+              <Field
+                label="Heslo"
                 type="password"
-                value={formData.confirmPassword}
-                onChange={e => set('confirmPassword', e.target.value)}
-                className={INPUT}
-                placeholder="Zopakuj heslo"
-                required={!isLogin}
+                value={formData.password}
+                onChange={(v) => set('password', v)}
+                placeholder="Min. 8 znakov"
                 autoComplete="new-password"
               />
-              {errors.confirmPassword && (
-                <BodyText size="sm" className="mt-1 text-terra">{errors.confirmPassword}</BodyText>
-              )}
-            </div>
-          )}
-
-          {!isLogin && (
-            <div className="flex items-start gap-3 pt-1">
-              <input
-                id="gdpr-consent"
-                type="checkbox"
-                checked={formData.gdprConsent}
-                onChange={e => {
-                  setFormData(p => ({ ...p, gdprConsent: e.target.checked }));
-                  if (errors.gdpr) setErrors(p => ({ ...p, gdpr: '' }));
-                }}
-                className="mt-0.5 h-4 w-4 rounded border-ink/20 accent-ink flex-shrink-0 cursor-pointer"
+              {errors.password && <FieldError>{errors.password}</FieldError>}
+              <Field
+                label="Potvrď heslo"
+                type="password"
+                value={formData.confirmPassword}
+                onChange={(v) => set('confirmPassword', v)}
+                placeholder="Zopakuj heslo"
+                autoComplete="new-password"
               />
-              <label htmlFor="gdpr-consent" className="font-sans text-xs text-ink/52 leading-relaxed cursor-pointer">
-                Súhlasím so{' '}
-                <a href="https://neome.sk/privacy" target="_blank" rel="noreferrer" className="text-ink underline underline-offset-2">
-                  spracovaním osobných údajov
-                </a>
-                {' '}vrátane zdravotných dát (cyklus, symptómy) v súlade s GDPR.{' '}
-                <a href="https://neome.sk/privacy" target="_blank" rel="noreferrer" className="text-ink underline underline-offset-2">
-                  Zásady ochrany súkromia
-                </a>
+              {errors.confirmPassword && <FieldError>{errors.confirmPassword}</FieldError>}
+              <label style={{ display: 'flex', alignItems: 'flex-start', gap: 10, paddingTop: 4, cursor: 'pointer' }}>
+                <input
+                  type="checkbox"
+                  checked={formData.gdprConsent}
+                  onChange={(e) => { setFormData((p) => ({ ...p, gdprConsent: e.target.checked })); if (errors.gdpr) setErrors((p) => ({ ...p, gdpr: '' })); }}
+                  style={{ marginTop: 3, width: 16, height: 16, accentColor: T.INK, flexShrink: 0 }}
+                />
+                <span style={{ fontSize: 11.5, color: T.FG_2, lineHeight: 1.5, fontWeight: 300 }}>
+                  Súhlasím so{' '}
+                  <a href="https://neome.sk/privacy" target="_blank" rel="noreferrer" style={{ color: T.INK, textDecoration: 'underline', textUnderlineOffset: 2 }}>
+                    spracovaním osobných údajov
+                  </a>{' '}
+                  vrátane zdravotných dát (cyklus, symptómy) v súlade s GDPR.
+                </span>
               </label>
+              {errors.gdpr && <FieldError>{errors.gdpr}</FieldError>}
             </div>
-          )}
-          {errors.gdpr && <BodyText size="sm" className="-mt-2 text-terra">{errors.gdpr}</BodyText>}
-
-          {errors.submit && (
-            <div className="px-4 py-3 rounded-2xl bg-white border border-terra/20">
-              <BodyText size="sm" className="text-terra">{errors.submit}</BodyText>
-            </div>
-          )}
-          {errors.success && (
-            <div className="px-4 py-3 rounded-2xl bg-white border border-ink/[0.08]">
-              <BodyText size="sm" tone="secondary">{errors.success}</BodyText>
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full py-4 mt-2 rounded-full bg-ink text-cream font-sans font-semibold text-[15px] tracking-[-0.01em] transition-all active:scale-[0.98] disabled:opacity-40"
-          >
-            {isSubmitting ? 'Spracováva sa…' : (isLogin ? 'Prihlásiť sa' : 'Registrovať sa')}
-          </button>
-
-          {isLogin && (
-            <button
-              type="button"
-              onClick={async () => {
-                if (!formData.email) { setErrors({ submit: 'Zadajte email pre reset hesla.' }); return; }
-                const { error } = await resetPassword(formData.email);
-                if (error) setErrors({ submit: error.message });
-                else setErrors({ success: 'Email na reset hesla bol odoslaný.' });
-              }}
-              className="text-center font-sans text-xs text-ink/40"
-            >
-              Zabudnuté heslo?
+            {errors.submit && <Banner tone="error">{errors.submit}</Banner>}
+            {errors.success && <Banner tone="info">{errors.success}</Banner>}
+            <button type="submit" disabled={submitting} style={primaryPill(submitting)}>
+              {submitting ? 'Spracovávam…' : 'Vytvoriť účet'}
             </button>
+          </form>
+        )}
+
+        {/* Bottom row: switch login ↔ register */}
+        <div style={{ marginTop: 22, textAlign: 'center', fontSize: 13, color: T.FG_2, fontWeight: 300 }}>
+          {mode === 'register' ? (
+            <>Už máš účet?{' '}
+              <button type="button" onClick={() => { setMode('choose'); setErrors({}); }} style={inlineLink()}>Prihlás sa</button>
+            </>
+          ) : (
+            <>Nemáš účet?{' '}
+              <button type="button" onClick={() => { setMode('register'); setErrors({}); }} style={inlineLink()}>Vytvor si ho</button>
+            </>
           )}
-        </form>
-
-        {/* Switch mode */}
-        <div className="mt-8 text-center">
-          <BodyText size="sm" tone="muted">
-            {isLogin ? 'Nemáš účet? ' : 'Máš účet? '}
-            <button onClick={switchMode} className="text-ink font-medium">
-              {isLogin ? 'Registruj sa' : 'Prihláš sa'}
-            </button>
-          </BodyText>
-        </div>
-
-        {/* Trust signals */}
-        <div className="mt-10 pt-8 border-t border-ink/[0.06] flex justify-around">
-          {[['2 400+', 'žien v komunite'], ['105', 'receptov'], ['17', 'meditácií']].map(([n, l]) => (
-            <div key={l} className="text-center">
-              <div className="font-serif text-2xl font-normal text-ink tracking-tight leading-none mb-1">{n}</div>
-              <Eyebrow tone="muted">{l}</Eyebrow>
-            </div>
-          ))}
         </div>
       </div>
     </div>
   );
+}
+
+// ─── Atoms ────────────────────────────────────────────────────────
+function Field({ label, value, onChange, placeholder, type = 'text', autoComplete, trailingButton }: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+  type?: string;
+  autoComplete?: string;
+  trailingButton?: React.ReactNode;
+}) {
+  return (
+    <div style={{ flex: 1, minWidth: 0 }}>
+      <div style={{ fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: T.FG_3, fontWeight: 500, marginBottom: 8 }}>{label}</div>
+      <div style={{ position: 'relative', borderBottom: `1px solid ${T.HAIR_2}`, paddingBottom: 10 }}>
+        <input
+          type={type}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          autoComplete={autoComplete}
+          required
+          style={{
+            width: '100%', border: 0, background: 'transparent',
+            fontFamily: T.SANS, fontSize: 15, color: T.INK, fontWeight: 400,
+            padding: 0, outline: 'none',
+            paddingRight: trailingButton ? 28 : 0,
+          }}
+        />
+        {trailingButton && (
+          <div style={{ position: 'absolute', right: 0, top: 0 }}>{trailingButton}</div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function FieldError({ children }: { children: React.ReactNode }) {
+  return <div style={{ marginTop: -8, fontSize: 11.5, color: T.TERRA, fontWeight: 400 }}>{children}</div>;
+}
+
+function Banner({ tone, children }: { tone: 'error' | 'info'; children: React.ReactNode }) {
+  const isError = tone === 'error';
+  return (
+    <div role="alert" style={{
+      marginTop: 14, padding: '10px 14px', borderRadius: 12,
+      background: isError ? 'rgba(224,90,90,0.10)' : 'rgba(184,150,90,0.10)',
+      border: `1px solid ${isError ? 'rgba(224,90,90,0.32)' : 'rgba(184,150,90,0.32)'}`,
+      fontSize: 13, color: isError ? '#A03A3A' : T.INK,
+    }}>{children}</div>
+  );
+}
+
+function socialBtnDark(): React.CSSProperties {
+  return {
+    width: '100%', padding: '14px 18px', borderRadius: 999,
+    background: T.INK_2, color: '#fff', border: 0, cursor: 'pointer',
+    display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+    fontFamily: T.SANS, fontSize: 13.5, fontWeight: 500, letterSpacing: '0.01em',
+  };
+}
+function socialBtnLight(): React.CSSProperties {
+  return {
+    width: '100%', padding: '14px 18px', borderRadius: 999,
+    background: T.CARD, color: T.INK, border: `1px solid ${T.HAIR_2}`, cursor: 'pointer',
+    display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+    fontFamily: T.SANS, fontSize: 13.5, fontWeight: 500, letterSpacing: '0.01em',
+  };
+}
+function socialBtnOutline(): React.CSSProperties {
+  return {
+    width: '100%', padding: '14px 18px', borderRadius: 999,
+    background: 'transparent', color: T.INK, border: `1px solid ${T.HAIR_2}`, cursor: 'pointer',
+    display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+    fontFamily: T.SANS, fontSize: 13.5, fontWeight: 500, letterSpacing: '0.01em',
+  };
+}
+function primaryPill(submitting: boolean): React.CSSProperties {
+  return {
+    marginTop: 18, width: '100%', padding: '16px 22px', borderRadius: 999,
+    background: T.INK, color: '#fff', border: 0,
+    cursor: submitting ? 'not-allowed' : 'pointer',
+    opacity: submitting ? 0.5 : 1,
+    fontFamily: T.SANS, fontSize: 14, fontWeight: 500, letterSpacing: '0.04em',
+  };
+}
+function backLink(): React.CSSProperties {
+  return {
+    marginTop: 22, background: 'transparent', border: 0, padding: 0, cursor: 'pointer',
+    display: 'inline-flex', alignItems: 'center', gap: 6,
+    fontFamily: T.SANS, fontSize: 11.5, color: T.FG_3, fontWeight: 500, letterSpacing: '0.04em',
+  };
+}
+function textLink(): React.CSSProperties {
+  return {
+    background: 'transparent', border: 0, padding: 0, cursor: 'pointer',
+    fontFamily: T.SANS, fontSize: 12, color: T.FG_2, fontWeight: 400,
+    textDecoration: 'underline', textUnderlineOffset: 3,
+  };
+}
+function inlineLink(): React.CSSProperties {
+  return {
+    background: 'transparent', border: 0, padding: 0, cursor: 'pointer',
+    fontFamily: T.SANS, fontSize: 13, color: T.INK, fontWeight: 500,
+    textDecoration: 'underline', textUnderlineOffset: 3,
+  };
 }
