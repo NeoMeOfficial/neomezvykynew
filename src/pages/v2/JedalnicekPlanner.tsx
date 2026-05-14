@@ -1,5 +1,7 @@
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMealPlan } from '../../features/nutrition/useMealPlan';
+import { useSubscription } from '../../contexts/SubscriptionContext';
 import { recipes } from '../../data/recipes';
 import { Page, BackHeader, Eye, Ser, NM } from '../../components/v2/neome';
 import type { DayPlan, MealSlot } from '../../features/nutrition/types';
@@ -52,7 +54,20 @@ function recipeImg(recipeId: string): string {
 
 export default function JedalnicekPlanner() {
   const navigate = useNavigate();
+  const { hasMealPlanner, isLoading: subLoading } = useSubscription();
   const { plan, activeDay, setActiveDay } = useMealPlan();
+
+  // Gate: this page is the €57 meal-plan add-on. Without the purchase
+  // flag (set by Stripe webhook → profiles.nutrition_plan_purchased),
+  // bounce to the promo / checkout page. Wait for the subscription read
+  // to settle so paid users don't flash a redirect on first paint.
+  useEffect(() => {
+    if (!subLoading && !hasMealPlanner) {
+      navigate('/jedalnicek-promo', { replace: true });
+    }
+  }, [subLoading, hasMealPlanner, navigate]);
+
+  if (!hasMealPlanner) return null;
 
   const today = new Date();
   const dow = (today.getDay() + 6) % 7; // Mon=0

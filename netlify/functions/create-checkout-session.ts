@@ -28,7 +28,7 @@ export async function handler(event: any, context: any) {
   }
 
   try {
-    const { priceId, userId, email, successUrl, cancelUrl } = JSON.parse(event.body);
+    const { priceId, userId, email, mode, successUrl, cancelUrl } = JSON.parse(event.body);
 
     if (!priceId || !userId || !email) {
       return {
@@ -37,6 +37,8 @@ export async function handler(event: any, context: any) {
         body: JSON.stringify({ error: 'Missing required parameters' }),
       };
     }
+
+    const checkoutMode: 'subscription' | 'payment' = mode === 'payment' ? 'payment' : 'subscription';
 
     // Create or retrieve customer
     let customer;
@@ -56,30 +58,37 @@ export async function handler(event: any, context: any) {
       });
     }
 
-    // Create checkout session
-    const session = await stripe.checkout.sessions.create({
+    // Create checkout session — subscription (recurring) vs payment (one-time)
+    const baseParams = {
       customer: customer.id,
-      payment_method_types: ['card'],
+      payment_method_types: ['card'] as const,
       line_items: [
         {
           price: priceId,
           quantity: 1,
         },
       ],
-      mode: 'subscription',
       allow_promotion_codes: true,
-      subscription_data: {
-        trial_period_days: 7,
-        metadata: {
-          userId: userId,
-        },
-      },
       success_url: successUrl,
       cancel_url: cancelUrl,
       metadata: {
         userId: userId,
       },
-    });
+    };
+
+    const session = checkoutMode === 'subscription'
+      ? await stripe.checkout.sessions.create({
+          ...baseParams,
+          mode: 'subscription',
+          subscription_data: {
+            trial_period_days: 7,
+            metadata: { userId },
+          },
+        })
+      : await stripe.checkout.sessions.create({
+          ...baseParams,
+          mode: 'payment',
+        });
 
     return {
       statusCode: 200,

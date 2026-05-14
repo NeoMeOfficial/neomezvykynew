@@ -5,6 +5,11 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2023-10-16',
 });
 
+// Stripe price ID for the €57 nutrition plan one-time purchase. The webhook
+// uses this to identify which checkout.session.completed events should set
+// `profiles.nutrition_plan_purchased = true`.
+const MEAL_PLAN_PRICE_ID = 'price_1TW8SeEpPqBqxo4mOwzTetog';
+
 const supabase = createClient(
   process.env.SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -40,6 +45,16 @@ export async function handler(event: any) {
         await upsertSubscription(sub, false);
         break;
       }
+      case 'checkout.session.completed': {
+        // One-time purchases (mode='payment') land here. Subscriptions
+        // also fire this event but are handled by the subscription.*
+        // cases above.
+        const session = stripeEvent.data.object as Stripe.Checkout.Session;
+        if (session.mode === 'payment') {
+          await handleOneTimePayment(session);
+        }
+        break;
+      }
       default:
         console.log(`Unhandled event type: ${stripeEvent.type}`);
     }
@@ -48,6 +63,35 @@ export async function handler(event: any) {
   } catch (error: any) {
     console.error('Webhook processing error:', error);
     return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
+  }
+}
+
+// Handle one-time purchases. Currently only the €57 meal plan add-on:
+// expanded line items are checked for the known price id, and on match we
+// flip profiles.nutrition_plan_purchased so the client unlocks the planner.
+async function handleOneTimePayment(session: Stripe.Checkout.Session) {
+  const userId = session.metadata?.userId;
+  if (!userId) {
+    console.error('No userId in checkout.session.completed metadata:', session.id);
+    return;
+  }
+
+  const lineItems = await stripe.checkout.sessions.listLineItems(session.id, { limit: 5 });
+  const boughtMealPlan = lineItems.data.some((item) => item.price?.id === MEAL_PLAN_PRICE_ID);
+  if (!boughtMealPlan) {
+    console.log('One-time payment for unknown price — no action:', session.id);
+    return;
+  }
+
+  const { error } = await supabase
+    .from('profiles')
+    .update({ nutrition_plan_purchased: true, updated_at: new Date().toISOString() })
+    .eq('id', userId);
+
+  if (error) {
+    console.error('Failed to flip nutrition_plan_purchased for', userId, ':', error);
+  } else {
+    console.log(`Meal plan purchased — user ${userId} unlocked.`);
   }
 }
 

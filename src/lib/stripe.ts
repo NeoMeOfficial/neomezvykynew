@@ -3,6 +3,12 @@ import { loadStripe } from '@stripe/stripe-js';
 // Initialize Stripe
 export const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
+// One-time purchase: €57 nutrition plan add-on.
+// Activates `profile.nutrition_plan_purchased = true` via the Stripe webhook
+// on checkout.session.completed, which the Subscription context then reads
+// as hasMealPlanner.
+export const MEAL_PLAN_PRICE_ID = 'price_1TW8SeEpPqBqxo4mOwzTetog';
+
 // Subscription plans
 export const SUBSCRIPTION_PLANS = {
   premium: {
@@ -45,8 +51,17 @@ export interface SubscriptionData {
   customer_id: string;
 }
 
-// Create checkout session
-export async function createCheckoutSession(priceId: string, userId: string, email: string) {
+// Create checkout session. `mode` defaults to 'subscription' for the
+// recurring NeoMe Plus plan; pass 'payment' for one-time purchases like
+// the €57 meal plan add-on (the Netlify function omits trial + subscription
+// metadata in payment mode and the webhook treats it as a one-shot flag flip).
+export async function createCheckoutSession(
+  priceId: string,
+  userId: string,
+  email: string,
+  mode: 'subscription' | 'payment' = 'subscription',
+  options?: { successUrl?: string; cancelUrl?: string },
+) {
   try {
     const response = await fetch('/.netlify/functions/create-checkout-session', {
       method: 'POST',
@@ -57,8 +72,9 @@ export async function createCheckoutSession(priceId: string, userId: string, ema
         priceId,
         userId,
         email,
-        successUrl: `${window.location.origin}/domov-new?session_id={CHECKOUT_SESSION_ID}`,
-        cancelUrl: `${window.location.origin}/profil/predplatne?canceled=true`
+        mode,
+        successUrl: options?.successUrl ?? `${window.location.origin}/domov-new?session_id={CHECKOUT_SESSION_ID}`,
+        cancelUrl: options?.cancelUrl ?? `${window.location.origin}/profil/predplatne?canceled=true`,
       }),
     });
 

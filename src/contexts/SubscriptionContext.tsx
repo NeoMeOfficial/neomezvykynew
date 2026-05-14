@@ -21,6 +21,7 @@ import {
   createPortalSession,
   createPortalSessionMock,
   SUBSCRIPTION_PLANS,
+  MEAL_PLAN_PRICE_ID,
   stripePromise,
 } from '../lib/stripe';
 import { supabase } from '../lib/supabase';
@@ -75,7 +76,7 @@ interface SubscriptionContextType {
   // Meal planner (separate one-time purchase)
   hasMealPlanner: boolean;
   canUseMealPlanner: boolean; // alias for hasMealPlanner (used by legacy callers)
-  purchaseMealPlanner: () => void;
+  purchaseMealPlanner: () => Promise<void>;
 
   // Paywall gate — shows paywall modal (managed by provider)
   gate: () => void;
@@ -189,6 +190,19 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
       } else {
         setSubscription(null);
       }
+
+      // Read nutrition_plan_purchased from profile (source of truth — set by
+      // the Stripe webhook on a successful one-time payment). Merge with the
+      // localStorage cache so the UI doesn't flash unpurchased state on reload.
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('nutrition_plan_purchased')
+        .eq('id', userId)
+        .maybeSingle();
+      if (profileData?.nutrition_plan_purchased) {
+        setMealPlannerPurchased(true);
+        localStorage.setItem(MEAL_PLANNER_KEY, 'true');
+      }
     } catch (error) {
       console.error('Error loading subscription:', error);
       setSubscription(null);
@@ -237,10 +251,41 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   const dismissPaywall = useCallback(() => setPaywallVisible(false), []);
 
   // ------ Meal planner ------
-  const purchaseMealPlanner = useCallback(() => {
-    localStorage.setItem(MEAL_PLANNER_KEY, 'true');
-    setMealPlannerPurchased(true);
-  }, []);
+  // Opens a Stripe one-time checkout for the €57 nutrition plan add-on.
+  // On successful payment, the stripe-webhook flips
+  // profiles.nutrition_plan_purchased and loadSubscription() picks it up
+  // on next mount (or on the post-checkout redirect back to /domov-new).
+  // Demo / unconfigured-Stripe path falls back to the previous local-only
+  // unlock so the UI still works end-to-end without keys.
+  const purchaseMealPlanner = useCallback(async () => {
+    if (demoMode || !isStripeConfigured()) {
+      localStorage.setItem(MEAL_PLANNER_KEY, 'true');
+      setMealPlannerPurchased(true);
+      return;
+    }
+    setLoading(true);
+    try {
+      const userId = getUserId();
+      const email = getUserEmail();
+      const sessionId = await createCheckoutSession(
+        MEAL_PLAN_PRICE_ID,
+        userId || 'anon',
+        email || '',
+        'payment',
+        {
+          successUrl: `${window.location.origin}/jedalnicek?session_id={CHECKOUT_SESSION_ID}`,
+          cancelUrl: `${window.location.origin}/jedalnicek-promo?canceled=true`,
+        },
+      );
+      const stripe = await stripePromise;
+      if (stripe) await stripe.redirectToCheckout({ sessionId });
+    } catch (error) {
+      console.error('Error opening meal-plan checkout:', error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  }, [demoMode]);
 
   // ------ Stripe actions ------
   const startCheckout = useCallback(
