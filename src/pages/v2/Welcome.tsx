@@ -5,10 +5,11 @@ const DEEP2 = '#2A1A14';
 const GOLD  = '#B8864A';
 
 const PILLARS = [
-  { n: '01', t: 'Telo',   d: 'Cvičenia od postpartum po silu' },
-  { n: '02', t: 'Strava', d: 'Recepty, plány, cyklová výživa' },
-  { n: '03', t: 'Myseľ',  d: 'Meditácie, denník, reflexia' },
-  { n: '04', t: 'Cyklus', d: 'Fázy, nálady, intuitívne odporúčania' },
+  { n: '01', t: 'Telo',     d: 'Cvičenia od postpartum po silu' },
+  { n: '02', t: 'Strava',   d: 'Recepty, plány, cyklová výživa' },
+  { n: '03', t: 'Myseľ',    d: 'Meditácie, denník, reflexia' },
+  { n: '04', t: 'Periodka', d: 'Fázy, nálady, intuitívne odporúčania' },
+  { n: '05', t: 'Komunita', d: 'Príspevky, otázky, podpora od žien' },
 ];
 
 export default function Welcome() {
@@ -25,7 +26,7 @@ export default function Welcome() {
       style={{
         minHeight: '100vh', position: 'relative',
         backgroundImage: 'linear-gradient(180deg, rgba(42,26,20,0.18) 0%, rgba(42,26,20,0.62) 52%, #2A1A14 100%), url(/images/r9/lifestyle-mother-baby.jpg)',
-        backgroundSize: 'cover', backgroundPosition: 'center',
+        backgroundSize: 'cover', backgroundPosition: 'center top',
         color: '#fff', paddingBottom: 0,
       }}
     >
