@@ -137,9 +137,9 @@ export default function AuthReal() {
       {/* Background photo */}
       <div style={{
         position: 'absolute', inset: 0,
-        backgroundImage: 'url(/images/r9/welcome-hero.webp)',
+        backgroundImage: 'url(/images/r9/login-hero.webp)',
         backgroundSize: 'cover',
-        backgroundPosition: '75% top',
+        backgroundPosition: 'center top',
       }} />
       {/* White gradient — photo fades out around 58% from the top */}
       <div style={{
