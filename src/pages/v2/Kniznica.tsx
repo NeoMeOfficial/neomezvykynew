@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useSubscription } from '@/contexts/SubscriptionContext';
+import { BottomNav } from '@/components/v2/bottom-nav';
 import { SlidersHorizontal, ChevronRight, Salad, Dumbbell, Brain, BookOpen } from 'lucide-react';
 import { recipes } from '@/data/recipes';
 import { programList } from '@/data/programs';
@@ -406,6 +407,8 @@ export default function Kniznica() {
           </div>
         </div>
       )}
+
+      <BottomNav active="kniznica" />
 
       {showSearch && <SearchSheet onClose={() => setShowSearch(false)} />}
     </div>
