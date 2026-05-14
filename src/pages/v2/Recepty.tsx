@@ -66,7 +66,7 @@ export default function Recepty() {
   const handleClick = (r: SupabaseRecipe) => {
     const accessible = isPremium || freeIds.has(r.id);
     if (accessible) {
-      navigate(`/recipe/${r.id}`);
+      navigate(`/recept/${r.id}`);
     } else {
       navigate('/paywall');
     }
