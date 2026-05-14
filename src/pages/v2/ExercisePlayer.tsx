@@ -1,11 +1,12 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Play, Pause, RotateCcw, Share2 } from 'lucide-react';
 import { TopBar } from '@/components/v2/top-bar';
 import { Eyebrow } from '@/components/ui/eyebrow';
 import { BodyText } from '@/components/ui/body-text';
 import { exercises } from '../../data/exercises';
 import FavoriteButton from '../../components/v2/favorites/FavoriteButton';
+import { useSubscription } from '../../contexts/SubscriptionContext';
 
 const INTENSITY_LABEL: Record<string, string> = {
   low: 'Nízka intenzita',
@@ -22,6 +23,7 @@ const INTENSITY_CLASS: Record<string, string> = {
 export default function ExercisePlayer() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { isPremium, isLoading: subLoading } = useSubscription();
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -32,6 +34,17 @@ export default function ExercisePlayer() {
     exercise = exercises.find(e => e.route === routePath || routePath.includes(e.id));
   }
   if (!exercise) exercise = exercises[0];
+
+  // Subscription gate: free users can only access exercises explicitly
+  // marked `free: true` (curated preview set). Everything else routes to
+  // /paywall. Waits for the subscription load so paid users don't flash.
+  const isLocked = !exercise.free && !isPremium;
+  useEffect(() => {
+    if (!subLoading && isLocked) {
+      navigate('/paywall', { replace: true });
+    }
+  }, [subLoading, isLocked, navigate]);
+  if (isLocked) return null;
 
   const isVimeo = !!exercise.videoUrl && /^\d+$/.test(exercise.videoUrl);
 
@@ -73,11 +86,21 @@ export default function ExercisePlayer() {
         onBack={() => navigate(getBackPath())}
         right={
           <div className="flex items-center gap-1">
+            <span
+              className={`px-2 py-0.5 rounded-full text-[10px] font-medium tracking-[0.12em] uppercase ${
+                exercise.free
+                  ? 'bg-pillar-strava/[0.12] text-pillar-strava'
+                  : 'bg-gold/[0.12] text-gold'
+              }`}
+              title={exercise.free ? 'Voľne dostupné' : 'Súčasť NeoMe Plus'}
+            >
+              {exercise.free ? 'Free' : 'Plus'}
+            </span>
             <FavoriteButton
               itemId={exercise.id}
               type="workout"
               title={exercise.name}
-              duration={exercise.duration_minutes ? `${exercise.duration_minutes} min` : undefined}
+              duration={exercise.duration}
               category={exercise.category}
               size="md"
             />

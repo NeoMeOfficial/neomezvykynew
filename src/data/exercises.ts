@@ -11,6 +11,13 @@ export interface Exercise {
   route: string;
   /** Video ID. All-digit string (e.g. "1186819320") is treated as a Vimeo ID; otherwise YouTube ID (e.g. "v7AYKMP6rOE"). When set, renders an embedded player. */
   videoUrl?: string;
+  /**
+   * When true, this exercise is part of the free-tier preview and is
+   * accessible to all signed-in users. When false / undefined, the
+   * ExercisePlayer redirects free users to /paywall. Curated free set —
+   * gives a feel for the library without unlocking the full catalog.
+   */
+  free?: boolean;
 }
 
 // Stretching exercises - ideal for luteal/menstrual phases
@@ -28,6 +35,7 @@ const stretchExercises: Exercise[] = [
     intensity: 'low',
     route: '/stretch/0',
     videoUrl: 'jZ6ZQXB1F7g',
+    free: true,
   },
   {
     id: 'stretch-2',
@@ -67,6 +75,7 @@ const stretchExercises: Exercise[] = [
     intensity: 'low',
     route: '/stretch/3',
     videoUrl: 'jZ6ZQXB1F7g',
+    free: true,
   }
 ];
 
