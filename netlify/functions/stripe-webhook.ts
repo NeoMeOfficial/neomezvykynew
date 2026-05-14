@@ -55,6 +55,24 @@ export async function handler(event: any) {
         }
         break;
       }
+      case 'invoice.payment_failed': {
+        // Subscription renewal payment failed — user's card was declined
+        // or has insufficient funds. Logged so the UI can surface a
+        // "please update card" prompt and so Gabi can email-retarget.
+        await logPaymentEvent(stripeEvent.data.object as Stripe.Invoice, 'invoice_payment_failed');
+        break;
+      }
+      case 'checkout.session.expired': {
+        // User opened a checkout but never paid. Default expiry is 24h.
+        // Captured so we can retarget abandoned €57 meal-plan carts.
+        await logCheckoutEvent(stripeEvent.data.object as Stripe.Checkout.Session, 'checkout_expired');
+        break;
+      }
+      case 'checkout.session.async_payment_failed': {
+        // SEPA / bank-redirect payment failed asynchronously.
+        await logCheckoutEvent(stripeEvent.data.object as Stripe.Checkout.Session, 'async_payment_failed');
+        break;
+      }
       default:
         console.log(`Unhandled event type: ${stripeEvent.type}`);
     }
@@ -63,6 +81,77 @@ export async function handler(event: any) {
   } catch (error: any) {
     console.error('Webhook processing error:', error);
     return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
+  }
+}
+
+// Log a failed invoice (renewal payment declined) to payment_events so the
+// app can surface a card-update prompt and Gabi can retarget the user.
+async function logPaymentEvent(invoice: Stripe.Invoice, eventType: 'invoice_payment_failed') {
+  // Best-effort user lookup: subscription.metadata.userId is the canonical
+  // source. If the invoice is for a subscription we can reach the metadata.
+  let userId: string | null = null;
+  if (invoice.subscription && typeof invoice.subscription === 'string') {
+    try {
+      const sub = await stripe.subscriptions.retrieve(invoice.subscription);
+      userId = sub.metadata?.userId ?? null;
+    } catch (err) {
+      console.warn('Could not fetch subscription for failed invoice:', err);
+    }
+  }
+  // Fallback: invoice.metadata.userId if set
+  if (!userId) userId = invoice.metadata?.userId ?? null;
+
+  const { error } = await supabase.from('payment_events').insert({
+    user_id: userId,
+    event_type: eventType,
+    stripe_object_id: invoice.id,
+    stripe_customer_id: typeof invoice.customer === 'string' ? invoice.customer : invoice.customer?.id,
+    amount_cents: invoice.amount_due ?? invoice.amount_remaining ?? null,
+    currency: invoice.currency,
+    failure_code: (invoice.last_finalization_error?.code as string | undefined) ?? null,
+    failure_message: invoice.last_finalization_error?.message ?? null,
+    metadata: {
+      invoice_number: invoice.number,
+      hosted_invoice_url: invoice.hosted_invoice_url,
+      attempt_count: invoice.attempt_count,
+    },
+  });
+
+  if (error) {
+    console.error('Failed to log invoice payment event:', error);
+  } else {
+    console.log(`Payment event logged — ${eventType} for user ${userId ?? '(unknown)'}, invoice ${invoice.id}`);
+  }
+}
+
+// Log an abandoned / failed checkout session to payment_events. Used for
+// both 'checkout.session.expired' and 'checkout.session.async_payment_failed'.
+async function logCheckoutEvent(
+  session: Stripe.Checkout.Session,
+  eventType: 'checkout_expired' | 'async_payment_failed',
+) {
+  const userId = session.metadata?.userId ?? null;
+
+  const { error } = await supabase.from('payment_events').insert({
+    user_id: userId,
+    event_type: eventType,
+    stripe_object_id: session.id,
+    stripe_customer_id: typeof session.customer === 'string' ? session.customer : session.customer?.id,
+    amount_cents: session.amount_total ?? null,
+    currency: session.currency,
+    failure_code: null,
+    failure_message: null,
+    metadata: {
+      mode: session.mode,
+      customer_email: session.customer_email,
+      payment_status: session.payment_status,
+    },
+  });
+
+  if (error) {
+    console.error('Failed to log checkout event:', error);
+  } else {
+    console.log(`Payment event logged — ${eventType} for user ${userId ?? '(unknown)'}, session ${session.id}`);
   }
 }
 
