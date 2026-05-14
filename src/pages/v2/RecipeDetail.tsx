@@ -2,13 +2,18 @@ import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useUniversalFavorites } from '../../hooks/useUniversalFavorites';
 import { useRecipe, SLOT_LABEL } from '@/hooks/useRecipes';
+import { useMealPlan } from '../../features/nutrition/useMealPlan';
+import { useSubscription } from '../../contexts/SubscriptionContext';
 import { BackHeader, Eye, Ser, Body, NM } from '../../components/v2/neome';
 
 /**
- * Recipe detail — reads from Supabase via useRecipe(id)
+ * Recipe detail — reads from Supabase via useRecipe(id).
  *
- * FEATURE-NEEDED-RECIPE-ADD-TO-PLAN: actually add recipe to active
- * meal plan — currently the button just navigates back.
+ * "Pridať do jedálnička" CTA opens a sheet listing the user's meal-plan
+ * days + slots; tapping a slot inserts the recipe via
+ * useMealPlan.setRecipeForSlot and closes the sheet. Without the meal-plan
+ * add-on (hasMealPlanner=false), the CTA routes to /jedalnicek-promo to
+ * upsell the €57 purchase instead.
  */
 
 function recipeHeroImg(slot: string): string {
@@ -24,12 +29,18 @@ function instructionSteps(text: string | null): string[] {
     .filter(Boolean);
 }
 
+const SK_DAYS_SHORT = ['Po', 'Ut', 'St', 'Št', 'Pi', 'So', 'Ne'] as const;
+
 export default function RecipeDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { isFavorite, toggleFavorite } = useUniversalFavorites();
   const { recipe, loading } = useRecipe(id);
+  const { plan, setRecipeForSlot } = useMealPlan();
+  const { hasMealPlanner } = useSubscription();
   const [checkedIngredients, setCheckedIngredients] = useState<Set<number>>(new Set());
+  const [showPicker, setShowPicker] = useState(false);
+  const [picked, setPicked] = useState<{ dayIndex: number; slotIndex: number } | null>(null);
 
   const toggleIngredient = (i: number) => {
     setCheckedIngredients((prev) => {
@@ -37,6 +48,29 @@ export default function RecipeDetail() {
       if (next.has(i)) next.delete(i); else next.add(i);
       return next;
     });
+  };
+
+  const onAddToPlan = () => {
+    if (!hasMealPlanner) {
+      navigate('/jedalnicek-promo');
+      return;
+    }
+    if (!plan) {
+      navigate('/jedalnicek');
+      return;
+    }
+    setShowPicker(true);
+  };
+
+  const onPickSlot = (dayIndex: number, slotIndex: number) => {
+    if (!recipe) return;
+    setRecipeForSlot(dayIndex, slotIndex, recipe.id);
+    setPicked({ dayIndex, slotIndex });
+    // Close after a short confirmation moment so user sees the tick.
+    setTimeout(() => {
+      setShowPicker(false);
+      setPicked(null);
+    }, 700);
   };
 
   if (loading) {
@@ -227,7 +261,7 @@ export default function RecipeDetail() {
           </svg>
         </button>
         <button
-          onClick={() => navigate('/jedalnicek')}
+          onClick={onAddToPlan}
           style={{
             flex: 1, padding: '16px 20px',
             background: NM.DEEP, color: '#fff', border: 'none', borderRadius: 999,
@@ -237,6 +271,85 @@ export default function RecipeDetail() {
           Pridať do jedálnička
         </button>
       </div>
+
+      {/* Day + slot picker sheet */}
+      {showPicker && plan && (
+        <div
+          onClick={() => setShowPicker(false)}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 60,
+            background: 'rgba(42,26,20,0.42)', backdropFilter: 'blur(4px)',
+            display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              width: '100%', maxWidth: 520, maxHeight: '85vh', overflow: 'auto',
+              background: NM.BG, borderTopLeftRadius: 22, borderTopRightRadius: 22,
+              padding: '20px 18px calc(env(safe-area-inset-bottom) + 20px)',
+              boxShadow: '0 -8px 30px rgba(0,0,0,0.18)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+              <Eye>Pridať do jedálnička</Eye>
+              <button
+                onClick={() => setShowPicker(false)}
+                aria-label="Zavrieť"
+                style={{ all: 'unset', cursor: 'pointer', padding: 6, fontFamily: NM.SANS, fontSize: 13, color: NM.MUTED }}
+              >
+                Zrušiť
+              </button>
+            </div>
+            <Ser size={20} style={{ marginBottom: 4 }}>
+              Kde mám pridať <em style={{ color: NM.TERRA, fontStyle: 'italic', fontWeight: 500 }}>{recipe?.name}</em>?
+            </Ser>
+            <Body style={{ marginBottom: 16, color: NM.TERTIARY, fontSize: 12 }}>
+              Vyber deň a jedlo — nahradí aktuálne vybranú možnosť pre daný slot.
+            </Body>
+
+            {plan.days.map((day, dayIdx) => {
+              const date = new Date(day.date);
+              const dayLabel = SK_DAYS_SHORT[(date.getDay() + 6) % 7];
+              return (
+                <div key={day.date} style={{ marginBottom: 14 }}>
+                  <div style={{ fontFamily: NM.SANS, fontSize: 11, fontWeight: 500, color: NM.MUTED, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 8 }}>
+                    {dayLabel} · {date.getDate()}.
+                  </div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                    {day.meals.map((meal, slotIdx) => {
+                      const isPicked = picked?.dayIndex === dayIdx && picked?.slotIndex === slotIdx;
+                      return (
+                        <button
+                          key={meal.type}
+                          onClick={() => onPickSlot(dayIdx, slotIdx)}
+                          disabled={picked !== null}
+                          style={{
+                            all: 'unset', cursor: picked === null ? 'pointer' : 'default',
+                            padding: '8px 12px', borderRadius: 999,
+                            background: isPicked ? NM.SAGE : '#fff',
+                            color: isPicked ? '#fff' : NM.DEEP,
+                            border: `1px solid ${isPicked ? NM.SAGE : NM.HAIR_2}`,
+                            fontFamily: NM.SANS, fontSize: 12, fontWeight: 500,
+                            display: 'inline-flex', alignItems: 'center', gap: 6,
+                          }}
+                        >
+                          {meal.label}
+                          {isPicked && (
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M20 6L9 17l-5-5" />
+                            </svg>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

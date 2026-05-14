@@ -116,6 +116,37 @@ export function useMealPlan() {
     setActiveWeek(getWeekForDay(todayIdx));
   }, [queueSync]);
 
+  /**
+   * Replace the currently-selected option of a specific meal slot with a
+   * different recipe. Used by RecipeDetail's "Pridať do jedálnička" flow:
+   * user picks a day + slot, we drop the chosen recipe into that slot.
+   * The other option (recipe at meal.options[1 - meal.selected]) is kept
+   * so the user can still swap back, matching the existing two-option UX.
+   */
+  const setRecipeForSlot = useCallback(
+    (dayIndex: number, mealIndex: number, recipeId: string) => {
+      setPlan((prev) => {
+        if (!prev) return prev;
+        const newPlan = { ...prev, days: [...prev.days] };
+        const day = { ...newPlan.days[dayIndex], meals: [...newPlan.days[dayIndex].meals] };
+        const meal = { ...day.meals[mealIndex], options: [...day.meals[mealIndex].options] as [string, string] };
+
+        // Insert into the currently-selected slot, leave the alt option intact.
+        meal.options[meal.selected] = recipeId;
+
+        // Reset portion multiplier — caller can re-tune later via swapMeal logic.
+        meal.portionMultiplier = 1;
+
+        day.meals[mealIndex] = meal;
+        newPlan.days[dayIndex] = recalculateDayTotals(day);
+        savePlan(newPlan);
+        queueSync(newPlan);
+        return newPlan;
+      });
+    },
+    [queueSync],
+  );
+
   const swapMeal = useCallback((dayIndex: number, mealIndex: number) => {
     setPlan((prev) => {
       if (!prev) return prev;
@@ -164,6 +195,7 @@ export function useMealPlan() {
     plan,
     generatePlan,
     swapMeal,
+    setRecipeForSlot,
     todayPlan,
     activeDay,
     activeWeek,
