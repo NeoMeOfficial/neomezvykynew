@@ -1,8 +1,12 @@
 /**
- * useStretches — reads the public `stretches` table (migration
- * 20260514140001_stretches_table.sql). Stretches are kept in their own
- * table from exercises so pillar-specific filters and rules can evolve
- * independently.
+ * useStretches — reads the existing unified `exercises` table on prod
+ * (the same one useExercises queries), filtered to content_type='stretch'.
+ *
+ * Production schema has both types in one table with a discriminator;
+ * this hook just isolates the stretch subset and adapts column names
+ * to the DbStretch shape used by the UI.
+ *
+ * Falls back to hardcoded preview when Supabase isn't configured.
  */
 import { useEffect, useState } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
@@ -23,13 +27,71 @@ export interface DbStretch {
   sort_order: number;
 }
 
+interface RawExercise {
+  id: string;
+  content_type: 'exercise' | 'stretch';
+  name: string;
+  duration: string | null;
+  category: string | null;
+  body: string | null;
+  equip: string | null;
+  level: number | null;
+  thumb: string | null;
+  video_url: string | null;
+  active: boolean | null;
+}
+
+function parseDurationMin(s: string | null): number {
+  if (!s) return 10;
+  const m = s.match(/(\d+)/);
+  return m ? parseInt(m[1], 10) : 10;
+}
+
+function detectProvider(videoUrl: string | null): 'vimeo' | 'youtube' | null {
+  if (!videoUrl) return null;
+  if (videoUrl.includes('vimeo.com') || /^\d+$/.test(videoUrl)) return 'vimeo';
+  if (videoUrl.includes('youtu')) return 'youtube';
+  return null;
+}
+
+function extractVideoId(videoUrl: string | null): string | null {
+  if (!videoUrl) return null;
+  if (/^\d+$/.test(videoUrl)) return videoUrl;
+  if (/^[A-Za-z0-9_-]{11}$/.test(videoUrl)) return videoUrl;
+  const v = videoUrl.match(/vimeo\.com\/(\d+)/);
+  if (v) return v[1];
+  const y = videoUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([A-Za-z0-9_-]{11})/);
+  if (y) return y[1];
+  return null;
+}
+
+function adapt(row: RawExercise, index: number): DbStretch {
+  // Stretches are generally low-intensity in this catalog; treat short
+  // ones (≤5 min) and the first morning stretch as free preview.
+  const dur = parseDurationMin(row.duration);
+  return {
+    id: row.id,
+    name: row.name,
+    duration_min: dur,
+    body_target: row.body ?? 'Celé telo',
+    equipment: row.equip ?? 'Bez pomôcok',
+    thumb_url: row.thumb,
+    phase: 'all',
+    intensity: 'low',
+    video_id: extractVideoId(row.video_url),
+    video_provider: detectProvider(row.video_url),
+    free: dur <= 7 || row.id === 'ranny-prebudzac' || row.id === 'krk-plecia',
+    sort_order: index + 1,
+  };
+}
+
 function fallback(): DbStretch[] {
   return LOCAL_FALLBACK
     .filter((e) => e.category === 'stretch')
     .map((e, i): DbStretch => ({
       id: e.id,
       name: e.name,
-      duration_min: parseInt(e.duration, 10) || 15,
+      duration_min: parseDurationMin(e.duration),
       body_target: e.body,
       equipment: e.equip,
       thumb_url: e.thumb,
@@ -56,14 +118,16 @@ export function useStretches() {
     }
     setLoading(true);
     supabase
-      .from('stretches')
-      .select('*')
-      .order('sort_order', { ascending: true })
+      .from('exercises')
+      .select('id, content_type, name, duration, category, body, equip, level, thumb, video_url, active')
+      .eq('content_type', 'stretch')
+      .eq('active', true)
+      .order('id', { ascending: true })
       .then(({ data, error }) => {
-        if (error || !data) {
+        if (error || !data || data.length === 0) {
           setStretches(fallback());
         } else {
-          setStretches(data as DbStretch[]);
+          setStretches(data.map((r, i) => adapt(r as RawExercise, i)));
         }
         setLoading(false);
       });

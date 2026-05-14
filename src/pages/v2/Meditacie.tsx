@@ -9,24 +9,23 @@ import { BodyText } from '@/components/ui/body-text';
 import { SectionHeader } from '@/components/ui/section-header';
 import { useMeditations, DbMeditation } from '../../hooks/useMeditations';
 
-const CATEGORIES: { label: string; filter: DbMeditation['category'] | null }[] = [
-  { label: 'Všetko', filter: null },
-  { label: 'Ráno',   filter: 'rano' },
-  { label: 'Spánok', filter: 'spanok' },
-  { label: 'Stres',  filter: 'stres' },
-  { label: 'Fokus',  filter: 'fokus' },
-  { label: 'Dych',   filter: 'dych' },
+// Categories match the prod meditations.category values (free-form Slovak
+// labels set by Gabi in the admin / SQL editor): 'Mindfulness', 'Spánok',
+// 'Stres', 'Materstvo', 'Emócie', 'Ja'. Filter list is hand-picked from
+// what's currently in the table.
+const CATEGORIES: { label: string; filter: string | null }[] = [
+  { label: 'Všetko',      filter: null },
+  { label: 'Mindfulness', filter: 'Mindfulness' },
+  { label: 'Spánok',      filter: 'Spánok' },
+  { label: 'Stres',       filter: 'Stres' },
+  { label: 'Materstvo',   filter: 'Materstvo' },
+  { label: 'Emócie',      filter: 'Emócie' },
 ];
-
-const CAT_LABEL: Record<DbMeditation['category'], string> = {
-  rano: 'Ráno', vecer: 'Večer', spanok: 'Spánok', stres: 'Stres',
-  fokus: 'Fokus', dych: 'Dych', uzkost: 'Úzkosť', telo: 'Telo', general: 'Všeobecné',
-};
 
 export default function Meditacie() {
   const navigate = useNavigate();
   const { meditations, loading } = useMeditations();
-  const [activeCat, setActiveCat] = useState<DbMeditation['category'] | null>(null);
+  const [activeCat, setActiveCat] = useState<string | null>(null);
 
   const featured = meditations[0] ?? null;
   const list = meditations.slice(1).filter((s) => activeCat === null || s.category === activeCat);
@@ -51,7 +50,7 @@ export default function Meditacie() {
           </div>
           <div className="flex-1 min-w-0">
             <Eyebrow tone="muted" className="mb-0.5">
-              {CAT_LABEL[featured.category] ?? featured.category} · {minutesOf(featured)} min
+              {featured.category} · {minutesOf(featured)} min
             </Eyebrow>
             <div className="font-serif text-h3 text-ink leading-snug truncate">{featured.title}</div>
             {featured.subtitle && (
@@ -104,7 +103,7 @@ export default function Meditacie() {
               </div>
               <div className="flex-1 min-w-0">
                 <Eyebrow tone="muted" className="mb-0.5">
-                  {CAT_LABEL[session.category] ?? session.category} · {minutesOf(session)} min
+                  {session.category} · {minutesOf(session)} min
                 </Eyebrow>
                 <div className="font-serif text-h3 text-ink leading-snug">{session.title}</div>
               </div>
