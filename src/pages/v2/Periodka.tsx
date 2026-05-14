@@ -33,11 +33,22 @@ import type { DerivedState, CycleData } from '../../features/cycle/types';
  * Old version: Periodka.old.tsx.
  */
 
+// Round 18 phase palette: ROSE (menstrual), SAGE (follicular),
+// LILAC (ovulation), SAND (luteal). Plus tints used for calendar cell
+// fills, halo backgrounds, and active-state glows.
 const PHASE = {
-  MENSTR: '#D69A9A',
-  FOLLIC: '#A8C4A0',
-  OVULAT: '#C8A8D4',
-  LUTEAL: '#D4B48C',
+  MENSTR: '#C98FA3',   // ROSE
+  FOLLIC: '#8B9E88',   // SAGE
+  OVULAT: '#B7A5C8',   // LILAC
+  LUTEAL: '#D6C2A8',   // SAND
+};
+const TINT = {
+  MENSTR_50:  '#FAEEF2',
+  MENSTR_100: '#F2DEE6',
+  FOLLIC_100: '#D8DFD7',
+  OVULAT_100: '#E2D6EE',
+  LUTEAL_100: '#EBDCC6',
+  GOLD_SOFT:  'rgba(184,150,90,0.15)',
 };
 
 function TopBar({ title, showLock = false, onBack, onSettings }: { title: string; showLock?: boolean; onBack?: () => void; onSettings?: () => void }) {
@@ -108,22 +119,20 @@ function RingDial({
         {phases.map((p, i) => (
           <path key={i} d={arc(p.s, p.e)} stroke={p.c} strokeWidth={strokeW} fill="none" strokeLinecap="butt" opacity={0.85} />
         ))}
-        {[0, 7, 14, 21].map((d) => {
-          const [x, y] = polar(d);
-          return <circle key={d} cx={x} cy={y} r={2} fill={NM.DEEP} opacity={0.3} />;
-        })}
-        <circle cx={mx} cy={my} r={9} fill={NM.BG} />
-        <circle cx={mx} cy={my} r={6.5} fill={NM.DEEP} />
-        <text x={cx} y={cy - 18} textAnchor="middle" fontFamily="DM Sans" fontSize="9.5" letterSpacing="2.5" fill={NM.TERTIARY}>
+        {/* Today marker — ink-filled chip with white border (Round 18) */}
+        <circle cx={mx} cy={my} r={11} fill="#fff" />
+        <circle cx={mx} cy={my} r={9} fill={NM.DEEP} />
+
+        <text x={cx} y={cy - 22} textAnchor="middle" fontFamily="DM Sans" fontSize="9.5" letterSpacing="2.5" fill={NM.TERTIARY}>
           DEŇ
         </text>
-        <text x={cx} y={cy + 10} textAnchor="middle" fontFamily="Gilda Display" fontSize="38" fontWeight="500" fill={NM.DEEP} letterSpacing="-0.5">
+        <text x={cx} y={cy + 14} textAnchor="middle" fontFamily="Gilda Display" fontSize="48" fontWeight="500" fill={NM.DEEP} letterSpacing="-1">
           {currentDay}
         </text>
-        <text x={cx} y={cy + 32} textAnchor="middle" fontFamily="Gilda Display" fontSize="13" fontWeight="500" fill={phaseColor} fontStyle="italic">
+        <text x={cx} y={cy + 36} textAnchor="middle" fontFamily="Gilda Display" fontSize="14" fontWeight="500" fill={NM.GOLD} fontStyle="italic">
           {phaseLabel}
         </text>
-        <text x={cx} y={cy + 48} textAnchor="middle" fontFamily="DM Sans" fontSize="10" fill={NM.MUTED}>
+        <text x={cx} y={cy + 52} textAnchor="middle" fontFamily="DM Sans" fontSize="10" fill={NM.TERTIARY}>
           {daysToNextLabel}
         </text>
       </svg>
@@ -131,21 +140,32 @@ function RingDial({
   );
 }
 
-function PhaseLegend() {
+function PhaseLegend({ activeKey }: { activeKey?: string }) {
   const items = [
-    { n: 'Menštruácia', c: PHASE.MENSTR },
-    { n: 'Folikulárna', c: PHASE.FOLLIC },
-    { n: 'Ovulácia', c: PHASE.OVULAT },
-    { n: 'Luteálna', c: PHASE.LUTEAL },
+    { k: 'menstrual',  n: 'Menštruácia', c: PHASE.MENSTR },
+    { k: 'follicular', n: 'Folikulárna', c: PHASE.FOLLIC },
+    { k: 'ovulation',  n: 'Ovulácia',    c: PHASE.OVULAT },
+    { k: 'luteal',     n: 'Luteálna',    c: PHASE.LUTEAL },
   ];
   return (
-    <div style={{ padding: '0 20px 22px', display: 'flex', justifyContent: 'space-between' }}>
-      {items.map((p) => (
-        <div key={p.n} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5 }}>
-          <div style={{ width: 10, height: 10, borderRadius: 999, background: p.c }} />
-          <div style={{ fontFamily: NM.SANS, fontSize: 10, color: NM.MUTED }}>{p.n}</div>
-        </div>
-      ))}
+    <div style={{ padding: '8px 20px 22px', display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 6 }}>
+      {items.map((p) => {
+        const active = activeKey === p.k;
+        return (
+          <div key={p.k} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+            <div style={{
+              width: 7, height: 7, borderRadius: 999, background: p.c,
+              boxShadow: active ? `0 0 0 4px ${p.c}28` : 'none',
+            }} />
+            <div style={{
+              fontFamily: NM.SANS, fontSize: 10.5,
+              color: active ? NM.DEEP : NM.MUTED,
+              fontWeight: active ? 500 : 400,
+              letterSpacing: '0.02em',
+            }}>{p.n}</div>
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -177,6 +197,12 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart }: Paid
     ovulation: PHASE.OVULAT,
     luteal: PHASE.LUTEAL,
   };
+  const phaseTintByKey: Record<string, string> = {
+    menstrual: TINT.MENSTR_100,
+    follicular: TINT.FOLLIC_100,
+    ovulation: TINT.OVULAT_100,
+    luteal: TINT.LUTEAL_100,
+  };
   const phaseColor = phaseColorByKey[currentPhaseKey];
   const currentPhaseName = derivedState?.currentPhase?.name ?? 'Folikulárna';
   const today = derivedState?.today ?? new Date();
@@ -189,6 +215,10 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart }: Paid
   const phaseOf = (d: number) => {
     const range = phases.find((p) => d >= p.start && d <= p.end);
     return range ? phaseColorByKey[range.key] : null;
+  };
+  const phaseTintOf = (d: number) => {
+    const range = phases.find((p) => d >= p.start && d <= p.end);
+    return range ? phaseTintByKey[range.key] : null;
   };
 
   const daysToMenstruation = Math.max(0, totalDays - currentDay);
@@ -292,34 +322,50 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart }: Paid
 
   return (
     <>
-      <TopBar title="Cyklus" onBack={() => navigate('/domov-new')} onSettings={() => navigate('/kniznica/periodka/nastavenia')} />
-      <div style={{ padding: '2px 20px 6px' }}>
+      {/* Round 18 top bar — back chevron + centered Gilda title + calendar shortcut */}
+      <div style={{ padding: 'calc(env(safe-area-inset-top) + 14px) 20px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <button onClick={() => navigate('/domov-new')} aria-label="Späť" style={{ all: 'unset', width: 36, height: 36, borderRadius: 999, background: '#fff', border: `1px solid ${NM.HAIR_2}`, display: 'grid', placeItems: 'center', cursor: 'pointer' }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={NM.DEEP} strokeWidth="1.8" strokeLinecap="round"><path d="M15 6l-6 6 6 6"/></svg>
+        </button>
+        <div style={{ fontFamily: NM.SERIF, fontSize: 20, fontWeight: 400, color: NM.DEEP, letterSpacing: '-0.005em' }}>Cyklus</div>
+        <button onClick={() => navigate('/kniznica/periodka/nastavenia')} aria-label="Nastavenia cyklu" style={{ all: 'unset', width: 36, height: 36, borderRadius: 999, background: '#fff', border: `1px solid ${NM.HAIR_2}`, display: 'grid', placeItems: 'center', cursor: 'pointer' }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={NM.DEEP} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="4" y="5" width="16" height="16" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>
+          </svg>
+        </button>
+      </div>
+
+      <div style={{ padding: '4px 22px 0' }}>
         <Eye color={NM.GOLD}>{head.eye}</Eye>
-        <Ser size={30} style={{ marginTop: 10, lineHeight: 1.02 }}>
+        <Ser size={40} style={{ marginTop: 12, lineHeight: 1.05 }}>
           {head.before}
           <br />
-          <em style={{ color: phaseColor, fontStyle: 'italic', fontWeight: 500 }}>{head.em}</em>
+          <em style={{ color: NM.GOLD, fontStyle: 'italic', fontWeight: 400 }}>{head.em}</em>
         </Ser>
-        <Body style={{ marginTop: 10, maxWidth: 320 }}>{head.body}</Body>
+        <Body style={{ marginTop: 12, maxWidth: 320 }}>{head.body}</Body>
       </div>
 
       <RingDial currentDay={currentDay} totalDays={totalDays} phaseLabel={currentPhaseName} phaseColor={phaseColor} daysToNextLabel={`menštruácia o ${daysToMenstruation} dní`} />
-      <PhaseLegend />
+      <PhaseLegend activeKey={currentPhaseKey} />
 
-      <div style={{ padding: '0 20px 22px', display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 8 }}>
+      <div style={{ padding: '0 18px 0', display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 8 }}>
         {[
-          { eye: 'Priemer', v: `${totalDays} dní`, c: NM.DEEP },
-          { eye: 'Predpoveď', v: nextPeriodLabel, c: PHASE.MENSTR },
-          { eye: 'Ovulácia', v: `o ${daysToOvulation} dní`, c: PHASE.OVULAT },
+          { eye: 'Priemer',   v: String(totalDays), suf: 'dní', c: NM.DEEP },
+          { eye: 'Predpoveď', v: nextPeriodLabel.replace(/\.$/, ''), suf: '', c: PHASE.MENSTR },
+          { eye: 'Ovulácia',  v: String(daysToOvulation), suf: 'dní', c: PHASE.OVULAT, prefix: 'o' },
         ].map((s) => (
-          <div key={s.eye} style={{ padding: '12px 10px', background: NM.CREAM_2 ?? '#F1ECE3', borderRadius: 12, textAlign: 'center' }}>
+          <div key={s.eye} style={{ padding: '14px 12px', background: '#fff', border: `1px solid ${NM.HAIR}`, borderRadius: 18, textAlign: 'center' }}>
             <Eye size={9} color={NM.TERTIARY}>{s.eye}</Eye>
-            <div style={{ fontFamily: NM.SERIF, fontSize: 15, fontWeight: 500, color: s.c, marginTop: 6, letterSpacing: '-0.005em' }}>{s.v}</div>
+            <div style={{ marginTop: 10, display: 'inline-flex', alignItems: 'baseline', gap: 4 }}>
+              {s.prefix && <span style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.TERTIARY, fontWeight: 500 }}>{s.prefix}</span>}
+              <span style={{ fontFamily: NM.SERIF, fontSize: 26, fontWeight: 400, color: s.c, letterSpacing: '-0.01em', lineHeight: 1 }}>{s.v}</span>
+              {s.suf && <span style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.TERTIARY, fontWeight: 500, letterSpacing: '0.04em' }}>{s.suf}</span>}
+            </div>
           </div>
         ))}
       </div>
 
-      <div style={{ padding: '0 20px 24px' }}>
+      <div style={{ padding: '18px 18px 0' }}>
         <button
           onClick={onMarkPeriodStart}
           style={{
@@ -327,25 +373,25 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart }: Paid
             cursor: 'pointer',
             display: 'flex',
             width: '100%',
-            padding: '14px 18px',
-            borderRadius: 16,
+            padding: '14px 16px',
+            borderRadius: 20,
             background: '#fff',
             border: `1.5px solid ${PHASE.MENSTR}`,
             alignItems: 'center',
-            gap: 12,
+            gap: 14,
             boxSizing: 'border-box',
           }}
         >
-          <div style={{ width: 30, height: 30, borderRadius: 999, background: PHASE.MENSTR, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 2l4 8a5 5 0 1 1-8 0l4-8z" />
+          <div style={{ width: 44, height: 44, borderRadius: 999, background: TINT.MENSTR_50, display: 'grid', placeItems: 'center', flexShrink: 0 }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill={PHASE.MENSTR}>
+              <path d="M12 3c-3 4-6 7.5-6 12a6 6 0 1 0 12 0c0-4.5-3-8-6-12z" />
             </svg>
           </div>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontFamily: NM.SANS, fontSize: 13, color: NM.DEEP, fontWeight: 500 }}>Dnes mi začala menštruácia</div>
-            <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.EYEBROW, marginTop: 2, fontWeight: 300 }}>Zaznamenať začiatok cyklu</div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontFamily: NM.SERIF, fontSize: 16, color: NM.DEEP, letterSpacing: '-0.005em' }}>Dnes mi začala menštruácia</div>
+            <div style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.EYEBROW, marginTop: 3, fontWeight: 300 }}>Zaznamenať začiatok cyklu</div>
           </div>
-          <div style={{ color: PHASE.MENSTR, fontSize: 18 }}>›</div>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={NM.TERTIARY} strokeWidth="1.8" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
         </button>
       </div>
 
@@ -361,9 +407,9 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart }: Paid
             </div>
           ))}
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: 3 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: 4 }}>
           {weeks.flat().map((c, i) => {
-            const phCol = !c.mute ? phaseOf(c.d) : null;
+            const tint = !c.mute ? phaseTintOf(c.d) : null;
             const today = !c.mute && c.d === todayDate;
             const sym = !c.mute && symptomDays.includes(c.d);
             return (
@@ -372,15 +418,20 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart }: Paid
                 style={{
                   position: 'relative',
                   aspectRatio: '1',
-                  borderRadius: 8,
-                  background: today ? NM.DEEP : phCol ? phCol + '38' : 'transparent',
-                  border: today ? 'none' : phCol ? `1px solid ${phCol}66` : '1px solid transparent',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
+                  borderRadius: 9,
+                  background: today ? NM.DEEP : tint ?? 'transparent',
+                  display: 'grid',
+                  placeItems: 'center',
                 }}
               >
-                <div style={{ fontFamily: NM.SERIF, fontSize: 13, fontWeight: today ? 500 : 400, color: today ? '#fff' : c.mute ? 'rgba(61,41,33,0.25)' : NM.DEEP }}>{c.d}</div>
+                <div style={{
+                  fontFamily: NM.SERIF,
+                  fontSize: 14,
+                  fontWeight: today ? 500 : 400,
+                  letterSpacing: '-0.01em',
+                  color: today ? '#fff' : c.mute ? 'rgba(61,41,33,0.40)' : NM.DEEP,
+                  opacity: c.mute ? 0.5 : 1,
+                }}>{c.d}</div>
                 {sym && (
                   <div style={{ position: 'absolute', bottom: 2.5, display: 'flex', gap: 1.5 }}>
                     {[0, 1, 2].map((k) => (
@@ -394,9 +445,9 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart }: Paid
         </div>
       </div>
 
-      <div style={{ padding: '26px 20px 0' }}>
-        <Eye style={{ marginBottom: 12 }}>Ako sa dnes cítiš</Eye>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+      <div style={{ padding: '28px 18px 0' }}>
+        <Eye style={{ marginBottom: 14 }}>Ako sa dnes cítiš</Eye>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
           {symptoms.map((s) => (
             <button
               key={s.k}
@@ -404,14 +455,14 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart }: Paid
               style={{
                 all: 'unset',
                 cursor: 'pointer',
-                padding: '7px 12px',
+                padding: '8px 14px',
                 borderRadius: 999,
-                background: s.on ? NM.DEEP : '#fff',
-                color: s.on ? '#fff' : NM.DEEP,
-                border: s.on ? 'none' : `1px solid ${NM.HAIR_2}`,
+                background: s.on ? TINT.GOLD_SOFT : '#fff',
+                color: s.on ? NM.GOLD : NM.DEEP,
+                border: `1px solid ${s.on ? NM.GOLD : NM.HAIR_2}`,
                 fontFamily: NM.SANS,
-                fontSize: 12,
-                fontWeight: s.on ? 400 : 300,
+                fontSize: 12.5,
+                fontWeight: s.on ? 500 : 400,
               }}
             >
               {s.l}
@@ -420,12 +471,13 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart }: Paid
         </div>
       </div>
 
-      <div style={{ padding: '28px 20px 0' }}>
-        <Eye style={{ marginBottom: 6 }}>Pre {currentPhaseName.toLowerCase()} fázu · deň {dayInPhase}</Eye>
-        <Ser size={20} style={{ marginTop: 8, lineHeight: 1.2 }}>
-          Ako sa dnes môžeš cítiť <em style={{ color: phaseColor, fontWeight: 500, fontStyle: 'italic' }}>ešte lepšie</em>
+      <div style={{ padding: '32px 22px 0' }}>
+        <Eye color={NM.GOLD}>Pre {currentPhaseName.toLowerCase()} fázu · deň {dayInPhase}</Eye>
+        <Ser size={28} style={{ marginTop: 12, lineHeight: 1.1 }}>
+          Ako sa dnes môžeš cítiť<br />
+          <em style={{ color: NM.GOLD, fontWeight: 400, fontStyle: 'italic' }}>ešte lepšie</em>
         </Ser>
-        <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column' }}>
+        <div style={{ marginTop: 18, display: 'flex', flexDirection: 'column' }}>
           {advice.map((r, i) => (
             <button
               key={r.pillar}
@@ -433,28 +485,28 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart }: Paid
               style={{
                 all: 'unset',
                 cursor: 'pointer',
-                padding: '14px 0',
+                padding: '16px 0',
                 display: 'flex',
                 alignItems: 'flex-start',
-                gap: 12,
+                gap: 14,
                 borderBottom: i < advice.length - 1 ? `1px solid ${NM.HAIR}` : 'none',
               }}
             >
-              <div style={{ width: 52, height: 66, borderRadius: 8, backgroundImage: `url(/images/r9/${r.img})`, backgroundSize: 'cover', backgroundPosition: 'center', flexShrink: 0 }} />
+              <div style={{ width: 88, height: 88, flexShrink: 0, borderRadius: 14, backgroundImage: `url(/images/r9/${r.img})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
               <div style={{ flex: 1, minWidth: 0 }}>
-                <Eye size={8.5} color={r.color}>{r.pillar}</Eye>
-                <div style={{ fontFamily: NM.SERIF, fontSize: 15, fontWeight: 500, color: NM.DEEP, marginTop: 3, letterSpacing: '-0.005em' }}>{r.title}</div>
-                <Body size={11.5} style={{ marginTop: 4 }}>{r.body}</Body>
+                <Eye size={10} color={r.color}>{r.pillar}</Eye>
+                <div style={{ fontFamily: NM.SERIF, fontSize: 20, fontWeight: 400, color: NM.DEEP, marginTop: 6, letterSpacing: '-0.01em', lineHeight: 1.15 }}>{r.title}</div>
+                <Body size={12.5} style={{ marginTop: 6 }}>{r.body}</Body>
               </div>
-              <div style={{ color: NM.EYEBROW, fontSize: 14, marginTop: 4 }}>›</div>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={NM.TERTIARY} strokeWidth="1.7" strokeLinecap="round" style={{ flexShrink: 0, marginTop: 6 }}><path d="M9 6l6 6-6 6"/></svg>
             </button>
           ))}
         </div>
       </div>
 
-      <div style={{ padding: '24px 20px 8px' }}>
-        <Eye style={{ marginBottom: 12 }}>Čaká ťa</Eye>
-        <div>
+      <div style={{ padding: '28px 22px 8px' }}>
+        <Eye>Čaká ťa</Eye>
+        <div style={{ marginTop: 16 }}>
           {[
             { w: 'O 7 dní', t: 'Začiatok ovulácie', c: PHASE.OVULAT },
             { w: 'O 21 dní', t: 'Nasledujúca menštruácia', c: PHASE.MENSTR },
@@ -465,13 +517,13 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart }: Paid
                 display: 'flex',
                 alignItems: 'center',
                 gap: 12,
-                padding: '12px 0',
+                padding: '14px 0',
                 borderBottom: i < arr.length - 1 ? `1px solid ${NM.HAIR}` : 'none',
               }}
             >
-              <div style={{ width: 6, height: 6, borderRadius: 999, background: u.c }} />
-              <div style={{ flex: 1, fontFamily: NM.SANS, fontSize: 13, color: NM.DEEP }}>{u.t}</div>
-              <div style={{ fontFamily: NM.SANS, fontSize: 13, color: NM.MUTED }}>{u.w}</div>
+              <div style={{ width: 8, height: 8, borderRadius: 999, background: u.c, flexShrink: 0 }} />
+              <div style={{ flex: 1, fontFamily: NM.SANS, fontSize: 13, color: NM.DEEP, fontWeight: 400 }}>{u.t}</div>
+              <div style={{ fontFamily: NM.SERIF, fontSize: 15, color: NM.DEEP, letterSpacing: '-0.005em' }}>{u.w}</div>
             </div>
           ))}
         </div>
