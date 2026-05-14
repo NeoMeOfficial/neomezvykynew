@@ -25,39 +25,11 @@ export default function Welcome() {
     <div
       style={{
         minHeight: '100vh', position: 'relative',
-        background: DEEP2,
+        backgroundImage: 'linear-gradient(180deg, rgba(42,26,20,0.18) 0%, rgba(42,26,20,0.62) 52%, #2A1A14 100%), url(/images/r9/lifestyle-mother-baby.jpg)',
+        backgroundSize: 'cover', backgroundPosition: 'center top',
         color: '#fff', paddingBottom: 0,
-        overflow: 'hidden',
       }}
     >
-      {/* Background photo — explicit <img> so object-position actually crops.
-          Top ~20% is shifted off-screen via translateY so the face sits
-          higher in the viewport, clear of the bottom-anchored text. */}
-      <img
-        src="/images/r9/lifestyle-mother-baby.jpg"
-        alt=""
-        aria-hidden
-        style={{
-          position: 'absolute', inset: 0,
-          width: '100%', height: '100%',
-          objectFit: 'cover',
-          objectPosition: 'center top',
-          transform: 'translateY(-20%) scale(1.25)',
-          transformOrigin: 'center top',
-          zIndex: 0,
-        }}
-      />
-      {/* Dark gradient overlay */}
-      <div
-        style={{
-          position: 'absolute', inset: 0,
-          background: 'linear-gradient(180deg, rgba(42,26,20,0.18) 0%, rgba(42,26,20,0.62) 52%, #2A1A14 100%)',
-          zIndex: 1,
-        }}
-      />
-
-      {/* All foreground content sits above the photo + gradient */}
-      <div style={{ position: 'relative', zIndex: 2 }}>
 
       {/* NeoMe wordmark */}
       <div style={{ padding: '68px 22px 0', display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -128,8 +100,6 @@ export default function Welcome() {
           </span>
         </div>
       </div>
-
-      </div>{/* end of zIndex:2 foreground wrapper */}
     </div>
   );
 }
