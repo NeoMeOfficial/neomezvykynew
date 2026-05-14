@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useFavorites } from '../../hooks/useFavorites';
+import { useUniversalFavorites } from '../../hooks/useUniversalFavorites';
 import { useRecipe, SLOT_LABEL } from '@/hooks/useRecipes';
 import { BackHeader, Eye, Ser, Body, NM } from '../../components/v2/neome';
 
@@ -27,7 +27,7 @@ function instructionSteps(text: string | null): string[] {
 export default function RecipeDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { isFavorite, toggleFavorite } = useFavorites();
+  const { isFavorite, toggleFavorite } = useUniversalFavorites();
   const { recipe, loading } = useRecipe(id);
   const [checkedIngredients, setCheckedIngredients] = useState<Set<number>>(new Set());
 
@@ -63,8 +63,7 @@ export default function RecipeDetail() {
     );
   }
 
-  const recipeIdNum = recipe.id.split('').reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 0);
-  const isFav = isFavorite(Math.abs(recipeIdNum));
+  const isFav = isFavorite(recipe.id, 'recipe');
   const steps = instructionSteps(recipe.instructions);
 
   return (
@@ -206,7 +205,14 @@ export default function RecipeDetail() {
         }}
       >
         <button
-          onClick={() => toggleFavorite({ id: Math.abs(recipeIdNum), title: recipe.name, image: '', time: `${recipe.prep_minutes ?? 0} min`, kcal: recipe.kcal ?? 0, category: recipe.slot })}
+          onClick={() => toggleFavorite({
+            id: recipe.id,
+            type: 'recipe',
+            title: recipe.name,
+            duration: `${recipe.prep_minutes ?? 0} min`,
+            kcal: recipe.kcal ?? 0,
+            category: recipe.slot,
+          })}
           aria-label="Uložiť"
           style={{
             all: 'unset', cursor: 'pointer',

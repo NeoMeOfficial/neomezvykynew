@@ -73,7 +73,14 @@ export default function ExercisePlayer() {
         onBack={() => navigate(getBackPath())}
         right={
           <div className="flex items-center gap-1">
-            <FavoriteButton itemId={exercise.id} itemType="exercise" size="md" />
+            <FavoriteButton
+              itemId={exercise.id}
+              type="workout"
+              title={exercise.name}
+              duration={exercise.duration_minutes ? `${exercise.duration_minutes} min` : undefined}
+              category={exercise.category}
+              size="md"
+            />
             <button
               onClick={handleShare}
               className="h-9 w-9 rounded-full flex items-center justify-center active:scale-95 transition-transform"
