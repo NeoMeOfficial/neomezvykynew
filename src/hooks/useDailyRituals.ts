@@ -36,14 +36,31 @@ export interface ReflectionEntry {
   created_at: string;
 }
 
-// localStorage key. Used for demo users AND as a write-through cache for
-// real users so an entry never disappears between save and list-refresh,
-// even if the Supabase write or fetch hiccups.
-const REFLECTIONS_DEMO_KEY = 'neome_reflections_demo';
+/**
+ * Diary cache strategy
+ * ────────────────────
+ * • Entries are written to a user-scoped localStorage key
+ *   ('neome_reflections::<uid>') so they survive logout/login.
+ * • An anon key ('neome_reflections_demo') stores entries written
+ *   while signed out / in demo mode — migrated into the user's
+ *   bucket on the next signed-in refresh.
+ * • Each cached entry carries a `synced` flag. If the Supabase insert
+ *   fails (RLS, FK, network), the entry stays in cache as
+ *   synced=false and refresh() retries the insert next time we have
+ *   a real user. Once accepted, it's marked synced.
+ */
+const ANON_KEY = 'neome_reflections_demo';
+const KEY_PREFIX = 'neome_reflections::';
 
-function loadCachedReflections(): ReflectionEntry[] {
+type CachedReflection = ReflectionEntry & { synced?: boolean };
+
+function userKey(uid: string | undefined | null): string {
+  return uid && isRealUser(uid) ? `${KEY_PREFIX}${uid}` : ANON_KEY;
+}
+
+function loadCache(key: string): CachedReflection[] {
   try {
-    const raw = localStorage.getItem(REFLECTIONS_DEMO_KEY);
+    const raw = localStorage.getItem(key);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed : [];
@@ -52,51 +69,103 @@ function loadCachedReflections(): ReflectionEntry[] {
   }
 }
 
-function saveCachedReflections(rows: ReflectionEntry[]) {
+function saveCache(key: string, rows: CachedReflection[]) {
   try {
-    localStorage.setItem(REFLECTIONS_DEMO_KEY, JSON.stringify(rows.slice(0, 200)));
+    localStorage.setItem(key, JSON.stringify(rows.slice(0, 200)));
   } catch {
     // quota or private mode — ignore
   }
 }
 
-// Merge two arrays of entries, dedup by id, sort by created_at desc.
-function mergeEntries(a: ReflectionEntry[], b: ReflectionEntry[]): ReflectionEntry[] {
-  const map = new Map<string, ReflectionEntry>();
-  for (const e of [...a, ...b]) map.set(e.id, e);
+function mergeEntries(a: CachedReflection[], b: CachedReflection[]): CachedReflection[] {
+  const map = new Map<string, CachedReflection>();
+  for (const e of [...a, ...b]) {
+    const existing = map.get(e.id);
+    // Prefer the synced copy when ids collide.
+    if (!existing || (!existing.synced && e.synced)) map.set(e.id, e);
+  }
   return Array.from(map.values()).sort((x, y) => (y.created_at || '').localeCompare(x.created_at || ''));
 }
 
 export function useReflections() {
   const { user } = useSupabaseAuth();
-  const [entries, setEntries] = useState<ReflectionEntry[]>(() => loadCachedReflections());
-  const [loading, setLoading] = useState(true);
   const real = isRealUser(user?.id);
+  const key = userKey(user?.id);
+
+  const [entries, setEntries] = useState<CachedReflection[]>(() => {
+    // Initial render: show whatever's already in this bucket plus any
+    // anonymous entries that should be migrated.
+    const own = loadCache(key);
+    const anon = key !== ANON_KEY ? loadCache(ANON_KEY) : [];
+    return mergeEntries(own, anon);
+  });
+  const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
-    const cached = loadCachedReflections();
+    const own = loadCache(key);
+    const anon = key !== ANON_KEY ? loadCache(ANON_KEY) : [];
+    const localMerged = mergeEntries(own, anon);
+
     if (!real) {
-      setEntries(cached);
+      setEntries(localMerged);
       setLoading(false);
       return;
     }
+
+    // Fetch remote.
     const { data, error } = await supabase
       .from('diary_entries')
       .select('*')
       .eq('user_id', user!.id)
       .order('created_at', { ascending: false })
-      .limit(50);
+      .limit(100);
+
+    let remote: CachedReflection[] = [];
     if (error) {
-      console.warn('diary_entries fetch failed, using local cache', error);
-      setEntries(cached);
+      console.warn('[diary] fetch failed, using local cache', error);
     } else {
-      const remote = (data as ReflectionEntry[] | null) ?? [];
-      const merged = mergeEntries(remote, cached);
-      setEntries(merged);
-      saveCachedReflections(merged);
+      remote = ((data as ReflectionEntry[] | null) ?? []).map((r) => ({ ...r, synced: true }));
     }
+
+    // Re-try any cached entries that haven't synced yet.
+    const pending = localMerged.filter((e) => e.synced === false);
+    if (pending.length > 0 && !error) {
+      const inserts = pending.map((p) => ({
+        user_id: user!.id,
+        text: p.text,
+        date: p.date || todayISODate(),
+        // Note: omit id/created_at — let the DB assign them. Local
+        // copy is matched against remote by text+date+user.
+      }));
+      const { error: insertErr } = await supabase.from('diary_entries').insert(inserts);
+      if (insertErr) {
+        console.warn('[diary] pending sync failed; will retry next refresh', {
+          code: insertErr.code,
+          message: insertErr.message,
+          details: insertErr.details,
+          hint: insertErr.hint,
+        });
+      } else if (remote) {
+        // Re-fetch so synced ids come from the server.
+        const { data: data2 } = await supabase
+          .from('diary_entries')
+          .select('*')
+          .eq('user_id', user!.id)
+          .order('created_at', { ascending: false })
+          .limit(100);
+        remote = ((data2 as ReflectionEntry[] | null) ?? []).map((r) => ({ ...r, synced: true }));
+      }
+    }
+
+    const merged = mergeEntries(remote, localMerged);
+    setEntries(merged);
+    saveCache(key, merged);
+    // Anon entries have been migrated into the user bucket — clear so
+    // a future logout doesn't replay them for someone else on the same
+    // device.
+    if (anon.length > 0 && key !== ANON_KEY) localStorage.removeItem(ANON_KEY);
     setLoading(false);
-  }, [real, user?.id]);
+  }, [real, user?.id, key]);
 
   useEffect(() => {
     refresh();
@@ -106,18 +175,18 @@ export function useReflections() {
     async (text: string) => {
       const trimmed = text.trim();
       if (!trimmed) return;
-      const next: ReflectionEntry = {
+      const next: CachedReflection = {
         id: crypto.randomUUID(),
         user_id: user?.id ?? 'demo',
         text: trimmed,
         date: todayISODate(),
         created_at: new Date().toISOString(),
+        synced: false,
       };
-      // Optimistic local write — always succeeds, list shows the entry
-      // immediately on the next page even if Supabase is down.
+      // Optimistic local write — show immediately, persist to bucket.
       setEntries((prev) => {
         const updated = [next, ...prev];
-        saveCachedReflections(updated);
+        saveCache(key, updated);
         return updated;
       });
       if (!real) return;
@@ -127,18 +196,22 @@ export function useReflections() {
         date: todayISODate(),
       });
       if (error) {
-        // Non-fatal: the entry is already in the localStorage cache and
-        // will display in the history. We log full detail so we can
-        // diagnose RLS/FK/schema issues without scaring the user.
-        console.warn('[diary] Supabase insert failed; entry kept locally', {
+        console.warn('[diary] insert failed; will retry on next refresh', {
           code: error.code,
           message: error.message,
           details: error.details,
           hint: error.hint,
         });
+        return;
       }
+      // Mark synced — the next refresh will reconcile ids with the server.
+      setEntries((prev) => {
+        const updated = prev.map((e) => (e.id === next.id ? { ...e, synced: true } : e));
+        saveCache(key, updated);
+        return updated;
+      });
     },
-    [real, user?.id],
+    [real, user?.id, key],
   );
 
   return { entries, count: entries.length, loading, addReflection, refresh };
