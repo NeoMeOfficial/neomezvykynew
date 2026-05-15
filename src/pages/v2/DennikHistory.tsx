@@ -1,6 +1,6 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Page, Eye, NM } from '../../components/v2/neome';
+import { Page, Eye, NM, ConfirmSheet } from '../../components/v2/neome';
 import { useReflections } from '../../hooks/useDailyRituals';
 
 /**
@@ -29,7 +29,9 @@ const MAUVE_300 = '#CBB2B6';
 
 export default function DennikHistory() {
   const navigate = useNavigate();
-  const { entries, loading } = useReflections();
+  const { entries, loading, deleteReflection } = useReflections();
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const today = new Date();
   const todayLabel = `Dnes · ${SK_DAYS[today.getDay()].toLowerCase()} ${today.getDate()}. ${today.getMonth() + 1}.`;
   const prompt = PROMPTS[dayPromptIndex(today)];
@@ -51,6 +53,7 @@ export default function DennikHistory() {
   }, [entries]);
 
   const isEmpty = !loading && rows.length === 0;
+  const selectedRow = rows.find((r) => r.id === selectedId) || null;
 
   return (
     <Page paddingBottom={120}>
@@ -74,13 +77,44 @@ export default function DennikHistory() {
                 }}
               >
                 {rows.map((r, i) => (
-                  <EntryRow key={r.id} d={r.d} t={r.t} body={r.body} last={i === rows.length - 1} />
+                  <EntryRow
+                    key={r.id}
+                    d={r.d}
+                    t={r.t}
+                    body={r.body}
+                    last={i === rows.length - 1}
+                    onOpen={() => setSelectedId(r.id)}
+                  />
                 ))}
               </div>
             </div>
           )}
         </>
       )}
+
+      {selectedRow && !confirmOpen && (
+        <EntryDetailSheet
+          row={selectedRow}
+          onClose={() => setSelectedId(null)}
+          onDelete={() => setConfirmOpen(true)}
+        />
+      )}
+
+      <ConfirmSheet
+        open={confirmOpen}
+        eyebrow="Osobný denník"
+        title="Vymazať tento záznam?"
+        message="Záznam bude trvalo odstránený. Túto akciu nemožno vrátiť."
+        confirmLabel="Áno, vymazať"
+        cancelLabel="Späť"
+        tone="danger"
+        onConfirm={async () => {
+          if (selectedId) await deleteReflection(selectedId);
+          setConfirmOpen(false);
+          setSelectedId(null);
+        }}
+        onCancel={() => setConfirmOpen(false)}
+      />
     </Page>
   );
 }
@@ -177,14 +211,31 @@ function TodayPrompt({ label, prompt, onWrite }: { label: string; prompt: string
   );
 }
 
-function EntryRow({ d, t, body, last }: { d: string; t: string; body: string; last: boolean }) {
+function EntryRow({
+  d,
+  t,
+  body,
+  last,
+  onOpen,
+}: {
+  d: string;
+  t: string;
+  body: string;
+  last: boolean;
+  onOpen: () => void;
+}) {
   return (
-    <div
+    <button
+      onClick={onOpen}
       style={{
+        all: 'unset',
         display: 'flex',
         gap: 16,
         padding: '16px 18px',
         borderBottom: last ? 'none' : `1px solid ${NM.HAIR}`,
+        cursor: 'pointer',
+        width: '100%',
+        boxSizing: 'border-box',
       }}
     >
       <div style={{ width: 56, flexShrink: 0 }}>
@@ -210,9 +261,131 @@ function EntryRow({ d, t, body, last }: { d: string; t: string; body: string; la
             fontWeight: 300,
             lineHeight: 1.55,
             whiteSpace: 'pre-wrap',
+            display: '-webkit-box',
+            WebkitLineClamp: 3,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
           }}
         >
           {body}
+        </div>
+      </div>
+    </button>
+  );
+}
+
+function EntryDetailSheet({
+  row,
+  onClose,
+  onDelete,
+}: {
+  row: { d: string; t: string; body: string };
+  onClose: () => void;
+  onDelete: () => void;
+}) {
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      onClick={onClose}
+      style={{
+        position: 'fixed',
+        inset: 0,
+        background: 'rgba(42,26,20,0.55)',
+        backdropFilter: 'blur(6px)',
+        WebkitBackdropFilter: 'blur(6px)',
+        display: 'flex',
+        alignItems: 'flex-end',
+        justifyContent: 'center',
+        zIndex: 100,
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          width: '100%',
+          maxWidth: 480,
+          background: NM.BG,
+          borderTopLeftRadius: 28,
+          borderTopRightRadius: 28,
+          padding: '24px 24px max(env(safe-area-inset-bottom), 24px)',
+          boxShadow: '0 -10px 40px rgba(0,0,0,0.18)',
+          maxHeight: '85vh',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        <div
+          aria-hidden="true"
+          style={{
+            width: 36,
+            height: 4,
+            borderRadius: 999,
+            background: NM.HAIR_2,
+            margin: '0 auto 18px',
+          }}
+        />
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 16 }}>
+          <div style={{ fontFamily: NM.SERIF, fontSize: 22, color: NM.MAUVE, lineHeight: 1 }}>{row.d}</div>
+          <Eye size={10}>{row.t}</Eye>
+        </div>
+        <div
+          style={{
+            flex: 1,
+            minHeight: 0,
+            overflowY: 'auto',
+            fontFamily: NM.SERIF,
+            fontSize: 17,
+            color: NM.DEEP,
+            fontWeight: 400,
+            lineHeight: 1.65,
+            letterSpacing: '-0.003em',
+            whiteSpace: 'pre-wrap',
+            marginBottom: 22,
+          }}
+        >
+          {row.body}
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <button
+            type="button"
+            onClick={onDelete}
+            style={{
+              all: 'unset',
+              cursor: 'pointer',
+              textAlign: 'center',
+              padding: '14px 20px',
+              borderRadius: 999,
+              background: 'transparent',
+              border: `1px solid ${NM.HAIR_2}`,
+              color: '#B5544A',
+              fontFamily: NM.SANS,
+              fontSize: 13.5,
+              fontWeight: 500,
+              letterSpacing: '0.02em',
+            }}
+          >
+            Vymazať záznam
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            style={{
+              all: 'unset',
+              cursor: 'pointer',
+              textAlign: 'center',
+              padding: '12px 20px',
+              borderRadius: 999,
+              background: 'transparent',
+              color: NM.MUTED,
+              fontFamily: NM.SANS,
+              fontSize: 13,
+              fontWeight: 500,
+              letterSpacing: '0.02em',
+            }}
+          >
+            Zavrieť
+          </button>
         </div>
       </div>
     </div>

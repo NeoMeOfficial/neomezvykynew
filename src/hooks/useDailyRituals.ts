@@ -241,7 +241,34 @@ export function useReflections() {
     [real, user?.id, key],
   );
 
-  return { entries, count: entries.length, loading, addReflection, refresh };
+  const deleteReflection = useCallback(
+    async (id: string) => {
+      // Optimistic local removal — drops from state + cache immediately
+      // so the list updates without waiting for the network.
+      setEntries((prev) => {
+        const updated = prev.filter((e) => e.id !== id);
+        saveCache(key, updated);
+        return updated;
+      });
+      if (!real) return;
+      const { error } = await supabase
+        .from('diary_entries')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', user!.id);
+      if (error) {
+        console.warn('[diary] delete failed; entry was already removed from cache', {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+        });
+      }
+    },
+    [real, user?.id, key],
+  );
+
+  return { entries, count: entries.length, loading, addReflection, deleteReflection, refresh };
 }
 
 // ─── Cycle symptoms ─────────────────────────────────────────
