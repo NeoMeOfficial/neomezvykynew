@@ -79,7 +79,7 @@ export default function ReflectionEntry() {
           style={{
             all: 'unset',
             cursor: text.trim().length === 0 || saving ? 'not-allowed' : 'pointer',
-            background: NM.TERRA,
+            background: NM.DEEP,
             color: '#fff',
             padding: '8px 16px',
             borderRadius: 999,
