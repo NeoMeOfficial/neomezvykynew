@@ -3,21 +3,34 @@ import BottomNav from '../../components/v2/BottomNav';
 import ErrorBoundary from '../../components/v2/ErrorBoundary';
 import { useAppVersion } from '../../hooks/useAppVersion';
 
+function reloadNow() {
+  // Hard reload to a cache-busted URL. We use href= over replace() so
+  // the navigation actually queues even if something else has hooked
+  // beforeunload.
+  const url = window.location.pathname + '?_r=' + Date.now() + window.location.hash;
+  window.location.href = url;
+}
+
 async function flushAndReload() {
+  // Belt-and-braces: if cleanup hangs (iOS standalone PWAs sometimes
+  // freeze on getRegistrations / caches.keys), force a reload after
+  // 1.5s no matter what. The reload itself is what the user actually
+  // needs — cache cleanup is an optimization on top.
+  const safetyReload = window.setTimeout(reloadNow, 1500);
   try {
     if ('serviceWorker' in navigator) {
       const regs = await navigator.serviceWorker.getRegistrations();
-      await Promise.all(regs.map((r) => r.unregister()));
+      await Promise.all(regs.map((r) => r.unregister().catch(() => {})));
     }
     if ('caches' in window) {
       const keys = await caches.keys();
-      await Promise.all(keys.map((k) => caches.delete(k)));
+      await Promise.all(keys.map((k) => caches.delete(k).catch(() => false)));
     }
   } catch {
     // Best-effort — fall through to reload regardless.
   }
-  // Hard reload bypassing any remaining HTTP cache.
-  window.location.replace(window.location.pathname + '?_r=' + Date.now());
+  window.clearTimeout(safetyReload);
+  reloadNow();
 }
 
 function UpdateBanner() {
