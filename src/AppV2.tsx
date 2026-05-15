@@ -87,6 +87,7 @@ const BuddySystem = lazy(() => import('./pages/v2/BuddySystem'));
 const Blog = lazy(() => import('./pages/v2/Blog'));
 const SubscriptionManagement = lazy(() => import('./pages/v2/SubscriptionManagement'));
 const CheckoutSuccess = lazy(() => import('./pages/v2/CheckoutSuccess'));
+const CheckoutCanceled = lazy(() => import('./pages/v2/CheckoutCanceled'));
 const Search = lazy(() => import('./pages/v2/Search'));
 const CyklusInsights = lazy(() => import('./pages/v2/CyklusInsights'));
 const Odznaky = lazy(() => import('./pages/v2/Odznaky'));
@@ -175,6 +176,7 @@ export default function AppV2() {
             <Route element={<RequireAuth><Outlet /></RequireAuth>}>
               <Route path="/paywall" element={<Paywall />} />
               <Route path="/checkout/success" element={<CheckoutSuccess />} />
+              <Route path="/checkout/canceled" element={<CheckoutCanceled />} />
             </Route>
 
             {/* Protected routes */}

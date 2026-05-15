@@ -70,7 +70,7 @@ export async function createCheckoutSession(
         email,
         mode,
         successUrl: options?.successUrl ?? `${window.location.origin}/checkout/success?type=subscription&session_id={CHECKOUT_SESSION_ID}`,
-        cancelUrl: options?.cancelUrl ?? `${window.location.origin}/profil/predplatne?canceled=true`,
+        cancelUrl: options?.cancelUrl ?? `${window.location.origin}/checkout/canceled?type=subscription`,
       }),
     });
 

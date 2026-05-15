@@ -274,7 +274,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
         'payment',
         {
           successUrl: `${window.location.origin}/checkout/success?type=meal&session_id={CHECKOUT_SESSION_ID}`,
-          cancelUrl: `${window.location.origin}/jedalnicek-promo?canceled=true`,
+          cancelUrl: `${window.location.origin}/checkout/canceled?type=meal`,
         },
       );
       const stripe = await stripePromise;
