@@ -212,17 +212,9 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart }: Paid
   const monthLabel = SK_MONTHS_FULL[monthIdx];
   const monthShort = SK_MONTHS_SHORT_LOWER[monthIdx];
 
-  const phaseOf = (d: number) => {
-    const range = phases.find((p) => d >= p.start && d <= p.end);
-    return range ? phaseColorByKey[range.key] : null;
-  };
-  const phaseTintOf = (d: number) => {
-    const range = phases.find((p) => d >= p.start && d <= p.end);
-    return range ? phaseTintByKey[range.key] : null;
-  };
   // Day-of-month → cycle-day → phase key. Maps a calendar date in the
-  // visible month back to a phase so the legend can highlight the
-  // matching pill when the user taps a day.
+  // visible month back to a phase. Both the cell tint AND the legend
+  // highlight derive from this so they're guaranteed to agree.
   const phaseKeyForCalendarDay = (d: number): string | null => {
     if (!cycleData.lastPeriodStart) return null;
     const target = new Date(yearIdx, monthIdx, d);
@@ -232,6 +224,14 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart }: Paid
     const cycleDay = (daysSince % totalDays) + 1;
     const range = phases.find((p) => cycleDay >= p.start && cycleDay <= p.end);
     return range?.key ?? null;
+  };
+  const phaseOf = (d: number) => {
+    const key = phaseKeyForCalendarDay(d);
+    return key ? phaseColorByKey[key] : null;
+  };
+  const phaseTintOf = (d: number) => {
+    const key = phaseKeyForCalendarDay(d);
+    return key ? phaseTintByKey[key] : null;
   };
 
   // Day selected by tap on the calendar — drives the legend highlight.
