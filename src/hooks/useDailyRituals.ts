@@ -241,6 +241,40 @@ export function useReflections() {
     [real, user?.id, key],
   );
 
+  const updateReflection = useCallback(
+    async (id: string, text: string) => {
+      const trimmed = text.trim();
+      if (!trimmed) return;
+      // Optimistic local update.
+      setEntries((prev) => {
+        const updated = prev.map((e) => (e.id === id ? { ...e, text: trimmed } : e));
+        saveCache(key, updated);
+        return updated;
+      });
+      if (!real) return;
+      const { error } = await supabase
+        .from('diary_entries')
+        .update({ text: trimmed })
+        .eq('id', id)
+        .eq('user_id', user!.id);
+      if (error) {
+        console.warn('[diary] update failed; local copy still reflects new text', {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+        });
+        // Mark unsynced so refresh() retries.
+        setEntries((prev) => {
+          const updated = prev.map((e) => (e.id === id ? { ...e, synced: false } : e));
+          saveCache(key, updated);
+          return updated;
+        });
+      }
+    },
+    [real, user?.id, key],
+  );
+
   const deleteReflection = useCallback(
     async (id: string) => {
       // Optimistic local removal — drops from state + cache immediately
@@ -268,7 +302,15 @@ export function useReflections() {
     [real, user?.id, key],
   );
 
-  return { entries, count: entries.length, loading, addReflection, deleteReflection, refresh };
+  return {
+    entries,
+    count: entries.length,
+    loading,
+    addReflection,
+    updateReflection,
+    deleteReflection,
+    refresh,
+  };
 }
 
 // ─── Cycle symptoms ─────────────────────────────────────────

@@ -29,8 +29,10 @@ const MAUVE_300 = '#CBB2B6';
 
 export default function DennikHistory() {
   const navigate = useNavigate();
-  const { entries, loading, deleteReflection } = useReflections();
+  const { entries, loading, deleteReflection, updateReflection } = useReflections();
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [actionId, setActionId] = useState<string | null>(null);
+  const [editId, setEditId] = useState<string | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const today = new Date();
   const todayLabel = `Dnes · ${SK_DAYS[today.getDay()].toLowerCase()} ${today.getDate()}. ${today.getMonth() + 1}.`;
@@ -54,6 +56,10 @@ export default function DennikHistory() {
 
   const isEmpty = !loading && rows.length === 0;
   const selectedRow = rows.find((r) => r.id === selectedId) || null;
+  const actionRow = rows.find((r) => r.id === actionId) || null;
+  const editRow = rows.find((r) => r.id === editId) || null;
+  // The row whose id is targeted by the destructive confirm sheet.
+  const pendingDeleteId = selectedId || actionId;
 
   return (
     <Page paddingBottom={120}>
@@ -84,6 +90,7 @@ export default function DennikHistory() {
                     body={r.body}
                     last={i === rows.length - 1}
                     onOpen={() => setSelectedId(r.id)}
+                    onMore={() => setActionId(r.id)}
                   />
                 ))}
               </div>
@@ -96,7 +103,34 @@ export default function DennikHistory() {
         <EntryDetailSheet
           row={selectedRow}
           onClose={() => setSelectedId(null)}
+          onEdit={() => {
+            setEditId(selectedId);
+            setSelectedId(null);
+          }}
           onDelete={() => setConfirmOpen(true)}
+        />
+      )}
+
+      {actionRow && (
+        <EntryActionSheet
+          row={actionRow}
+          onClose={() => setActionId(null)}
+          onEdit={() => {
+            setEditId(actionId);
+            setActionId(null);
+          }}
+          onDelete={() => setConfirmOpen(true)}
+        />
+      )}
+
+      {editRow && (
+        <EditEntrySheet
+          row={editRow}
+          onClose={() => setEditId(null)}
+          onSave={async (text) => {
+            if (editId) await updateReflection(editId, text);
+            setEditId(null);
+          }}
         />
       )}
 
@@ -109,9 +143,10 @@ export default function DennikHistory() {
         cancelLabel="Späť"
         tone="danger"
         onConfirm={async () => {
-          if (selectedId) await deleteReflection(selectedId);
+          if (pendingDeleteId) await deleteReflection(pendingDeleteId);
           setConfirmOpen(false);
           setSelectedId(null);
+          setActionId(null);
         }}
         onCancel={() => setConfirmOpen(false)}
       />
@@ -217,18 +252,21 @@ function EntryRow({
   body,
   last,
   onOpen,
+  onMore,
 }: {
   d: string;
   t: string;
   body: string;
   last: boolean;
   onOpen: () => void;
+  onMore: () => void;
 }) {
   return (
-    <button
+    <div
       onClick={onOpen}
+      role="button"
+      tabIndex={0}
       style={{
-        all: 'unset',
         display: 'flex',
         gap: 16,
         padding: '16px 18px',
@@ -270,17 +308,300 @@ function EntryRow({
           {body}
         </div>
       </div>
+      <button
+        type="button"
+        aria-label="Možnosti záznamu"
+        onClick={(e) => {
+          e.stopPropagation();
+          onMore();
+        }}
+        style={{
+          all: 'unset',
+          cursor: 'pointer',
+          flexShrink: 0,
+          width: 30,
+          height: 30,
+          borderRadius: 999,
+          display: 'grid',
+          placeItems: 'center',
+          alignSelf: 'flex-start',
+          marginTop: -2,
+        }}
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill={NM.TERTIARY}>
+          <circle cx="5" cy="12" r="1.6" />
+          <circle cx="12" cy="12" r="1.6" />
+          <circle cx="19" cy="12" r="1.6" />
+        </svg>
+      </button>
+    </div>
+  );
+}
+
+function EntryActionSheet({
+  row,
+  onClose,
+  onEdit,
+  onDelete,
+}: {
+  row: { d: string; t: string };
+  onClose: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      onClick={onClose}
+      style={{
+        position: 'fixed',
+        inset: 0,
+        background: 'rgba(42,26,20,0.55)',
+        backdropFilter: 'blur(6px)',
+        WebkitBackdropFilter: 'blur(6px)',
+        display: 'flex',
+        alignItems: 'flex-end',
+        justifyContent: 'center',
+        zIndex: 100,
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          width: '100%',
+          maxWidth: 480,
+          background: NM.BG,
+          borderTopLeftRadius: 28,
+          borderTopRightRadius: 28,
+          padding: '24px 24px max(env(safe-area-inset-bottom), 24px)',
+          boxShadow: '0 -10px 40px rgba(0,0,0,0.18)',
+        }}
+      >
+        <div
+          aria-hidden="true"
+          style={{
+            width: 36,
+            height: 4,
+            borderRadius: 999,
+            background: NM.HAIR_2,
+            margin: '0 auto 18px',
+          }}
+        />
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 18 }}>
+          <div style={{ fontFamily: NM.SERIF, fontSize: 20, color: NM.MAUVE, lineHeight: 1 }}>{row.d}</div>
+          <Eye size={10}>{row.t}</Eye>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <ActionButton onClick={onEdit} icon="edit">Upraviť záznam</ActionButton>
+          <ActionButton onClick={onDelete} icon="trash" danger>Vymazať záznam</ActionButton>
+          <button
+            type="button"
+            onClick={onClose}
+            style={{
+              all: 'unset',
+              cursor: 'pointer',
+              textAlign: 'center',
+              padding: '12px 20px',
+              marginTop: 6,
+              borderRadius: 999,
+              background: 'transparent',
+              color: NM.MUTED,
+              fontFamily: NM.SANS,
+              fontSize: 13,
+              fontWeight: 500,
+              letterSpacing: '0.02em',
+            }}
+          >
+            Späť
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ActionButton({
+  children,
+  onClick,
+  icon,
+  danger,
+}: {
+  children: React.ReactNode;
+  onClick: () => void;
+  icon: 'edit' | 'trash';
+  danger?: boolean;
+}) {
+  const color = danger ? '#B5544A' : NM.DEEP;
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      style={{
+        all: 'unset',
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 12,
+        padding: '14px 18px',
+        borderRadius: 16,
+        background: '#FFFFFF',
+        border: `1px solid ${NM.HAIR}`,
+        color,
+        fontFamily: NM.SANS,
+        fontSize: 14,
+        fontWeight: 500,
+        letterSpacing: '0.01em',
+      }}
+    >
+      {icon === 'edit' ? (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 20h9" />
+          <path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
+        </svg>
+      ) : (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M3 6h18" />
+          <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+        </svg>
+      )}
+      <span>{children}</span>
     </button>
+  );
+}
+
+function EditEntrySheet({
+  row,
+  onClose,
+  onSave,
+}: {
+  row: { d: string; t: string; body: string };
+  onClose: () => void;
+  onSave: (text: string) => Promise<void> | void;
+}) {
+  const [text, setText] = useState(row.body);
+  const [saving, setSaving] = useState(false);
+  const dirty = text.trim() !== row.body.trim();
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      onClick={onClose}
+      style={{
+        position: 'fixed',
+        inset: 0,
+        background: 'rgba(42,26,20,0.55)',
+        backdropFilter: 'blur(6px)',
+        WebkitBackdropFilter: 'blur(6px)',
+        display: 'flex',
+        alignItems: 'flex-end',
+        justifyContent: 'center',
+        zIndex: 100,
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          width: '100%',
+          maxWidth: 480,
+          background: NM.BG,
+          borderTopLeftRadius: 28,
+          borderTopRightRadius: 28,
+          padding: '20px 22px max(env(safe-area-inset-bottom), 20px)',
+          boxShadow: '0 -10px 40px rgba(0,0,0,0.18)',
+          maxHeight: '90vh',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        <div
+          aria-hidden="true"
+          style={{
+            width: 36,
+            height: 4,
+            borderRadius: 999,
+            background: NM.HAIR_2,
+            margin: '0 auto 14px',
+          }}
+        />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+          <button
+            type="button"
+            onClick={onClose}
+            style={{ all: 'unset', cursor: 'pointer', fontFamily: NM.SANS, fontSize: 13, color: NM.DEEP, padding: 6 }}
+          >
+            Zrušiť
+          </button>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+            <div style={{ fontFamily: NM.SERIF, fontSize: 18, color: NM.MAUVE, lineHeight: 1 }}>{row.d}</div>
+            <Eye size={9.5}>{row.t}</Eye>
+          </div>
+          <button
+            type="button"
+            onClick={async () => {
+              if (!dirty || saving) return;
+              setSaving(true);
+              try {
+                await onSave(text);
+              } finally {
+                setSaving(false);
+              }
+            }}
+            disabled={!dirty || saving}
+            style={{
+              all: 'unset',
+              cursor: !dirty || saving ? 'not-allowed' : 'pointer',
+              background: NM.DEEP,
+              color: '#fff',
+              padding: '8px 16px',
+              borderRadius: 999,
+              fontFamily: NM.SANS,
+              fontSize: 13,
+              fontWeight: 500,
+              opacity: !dirty || saving ? 0.5 : 1,
+            }}
+          >
+            {saving ? 'Ukladám…' : 'Uložiť'}
+          </button>
+        </div>
+        <textarea
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          autoFocus
+          style={{
+            flex: 1,
+            minHeight: 220,
+            width: '100%',
+            boxSizing: 'border-box',
+            border: 'none',
+            outline: 'none',
+            resize: 'none',
+            background: 'transparent',
+            fontFamily: NM.SERIF,
+            fontSize: 17,
+            fontWeight: 400,
+            color: NM.DEEP,
+            letterSpacing: '-0.003em',
+            lineHeight: 1.65,
+            padding: '8px 0 12px',
+          }}
+        />
+      </div>
+    </div>
   );
 }
 
 function EntryDetailSheet({
   row,
   onClose,
+  onEdit,
   onDelete,
 }: {
   row: { d: string; t: string; body: string };
   onClose: () => void;
+  onEdit: () => void;
   onDelete: () => void;
 }) {
   return (
@@ -346,27 +667,9 @@ function EntryDetailSheet({
         >
           {row.body}
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <button
-            type="button"
-            onClick={onDelete}
-            style={{
-              all: 'unset',
-              cursor: 'pointer',
-              textAlign: 'center',
-              padding: '14px 20px',
-              borderRadius: 999,
-              background: 'transparent',
-              border: `1px solid ${NM.HAIR_2}`,
-              color: '#B5544A',
-              fontFamily: NM.SANS,
-              fontSize: 13.5,
-              fontWeight: 500,
-              letterSpacing: '0.02em',
-            }}
-          >
-            Vymazať záznam
-          </button>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <ActionButton onClick={onEdit} icon="edit">Upraviť záznam</ActionButton>
+          <ActionButton onClick={onDelete} icon="trash" danger>Vymazať záznam</ActionButton>
           <button
             type="button"
             onClick={onClose}
@@ -375,6 +678,7 @@ function EntryDetailSheet({
               cursor: 'pointer',
               textAlign: 'center',
               padding: '12px 20px',
+              marginTop: 4,
               borderRadius: 999,
               background: 'transparent',
               color: NM.MUTED,
