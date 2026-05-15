@@ -78,13 +78,29 @@ function saveCache(key: string, rows: CachedReflection[]) {
 }
 
 function mergeEntries(a: CachedReflection[], b: CachedReflection[]): CachedReflection[] {
-  const map = new Map<string, CachedReflection>();
+  // First dedupe by id, preferring the synced copy.
+  const byId = new Map<string, CachedReflection>();
   for (const e of [...a, ...b]) {
-    const existing = map.get(e.id);
-    // Prefer the synced copy when ids collide.
-    if (!existing || (!existing.synced && e.synced)) map.set(e.id, e);
+    const existing = byId.get(e.id);
+    if (!existing || (!existing.synced && e.synced)) byId.set(e.id, e);
   }
-  return Array.from(map.values()).sort((x, y) => (y.created_at || '').localeCompare(x.created_at || ''));
+  // Then drop unsynced entries that have a synced sibling with the
+  // same user_id + date + text. This collapses duplicates that were
+  // created before the addReflection insert started passing the
+  // client-generated id: the unsynced local row and the synced server
+  // row had different ids but the same content.
+  const all = Array.from(byId.values());
+  const syncedKeys = new Set(
+    all
+      .filter((e) => e.synced)
+      .map((e) => `${e.user_id}::${e.date}::${e.text.trim()}`),
+  );
+  const filtered = all.filter((e) => {
+    if (e.synced) return true;
+    const k = `${e.user_id}::${e.date}::${e.text.trim()}`;
+    return !syncedKeys.has(k);
+  });
+  return filtered.sort((x, y) => (y.created_at || '').localeCompare(x.created_at || ''));
 }
 
 export function useReflections() {
@@ -127,17 +143,22 @@ export function useReflections() {
       remote = ((data as ReflectionEntry[] | null) ?? []).map((r) => ({ ...r, synced: true }));
     }
 
-    // Re-try any cached entries that haven't synced yet.
+    // Re-try any cached entries that haven't synced yet. Use upsert so
+    // re-runs are idempotent: if the row already exists with this id
+    // (e.g. a previous insert succeeded but the success-path didn't
+    // run), the conflict is silently ignored instead of duplicating.
     const pending = localMerged.filter((e) => e.synced === false);
     if (pending.length > 0 && !error) {
       const inserts = pending.map((p) => ({
+        id: p.id,
         user_id: user!.id,
         text: p.text,
         date: p.date || todayISODate(),
-        // Note: omit id/created_at — let the DB assign them. Local
-        // copy is matched against remote by text+date+user.
+        created_at: p.created_at,
       }));
-      const { error: insertErr } = await supabase.from('diary_entries').insert(inserts);
+      const { error: insertErr } = await supabase
+        .from('diary_entries')
+        .upsert(inserts, { onConflict: 'id', ignoreDuplicates: true });
       if (insertErr) {
         console.warn('[diary] pending sync failed; will retry next refresh', {
           code: insertErr.code,
@@ -145,8 +166,8 @@ export function useReflections() {
           details: insertErr.details,
           hint: insertErr.hint,
         });
-      } else if (remote) {
-        // Re-fetch so synced ids come from the server.
+      } else {
+        // Re-fetch so we have authoritative ids/timestamps from the server.
         const { data: data2 } = await supabase
           .from('diary_entries')
           .select('*')
@@ -190,10 +211,16 @@ export function useReflections() {
         return updated;
       });
       if (!real) return;
+      // Pass the client id so the local cache entry and the Supabase
+      // row share the same primary key — otherwise mergeEntries on the
+      // next refresh treats them as two distinct entries and the same
+      // reflection shows up twice in the list.
       const { error } = await supabase.from('diary_entries').insert({
+        id: next.id,
         user_id: user!.id,
         text: trimmed,
-        date: todayISODate(),
+        date: next.date,
+        created_at: next.created_at,
       });
       if (error) {
         console.warn('[diary] insert failed; will retry on next refresh', {
