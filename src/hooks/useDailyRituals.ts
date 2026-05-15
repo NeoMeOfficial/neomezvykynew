@@ -127,10 +127,15 @@ export function useReflections() {
         date: todayISODate(),
       });
       if (error) {
-        // The entry is already in local cache, so it won't be lost — but
-        // let the composer's catch surface the message so the user knows
-        // sync failed.
-        throw new Error(error.message || 'Sync failed');
+        // Non-fatal: the entry is already in the localStorage cache and
+        // will display in the history. We log full detail so we can
+        // diagnose RLS/FK/schema issues without scaring the user.
+        console.warn('[diary] Supabase insert failed; entry kept locally', {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+        });
       }
     },
     [real, user?.id],
