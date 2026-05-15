@@ -44,9 +44,19 @@ export default function SettingsProfile() {
 
   const onSave = async () => {
     setSaving(true);
-    // Update profiles table
+    // Split the entered name into first/last so all three columns stay
+    // consistent — useUser reads first_name first, so updating only
+    // full_name leaves a stale first_name and the home greeting won't
+    // reflect the new name.
+    const trimmed = name.trim();
+    const parts = trimmed.split(/\s+/);
+    const firstName = parts[0] ?? '';
+    const lastName = parts.slice(1).join(' ');
+
     const { error } = await updateProfile({
-      full_name: name,
+      full_name: trimmed,
+      first_name: firstName,
+      last_name: lastName,
       bio,
     } as Partial<typeof profile>);
     if (error) {
@@ -55,7 +65,9 @@ export default function SettingsProfile() {
       return;
     }
     // Also sync to auth user_metadata so the name shows everywhere immediately
-    await supabase.auth.updateUser({ data: { full_name: name } });
+    await supabase.auth.updateUser({
+      data: { full_name: trimmed, first_name: firstName, last_name: lastName },
+    });
     setSaving(false);
     toast({ title: 'Uložené' });
     navigate('/settings');
