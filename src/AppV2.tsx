@@ -86,6 +86,7 @@ const WorkoutDemo = lazy(() => import('./pages/v2/WorkoutDemo'));
 const BuddySystem = lazy(() => import('./pages/v2/BuddySystem'));
 const Blog = lazy(() => import('./pages/v2/Blog'));
 const SubscriptionManagement = lazy(() => import('./pages/v2/SubscriptionManagement'));
+const CheckoutSuccess = lazy(() => import('./pages/v2/CheckoutSuccess'));
 const Search = lazy(() => import('./pages/v2/Search'));
 const CyklusInsights = lazy(() => import('./pages/v2/CyklusInsights'));
 const Odznaky = lazy(() => import('./pages/v2/Odznaky'));
@@ -173,6 +174,7 @@ export default function AppV2() {
             {/* Full-screen protected routes — no BottomNav */}
             <Route element={<RequireAuth><Outlet /></RequireAuth>}>
               <Route path="/paywall" element={<Paywall />} />
+              <Route path="/checkout/success" element={<CheckoutSuccess />} />
             </Route>
 
             {/* Protected routes */}

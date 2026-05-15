@@ -69,7 +69,7 @@ export async function createCheckoutSession(
         userId,
         email,
         mode,
-        successUrl: options?.successUrl ?? `${window.location.origin}/domov-new?session_id={CHECKOUT_SESSION_ID}`,
+        successUrl: options?.successUrl ?? `${window.location.origin}/checkout/success?type=subscription&session_id={CHECKOUT_SESSION_ID}`,
         cancelUrl: options?.cancelUrl ?? `${window.location.origin}/profil/predplatne?canceled=true`,
       }),
     });
