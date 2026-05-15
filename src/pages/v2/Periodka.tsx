@@ -220,6 +220,23 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart }: Paid
     const range = phases.find((p) => d >= p.start && d <= p.end);
     return range ? phaseTintByKey[range.key] : null;
   };
+  // Day-of-month → cycle-day → phase key. Maps a calendar date in the
+  // visible month back to a phase so the legend can highlight the
+  // matching pill when the user taps a day.
+  const phaseKeyForCalendarDay = (d: number): string | null => {
+    if (!cycleData.lastPeriodStart) return null;
+    const target = new Date(yearIdx, monthIdx, d);
+    const start = new Date(cycleData.lastPeriodStart + 'T00:00:00');
+    const daysSince = Math.floor((target.getTime() - start.getTime()) / 86400000);
+    if (daysSince < 0) return null;
+    const cycleDay = (daysSince % totalDays) + 1;
+    const range = phases.find((p) => cycleDay >= p.start && cycleDay <= p.end);
+    return range?.key ?? null;
+  };
+
+  // Day selected by tap on the calendar — drives the legend highlight.
+  const [selectedDay, setSelectedDay] = useState<number | null>(null);
+  const selectedPhaseKey = selectedDay !== null ? phaseKeyForCalendarDay(selectedDay) : null;
 
   const daysToMenstruation = Math.max(0, totalDays - currentDay);
   const ovulationStart = phases.find((p) => p.key === 'ovulation')?.start ?? 14;
@@ -422,7 +439,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart }: Paid
         </button>
       </div>
 
-      <div style={{ padding: '0 20px 10px' }}>
+      <div style={{ padding: '28px 20px 10px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 14 }}>
           <Eye>Kalendár cyklu</Eye>
           <div style={{ fontFamily: NM.SERIF, fontSize: 14, color: NM.DEEP, fontWeight: 500, fontStyle: 'italic' }}>{monthLabel} {yearIdx}</div>
@@ -439,16 +456,27 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart }: Paid
             const tint = !c.mute ? phaseTintOf(c.d) : null;
             const today = !c.mute && c.d === todayDate;
             const sym = !c.mute && symptomDays.includes(c.d);
+            const selected = !c.mute && selectedDay === c.d;
+            const cellPhase = !c.mute ? phaseOf(c.d) : null;
             return (
-              <div
+              <button
                 key={i}
+                type="button"
+                onClick={() => {
+                  if (c.mute) return;
+                  setSelectedDay((prev) => (prev === c.d ? null : c.d));
+                }}
                 style={{
+                  all: 'unset',
+                  cursor: c.mute ? 'default' : 'pointer',
                   position: 'relative',
                   aspectRatio: '1',
                   borderRadius: 9,
                   background: today ? NM.DEEP : tint ?? 'transparent',
+                  boxShadow: selected && !today && cellPhase ? `0 0 0 1.5px ${cellPhase}` : 'none',
                   display: 'grid',
                   placeItems: 'center',
+                  boxSizing: 'border-box',
                 }}
               >
                 <div style={{
@@ -466,6 +494,46 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart }: Paid
                     ))}
                   </div>
                 )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Legend — tap any calendar day to highlight its phase here */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+            gap: 8,
+            marginTop: 16,
+          }}
+        >
+          {([
+            { key: 'menstrual', name: 'Menštruácia', color: PHASE.MENSTR },
+            { key: 'follicular', name: 'Folikulárna', color: PHASE.FOLLIC },
+            { key: 'ovulation', name: 'Ovulácia', color: PHASE.OVULAT },
+            { key: 'luteal', name: 'Luteálna', color: PHASE.LUTEAL },
+          ] as const).map((item) => {
+            const active = selectedPhaseKey === null || selectedPhaseKey === item.key;
+            return (
+              <div
+                key={item.key}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  padding: '8px 12px',
+                  borderRadius: 12,
+                  background: '#fff',
+                  border: `1px solid ${NM.HAIR}`,
+                  opacity: active ? 1 : 0.32,
+                  transition: 'opacity 180ms',
+                }}
+              >
+                <span style={{ width: 10, height: 10, borderRadius: 999, background: item.color, flexShrink: 0 }} />
+                <span style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.DEEP, fontWeight: 500, letterSpacing: '0.01em' }}>
+                  {item.name}
+                </span>
               </div>
             );
           })}
