@@ -11,6 +11,7 @@ import { useReferral } from '@/hooks/useReferral';
 import { usePointsLedger } from '@/hooks/usePointsLedger';
 import SectionEyebrow from '@/components/v2/home/SectionEyebrow';
 import UpsellBanner from '@/components/v2/home/UpsellBanner';
+import { DayPlanSheet } from '@/components/v2/home/DayPlanSheet';
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 const CREAM  = '#F8F5F0';
@@ -105,26 +106,96 @@ function PersistenceNotice() {
 }
 
 // ─── Weekly calendar strip ────────────────────────────────────────────────────
-function WeekCalendar() {
+function WeekCalendar({ onSelectDay }: { onSelectDay: (d: Date) => void }) {
+  const [offset, setOffset] = useState(0);
   const today = new Date();
+  const todayMid = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
   const dow = today.getDay();
   const mondayOffset = dow === 0 ? -6 : 1 - dow;
-  const days = ['Po','Ut','St','Št','Pi','So','Ne'];
+  const labels = ['Po', 'Ut', 'St', 'Št', 'Pi', 'So', 'Ne'];
   const week = Array.from({ length: 7 }, (_, i) => {
     const d = new Date(today);
-    d.setDate(today.getDate() + mondayOffset + i);
-    return { label: days[i], date: d.getDate(), isToday: i === (dow === 0 ? 6 : dow - 1), past: d < today };
+    d.setDate(today.getDate() + mondayOffset + i + offset * 7);
+    const mid = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+    return {
+      label: labels[i],
+      date: d.getDate(),
+      iso: d,
+      isToday: mid === todayMid,
+      past: mid < todayMid,
+    };
   });
+  const monthLabel = (() => {
+    const first = week[0].iso;
+    const last = week[6].iso;
+    const months = ['jan', 'feb', 'mar', 'apr', 'máj', 'jún', 'júl', 'aug', 'sep', 'okt', 'nov', 'dec'];
+    if (first.getMonth() === last.getMonth()) return `${months[first.getMonth()]} ${first.getFullYear()}`;
+    return `${months[first.getMonth()]} – ${months[last.getMonth()]}`;
+  })();
   return (
     <div style={{ padding: '20px 18px 0' }}>
-      <div style={{ background: WHITE, borderRadius: 18, padding: '10px 8px', border: `1px solid ${HAIR}`, display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4 }}>
-        {week.map((d, i) => (
-          <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, padding: '10px 0 8px', borderRadius: 12, background: d.isToday ? INK : 'transparent', color: d.isToday ? '#fff' : INK }}>
-            <div style={{ fontSize: 9.5, letterSpacing: '0.12em', textTransform: 'uppercase' as const, opacity: d.isToday ? 0.7 : 0.45, fontWeight: 500 }}>{d.label}</div>
-            <div style={{ fontSize: 16, fontWeight: 500, fontFamily: SERIF }}>{d.date}</div>
-            <div style={{ width: 4, height: 4, borderRadius: 2, background: d.past ? TELO : (d.isToday ? '#fff' : 'transparent') }} />
+      <div style={{ background: WHITE, borderRadius: 18, padding: '10px 8px 8px', border: `1px solid ${HAIR}` }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '2px 8px 8px' }}>
+          <button
+            type="button"
+            onClick={() => setOffset((o) => o - 1)}
+            aria-label="Predchádzajúci týždeň"
+            style={{ all: 'unset', cursor: 'pointer', width: 24, height: 24, display: 'grid', placeItems: 'center', color: FG3 }}
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <path d="M15 6l-6 6 6 6" />
+            </svg>
+          </button>
+          <div
+            style={{
+              fontFamily: SERIF,
+              fontSize: 13,
+              color: INK,
+              fontWeight: 500,
+              fontStyle: 'italic',
+              letterSpacing: '-0.005em',
+            }}
+          >
+            {monthLabel}
           </div>
-        ))}
+          <button
+            type="button"
+            onClick={() => setOffset((o) => o + 1)}
+            aria-label="Ďalší týždeň"
+            style={{ all: 'unset', cursor: 'pointer', width: 24, height: 24, display: 'grid', placeItems: 'center', color: FG3 }}
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <path d="M9 6l6 6-6 6" />
+            </svg>
+          </button>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4 }}>
+          {week.map((d, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => onSelectDay(d.iso)}
+              style={{
+                all: 'unset',
+                cursor: 'pointer',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 6,
+                padding: '10px 0 8px',
+                borderRadius: 12,
+                background: d.isToday ? INK : 'transparent',
+                color: d.isToday ? '#fff' : INK,
+              }}
+            >
+              <div style={{ fontSize: 9.5, letterSpacing: '0.12em', textTransform: 'uppercase' as const, opacity: d.isToday ? 0.7 : 0.45, fontWeight: 500 }}>
+                {d.label}
+              </div>
+              <div style={{ fontSize: 16, fontWeight: 500, fontFamily: SERIF }}>{d.date}</div>
+              <div style={{ width: 4, height: 4, borderRadius: 2, background: d.past ? TELO : d.isToday ? '#fff' : 'transparent' }} />
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -915,6 +986,7 @@ export default function DomovNew() {
   const navigate = useNavigate();
   const [showDiary,     setShowDiary]     = useState(false);
   const [showPointsInfo, setShowPointsInfo] = useState(false);
+  const [selectedDay,   setSelectedDay]   = useState<Date | null>(null);
   const user = useUser();
   const cycle = useCycle();
   const { userProgram } = useUserProgram();
@@ -945,7 +1017,9 @@ export default function DomovNew() {
 
       {!isPlus && <PersistenceNotice />}
 
-      <WeekCalendar />
+      <WeekCalendar onSelectDay={(d) => setSelectedDay(d)} />
+
+      {selectedDay && <DayPlanSheet date={selectedDay} onClose={() => setSelectedDay(null)} />}
 
       {/* Telo */}
       <SectionEyebrow color={TELO}>Telo · rýchly štart na dnes</SectionEyebrow>
