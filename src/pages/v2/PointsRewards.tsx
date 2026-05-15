@@ -33,6 +33,20 @@ interface Redemption {
   next_eligible_at: string;
 }
 
+const EARN_RULES: { a: string; p: string }[] = [
+  { a: 'Dokončené cvičenie', p: '+10' },
+  { a: 'Meditácia', p: '+8' },
+  { a: 'Reflexia / denník', p: '+6' },
+  { a: 'Záznam cyklu', p: '+4' },
+  { a: 'Dokončený návyk', p: '+3' },
+  { a: 'Lajk v komunite', p: '+1 (max 5/deň)' },
+  { a: 'Príspevok v komunite', p: '+20' },
+  { a: 'Odporúčanie · registrácia', p: '+50' },
+  { a: 'Odporúčanie · predplatné', p: '+300' },
+];
+
+const REWARDS_PREVIEW_COUNT = 3;
+
 const FALLBACK: Reward[] = [
   { slug: 'sub-50pct',        name: '50% zľava na ďalší mesiac',       description: 'Tvoja ďalšia platba NeoMe Plus bude o polovicu lacnejšia. Aplikuje sa automaticky.', point_cost: 2000, color_token: 'TERRA', stripe_coupon_id: 'NEOME_50PCT',    image_key: 'section-body.jpg' },
   { slug: 'sub-month-free',   name: 'Mesiac NeoMe Plus zadarmo',        description: 'Tvoja ďalšia platba bude plne odpustená. Aplikuje sa automaticky na Stripe.',       point_cost: 3500, color_token: 'GOLD',  stripe_coupon_id: 'NEOME_MONTH_FREE', image_key: 'hero-yoga.jpg' },
@@ -58,6 +72,7 @@ export default function PointsRewards() {
   const [rewards, setRewards] = useState<Reward[]>(FALLBACK);
   const [redemptions, setRedemptions] = useState<Redemption[]>([]);
   const [modal, setModal] = useState<ModalState>({ type: 'idle' });
+  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -174,7 +189,7 @@ export default function PointsRewards() {
       </div>
 
       <div style={{ margin: '24px 18px 0', display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {rewards.map((r) => {
+        {(expanded ? rewards : rewards.slice(0, REWARDS_PREVIEW_COUNT)).map((r) => {
           const tone = NM_COLORS[r.color_token] ?? NM.TERRA;
           const canAfford = balance >= r.point_cost;
           const cooldown = cooldownFor(r.slug);
@@ -219,15 +234,81 @@ export default function PointsRewards() {
         })}
       </div>
 
-      {/* Earn-more nudge */}
-      <div style={{ margin: '20px 18px 0', padding: '14px 16px', background: `${NM.GOLD}10`, borderRadius: 14, border: `1px solid ${NM.GOLD}25` }}>
-        <div style={{ fontFamily: NM.SANS, fontSize: 12, color: NM.DEEP, fontWeight: 500 }}>Ako zarobiť viac bodov?</div>
-        <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.MUTED, marginTop: 4, lineHeight: 1.5 }}>
-          Cvičenie +10 · Meditácia +8 · Reflexia +6 · Cyklus log +4 · Návyk +3 · Lajk v komunite +1 (max 5/deň) · Odporúčanie +50–300
+      {/* Expand / collapse rewards */}
+      {rewards.length > REWARDS_PREVIEW_COUNT && (
+        <div style={{ margin: '14px 18px 0', display: 'flex', justifyContent: 'center' }}>
+          <button
+            onClick={() => setExpanded((v) => !v)}
+            style={{
+              all: 'unset',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              padding: '10px 18px',
+              borderRadius: 999,
+              background: '#fff',
+              border: `1px solid ${NM.HAIR_2}`,
+              fontFamily: NM.SANS,
+              fontSize: 12.5,
+              fontWeight: 500,
+              color: NM.DEEP,
+              letterSpacing: '0.02em',
+            }}
+          >
+            {expanded
+              ? 'Zobraziť menej'
+              : `Zobraziť viac (${rewards.length - REWARDS_PREVIEW_COUNT})`}
+            <svg
+              width="10"
+              height="10"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke={NM.DEEP}
+              strokeWidth="2"
+              strokeLinecap="round"
+              style={{ transform: expanded ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 200ms' }}
+            >
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </button>
+        </div>
+      )}
+
+      {/* How to earn points — moved from /body */}
+      <div style={{ margin: '32px 18px 0' }}>
+        <Eye size={10} style={{ marginBottom: 12 }}>Ako zarobiť body</Eye>
+        <div style={{ background: '#fff', borderRadius: 18, border: `1px solid ${NM.HAIR}`, overflow: 'hidden' }}>
+          {EARN_RULES.map((r, i) => (
+            <div
+              key={r.a}
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                padding: '12px 18px',
+                alignItems: 'center',
+                borderBottom: i < EARN_RULES.length - 1 ? `1px solid ${NM.HAIR}` : 'none',
+              }}
+            >
+              <div style={{ fontFamily: NM.SANS, fontSize: 13, color: NM.DEEP, fontWeight: 400 }}>{r.a}</div>
+              <div style={{ fontFamily: NM.SERIF, fontSize: 15, color: NM.GOLD, fontWeight: 500, letterSpacing: '-0.005em' }}>{r.p}</div>
+            </div>
+          ))}
         </div>
         <button
           onClick={() => navigate('/body/odznaky')}
-          style={{ all: 'unset', cursor: 'pointer', marginTop: 8, fontFamily: NM.SANS, fontSize: 11, color: NM.GOLD, fontWeight: 500 }}
+          style={{
+            all: 'unset',
+            cursor: 'pointer',
+            marginTop: 14,
+            fontFamily: NM.SANS,
+            fontSize: 12,
+            color: NM.GOLD,
+            fontWeight: 500,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 4,
+          }}
         >
           Pozri odznaky a hodnosti →
         </button>

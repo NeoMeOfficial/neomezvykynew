@@ -21,18 +21,6 @@ import { Page, BackHeader, Eye, NM } from '../../components/v2/neome';
  * Mounted at /body.
  */
 
-const EARN_RULES = [
-  { a: 'Dokončené cvičenie', p: '+10' },
-  { a: 'Meditácia', p: '+8' },
-  { a: 'Reflexia / denník', p: '+6' },
-  { a: 'Záznam cyklu', p: '+4' },
-  { a: 'Dokončený návyk', p: '+3' },
-  { a: 'Lajk v komunite', p: '+1 (max 5/deň)' },
-  { a: 'Príspevok v komunite', p: '+20' },
-  { a: 'Odporúčanie · registrácia', p: '+50' },
-  { a: 'Odporúčanie · predplatné', p: '+300' },
-];
-
 const ACTIVITY_LABELS: Record<string, string> = {
   workout_completed: 'Dokončené cvičenie',
   meditation_complete: 'Meditácia',
@@ -123,18 +111,6 @@ export default function PointsSummary() {
               </div>
             );
           })}
-        </div>
-      </div>
-
-      <div style={{ margin: '26px 18px 0' }}>
-        <Eye size={10} style={{ marginBottom: 12 }}>Ako zarobiť body</Eye>
-        <div style={{ background: '#fff', borderRadius: 18, border: `1px solid ${NM.HAIR}`, overflow: 'hidden' }}>
-          {EARN_RULES.map((r, i) => (
-            <div key={r.a} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 18px', alignItems: 'center', borderBottom: i < EARN_RULES.length - 1 ? `1px solid ${NM.HAIR}` : 'none' }}>
-              <div style={{ fontFamily: NM.SANS, fontSize: 13, color: NM.DEEP, fontWeight: 400 }}>{r.a}</div>
-              <div style={{ fontFamily: NM.SERIF, fontSize: 15, color: NM.GOLD, fontWeight: 500, letterSpacing: '-0.005em' }}>{r.p}</div>
-            </div>
-          ))}
         </div>
       </div>
 
