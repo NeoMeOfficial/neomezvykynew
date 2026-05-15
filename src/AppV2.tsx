@@ -66,6 +66,7 @@ const MeditationPlayer = lazy(() => import('./pages/v2/MeditationPlayer'));
 const ExercisePlayer = lazy(() => import('./pages/v2/ExercisePlayer'));
 const JedalnicekPlanner = lazy(() => import('./pages/v2/JedalnicekPlanner'));
 const JedalnicekPromo = lazy(() => import('./pages/v2/JedalnicekPromo'));
+const JedalnicekOnboarding = lazy(() => import('./pages/v2/JedalnicekOnboarding'));
 const NavykyTracker = lazy(() => import('./pages/v2/NavykyTracker'));
 const TeloPrograms = lazy(() => import('./pages/v2/TeloPrograms'));
 const ProgramDetail = lazy(() => import('./pages/v2/ProgramDetail'));
@@ -245,6 +246,7 @@ export default function AppV2() {
               <Route path="/exercise/extra/:id" element={<ExercisePlayer />} />
               <Route path="/exercise/today" element={<ExercisePlayer />} />
               <Route path="/jedalnicek" element={<JedalnicekPlanner />} />
+              <Route path="/jedalnicek/onboarding" element={<JedalnicekOnboarding />} />
               <Route path="/jedalnicek-promo" element={<JedalnicekPromo />} />
               <Route path="/navyky" element={<NavykyTracker />} />
               <Route path="/postpartum" element={<PostpartumLanding />} />

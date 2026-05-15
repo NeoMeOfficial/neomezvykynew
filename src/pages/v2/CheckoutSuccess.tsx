@@ -118,7 +118,7 @@ export default function CheckoutSuccess() {
         )}
         {phase === 'confirmed' && type === 'meal' && (
           <MealConfirmed
-            onNow={() => navigate('/jedalnicek')}
+            onNow={() => navigate('/jedalnicek/onboarding')}
             onLater={() => navigate('/domov-new')}
             loading={loading}
           />
