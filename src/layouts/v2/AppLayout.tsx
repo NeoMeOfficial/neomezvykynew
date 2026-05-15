@@ -1,39 +1,30 @@
 import { Outlet } from 'react-router-dom';
+import { useRegisterSW } from 'virtual:pwa-register/react';
 import BottomNav from '../../components/v2/BottomNav';
 import ErrorBoundary from '../../components/v2/ErrorBoundary';
-import { useAppVersion } from '../../hooks/useAppVersion';
 
-function reloadNow() {
-  // Hard reload to a cache-busted URL. We use href= over replace() so
-  // the navigation actually queues even if something else has hooked
-  // beforeunload.
-  const url = window.location.pathname + '?_r=' + Date.now() + window.location.hash;
-  window.location.href = url;
-}
-
-async function flushAndReload() {
-  // Belt-and-braces: if cleanup hangs (iOS standalone PWAs sometimes
-  // freeze on getRegistrations / caches.keys), force a reload after
-  // 1.5s no matter what. The reload itself is what the user actually
-  // needs — cache cleanup is an optimization on top.
-  const safetyReload = window.setTimeout(reloadNow, 1500);
-  try {
-    if ('serviceWorker' in navigator) {
-      const regs = await navigator.serviceWorker.getRegistrations();
-      await Promise.all(regs.map((r) => r.unregister().catch(() => {})));
-    }
-    if ('caches' in window) {
-      const keys = await caches.keys();
-      await Promise.all(keys.map((k) => caches.delete(k).catch(() => false)));
-    }
-  } catch {
-    // Best-effort — fall through to reload regardless.
-  }
-  window.clearTimeout(safetyReload);
-  reloadNow();
-}
-
-function UpdateBanner() {
+/**
+ * PWA update banner.
+ *
+ * Uses vite-plugin-pwa's `useRegisterSW`, which talks to the actual
+ * service worker:
+ *
+ *   • `needRefresh` flips to true when a new SW has been installed and
+ *     is waiting to take over (autoUpdate strategy).
+ *   • `updateServiceWorker()` sends SKIP_WAITING to the waiting SW,
+ *     waits for the `controllerchange` event, and reloads — the
+ *     canonical path that works reliably on iOS standalone PWAs
+ *     where manual unregister/cache-clear sometimes hangs.
+ *
+ * Replaces the previous home-grown hash-compare + flushAndReload
+ * approach which had two failure modes on iOS:
+ *   1. The hash check raced the SW and could oscillate (auto-reload
+ *      loop, fixed earlier).
+ *   2. Manual SW unregister + caches.delete sometimes hung in
+ *      standalone mode, leaving the user with a button that did
+ *      nothing.
+ */
+function UpdateBanner({ onRefresh }: { onRefresh: () => void }) {
   return (
     <div
       style={{
@@ -55,7 +46,7 @@ function UpdateBanner() {
     >
       <span>K dispozícii je nová verzia</span>
       <button
-        onClick={() => { void flushAndReload(); }}
+        onClick={onRefresh}
         style={{
           all: 'unset',
           cursor: 'pointer',
@@ -74,18 +65,32 @@ function UpdateBanner() {
 }
 
 export default function AppLayout() {
-  const { updateAvailable } = useAppVersion();
+  const {
+    needRefresh: [needRefresh],
+    updateServiceWorker,
+  } = useRegisterSW({
+    onRegisteredSW(_swUrl, registration) {
+      // Poll for updates every 15 minutes so users on long-lived
+      // sessions still get prompted to refresh after a deploy.
+      if (registration) {
+        setInterval(() => {
+          registration.update().catch(() => {});
+        }, 15 * 60 * 1000);
+      }
+    },
+  });
+
+  const onRefresh = () => {
+    void updateServiceWorker(true);
+  };
 
   return (
     <div
       className="min-h-screen font-sans relative w-full overflow-x-hidden"
       style={{ background: 'linear-gradient(to bottom, #FAF7F2, #F5F1E8)' }}
     >
-      {updateAvailable && <UpdateBanner />}
+      {needRefresh && <UpdateBanner onRefresh={onRefresh} />}
 
-      {/* Main content — redesigned screens handle their own safe-area
-          padding via env(safe-area-inset-*). No top/bottom padding here
-          so hero photos can full-bleed under the status bar. */}
       <main className="relative z-10 w-full max-w-none mx-auto min-h-screen">
         <ErrorBoundary>
           <Outlet />

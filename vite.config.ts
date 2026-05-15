@@ -34,6 +34,10 @@ export default defineConfig(({ mode }) => ({
     componentTagger(),
     VitePWA({
       registerType: 'autoUpdate',
+      // useRegisterSW (in src/layouts/v2/AppLayout.tsx) handles
+      // registration via the React hook — don't also inject a
+      // separate <script> registration, or registerSW runs twice.
+      injectRegister: false,
       includeAssets: [
         'favicon.ico',
         'favicon-32.png',
