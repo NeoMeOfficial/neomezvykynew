@@ -140,7 +140,7 @@ export default function SubscriptionManagement() {
               <span className="font-serif text-h1 text-ink">{formatPrice(SUBSCRIPTION_PLANS.premium.price)}</span>
               <span className="font-sans text-sm text-ink/56">/ mesiac</span>
             </div>
-            <Eyebrow tone="gold" className="mb-5">Prvých 7 dní zadarmo</Eyebrow>
+            <Eyebrow tone="gold" className="mb-5">Zrušíš kedykoľvek</Eyebrow>
 
             <div className="flex flex-col gap-2 mb-6 text-left">
               {SUBSCRIPTION_PLANS.premium.features.map((f: string, i: number) => (

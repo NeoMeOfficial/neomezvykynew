@@ -12,7 +12,7 @@ Before writing any code, read these shared context files:
 /Users/sambot/.openclaw/workspace/projects/neome/_shared/BRAND.md      ← Tone, colours, design rules
 ```
 
-Then check `workflows/session-startup.md` (in this directory) for the startup checklist.
+Then check `/Users/sambot/.openclaw/workspace/projects/neome/_shared/workflows/session-startup.md` for the startup checklist.
 
 ---
 
@@ -194,20 +194,19 @@ If a workflow exists for the task, follow it. If it doesn't and the pattern is w
 
 ---
 
-## Workflows & Tools
+## Shared Workflows & Tools
 
-All workflows live in `workflows/` (this directory):
+All workflows live in `/Users/sambot/.openclaw/workspace/projects/neome/_shared/workflows/`:
 
 | Task | Workflow |
 |------|----------|
-| Session startup | `workflows/session-startup.md` |
-| Add more recipes | `workflows/expand-recipe-database.md` |
-| Improve translations | `workflows/retranslate-recipes.md` |
-| Fix broken recipe steps | `workflows/patch-recipe-steps.md` |
-| Deploy to Netlify | `workflows/deploy.md` |
-| Complete meal planner | `workflows/build-meal-planner.md` |
+| Add more recipes | `expand-recipe-database.md` |
+| Improve translations | `retranslate-recipes.md` |
+| Fix broken recipe steps | `patch-recipe-steps.md` |
+| Deploy to Netlify | `deploy.md` |
+| Complete meal planner | `build-meal-planner.md` |
 
-Tool docs (for the `.cjs` scripts at this directory root) live in `tools/`.
+Tool docs (for the `.cjs` scripts) live in `/Users/sambot/.openclaw/workspace/projects/neome/_shared/tools/`.
 
 ## Current Priorities (as of 2026-04-07)
 

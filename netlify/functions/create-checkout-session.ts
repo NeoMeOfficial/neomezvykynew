@@ -81,7 +81,9 @@ export async function handler(event: any, context: any) {
           ...baseParams,
           mode: 'subscription',
           subscription_data: {
-            trial_period_days: 7,
+            // No trial period — users are billed immediately on
+            // checkout. The 7-day trial was removed per product
+            // decision.
             metadata: { userId },
           },
         })

@@ -395,7 +395,7 @@ export default function Kniznica() {
                 Aktivovať Plus
               </button>
               <div style={{ textAlign: 'center', marginTop: 10, fontFamily: 'DM Sans', fontSize: 11, color: 'rgba(255,255,255,0.5)', fontWeight: 300 }}>
-                7 dní zadarmo
+                Zrušíš kedykoľvek
               </div>
             </div>
           </div>

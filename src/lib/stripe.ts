@@ -32,10 +32,6 @@ export const SUBSCRIPTION_PLANS = {
       'Bez dlhodobých záväzkov'
     ]
   },
-  trial: {
-    days: 7,
-    name: '7-dňová skúška zadarmo'
-  }
 };
 
 // Subscription status types
@@ -128,13 +124,12 @@ export async function createCheckoutSessionMock(priceId: string, userId: string,
   // Simulate realistic processing delay
   await new Promise(resolve => setTimeout(resolve, 1500));
   
-  // Create realistic mock subscription
+  // Create realistic mock subscription (demo flow only — no trial).
   const mockSubscription = {
     id: 'sub_demo_neome_' + Date.now(),
-    status: 'trialing' as SubscriptionStatus,
+    status: 'active' as SubscriptionStatus,
     current_period_start: Date.now() / 1000,
     current_period_end: (Date.now() + (30 * 24 * 60 * 60 * 1000)) / 1000,
-    trial_end: (Date.now() + (7 * 24 * 60 * 60 * 1000)) / 1000,
     cancel_at_period_end: false,
     customer_id: 'cus_demo_neome_' + userId.substring(0, 8)
   };

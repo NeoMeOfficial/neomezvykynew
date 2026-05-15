@@ -53,7 +53,7 @@ export default function SubscriptionPromoBanner({
               Odomknúť všetky funkcie
             </h4>
             <p className="text-xs" style={{ color: colors.textSecondary }}>
-              7-dňová bezplatná skúška
+              €24.90 mesačne · zrušíš kedykoľvek
             </p>
           </div>
           
@@ -100,7 +100,7 @@ export default function SubscriptionPromoBanner({
           style={{ background: `linear-gradient(135deg, ${colors.accent}, ${colors.periodka})` }}
         >
           <div className="text-2xl font-bold mb-1">€24.90/mesiac</div>
-          <div className="text-sm opacity-90">7-dňová bezplatná skúška</div>
+          <div className="text-sm opacity-90">Zrušíš kedykoľvek</div>
         </div>
 
         <div className="grid grid-cols-2 gap-3 mb-6 text-sm">
