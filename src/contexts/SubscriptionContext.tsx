@@ -76,7 +76,7 @@ interface SubscriptionContextType {
   // Meal planner (separate one-time purchase)
   hasMealPlanner: boolean;
   canUseMealPlanner: boolean; // alias for hasMealPlanner (used by legacy callers)
-  purchaseMealPlanner: () => Promise<void>;
+  purchaseMealPlanner: (opts?: { successUrl?: string; cancelUrl?: string }) => Promise<void>;
 
   // Paywall gate — shows paywall modal (managed by provider)
   gate: () => void;
@@ -257,10 +257,15 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   // on next mount (or on the post-checkout redirect back to /domov-new).
   // Demo / unconfigured-Stripe path falls back to the previous local-only
   // unlock so the UI still works end-to-end without keys.
-  const purchaseMealPlanner = useCallback(async () => {
+  const purchaseMealPlanner = useCallback(async (opts?: { successUrl?: string; cancelUrl?: string }) => {
     if (demoMode || !isStripeConfigured()) {
       localStorage.setItem(MEAL_PLANNER_KEY, 'true');
       setMealPlannerPurchased(true);
+      if (opts?.successUrl) {
+        // Demo: simulate the Stripe success redirect so onboarding-plus
+        // callers don't need a separate branch.
+        window.location.href = opts.successUrl.replace('{CHECKOUT_SESSION_ID}', 'demo');
+      }
       return;
     }
     setLoading(true);
@@ -273,8 +278,8 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
         email || '',
         'payment',
         {
-          successUrl: `${window.location.origin}/checkout/success?type=meal&session_id={CHECKOUT_SESSION_ID}`,
-          cancelUrl: `${window.location.origin}/checkout/canceled?type=meal`,
+          successUrl: opts?.successUrl ?? `${window.location.origin}/checkout/success?type=meal&session_id={CHECKOUT_SESSION_ID}`,
+          cancelUrl: opts?.cancelUrl ?? `${window.location.origin}/checkout/canceled?type=meal`,
         },
       );
       const stripe = await stripePromise;

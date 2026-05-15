@@ -111,7 +111,7 @@ export default function CheckoutSuccess() {
         {phase === 'timeout' && <Timeout onRetry={onRetry} onSkip={() => navigate('/domov-new')} />}
         {phase === 'confirmed' && type === 'subscription' && (
           <SubscriptionConfirmed
-            onPrimary={() => navigate('/kniznica/telo/programy')}
+            onPrimary={() => navigate('/onboarding-plus/program')}
             onSkip={() => navigate('/domov-new')}
             loading={loading}
           />

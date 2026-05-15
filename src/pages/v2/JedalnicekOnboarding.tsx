@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import NutritionOnboarding from '../../features/nutrition/NutritionOnboarding';
 import { useNutritionProfile } from '../../features/nutrition/useNutritionProfile';
 import { useMealPlan } from '../../features/nutrition/useMealPlan';
@@ -6,27 +6,27 @@ import { useMealPlan } from '../../features/nutrition/useMealPlan';
 /**
  * Meal-planner onboarding route.
  *
- * Wraps the existing multi-step NutritionOnboarding questionnaire from
- * `src/features/nutrition/`. On completion we persist the profile and
- * generate the week-1 plan so the user lands on /jedalnicek with
- * something to look at immediately.
- *
- * Mounted at /jedalnicek/onboarding. Entry point is the meal-plan
- * celebration CTA "Vyplniť teraz" on /checkout/success.
+ * Wraps the multi-step NutritionOnboarding questionnaire. On completion
+ * we persist the profile and generate the first week's plan. The
+ * landing destination depends on where the user came from:
+ *   • `?from=onboarding-plus` → /onboarding-plus/hotovo (continue Plus flow)
+ *   • default → /jedalnicek (browse the planner)
  */
 export default function JedalnicekOnboarding() {
   const navigate = useNavigate();
+  const [params] = useSearchParams();
   const { saveProfile } = useNutritionProfile();
   const { generatePlan } = useMealPlan();
+  const fromOnboardingPlus = params.get('from') === 'onboarding-plus';
 
   return (
     <NutritionOnboarding
       onComplete={(profile, startDate) => {
         saveProfile(profile);
         generatePlan(profile, startDate);
-        navigate('/jedalnicek');
+        navigate(fromOnboardingPlus ? '/onboarding-plus/hotovo' : '/jedalnicek');
       }}
-      onCancel={() => navigate('/domov-new')}
+      onCancel={() => navigate(fromOnboardingPlus ? '/onboarding-plus/hotovo' : '/domov-new')}
     />
   );
 }

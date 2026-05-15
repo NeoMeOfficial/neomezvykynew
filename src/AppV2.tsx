@@ -89,6 +89,13 @@ const Blog = lazy(() => import('./pages/v2/Blog'));
 const SubscriptionManagement = lazy(() => import('./pages/v2/SubscriptionManagement'));
 const CheckoutSuccess = lazy(() => import('./pages/v2/CheckoutSuccess'));
 const CheckoutCanceled = lazy(() => import('./pages/v2/CheckoutCanceled'));
+const PlusProgramPrompt = lazy(() => import('./pages/v2/onboardingPlus/ProgramPrompt'));
+const PlusProgramSelect = lazy(() => import('./pages/v2/onboardingPlus/ProgramSelect'));
+const PlusCycleInfo = lazy(() => import('./pages/v2/onboardingPlus/CycleInfo'));
+const PlusNutritionPrompt = lazy(() => import('./pages/v2/onboardingPlus/NutritionPrompt'));
+const PlusNutritionTimePrompt = lazy(() => import('./pages/v2/onboardingPlus/NutritionTimePrompt'));
+const PlusNutritionMemo = lazy(() => import('./pages/v2/onboardingPlus/NutritionMemo'));
+const PlusFinal = lazy(() => import('./pages/v2/onboardingPlus/Final'));
 const Search = lazy(() => import('./pages/v2/Search'));
 const CyklusInsights = lazy(() => import('./pages/v2/CyklusInsights'));
 const Odznaky = lazy(() => import('./pages/v2/Odznaky'));
@@ -178,6 +185,13 @@ export default function AppV2() {
               <Route path="/paywall" element={<Paywall />} />
               <Route path="/checkout/success" element={<CheckoutSuccess />} />
               <Route path="/checkout/canceled" element={<CheckoutCanceled />} />
+              <Route path="/onboarding-plus/program" element={<PlusProgramPrompt />} />
+              <Route path="/onboarding-plus/program-select" element={<PlusProgramSelect />} />
+              <Route path="/onboarding-plus/cyklus" element={<PlusCycleInfo />} />
+              <Route path="/onboarding-plus/jedalnicek" element={<PlusNutritionPrompt />} />
+              <Route path="/onboarding-plus/jedalnicek-cas" element={<PlusNutritionTimePrompt />} />
+              <Route path="/onboarding-plus/jedalnicek-memo" element={<PlusNutritionMemo />} />
+              <Route path="/onboarding-plus/hotovo" element={<PlusFinal />} />
             </Route>
 
             {/* Protected routes */}
