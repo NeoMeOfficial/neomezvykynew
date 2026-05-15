@@ -44,6 +44,38 @@
 
   <body>
     <div id="root"></div>
+    <!--
+      Escape hatch: visit /?clear=1 to force-clear the PWA service
+      worker and caches, then reload. Runs before the app bundle so it
+      works even if the cached bundle is broken.
+    -->
+    <script>
+      (function () {
+        try {
+          if (new URLSearchParams(window.location.search).get('clear') !== '1') return;
+          var safety = setTimeout(function () {
+            window.location.replace('/?_r=' + Date.now());
+          }, 1500);
+          Promise.allSettled([
+            navigator.serviceWorker
+              ? navigator.serviceWorker.getRegistrations().then(function (regs) {
+                  return Promise.all(regs.map(function (r) { return r.unregister().catch(function () {}); }));
+                })
+              : Promise.resolve(),
+            window.caches
+              ? caches.keys().then(function (keys) {
+                  return Promise.all(keys.map(function (k) { return caches.delete(k).catch(function () {}); }));
+                })
+              : Promise.resolve(),
+          ]).then(function () {
+            clearTimeout(safety);
+            window.location.replace('/?_r=' + Date.now());
+          });
+        } catch (e) {
+          window.location.replace('/?_r=' + Date.now());
+        }
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
