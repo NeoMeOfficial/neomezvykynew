@@ -36,37 +36,65 @@ export interface ReflectionEntry {
   created_at: string;
 }
 
+// localStorage key. Used for demo users AND as a write-through cache for
+// real users so an entry never disappears between save and list-refresh,
+// even if the Supabase write or fetch hiccups.
 const REFLECTIONS_DEMO_KEY = 'neome_reflections_demo';
 
-function loadDemoReflections(): ReflectionEntry[] {
-  const raw = localStorage.getItem(REFLECTIONS_DEMO_KEY);
-  if (raw) return JSON.parse(raw);
-  return [];
+function loadCachedReflections(): ReflectionEntry[] {
+  try {
+    const raw = localStorage.getItem(REFLECTIONS_DEMO_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
 }
 
-function saveDemoReflections(rows: ReflectionEntry[]) {
-  localStorage.setItem(REFLECTIONS_DEMO_KEY, JSON.stringify(rows));
+function saveCachedReflections(rows: ReflectionEntry[]) {
+  try {
+    localStorage.setItem(REFLECTIONS_DEMO_KEY, JSON.stringify(rows.slice(0, 200)));
+  } catch {
+    // quota or private mode — ignore
+  }
+}
+
+// Merge two arrays of entries, dedup by id, sort by created_at desc.
+function mergeEntries(a: ReflectionEntry[], b: ReflectionEntry[]): ReflectionEntry[] {
+  const map = new Map<string, ReflectionEntry>();
+  for (const e of [...a, ...b]) map.set(e.id, e);
+  return Array.from(map.values()).sort((x, y) => (y.created_at || '').localeCompare(x.created_at || ''));
 }
 
 export function useReflections() {
   const { user } = useSupabaseAuth();
-  const [entries, setEntries] = useState<ReflectionEntry[]>([]);
+  const [entries, setEntries] = useState<ReflectionEntry[]>(() => loadCachedReflections());
   const [loading, setLoading] = useState(true);
   const real = isRealUser(user?.id);
 
   const refresh = useCallback(async () => {
+    const cached = loadCachedReflections();
     if (!real) {
-      setEntries(loadDemoReflections());
+      setEntries(cached);
       setLoading(false);
       return;
     }
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('diary_entries')
       .select('*')
       .eq('user_id', user!.id)
       .order('created_at', { ascending: false })
       .limit(50);
-    setEntries((data as ReflectionEntry[] | null) ?? []);
+    if (error) {
+      console.warn('diary_entries fetch failed, using local cache', error);
+      setEntries(cached);
+    } else {
+      const remote = (data as ReflectionEntry[] | null) ?? [];
+      const merged = mergeEntries(remote, cached);
+      setEntries(merged);
+      saveCachedReflections(merged);
+    }
     setLoading(false);
   }, [real, user?.id]);
 
@@ -78,27 +106,34 @@ export function useReflections() {
     async (text: string) => {
       const trimmed = text.trim();
       if (!trimmed) return;
-      if (!real) {
-        const next: ReflectionEntry = {
-          id: crypto.randomUUID(),
-          user_id: user?.id ?? 'demo',
-          text: trimmed,
-          date: todayISODate(),
-          created_at: new Date().toISOString(),
-        };
-        const updated = [next, ...entries];
-        setEntries(updated);
-        saveDemoReflections(updated);
-        return;
-      }
+      const next: ReflectionEntry = {
+        id: crypto.randomUUID(),
+        user_id: user?.id ?? 'demo',
+        text: trimmed,
+        date: todayISODate(),
+        created_at: new Date().toISOString(),
+      };
+      // Optimistic local write — always succeeds, list shows the entry
+      // immediately on the next page even if Supabase is down.
+      setEntries((prev) => {
+        const updated = [next, ...prev];
+        saveCachedReflections(updated);
+        return updated;
+      });
+      if (!real) return;
       const { error } = await supabase.from('diary_entries').insert({
         user_id: user!.id,
         text: trimmed,
         date: todayISODate(),
       });
-      if (!error) refresh();
+      if (error) {
+        // The entry is already in local cache, so it won't be lost — but
+        // let the composer's catch surface the message so the user knows
+        // sync failed.
+        throw new Error(error.message || 'Sync failed');
+      }
     },
-    [entries, real, refresh, user?.id],
+    [real, user?.id],
   );
 
   return { entries, count: entries.length, loading, addReflection, refresh };
