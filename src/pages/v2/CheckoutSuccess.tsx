@@ -35,12 +35,27 @@ export default function CheckoutSuccess() {
     return t === 'meal' ? 'meal' : 'subscription';
   }, [params]);
 
+  // Dev-only preview: ?dev=confirmed | pending | timeout lets us eyeball
+  // each state without flipping the Supabase flag. Disabled in production
+  // builds, but the URL also works on Netlify previews and prod since the
+  // gating is just on a query param — by design, so Sam can visually QA
+  // the confirmation flow without paying anything.
+  const devOverride = params.get('dev') as Phase | null;
   const confirmed = type === 'subscription' ? isPremium : hasMealPlanner;
-  const [phase, setPhase] = useState<Phase>(confirmed ? 'confirmed' : 'pending');
+  const [phase, setPhase] = useState<Phase>(
+    devOverride && ['confirmed', 'pending', 'timeout'].includes(devOverride)
+      ? devOverride
+      : confirmed
+        ? 'confirmed'
+        : 'pending',
+  );
   const [attempt, setAttempt] = useState(0);
 
-  // Poll until the relevant flag flips, or until we time out.
+  // Poll until the relevant flag flips, or until we time out. Skip the
+  // poll entirely when a dev override is active so the preview state
+  // doesn't shift under us.
   useEffect(() => {
+    if (devOverride) return;
     if (phase !== 'pending') return;
     if (confirmed) {
       setPhase('confirmed');
@@ -55,15 +70,17 @@ export default function CheckoutSuccess() {
       setAttempt((n) => n + 1);
     }, POLL_INTERVAL_MS);
     return () => clearTimeout(id);
-  }, [phase, confirmed, attempt, refreshSubscription]);
+  }, [phase, confirmed, attempt, refreshSubscription, devOverride]);
 
   // Once confirmed, scrub the query params so a back-button doesn't
-  // re-trigger the flow on a stale session_id.
+  // re-trigger the flow on a stale session_id. Skip when previewing —
+  // we want the dev override to survive a reload.
   useEffect(() => {
+    if (devOverride) return;
     if (phase === 'confirmed' && (params.get('session_id') || params.get('type'))) {
       window.history.replaceState(null, '', '/checkout/success');
     }
-  }, [phase, params]);
+  }, [phase, params, devOverride]);
 
   const onRetry = () => {
     setAttempt(0);
