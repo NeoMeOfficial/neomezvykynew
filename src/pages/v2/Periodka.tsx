@@ -298,7 +298,16 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart }: Paid
   if (row.length === 7) weeks.push(row);
 
   // F-004: cycle_symptoms via useCycleSymptoms (real DB / localStorage demo).
-  const { todayMap, symptomDates, toggleSymptom } = useCycleSymptoms();
+  const {
+    todayMap,
+    symptomDates,
+    toggleSymptom,
+    customDefs,
+    addCustomSymptom,
+    removeCustomSymptom,
+  } = useCycleSymptoms();
+  const [addingSymptom, setAddingSymptom] = useState(false);
+  const [newSymptomText, setNewSymptomText] = useState('');
   // Calendar dots — derive day-of-month for current month from symptomDates.
   const nowDate = new Date();
   const ym = `${nowDate.getFullYear()}-${String(nowDate.getMonth() + 1).padStart(2, '0')}`;
@@ -316,7 +325,11 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart }: Paid
     { l: 'Nafúknutá',     k: 'bloating' },
     { l: 'Únava',         k: 'fatigue' },
   ];
-  const symptoms = SYMPTOM_DEFS.map((s) => ({ l: s.l, k: s.k, on: !!todayMap[s.k] }));
+  const allSymptomDefs = [
+    ...SYMPTOM_DEFS.map((s) => ({ ...s, custom: false as const })),
+    ...customDefs.map((s) => ({ ...s, custom: true as const })),
+  ];
+  const symptoms = allSymptomDefs.map((s) => ({ l: s.l, k: s.k, on: !!todayMap[s.k], custom: s.custom }));
 
   // Phase-tailored daily advice — rotates through Gabi's 105-tip library
   // (5 phases × 3 categories × 7 tips/phase) by day-in-phase. Source:
@@ -542,15 +555,15 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart }: Paid
 
       <div style={{ padding: '28px 18px 0' }}>
         <Eye style={{ marginBottom: 14 }}>Ako sa dnes cítiš</Eye>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
           {symptoms.map((s) => (
-            <button
+            <div
               key={s.k}
-              onClick={() => toggleSymptom(s.k)}
               style={{
-                all: 'unset',
-                cursor: 'pointer',
-                padding: '8px 14px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: s.custom ? '6px 6px 6px 14px' : '8px 14px',
                 borderRadius: 999,
                 background: s.on ? TINT.GOLD_SOFT : '#fff',
                 color: s.on ? NM.GOLD : NM.DEEP,
@@ -560,9 +573,124 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart }: Paid
                 fontWeight: s.on ? 500 : 400,
               }}
             >
-              {s.l}
-            </button>
+              <button
+                type="button"
+                onClick={() => toggleSymptom(s.k)}
+                style={{
+                  all: 'unset',
+                  cursor: 'pointer',
+                  color: 'inherit',
+                }}
+              >
+                {s.l}
+              </button>
+              {s.custom && (
+                <button
+                  type="button"
+                  aria-label={`Vymazať ${s.l}`}
+                  onClick={() => removeCustomSymptom(s.k)}
+                  style={{
+                    all: 'unset',
+                    cursor: 'pointer',
+                    width: 18,
+                    height: 18,
+                    borderRadius: 999,
+                    display: 'grid',
+                    placeItems: 'center',
+                    color: NM.TERTIARY,
+                  }}
+                >
+                  <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
+                    <path d="M6 6l12 12M18 6L6 18" />
+                  </svg>
+                </button>
+              )}
+            </div>
           ))}
+
+          {addingSymptom ? (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const def = addCustomSymptom(newSymptomText);
+                if (def) toggleSymptom(def.k);
+                setNewSymptomText('');
+                setAddingSymptom(false);
+              }}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '4px 6px 4px 14px',
+                borderRadius: 999,
+                background: '#fff',
+                border: `1px solid ${NM.HAIR_2}`,
+              }}
+            >
+              <input
+                autoFocus
+                value={newSymptomText}
+                onChange={(e) => setNewSymptomText(e.target.value)}
+                onBlur={() => {
+                  // Cancel if the user taps elsewhere without typing.
+                  if (!newSymptomText.trim()) setAddingSymptom(false);
+                }}
+                maxLength={28}
+                placeholder="Vlastný príznak…"
+                style={{
+                  all: 'unset',
+                  fontFamily: NM.SANS,
+                  fontSize: 12.5,
+                  color: NM.DEEP,
+                  minWidth: 0,
+                  width: 130,
+                }}
+              />
+              <button
+                type="submit"
+                disabled={!newSymptomText.trim()}
+                style={{
+                  all: 'unset',
+                  cursor: newSymptomText.trim() ? 'pointer' : 'not-allowed',
+                  background: NM.DEEP,
+                  color: '#fff',
+                  padding: '4px 10px',
+                  borderRadius: 999,
+                  fontFamily: NM.SANS,
+                  fontSize: 11.5,
+                  fontWeight: 500,
+                  opacity: newSymptomText.trim() ? 1 : 0.5,
+                }}
+              >
+                Pridať
+              </button>
+            </form>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setAddingSymptom(true)}
+              style={{
+                all: 'unset',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+                padding: '8px 12px',
+                borderRadius: 999,
+                background: 'transparent',
+                color: NM.MUTED,
+                border: `1px dashed ${NM.HAIR_2}`,
+                fontFamily: NM.SANS,
+                fontSize: 12.5,
+                fontWeight: 500,
+              }}
+            >
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+              Pridať vlastný
+            </button>
+          )}
         </div>
       </div>
 

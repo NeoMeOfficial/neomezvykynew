@@ -322,6 +322,7 @@ export interface SymptomDay {
 }
 
 const SYMPTOMS_DEMO_KEY = 'neome_cycle_symptoms_demo';
+const CUSTOM_SYMPTOMS_PREFIX = 'neome_custom_symptoms::';
 
 function loadDemoSymptoms(): SymptomDay[] {
   const raw = localStorage.getItem(SYMPTOMS_DEMO_KEY);
@@ -333,10 +334,44 @@ function saveDemoSymptoms(days: SymptomDay[]) {
   localStorage.setItem(SYMPTOMS_DEMO_KEY, JSON.stringify(days));
 }
 
+/**
+ * User-defined symptom chip labels. Persisted to localStorage keyed
+ * by user id so two users on the same device don't share their list.
+ * Anonymous/demo users fall through to a shared 'anon' bucket.
+ */
+export interface CustomSymptomDef {
+  k: string; // slug, e.g. 'custom:abc123'
+  l: string; // label shown on the chip
+}
+
+function customSymptomsKey(uid: string | undefined | null): string {
+  return `${CUSTOM_SYMPTOMS_PREFIX}${uid && /^[0-9a-f-]{36}$/i.test(uid) ? uid : 'anon'}`;
+}
+
+function loadCustomSymptomDefs(uid: string | undefined | null): CustomSymptomDef[] {
+  try {
+    const raw = localStorage.getItem(customSymptomsKey(uid));
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveCustomSymptomDefs(uid: string | undefined | null, defs: CustomSymptomDef[]) {
+  try {
+    localStorage.setItem(customSymptomsKey(uid), JSON.stringify(defs.slice(0, 50)));
+  } catch {
+    // quota — ignore
+  }
+}
+
 export function useCycleSymptoms() {
   const { user } = useSupabaseAuth();
   const [days, setDays] = useState<SymptomDay[]>([]);
   const [loading, setLoading] = useState(true);
+  const [customDefs, setCustomDefs] = useState<CustomSymptomDef[]>(() => loadCustomSymptomDefs(user?.id));
   const real = isRealUser(user?.id);
 
   const refresh = useCallback(async () => {
@@ -406,7 +441,50 @@ export function useCycleSymptoms() {
   // Helper: list of dates (YYYY-MM-DD) in the last 60 days that have any symptom logged.
   const symptomDates = days.filter((d) => Object.keys(d.symptoms).length > 0).map((d) => d.date);
 
-  return { days, todayMap, symptomDates, loading, toggleSymptom, refresh };
+  // Reload custom defs when the user changes (login / logout).
+  useEffect(() => {
+    setCustomDefs(loadCustomSymptomDefs(user?.id));
+  }, [user?.id]);
+
+  const addCustomSymptom = useCallback(
+    (label: string): CustomSymptomDef | null => {
+      const trimmed = label.trim();
+      if (!trimmed) return null;
+      // Dedupe by label (case-insensitive).
+      const lower = trimmed.toLowerCase();
+      if (customDefs.some((d) => d.l.toLowerCase() === lower)) return null;
+      const def: CustomSymptomDef = {
+        k: `custom:${crypto.randomUUID()}`,
+        l: trimmed,
+      };
+      const updated = [...customDefs, def];
+      setCustomDefs(updated);
+      saveCustomSymptomDefs(user?.id, updated);
+      return def;
+    },
+    [customDefs, user?.id],
+  );
+
+  const removeCustomSymptom = useCallback(
+    (slug: string) => {
+      const updated = customDefs.filter((d) => d.k !== slug);
+      setCustomDefs(updated);
+      saveCustomSymptomDefs(user?.id, updated);
+    },
+    [customDefs, user?.id],
+  );
+
+  return {
+    days,
+    todayMap,
+    symptomDates,
+    loading,
+    toggleSymptom,
+    refresh,
+    customDefs,
+    addCustomSymptom,
+    removeCustomSymptom,
+  };
 }
 
 // ─── Active program ─────────────────────────────────────────
