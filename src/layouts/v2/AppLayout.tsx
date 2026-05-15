@@ -3,6 +3,23 @@ import BottomNav from '../../components/v2/BottomNav';
 import ErrorBoundary from '../../components/v2/ErrorBoundary';
 import { useAppVersion } from '../../hooks/useAppVersion';
 
+async function flushAndReload() {
+  try {
+    if ('serviceWorker' in navigator) {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map((r) => r.unregister()));
+    }
+    if ('caches' in window) {
+      const keys = await caches.keys();
+      await Promise.all(keys.map((k) => caches.delete(k)));
+    }
+  } catch {
+    // Best-effort — fall through to reload regardless.
+  }
+  // Hard reload bypassing any remaining HTTP cache.
+  window.location.replace(window.location.pathname + '?_r=' + Date.now());
+}
+
 function UpdateBanner() {
   return (
     <div
@@ -25,7 +42,7 @@ function UpdateBanner() {
     >
       <span>K dispozícii je nová verzia</span>
       <button
-        onClick={() => window.location.reload()}
+        onClick={() => { void flushAndReload(); }}
         style={{
           all: 'unset',
           cursor: 'pointer',

@@ -1,11 +1,6 @@
 import { useEffect, useState } from 'react';
 
 const CHECK_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
-// If the app just loaded (within this window) and is already stale, reload silently
-// rather than showing the banner — user hasn't done anything yet so it's invisible.
-const SILENT_RELOAD_WINDOW_MS = 8 * 1000; // 8 seconds after mount
-
-const mountedAt = Date.now();
 
 function getRunningHash(): string | null {
   const scripts = Array.from(document.querySelectorAll<HTMLScriptElement>('script[src]'));
@@ -18,6 +13,9 @@ function getRunningHash(): string | null {
 
 async function fetchDeployedHash(): Promise<string | null> {
   try {
+    // Cache-bust through the SW too: SW caches typically ignore the
+    // query string when serving navigation requests, but we still
+    // include cache: 'no-store' to bypass HTTP cache layers.
     const res = await fetch(`/?_v=${Date.now()}`, { cache: 'no-store' });
     const html = await res.text();
     const m = html.match(/\/assets\/index-([A-Za-z0-9_-]+)\.js/);
@@ -37,15 +35,10 @@ export function useAppVersion() {
     const check = async () => {
       const deployedHash = await fetchDeployedHash();
       if (!deployedHash || deployedHash === runningHash) return;
-
-      // If the mismatch is detected within a few seconds of mount, the user
-      // just loaded a stale cached bundle. Reload silently — they won't notice.
-      if (Date.now() - mountedAt < SILENT_RELOAD_WINDOW_MS) {
-        window.location.reload();
-        return;
-      }
-
-      // Otherwise show the banner so the user can choose when to reload.
+      // Show the banner so the user can choose when to reload. Never
+      // auto-reload — the service worker may keep serving a stale
+      // index.html for a beat after deploy, which used to cause an
+      // infinite refresh loop on first load.
       setUpdateAvailable(true);
     };
 
