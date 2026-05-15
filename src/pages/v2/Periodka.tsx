@@ -230,12 +230,29 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart }: Paid
   nextPeriodDate.setDate(today.getDate() + daysToMenstruation);
   const nextPeriodLabel = `${nextPeriodDate.getDate()}. ${SK_MONTHS_SHORT_LOWER[nextPeriodDate.getMonth()]}.`;
 
+  // When the period is late the cycle-day counter keeps incrementing
+  // past totalDays (29, 30, 31…) on purpose — so we know how late
+  // we are. But "deň 31 z 28" reads as a bug to users, so swap the
+  // eyebrow to a late-period label instead of the of-N pattern.
+  const isLate = currentDay > totalDays;
+  const daysLate = isLate ? currentDay - totalDays : 0;
+  const dayLabel = isLate
+    ? `menštruácia mešká · ${daysLate} ${daysLate === 1 ? 'deň' : daysLate < 5 ? 'dni' : 'dní'}`
+    : `deň ${currentDay} z ${totalDays}`;
+
   // Headline copy adapts to phase
   const phaseHeadline: Record<string, { eye: string; before: string; em: string; body: string }> = {
-    menstrual: { eye: `${monthLabel} · deň ${currentDay} z ${totalDays} · menštruácia`, before: 'Telo sa', em: 'reštartuje.', body: 'Doprajte si pokoj, teplo a jemný pohyb.' },
-    follicular: { eye: `${monthLabel} · deň ${currentDay} z ${totalDays} · folikulárna`, before: 'Energia sa', em: 'vracia.', body: 'Estrogén stúpa. Skvelý čas začať niečo nové alebo vrátiť sa k náročnejším tréningom.' },
-    ovulation: { eye: `${monthLabel} · deň ${currentDay} z ${totalDays} · ovulácia`, before: 'Vrchol', em: 'sily.', body: 'Najvyššia energia a sebavedomie. Sociálny, kreatívny čas.' },
-    luteal: { eye: `${monthLabel} · deň ${currentDay} z ${totalDays} · luteálna`, before: 'Spomaľ a', em: 'uzemni sa.', body: 'Telo sa pripravuje na ďalší cyklus. Buď k sebe jemnejšia.' },
+    menstrual: { eye: `${monthLabel} · ${dayLabel} · menštruácia`, before: 'Telo sa', em: 'reštartuje.', body: 'Doprajte si pokoj, teplo a jemný pohyb.' },
+    follicular: { eye: `${monthLabel} · ${dayLabel} · folikulárna`, before: 'Energia sa', em: 'vracia.', body: 'Estrogén stúpa. Skvelý čas začať niečo nové alebo vrátiť sa k náročnejším tréningom.' },
+    ovulation: { eye: `${monthLabel} · ${dayLabel} · ovulácia`, before: 'Vrchol', em: 'sily.', body: 'Najvyššia energia a sebavedomie. Sociálny, kreatívny čas.' },
+    luteal: {
+      eye: `${monthLabel} · ${dayLabel}${isLate ? '' : ' · luteálna'}`,
+      before: isLate ? 'Cyklus je' : 'Spomaľ a',
+      em: isLate ? 'predĺžený.' : 'uzemni sa.',
+      body: isLate
+        ? 'Ak ti menštruácia ešte nezačala, môže to byť normálne. Keď príde, označ jej začiatok v nastaveniach a cyklus sa zarovná.'
+        : 'Telo sa pripravuje na ďalší cyklus. Buď k sebe jemnejšia.',
+    },
   };
   const head = phaseHeadline[currentPhaseKey] ?? phaseHeadline.follicular;
 
@@ -345,7 +362,17 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart }: Paid
         <Body style={{ marginTop: 12, maxWidth: 320 }}>{head.body}</Body>
       </div>
 
-      <RingDial currentDay={currentDay} totalDays={totalDays} phaseLabel={currentPhaseName} phaseColor={phaseColor} daysToNextLabel={`menštruácia o ${daysToMenstruation} dní`} />
+      <RingDial
+        currentDay={currentDay}
+        totalDays={totalDays}
+        phaseLabel={isLate ? 'Cyklus predĺžený' : currentPhaseName}
+        phaseColor={phaseColor}
+        daysToNextLabel={
+          isLate
+            ? `mešká ${daysLate} ${daysLate === 1 ? 'deň' : daysLate < 5 ? 'dni' : 'dní'}`
+            : `menštruácia o ${daysToMenstruation} dní`
+        }
+      />
       <PhaseLegend activeKey={currentPhaseKey} />
 
       <div style={{ padding: '0 18px 0', display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 8 }}>
