@@ -309,6 +309,60 @@ function CardNutrition({ href }: { href: string }) {
   );
 }
 
+// ─── Strava card — purchased but no plan generated yet ───────────────────────
+function CardNutritionSetup({ href }: { href: string }) {
+  const navigate = useNavigate();
+  return (
+    <div style={{ padding: '0 18px', marginBottom: 12 }}>
+      <div
+        onClick={() => navigate(href)}
+        style={{
+          background: WHITE,
+          borderRadius: 20,
+          border: `1px solid ${HAIR}`,
+          overflow: 'hidden',
+          cursor: 'pointer',
+        }}
+      >
+        <div style={{ height: 110, position: 'relative', background: `url(/images/r9/section-nutrition.jpg) center/cover` }}>
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.55) 100%)' }} />
+          <div style={{ position: 'absolute', top: 14, left: 16, fontSize: 9.5, color: '#fff', opacity: 0.85, letterSpacing: '0.18em', textTransform: 'uppercase' as const, fontWeight: 500 }}>
+            Jedálniček · odomknutý
+          </div>
+          <div style={{ position: 'absolute', bottom: 12, left: 16, right: 16, fontFamily: SERIF, fontSize: 19, color: '#fff', lineHeight: 1.2 }}>
+            Tvoj jedálniček čaká na pár detailov
+          </div>
+        </div>
+        <div style={{ padding: 16 }}>
+          <div style={{ fontSize: 12, color: FG2, lineHeight: 1.55, fontWeight: 300, marginBottom: 12 }}>
+            Vyplň krátky dotazník o cieli, dni a chutiach a pripravíme ti prvý týždenný plán. Trvá to asi 2 minúty.
+          </div>
+          <button
+            onClick={(e) => { e.stopPropagation(); navigate(href); }}
+            style={{
+              background: 'transparent',
+              border: 0,
+              padding: 0,
+              cursor: 'pointer',
+              fontSize: 12,
+              fontWeight: 500,
+              color: STRAVA,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+            }}
+          >
+            Vyplniť teraz
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={STRAVA} strokeWidth="2" strokeLinecap="round">
+              <path d="M9 6l6 6-6 6" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Strava card — recipes only (no meal plan add-on) ─────────────────────────
 function CardRecipeOnly({ href }: { href: string }) {
   const navigate = useNavigate();
@@ -998,7 +1052,11 @@ export default function DomovNew() {
 
   const isPlus    = user.tier === 'plus';
   const hasCycle  = isPlus && user.hasCycleData;
-  const hasMealPlan = isPlus && user.hasMealPlan;
+  const hasMealPlanAddon = user.hasMealPlanAddon;
+  const hasMealPlan = hasMealPlanAddon && user.hasMealPlan;
+  // Purchased the add-on but hasn't filled the questionnaire yet —
+  // we prompt for setup instead of showing the upsell again.
+  const mealPlanNeedsSetup = hasMealPlanAddon && !user.hasMealPlan;
   const code = referralCode?.code ?? 'NEOME';
   const streakDays = getDaysSince((profile as any)?.created_at);
 
@@ -1047,12 +1105,17 @@ export default function DomovNew() {
       <SectionEyebrow color={STRAVA}>Výživa · dnes</SectionEyebrow>
       {hasMealPlan ? (
         <CardNutrition href="/jedalnicek" />
+      ) : mealPlanNeedsSetup ? (
+        <CardNutritionSetup href="/jedalnicek/onboarding" />
       ) : isPlus ? (
         <CardRecipeOnly href="/kniznica/strava" />
       ) : (
         <CardNutritionFree href="/kniznica/strava" />
       )}
-      {!hasMealPlan && (
+      {/* Upsell appears only when the user has not yet purchased the
+          €57 add-on. Once purchased — even if the plan isn't generated
+          yet — we don't push for another purchase. */}
+      {!hasMealPlanAddon && (
         <UpsellBanner
           color={STRAVA}
           eyebrow="Doplnok · Jedálniček"

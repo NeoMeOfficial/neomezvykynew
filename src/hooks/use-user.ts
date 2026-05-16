@@ -8,13 +8,17 @@ export interface UserProfile {
   name: string;
   tier: 'free' | 'plus';
   hasProgram: boolean;
+  /** Has the user purchased the €57 meal-plan add-on. */
+  hasMealPlanAddon: boolean;
+  /** Has the user actually generated a plan (i.e. completed the
+   *  nutrition questionnaire) and there's something to show today. */
   hasMealPlan: boolean;
   hasCycleData: boolean;
 }
 
 export function useUser(): UserProfile {
   const { profile } = useSupabaseAuth();
-  const { tier } = useSubscription();
+  const { tier, hasMealPlanner } = useSubscription();
   const { userProgram } = useUserProgram();
   const { todayPlan } = useMealPlan();
   const { derivedState } = useCycleData();
@@ -25,6 +29,7 @@ export function useUser(): UserProfile {
     name: firstName,
     tier: tier === 'premium' ? 'plus' : 'free',
     hasProgram: !!userProgram,
+    hasMealPlanAddon: hasMealPlanner,
     hasMealPlan: !!todayPlan,
     hasCycleData: !!derivedState?.lastPeriodStart,
   };
