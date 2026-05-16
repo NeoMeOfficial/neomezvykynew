@@ -12,6 +12,7 @@
 // Self-demotion is blocked so you can't accidentally lock yourself out.
 
 import { createClient } from '@supabase/supabase-js';
+import { requireAdmin } from './_adminAuth';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -33,23 +34,15 @@ export async function handler(event: any) {
   if (event.httpMethod !== 'POST') return jsonResponse({ error: 'Method not allowed' }, 405);
 
   try {
-    const authHeader = event.headers.authorization || event.headers.Authorization;
-    if (!authHeader) return jsonResponse({ error: 'Unauthorized' }, 401);
-    const { data: { user: caller }, error: callerErr } = await supabase.auth.getUser(authHeader.replace('Bearer ', ''));
-    if (callerErr || !caller) return jsonResponse({ error: 'Unauthorized' }, 401);
-    const { data: callerProfile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', caller.id)
-      .maybeSingle();
-    if (callerProfile?.role !== 'admin') return jsonResponse({ error: 'Forbidden' }, 403);
+    const auth = await requireAdmin(event.headers.authorization || event.headers.Authorization);
+    if (!auth.ok) return jsonResponse({ error: auth.error }, auth.status);
 
     const { userId, role } = JSON.parse(event.body || '{}') as { userId?: string; role?: string };
     if (!userId) return jsonResponse({ error: 'userId required' }, 400);
     if (role !== 'admin' && role !== 'user') {
       return jsonResponse({ error: 'role must be "admin" or "user"' }, 400);
     }
-    if (userId === caller.id && role === 'user') {
+    if (userId === auth.userId && role === 'user') {
       return jsonResponse({ error: 'Nemôžeš sa sám odobrať z admin role.' }, 400);
     }
 

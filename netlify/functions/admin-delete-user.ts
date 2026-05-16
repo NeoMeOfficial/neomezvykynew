@@ -19,6 +19,7 @@
 import { createClient } from '@supabase/supabase-js';
 import Stripe from 'stripe';
 import { stripeEnv } from './_stripeEnv';
+import { requireAdmin } from './_adminAuth';
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
@@ -45,21 +46,13 @@ export async function handler(event: any) {
 
   try {
     // ── Admin auth ────────────────────────────────────────────────
-    const authHeader = event.headers.authorization || event.headers.Authorization;
-    if (!authHeader) return jsonResponse({ error: 'Unauthorized' }, 401);
-    const { data: { user: caller }, error: callerErr } = await supabase.auth.getUser(authHeader.replace('Bearer ', ''));
-    if (callerErr || !caller) return jsonResponse({ error: 'Unauthorized' }, 401);
-    const { data: callerProfile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', caller.id)
-      .maybeSingle();
-    if (callerProfile?.role !== 'admin') return jsonResponse({ error: 'Forbidden' }, 403);
+    const auth = await requireAdmin(event.headers.authorization || event.headers.Authorization);
+    if (!auth.ok) return jsonResponse({ error: auth.error }, auth.status);
 
     // ── Inputs ────────────────────────────────────────────────────
     const { userId } = JSON.parse(event.body || '{}') as { userId?: string };
     if (!userId) return jsonResponse({ error: 'Missing userId' }, 400);
-    if (userId === caller.id) {
+    if (userId === auth.userId) {
       return jsonResponse({ error: 'Nemôžeš zmazať vlastný účet cez admin. Použi Profil → Zmazať účet.' }, 400);
     }
 
