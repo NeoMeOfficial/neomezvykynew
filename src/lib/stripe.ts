@@ -7,12 +7,19 @@ export const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_
 // Activates `profile.nutrition_plan_purchased = true` via the Stripe webhook
 // on checkout.session.completed, which the Subscription context then reads
 // as hasMealPlanner.
-export const MEAL_PLAN_PRICE_ID = 'price_1TW8SeEpPqBqxo4mOwzTetog';
+//
+// Price IDs default to the live-mode values but can be overridden per env
+// (Netlify) so test mode can use distinct test-mode price IDs without a
+// code change: VITE_STRIPE_MEAL_PRICE_ID / VITE_STRIPE_SUBSCRIPTION_PRICE_ID.
+export const MEAL_PLAN_PRICE_ID =
+  import.meta.env.VITE_STRIPE_MEAL_PRICE_ID || 'price_1TW8SeEpPqBqxo4mOwzTetog';
 
 // Subscription plans
 export const SUBSCRIPTION_PLANS = {
   premium: {
-    priceId: 'price_1TM4KREpPqBqxo4m0Swf5F88',
+    priceId:
+      import.meta.env.VITE_STRIPE_SUBSCRIPTION_PRICE_ID ||
+      'price_1TM4KREpPqBqxo4m0Swf5F88',
     price: 24.90,
     currency: 'EUR',
     interval: 'month',
