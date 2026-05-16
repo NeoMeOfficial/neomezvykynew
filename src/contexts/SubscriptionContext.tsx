@@ -41,13 +41,13 @@ const TIER_LIMITS: Record<Tier, Record<ContentType, number>> = {
   premium: { recipes: -1, exercises: -1, meditations: -1, stretches: -1 },
 };
 
-// True when a real Stripe publishable key is configured
-const isStripeConfigured = () =>
-  !!(
-    import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY &&
-    (import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY.startsWith('pk_test_') ||
-      import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY.startsWith('pk_live_'))
-  );
+// True when a real Stripe publishable key is configured. Honors the
+// _TEST suffix override so deploy previews (test mode) are detected too.
+const isStripeConfigured = () => {
+  const e = import.meta.env as Record<string, string | undefined>;
+  const key = e.VITE_STRIPE_PUBLISHABLE_KEY_TEST || e.VITE_STRIPE_PUBLISHABLE_KEY;
+  return !!(key && (key.startsWith('pk_test_') || key.startsWith('pk_live_')));
+};
 
 // True when Supabase is configured (auth available)
 const isAuthConfigured = () =>
@@ -202,6 +202,12 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
       if (profileData?.nutrition_plan_purchased) {
         setMealPlannerPurchased(true);
         localStorage.setItem(MEAL_PLANNER_KEY, 'true');
+      } else {
+        // DB is the source of truth. If it says false, clear any stale
+        // local cache so the UI doesn't keep showing as purchased after
+        // a refund / reset / fresh test account.
+        setMealPlannerPurchased(false);
+        localStorage.removeItem(MEAL_PLANNER_KEY);
       }
     } catch (error) {
       console.error('Error loading subscription:', error);
