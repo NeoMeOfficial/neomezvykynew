@@ -15,6 +15,7 @@
 // Auth: caller must be authenticated AND have profiles.role = 'admin'.
 
 import { createClient } from '@supabase/supabase-js';
+import { requireAdmin } from './_adminAuth';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -26,19 +27,6 @@ const supabase = createClient(
   process.env.SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!,
 );
-
-async function requireAdmin(authHeader: string | undefined) {
-  if (!authHeader) return { ok: false as const, status: 401, error: 'Unauthorized' };
-  const { data: { user }, error } = await supabase.auth.getUser(authHeader.replace('Bearer ', ''));
-  if (error || !user) return { ok: false as const, status: 401, error: 'Unauthorized' };
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .maybeSingle();
-  if (profile?.role !== 'admin') return { ok: false as const, status: 403, error: 'Forbidden' };
-  return { ok: true as const, userId: user.id };
-}
 
 function jsonResponse(body: unknown, status = 200) {
   return { statusCode: status, headers: { ...CORS, 'Content-Type': 'application/json' }, body: JSON.stringify(body) };

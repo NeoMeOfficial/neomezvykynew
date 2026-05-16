@@ -10,6 +10,7 @@
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import { stripeEnv } from './_stripeEnv';
+import { requireAdmin } from './_adminAuth';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -32,16 +33,8 @@ export async function handler(event: any) {
 
   try {
     // Admin auth
-    const authHeader = event.headers.authorization || event.headers.Authorization;
-    if (!authHeader) return { statusCode: 401, headers: CORS, body: JSON.stringify({ error: 'Unauthorized' }) };
-    const { data: { user }, error: authErr } = await supabase.auth.getUser(authHeader.replace('Bearer ', ''));
-    if (authErr || !user) return { statusCode: 401, headers: CORS, body: JSON.stringify({ error: 'Unauthorized' }) };
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .maybeSingle();
-    if (profile?.role !== 'admin') return { statusCode: 403, headers: CORS, body: JSON.stringify({ error: 'Forbidden' }) };
+    const auth = await requireAdmin(event.headers.authorization || event.headers.Authorization);
+    if (!auth.ok) return { statusCode: auth.status, headers: CORS, body: JSON.stringify({ error: auth.error }) };
 
     // Fetch promotion codes (newest first). Stripe limit per page = 100;
     // for >100 we'd paginate but that's plenty for the foreseeable.
