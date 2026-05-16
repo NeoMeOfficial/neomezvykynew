@@ -637,7 +637,9 @@ export default function NutritionOnboarding({
         color: T.INK,
         display: 'flex',
         flexDirection: 'column',
-        zIndex: 60,
+        // Above the layout BottomNav (z-50) so the focus flow is
+        // visually exclusive — no nav chrome poking through.
+        zIndex: 100,
       }}
     >
       {/* Sticky top — progress + label + CTA */}
@@ -722,13 +724,16 @@ export default function NutritionOnboarding({
         </div>
       </div>
 
-      {/* Scroll body */}
+      {/* Scroll body — generous bottom padding so the last card on
+          long-form steps (Step 11 summary, Step 8 prefs) clears the
+          underlying layout BottomNav even if the z-index override
+          isn't honored on a given browser. */}
       <div
         style={{
           flex: 1,
           overflowY: 'auto',
           WebkitOverflowScrolling: 'touch',
-          padding: '18px 20px calc(env(safe-area-inset-bottom) + 32px)',
+          padding: '18px 20px calc(env(safe-area-inset-bottom) + 110px)',
         }}
       >
         {step === 1 && <Step1Goal goal={goal} setGoal={setGoal} />}
