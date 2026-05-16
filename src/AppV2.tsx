@@ -204,9 +204,33 @@ export default function AppV2() {
             {/* Public routes */}
             <Route path="/auth-demo" element={<AuthDemo />} />
             <Route path="/auth-real" element={<AuthReal />} />
-            <Route path="/auth" element={<AuthReal />} />
-            <Route path="/register" element={<AuthReal />} />
-            <Route path="/login" element={<AuthReal />} />
+            {/* /auth, /register, /login on the admin subdomain bounce to
+                the minimal admin sign-in. On the main domain they render
+                the regular consumer auth screen. */}
+            <Route
+              path="/auth"
+              element={
+                typeof window !== 'undefined' && window.location.hostname === 'admin.neome.com.au'
+                  ? <Navigate to="/admin/login" replace />
+                  : <AuthReal />
+              }
+            />
+            <Route
+              path="/register"
+              element={
+                typeof window !== 'undefined' && window.location.hostname === 'admin.neome.com.au'
+                  ? <Navigate to="/admin/login" replace />
+                  : <AuthReal />
+              }
+            />
+            <Route
+              path="/login"
+              element={
+                typeof window !== 'undefined' && window.location.hostname === 'admin.neome.com.au'
+                  ? <Navigate to="/admin/login" replace />
+                  : <AuthReal />
+              }
+            />
             {/* Minimal internal admin sign-in — used when RequireAdmin
                 bounces an unauthenticated visitor (typically the
                 admin.neome.com.au subdomain). */}
