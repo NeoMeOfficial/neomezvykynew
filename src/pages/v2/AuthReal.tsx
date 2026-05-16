@@ -8,7 +8,7 @@ import { supabase, isSupabaseConfigured } from '../../lib/supabase';
  *
  * Full-bleed editorial photo with white gradient fade. Brand monogram
  * + serif "Vitaj späť · domov." headline with GOLD italic em. Three
- * stacked buttons (Apple · Google · Pokračovať e-mailom). Tapping the
+ * stacked buttons (Google · Pokračovať e-mailom). Tapping the
  * email option swaps to email + password fields with a back link.
  *
  * Registration kept on the same component as a third mode — the new
@@ -101,7 +101,7 @@ export default function AuthReal() {
     }
   };
 
-  const handleOAuth = async (provider: 'apple' | 'google') => {
+  const handleOAuth = async (provider: 'google') => {
     if (!isSupabaseConfigured()) {
       setErrors({ submit: 'Prihlásenie cez sociálne siete je v príprave.' });
       return;
@@ -182,12 +182,6 @@ export default function AuthReal() {
         {/* === mode: choose === */}
         {mode === 'choose' && (
           <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 9 }}>
-            <button onClick={() => handleOAuth('apple')} disabled={submitting} style={socialBtnDark()}>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="#fff">
-                <path d="M17.05 12.04c-.03-3.15 2.57-4.66 2.69-4.74-1.47-2.15-3.76-2.45-4.57-2.48-1.94-.2-3.79 1.14-4.78 1.14-.99 0-2.51-1.11-4.13-1.08-2.12.03-4.08 1.24-5.17 3.14-2.21 3.83-.56 9.48 1.58 12.58 1.05 1.52 2.31 3.23 3.96 3.17 1.59-.06 2.19-1.03 4.11-1.03 1.92 0 2.46 1.03 4.14.99 1.71-.03 2.79-1.55 3.83-3.08 1.21-1.77 1.71-3.5 1.74-3.59-.04-.02-3.34-1.28-3.37-5.06zM13.85 3.7c.88-1.07 1.47-2.55 1.31-4.03-1.27.05-2.81.85-3.72 1.91-.81.95-1.52 2.46-1.33 3.91 1.41.11 2.86-.72 3.74-1.79z"/>
-              </svg>
-              <span>Pokračovať cez Apple</span>
-            </button>
             <button onClick={() => handleOAuth('google')} disabled={submitting} style={socialBtnLight()}>
               <svg width="15" height="15" viewBox="0 0 24 24">
                 <path d="M22 12.2c0-.8-.1-1.4-.2-2H12v3.8h5.6c-.2 1.4-1 2.6-2.2 3.4l3.5 2.7c2-1.9 3.1-4.6 3.1-7.9z" fill="#4285F4"/>
@@ -403,14 +397,6 @@ function Banner({ tone, children }: { tone: 'error' | 'info'; children: React.Re
   );
 }
 
-function socialBtnDark(): React.CSSProperties {
-  return {
-    width: '100%', padding: '14px 18px', borderRadius: 999,
-    background: T.INK_2, color: '#fff', border: 0, cursor: 'pointer',
-    display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-    fontFamily: T.SANS, fontSize: 13.5, fontWeight: 500, letterSpacing: '0.01em',
-  };
-}
 function socialBtnLight(): React.CSSProperties {
   return {
     width: '100%', padding: '14px 18px', borderRadius: 999,
