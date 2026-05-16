@@ -115,145 +115,273 @@ const btnSecondary: React.CSSProperties = { background: _A.CREAM2, color: _A.DEE
 const btnDanger: React.CSSProperties = { background: _A.TERRA, color: '#fff', borderRadius: 10, padding: '10px 16px', border: 'none', fontFamily: 'DM Sans, system-ui', fontSize: 12, fontWeight: 500, cursor: 'pointer' };
 
 function PartnerDiscountsTab() {
-  const [discounts, setDiscounts] = useState<PartnerDiscount[]>(() => loadLS('neome-admin-partner-discounts', INIT_PARTNER_DISCOUNTS));
-  const [showForm, setShowForm] = useState(false);
-  const [editId, setEditId] = useState<string | null>(null);
-  const [form, setForm] = useState<Partial<PartnerDiscount>>({});
+  interface PartnerReward {
+    slug: string;
+    name: string;
+    point_cost: number;
+    color_token: string;
+  }
+  interface PoolStats { total: number; served: number; available: number }
+  interface PoolRow { id: string; code: string; served_to: string | null; served_at: string | null; claimed_at: string | null; expires_at: string | null; created_at: string }
 
-  useEffect(() => { saveLS('neome-admin-partner-discounts', discounts); }, [discounts]);
+  const [rewards, setRewards] = useState<PartnerReward[]>([]);
+  const [stats, setStats] = useState<Record<string, PoolStats>>({});
+  const [loading, setLoading] = useState(true);
+  const [loadErr, setLoadErr] = useState<string | null>(null);
+  const [openSlug, setOpenSlug] = useState<string | null>(null);
+  const [recent, setRecent] = useState<PoolRow[]>([]);
+  const [uploadOpen, setUploadOpen] = useState(false);
+  const [uploadText, setUploadText] = useState('');
+  const [uploadBusy, setUploadBusy] = useState(false);
+  const [uploadMsg, setUploadMsg] = useState<string | null>(null);
 
-  const openAdd = () => { setForm({ category: 'wellness', isActive: true }); setEditId(null); setShowForm(true); };
-  const openEdit = (d: PartnerDiscount) => { setForm({ ...d }); setEditId(d.id); setShowForm(true); };
-  const closeForm = () => { setShowForm(false); setForm({}); setEditId(null); };
-
-  const save = () => {
-    if (!form.partnerName || !form.code) return;
-    if (editId) {
-      setDiscounts(prev => prev.map(d => d.id === editId ? { ...d, ...form } as PartnerDiscount : d));
-    } else {
-      const nd: PartnerDiscount = {
-        id: 'pd-' + Date.now(),
-        partnerName: form.partnerName!,
-        description: form.description || '',
-        code: form.code!,
-        discountValue: form.discountValue || '',
-        category: (form.category as PartnerDiscount['category']) || 'other',
-        expiryDate: form.expiryDate || '',
-        isActive: form.isActive ?? true,
-        createdAt: new Date().toISOString().split('T')[0],
-      };
-      setDiscounts(prev => [nd, ...prev]);
-    }
-    closeForm();
+  const callApi = async (init: RequestInit) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    return fetch('/.netlify/functions/admin-partner-codes', {
+      ...init,
+      headers: {
+        ...(init.headers || {}),
+        ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+      },
+    });
   };
 
-  const remove = (id: string) => setDiscounts(prev => prev.filter(d => d.id !== id));
-  const toggle = (id: string) => setDiscounts(prev => prev.map(d => d.id === id ? { ...d, isActive: !d.isActive } : d));
+  const loadAll = async () => {
+    setLoading(true);
+    setLoadErr(null);
+    try {
+      const res = await callApi({ method: 'GET' });
+      const body = await res.json();
+      if (!res.ok) throw new Error(body.error || 'Failed to load');
+      setRewards(body.rewards as PartnerReward[]);
+      setStats(body.stats as Record<string, PoolStats>);
+    } catch (err: any) {
+      setLoadErr(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const thStyle: React.CSSProperties = { textAlign: 'left', padding: '11px 14px', fontFamily: 'DM Sans, system-ui', fontSize: 9.5, letterSpacing: '0.18em', textTransform: 'uppercase', color: _A.EYEBROW, fontWeight: 500 };
+  const loadSlug = async (slug: string) => {
+    setOpenSlug(slug);
+    setRecent([]);
+    try {
+      const res = await callApi({ method: 'GET' });
+      // We could include slug in query, but the GET returns recent
+      // only when ?slug=… is set — fetch again with slug param.
+      const res2 = await callApi({ method: 'GET' });
+      void res; void res2;
+      // Direct fetch with slug:
+      const { data: { session } } = await supabase.auth.getSession();
+      const res3 = await fetch(`/.netlify/functions/admin-partner-codes?slug=${encodeURIComponent(slug)}`, {
+        headers: { ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}) },
+      });
+      const body = await res3.json();
+      if (res3.ok && body.recent) setRecent(body.recent as PoolRow[]);
+    } catch { /* silent */ }
+  };
+
+  useEffect(() => { loadAll(); }, []);
+
+  const openUpload = (slug: string) => {
+    setOpenSlug(slug);
+    setUploadOpen(true);
+    setUploadText('');
+    setUploadMsg(null);
+  };
+
+  const submitUpload = async () => {
+    if (!openSlug || !uploadText.trim()) return;
+    const codes = uploadText.split(/[\n,;\t]+/).map(s => s.trim()).filter(Boolean);
+    if (codes.length === 0) {
+      setUploadMsg('Žiadne validné kódy.');
+      return;
+    }
+    setUploadBusy(true);
+    setUploadMsg(null);
+    try {
+      const res = await callApi({
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug: openSlug, codes }),
+      });
+      const body = await res.json();
+      if (!res.ok) throw new Error(body.error || 'Upload failed');
+      setUploadMsg(`Pridaných: ${body.inserted}. Preskočených (duplikáty): ${body.skipped}.`);
+      setUploadText('');
+      // Refresh stats + recent
+      await loadAll();
+      if (openSlug) await loadSlug(openSlug);
+    } catch (err: any) {
+      setUploadMsg('Chyba: ' + err.message);
+    } finally {
+      setUploadBusy(false);
+    }
+  };
+
+  const deleteUnclaimed = async (id: string) => {
+    if (!confirm('Odstrániť tento kód z poolu?')) return;
+    try {
+      const res = await callApi({ method: 'DELETE', headers: { 'Content-Type': 'application/json' } });
+      // Re-do with id query param directly:
+      const { data: { session } } = await supabase.auth.getSession();
+      const res2 = await fetch(`/.netlify/functions/admin-partner-codes?id=${encodeURIComponent(id)}`, {
+        method: 'DELETE',
+        headers: { ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}) },
+      });
+      void res;
+      const body = await res2.json();
+      if (!res2.ok) throw new Error(body.error);
+      await loadAll();
+      if (openSlug) await loadSlug(openSlug);
+    } catch (err: any) {
+      alert('Chyba: ' + err.message);
+    }
+  };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 22, fontWeight: 500, color: _A.DEEP }}>Partner Zľavy</div>
-        <button onClick={openAdd} style={{ ...btnPrimary, display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Plus style={{ width: 14, height: 14 }} />Pridať partnera
+        <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 22, fontWeight: 500, color: _A.DEEP }}>Partner Zľavy · pool kódov</div>
+        <button onClick={loadAll} disabled={loading} style={{ ...btnSecondary, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <RefreshCw style={{ width: 13, height: 13, animation: loading ? 'spin 1s linear infinite' : 'none' }} />
+          Obnoviť
         </button>
       </div>
+      <Card>
+        <p style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED, lineHeight: 1.55, margin: 0 }}>
+          Partner ti pošle zoznam jednorázových kódov. Pridaj ich do poolu pre daný reward. Keď používateľka vymení body, edge-funkcia <code style={{ fontFamily: 'monospace', fontSize: 11 }}>redeem-reward</code> jeden vytiahne a označí ako vydaný. Vydané kódy už nemožno znova použiť.
+        </p>
+      </Card>
 
-      {/* Form panel */}
-      {showForm && (
-        <Card>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
-            <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 18, fontWeight: 500, color: _A.DEEP }}>{editId ? 'Upraviť zľavu' : 'Nová partnerská zľava'}</div>
-            <button onClick={closeForm} style={{ all: 'unset', cursor: 'pointer' }}><X style={{ width: 16, height: 16, color: _A.MUTED }} /></button>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-            <div>
-              <label style={labelStyle}>Meno partnera *</label>
-              <input value={form.partnerName || ''} onChange={e => setForm(f => ({ ...f, partnerName: e.target.value }))} style={inputStyle} />
-            </div>
-            <div>
-              <label style={labelStyle}>Kód *</label>
-              <input value={form.code || ''} onChange={e => setForm(f => ({ ...f, code: e.target.value.toUpperCase() }))} style={{ ...inputStyle, fontFamily: 'monospace' }} />
-            </div>
-            <div>
-              <label style={labelStyle}>Hodnota zľavy</label>
-              <input value={form.discountValue || ''} onChange={e => setForm(f => ({ ...f, discountValue: e.target.value }))} placeholder="napr. 20% alebo €10" style={inputStyle} />
-            </div>
-            <div>
-              <label style={labelStyle}>Kategória</label>
-              <select value={form.category || 'wellness'} onChange={e => setForm(f => ({ ...f, category: e.target.value as PartnerDiscount['category'] }))} style={inputStyle}>
-                <option value="wellness">Wellness</option>
-                <option value="food">Jedlo</option>
-                <option value="fitness">Fitness</option>
-                <option value="other">Iné</option>
-              </select>
-            </div>
-            <div>
-              <label style={labelStyle}>Platnosť do</label>
-              <input type="date" value={form.expiryDate || ''} onChange={e => setForm(f => ({ ...f, expiryDate: e.target.value }))} style={inputStyle} />
-            </div>
-            <div style={{ display: 'flex', alignItems: 'flex-end' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
-                <button onClick={() => setForm(f => ({ ...f, isActive: !f.isActive }))} style={{ all: 'unset', cursor: 'pointer' }}>
-                  {form.isActive ? <CheckSquare style={{ width: 18, height: 18, color: _A.SAGE }} /> : <Square style={{ width: 18, height: 18, color: _A.MUTED }} />}
-                </button>
-                <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.DEEP }}>Aktívna</span>
-              </label>
-            </div>
-            <div style={{ gridColumn: '1 / -1' }}>
-              <label style={labelStyle}>Popis</label>
-              <textarea value={form.description || ''} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} rows={2} style={{ ...inputStyle, resize: 'none' }} />
-            </div>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 18 }}>
-            <button onClick={closeForm} style={btnSecondary}>Zrušiť</button>
-            <button onClick={save} style={btnPrimary}>Uložiť</button>
-          </div>
-        </Card>
+      {loadErr && (
+        <div style={{ padding: '12px 14px', borderRadius: 10, background: 'rgba(193,133,106,0.12)', border: `1px solid ${_A.TERRA}30`, fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.TERRA }}>
+          {loadErr}
+        </div>
       )}
 
-      {/* Table */}
-      <Card>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr style={{ background: _A.CREAM2, borderRadius: 8 }}>
-              {['Partner', 'Kód', 'Zľava', 'Kategória', 'Platnosť', 'Aktívna', 'Akcie'].map(h => (
-                <th key={h} style={thStyle}>{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {discounts.map(d => (
-              <tr key={d.id} style={{ borderBottom: `1px solid ${_A.HAIR}` }}>
-                <td style={{ padding: '12px 14px' }}>
-                  <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 13, fontWeight: 500, color: _A.DEEP }}>{d.partnerName}</div>
-                  {d.description && <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED, marginTop: 2 }}>{d.description}</div>}
-                </td>
-                <td style={{ padding: '12px 14px' }}><span style={{ fontFamily: 'monospace', fontSize: 11, padding: '3px 8px', borderRadius: 6, background: _A.CREAM2, color: _A.DEEP }}>{d.code}</span></td>
-                <td style={{ padding: '12px 14px', fontFamily: 'DM Sans, system-ui', fontSize: 13, fontWeight: 600, color: _A.GOLD }}>{d.discountValue}</td>
-                <td style={{ padding: '12px 14px' }}><span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', padding: '3px 8px', borderRadius: 999, background: `rgba(193,133,106,0.18)`, color: _A.TERRA }}>{CATEGORY_LABELS[d.category]}</span></td>
-                <td style={{ padding: '12px 14px', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>{d.expiryDate}</td>
-                <td style={{ padding: '12px 14px' }}>
-                  <button onClick={() => toggle(d.id)} style={{ all: 'unset', cursor: 'pointer' }}>
-                    {d.isActive ? <CheckSquare style={{ width: 16, height: 16, color: _A.SAGE }} /> : <Square style={{ width: 16, height: 16, color: _A.MUTED }} />}
-                  </button>
-                </td>
-                <td style={{ padding: '12px 14px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                    <button onClick={() => openEdit(d)} style={{ all: 'unset', cursor: 'pointer', padding: 6, borderRadius: 8 }}><Edit3 style={{ width: 14, height: 14, color: _A.MUTED }} /></button>
-                    <button onClick={() => remove(d.id)} style={{ all: 'unset', cursor: 'pointer', padding: 6, borderRadius: 8 }}><Trash2 style={{ width: 14, height: 14, color: _A.TERRA }} /></button>
+      {/* Per-reward cards */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {rewards.map(r => {
+          const s = stats[r.slug] ?? { total: 0, served: 0, available: 0 };
+          const isOpen = openSlug === r.slug && !uploadOpen;
+          return (
+            <div key={r.slug} style={{ background: _A.CARD, borderRadius: 12, border: `1px solid ${_A.HAIR}`, padding: '14px 16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 13, fontWeight: 500, color: _A.DEEP }}>{r.name}</div>
+                    <span style={{ fontFamily: 'monospace', fontSize: 10, color: _A.TERTIARY }}>{r.slug}</span>
                   </div>
-                </td>
-              </tr>
-            ))}
-            {discounts.length === 0 && (
-              <tr><td colSpan={7} style={{ padding: '32px 14px', textAlign: 'center', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>Žiadne partnerské zľavy.</td></tr>
+                  <div style={{ marginTop: 4, fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED }}>
+                    Cena: <strong>{r.point_cost} bodov</strong> · Pool: <strong>{s.available}</strong> dostupných · {s.served} vydaných · {s.total} celkovo
+                  </div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+                  <button onClick={() => openUpload(r.slug)} style={{ ...btnPrimary, padding: '7px 12px', fontSize: 11, display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <Plus style={{ width: 12, height: 12 }} />
+                    Pridať kódy
+                  </button>
+                  <button onClick={() => isOpen ? setOpenSlug(null) : loadSlug(r.slug)} style={{ ...btnSecondary, padding: '7px 12px', fontSize: 11 }}>
+                    {isOpen ? 'Skryť' : 'Zobraziť'}
+                  </button>
+                </div>
+              </div>
+
+              {isOpen && (
+                <div style={{ marginTop: 14, paddingTop: 12, borderTop: `1px solid ${_A.HAIR}` }}>
+                  <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: _A.EYEBROW, fontWeight: 500, marginBottom: 8 }}>Posledných 50 kódov</div>
+                  {recent.length === 0 ? (
+                    <p style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED }}>Pool je prázdny.</p>
+                  ) : (
+                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                      <thead>
+                        <tr style={{ background: _A.CREAM2 }}>
+                          {['Kód', 'Stav', 'Vydaný', 'Akcia'].map(h => (
+                            <th key={h} style={{ textAlign: 'left', padding: '8px 12px', fontFamily: 'DM Sans, system-ui', fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase', color: _A.EYEBROW, fontWeight: 500 }}>{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {recent.map(row => {
+                          const claimed = !!row.claimed_at;
+                          return (
+                            <tr key={row.id} style={{ borderBottom: `1px solid ${_A.HAIR}` }}>
+                              <td style={{ padding: '8px 12px', fontFamily: 'monospace', fontSize: 12, color: _A.DEEP }}>{row.code}</td>
+                              <td style={{ padding: '8px 12px' }}>
+                                <span style={{
+                                  fontSize: 9, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase',
+                                  padding: '3px 7px', borderRadius: 999,
+                                  background: claimed ? 'rgba(193,133,106,0.15)' : 'rgba(139,158,136,0.15)',
+                                  color: claimed ? _A.TERRA : _A.SAGE,
+                                }}>{claimed ? 'Vydaný' : 'Dostupný'}</span>
+                              </td>
+                              <td style={{ padding: '8px 12px', fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED }}>
+                                {claimed && row.claimed_at ? new Date(row.claimed_at).toLocaleString('sk-SK', { day: 'numeric', month: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—'}
+                              </td>
+                              <td style={{ padding: '8px 12px' }}>
+                                {!claimed && (
+                                  <button onClick={() => deleteUnclaimed(row.id)} style={{ all: 'unset', cursor: 'pointer', padding: 4 }}>
+                                    <Trash2 style={{ width: 12, height: 12, color: _A.TERRA }} />
+                                  </button>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })}
+        {!loading && rewards.length === 0 && (
+          <div style={{ padding: '32px 14px', textAlign: 'center', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>
+            Žiadne partner-* rewards v rewards tabuľke.
+          </div>
+        )}
+      </div>
+
+      {/* Upload modal */}
+      {uploadOpen && openSlug && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'grid', placeItems: 'center', zIndex: 200, padding: 24 }}>
+          <div style={{ background: _A.CARD, borderRadius: 14, padding: 22, maxWidth: 540, width: '100%', boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+              <div>
+                <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 18, fontWeight: 500, color: _A.DEEP }}>Pridať kódy do poolu</div>
+                <div style={{ fontFamily: 'monospace', fontSize: 11, color: _A.MUTED, marginTop: 2 }}>{openSlug}</div>
+              </div>
+              <button onClick={() => { setUploadOpen(false); setUploadMsg(null); }} style={{ all: 'unset', cursor: 'pointer' }}>
+                <X style={{ width: 16, height: 16, color: _A.MUTED }} />
+              </button>
+            </div>
+            <p style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11.5, color: _A.MUTED, lineHeight: 1.55, marginBottom: 10 }}>
+              Vlož kódy — jeden na riadok, alebo oddelené čiarkou. Duplikáty (kódy, ktoré sú už v pooli pre tento reward) sa preskočia.
+            </p>
+            <textarea
+              value={uploadText}
+              onChange={e => setUploadText(e.target.value)}
+              rows={10}
+              placeholder={'GYM-A1B2\nGYM-C3D4\nGYM-E5F6\n…'}
+              style={{ ...inputStyle, fontFamily: 'monospace', fontSize: 12, resize: 'vertical', minHeight: 180 }}
+            />
+            {uploadMsg && (
+              <div style={{ marginTop: 10, padding: '8px 12px', borderRadius: 8, background: _A.CREAM2, fontFamily: 'DM Sans, system-ui', fontSize: 11.5, color: _A.DEEP }}>
+                {uploadMsg}
+              </div>
             )}
-          </tbody>
-        </table>
-      </Card>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 14 }}>
+              <button onClick={() => { setUploadOpen(false); setUploadMsg(null); }} disabled={uploadBusy} style={btnSecondary}>Zavrieť</button>
+              <button onClick={submitUpload} disabled={uploadBusy || !uploadText.trim()} style={{ ...btnPrimary, display: 'flex', alignItems: 'center', gap: 8 }}>
+                {uploadBusy && <RefreshCw style={{ width: 12, height: 12, animation: 'spin 1s linear infinite' }} />}
+                {uploadBusy ? 'Pridávam…' : 'Pridať'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
