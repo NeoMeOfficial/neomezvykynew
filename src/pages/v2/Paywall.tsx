@@ -2,7 +2,12 @@ import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Eye, Ser, Body, NM } from '../../components/v2/neome';
 import { useSubscription } from '../../contexts/SubscriptionContext';
-import { SUBSCRIPTION_PLANS } from '../../lib/stripe';
+import { SUBSCRIPTION_PLANS, formatPrice } from '../../lib/stripe';
+
+// Canonical paywall price label — derived from the Stripe constant so a
+// price change anywhere only needs SUBSCRIPTION_PLANS.premium.price
+// updated.
+const PLAN_PRICE_LABEL = formatPrice(SUBSCRIPTION_PLANS.premium.price);
 
 /**
  * Paywall — R7 (three editorial variants)
@@ -96,14 +101,13 @@ function PaywallWarm({ onContinueFree, onClose, onActivate }: { onContinueFree: 
           }}
         >
           <div>
-            <Eye color={NM.GOLD} size={10.5}>Zvýhodnený prvý mesiac</Eye>
+            <Eye color={NM.GOLD} size={10.5}>NeoMe Plus</Eye>
             <div style={{ marginTop: 4, display: 'flex', alignItems: 'baseline', gap: 8 }}>
-              <span style={{ fontFamily: NM.SERIF, fontSize: 28, fontWeight: 500, color: NM.DEEP, letterSpacing: '-0.02em' }}>4,99 €</span>
-              <span style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.EYEBROW, fontWeight: 400 }}>prvý mesiac</span>
+              <span style={{ fontFamily: NM.SERIF, fontSize: 28, fontWeight: 500, color: NM.DEEP, letterSpacing: '-0.02em' }}>{PLAN_PRICE_LABEL}</span>
+              <span style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.EYEBROW, fontWeight: 400 }}>/ mesiac</span>
             </div>
-            <div style={{ fontFamily: NM.SANS, fontSize: 10.5, color: NM.TERTIARY, marginTop: 2, fontWeight: 400 }}>Potom 9,99 € / mesiac · zrušíš kedykoľvek</div>
+            <div style={{ fontFamily: NM.SANS, fontSize: 10.5, color: NM.TERTIARY, marginTop: 2, fontWeight: 400 }}>Zrušíš kedykoľvek</div>
           </div>
-          <Eye color={NM.TERRA} size={9.5}>-50%</Eye>
         </div>
         <button
           onClick={onActivate}
@@ -186,13 +190,12 @@ function PaywallDark({ onContinueFree, onClose, onActivate }: { onContinueFree: 
         </div>
         <div style={{ padding: '24px 22px 0' }}>
           <div style={{ padding: '18px 20px', borderRadius: 18, background: 'rgba(255,255,255,0.06)', border: `1px solid ${NM.GOLD}44`, position: 'relative', overflow: 'hidden' }}>
-            <div style={{ position: 'absolute', top: 14, right: 14, padding: '4px 10px', background: NM.GOLD, borderRadius: 999, fontFamily: NM.SANS, fontSize: 9, color: '#fff', letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 500 }}>Ponuka</div>
-            <Eye color={NM.GOLD} size={10}>Prvý mesiac</Eye>
+            <Eye color={NM.GOLD} size={10}>NeoMe Plus</Eye>
             <div style={{ marginTop: 8, display: 'flex', alignItems: 'baseline', gap: 10 }}>
-              <span style={{ fontFamily: NM.SERIF, fontSize: 38, fontWeight: 500, color: '#fff', letterSpacing: '-0.025em' }}>4,99 €</span>
-              <span style={{ fontFamily: NM.SANS, fontSize: 12, color: 'rgba(255,255,255,0.5)', textDecoration: 'line-through', fontWeight: 400 }}>9,99 €</span>
+              <span style={{ fontFamily: NM.SERIF, fontSize: 38, fontWeight: 500, color: '#fff', letterSpacing: '-0.025em' }}>{PLAN_PRICE_LABEL}</span>
+              <span style={{ fontFamily: NM.SANS, fontSize: 12, color: 'rgba(255,255,255,0.55)', fontWeight: 400 }}>/ mesiac</span>
             </div>
-            <div style={{ fontFamily: NM.SANS, fontSize: 11.5, color: 'rgba(255,255,255,0.55)', marginTop: 4, fontWeight: 400 }}>Potom 9,99 € mesačne · zrušíš kedykoľvek</div>
+            <div style={{ fontFamily: NM.SANS, fontSize: 11.5, color: 'rgba(255,255,255,0.55)', marginTop: 4, fontWeight: 400 }}>Zrušíš kedykoľvek</div>
           </div>
         </div>
       </div>
@@ -213,7 +216,7 @@ function PaywallDark({ onContinueFree, onClose, onActivate }: { onContinueFree: 
             cursor: 'pointer',
           }}
         >
-          Začať s Plus · 4,99 €
+          Začať s Plus
         </button>
         <button
           onClick={onContinueFree}
@@ -277,10 +280,10 @@ function PaywallCompare({ onContinueFree, onClose, onActivate }: { onContinueFre
           <div style={{ position: 'relative' }}>
             <Eye color={NM.GOLD} size={10}>Plus · odporúčané</Eye>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 8 }}>
-              <span style={{ fontFamily: NM.SERIF, fontSize: 26, fontWeight: 500, letterSpacing: '-0.02em' }}>4,99 €</span>
-              <span style={{ fontFamily: NM.SANS, fontSize: 10, color: 'rgba(255,255,255,0.5)', textDecoration: 'line-through', fontWeight: 400 }}>9,99 €</span>
+              <span style={{ fontFamily: NM.SERIF, fontSize: 26, fontWeight: 500, letterSpacing: '-0.02em' }}>{PLAN_PRICE_LABEL}</span>
+              <span style={{ fontFamily: NM.SANS, fontSize: 10, color: 'rgba(255,255,255,0.6)', fontWeight: 400 }}>/ mesiac</span>
             </div>
-            <div style={{ fontFamily: NM.SANS, fontSize: 10.5, color: 'rgba(255,255,255,0.6)', marginTop: 2, fontWeight: 400 }}>prvý mesiac</div>
+            <div style={{ fontFamily: NM.SANS, fontSize: 10.5, color: 'rgba(255,255,255,0.6)', marginTop: 2, fontWeight: 400 }}>Zrušíš kedykoľvek</div>
             <div style={{ marginTop: 14, padding: '10px 0', borderTop: '1px solid rgba(255,255,255,0.1)', fontFamily: NM.SANS, fontSize: 11.5, color: 'rgba(255,255,255,0.8)', fontWeight: 400 }}>
               Všetko vo Free + 4 programy, plný cyklus, návyky bez limitu.
             </div>
@@ -328,7 +331,7 @@ function PaywallCompare({ onContinueFree, onClose, onActivate }: { onContinueFre
             cursor: 'pointer',
           }}
         >
-          Začať s Plus · 4,99 €
+          Začať s Plus
         </button>
         <button
           onClick={onContinueFree}

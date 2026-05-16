@@ -80,6 +80,31 @@ export default function PointsSummary() {
         <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.EYEBROW, marginTop: 4, letterSpacing: '0.22em', textTransform: 'uppercase', fontWeight: 500 }}>
           Bodov · {earnedCount} {earnedCount === 1 ? 'odznak' : 'odznaky'}
         </div>
+        {/* Primary action — make it unmistakable how to spend the points. */}
+        <button
+          onClick={() => navigate('/body/odmeny')}
+          style={{
+            marginTop: 22,
+            background: NM.DEEP,
+            color: '#fff',
+            border: 0,
+            padding: '14px 26px',
+            borderRadius: 999,
+            fontFamily: NM.SANS,
+            fontSize: 14,
+            fontWeight: 500,
+            letterSpacing: '0.02em',
+            cursor: 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
+          }}
+        >
+          Vymeniť body za odmeny
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M9 6l6 6-6 6" />
+          </svg>
+        </button>
       </div>
 
       {milestone && (
