@@ -63,6 +63,10 @@ export async function handler(event: any, context: any) {
     const baseParams = {
       customer: customer.id,
       payment_method_types: ['card'] as const,
+      // Force Slovak UI — overrides Stripe's auto-detection from
+      // Accept-Language so the checkout page stays consistent for our
+      // SK audience regardless of browser locale.
+      locale: 'sk' as const,
       line_items: [
         {
           price: priceId,

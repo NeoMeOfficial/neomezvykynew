@@ -39,10 +39,12 @@ export async function handler(event: any, context: any) {
       };
     }
 
-    // Create portal session
+    // Create portal session. Locale forced to Slovak for UI consistency
+    // with the checkout flow.
     const portalSession = await stripe.billingPortal.sessions.create({
       customer: customerId,
       return_url: returnUrl,
+      locale: 'sk',
     });
 
     return {
