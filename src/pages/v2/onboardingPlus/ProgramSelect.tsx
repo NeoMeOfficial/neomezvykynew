@@ -144,7 +144,7 @@ export default function PlusProgramSelect() {
                     textTransform: 'uppercase' as const,
                   }}
                 >
-                  L{p.level} · {p.weeks} týž.
+                  Level {p.level} · {p.weeks} týž.
                 </div>
                 {/* Title bottom-left */}
                 <div

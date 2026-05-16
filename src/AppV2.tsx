@@ -312,11 +312,17 @@ export default function AppV2() {
               <Route path="/exercise/extra/:id" element={<ExercisePlayer />} />
               <Route path="/exercise/today" element={<ExercisePlayer />} />
               <Route path="/jedalnicek" element={<JedalnicekPlanner />} />
-              <Route path="/jedalnicek/onboarding" element={<JedalnicekOnboarding />} />
               <Route path="/jedalnicek-promo" element={<JedalnicekPromo />} />
               <Route path="/navyky" element={<NavykyTracker />} />
               <Route path="/postpartum" element={<PostpartumLanding />} />
             </Route>
+
+            {/* Meal-plan onboarding questionnaire — public for design QA.
+                Same rationale as /onboarding-plus/*: the form renders
+                without auth so it can be previewed. Saving the result
+                (saveProfile + generatePlan) requires auth and will fail
+                gracefully if not signed in. */}
+            <Route path="/jedalnicek/onboarding" element={<JedalnicekOnboarding />} />
             
             {/* Catch-all route for unknown paths */}
             <Route path="*" element={<Navigate to="/" replace />} />
