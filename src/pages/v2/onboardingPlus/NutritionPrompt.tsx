@@ -42,84 +42,79 @@ export default function PlusNutritionPrompt() {
         eyebrow="Výživa"
         title="Chceš pridať aj"
         accentTitle="Jedálniček?"
-        accentColor={NM.GOLD}
+        accentColor={NM.SAGE}
         helper="Plán jedál na týždeň s receptami, makrami a nákupným zoznamom. Vyplníš krátky dotazník a dostaneš svoj prvý plán hneď."
         size={30}
       />
 
       <div style={{ padding: '28px 22px 28px' }}>
-        {/* Featured upsell card */}
+        {/* Featured upsell card — nutrition image fades in from the right */}
         <button
           onClick={onYes}
           style={{
             all: 'unset',
             cursor: 'pointer',
             display: 'block',
-            padding: '22px 20px',
-            background: '#fff',
-            borderRadius: 22,
-            border: `1.5px solid ${NM.GOLD}`,
-            boxShadow: '0 14px 34px rgba(184,134,74,0.18)',
             position: 'relative',
+            borderRadius: 22,
+            border: `1.5px solid ${NM.SAGE}`,
+            boxShadow: '0 14px 34px rgba(139,158,136,0.22)',
             overflow: 'hidden',
             width: '100%',
             boxSizing: 'border-box',
+            // Image positioned right-of-card, white-to-translucent
+            // gradient from left to right keeps the copy readable while
+            // the food photo bleeds in on the right side.
+            background:
+              `linear-gradient(90deg, #FFFFFF 0%, #FFFFFF 32%, rgba(255,255,255,0.85) 55%, rgba(255,255,255,0.55) 80%, rgba(255,255,255,0.35) 100%), ` +
+              `url(/images/r9/section-nutrition.jpg) right center / cover no-repeat`,
+            minHeight: 260,
           }}
         >
-          <div
-            style={{
-              position: 'absolute',
-              top: -30,
-              right: -30,
-              width: 120,
-              height: 120,
-              borderRadius: 999,
-              background: 'rgba(184,134,74,0.08)',
-            }}
-          />
-          <div style={{ position: 'relative' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-              <Eye color={NM.GOLD} size={10}>Odporúčané</Eye>
-              <div
-                style={{
-                  padding: '3px 8px',
-                  background: 'rgba(184,134,74,0.14)',
-                  borderRadius: 999,
-                  fontFamily: NM.SANS,
-                  fontSize: 9,
-                  color: NM.GOLD,
-                  letterSpacing: '0.14em',
-                  textTransform: 'uppercase',
-                  fontWeight: 500,
-                }}
-              >
-                +57 €
-              </div>
-            </div>
+          <div style={{ position: 'relative', padding: '22px 22px 24px' }}>
+            <Eye color={NM.SAGE} size={10}>Odporúčané</Eye>
+
             <div
               style={{
+                marginTop: 10,
                 fontFamily: NM.SERIF,
                 fontSize: 22,
                 fontWeight: 500,
                 color: NM.DEEP,
                 letterSpacing: '-0.01em',
-                marginBottom: 6,
+                lineHeight: 1.2,
               }}
             >
               Áno, pridať Jedálniček
             </div>
-            <div
-              style={{
-                fontFamily: NM.SANS,
-                fontSize: 12.5,
-                color: NM.MUTED,
-                fontWeight: 300,
-                marginBottom: 14,
-              }}
-            >
-              Jednorazový poplatok · navždy tvoj
+
+            {/* Large, unambiguous price */}
+            <div style={{ marginTop: 12, display: 'flex', alignItems: 'baseline', gap: 8 }}>
+              <span
+                style={{
+                  fontFamily: NM.SERIF,
+                  fontSize: 38,
+                  fontWeight: 500,
+                  color: NM.SAGE,
+                  letterSpacing: '-0.02em',
+                  lineHeight: 1,
+                }}
+              >
+                57 €
+              </span>
+              <span
+                style={{
+                  fontFamily: NM.SANS,
+                  fontSize: 12,
+                  color: NM.MUTED,
+                  fontWeight: 400,
+                }}
+              >
+                jednorazovo · navždy tvoj
+              </span>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+
+            <div style={{ marginTop: 18, display: 'flex', flexDirection: 'column', gap: 10, maxWidth: 280 }}>
               {FEATURES.map((li) => (
                 <div key={li} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
                   <div
@@ -127,14 +122,14 @@ export default function PlusNutritionPrompt() {
                       width: 16,
                       height: 16,
                       borderRadius: 999,
-                      background: 'rgba(184,134,74,0.16)',
+                      background: 'rgba(139,158,136,0.22)',
                       display: 'grid',
                       placeItems: 'center',
                       flexShrink: 0,
                       marginTop: 2,
                     }}
                   >
-                    <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke={NM.GOLD} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke={NM.SAGE} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M20 6L9 17l-5-5" />
                     </svg>
                   </div>
