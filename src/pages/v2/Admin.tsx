@@ -1038,6 +1038,34 @@ function UsersTab() {
   };
 
   const [togglingMeal, setTogglingMeal] = useState<string | null>(null);
+  const [togglingRole, setTogglingRole] = useState<string | null>(null);
+
+  const handleToggleAdmin = async (user: AdminUser) => {
+    const next: 'admin' | 'user' = user.role === 'admin' ? 'user' : 'admin';
+    const msg = next === 'admin'
+      ? `Povýšiť ${user.email} na admin? Bude mať prístup k celému admin panelu.`
+      : `Odobrať ${user.email} admin role?`;
+    if (!window.confirm(msg)) return;
+    setTogglingRole(user.id);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch('/.netlify/functions/admin-set-user-role', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+        },
+        body: JSON.stringify({ userId: user.id, role: next }),
+      });
+      const body = await res.json();
+      if (!res.ok) throw new Error(body.error);
+      setUsers(prev => prev.map(u => (u.id === user.id ? { ...u, role: next } : u)));
+    } catch (err: any) {
+      alert('Chyba pri zmene admin role: ' + err.message);
+    } finally {
+      setTogglingRole(null);
+    }
+  };
   const handleToggleMealPlan = async (user: AdminUser) => {
     const next = !user.nutrition_plan_purchased;
     const confirmMsg = next
@@ -1232,6 +1260,30 @@ function UsersTab() {
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }} onClick={e => e.stopPropagation()}>
                     <span style={tierBadgeStyle(tier)}>{tierLabel(tier)}</span>
+
+                    {/* Admin role chip — click to promote / demote */}
+                    <button
+                      onClick={() => handleToggleAdmin(user)}
+                      disabled={togglingRole === user.id}
+                      title={user.role === 'admin' ? 'Odobrať admin role' : 'Povýšiť na admin'}
+                      style={{
+                        all: 'unset',
+                        cursor: togglingRole === user.id ? 'not-allowed' : 'pointer',
+                        padding: '4px 8px',
+                        borderRadius: 999,
+                        fontFamily: 'DM Sans, system-ui',
+                        fontSize: 10,
+                        fontWeight: 500,
+                        letterSpacing: '0.06em',
+                        textTransform: 'uppercase' as const,
+                        background: user.role === 'admin' ? _A.DEEP : 'transparent',
+                        color: user.role === 'admin' ? '#fff' : _A.MUTED,
+                        border: user.role === 'admin' ? `1px solid ${_A.DEEP}` : `1px solid ${_A.HAIR2}`,
+                        opacity: togglingRole === user.id ? 0.6 : 1,
+                      }}
+                    >
+                      {togglingRole === user.id ? '…' : (user.role === 'admin' ? 'Admin ✓' : '+ Admin')}
+                    </button>
 
                     {/* Meal-plan add-on chip — click to toggle */}
                     <button
