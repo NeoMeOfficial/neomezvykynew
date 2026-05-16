@@ -607,7 +607,12 @@ interface AdminUser {
 
 interface UserDetail {
   purchases: { program_id: string; purchased_at: string; stripe_payment_id: string | null }[];
-  totalPoints: number;
+  /** Net current balance — sum of positive AND negative ledger entries.
+   *  Matches what the redeem-reward edge function checks against. */
+  balance: number;
+  /** Lifetime earned — sum of positive ledger entries only. Useful for
+   *  understanding total engagement separately from spending. */
+  totalEarned: number;
   lastActivity: string | null;
   activityBreakdown: { event_type: string; count: number; points: number }[];
 }
@@ -708,7 +713,8 @@ function UsersTab() {
       ]);
 
       const ledger = pointsRes.data ?? [];
-      const totalPoints = ledger.reduce((sum, r) => sum + (r.points > 0 ? r.points : 0), 0);
+      const balance = ledger.reduce((sum, r) => sum + (r.points ?? 0), 0);
+      const totalEarned = ledger.reduce((sum, r) => sum + (r.points > 0 ? r.points : 0), 0);
       const lastActivity = lastRes.data?.[0]?.created_at ?? null;
 
       const breakdown: Record<string, { count: number; points: number }> = {};
@@ -722,7 +728,8 @@ function UsersTab() {
         ...prev,
         [userId]: {
           purchases: [],
-          totalPoints,
+          balance,
+          totalEarned,
           lastActivity,
           activityBreakdown: Object.entries(breakdown)
             .map(([event_type, v]) => ({ event_type, ...v }))
@@ -1158,13 +1165,21 @@ function UsersTab() {
                         {/* Activity block */}
                         <div style={{ background: _A.CARD, borderRadius: 10, border: `1px solid ${_A.HAIR}`, padding: '12px 14px' }}>
                           <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: _A.EYEBROW, fontWeight: 500, marginBottom: 10 }}>Aktivita</div>
-                          {!detail || detail.totalPoints === 0 ? (
+                          {!detail || detail.totalEarned === 0 ? (
                             <p style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.TERTIARY }}>Žiadna zaznamenaná aktivita</p>
                           ) : (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                              {/* Aktuálny zostatok — what the user actually has
+                                  available to spend right now. Matches the
+                                  edge function's affordability check. */}
                               <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: 6, borderBottom: `1px solid ${_A.HAIR}`, marginBottom: 2 }}>
-                                <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10.5, color: _A.EYEBROW }}>Celkové body</span>
-                                <span style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 15, color: _A.TERRA }}>{detail.totalPoints}</span>
+                                <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10.5, color: _A.EYEBROW }}>Aktuálny zostatok</span>
+                                <span style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 16, color: _A.GOLD, fontWeight: 500 }}>{detail.balance}</span>
+                              </div>
+                              {/* Lifetime earned — shown smaller for context. */}
+                              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10.5, color: _A.EYEBROW }}>Celkovo zarobené</span>
+                                <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10.5, color: _A.DEEP, fontWeight: 500 }}>{detail.totalEarned}</span>
                               </div>
                               {detail.lastActivity && (
                                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
