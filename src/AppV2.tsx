@@ -226,14 +226,22 @@ export default function AppV2() {
               <Route path="/paywall" element={<Paywall />} />
               <Route path="/checkout/success" element={<CheckoutSuccess />} />
               <Route path="/checkout/canceled" element={<CheckoutCanceled />} />
-              <Route path="/onboarding-plus/program" element={<PlusProgramPrompt />} />
-              <Route path="/onboarding-plus/program-select" element={<PlusProgramSelect />} />
-              <Route path="/onboarding-plus/cyklus" element={<PlusCycleInfo />} />
-              <Route path="/onboarding-plus/jedalnicek" element={<PlusNutritionPrompt />} />
-              <Route path="/onboarding-plus/jedalnicek-cas" element={<PlusNutritionTimePrompt />} />
-              <Route path="/onboarding-plus/jedalnicek-memo" element={<PlusNutritionMemo />} />
-              <Route path="/onboarding-plus/hotovo" element={<PlusFinal />} />
             </Route>
+
+            {/* Post-subscription onboarding — public so design QA can
+                preview each screen without signing in. Real users enter
+                via /checkout/success which validates the subscription
+                server-side first. The actions inside (purchase meal
+                plan, save cycle data) require auth and will fail
+                gracefully for unauthenticated visitors — they can still
+                see the UI. */}
+            <Route path="/onboarding-plus/program" element={<PlusProgramPrompt />} />
+            <Route path="/onboarding-plus/program-select" element={<PlusProgramSelect />} />
+            <Route path="/onboarding-plus/cyklus" element={<PlusCycleInfo />} />
+            <Route path="/onboarding-plus/jedalnicek" element={<PlusNutritionPrompt />} />
+            <Route path="/onboarding-plus/jedalnicek-cas" element={<PlusNutritionTimePrompt />} />
+            <Route path="/onboarding-plus/jedalnicek-memo" element={<PlusNutritionMemo />} />
+            <Route path="/onboarding-plus/hotovo" element={<PlusFinal />} />
 
             {/* Protected routes */}
             <Route element={<RequireAuth><AppLayout /></RequireAuth>}>
