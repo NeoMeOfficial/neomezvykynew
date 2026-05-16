@@ -16,7 +16,9 @@ const supabaseAdmin = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!,
 );
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? '', {
+import { stripeEnv } from './_stripeEnv';
+
+const stripe = new Stripe(stripeEnv('STRIPE_SECRET_KEY') ?? '', {
   apiVersion: '2024-06-20',
 });
 
@@ -52,7 +54,7 @@ export async function handler(event: { httpMethod: string; headers: Record<strin
     const stripeCustomerId = subRow?.stripe_customer_id ?? null;
 
     // Delete Stripe customer (if any). Cancels subs implicitly.
-    if (stripeCustomerId && process.env.STRIPE_SECRET_KEY) {
+    if (stripeCustomerId && stripeEnv('STRIPE_SECRET_KEY')) {
       try {
         await stripe.customers.del(stripeCustomerId);
       } catch (sErr) {

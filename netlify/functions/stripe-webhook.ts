@@ -1,14 +1,17 @@
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
+import { stripeEnv } from './_stripeEnv';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+const stripe = new Stripe(stripeEnv('STRIPE_SECRET_KEY')!, {
   apiVersion: '2023-10-16',
 });
 
 // Stripe price ID for the €57 nutrition plan one-time purchase. The webhook
 // uses this to identify which checkout.session.completed events should set
-// `profiles.nutrition_plan_purchased = true`.
-const MEAL_PLAN_PRICE_ID = 'price_1TW8SeEpPqBqxo4mOwzTetog';
+// `profiles.nutrition_plan_purchased = true`. Env-overridable so test mode
+// can match against the test-mode meal plan price ID.
+const MEAL_PLAN_PRICE_ID =
+  stripeEnv('STRIPE_MEAL_PRICE_ID') || 'price_1TW8SeEpPqBqxo4mOwzTetog';
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
@@ -23,7 +26,7 @@ export async function handler(event: any) {
     stripeEvent = stripe.webhooks.constructEvent(
       event.body,
       signature,
-      process.env.STRIPE_WEBHOOK_SECRET!
+      stripeEnv('STRIPE_WEBHOOK_SECRET')!
     );
   } catch (err: any) {
     console.error('Webhook signature verification failed:', err.message);

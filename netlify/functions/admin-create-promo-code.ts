@@ -1,6 +1,7 @@
 import Stripe from 'stripe';
+import { stripeEnv } from './_stripeEnv';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+const stripe = new Stripe(stripeEnv('STRIPE_SECRET_KEY')!, {
   apiVersion: '2023-10-16',
 });
 

@@ -1,7 +1,22 @@
 import { loadStripe } from '@stripe/stripe-js';
 
+/**
+ * Env lookup with explicit test-suffix override.
+ *
+ *   {KEY}_TEST   — wins if set; intended for Netlify "Deploy previews"
+ *                  scope so the variable name itself reads as test.
+ *   {KEY}        — falls back when no _TEST value is present.
+ *
+ * Lets a single Netlify site host both live (production scope) and test
+ * (deploy-preview scope) without renaming the constants in code.
+ */
+const env = (name: string): string | undefined => {
+  const e = import.meta.env as Record<string, string | undefined>;
+  return e[`${name}_TEST`] || e[name];
+};
+
 // Initialize Stripe
-export const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+export const stripePromise = loadStripe(env('VITE_STRIPE_PUBLISHABLE_KEY') || '');
 
 // One-time purchase: €57 nutrition plan add-on.
 // Activates `profile.nutrition_plan_purchased = true` via the Stripe webhook
@@ -10,16 +25,15 @@ export const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_
 //
 // Price IDs default to the live-mode values but can be overridden per env
 // (Netlify) so test mode can use distinct test-mode price IDs without a
-// code change: VITE_STRIPE_MEAL_PRICE_ID / VITE_STRIPE_SUBSCRIPTION_PRICE_ID.
+// code change. _TEST suffix wins when present.
 export const MEAL_PLAN_PRICE_ID =
-  import.meta.env.VITE_STRIPE_MEAL_PRICE_ID || 'price_1TW8SeEpPqBqxo4mOwzTetog';
+  env('VITE_STRIPE_MEAL_PRICE_ID') || 'price_1TW8SeEpPqBqxo4mOwzTetog';
 
 // Subscription plans
 export const SUBSCRIPTION_PLANS = {
   premium: {
     priceId:
-      import.meta.env.VITE_STRIPE_SUBSCRIPTION_PRICE_ID ||
-      'price_1TM4KREpPqBqxo4m0Swf5F88',
+      env('VITE_STRIPE_SUBSCRIPTION_PRICE_ID') || 'price_1TM4KREpPqBqxo4m0Swf5F88',
     price: 24.90,
     currency: 'EUR',
     interval: 'month',
