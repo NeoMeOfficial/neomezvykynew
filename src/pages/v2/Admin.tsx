@@ -13,7 +13,6 @@ import { uploadContentImage } from '../../lib/storage';
 import BlogEditor from '../../components/admin/BlogEditor';
 import ContentManager from '../../components/admin/ContentManager';
 import { useAdminMessages } from '../../hooks/useMessages';
-import { useCommunityPosts } from '../../hooks/useCommunityPosts';
 import { recipes as staticRecipesData } from '../../data/recipes';
 import { TeloExtraStaticData } from '../../data/teloExtraData';
 import { TeloStrecingStaticData } from '../../data/teloStrecingData';
@@ -260,28 +259,75 @@ function PartnerDiscountsTab() {
 }
 
 // ═══════════════════════════════════════════
-// PROMO CODES TAB — synced with Stripe
+// PROMO CODES TAB — live Stripe data
 // ═══════════════════════════════════════════
-interface PromoCodeExtended extends PromoCode {
-  stripePromoId?: string;
-  stripeSynced?: boolean;
+interface StripePromoCodeRow {
+  id: string;
+  code: string;
+  active: boolean;
+  timesRedeemed: number;
+  maxRedemptions: number | null;
+  expiresAt: string | null;
+  created: string;
+  coupon: {
+    id: string;
+    name: string | null;
+    percentOff: number | null;
+    amountOff: number | null;
+    currency: string | null;
+    duration: string;
+  };
+}
+
+function formatPromoDiscount(c: StripePromoCodeRow['coupon']): string {
+  if (c.percentOff != null) return `${c.percentOff}%`;
+  if (c.amountOff != null) {
+    const amount = (c.amountOff / 100).toFixed(2).replace('.', ',');
+    return `${amount} ${(c.currency ?? 'eur').toUpperCase()}`;
+  }
+  return '—';
 }
 
 function PromoCodesTab() {
-  const [codes, setCodes] = useState<PromoCodeExtended[]>(() => loadLS('neome-admin-promo-codes', INIT_PROMO_CODES));
+  const [codes, setCodes] = useState<StripePromoCodeRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadErr, setLoadErr] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
-  const [editId, setEditId] = useState<string | null>(null);
-  const [form, setForm] = useState<Partial<PromoCodeExtended & { discountValueStr: string; maxUsesStr: string }>>({});
+  const [form, setForm] = useState<{ code: string; discountType: 'percent' | 'fixed'; discountValueStr: string; maxUsesStr: string; expiryDate: string; description: string }>({
+    code: '', discountType: 'percent', discountValueStr: '', maxUsesStr: '', expiryDate: '', description: '',
+  });
   const [verifyInput, setVerifyInput] = useState('');
   const [verifyResult, setVerifyResult] = useState<{ ok: boolean; msg: string } | null>(null);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
 
-  useEffect(() => { saveLS('neome-admin-promo-codes', codes); }, [codes]);
+  const load = async () => {
+    setLoading(true);
+    setLoadErr(null);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch('/.netlify/functions/admin-list-promo-codes', {
+        method: 'GET',
+        headers: { ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}) },
+      });
+      const body = await res.json();
+      if (!res.ok) throw new Error(body.error || 'Failed to load');
+      setCodes(body.codes as StripePromoCodeRow[]);
+    } catch (err: any) {
+      setLoadErr(err.message || 'Network error');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const openAdd = () => { setForm({ discountType: 'percent', isActive: true, discountValueStr: '', maxUsesStr: '' }); setEditId(null); setShowForm(true); setSaveError(null); };
-  const openEdit = (c: PromoCodeExtended) => { setForm({ ...c, discountValueStr: String(c.discountValue), maxUsesStr: String(c.maxUses) }); setEditId(c.id); setShowForm(true); setSaveError(null); };
-  const closeForm = () => { setShowForm(false); setForm({}); setEditId(null); setSaveError(null); };
+  useEffect(() => { load(); }, []);
+
+  const openAdd = () => {
+    setForm({ code: '', discountType: 'percent', discountValueStr: '', maxUsesStr: '', expiryDate: '', description: '' });
+    setShowForm(true);
+    setSaveError(null);
+  };
+  const closeForm = () => { setShowForm(false); setSaveError(null); };
 
   const saveCode = async () => {
     if (!form.code) return;
@@ -289,65 +335,40 @@ function PromoCodesTab() {
     setSaveError(null);
     const val = parseFloat(form.discountValueStr || '0');
     const maxU = parseInt(form.maxUsesStr || '100', 10);
-
-    if (editId) {
-      // Edit: local only (Stripe codes can't be renamed; just update local state)
-      setCodes(prev => prev.map(c => c.id === editId ? {
-        ...c, code: form.code!, discountType: form.discountType as PromoCode['discountType'] || 'percent',
-        discountValue: val, maxUses: maxU, expiryDate: form.expiryDate || c.expiryDate,
-        description: form.description || '', isActive: form.isActive ?? c.isActive,
-      } : c));
-      setSaving(false);
+    try {
+      const res = await fetch('/.netlify/functions/admin-create-promo-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code: form.code.toUpperCase(),
+          discountType: form.discountType,
+          discountValue: val,
+          maxUses: maxU,
+          expiryDate: form.expiryDate || null,
+          description: form.description || form.code,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Stripe error');
       closeForm();
-    } else {
-      // New code: sync to Stripe first
-      try {
-        const res = await fetch('/.netlify/functions/admin-create-promo-code', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            code: form.code!.toUpperCase(),
-            discountType: form.discountType || 'percent',
-            discountValue: val,
-            maxUses: maxU,
-            expiryDate: form.expiryDate || null,
-            description: form.description || form.code,
-          }),
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Stripe error');
-
-        const nc: PromoCodeExtended = {
-          id: 'pc-' + Date.now(), code: form.code!.toUpperCase(),
-          discountType: (form.discountType as PromoCode['discountType']) || 'percent',
-          discountValue: val, maxUses: maxU, usedCount: 0,
-          expiryDate: form.expiryDate || '', description: form.description || '',
-          isActive: form.isActive ?? true, createdAt: new Date().toISOString().split('T')[0],
-          stripePromoId: data.stripePromoId,
-          stripeSynced: true,
-        };
-        setCodes(prev => [nc, ...prev]);
-        closeForm();
-      } catch (err: any) {
-        setSaveError(err.message);
-      } finally {
-        setSaving(false);
-      }
+      // Re-fetch so the table reflects what's actually in Stripe.
+      await load();
+    } catch (err: any) {
+      setSaveError(err.message);
+    } finally {
+      setSaving(false);
     }
   };
 
-  const remove = (id: string) => setCodes(prev => prev.filter(c => c.id !== id));
-  const toggle = (id: string) => setCodes(prev => prev.map(c => c.id === id ? { ...c, isActive: !c.isActive } : c));
-
   const verify = () => {
-    const c = codes.find(c => c.code === verifyInput.trim().toUpperCase());
+    const c = codes.find(c => c.code.toUpperCase() === verifyInput.trim().toUpperCase());
     if (!c) { setVerifyResult({ ok: false, msg: 'Kód neexistuje.' }); return; }
-    if (!c.isActive) { setVerifyResult({ ok: false, msg: 'Kód je neaktívny.' }); return; }
-    if (c.expiryDate && new Date(c.expiryDate) < new Date()) { setVerifyResult({ ok: false, msg: 'Kód je po platnosti.' }); return; }
-    if (c.usedCount >= c.maxUses) { setVerifyResult({ ok: false, msg: 'Kód bol vyčerpaný.' }); return; }
-    const rem = c.maxUses - c.usedCount;
-    const discStr = c.discountType === 'percent' ? `${c.discountValue}%` : `€${c.discountValue}`;
-    setVerifyResult({ ok: true, msg: `Platný! Zľava: ${discStr}. Zostatok použití: ${rem} z ${c.maxUses}.` });
+    if (!c.active) { setVerifyResult({ ok: false, msg: 'Kód je neaktívny.' }); return; }
+    if (c.expiresAt && new Date(c.expiresAt) < new Date()) { setVerifyResult({ ok: false, msg: 'Kód je po platnosti.' }); return; }
+    if (c.maxRedemptions != null && c.timesRedeemed >= c.maxRedemptions) { setVerifyResult({ ok: false, msg: 'Kód bol vyčerpaný.' }); return; }
+    const discStr = formatPromoDiscount(c.coupon);
+    const usageStr = c.maxRedemptions != null ? `${c.timesRedeemed}/${c.maxRedemptions}` : `${c.timesRedeemed} (bez limitu)`;
+    setVerifyResult({ ok: true, msg: `Platný! Zľava: ${discStr}. Použité: ${usageStr}.` });
   };
 
   const thStyle: React.CSSProperties = { textAlign: 'left', padding: '11px 14px', fontFamily: 'DM Sans, system-ui', fontSize: 9.5, letterSpacing: '0.18em', textTransform: 'uppercase', color: _A.EYEBROW, fontWeight: 500 };
@@ -380,44 +401,36 @@ function PromoCodesTab() {
       {showForm && (
         <Card>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
-            <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 18, fontWeight: 500, color: _A.DEEP }}>{editId ? 'Upraviť kód' : 'Nový promo kód'}</div>
+            <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 18, fontWeight: 500, color: _A.DEEP }}>Nový promo kód</div>
             <button onClick={closeForm} style={{ all: 'unset', cursor: 'pointer' }}><X style={{ width: 16, height: 16, color: _A.MUTED }} /></button>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
             <div>
               <label style={labelStyle}>Kód *</label>
-              <input value={form.code || ''} onChange={e => setForm(f => ({ ...f, code: e.target.value.toUpperCase() }))} style={{ ...inputStyle, fontFamily: 'monospace' }} />
+              <input value={form.code} onChange={e => setForm(f => ({ ...f, code: e.target.value.toUpperCase() }))} style={{ ...inputStyle, fontFamily: 'monospace' }} />
             </div>
             <div>
               <label style={labelStyle}>Typ zľavy</label>
-              <select value={form.discountType || 'percent'} onChange={e => setForm(f => ({ ...f, discountType: e.target.value as PromoCode['discountType'] }))} style={inputStyle}>
+              <select value={form.discountType} onChange={e => setForm(f => ({ ...f, discountType: e.target.value as 'percent' | 'fixed' }))} style={inputStyle}>
                 <option value="percent">Percentuálna (%)</option>
                 <option value="fixed">Fixná (€)</option>
               </select>
             </div>
             <div>
               <label style={labelStyle}>Hodnota {form.discountType === 'fixed' ? '(€)' : '(%)'}</label>
-              <input type="number" value={form.discountValueStr || ''} onChange={e => setForm(f => ({ ...f, discountValueStr: e.target.value }))} style={inputStyle} />
+              <input type="number" value={form.discountValueStr} onChange={e => setForm(f => ({ ...f, discountValueStr: e.target.value }))} style={inputStyle} />
             </div>
             <div>
               <label style={labelStyle}>Max. použití</label>
-              <input type="number" value={form.maxUsesStr || ''} onChange={e => setForm(f => ({ ...f, maxUsesStr: e.target.value }))} style={inputStyle} />
+              <input type="number" value={form.maxUsesStr} onChange={e => setForm(f => ({ ...f, maxUsesStr: e.target.value }))} style={inputStyle} />
             </div>
             <div>
               <label style={labelStyle}>Platnosť do</label>
-              <input type="date" value={form.expiryDate || ''} onChange={e => setForm(f => ({ ...f, expiryDate: e.target.value }))} style={inputStyle} />
-            </div>
-            <div style={{ display: 'flex', alignItems: 'flex-end' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
-                <button onClick={() => setForm(f => ({ ...f, isActive: !f.isActive }))} style={{ all: 'unset', cursor: 'pointer' }}>
-                  {form.isActive ? <CheckSquare style={{ width: 18, height: 18, color: _A.SAGE }} /> : <Square style={{ width: 18, height: 18, color: _A.MUTED }} />}
-                </button>
-                <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.DEEP }}>Aktívny</span>
-              </label>
+              <input type="date" value={form.expiryDate} onChange={e => setForm(f => ({ ...f, expiryDate: e.target.value }))} style={inputStyle} />
             </div>
             <div style={{ gridColumn: '1 / -1' }}>
-              <label style={labelStyle}>Popis</label>
-              <textarea value={form.description || ''} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} rows={2} style={{ ...inputStyle, resize: 'none' }} />
+              <label style={labelStyle}>Popis (interne)</label>
+              <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} rows={2} style={{ ...inputStyle, resize: 'none' }} />
             </div>
           </div>
           {saveError && (
@@ -430,66 +443,79 @@ function PromoCodesTab() {
             <button onClick={closeForm} disabled={saving} style={btnSecondary}>Zrušiť</button>
             <button onClick={saveCode} disabled={saving} style={{ ...btnPrimary, display: 'flex', alignItems: 'center', gap: 8, opacity: saving ? 0.7 : 1 }}>
               {saving && <RefreshCw style={{ width: 13, height: 13, animation: 'spin 1s linear infinite' }} />}
-              {saving ? (editId ? 'Ukladám...' : 'Synchronizujem so Stripe...') : 'Uložiť'}
+              {saving ? 'Synchronizujem so Stripe…' : 'Uložiť'}
             </button>
           </div>
         </Card>
       )}
 
-      {/* Table */}
+      {/* Table — live from Stripe */}
       <Card>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr style={{ background: _A.CREAM2 }}>
-              {['Kód', 'Stripe', 'Zľava', 'Použitia', 'Platnosť', 'Popis', 'Aktívny', 'Akcie'].map(h => (
-                <th key={h} style={{ textAlign: 'left', padding: '11px 14px', fontFamily: 'DM Sans, system-ui', fontSize: 9.5, letterSpacing: '0.18em', textTransform: 'uppercase', color: _A.EYEBROW, fontWeight: 500 }}>{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {codes.map(c => {
-              const remaining = c.maxUses - c.usedCount;
-              const pct = Math.min(100, (c.usedCount / c.maxUses) * 100);
-              return (
-                <tr key={c.id} style={{ borderBottom: `1px solid ${_A.HAIR}` }}>
-                  <td style={{ padding: '12px 14px' }}><span style={{ fontFamily: 'monospace', fontSize: 13, fontWeight: 600, color: _A.DEEP }}>{c.code}</span></td>
-                  <td style={{ padding: '12px 14px' }}>
-                    {(c as PromoCodeExtended).stripeSynced ? (
-                      <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', padding: '3px 8px', borderRadius: 999, background: 'rgba(139,158,136,0.15)', color: _A.SAGE }}>Stripe</span>
-                    ) : (
-                      <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', padding: '3px 8px', borderRadius: 999, background: `rgba(61,41,33,0.07)`, color: _A.MUTED }}>lokálny</span>
-                    )}
-                  </td>
-                  <td style={{ padding: '12px 14px', fontFamily: 'DM Sans, system-ui', fontSize: 13, fontWeight: 600, color: _A.GOLD }}>
-                    {c.discountType === 'percent' ? `${c.discountValue}%` : `€${c.discountValue}`}
-                  </td>
-                  <td style={{ padding: '12px 14px' }}>
-                    <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.DEEP }}>{c.usedCount}/{c.maxUses} ({remaining} zostatok)</div>
-                    <div style={{ marginTop: 4, height: 4, borderRadius: 999, background: _A.CREAM2, overflow: 'hidden', width: 80 }}>
-                      <div style={{ height: '100%', borderRadius: 999, width: `${pct}%`, background: pct > 80 ? _A.TERRA : _A.SAGE }} />
-                    </div>
-                  </td>
-                  <td style={{ padding: '12px 14px', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>{c.expiryDate}</td>
-                  <td style={{ padding: '12px 14px', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED, maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.description}</td>
-                  <td style={{ padding: '12px 14px' }}>
-                    <button onClick={() => toggle(c.id)} style={{ all: 'unset', cursor: 'pointer' }}>
-                      {c.isActive ? <CheckSquare style={{ width: 16, height: 16, color: _A.SAGE }} /> : <Square style={{ width: 16, height: 16, color: _A.MUTED }} />}
-                    </button>
-                  </td>
-                  <td style={{ padding: '12px 14px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                      <button onClick={() => openEdit(c)} style={{ all: 'unset', cursor: 'pointer', padding: 6, borderRadius: 8 }}><Edit3 style={{ width: 14, height: 14, color: _A.MUTED }} /></button>
-                      <button onClick={() => remove(c.id)} style={{ all: 'unset', cursor: 'pointer', padding: 6, borderRadius: 8 }}><Trash2 style={{ width: 14, height: 14, color: _A.TERRA }} /></button>
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-            {codes.length === 0 && (
-              <tr><td colSpan={8} style={{ padding: '32px 14px', textAlign: 'center', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>Žiadne promo kódy.</td></tr>
-            )}
-          </tbody>
-        </table>
+        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 10 }}>
+          <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: _A.EYEBROW, fontWeight: 500 }}>
+            Naživo zo Stripe · {codes.length} kód{codes.length === 1 ? '' : codes.length < 5 ? 'y' : 'ov'}
+          </div>
+          <button onClick={load} disabled={loading} style={{ ...btnSecondary, padding: '5px 10px', fontSize: 11, display: 'flex', alignItems: 'center', gap: 6 }}>
+            <RefreshCw style={{ width: 11, height: 11, animation: loading ? 'spin 1s linear infinite' : 'none' }} />
+            Obnoviť
+          </button>
+        </div>
+        {loadErr ? (
+          <div style={{ padding: '24px 14px', textAlign: 'center', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.TERRA }}>{loadErr}</div>
+        ) : (
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr style={{ background: _A.CREAM2 }}>
+                {['Kód', 'Coupon', 'Zľava', 'Použitia', 'Platnosť', 'Stav'].map(h => (
+                  <th key={h} style={{ textAlign: 'left', padding: '11px 14px', fontFamily: 'DM Sans, system-ui', fontSize: 9.5, letterSpacing: '0.18em', textTransform: 'uppercase', color: _A.EYEBROW, fontWeight: 500 }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {codes.map(c => {
+                const pct = c.maxRedemptions != null ? Math.min(100, (c.timesRedeemed / c.maxRedemptions) * 100) : 0;
+                const usageLabel = c.maxRedemptions != null ? `${c.timesRedeemed}/${c.maxRedemptions}` : `${c.timesRedeemed} (bez limitu)`;
+                const expiryLabel = c.expiresAt ? new Date(c.expiresAt).toLocaleDateString('sk-SK') : 'bez limitu';
+                return (
+                  <tr key={c.id} style={{ borderBottom: `1px solid ${_A.HAIR}` }}>
+                    <td style={{ padding: '12px 14px' }}>
+                      <span style={{ fontFamily: 'monospace', fontSize: 13, fontWeight: 600, color: _A.DEEP }}>{c.code}</span>
+                    </td>
+                    <td style={{ padding: '12px 14px', fontFamily: 'monospace', fontSize: 10.5, color: _A.MUTED }}>{c.coupon.id}</td>
+                    <td style={{ padding: '12px 14px', fontFamily: 'DM Sans, system-ui', fontSize: 13, fontWeight: 600, color: _A.GOLD }}>
+                      {formatPromoDiscount(c.coupon)}
+                    </td>
+                    <td style={{ padding: '12px 14px' }}>
+                      <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.DEEP }}>{usageLabel}</div>
+                      {c.maxRedemptions != null && (
+                        <div style={{ marginTop: 4, height: 4, borderRadius: 999, background: _A.CREAM2, overflow: 'hidden', width: 80 }}>
+                          <div style={{ height: '100%', borderRadius: 999, width: `${pct}%`, background: pct > 80 ? _A.TERRA : _A.SAGE }} />
+                        </div>
+                      )}
+                    </td>
+                    <td style={{ padding: '12px 14px', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>{expiryLabel}</td>
+                    <td style={{ padding: '12px 14px' }}>
+                      <span style={{
+                        fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase',
+                        padding: '3px 8px', borderRadius: 999,
+                        background: c.active ? 'rgba(139,158,136,0.15)' : 'rgba(61,41,33,0.07)',
+                        color: c.active ? _A.SAGE : _A.MUTED,
+                      }}>
+                        {c.active ? 'Aktívny' : 'Neaktívny'}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
+              {!loading && codes.length === 0 && (
+                <tr><td colSpan={6} style={{ padding: '32px 14px', textAlign: 'center', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>Žiadne promo kódy v Stripe.</td></tr>
+              )}
+              {loading && codes.length === 0 && (
+                <tr><td colSpan={6} style={{ padding: '32px 14px', textAlign: 'center', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>Načítavam zo Stripe…</td></tr>
+              )}
+            </tbody>
+          </table>
+        )}
       </Card>
     </div>
   );
@@ -498,19 +524,63 @@ function PromoCodesTab() {
 // ═══════════════════════════════════════════
 // COMMUNITY MODERATION TAB (wired to Supabase)
 // ═══════════════════════════════════════════
+interface AdminPost {
+  id: string;
+  user_id: string;
+  author_name: string;
+  type: 'post' | 'question';
+  content: string;
+  likes_count: number;
+  comments_count: number;
+  status: 'visible' | 'removed';
+  created_at: string;
+}
+
 function CommunityModerationTab() {
-  const { posts, loading } = useCommunityPosts();
-  const [localStatus, setLocalStatus] = useState<Record<string, 'approved' | 'removed'>>({});
-  const [filter, setFilter] = useState<'all' | 'flagged'>('all');
+  const [posts, setPosts] = useState<AdminPost[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState<'all' | 'removed'>('all');
+  const [busy, setBusy] = useState<string | null>(null);
 
-  const handleApprove = (id: string) => setLocalStatus(p => ({ ...p, [id]: 'approved' }));
-  const handleRemove = (id: string) => setLocalStatus(p => ({ ...p, [id]: 'removed' }));
-  // TODO: wire to Supabase community_posts table — update `status` column on approve/remove
+  // Admin sees ALL posts including removed ones — so they can restore.
+  // Direct query bypasses useCommunityPosts (which hides removed from
+  // the public feed).
+  const load = async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('community_posts')
+      .select('id, user_id, author_name, type, content, likes_count, comments_count, status, created_at')
+      .order('created_at', { ascending: false })
+      .limit(100);
+    if (!error && data) {
+      setPosts(data.map(r => ({
+        ...r,
+        status: (r.status as 'visible' | 'removed') ?? 'visible',
+      })));
+    }
+    setLoading(false);
+  };
 
-  const visible = posts.filter(p => {
-    if (localStatus[p.id] === 'removed') return false;
-    return true;
-  });
+  useEffect(() => { load(); }, []);
+
+  const setStatus = async (id: string, status: 'visible' | 'removed') => {
+    if (busy) return;
+    setBusy(id);
+    const { error } = await supabase
+      .from('community_posts')
+      .update({ status })
+      .eq('id', id);
+    if (error) {
+      alert('Chyba pri aktualizácii statusu: ' + error.message);
+    } else {
+      setPosts(prev => prev.map(p => p.id === id ? { ...p, status } : p));
+    }
+    setBusy(null);
+  };
+
+  const visible = posts.filter(p => filter === 'all' ? true : p.status === 'removed');
+  const removedCount = posts.filter(p => p.status === 'removed').length;
+  const visibleCount = posts.length - removedCount;
 
   const statNum = (val: number, color: string) => (
     <div style={{ textAlign: 'center' }}>
@@ -523,18 +593,18 @@ function CommunityModerationTab() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 22, fontWeight: 500, color: _A.DEEP }}>Community Moderácia</div>
         <div style={{ display: 'flex', gap: 8 }}>
-          {(['all', 'flagged'] as const).map(f => (
+          {(['all', 'removed'] as const).map(f => (
             <button key={f} onClick={() => setFilter(f)} style={{ padding: '8px 14px', borderRadius: 10, border: 'none', cursor: 'pointer', fontFamily: 'DM Sans, system-ui', fontSize: 12, fontWeight: 500, background: filter === f ? _A.DEEP : _A.CREAM2, color: filter === f ? '#fff' : _A.DEEP }}>
-              {f === 'all' ? 'Všetky' : 'Nahlásené'}
+              {f === 'all' ? 'Všetky' : 'Odstránené'}
             </button>
           ))}
         </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14 }}>
-        <Card>{statNum(posts.length, _A.DEEP)}<div style={{ textAlign: 'center', fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED, marginTop: 6 }}>Celkovo príspevkov</div></Card>
-        <Card>{statNum(Object.values(localStatus).filter(s => s === 'approved').length, _A.SAGE)}<div style={{ textAlign: 'center', fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED, marginTop: 6 }}>Schválené (session)</div></Card>
-        <Card>{statNum(Object.values(localStatus).filter(s => s === 'removed').length, _A.TERRA)}<div style={{ textAlign: 'center', fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED, marginTop: 6 }}>Odstránené (session)</div></Card>
+        <Card>{statNum(posts.length, _A.DEEP)}<div style={{ textAlign: 'center', fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED, marginTop: 6 }}>Celkovo</div></Card>
+        <Card>{statNum(visibleCount, _A.SAGE)}<div style={{ textAlign: 'center', fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED, marginTop: 6 }}>Viditeľné</div></Card>
+        <Card>{statNum(removedCount, _A.TERRA)}<div style={{ textAlign: 'center', fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED, marginTop: 6 }}>Odstránené</div></Card>
       </div>
 
       <div style={{ background: _A.CARD, borderRadius: 16, border: `1px solid ${_A.HAIR}`, overflow: 'hidden' }}>
@@ -543,39 +613,40 @@ function CommunityModerationTab() {
         ) : (
           <div>
             {visible.map((post, i) => {
-              const status = localStatus[post.id];
+              const isRemoved = post.status === 'removed';
+              const isBusy = busy === post.id;
               return (
-                <div key={post.id} style={{ padding: '14px 20px', borderBottom: i < visible.length - 1 ? `1px solid ${_A.HAIR}` : 'none' }}>
+                <div key={post.id} style={{ padding: '14px 20px', borderBottom: i < visible.length - 1 ? `1px solid ${_A.HAIR}` : 'none', opacity: isRemoved ? 0.55 : 1 }}>
                   <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16 }}>
                     <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, flex: 1, minWidth: 0 }}>
                       <div style={{ width: 34, height: 34, borderRadius: 999, background: _A.CREAM2, color: _A.DEEP, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Gilda Display, Georgia, serif', fontSize: 14, fontWeight: 500, flexShrink: 0 }}>
-                        {post.author.slice(0, 1)}
+                        {(post.author_name || '?').slice(0, 1).toUpperCase()}
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                          <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 13, fontWeight: 500, color: _A.DEEP }}>{post.author}</span>
-                          <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.TERTIARY }}>{post.time}</span>
+                          <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 13, fontWeight: 500, color: _A.DEEP }}>{post.author_name || '—'}</span>
+                          <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.TERTIARY }}>{new Date(post.created_at).toLocaleString('sk-SK', { day: 'numeric', month: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
                           <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', padding: '3px 8px', borderRadius: 999, background: `rgba(168,132,139,0.15)`, color: _A.MAUVE }}>{post.type === 'question' ? 'Otázka' : 'Príspevok'}</span>
+                          {isRemoved && (
+                            <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', padding: '3px 8px', borderRadius: 999, background: 'rgba(193,133,106,0.15)', color: _A.TERRA }}>Odstránené</span>
+                          )}
                         </div>
-                        <p style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.DEEP, lineHeight: 1.5 }}>{post.text}</p>
+                        <p style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.DEEP, lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>{post.content}</p>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 6, fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.TERTIARY }}>
-                          <span>{post.likes} likes</span>
-                          <span>{post.comments} komentárov</span>
+                          <span>{post.likes_count} likes</span>
+                          <span>{post.comments_count} komentárov</span>
                         </div>
                       </div>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-                      {status === 'approved' ? (
-                        <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', padding: '3px 8px', borderRadius: 999, background: 'rgba(139,158,136,0.15)', color: _A.SAGE }}>Schválené</span>
+                      {isRemoved ? (
+                        <button onClick={() => setStatus(post.id, 'visible')} disabled={isBusy} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 8, border: 'none', cursor: isBusy ? 'not-allowed' : 'pointer', fontFamily: 'DM Sans, system-ui', fontSize: 11, fontWeight: 500, background: 'rgba(139,158,136,0.15)', color: _A.SAGE, opacity: isBusy ? 0.5 : 1 }}>
+                          <Check style={{ width: 12, height: 12 }} />Obnoviť
+                        </button>
                       ) : (
-                        <>
-                          <button onClick={() => handleApprove(post.id)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 8, border: 'none', cursor: 'pointer', fontFamily: 'DM Sans, system-ui', fontSize: 11, fontWeight: 500, background: 'rgba(139,158,136,0.15)', color: _A.SAGE }}>
-                            <Check style={{ width: 12, height: 12 }} />Schváliť
-                          </button>
-                          <button onClick={() => handleRemove(post.id)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 8, border: 'none', cursor: 'pointer', fontFamily: 'DM Sans, system-ui', fontSize: 11, fontWeight: 500, background: 'rgba(193,133,106,0.15)', color: _A.TERRA }}>
-                            <Trash2 style={{ width: 12, height: 12 }} />Odstrániť
-                          </button>
-                        </>
+                        <button onClick={() => setStatus(post.id, 'removed')} disabled={isBusy} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 8, border: 'none', cursor: isBusy ? 'not-allowed' : 'pointer', fontFamily: 'DM Sans, system-ui', fontSize: 11, fontWeight: 500, background: 'rgba(193,133,106,0.15)', color: _A.TERRA, opacity: isBusy ? 0.5 : 1 }}>
+                          <Trash2 style={{ width: 12, height: 12 }} />Odstrániť
+                        </button>
                       )}
                     </div>
                   </div>
