@@ -1127,7 +1127,7 @@ function UsersTab() {
   const [authActionBusy, setAuthActionBusy] = useState<string | null>(null);
   const [authActionModal, setAuthActionModal] = useState<
     | null
-    | { email: string; type: 'recovery' | 'magiclink'; link: string }
+    | { email: string; type: 'recovery' | 'magiclink' }
     | { error: string }
   >(null);
 
@@ -1151,9 +1151,9 @@ function UsersTab() {
       });
       const body = await res.json();
       if (!res.ok) {
-        setAuthActionModal({ error: body.error || 'Nepodarilo sa vygenerovať odkaz' });
+        setAuthActionModal({ error: body.error || 'Nepodarilo sa odoslať e-mail' });
       } else {
-        setAuthActionModal({ email: body.email, type: body.type, link: body.actionLink });
+        setAuthActionModal({ email: body.email, type: body.type });
       }
     } catch (err: any) {
       setAuthActionModal({ error: err.message || 'Chyba siete' });
@@ -1611,13 +1611,17 @@ function UsersTab() {
         </div>
       </Card>
 
-      {/* Auth action result — generated magic link / password reset */}
+      {/* Auth action result — confirms the email was triggered */}
       {authActionModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'grid', placeItems: 'center', zIndex: 200, padding: 24 }} onClick={() => setAuthActionModal(null)}>
-          <div onClick={e => e.stopPropagation()} style={{ background: _A.CARD, borderRadius: 14, padding: 22, maxWidth: 540, width: '100%', boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
+          <div onClick={e => e.stopPropagation()} style={{ background: _A.CARD, borderRadius: 14, padding: 22, maxWidth: 480, width: '100%', boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
               <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 18, fontWeight: 500, color: _A.DEEP }}>
-                {'error' in authActionModal ? 'Chyba' : authActionModal.type === 'recovery' ? 'Odkaz na reset hesla' : 'Magic link'}
+                {'error' in authActionModal
+                  ? 'Chyba'
+                  : authActionModal.type === 'recovery'
+                    ? 'E-mail na reset hesla odoslaný'
+                    : 'Magic link odoslaný'}
               </div>
               <button onClick={() => setAuthActionModal(null)} style={{ all: 'unset', cursor: 'pointer' }}>
                 <X style={{ width: 16, height: 16, color: _A.MUTED }} />
@@ -1629,35 +1633,17 @@ function UsersTab() {
               </div>
             ) : (
               <>
-                <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED, lineHeight: 1.55, marginBottom: 10 }}>
-                  Jednorazový odkaz pre <strong style={{ color: _A.DEEP, fontWeight: 500 }}>{authActionModal.email}</strong>. Skopíruj a pošli cez Slack / e-mail / SMS — automatický e-mail z appky nemusí prísť.
+                <div style={{ padding: '12px 14px', background: 'rgba(139,158,136,0.10)', border: `1px solid ${_A.SAGE}30`, borderRadius: 10, fontFamily: 'DM Sans, system-ui', fontSize: 12.5, color: _A.DEEP, lineHeight: 1.55 }}>
+                  E-mail bol odoslaný na <strong style={{ color: _A.DEEP, fontWeight: 500 }}>{authActionModal.email}</strong>. Mal by doraziť do 1 minúty (skontrolovať aj spam).
                 </div>
-                <div style={{ display: 'flex', gap: 8, alignItems: 'stretch' }}>
-                  <input
-                    readOnly
-                    value={authActionModal.link}
-                    onClick={(e) => (e.target as HTMLInputElement).select()}
-                    style={{ ...inputStyle, fontFamily: 'monospace', fontSize: 11, flex: 1 }}
-                  />
-                  <button
-                    onClick={async () => {
-                      try {
-                        await navigator.clipboard.writeText(authActionModal.link);
-                        alert('Skopírované.');
-                      } catch {
-                        alert('Kopírovanie zlyhalo — vyber odkaz a Cmd+C.');
-                      }
-                    }}
-                    style={{ ...btnPrimary, display: 'flex', alignItems: 'center', gap: 8 }}
-                  >
-                    Kopírovať
-                  </button>
-                </div>
-                <div style={{ marginTop: 12, fontFamily: 'DM Sans, system-ui', fontSize: 10.5, color: _A.TERTIARY, lineHeight: 1.55 }}>
-                  Platnosť: 1 hodina. Po kliknutí používateľa automaticky prihlási{authActionModal.type === 'recovery' ? ' a presmeruje na zmenu hesla' : ''}.
+                <div style={{ marginTop: 12, fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.TERTIARY, lineHeight: 1.55 }}>
+                  Doručenie môžeš overiť v E-mail logu nižšie alebo priamo v Resend dashbord.
                 </div>
               </>
             )}
+            <div style={{ marginTop: 16, display: 'flex', justifyContent: 'flex-end' }}>
+              <button onClick={() => setAuthActionModal(null)} style={btnPrimary}>Zavrieť</button>
+            </div>
           </div>
         </div>
       )}
