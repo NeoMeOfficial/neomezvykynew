@@ -31,16 +31,11 @@
   status = 200
   force = true
 
-# admin.neome.com.au subdomain — root path 301s to /admin so the admin
-# SPA mounts immediately. After the redirect the URL bar reads
-# https://admin.neome.com.au/admin and React Router handles nested
-# navigation from there. The SPA catchall below serves index.html for
-# every other path (including /admin, /admin/referrals, etc.).
-[[redirects]]
-  from = "/"
-  to = "/admin"
-  status = 301
-  conditions = { Host = ["admin.neome.com.au"] }
+# admin.neome.com.au — the subdomain redirect to /admin is now done
+# client-side in AppV2.tsx (Netlify's host-conditional redirect didn't
+# fire reliably). The SPA catchall below serves index.html for every
+# path; the SPA reads window.location.hostname to decide whether to
+# render Welcome or Navigate to /admin.
 
 [[redirects]]
   from = "/*"
