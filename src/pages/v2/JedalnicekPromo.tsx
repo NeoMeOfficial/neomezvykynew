@@ -6,6 +6,7 @@ import { Eyebrow } from '@/components/ui/eyebrow';
 import { BodyText } from '@/components/ui/body-text';
 import { SerifHeader } from '@/components/ui/serif-header';
 import { FaqAccordion } from '@/components/v2/neome/FaqAccordion';
+import { useSubscription } from '@/contexts/SubscriptionContext';
 
 const COMPARISON = [
   { diet: 'Zákaz jedál', neome: 'Žiadne zákazy' },
@@ -59,6 +60,22 @@ const SAMPLE_DAY = [
 export default function JedalnicekPromo() {
   const navigate = useNavigate();
   const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
+  const { hasMealPlanner, purchaseMealPlanner } = useSubscription();
+  const [buying, setBuying] = useState(false);
+
+  const onPrimary = async () => {
+    if (hasMealPlanner) {
+      navigate('/jedalnicek');
+      return;
+    }
+    setBuying(true);
+    try {
+      await purchaseMealPlanner();
+    } catch (err) {
+      console.error('[jedalnicek-promo] checkout failed', err);
+      setBuying(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-cream pb-28">
@@ -245,13 +262,20 @@ export default function JedalnicekPromo() {
       {/* Sticky CTA */}
       <div className="fixed bottom-0 left-0 right-0 z-20 px-5 pb-8 pt-4 bg-cream border-t border-ink/[0.08]">
         <button
-          onClick={() => navigate('/jedalnicek')}
-          className="w-full py-4 rounded-full bg-pillar-strava text-white font-sans font-semibold transition-all active:scale-[0.98]"
+          onClick={onPrimary}
+          disabled={buying}
+          className="w-full py-4 rounded-full bg-pillar-strava text-white font-sans font-semibold transition-all active:scale-[0.98] disabled:opacity-60"
         >
-          Vytvoriť môj jedálniček
+          {hasMealPlanner
+            ? 'Vytvoriť môj jedálniček'
+            : buying
+              ? 'Otváram platbu…'
+              : 'Pridať Jedálniček · 57 €'}
         </button>
         <BodyText size="sm" tone="muted" className="text-center mt-2">
-          Súčasť NeoMe Plus predplatného
+          {hasMealPlanner
+            ? 'Jedálniček máš odomknutý'
+            : 'Jednorazový poplatok · navždy tvoj'}
         </BodyText>
       </div>
     </div>
