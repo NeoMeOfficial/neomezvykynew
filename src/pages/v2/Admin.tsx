@@ -1059,12 +1059,58 @@ function UsersTab() {
     }
   };
 
+  // ── Auth recovery / magic link generation ─────────────────────
+  // Generates a one-time link the admin can send to a user via Slack
+  // or another channel — useful when the user can't log in and the
+  // transactional email pipeline is unreliable.
+  const [authActionBusy, setAuthActionBusy] = useState<string | null>(null);
+  const [authActionModal, setAuthActionModal] = useState<
+    | null
+    | { email: string; type: 'recovery' | 'magiclink'; link: string }
+    | { error: string }
+  >(null);
+
+  const runAuthAction = async (user: AdminUser, type: 'recovery' | 'magiclink') => {
+    if (authActionBusy) return;
+    setAuthActionBusy(user.id);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch('/.netlify/functions/admin-user-auth-action', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          type,
+          // Land them on Domov after the recovery / magic-link flow.
+          redirectTo: `${window.location.origin}/domov-new`,
+        }),
+      });
+      const body = await res.json();
+      if (!res.ok) {
+        setAuthActionModal({ error: body.error || 'Nepodarilo sa vygenerovať odkaz' });
+      } else {
+        setAuthActionModal({ email: body.email, type: body.type, link: body.actionLink });
+      }
+    } catch (err: any) {
+      setAuthActionModal({ error: err.message || 'Chyba siete' });
+    } finally {
+      setAuthActionBusy(null);
+    }
+  };
+
   const handleDeleteUser = async (userId: string) => {
     setDeleting(userId);
     try {
+      const { data: { session } } = await supabase.auth.getSession();
       const res = await fetch('/.netlify/functions/admin-delete-user', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+        },
         body: JSON.stringify({ userId }),
       });
       const data = await res.json();
@@ -1211,6 +1257,24 @@ function UsersTab() {
                       {togglingMeal === user.id ? '…' : (user.nutrition_plan_purchased ? 'Jedálniček ✓' : '+ Jedálniček')}
                     </button>
 
+                    {/* Auth helpers — generate magic link or password
+                        reset link the admin can copy and forward. */}
+                    <button
+                      onClick={() => runAuthAction(user, 'magiclink')}
+                      disabled={authActionBusy === user.id}
+                      title="Vygenerovať jednorazový magic link na prihlásenie"
+                      style={{ ...btnSecondary, padding: '6px 10px', fontSize: 11, opacity: authActionBusy === user.id ? 0.5 : 1 }}
+                    >
+                      {authActionBusy === user.id ? '…' : 'Magic link'}
+                    </button>
+                    <button
+                      onClick={() => runAuthAction(user, 'recovery')}
+                      disabled={authActionBusy === user.id}
+                      title="Vygenerovať odkaz na reset hesla"
+                      style={{ ...btnSecondary, padding: '6px 10px', fontSize: 11, opacity: authActionBusy === user.id ? 0.5 : 1 }}
+                    >
+                      Reset hesla
+                    </button>
 
                     {/* Access picker */}
                     <div style={{ position: 'relative' }}>
@@ -1405,6 +1469,57 @@ function UsersTab() {
           })}
         </div>
       </Card>
+
+      {/* Auth action result — generated magic link / password reset */}
+      {authActionModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'grid', placeItems: 'center', zIndex: 200, padding: 24 }} onClick={() => setAuthActionModal(null)}>
+          <div onClick={e => e.stopPropagation()} style={{ background: _A.CARD, borderRadius: 14, padding: 22, maxWidth: 540, width: '100%', boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+              <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 18, fontWeight: 500, color: _A.DEEP }}>
+                {'error' in authActionModal ? 'Chyba' : authActionModal.type === 'recovery' ? 'Odkaz na reset hesla' : 'Magic link'}
+              </div>
+              <button onClick={() => setAuthActionModal(null)} style={{ all: 'unset', cursor: 'pointer' }}>
+                <X style={{ width: 16, height: 16, color: _A.MUTED }} />
+              </button>
+            </div>
+            {'error' in authActionModal ? (
+              <div style={{ padding: '12px 14px', background: 'rgba(193,133,106,0.12)', border: `1px solid ${_A.TERRA}30`, borderRadius: 10, fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.TERRA }}>
+                {authActionModal.error}
+              </div>
+            ) : (
+              <>
+                <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED, lineHeight: 1.55, marginBottom: 10 }}>
+                  Jednorazový odkaz pre <strong style={{ color: _A.DEEP, fontWeight: 500 }}>{authActionModal.email}</strong>. Skopíruj a pošli cez Slack / e-mail / SMS — automatický e-mail z appky nemusí prísť.
+                </div>
+                <div style={{ display: 'flex', gap: 8, alignItems: 'stretch' }}>
+                  <input
+                    readOnly
+                    value={authActionModal.link}
+                    onClick={(e) => (e.target as HTMLInputElement).select()}
+                    style={{ ...inputStyle, fontFamily: 'monospace', fontSize: 11, flex: 1 }}
+                  />
+                  <button
+                    onClick={async () => {
+                      try {
+                        await navigator.clipboard.writeText(authActionModal.link);
+                        alert('Skopírované.');
+                      } catch {
+                        alert('Kopírovanie zlyhalo — vyber odkaz a Cmd+C.');
+                      }
+                    }}
+                    style={{ ...btnPrimary, display: 'flex', alignItems: 'center', gap: 8 }}
+                  >
+                    Kopírovať
+                  </button>
+                </div>
+                <div style={{ marginTop: 12, fontFamily: 'DM Sans, system-ui', fontSize: 10.5, color: _A.TERTIARY, lineHeight: 1.55 }}>
+                  Platnosť: 1 hodina. Po kliknutí používateľa automaticky prihlási{authActionModal.type === 'recovery' ? ' a presmeruje na zmenu hesla' : ''}.
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
