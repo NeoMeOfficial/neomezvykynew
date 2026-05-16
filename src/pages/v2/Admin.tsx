@@ -601,6 +601,7 @@ interface AdminUser {
   full_name: string | null;
   role: string;
   created_at: string;
+  nutrition_plan_purchased: boolean;
   subscriptions: { tier: string; active: boolean; stripe_customer_id?: string | null; stripe_subscription_id: string | null; current_period_end: string | null; cancel_at_period_end: boolean } | null;
 }
 
@@ -635,7 +636,7 @@ function UsersTab() {
       // (migration 20260505_gdpr_consent.sql).
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
-        .select('id, email, full_name, role, created_at')
+        .select('id, email, full_name, role, created_at, nutrition_plan_purchased')
         .order('created_at', { ascending: false });
 
       if (profilesError) throw new Error(profilesError.message);
@@ -656,7 +657,11 @@ function UsersTab() {
         };
       }
 
-      setUsers((profiles ?? []).map(p => ({ ...p, subscriptions: subMap[p.id] ?? null })));
+      setUsers((profiles ?? []).map(p => ({
+        ...p,
+        nutrition_plan_purchased: !!(p as any).nutrition_plan_purchased,
+        subscriptions: subMap[p.id] ?? null,
+      })));
     } catch (err: any) {
       // Likely cause: admin RLS policy not applied yet.
       // Run migration 20260505_gdpr_consent.sql in Supabase dashboard.
@@ -768,6 +773,28 @@ function UsersTab() {
       alert('Chyba pri zmene tarifu: ' + err.message);
     } finally {
       setSettingTier(null);
+    }
+  };
+
+  const [togglingMeal, setTogglingMeal] = useState<string | null>(null);
+  const handleToggleMealPlan = async (user: AdminUser) => {
+    const next = !user.nutrition_plan_purchased;
+    const confirmMsg = next
+      ? `Pridelíme ${user.email} prístup k jedálničku (bez platby v Stripe).`
+      : `Odoberieme ${user.email} prístup k jedálničku. Toto NEVRACIA peniaze — refund spravíš v Stripe.`;
+    if (!window.confirm(confirmMsg)) return;
+    setTogglingMeal(user.id);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ nutrition_plan_purchased: next })
+        .eq('id', user.id);
+      if (error) throw new Error(error.message);
+      setUsers(prev => prev.map(u => (u.id === user.id ? { ...u, nutrition_plan_purchased: next } : u)));
+    } catch (err: any) {
+      alert('Chyba pri zmene jedálnička: ' + err.message);
+    } finally {
+      setTogglingMeal(null);
     }
   };
 
@@ -898,6 +925,31 @@ function UsersTab() {
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }} onClick={e => e.stopPropagation()}>
                     <span style={tierBadgeStyle(tier)}>{tierLabel(tier)}</span>
+
+                    {/* Meal-plan add-on chip — click to toggle */}
+                    <button
+                      onClick={() => handleToggleMealPlan(user)}
+                      disabled={togglingMeal === user.id}
+                      title={user.nutrition_plan_purchased ? 'Odobrať jedálniček' : 'Pridať jedálniček'}
+                      style={{
+                        all: 'unset',
+                        cursor: togglingMeal === user.id ? 'not-allowed' : 'pointer',
+                        padding: '4px 8px',
+                        borderRadius: 999,
+                        fontFamily: 'DM Sans, system-ui',
+                        fontSize: 10,
+                        fontWeight: 500,
+                        letterSpacing: '0.06em',
+                        textTransform: 'uppercase' as const,
+                        background: user.nutrition_plan_purchased ? _A.GOLD : 'transparent',
+                        color: user.nutrition_plan_purchased ? '#fff' : _A.MUTED,
+                        border: user.nutrition_plan_purchased ? `1px solid ${_A.GOLD}` : `1px solid ${_A.HAIR2}`,
+                        opacity: togglingMeal === user.id ? 0.6 : 1,
+                      }}
+                    >
+                      {togglingMeal === user.id ? '…' : (user.nutrition_plan_purchased ? 'Jedálniček ✓' : '+ Jedálniček')}
+                    </button>
+
 
                     {/* Access picker */}
                     <div style={{ position: 'relative' }}>
