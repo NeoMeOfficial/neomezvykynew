@@ -1,7 +1,17 @@
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 import BottomNav from '../../components/v2/BottomNav';
 import ErrorBoundary from '../../components/v2/ErrorBoundary';
+
+/**
+ * Routes where the layout BottomNav should be hidden so the screen
+ * gets a distraction-free "focus mode". Any path matching one of
+ * these prefixes suppresses the nav.
+ */
+const FOCUS_ROUTE_PREFIXES = [
+  '/jedalnicek/onboarding',
+  '/onboarding-plus/',
+];
 
 /**
  * PWA update banner.
@@ -84,6 +94,9 @@ export default function AppLayout() {
     void updateServiceWorker(true);
   };
 
+  const { pathname } = useLocation();
+  const focusMode = FOCUS_ROUTE_PREFIXES.some((p) => pathname.startsWith(p));
+
   return (
     <div
       className="min-h-screen font-sans relative w-full overflow-x-hidden"
@@ -96,7 +109,7 @@ export default function AppLayout() {
           <Outlet />
         </ErrorBoundary>
       </main>
-      <BottomNav />
+      {!focusMode && <BottomNav />}
     </div>
   );
 }

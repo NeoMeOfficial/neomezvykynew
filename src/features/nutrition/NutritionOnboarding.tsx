@@ -1,6 +1,59 @@
-import { useState, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import type { NutritionProfile } from './types';
 import { getBreastfeedingBonus } from './useNutritionProfile';
+
+/**
+ * localStorage key for save-for-later drafts. Stores a serialized
+ * snapshot of every controlled input so the user can leave the flow
+ * mid-way and resume from the same step + values. Cleared on
+ * successful complete.
+ */
+const DRAFT_KEY = 'neome_nutrition_onboarding_draft';
+
+interface DraftSnapshot {
+  step: number;
+  goal: string | null;
+  age: string;
+  weight: string;
+  height: string;
+  waist: string;
+  breast: string;
+  hip: string;
+  regularDay: string | null;
+  stepsRange: string | null;
+  sports: string[];
+  sportsOther: string;
+  sportsFrequency: number | null;
+  selectedMeals: string[];
+  likedIngredients: string[];
+  dislikedIngredients: string[];
+  dietType: string;
+  allergies: string[];
+  customAllergies: string[];
+  lifePhase: string | null;
+  isBreastfeeding: boolean | null;
+  bfFrequency: string;
+  startDateISO: string | null;
+  savedAt: string;
+}
+
+function loadDraft(): DraftSnapshot | null {
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as DraftSnapshot;
+  } catch {
+    return null;
+  }
+}
+
+function clearDraft() {
+  try {
+    localStorage.removeItem(DRAFT_KEY);
+  } catch {
+    // ignore
+  }
+}
 
 /* ─── Round 21 tokens ─── */
 const T = {
@@ -485,46 +538,88 @@ export default function NutritionOnboarding({
   onComplete: (profile: NutritionProfile, startDate: Date) => void;
   onCancel?: () => void;
 }) {
-  const [step, setStep] = useState(1);
+  // Lazy-init from a saved draft if one exists. Falls back to fresh
+  // defaults otherwise. The draft survives logout/login and tab close.
+  const initialDraft = useRef<DraftSnapshot | null>(loadDraft()).current;
+
+  const [step, setStep] = useState(initialDraft?.step ?? 1);
 
   // S1 — Goal
-  const [goal, setGoal] = useState<Goal | null>(null);
+  const [goal, setGoal] = useState<Goal | null>((initialDraft?.goal as Goal | null) ?? null);
 
   // S2 — Physical params
-  const [age, setAge] = useState('');
-  const [weight, setWeight] = useState('');
-  const [height, setHeight] = useState('');
-  const [waist, setWaist] = useState('');
-  const [breast, setBreast] = useState('');
-  const [hip, setHip] = useState('');
+  const [age, setAge] = useState(initialDraft?.age ?? '');
+  const [weight, setWeight] = useState(initialDraft?.weight ?? '');
+  const [height, setHeight] = useState(initialDraft?.height ?? '');
+  const [waist, setWaist] = useState(initialDraft?.waist ?? '');
+  const [breast, setBreast] = useState(initialDraft?.breast ?? '');
+  const [hip, setHip] = useState(initialDraft?.hip ?? '');
 
   // S3 — Activity (4 parts)
-  const [regularDay, setRegularDay] = useState<RegularDay | null>(null);
-  const [stepsRange, setStepsRange] = useState<StepsRange | null>(null);
-  const [sports, setSports] = useState<string[]>([]);
-  const [sportsOther, setSportsOther] = useState('');
-  const [sportsFrequency, setSportsFrequency] = useState<number | null>(null);
+  const [regularDay, setRegularDay] = useState<RegularDay | null>(
+    (initialDraft?.regularDay as RegularDay | null) ?? null,
+  );
+  const [stepsRange, setStepsRange] = useState<StepsRange | null>(
+    (initialDraft?.stepsRange as StepsRange | null) ?? null,
+  );
+  const [sports, setSports] = useState<string[]>(initialDraft?.sports ?? []);
+  const [sportsOther, setSportsOther] = useState(initialDraft?.sportsOther ?? '');
+  const [sportsFrequency, setSportsFrequency] = useState<number | null>(initialDraft?.sportsFrequency ?? null);
 
   // S4 — Meal prefs (3 parts)
-  const [selectedMeals, setSelectedMeals] = useState<string[]>([]);
-  const [likedIngredients, setLikedIngredients] = useState<string[]>([]);
-  const [dislikedIngredients, setDislikedIngredients] = useState<string[]>([]);
+  const [selectedMeals, setSelectedMeals] = useState<string[]>(initialDraft?.selectedMeals ?? []);
+  const [likedIngredients, setLikedIngredients] = useState<string[]>(initialDraft?.likedIngredients ?? []);
+  const [dislikedIngredients, setDislikedIngredients] = useState<string[]>(initialDraft?.dislikedIngredients ?? []);
   const [likedInput, setLikedInput] = useState('');
   const [dislikedInput, setDislikedInput] = useState('');
-  const [dietType, setDietType] = useState<DietType>('standard');
-  const [allergies, setAllergies] = useState<Set<Allergy>>(new Set());
+  const [dietType, setDietType] = useState<DietType>((initialDraft?.dietType as DietType) ?? 'standard');
+  const [allergies, setAllergies] = useState<Set<Allergy>>(
+    () => new Set((initialDraft?.allergies as Allergy[]) ?? []),
+  );
   const [customAllergyInput, setCustomAllergyInput] = useState('');
-  const [customAllergies, setCustomAllergies] = useState<string[]>([]);
+  const [customAllergies, setCustomAllergies] = useState<string[]>(initialDraft?.customAllergies ?? []);
 
   // S5 — Life phase
   type LifePhase = 'regular' | 'postpartum' | 'pregnant';
-  const [lifePhase, setLifePhase] = useState<LifePhase | null>(null);
-  const [isBreastfeeding, setIsBreastfeeding] = useState<boolean | null>(null);
-  const [bfFrequency, setBfFrequency] = useState('');
+  const [lifePhase, setLifePhase] = useState<LifePhase | null>(
+    (initialDraft?.lifePhase as LifePhase | null) ?? null,
+  );
+  const [isBreastfeeding, setIsBreastfeeding] = useState<boolean | null>(initialDraft?.isBreastfeeding ?? null);
+  const [bfFrequency, setBfFrequency] = useState(initialDraft?.bfFrequency ?? '');
 
   // S7 — Start date
-  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [startDate, setStartDate] = useState<Date | null>(
+    initialDraft?.startDateISO ? new Date(initialDraft.startDateISO) : null,
+  );
   const mondays = getNextMondays(4);
+
+  const [savedNotice, setSavedNotice] = useState(false);
+  const saveDraft = () => {
+    const snapshot: DraftSnapshot = {
+      step,
+      goal,
+      age, weight, height, waist, breast, hip,
+      regularDay, stepsRange, sports, sportsOther, sportsFrequency,
+      selectedMeals, likedIngredients, dislikedIngredients,
+      dietType, allergies: Array.from(allergies), customAllergies,
+      lifePhase, isBreastfeeding, bfFrequency,
+      startDateISO: startDate ? startDate.toISOString() : null,
+      savedAt: new Date().toISOString(),
+    };
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(snapshot));
+    } catch {
+      // quota / private mode — ignore
+    }
+  };
+  const handleSaveForLater = () => {
+    saveDraft();
+    setSavedNotice(true);
+    // Give the toast a beat so the user sees it, then close.
+    window.setTimeout(() => {
+      onCancel?.();
+    }, 700);
+  };
 
   /* ─── helpers ─── */
   const toggleSport = (s: string) => setSports((prev) => (prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]));
@@ -611,7 +706,17 @@ export default function NutritionOnboarding({
       dailyFiber: n.fiberG,
       proteinPerKg: n.proteinPerKg,
     }, startDate!);
+    // Completed — wipe the draft so a future entry starts fresh.
+    clearDraft();
   };
+
+  // Auto-clear the toast after a short window so it doesn't linger
+  // if the user happens to stay on the screen.
+  useEffect(() => {
+    if (!savedNotice) return;
+    const id = window.setTimeout(() => setSavedNotice(false), 1800);
+    return () => window.clearTimeout(id);
+  }, [savedNotice]);
 
   const meta = STEP_META[step - 1];
   const goBack = () => {
@@ -700,7 +805,46 @@ export default function NutritionOnboarding({
               )}
             </div>
           </div>
+          {/* Save-for-later — persists all current state to localStorage
+              then exits. On re-entry the form rehydrates from the draft. */}
+          <button
+            onClick={handleSaveForLater}
+            style={{
+              all: 'unset',
+              cursor: 'pointer',
+              padding: '6px 12px',
+              borderRadius: 999,
+              background: T.CARD,
+              border: `1px solid ${T.HAIR_2}`,
+              fontFamily: T.SANS,
+              fontSize: 11.5,
+              color: T.FG_2,
+              fontWeight: 500,
+              flexShrink: 0,
+            }}
+          >
+            Uložiť
+          </button>
         </div>
+        {savedNotice && (
+          <div
+            role="status"
+            style={{
+              margin: '0 18px 8px',
+              padding: '8px 12px',
+              background: T.SAGE_SOFT,
+              border: `1px solid ${T.SAGE}30`,
+              borderRadius: 10,
+              fontFamily: T.SANS,
+              fontSize: 11.5,
+              color: T.SAGE,
+              fontWeight: 500,
+              textAlign: 'center',
+            }}
+          >
+            Uložené — môžeš sa kedykoľvek vrátiť.
+          </div>
+        )}
         <div style={{ padding: '0 18px 14px' }}>
           <button
             onClick={goNext}
@@ -1018,12 +1162,10 @@ function Step6Frequency({
 }
 
 function Step7Meals({ selected, toggle }: { selected: string[]; toggle: (k: string) => void }) {
-  const totalPct = MEAL_OPTIONS.filter((m) => selected.includes(m.key)).reduce((a, m) => a + m.pct, 0);
   return (
     <>
       <Question>Aké jedlá chceš mať v pláne?</Question>
-      <Body size={12} style={{ marginTop: 8 }}>Kalórie sa rozložia podľa výberu. Vyber aspoň 1 jedlo.</Body>
-      <div style={{ marginTop: 18 }}>
+      <div style={{ marginTop: 22 }}>
         {MEAL_OPTIONS.map((m, i) => (
           <OptionCard
             key={m.key}
@@ -1036,12 +1178,6 @@ function Step7Meals({ selected, toggle }: { selected: string[]; toggle: (k: stri
           />
         ))}
       </div>
-      {selected.length > 0 && (
-        <Body size={11.5} style={{ marginTop: 12 }}>
-          Celkové % = {totalPct}%{' '}
-          {totalPct !== 100 && <span style={{ color: T.GOLD, fontWeight: 500 }}>(bude normalizovaných na 100%)</span>}
-        </Body>
-      )}
     </>
   );
 }
