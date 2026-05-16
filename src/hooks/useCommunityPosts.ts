@@ -46,6 +46,11 @@ export function useCommunityPosts() {
     supabase
       .from('community_posts')
       .select('*')
+      // Hide moderator-removed posts from the public feed. The status
+      // column is added in 20260516180000_community_post_status.sql;
+      // .neq survives the absence of the column (returns all rows) so
+      // this is safe to deploy before the migration is applied.
+      .neq('status', 'removed')
       .order('created_at', { ascending: false })
       .limit(50)
       .then(({ data, error }) => {
