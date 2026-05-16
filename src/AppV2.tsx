@@ -211,7 +211,18 @@ export default function AppV2() {
                 bounces an unauthenticated visitor (typically the
                 admin.neome.com.au subdomain). */}
             <Route path="/admin/login" element={<AdminLogin />} />
-            <Route path="/" element={<Welcome />} />
+            {/* Root path — admin subdomain bounces straight to /admin,
+                main domain renders the Welcome screen. Done client-side
+                because Netlify's host-conditional redirect in
+                netlify.toml didn't reliably fire on admin.neome.com.au. */}
+            <Route
+              path="/"
+              element={
+                typeof window !== 'undefined' && window.location.hostname === 'admin.neome.com.au'
+                  ? <Navigate to="/admin" replace />
+                  : <Welcome />
+              }
+            />
             <Route path="/welcome" element={<Welcome />} />
             <Route path="/onboarding" element={<OnboardingWelcome />} />
             <Route path="/onboarding/welcome" element={<OnboardingWelcome />} />
