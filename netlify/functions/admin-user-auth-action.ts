@@ -33,9 +33,19 @@ const supabaseAdmin = createClient(
 // Anon-key client to call the regular auth methods. The regular methods
 // (signInWithOtp, resetPasswordForEmail) trigger the email send via
 // the configured SMTP — service-role calls bypass the email flow.
+//
+// Reads either env-var name: the frontend already sets
+// VITE_SUPABASE_ANON_KEY (Vite-prefixed so it gets bundled into the
+// browser build), and Netlify also exposes that variable to functions.
+// Falling back to SUPABASE_ANON_KEY for the case where someone added
+// it server-side only.
 function anonClient() {
-  const anonKey = process.env.SUPABASE_ANON_KEY;
-  if (!anonKey) throw new Error('SUPABASE_ANON_KEY not configured in Netlify env');
+  const anonKey =
+    process.env.SUPABASE_ANON_KEY ||
+    process.env.VITE_SUPABASE_ANON_KEY;
+  if (!anonKey) {
+    throw new Error('SUPABASE_ANON_KEY (or VITE_SUPABASE_ANON_KEY) not configured in Netlify env');
+  }
   return createClient(process.env.SUPABASE_URL!, anonKey);
 }
 
