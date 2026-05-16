@@ -99,8 +99,8 @@ export async function createCheckoutSession(
       throw new Error('Failed to create checkout session');
     }
 
-    const { sessionId } = await response.json();
-    return sessionId;
+    const { url, sessionId } = await response.json();
+    return { url, sessionId } as { url: string; sessionId: string };
   } catch (error) {
     console.error('Error creating checkout session:', error);
     throw error;
