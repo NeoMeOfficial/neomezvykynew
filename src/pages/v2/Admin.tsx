@@ -612,6 +612,29 @@ interface UserDetail {
   activityBreakdown: { event_type: string; count: number; points: number }[];
 }
 
+// Live Stripe state fetched on-demand from admin-user-stripe netlify fn.
+interface StripeDetail {
+  subscription: null | {
+    id: string;
+    status: string;
+    currentPeriodEnd: string | null;
+    cancelAtPeriodEnd: boolean;
+    amount: number;
+    currency: string;
+    discount: null | { coupon: string; percentOff: number | null; amountOff: number | null };
+  };
+  invoices: { id: string; number: string | null; created: string; total: number; currency: string; paid: boolean; status: string | null; hostedUrl: string | null }[];
+  paymentMethod: null | { brand: string; last4: string; exp: string };
+}
+
+function fmtCents(cents: number, currency: string): string {
+  try {
+    return new Intl.NumberFormat('sk-SK', { style: 'currency', currency: currency.toUpperCase() }).format(cents / 100);
+  } catch {
+    return `${(cents / 100).toFixed(2)} ${currency.toUpperCase()}`;
+  }
+}
+
 function UsersTab() {
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
@@ -626,6 +649,8 @@ function UsersTab() {
   const [expandedUser, setExpandedUser] = useState<string | null>(null);
   const [userDetails, setUserDetails] = useState<Record<string, UserDetail>>({});
   const [loadingDetail, setLoadingDetail] = useState<string | null>(null);
+  const [stripeDetails, setStripeDetails] = useState<Record<string, StripeDetail | { error: string }>>({});
+  const [loadingStripe, setLoadingStripe] = useState<string | null>(null);
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -709,12 +734,42 @@ function UsersTab() {
     }
   };
 
+  const fetchStripeDetail = async (user: AdminUser) => {
+    const customerId = user.subscriptions?.stripe_customer_id;
+    if (!customerId) return; // nothing to fetch
+    if (stripeDetails[user.id] || loadingStripe === user.id) return;
+    setLoadingStripe(user.id);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch('/.netlify/functions/admin-user-stripe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+        },
+        body: JSON.stringify({ customerId }),
+      });
+      const body = await res.json();
+      if (!res.ok) {
+        setStripeDetails(prev => ({ ...prev, [user.id]: { error: body.error || 'Failed to load' } }));
+      } else {
+        setStripeDetails(prev => ({ ...prev, [user.id]: body as StripeDetail }));
+      }
+    } catch (err: any) {
+      setStripeDetails(prev => ({ ...prev, [user.id]: { error: err.message || 'Network error' } }));
+    } finally {
+      setLoadingStripe(null);
+    }
+  };
+
   const toggleExpand = (userId: string) => {
     if (expandedUser === userId) {
       setExpandedUser(null);
     } else {
       setExpandedUser(userId);
       fetchUserDetail(userId);
+      const u = users.find(x => x.id === userId);
+      if (u) fetchStripeDetail(u);
     }
   };
 
@@ -1037,12 +1092,67 @@ function UsersTab() {
                           </div>
                         </div>
 
-                        {/* Programs + LTV block */}
+                        {/* Live Stripe block — discount + invoices + payment method */}
                         <div style={{ background: _A.CARD, borderRadius: 10, border: `1px solid ${_A.HAIR}`, padding: '12px 14px' }}>
-                          <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: _A.EYEBROW, fontWeight: 500, marginBottom: 10 }}>Programy & LTV</div>
-                          <p style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.TERTIARY, lineHeight: 1.5 }}>
-                            Tabuľka nákupov programov (program_purchases) ešte nebola vytvorená v databáze. Spustíte po integrácii Stripe platieb.
-                          </p>
+                          <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: _A.EYEBROW, fontWeight: 500, marginBottom: 10 }}>Stripe (live)</div>
+                          {!user.subscriptions?.stripe_customer_id ? (
+                            <p style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.TERTIARY, lineHeight: 1.5 }}>Bez Stripe customera.</p>
+                          ) : loadingStripe === user.id ? (
+                            <p style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED }}>Načítavam zo Stripe…</p>
+                          ) : !stripeDetails[user.id] ? (
+                            <p style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED }}>—</p>
+                          ) : 'error' in stripeDetails[user.id] ? (
+                            <p style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10.5, color: _A.TERRA, lineHeight: 1.5 }}>
+                              {(stripeDetails[user.id] as { error: string }).error}
+                            </p>
+                          ) : (() => {
+                            const sd = stripeDetails[user.id] as StripeDetail;
+                            return (
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                                {/* Discount — the headline thing */}
+                                {sd.subscription?.discount ? (
+                                  <div style={{ padding: '8px 10px', background: `${_A.GOLD}14`, border: `1px solid ${_A.GOLD}30`, borderRadius: 8 }}>
+                                    <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: _A.GOLD, fontWeight: 600 }}>Zľava aktívna</div>
+                                    <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.DEEP, marginTop: 4, fontWeight: 500 }}>
+                                      {sd.subscription.discount.coupon}
+                                      {sd.subscription.discount.percentOff != null && ` — ${sd.subscription.discount.percentOff}% off`}
+                                      {sd.subscription.discount.amountOff != null && ` — ${fmtCents(sd.subscription.discount.amountOff, sd.subscription.currency)} off`}
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10.5, color: _A.TERTIARY }}>Bez aktívnej zľavy</div>
+                                )}
+                                {/* Default PM */}
+                                {sd.paymentMethod && (
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
+                                    <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10.5, color: _A.EYEBROW }}>Karta</span>
+                                    <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10.5, color: _A.DEEP, fontWeight: 500 }}>
+                                      {sd.paymentMethod.brand} ···· {sd.paymentMethod.last4} ({sd.paymentMethod.exp})
+                                    </span>
+                                  </div>
+                                )}
+                                {/* Last invoices */}
+                                {sd.invoices.length > 0 && (
+                                  <div>
+                                    <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: _A.EYEBROW, fontWeight: 500, marginBottom: 6 }}>Posledné faktúry</div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                                      {sd.invoices.slice(0, 5).map(inv => (
+                                        <a key={inv.id} href={inv.hostedUrl ?? '#'} target="_blank" rel="noopener noreferrer"
+                                          style={{ display: 'flex', justifyContent: 'space-between', gap: 8, padding: '4px 0', textDecoration: 'none' }}>
+                                          <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10.5, color: _A.MUTED }}>
+                                            {new Date(inv.created).toLocaleDateString('sk-SK')}
+                                          </span>
+                                          <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10.5, color: inv.paid ? _A.SAGE : _A.TERRA, fontWeight: 500 }}>
+                                            {fmtCents(inv.total, inv.currency)} {inv.paid ? '✓' : `(${inv.status})`}
+                                          </span>
+                                        </a>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })()}
                         </div>
 
                         {/* Activity block */}
