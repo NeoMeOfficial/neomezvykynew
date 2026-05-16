@@ -968,6 +968,36 @@ function UsersTab() {
     }
   };
 
+  interface UserEmail { id: string; to: string; from: string; subject: string; created_at: string; last_event: string }
+  const [emailLogs, setEmailLogs] = useState<Record<string, { emails: UserEmail[] } | { error: string }>>({});
+  const [loadingEmails, setLoadingEmails] = useState<string | null>(null);
+
+  const fetchUserEmails = async (user: AdminUser) => {
+    if (emailLogs[user.id] || loadingEmails === user.id) return;
+    setLoadingEmails(user.id);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch('/.netlify/functions/admin-user-emails', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+        },
+        body: JSON.stringify({ userId: user.id }),
+      });
+      const body = await res.json();
+      if (!res.ok) {
+        setEmailLogs(prev => ({ ...prev, [user.id]: { error: body.error || 'Failed to load' } }));
+      } else {
+        setEmailLogs(prev => ({ ...prev, [user.id]: { emails: body.emails as UserEmail[] } }));
+      }
+    } catch (err: any) {
+      setEmailLogs(prev => ({ ...prev, [user.id]: { error: err.message || 'Network error' } }));
+    } finally {
+      setLoadingEmails(null);
+    }
+  };
+
   const toggleExpand = (userId: string) => {
     if (expandedUser === userId) {
       setExpandedUser(null);
@@ -975,7 +1005,10 @@ function UsersTab() {
       setExpandedUser(userId);
       fetchUserDetail(userId);
       const u = users.find(x => x.id === userId);
-      if (u) fetchStripeDetail(u);
+      if (u) {
+        fetchStripeDetail(u);
+        fetchUserEmails(u);
+      }
     }
   };
 
@@ -1512,6 +1545,62 @@ function UsersTab() {
                           )}
                         </div>
 
+                      </div>
+                    )}
+
+                    {/* Email log — last sends from Resend, filtered to this user's address */}
+                    {!isLoadingDetail && (
+                      <div style={{ marginTop: 12, background: _A.CARD, borderRadius: 10, border: `1px solid ${_A.HAIR}`, padding: '12px 14px' }}>
+                        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 8 }}>
+                          <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: _A.EYEBROW, fontWeight: 500 }}>E-mail log (Resend)</div>
+                          <button
+                            onClick={() => { setEmailLogs(prev => { const n = { ...prev }; delete n[user.id]; return n; }); fetchUserEmails(user); }}
+                            disabled={loadingEmails === user.id}
+                            style={{ all: 'unset', cursor: loadingEmails === user.id ? 'not-allowed' : 'pointer', fontFamily: 'DM Sans, system-ui', fontSize: 10, color: _A.GOLD, fontWeight: 500 }}
+                          >
+                            Obnoviť
+                          </button>
+                        </div>
+                        {loadingEmails === user.id ? (
+                          <p style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED }}>Načítavam…</p>
+                        ) : !emailLogs[user.id] ? (
+                          <p style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED }}>—</p>
+                        ) : 'error' in emailLogs[user.id] ? (
+                          <p style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10.5, color: _A.TERRA, lineHeight: 1.5 }}>
+                            {(emailLogs[user.id] as { error: string }).error}
+                          </p>
+                        ) : (() => {
+                          const log = emailLogs[user.id] as { emails: UserEmail[] };
+                          if (log.emails.length === 0) {
+                            return <p style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED }}>Žiadne e-maily v posledných 100 odoslaných.</p>;
+                          }
+                          return (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                              {log.emails.slice(0, 10).map(em => {
+                                const eventColor = em.last_event === 'delivered'    ? _A.SAGE
+                                                  : em.last_event === 'opened'      ? _A.GOLD
+                                                  : em.last_event === 'bounced'     ? _A.TERRA
+                                                  : em.last_event === 'complained'  ? _A.TERRA
+                                                  : _A.MUTED;
+                                return (
+                                  <div key={em.id} style={{ display: 'flex', justifyContent: 'space-between', gap: 8, alignItems: 'baseline' }}>
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                      <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.DEEP, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{em.subject}</div>
+                                      <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10, color: _A.TERTIARY }}>
+                                        {new Date(em.created_at).toLocaleString('sk-SK', { day: 'numeric', month: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                      </div>
+                                    </div>
+                                    <span style={{
+                                      fontSize: 9, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase',
+                                      padding: '2px 7px', borderRadius: 999,
+                                      background: `${eventColor}18`, color: eventColor, flexShrink: 0,
+                                    }}>{em.last_event}</span>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          );
+                        })()}
                       </div>
                     )}
                   </div>
