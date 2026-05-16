@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SupabaseAuthProvider, useSupabaseAuth } from './contexts/SupabaseAuthContext';
+import { supabase } from './lib/supabase';
 import { SubscriptionProvider } from './contexts/SubscriptionContext';
 import AppLayout from './layouts/v2/AppLayout';
 import ErrorBoundary from './components/v2/ErrorBoundary';
@@ -144,19 +145,49 @@ function RequireAuth({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-/* Admin guard — RequireAuth + JWT role check. Non-admins redirect to /domov-new.
-   Unauthenticated visitors land on the minimal /admin/login (internal
-   sign-in) instead of the public editorial /auth page. */
+/* Admin guard — RequireAuth + profiles.role check.
+   Reads profiles.role directly (canonical source) so a fresh promotion
+   takes effect on the next route navigation, not next login. Falls
+   back to JWT app_metadata.role to allow non-DB role grants and to
+   short-circuit the profile query when the JWT already has the claim.
+   Unauthenticated visitors land on the minimal /admin/login. */
 function RequireAdmin({ children }: { children: React.ReactNode }) {
   const { user, loading } = useSupabaseAuth();
   const { pathname, search } = useLocation();
-  if (loading) return <LoadingSpinner />;
+  const [checking, setChecking] = useState(true);
+  const [allowed, setAllowed] = useState(false);
+
+  useEffect(() => {
+    if (loading) return;
+    if (!user) { setChecking(false); return; }
+    // Fast path: JWT app_metadata already says admin.
+    const jwtRole = (user.app_metadata as Record<string, unknown> | null)?.role;
+    if (jwtRole === 'admin') {
+      setAllowed(true);
+      setChecking(false);
+      return;
+    }
+    // Slow path: query profiles.role. Single source of truth.
+    let cancelled = false;
+    supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (cancelled) return;
+        setAllowed(data?.role === 'admin');
+        setChecking(false);
+      });
+    return () => { cancelled = true; };
+  }, [user, loading]);
+
+  if (loading || checking) return <LoadingSpinner />;
   if (!user) {
     const next = encodeURIComponent(pathname + search);
     return <Navigate to={`/admin/login?next=${next}`} replace />;
   }
-  const role = (user.app_metadata as Record<string, unknown> | null)?.role;
-  if (role !== 'admin') return <Navigate to="/domov-new" replace />;
+  if (!allowed) return <Navigate to="/domov-new" replace />;
   return <>{children}</>;
 }
 
