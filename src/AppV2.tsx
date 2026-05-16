@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SupabaseAuthProvider, useSupabaseAuth } from './contexts/SupabaseAuthContext';
 import { SubscriptionProvider } from './contexts/SubscriptionContext';
@@ -74,6 +74,7 @@ const ReferralLanding = lazy(() => import('./pages/v2/ReferralLanding'));
 const ReferralCenter = lazy(() => import('./components/v2/referral/ReferralCenter'));
 const ReferralPage = lazy(() => import('./pages/v2/ReferralPage'));
 const Admin = lazy(() => import('./pages/v2/Admin'));
+const AdminLogin = lazy(() => import('./pages/v2/AdminLogin'));
 const AdminReferrals = lazy(() => import('./pages/v2/AdminReferrals'));
 const TeloExtra = lazy(() => import('./pages/v2/TeloExtra'));
 const TeloStrecing = lazy(() => import('./pages/v2/TeloStrecing'));
@@ -143,11 +144,17 @@ function RequireAuth({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-/* Admin guard — RequireAuth + JWT role check. Non-admins redirect to /domov-new. */
+/* Admin guard — RequireAuth + JWT role check. Non-admins redirect to /domov-new.
+   Unauthenticated visitors land on the minimal /admin/login (internal
+   sign-in) instead of the public editorial /auth page. */
 function RequireAdmin({ children }: { children: React.ReactNode }) {
   const { user, loading } = useSupabaseAuth();
+  const { pathname, search } = useLocation();
   if (loading) return <LoadingSpinner />;
-  if (!user) return <Navigate to="/auth" replace />;
+  if (!user) {
+    const next = encodeURIComponent(pathname + search);
+    return <Navigate to={`/admin/login?next=${next}`} replace />;
+  }
   const role = (user.app_metadata as Record<string, unknown> | null)?.role;
   if (role !== 'admin') return <Navigate to="/domov-new" replace />;
   return <>{children}</>;
@@ -169,6 +176,10 @@ export default function AppV2() {
             <Route path="/auth" element={<AuthReal />} />
             <Route path="/register" element={<AuthReal />} />
             <Route path="/login" element={<AuthReal />} />
+            {/* Minimal internal admin sign-in — used when RequireAdmin
+                bounces an unauthenticated visitor (typically the
+                admin.neome.com.au subdomain). */}
+            <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/" element={<Welcome />} />
             <Route path="/welcome" element={<Welcome />} />
             <Route path="/onboarding" element={<OnboardingWelcome />} />
