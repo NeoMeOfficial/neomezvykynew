@@ -1,5 +1,8 @@
+import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Eye, Ser, Body, NM } from '../../components/v2/neome';
+import { useSubscription } from '../../contexts/SubscriptionContext';
+import { SUBSCRIPTION_PLANS } from '../../lib/stripe';
 
 /**
  * Paywall — R7 (three editorial variants)
@@ -355,9 +358,23 @@ export default function Paywall() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const variant = (params.get('v') ?? 'dark') as 'warm' | 'dark' | 'compare';
-  const returnTo = params.get('returnTo');
+  const { startCheckout } = useSubscription();
+  const [busy, setBusy] = useState(false);
 
-  const onActivate = () => navigate(returnTo ? `/profil/predplatne?returnTo=${encodeURIComponent(returnTo)}` : '/profil/predplatne');
+  // Skip the intermediate /profil/predplatne page and go straight to
+  // Stripe checkout. In demo / non-Stripe mode, startCheckout falls
+  // back to a local-only unlock and the redirect-to-success URL is a
+  // no-op — see SubscriptionContext for the demo path.
+  const onActivate = async () => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await startCheckout(SUBSCRIPTION_PLANS.premium.priceId);
+    } catch (err) {
+      console.error('[paywall] checkout failed', err);
+      setBusy(false);
+    }
+  };
   const onClose = () => navigate(-1);
   const onContinueFree = () => navigate('/domov-new');
 
