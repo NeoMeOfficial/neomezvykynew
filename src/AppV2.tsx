@@ -55,7 +55,6 @@ const MyselNew = lazy(() => import('./pages/v2/MyselNew'));
 const Periodka = lazy(() => import('./pages/v2/Periodka'));
 const PeriodkaSettings = lazy(() => import('./components/v2/periodka/PeriodkaSettings'));
 const PeriodkaTestingConsole = lazy(() => import('./components/v2/periodka/PeriodkaTestingConsole'));
-const ProgramSales = lazy(() => import('./pages/v2/ProgramSales'));
 const Komunita = lazy(() => import('./pages/v2/Komunita'));
 const Spravy = lazy(() => import('./pages/v2/Spravy'));
 const Profil = lazy(() => import('./pages/v2/Profil'));
@@ -235,7 +234,10 @@ export default function AppV2() {
               <Route path="/kniznica/navyky" element={<NavykyHistory />} />
               <Route path="/kniznica/symptomy" element={<SymptomCalendar />} />
               <Route path="/program/:programId/info" element={<PostpartumInfo />} />
-              <Route path="/program/:id/buy" element={<ProgramSales />} />
+              {/* Per-program purchase removed — single NeoMe Plus
+                  subscription replaces it. Any stale link gracefully
+                  funnels to the paywall. */}
+              <Route path="/program/:id/buy" element={<Navigate to="/paywall" replace />} />
               <Route path="/program/:programId" element={<ProgramDetail />} />
               <Route path="/komunita" element={<Komunita />} />
               <Route path="/spravy" element={<Spravy />} />
