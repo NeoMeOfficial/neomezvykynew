@@ -96,7 +96,11 @@ export async function handler(event: any, context: any) {
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({ sessionId: session.id }),
+      // `url` is the Stripe-hosted checkout page; we redirect via
+      // window.location instead of the deprecated
+      // stripe.redirectToCheckout (removed 2025-09-30). sessionId is
+      // kept for callers that still need it.
+      body: JSON.stringify({ url: session.url, sessionId: session.id }),
     };
   } catch (error: any) {
     console.error('Error creating checkout session:', error);

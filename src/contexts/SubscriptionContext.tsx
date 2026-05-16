@@ -22,7 +22,6 @@ import {
   createPortalSessionMock,
   SUBSCRIPTION_PLANS,
   MEAL_PLAN_PRICE_ID,
-  stripePromise,
 } from '../lib/stripe';
 import { supabase } from '../lib/supabase';
 
@@ -278,7 +277,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     try {
       const userId = getUserId();
       const email = getUserEmail();
-      const sessionId = await createCheckoutSession(
+      const { url } = await createCheckoutSession(
         MEAL_PLAN_PRICE_ID,
         userId || 'anon',
         email || '',
@@ -288,8 +287,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
           cancelUrl: opts?.cancelUrl ?? `${window.location.origin}/checkout/canceled?type=meal`,
         },
       );
-      const stripe = await stripePromise;
-      if (stripe) await stripe.redirectToCheckout({ sessionId });
+      if (url) window.location.href = url;
     } catch (error) {
       console.error('Error opening meal-plan checkout:', error);
       throw error;
@@ -307,11 +305,8 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
         const email = getUserEmail();
 
         if (isStripeConfigured()) {
-          const sessionId = await createCheckoutSession(priceId, userId || 'anon', email || '');
-          const stripe = await stripePromise;
-          if (stripe) {
-            await stripe.redirectToCheckout({ sessionId });
-          }
+          const { url } = await createCheckoutSession(priceId, userId || 'anon', email || '');
+          if (url) window.location.href = url;
         } else {
           const sessionId = await createCheckoutSessionMock(priceId, userId || 'demo', email || 'demo@neome.sk');
           if (sessionId === 'demo_session_success') {
