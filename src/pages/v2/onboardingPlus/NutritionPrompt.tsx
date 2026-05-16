@@ -68,61 +68,8 @@ export default function PlusNutritionPrompt() {
           <div style={{ position: 'relative', padding: '22px 22px 22px' }}>
             <Eye color={NM.SAGE} size={10}>Odporúčané</Eye>
 
-            <div
-              style={{
-                marginTop: 10,
-                fontFamily: NM.SERIF,
-                fontSize: 22,
-                fontWeight: 500,
-                color: NM.DEEP,
-                letterSpacing: '-0.01em',
-                lineHeight: 1.2,
-              }}
-            >
-              Pridať Jedálniček
-            </div>
-
-            {/* Big sage price */}
-            <div style={{ marginTop: 12, display: 'flex', alignItems: 'baseline', gap: 10 }}>
-              <span
-                style={{
-                  fontFamily: NM.SERIF,
-                  fontSize: 38,
-                  fontWeight: 500,
-                  color: NM.SAGE,
-                  letterSpacing: '-0.02em',
-                  lineHeight: 1,
-                }}
-              >
-                57 €
-              </span>
-              <span
-                style={{
-                  fontFamily: NM.SANS,
-                  fontSize: 12,
-                  color: NM.MUTED,
-                  fontWeight: 400,
-                }}
-              >
-                jednorazová platba
-              </span>
-            </div>
-
-            {/* Reassurance subtitle — explicit about what the user gets */}
-            <div
-              style={{
-                marginTop: 6,
-                fontFamily: NM.SANS,
-                fontSize: 12,
-                color: NM.SAGE,
-                fontWeight: 500,
-                lineHeight: 1.5,
-              }}
-            >
-              Jedálniček zostáva tvoj navždy — žiadne ďalšie poplatky.
-            </div>
-
-            <div style={{ marginTop: 18, display: 'flex', flexDirection: 'column', gap: 10, maxWidth: 280 }}>
+            {/* Features — the only content above the CTA */}
+            <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 10, maxWidth: 280 }}>
               {FEATURES.map((li) => (
                 <div key={li} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
                   <div
@@ -156,14 +103,14 @@ export default function PlusNutritionPrompt() {
               ))}
             </div>
 
-            {/* Explicit sage CTA inside the card */}
+            {/* Explicit sage CTA — carries the price + verb */}
             <button
               onClick={onYes}
               style={{
                 all: 'unset',
                 cursor: 'pointer',
                 display: 'block',
-                marginTop: 20,
+                marginTop: 22,
                 padding: '14px 22px',
                 background: NM.SAGE,
                 color: '#fff',
@@ -179,6 +126,21 @@ export default function PlusNutritionPrompt() {
             >
               Áno, pridať Jedálniček · 57 €
             </button>
+
+            {/* Reassurance line directly under the CTA */}
+            <div
+              style={{
+                marginTop: 10,
+                fontFamily: NM.SANS,
+                fontSize: 11.5,
+                color: NM.MUTED,
+                fontWeight: 400,
+                lineHeight: 1.5,
+                textAlign: 'center' as const,
+              }}
+            >
+              Jednorazová platba · jedálniček zostáva tvoj navždy.
+            </div>
           </div>
         </div>
 
