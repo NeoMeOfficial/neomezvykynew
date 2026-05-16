@@ -62,8 +62,25 @@ type ModalState =
   | { type: 'idle' }
   | { type: 'confirm'; reward: Reward }
   | { type: 'loading'; reward: Reward }
-  | { type: 'success'; reward: Reward; code: string | null; isStripe: boolean }
+  | { type: 'success'; reward: Reward; code: string | null; isStripe: boolean; nextBillingDate: string | null }
   | { type: 'error'; message: string };
+
+const MONTHLY_SUB_PRICE_EUR = 24.9;
+
+function fmtEur(eur: number): string {
+  return `€${eur.toFixed(2).replace('.', ',')}`;
+}
+
+function fmtBillingDate(iso: string | null): string | null {
+  if (!iso) return null;
+  try {
+    const d = new Date(iso);
+    const months = ['januára', 'februára', 'marca', 'apríla', 'mája', 'júna', 'júla', 'augusta', 'septembra', 'októbra', 'novembra', 'decembra'];
+    return `${d.getDate()}. ${months[d.getMonth()]}`;
+  } catch {
+    return null;
+  }
+}
 
 export default function PointsRewards() {
   const navigate = useNavigate();
@@ -166,6 +183,7 @@ export default function PointsRewards() {
         reward,
         code: body.code ?? null,
         isStripe: !!reward.stripe_coupon_id,
+        nextBillingDate: body.next_billing_date ?? null,
       });
     } catch {
       setModal({ type: 'error', message: 'Chyba siete. Skontroluj pripojenie.' });
@@ -361,10 +379,40 @@ export default function PointsRewards() {
                 </div>
 
                 {modal.isStripe ? (
-                  <div style={{ padding: '16px', background: `${NM.GOLD}12`, borderRadius: 14, border: `1px solid ${NM.GOLD}30`, marginBottom: 20, textAlign: 'center' }}>
-                    <div style={{ fontFamily: NM.SANS, fontSize: 12, color: NM.GOLD, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 4 }}>Zľava aplikovaná</div>
-                    <div style={{ fontFamily: NM.SANS, fontSize: 12, color: NM.MUTED, lineHeight: 1.5 }}>Zľava bola automaticky aplikovaná na tvoje predplatné. Uvidíš ju na najbližšej platbe.</div>
-                  </div>
+                  (() => {
+                    // Compute the discounted next-invoice amount per
+                    // reward slug. Assumes the standard €24.90 monthly
+                    // subscription; partner / one-time charges aren't
+                    // affected by these subscription-level coupons.
+                    const slug = modal.reward.slug;
+                    const fullPrice = MONTHLY_SUB_PRICE_EUR;
+                    const discountedPrice =
+                      slug === 'sub-month-free' ? 0
+                      : slug === 'sub-50pct' ? fullPrice / 2
+                      : fullPrice;
+                    const dateLabel = fmtBillingDate(modal.nextBillingDate);
+                    return (
+                      <div style={{ padding: '18px 18px', background: `${NM.GOLD}12`, borderRadius: 14, border: `1px solid ${NM.GOLD}30`, marginBottom: 20, textAlign: 'center' }}>
+                        <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.GOLD, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 10 }}>
+                          Zľava aplikovaná
+                        </div>
+                        <div style={{ fontFamily: NM.SANS, fontSize: 13, color: NM.DEEP, lineHeight: 1.55, marginBottom: 12 }}>
+                          {dateLabel
+                            ? <>Tvoja ďalšia platba <strong>{dateLabel}</strong> bude:</>
+                            : <>Tvoja ďalšia platba bude:</>}
+                        </div>
+                        <div style={{ fontFamily: NM.SERIF, fontSize: 28, color: NM.DEEP, fontWeight: 500, letterSpacing: '-0.01em', lineHeight: 1 }}>
+                          {fmtEur(discountedPrice)}
+                          <span style={{ fontFamily: NM.SANS, fontSize: 13, color: NM.MUTED, fontWeight: 400, marginLeft: 8, textDecoration: 'line-through' }}>
+                            {fmtEur(fullPrice)}
+                          </span>
+                        </div>
+                        <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.MUTED, lineHeight: 1.55, marginTop: 12 }}>
+                          Zľava sa uplatní automaticky — nemusíš nič zadávať.
+                        </div>
+                      </div>
+                    );
+                  })()
                 ) : (
                   <div style={{ padding: '16px', background: '#fff', borderRadius: 14, border: `1px solid ${NM.HAIR}`, marginBottom: 20, textAlign: 'center' }}>
                     <div style={{ fontFamily: NM.SANS, fontSize: 10, color: NM.EYEBROW, letterSpacing: '0.18em', textTransform: 'uppercase', marginBottom: 8 }}>Tvoj kód</div>
