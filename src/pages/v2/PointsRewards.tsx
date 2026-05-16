@@ -45,7 +45,6 @@ const EARN_RULES: { a: string; p: string }[] = [
   { a: 'Odporúčanie · predplatné', p: '+300' },
 ];
 
-const REWARDS_PREVIEW_COUNT = 3;
 
 const FALLBACK: Reward[] = [
   { slug: 'sub-50pct',        name: '50% zľava na ďalší mesiac',       description: 'Tvoja ďalšia platba NeoMe Plus bude o polovicu lacnejšia. Aplikuje sa automaticky.', point_cost: 2000, color_token: 'TERRA', stripe_coupon_id: 'NEOME_50PCT',    image_key: 'section-body.jpg' },
@@ -89,7 +88,6 @@ export default function PointsRewards() {
   const [rewards, setRewards] = useState<Reward[]>(FALLBACK);
   const [redemptions, setRedemptions] = useState<Redemption[]>([]);
   const [modal, setModal] = useState<ModalState>({ type: 'idle' });
-  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -207,7 +205,11 @@ export default function PointsRewards() {
       </div>
 
       <div style={{ margin: '24px 18px 0', display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {(expanded ? rewards : rewards.slice(0, REWARDS_PREVIEW_COUNT)).map((r) => {
+        {/* Only subscription-discount rewards are exposed publicly for now.
+            Partner rewards exist in the catalog but are kept admin-side until
+            real partnerships are signed. The glass 'Viac odmien čoskoro'
+            card below teases what's coming without showing placeholders. */}
+        {rewards.filter(r => !!r.stripe_coupon_id).map((r) => {
           const tone = NM_COLORS[r.color_token] ?? NM.TERRA;
           const canAfford = balance >= r.point_cost;
           const cooldown = cooldownFor(r.slug);
@@ -252,46 +254,99 @@ export default function PointsRewards() {
         })}
       </div>
 
-      {/* Expand / collapse rewards */}
-      {rewards.length > REWARDS_PREVIEW_COUNT && (
-        <div style={{ margin: '14px 18px 0', display: 'flex', justifyContent: 'center' }}>
-          <button
-            onClick={() => setExpanded((v) => !v)}
+      {/* "More discounts coming soon" — frosted glass placeholder.
+          Replaces the partner reward cards (which exist in the DB but
+          are kept admin-side until real partnerships are signed). */}
+      <div style={{ margin: '12px 18px 0' }}>
+        <div
+          style={{
+            position: 'relative',
+            borderRadius: 18,
+            padding: '22px 20px',
+            overflow: 'hidden',
+            background: 'rgba(255,255,255,0.35)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: `1px solid rgba(255,255,255,0.55)`,
+            boxShadow: '0 10px 30px rgba(61,41,33,0.06)',
+          }}
+        >
+          {/* Soft gold + mauve glow under the glass — adds depth */}
+          <div
+            aria-hidden
             style={{
-              all: 'unset',
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
-              padding: '10px 18px',
+              position: 'absolute',
+              top: -40,
+              right: -40,
+              width: 160,
+              height: 160,
               borderRadius: 999,
-              background: '#fff',
-              border: `1px solid ${NM.HAIR_2}`,
-              fontFamily: NM.SANS,
-              fontSize: 12.5,
-              fontWeight: 500,
-              color: NM.DEEP,
-              letterSpacing: '0.02em',
+              background: `radial-gradient(circle, ${NM.GOLD}38, transparent 70%)`,
+              pointerEvents: 'none',
             }}
-          >
-            {expanded
-              ? 'Zobraziť menej'
-              : `Zobraziť viac (${rewards.length - REWARDS_PREVIEW_COUNT})`}
-            <svg
-              width="10"
-              height="10"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke={NM.DEEP}
-              strokeWidth="2"
-              strokeLinecap="round"
-              style={{ transform: expanded ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 200ms' }}
+          />
+          <div
+            aria-hidden
+            style={{
+              position: 'absolute',
+              bottom: -50,
+              left: -30,
+              width: 140,
+              height: 140,
+              borderRadius: 999,
+              background: `radial-gradient(circle, ${NM.MAUVE}30, transparent 70%)`,
+              pointerEvents: 'none',
+            }}
+          />
+          <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 14 }}>
+            <div
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: 999,
+                background: 'rgba(255,255,255,0.55)',
+                border: `1px solid rgba(255,255,255,0.7)`,
+                display: 'grid',
+                placeItems: 'center',
+                flexShrink: 0,
+              }}
             >
-              <path d="M6 9l6 6 6-6" />
-            </svg>
-          </button>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={NM.GOLD} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+              </svg>
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <Eye color={NM.GOLD} size={10}>Pripravujeme</Eye>
+              <div
+                style={{
+                  marginTop: 6,
+                  fontFamily: NM.SERIF,
+                  fontSize: 18,
+                  fontWeight: 500,
+                  color: NM.DEEP,
+                  letterSpacing: '-0.01em',
+                  lineHeight: 1.2,
+                }}
+              >
+                Viac odmien <em style={{ color: NM.GOLD, fontStyle: 'italic', fontWeight: 500 }}>čoskoro</em>
+              </div>
+              <div
+                style={{
+                  marginTop: 6,
+                  fontFamily: NM.SANS,
+                  fontSize: 12,
+                  color: NM.MUTED,
+                  fontWeight: 300,
+                  lineHeight: 1.55,
+                }}
+              >
+                Partnerské zľavy na wellness, výživu a športové oblečenie — už čoskoro.
+              </div>
+            </div>
+          </div>
         </div>
-      )}
+      </div>
+
 
       {/* How to earn points — moved from /body */}
       <div style={{ margin: '32px 18px 0' }}>
