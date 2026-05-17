@@ -93,7 +93,7 @@ export const SUBSCRIPTION_PLANS = {
         key: 'quarterly',
         priceId:
           env('VITE_STRIPE_SUBSCRIPTION_QUARTERLY_PRICE_ID') ||
-          'price_1TY3qHEpPqBqxo4mtleFrBFq',
+          'price_1TY3cJEpPqBqxo4m4wlwA8SA', // TODO: replace with new 63 € live price ID once created
         price: 63,
         perMonth: 21,
         interval: 'month',
