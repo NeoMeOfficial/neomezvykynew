@@ -5,6 +5,7 @@ import { useActiveProgram } from '../../hooks/useDailyRituals';
 import { useToast } from '@/hooks/use-toast';
 import { Eye, Ser, Body, PlusTag, FaqAccordion, NM } from '../../components/v2/neome';
 import { getProgramBySlug, type Program, type ProgramSlug } from '../../data/programs';
+import { supabase } from '../../lib/supabase';
 
 /**
  * Program detail — R9 + Gabi's full content (postpartum, bodyforming,
@@ -101,7 +102,7 @@ export default function ProgramDetail() {
   const { programId: rawSlug } = useParams<{ programId: string }>();
   const navigate = useNavigate();
   const { isPremium } = useSubscription();
-  const { activateProgram } = useActiveProgram();
+  const { program: activeProgram, activateProgram, deactivateProgram } = useActiveProgram();
   const { toast } = useToast();
 
   const resolvedSlug: string = (rawSlug && SLUG_ALIASES[rawSlug]) || rawSlug || 'postpartum';
@@ -111,6 +112,9 @@ export default function ProgramDetail() {
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [activating, setActivating] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  // Cancel / pause / complete confirmation. null = no dialog open.
+  const [endReason, setEndReason] = useState<'canceled' | 'paused' | 'completed' | null>(null);
+  const [ending, setEnding] = useState(false);
 
   if (!program) {
     return (
@@ -164,6 +168,38 @@ export default function ProgramDetail() {
     setConfirmOpen(false);
     navigate('/domov-new');
     setTimeout(() => window.scrollTo({ top: 0, behavior: 'auto' }), 0);
+  };
+
+  const isActive = activeProgram?.program_id === program.slug;
+
+  const onConfirmEnd = async () => {
+    if (!endReason || ending) return;
+    setEnding(true);
+    const { error } = await deactivateProgram();
+    if (error) {
+      setEnding(false);
+      toast({
+        title: 'Akcia zlyhala',
+        description: error.message ?? 'Skús to ešte raz.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    // Fire-and-forget AC tag removal — never block the user.
+    supabase.auth.getSession().then(({ data }) => {
+      const token = data.session?.access_token;
+      if (!token) return;
+      fetch('/api/ac-program-ended', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ programSlug: program.slug, reason: endReason }),
+      }).catch(() => {});
+    });
+    const labels = { canceled: 'Program zrušený', paused: 'Program pozastavený', completed: 'Program dokončený' };
+    toast({ title: labels[endReason], description: 'Vrátili sme ti odporúčané cvičenia na Domov.' });
+    setEnding(false);
+    setEndReason(null);
+    navigate('/domov-new');
   };
 
   const formatMonday = (d: Date) => `${d.getDate()}. ${SK_MONTHS_SHORT[d.getMonth()]}`;
@@ -605,11 +641,130 @@ export default function ProgramDetail() {
         )}
       </div>
 
+      {/* Manage active program — only visible when this is the user's
+          active program. Three actions, all remove the program from
+          Domov and stop AC emails. Status tag differs per reason. */}
+      {isActive && (
+        <div style={{ margin: '36px 20px 0' }}>
+          <Eye size={10} style={{ marginBottom: 12 }}>Správa programu</Eye>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {([
+              { key: 'paused', label: 'Pozastaviť program', hint: 'Dočasne. Môžeš sa kedykoľvek vrátiť.' },
+              { key: 'completed', label: 'Označiť ako dokončený', hint: 'Skvelá práca. Posunieme sa ďalej.' },
+              { key: 'canceled', label: 'Zrušiť program', hint: 'Skončiť úplne. Bez emailov.' },
+            ] as const).map((opt) => (
+              <button
+                key={opt.key}
+                onClick={() => setEndReason(opt.key)}
+                style={{
+                  all: 'unset',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  padding: '14px 16px',
+                  background: 'transparent',
+                  border: `1px solid ${NM.HAIR_2 ?? '#E4DDD0'}`,
+                  borderRadius: 14,
+                }}
+              >
+                <div style={{ fontFamily: NM.SANS, fontSize: 13.5, fontWeight: 500, color: NM.DEEP }}>{opt.label}</div>
+                <div style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.MUTED, marginTop: 2, fontWeight: 300 }}>{opt.hint}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* FAQ */}
       {program.faqs && program.faqs.length > 0 && (
         <div style={{ margin: '36px 20px 0' }}>
           <Eye size={10} style={{ marginBottom: 12 }}>Časté otázky</Eye>
           <FaqAccordion items={program.faqs} accent={NM.TERRA} />
+        </div>
+      )}
+
+      {endReason && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(42,26,20,0.55)',
+            backdropFilter: 'blur(6px)',
+            WebkitBackdropFilter: 'blur(6px)',
+            display: 'flex',
+            alignItems: 'flex-end',
+            justifyContent: 'center',
+            zIndex: 100,
+          }}
+          onClick={() => !ending && setEndReason(null)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              width: '100%',
+              maxWidth: 480,
+              background: NM.BG,
+              borderTopLeftRadius: 28,
+              borderTopRightRadius: 28,
+              padding: '28px 24px 32px',
+              boxShadow: '0 -10px 40px rgba(0,0,0,0.18)',
+            }}
+          >
+            <Eye color={NM.TERRA} size={10}>
+              {endReason === 'canceled' ? 'Zrušiť program' : endReason === 'paused' ? 'Pozastaviť' : 'Dokončiť'}
+            </Eye>
+            <div style={{ marginTop: 10, fontFamily: NM.SERIF, fontSize: 22, fontWeight: 500, color: NM.DEEP, letterSpacing: '-0.01em' }}>
+              {endReason === 'canceled' && 'Naozaj chceš zrušiť?'}
+              {endReason === 'paused' && 'Pozastaviť program?'}
+              {endReason === 'completed' && 'Dokončila si program?'}
+            </div>
+            <Body size={13} color={NM.MUTED} style={{ marginTop: 10 }}>
+              Program <strong style={{ color: NM.DEEP, fontWeight: 500 }}>{program.name}</strong> sa odstráni z Domov a Kalendára. Prestaneme posielať emaily k tomuto programu.
+            </Body>
+            <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
+              <button
+                onClick={() => !ending && setEndReason(null)}
+                disabled={ending}
+                style={{
+                  flex: 1,
+                  padding: '14px 20px',
+                  background: 'transparent',
+                  color: NM.DEEP,
+                  border: `1px solid ${NM.HAIR_2 ?? '#E4DDD0'}`,
+                  borderRadius: 999,
+                  fontFamily: NM.SANS,
+                  fontSize: 14,
+                  fontWeight: 500,
+                  cursor: ending ? 'default' : 'pointer',
+                  opacity: ending ? 0.6 : 1,
+                }}
+              >
+                Späť
+              </button>
+              <button
+                onClick={onConfirmEnd}
+                disabled={ending}
+                style={{
+                  flex: 1,
+                  padding: '14px 20px',
+                  background: NM.TERRA,
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: 999,
+                  fontFamily: NM.SANS,
+                  fontSize: 14,
+                  fontWeight: 500,
+                  letterSpacing: '0.02em',
+                  cursor: ending ? 'default' : 'pointer',
+                  opacity: ending ? 0.6 : 1,
+                }}
+              >
+                {ending ? 'Ukladám…' : 'Potvrdiť'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

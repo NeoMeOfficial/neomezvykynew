@@ -554,5 +554,23 @@ export function useActiveProgram() {
     [real, user?.id],
   );
 
-  return { program, loading, activateProgram, refresh };
+  /**
+   * Remove the user's active program. Used when they cancel, pause, or
+   * mark it complete from the program detail page. After this, the
+   * home tile reverts to suggested exercises.
+   */
+  const deactivateProgram = useCallback(async () => {
+    setProgram(null);
+    if (!real) {
+      localStorage.removeItem(ACTIVE_PROGRAM_DEMO_KEY);
+      return { error: null };
+    }
+    const { error } = await supabase
+      .from('user_active_programs')
+      .delete()
+      .eq('user_id', user!.id);
+    return { error };
+  }, [real, user?.id]);
+
+  return { program, loading, activateProgram, deactivateProgram, refresh };
 }
