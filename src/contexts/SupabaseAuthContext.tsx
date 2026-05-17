@@ -188,6 +188,14 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
         email,
         password,
         options: {
+          // After clicking the confirmation email, land on /auth so the
+          // user explicitly logs in with the credentials they just set.
+          // Without this, Supabase redirects to the Site URL root which
+          // is the marketing Welcome screen — visually confusing.
+          emailRedirectTo:
+            typeof window !== 'undefined'
+              ? `${window.location.origin}/auth`
+              : undefined,
           data: {
             first_name: firstName,
             last_name: lastName,
