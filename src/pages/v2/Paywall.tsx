@@ -243,7 +243,7 @@ function PaywallDark({ onContinueFree, onClose, onActivate }: { onContinueFree: 
 }
 
 // ─── Variant C · Compare table ─────────────────────────────────
-function PaywallCompare({ onContinueFree, onClose, onActivate }: { onContinueFree: () => void; onClose: () => void; onActivate: () => void }) {
+export function PaywallCompare({ onContinueFree, onClose, onActivate }: { onContinueFree: () => void; onClose: () => void; onActivate: () => void }) {
   const features = [
     { f: 'Knižnica cvičení, receptov, meditácií', free: true, plus: true },
     { f: 'Reflexia a denník (7 dní histórie)', free: true, plus: true },

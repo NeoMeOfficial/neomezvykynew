@@ -72,7 +72,7 @@ export default function Welcome() {
       {/* Fixed CTA panel */}
       <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, padding: '18px 22px 36px', background: `linear-gradient(to top, ${DEEP2} 60%, transparent)` }}>
         <button
-          onClick={() => navigate('/register')}
+          onClick={() => navigate('/onboarding/plan')}
           style={{
             width: '100%', padding: '16px',
             background: '#fff', color: DEEP,

@@ -1,7 +1,19 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { useSupabaseAuth } from '../../contexts/SupabaseAuthContext';
 import { supabase, isSupabaseConfigured } from '../../lib/supabase';
+
+// Where to send the user after a successful login or signup. The
+// onboarding-plan screen writes this before sending the user here, so
+// that picking Plus → checkout, Free → /domov-new survives the
+// email-confirmation round-trip.
+const POST_SIGNUP_ROUTE_KEY = 'post_signup_route';
+function consumePostAuthRoute(fallback: string): string {
+  if (typeof window === 'undefined') return fallback;
+  const stored = localStorage.getItem(POST_SIGNUP_ROUTE_KEY);
+  if (stored) localStorage.removeItem(POST_SIGNUP_ROUTE_KEY);
+  return stored || fallback;
+}
 
 /**
  * Auth screen — Round 19 redesign (claude.ai/design).
@@ -39,9 +51,22 @@ type Mode = 'choose' | 'email' | 'register';
 
 export default function AuthReal() {
   const navigate = useNavigate();
+  const [params] = useSearchParams();
+  const { pathname } = useLocation();
   const { signUp, signIn, resetPassword } = useSupabaseAuth();
 
-  const [mode, setMode] = useState<Mode>('choose');
+  // Login-only on /register and /login — used as the internal sign-in
+  // surface after the onboarding flow has captured the plan choice.
+  const loginOnly = pathname === '/register' || pathname === '/login';
+  // Allow onboarding to deep-link into the register form via
+  // /auth?mode=register.
+  const initialMode: Mode = !loginOnly && params.get('mode') === 'register' ? 'register' : 'choose';
+  const [mode, setMode] = useState<Mode>(initialMode);
+  useEffect(() => {
+    // If the URL changes (e.g. user clicks an internal link), keep mode
+    // in sync with the new query/path.
+    setMode(loginOnly ? 'choose' : (params.get('mode') === 'register' ? 'register' : 'choose'));
+  }, [params, loginOnly]);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: '', password: '', firstName: '', lastName: '',
@@ -62,7 +87,7 @@ export default function AuthReal() {
     try {
       const { error } = await signIn(formData.email, formData.password);
       if (error) setErrors({ submit: error.message });
-      else navigate('/domov-new');
+      else navigate(consumePostAuthRoute('/domov-new'));
     } catch (err) {
       setErrors({ submit: err instanceof Error ? err.message : 'Nastala chyba' });
     } finally {
@@ -92,8 +117,21 @@ export default function AuthReal() {
     setSubmitting(true);
     try {
       const { error } = await signUp(formData.email, formData.password, formData.firstName, formData.lastName, true);
-      if (error) setErrors({ submit: error.message });
-      else setErrors({ success: 'Registrácia úspešná! Skontroluj e-mail.' });
+      if (error) {
+        setErrors({ submit: error.message });
+      } else {
+        // If Supabase auto-confirms (email confirmation disabled), the
+        // signUp call also signs the user in — go straight to the
+        // intended post-signup route. Otherwise show the check-email
+        // banner; the consumePostAuthRoute call below survives the
+        // round-trip via localStorage.
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          navigate(consumePostAuthRoute('/domov-new'));
+        } else {
+          setErrors({ success: 'Registrácia úspešná! Skontroluj e-mail.' });
+        }
+      }
     } catch (err) {
       setErrors({ submit: err instanceof Error ? err.message : 'Nastala chyba' });
     } finally {
@@ -328,18 +366,28 @@ export default function AuthReal() {
           </form>
         )}
 
-        {/* Bottom row: switch login ↔ register */}
-        <div style={{ marginTop: 22, textAlign: 'center', fontSize: 13, color: T.FG_2, fontWeight: 300 }}>
-          {mode === 'register' ? (
-            <>Už máš účet?{' '}
-              <button type="button" onClick={() => { setMode('choose'); setErrors({}); }} style={inlineLink()}>Prihlás sa</button>
-            </>
-          ) : (
-            <>Nemáš účet?{' '}
-              <button type="button" onClick={() => { setMode('register'); setErrors({}); }} style={inlineLink()}>Vytvor si ho</button>
-            </>
-          )}
-        </div>
+        {/* Bottom row: switch login ↔ register. On /register and /login
+            we suppress the switch — those routes are login-only and the
+            "create account" path goes through the onboarding flow. */}
+        {!loginOnly && (
+          <div style={{ marginTop: 22, textAlign: 'center', fontSize: 13, color: T.FG_2, fontWeight: 300 }}>
+            {mode === 'register' ? (
+              <>Už máš účet?{' '}
+                <button type="button" onClick={() => { setMode('choose'); setErrors({}); }} style={inlineLink()}>Prihlás sa</button>
+              </>
+            ) : (
+              <>Nemáš účet?{' '}
+                <button type="button" onClick={() => navigate('/onboarding/plan')} style={inlineLink()}>Vytvor si ho</button>
+              </>
+            )}
+          </div>
+        )}
+        {loginOnly && (
+          <div style={{ marginTop: 22, textAlign: 'center', fontSize: 13, color: T.FG_2, fontWeight: 300 }}>
+            Nemáš účet?{' '}
+            <button type="button" onClick={() => navigate('/onboarding/plan')} style={inlineLink()}>Začni cestu</button>
+          </div>
+        )}
       </div>
     </div>
   );
