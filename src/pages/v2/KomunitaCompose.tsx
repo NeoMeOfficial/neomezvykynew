@@ -41,7 +41,7 @@ export default function KomunitaCompose() {
     setSubmitting(true);
     setError(null);
     try {
-      await submitPost(text.trim(), type, author);
+      await submitPost(text.trim(), type, author, user?.id);
       navigate('/komunita');
     } catch (err) {
       console.error('Komunita compose failed:', err);
