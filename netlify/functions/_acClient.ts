@@ -88,6 +88,20 @@ export async function addTag(contactId: string, tagName: string): Promise<void> 
   });
 }
 
+/**
+ * Remove a tag from a contact. AC's API takes the *contactTag* id (the
+ * join-row id, not the tag id itself), so we look it up first. No-op
+ * if the contact doesn't have the tag.
+ */
+export async function removeTag(contactId: string, tagName: string): Promise<void> {
+  const tagId = await findTagId(tagName);
+  if (!tagId) return;
+  const body = await acFetch(`/api/3/contacts/${contactId}/contactTags`);
+  const link = (body.contactTags || []).find((t: { tag: string; id: string }) => t.tag === tagId);
+  if (!link) return;
+  await acFetch(`/api/3/contactTags/${link.id}`, { method: 'DELETE' });
+}
+
 const fieldIdCache = new Map<string, string>();
 
 /** Look up a custom-field id by its title ("perstag" name), cached. */
