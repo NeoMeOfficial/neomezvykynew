@@ -38,40 +38,54 @@ export function useCommunityPosts() {
   const [likedIds, setLikedIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
 
-  // Load posts — Supabase if configured, otherwise use seed data
-  useEffect(() => {
+  // Pull posts from Supabase. Pulled out so we can refetch on tab
+  // refocus — important for moderation (post removed in admin tab
+  // disappears for the author when they switch back to their tab).
+  const fetchPosts = useCallback(async () => {
     if (!isSupabaseConfigured()) return;
-
     setLoading(true);
-    supabase
+    const { data, error } = await supabase
       .from('community_posts')
       .select('*')
-      // Hide moderator-removed posts from the public feed. The status
-      // column is added in 20260516180000_community_post_status.sql;
-      // .neq survives the absence of the column (returns all rows) so
-      // this is safe to deploy before the migration is applied.
       .neq('status', 'removed')
       .order('created_at', { ascending: false })
-      .limit(50)
-      .then(({ data, error }) => {
-        if (!error && data && data.length > 0) {
-          setPosts(
-            data.map((row) => ({
-              id: row.id,
-              type: row.type,
-              author: row.author_name,
-              text: row.content,
-              likes: row.likes_count,
-              comments: row.comments_count,
-              time: formatRelativeTime(row.created_at),
-              created_at: row.created_at,
-              user_id: row.user_id,
-            }))
-          );
-        }
-        setLoading(false);
-      });
+      .limit(50);
+    if (!error && data) {
+      // Empty result is now a legitimate state (all posts removed),
+      // so we set even when length === 0 instead of falling back to
+      // seed posts.
+      setPosts(
+        data.map((row) => ({
+          id: row.id,
+          type: row.type,
+          author: row.author_name,
+          text: row.content,
+          likes: row.likes_count,
+          comments: row.comments_count,
+          time: formatRelativeTime(row.created_at),
+          created_at: row.created_at,
+          user_id: row.user_id,
+        }))
+      );
+    }
+    setLoading(false);
   }, []);
+
+  useEffect(() => {
+    fetchPosts();
+    // Refetch whenever the tab regains focus or the user comes back to
+    // the app after backgrounding it. Cheap network call, big UX win.
+    const onFocus = () => fetchPosts();
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') fetchPosts();
+    };
+    window.addEventListener('focus', onFocus);
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      window.removeEventListener('focus', onFocus);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
+  }, [fetchPosts]);
 
   const submitPost = useCallback(
     async (text: string, type: 'post' | 'question', authorName: string, userId?: string) => {
