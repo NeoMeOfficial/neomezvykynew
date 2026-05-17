@@ -10,7 +10,7 @@
 // Body: { programSlug: 'postpartum' | 'bodyforming' | 'elastic-bands' | 'strong-sexy' }
 
 import { createClient } from '@supabase/supabase-js';
-import { syncContact, addTag } from './_acClient';
+import { syncContact, addTag, setCustomField } from './_acClient';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -47,9 +47,15 @@ export async function handler(event: any) {
     );
     if (authErr || !user?.email) return jsonResponse({ error: 'Unauthorized' }, 401);
 
-    const { programSlug } = JSON.parse(event.body || '{}') as { programSlug?: string };
+    const { programSlug, startDate } = JSON.parse(event.body || '{}') as {
+      programSlug?: string;
+      startDate?: string; // YYYY-MM-DD
+    };
     if (!programSlug || !VALID_SLUGS.has(programSlug)) {
       return jsonResponse({ error: 'Invalid programSlug' }, 400);
+    }
+    if (!startDate || !/^\d{4}-\d{2}-\d{2}$/.test(startDate)) {
+      return jsonResponse({ error: 'startDate must be YYYY-MM-DD' }, 400);
     }
 
     const meta = (user.user_metadata || {}) as Record<string, string>;
@@ -58,9 +64,12 @@ export async function handler(event: any) {
       firstName: meta.firstName || meta.first_name || '',
       lastName: meta.lastName || meta.last_name || '',
     });
+    // Order matters: set the date field FIRST so AC's "Tag added"
+    // automation can read program_start_date on its first evaluation.
+    await setCustomField(contactId, 'program_start_date', startDate, 'date');
     await addTag(contactId, `app_${programSlug}`);
 
-    return jsonResponse({ ok: true, contactId, tag: `app_${programSlug}` });
+    return jsonResponse({ ok: true, contactId, tag: `app_${programSlug}`, startDate });
   } catch (err: any) {
     console.error('ac-program-enrolled error:', err);
     return jsonResponse({ error: err.message }, 500);

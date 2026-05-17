@@ -87,3 +87,52 @@ export async function addTag(contactId: string, tagName: string): Promise<void> 
     body: JSON.stringify({ contactTag: { contact: contactId, tag: tagId } }),
   });
 }
+
+const fieldIdCache = new Map<string, string>();
+
+/** Look up a custom-field id by its title ("perstag" name), cached. */
+async function ensureFieldId(title: string, type: 'text' | 'date' = 'date'): Promise<string> {
+  if (fieldIdCache.has(title)) return fieldIdCache.get(title)!;
+  // AC's /api/3/fields doesn't support a name search param, so we page
+  // and match client-side. App will have <10 custom fields so this is
+  // fine; cache means it only happens once per warm container.
+  const body = await acFetch('/api/3/fields?limit=100');
+  const match = (body.fields || []).find((f: { title: string; id: string }) => f.title === title);
+  if (match) {
+    fieldIdCache.set(title, match.id);
+    return match.id;
+  }
+  // Create the field if missing. perstag uppercases the title with
+  // underscores by default; we set it explicitly so AC merge tags are
+  // predictable (e.g. %PROGRAM_START_DATE%).
+  const created = await acFetch('/api/3/fields', {
+    method: 'POST',
+    body: JSON.stringify({
+      field: {
+        title,
+        type,
+        perstag: title.toUpperCase().replace(/\s+/g, '_'),
+        visible: 1,
+      },
+    }),
+  });
+  const id = created.field.id as string;
+  fieldIdCache.set(title, id);
+  return id;
+}
+
+/** Set a custom field value on a contact. Creates the field if missing. */
+export async function setCustomField(
+  contactId: string,
+  fieldTitle: string,
+  value: string,
+  type: 'text' | 'date' = 'date',
+): Promise<void> {
+  const fieldId = await ensureFieldId(fieldTitle, type);
+  await acFetch('/api/3/fieldValues', {
+    method: 'POST',
+    body: JSON.stringify({
+      fieldValue: { contact: contactId, field: fieldId, value },
+    }),
+  });
+}
