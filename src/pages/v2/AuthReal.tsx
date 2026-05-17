@@ -307,7 +307,34 @@ export default function AuthReal() {
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={T.FG_3} strokeWidth="2" strokeLinecap="round"><path d="M15 6l-6 6 6 6"/></svg>
               Späť
             </button>
-            <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+            {/* Google OAuth shortcut — same handler as login; OAuth
+                creates the account on first click. Placed above the
+                email form so the option is impossible to miss. */}
+            <div style={{ marginTop: 16 }}>
+              <button
+                type="button"
+                onClick={() => handleOAuth('google')}
+                disabled={submitting}
+                style={socialBtnLight()}
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24">
+                  <path d="M22 12.2c0-.8-.1-1.4-.2-2H12v3.8h5.6c-.2 1.4-1 2.6-2.2 3.4l3.5 2.7c2-1.9 3.1-4.6 3.1-7.9z" fill="#4285F4"/>
+                  <path d="M12 22c2.8 0 5.2-.9 6.9-2.5l-3.5-2.7c-1 .7-2.2 1.1-3.4 1.1-2.6 0-4.9-1.8-5.7-4.2L2.7 16.4C4.4 19.7 8 22 12 22z" fill="#34A853"/>
+                  <path d="M6.3 13.7c-.2-.7-.4-1.4-.4-2.2 0-.8.1-1.5.4-2.2L2.7 6.6C2.2 7.5 2 8.7 2 10s.2 2.5.7 3.4l3.6-2.7z" fill="#FBBC05"/>
+                  <path d="M12 5.8c1.5 0 2.8.5 3.8 1.5l2.9-2.9C16.8 2.8 14.5 2 12 2 8 2 4.4 4.3 2.7 7.6l3.6 2.7C7.1 7.9 9.4 5.8 12 5.8z" fill="#EA4335"/>
+                </svg>
+                <span>Zaregistrovať sa cez Google</span>
+              </button>
+            </div>
+
+            <div style={{ marginTop: 16, marginBottom: 4, display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ flex: 1, height: 1, background: T.HAIR }} />
+              <div style={{ fontFamily: T.SANS, fontSize: 11, color: T.FG_3, fontWeight: 400 }}>alebo e-mailom</div>
+              <div style={{ flex: 1, height: 1, background: T.HAIR }} />
+            </div>
+
+            <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 16 }}>
               <div style={{ display: 'flex', gap: 14 }}>
                 <Field
                   label="Meno"
