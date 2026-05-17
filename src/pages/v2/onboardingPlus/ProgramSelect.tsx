@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { NM, Eye } from '../../../components/v2/neome';
 import { PlusPage, TopBar, StickyCTA } from './shared';
 import { PROGRAM_SLUGS, programs, type ProgramSlug } from '../../../data/programs';
+import { supabase } from '../../../lib/supabase';
 
 /**
  * /onboarding-plus/program-select — pick one of the four canonical Telo
@@ -51,6 +52,17 @@ export default function PlusProgramSelect() {
   const onContinue = () => {
     if (!selected) return;
     localStorage.setItem(PROGRAM_KEY, selected);
+    // Fire-and-forget AC tag — never block the user on a 3rd-party call.
+    // If unauthenticated (design QA), the function 401s and we ignore it.
+    supabase.auth.getSession().then(({ data }) => {
+      const token = data.session?.access_token;
+      if (!token) return;
+      fetch('/api/ac-program-enrolled', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ programSlug: selected }),
+      }).catch(() => {});
+    });
     navigate('/onboarding-plus/cyklus');
   };
 
