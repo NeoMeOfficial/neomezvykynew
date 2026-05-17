@@ -91,7 +91,9 @@ export const SUBSCRIPTION_PLANS = {
       },
       quarterly: {
         key: 'quarterly',
-        priceId: env('VITE_STRIPE_SUBSCRIPTION_QUARTERLY_PRICE_ID') || '',
+        priceId:
+          env('VITE_STRIPE_SUBSCRIPTION_QUARTERLY_PRICE_ID') ||
+          'price_1TY3cJEpPqBqxo4m4wlwA8SA',
         price: 69,
         perMonth: 23,
         interval: 'month',
@@ -101,7 +103,9 @@ export const SUBSCRIPTION_PLANS = {
       },
       yearly: {
         key: 'yearly',
-        priceId: env('VITE_STRIPE_SUBSCRIPTION_YEARLY_PRICE_ID') || '',
+        priceId:
+          env('VITE_STRIPE_SUBSCRIPTION_YEARLY_PRICE_ID') ||
+          'price_1TY3d6EpPqBqxo4mtqFHOXOz',
         price: 199,
         perMonth: 16.58,
         interval: 'year',
