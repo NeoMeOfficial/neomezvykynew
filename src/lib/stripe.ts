@@ -36,7 +36,7 @@ export const MEAL_PLAN_PRICE_ID =
 //
 // Tier prices (total per billing period) and per-month equivalents:
 //   monthly   24,90 €/mo  ·  24,90 €/mo  ·  baseline
-//   quarterly 69,00 €/3mo ·  23,00 €/mo  ·  ~8% saving vs monthly
+//   quarterly 63,00 €/3mo ·  21,00 €/mo  ·  ~15% saving vs monthly
 //   yearly    199,00 €/yr ·  16,58 €/mo  ·  ~33% saving vs monthly
 export type SubscriptionTierKey = 'monthly' | 'quarterly' | 'yearly';
 
@@ -93,13 +93,13 @@ export const SUBSCRIPTION_PLANS = {
         key: 'quarterly',
         priceId:
           env('VITE_STRIPE_SUBSCRIPTION_QUARTERLY_PRICE_ID') ||
-          'price_1TY3cJEpPqBqxo4m4wlwA8SA',
-        price: 69,
-        perMonth: 23,
+          'price_1TY3cJEpPqBqxo4m4wlwA8SA', // TODO: replace with new 63 € live price ID
+        price: 63,
+        perMonth: 21,
         interval: 'month',
         intervalCount: 3,
         label: 'Štvrťročne',
-        savingsPct: 8,
+        savingsPct: 15,
       },
       yearly: {
         key: 'yearly',
