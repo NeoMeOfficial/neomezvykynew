@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { NM, Eye, Ser } from '../../components/v2/neome';
-import { SUBSCRIPTION_PLANS, formatPrice } from '../../lib/stripe';
+import { SUBSCRIPTION_PLANS, formatPrice, type SubscriptionTierKey } from '../../lib/stripe';
 
 /**
  * /onboarding/plan — first screen of the new-user onboarding.
@@ -20,6 +20,9 @@ import { SUBSCRIPTION_PLANS, formatPrice } from '../../lib/stripe';
 
 const POST_SIGNUP_ROUTE_KEY = 'post_signup_route';
 const INTENDED_PLAN_KEY = 'intended_plan';
+// CheckoutLauncher reads this on /checkout to pick the right Stripe
+// price id for the user's chosen billing period.
+const INTENDED_PRICE_ID_KEY = 'intended_price_id';
 
 type Plan = 'free' | 'plus';
 
@@ -36,19 +39,26 @@ const FEATURES: { label: string; free: boolean; plus: boolean }[] = [
   { label: 'Plný prístup ku knižnici',                free: false, plus: true },
 ];
 
-const PLUS_PRICE = formatPrice(SUBSCRIPTION_PLANS.premium.price);
+const TIERS = SUBSCRIPTION_PLANS.premium.tiers;
 
 export default function OnboardingPlan() {
   const navigate = useNavigate();
   const [plan, setPlan] = useState<Plan>('plus');
+  // Billing-period selector only shown for Plus. Default monthly.
+  const [billing, setBilling] = useState<SubscriptionTierKey>('monthly');
   const touchStartX = useRef<number | null>(null);
+
+  const activeTier = TIERS[billing];
 
   const onConfirm = () => {
     localStorage.setItem(INTENDED_PLAN_KEY, plan);
-    localStorage.setItem(
-      POST_SIGNUP_ROUTE_KEY,
-      plan === 'plus' ? '/checkout' : '/domov-new',
-    );
+    if (plan === 'plus') {
+      localStorage.setItem(INTENDED_PRICE_ID_KEY, activeTier.priceId);
+      localStorage.setItem(POST_SIGNUP_ROUTE_KEY, '/checkout');
+    } else {
+      localStorage.removeItem(INTENDED_PRICE_ID_KEY);
+      localStorage.setItem(POST_SIGNUP_ROUTE_KEY, '/domov-new');
+    }
     navigate('/auth?mode=register');
   };
 
@@ -186,16 +196,84 @@ export default function OnboardingPlan() {
             </Eye>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 10 }}>
               <span style={{ fontFamily: NM.SERIF, fontSize: 36, fontWeight: 500, letterSpacing: '-0.02em' }}>
-                {plan === 'plus' ? PLUS_PRICE : '0 €'}
+                {plan === 'plus' ? `${activeTier.perMonth.toFixed(2).replace('.', ',')} €` : '0 €'}
               </span>
               <span style={{ fontFamily: NM.SANS, fontSize: 11, opacity: 0.65, fontWeight: 400 }}>
                 {plan === 'plus' ? '/ mesiac' : 'navždy'}
               </span>
             </div>
             <div style={{ fontFamily: NM.SANS, fontSize: 11, opacity: 0.65, marginTop: 2, fontWeight: 400 }}>
-              {plan === 'plus' ? 'Zrušíš kedykoľvek' : 'Bez kreditnej karty'}
+              {plan === 'plus'
+                ? (billing === 'monthly'
+                    ? 'Zrušíš kedykoľvek'
+                    : `${formatPrice(activeTier.price)} ${billing === 'quarterly' ? 'za 3 mesiace' : 'ročne'} · zrušíš kedykoľvek`)
+                : 'Bez kreditnej karty'}
             </div>
           </div>
+
+          {/* Billing period selector — Plus only. Tiers with no priceId
+              configured yet (env var empty) are disabled so we can't
+              accidentally start a checkout that 404s. */}
+          {plan === 'plus' && (
+            <div style={{ marginTop: 18, display: 'flex', gap: 6 }}>
+              {(['monthly', 'quarterly', 'yearly'] as SubscriptionTierKey[]).map((k) => {
+                const t = TIERS[k];
+                const active = billing === k;
+                const disabled = !t.priceId;
+                return (
+                  <button
+                    key={k}
+                    onClick={() => !disabled && setBilling(k)}
+                    disabled={disabled}
+                    title={disabled ? 'Čoskoro dostupné' : undefined}
+                    style={{
+                      all: 'unset',
+                      flex: 1,
+                      cursor: disabled ? 'not-allowed' : 'pointer',
+                      textAlign: 'center',
+                      padding: '12px 6px',
+                      borderRadius: 14,
+                      background: active ? `${NM.GOLD}24` : 'rgba(255,255,255,0.06)',
+                      border: active ? `1.5px solid ${NM.GOLD}` : `1px solid rgba(255,255,255,0.12)`,
+                      opacity: disabled ? 0.35 : 1,
+                      position: 'relative',
+                      transition: 'all .15s',
+                    }}
+                  >
+                    <div style={{ fontFamily: NM.SANS, fontSize: 11, fontWeight: 500, color: active ? NM.GOLD : 'rgba(255,255,255,0.78)', letterSpacing: '0.02em' }}>
+                      {t.label}
+                    </div>
+                    <div style={{ marginTop: 4, fontFamily: NM.SERIF, fontSize: 15, fontWeight: 500, color: '#fff' }}>
+                      {t.perMonth.toFixed(2).replace('.', ',')} €
+                    </div>
+                    <div style={{ marginTop: 1, fontFamily: NM.SANS, fontSize: 9, color: 'rgba(255,255,255,0.5)', fontWeight: 400 }}>
+                      /mes
+                    </div>
+                    {t.savingsPct != null && (
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: -8,
+                          right: 6,
+                          padding: '2px 7px',
+                          borderRadius: 999,
+                          background: NM.GOLD,
+                          color: NM.DEEP,
+                          fontFamily: NM.SANS,
+                          fontSize: 9,
+                          fontWeight: 700,
+                          letterSpacing: '0.06em',
+                          textTransform: 'uppercase' as const,
+                        }}
+                      >
+                        −{t.savingsPct}%
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          )}
 
           {/* Feature list — every row shown for both tabs. Included rows
               get an accent check; excluded rows are dim + strike-through
@@ -297,7 +375,9 @@ export default function OnboardingPlan() {
         >
           <span>Pokračovať s {plan === 'plus' ? 'Plus' : 'Free'}</span>
           {plan === 'plus' && (
-            <span style={{ fontWeight: 400, opacity: 0.7 }}>· {PLUS_PRICE}/mes</span>
+            <span style={{ fontWeight: 400, opacity: 0.7 }}>
+              · {activeTier.perMonth.toFixed(2).replace('.', ',')} €/mes
+            </span>
           )}
         </button>
       </div>

@@ -29,18 +29,44 @@ export const stripePromise = loadStripe(env('VITE_STRIPE_PUBLISHABLE_KEY') || ''
 export const MEAL_PLAN_PRICE_ID =
   env('VITE_STRIPE_MEAL_PRICE_ID') || 'price_1TW8SeEpPqBqxo4mOwzTetog';
 
+// Three billing tiers under the same Plus plan. Each tier is a distinct
+// Stripe price under the same product. Price IDs come from env vars so
+// test/live can use different IDs; quarterly + yearly start empty so
+// the UI can disable them until the env vars are filled in.
+//
+// Tier prices (total per billing period) and per-month equivalents:
+//   monthly   24,90 €/mo  ·  24,90 €/mo  ·  baseline
+//   quarterly 69,00 €/3mo ·  23,00 €/mo  ·  ~8% saving vs monthly
+//   yearly    199,00 €/yr ·  16,58 €/mo  ·  ~33% saving vs monthly
+export type SubscriptionTierKey = 'monthly' | 'quarterly' | 'yearly';
+
+export interface SubscriptionTier {
+  key: SubscriptionTierKey;
+  priceId: string;          // empty until configured in Netlify env
+  price: number;            // total charged per billing period
+  perMonth: number;         // computed equivalent for UI
+  interval: 'month' | 'year';
+  intervalCount: number;
+  label: string;            // SK label for tab
+  savingsPct: number | null; // null = no badge
+}
+
+const MONTHLY_PRICE_ID =
+  env('VITE_STRIPE_SUBSCRIPTION_PRICE_ID') || 'price_1TM4KREpPqBqxo4m0Swf5F88';
+
 // Subscription plans
 export const SUBSCRIPTION_PLANS = {
   premium: {
-    priceId:
-      env('VITE_STRIPE_SUBSCRIPTION_PRICE_ID') || 'price_1TM4KREpPqBqxo4m0Swf5F88',
+    // Existing fields kept for backwards compatibility with callers
+    // that haven't been migrated to .tiers yet (Paywall.tsx, etc.).
+    priceId: MONTHLY_PRICE_ID,
     price: 24.90,
     currency: 'EUR',
     interval: 'month',
-    name: 'NeoMe Premium',
+    name: 'NeoMe Plus',
     features: [
       'Všetky fitness programy (4 úrovne)',
-      'Neobmedzený prístup k 108+ receptom', 
+      'Neobmedzený prístup k 108+ receptom',
       'Sledovanie menštruačného cyklu a symptómov',
       'Komunita slovenských žien a buddy systém',
       'Osobný denník a sledovanie návykov',
@@ -48,10 +74,42 @@ export const SUBSCRIPTION_PLANS = {
     ],
     highlights: [
       '15-minútové tréningy prispôsobené cyklu',
-      'Recepty s ingredienciami z Tesca', 
+      'Recepty s ingredienciami z Tesca',
       'Podpora od skúsených mám',
       'Bez dlhodobých záväzkov'
-    ]
+    ],
+    tiers: {
+      monthly: {
+        key: 'monthly',
+        priceId: MONTHLY_PRICE_ID,
+        price: 24.90,
+        perMonth: 24.90,
+        interval: 'month',
+        intervalCount: 1,
+        label: 'Mesačne',
+        savingsPct: null,
+      },
+      quarterly: {
+        key: 'quarterly',
+        priceId: env('VITE_STRIPE_SUBSCRIPTION_QUARTERLY_PRICE_ID') || '',
+        price: 69,
+        perMonth: 23,
+        interval: 'month',
+        intervalCount: 3,
+        label: 'Štvrťročne',
+        savingsPct: 8,
+      },
+      yearly: {
+        key: 'yearly',
+        priceId: env('VITE_STRIPE_SUBSCRIPTION_YEARLY_PRICE_ID') || '',
+        price: 199,
+        perMonth: 16.58,
+        interval: 'year',
+        intervalCount: 1,
+        label: 'Ročne',
+        savingsPct: 33,
+      },
+    } as Record<SubscriptionTierKey, SubscriptionTier>,
   },
 };
 
