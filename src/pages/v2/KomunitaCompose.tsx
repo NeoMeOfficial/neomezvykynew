@@ -2,7 +2,23 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCommunityPosts } from '../../hooks/useCommunityPosts';
 import { useSupabaseAuth } from '../../contexts/SupabaseAuthContext';
+import { usePointsLedger } from '../../hooks/usePointsLedger';
 import { Page, Eye, NM } from '../../components/v2/neome';
+
+// Points award for publishing a community post. Daily cap of 5 pts —
+// effectively one rewarded post per day, so spam posting doesn't farm
+// points. Counter persisted to localStorage to avoid re-querying the
+// ledger on every compose.
+const POST_POINTS = 5;
+const DAILY_POST_CAP = 5;
+function postPtsToday(userId: string): number {
+  const key = `community_post_pts_${userId}_${new Date().toISOString().slice(0, 10)}`;
+  return parseInt(localStorage.getItem(key) || '0', 10);
+}
+function bumpPostPtsToday(userId: string, by: number): void {
+  const key = `community_post_pts_${userId}_${new Date().toISOString().slice(0, 10)}`;
+  localStorage.setItem(key, String(postPtsToday(userId) + by));
+}
 
 /**
  * Komunita composer — R2
@@ -27,6 +43,7 @@ export default function KomunitaCompose() {
   const navigate = useNavigate();
   const { submitPost } = useCommunityPosts();
   const { user } = useSupabaseAuth();
+  const { addEntry } = usePointsLedger();
   const [type, setType] = useState<'post' | 'question'>('post');
   const [text, setText] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -41,7 +58,14 @@ export default function KomunitaCompose() {
     setSubmitting(true);
     setError(null);
     try {
-      await submitPost(text.trim(), type, author, user?.id);
+      const created = await submitPost(text.trim(), type, author, user?.id);
+      // Award 5 pts for publishing, capped at 5 pts/day. ref_id is the
+      // post id so the admin removal flow can find + reverse this
+      // entry by querying ref_id = `post_<id>`.
+      if (created && user?.id && postPtsToday(user.id) < DAILY_POST_CAP) {
+        addEntry('post_published', POST_POINTS, `post_${created.id}`, 'community');
+        bumpPostPtsToday(user.id, POST_POINTS);
+      }
       navigate('/komunita');
     } catch (err) {
       console.error('Komunita compose failed:', err);

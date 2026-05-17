@@ -694,14 +694,23 @@ function CommunityModerationTab() {
   const setStatus = async (id: string, status: 'visible' | 'removed') => {
     if (busy) return;
     setBusy(id);
-    const { error } = await supabase
-      .from('community_posts')
-      .update({ status })
-      .eq('id', id);
-    if (error) {
-      alert('Chyba pri aktualizácii statusu: ' + error.message);
+    // Server-side: also reverses points_ledger entries tied to the post
+    // when status flips to 'removed' (author 5pts + every liker's 1pt).
+    const { data: { session } } = await supabase.auth.getSession();
+    const token = session?.access_token;
+    const res = await fetch('/api/admin-set-post-status', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ postId: id, status }),
+    });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      alert('Chyba pri aktualizácii statusu: ' + (body.error || res.statusText));
     } else {
       setPosts(prev => prev.map(p => p.id === id ? { ...p, status } : p));
+      if (status === 'removed' && body.reversedAuthor) {
+        console.log(`[moderation] Reversed ${body.reversedAuthor} author points for post ${id}`);
+      }
     }
     setBusy(null);
   };

@@ -88,7 +88,7 @@ export function useCommunityPosts() {
   }, [fetchPosts]);
 
   const submitPost = useCallback(
-    async (text: string, type: 'post' | 'question', authorName: string, userId?: string) => {
+    async (text: string, type: 'post' | 'question', authorName: string, userId?: string): Promise<{ id: string } | null> => {
       const optimisticPost: CommunityPost = {
         id: 'temp-' + Date.now(),
         type,
@@ -103,7 +103,7 @@ export function useCommunityPosts() {
       // Optimistic update
       setPosts((prev) => [optimisticPost, ...prev]);
 
-      if (!isSupabaseConfigured() || !userId) return;
+      if (!isSupabaseConfigured() || !userId) return null;
 
       const { data, error } = await supabase
         .from('community_posts')
@@ -111,16 +111,16 @@ export function useCommunityPosts() {
         .select()
         .single();
 
-      if (!error && data) {
-        // Replace optimistic with real
-        setPosts((prev) =>
-          prev.map((p) =>
-            p.id === optimisticPost.id
-              ? { ...optimisticPost, id: data.id, created_at: data.created_at }
-              : p
-          )
-        );
-      }
+      if (error || !data) return null;
+      // Replace optimistic with real
+      setPosts((prev) =>
+        prev.map((p) =>
+          p.id === optimisticPost.id
+            ? { ...optimisticPost, id: data.id, created_at: data.created_at }
+            : p
+        )
+      );
+      return { id: data.id };
     },
     []
   );
