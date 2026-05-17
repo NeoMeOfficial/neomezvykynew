@@ -116,6 +116,16 @@ export default function AuthReal() {
     }
     setSubmitting(true);
     try {
+      // If another user is already signed in on this device, sign them
+      // out first. Otherwise — when email confirmation is enabled —
+      // the new signUp succeeds but no session change occurs, so the
+      // app keeps showing the previous user. By clearing the session
+      // here, the email-confirm click later starts a clean session as
+      // the new user.
+      const { data: { session: existing } } = await supabase.auth.getSession();
+      if (existing) {
+        await supabase.auth.signOut();
+      }
       const { error } = await signUp(formData.email, formData.password, formData.firstName, formData.lastName, true);
       if (error) {
         setErrors({ submit: error.message });
