@@ -227,6 +227,9 @@ export default function Komunita() {
   const { posts, likedIds, toggleLike } = useCommunityPosts();
   const [followedIds, setFollowedIds] = useState<Set<string>>(loadFollowed);
   const [activeTab, setActiveTab] = useState<'posts' | 'following' | 'disc'>('posts');
+  // Sub-tab within the "Nové príspevky" feed: all, only questions, or
+  // only posts. Lets users find Q&A quickly without scrolling.
+  const [feedType, setFeedType] = useState<'all' | 'questions' | 'posts'>('all');
 
   const handleToggleLike = (postId: string) => {
     const wasLiked = likedIds.has(postId);
@@ -266,11 +269,20 @@ export default function Komunita() {
     isQuestion: p.type === 'question',
   }));
 
-  // "Najviac rezonovalo dnes" — top 2 by likes (only shown on Príspevky tab)
-  const resonated = [...display].sort((a, b) => b.likes - a.likes).slice(0, 2);
-  const feed = activeTab === 'following'
+  // Featured post — the single most-liked post, shown as a hero card
+  // above the compose section. Falls back to null if no posts exist.
+  // TODO: when an explicit `pinned` flag exists on community_posts,
+  // prefer the pinned one over top-liked.
+  const featured = [...display].sort((a, b) => b.likes - a.likes)[0] ?? null;
+  // The main feed excludes the featured post so it isn't shown twice.
+  const baseFeed = activeTab === 'following'
     ? display.filter((p) => followedIds.has(p.id))
-    : display;
+    : display.filter((p) => p.id !== featured?.id);
+  const feed = feedType === 'all'
+    ? baseFeed
+    : feedType === 'questions'
+      ? baseFeed.filter((p) => p.isQuestion)
+      : baseFeed.filter((p) => !p.isQuestion);
 
   return (
     <Page>
@@ -347,77 +359,143 @@ export default function Komunita() {
         </div>
       )}
 
-      {activeTab === 'posts' && (
-      <div style={{ padding: '0 24px 24px' }}>
-        <Eye color={NM.GOLD} style={{ marginBottom: 14 }}>Najviac rezonovalo dnes</Eye>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          {resonated.map((p) => (
-            <button
-              key={p.id}
-              onClick={() => navigate(`/komunita/${p.id}`)}
-              style={{ all: 'unset', cursor: 'pointer', display: 'flex', gap: 12, alignItems: 'flex-start', boxSizing: 'border-box', width: '100%', padding: '12px 14px', background: 'rgba(255,255,255,0.65)', borderRadius: 16, border: `1px solid ${NM.HAIR}` }}
+      {/* ─── Section 1 · Featured post ─────────────────────────────
+          One hero card highlighting the most-resonant post (or, once
+          we have a pinned flag, the post Gabi has pinned). Gold accent
+          + slightly larger so it reads as the room's "centre". */}
+      {activeTab === 'posts' && featured && (
+        <div style={{ padding: '4px 24px 24px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+            <Eye color={NM.GOLD}>Najviac rezonuje</Eye>
+            <span
+              style={{
+                padding: '2px 8px',
+                borderRadius: 999,
+                background: `${NM.GOLD}22`,
+                fontFamily: NM.SANS,
+                fontSize: 9.5,
+                color: NM.GOLD,
+                fontWeight: 600,
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase' as const,
+              }}
             >
-              <Avatar size={36} initial={p.initial} tone={p.tone} />
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                  <span style={{ fontFamily: NM.SANS, fontSize: 12, fontWeight: 500, color: NM.DEEP }}>{p.who}</span>
-                  <span style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.TERTIARY }}>· {p.time}</span>
-                </div>
-                <div style={{ fontFamily: NM.SANS, fontSize: 13.5, fontWeight: 400, color: NM.DEEP, lineHeight: 1.55, letterSpacing: '-0.002em', marginBottom: 6 }}>{p.text}</div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                    <svg width="13" height="13" viewBox="0 0 17 17" fill="none">
-                      <path d="M8.5 14.5s-5.5-3.5-5.5-8a3 3 0 015.5-1.5 3 3 0 015.5 1.5c0 4.5-5.5 8-5.5 8z" stroke={NM.MUTED} strokeWidth="1.3" strokeLinejoin="round" />
-                    </svg>
-                    <span style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.TERTIARY }}>{p.likes}</span>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={NM.MUTED} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
-                    </svg>
-                    <span style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.TERTIARY }}>5</span>
-                  </div>
-                  <span style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.TERTIARY }}>{p.comments} odpovedí</span>
-                </div>
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-      )}
-
-      {activeTab === 'posts' && (
-      <div style={{ padding: '0 24px 26px' }}>
-        <button
-          onClick={() => navigate('/komunita/new')}
-          style={{
-            all: 'unset',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 12,
-            width: '100%',
-            padding: '12px 14px 12px 12px',
-            background: 'rgba(255,255,255,0.55)',
-            border: `1px solid ${NM.HAIR_2}`,
-            borderRadius: 999,
-            boxSizing: 'border-box',
-          }}
-        >
-          <Avatar size={32} initial="K" tone="terra" />
-          <div style={{ flex: 1, fontFamily: NM.SANS, fontSize: 13, color: NM.TERTIARY, textAlign: 'left' }}>Napíš niečo, spýtaj sa…</div>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: 999, background: NM.DEEP }}>
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <path d="M7 3v8M3 7h8" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" />
-            </svg>
+              Vybrané
+            </span>
           </div>
-        </button>
-      </div>
+          <button
+            onClick={() => navigate(`/komunita/${featured.id}`)}
+            style={{
+              all: 'unset',
+              cursor: 'pointer',
+              display: 'flex',
+              gap: 14,
+              alignItems: 'flex-start',
+              boxSizing: 'border-box',
+              width: '100%',
+              padding: '18px 18px',
+              background: '#fff',
+              borderRadius: 18,
+              border: `1.5px solid ${NM.GOLD}`,
+              boxShadow: `0 10px 24px rgba(184,150,90,0.18)`,
+            }}
+          >
+            <Avatar size={42} initial={featured.initial} tone={featured.tone} />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                <span style={{ fontFamily: NM.SANS, fontSize: 12.5, fontWeight: 500, color: NM.DEEP }}>{featured.who}</span>
+                <span style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.TERTIARY }}>· {featured.time}</span>
+                {featured.isQuestion && (
+                  <span style={{ marginLeft: 'auto', padding: '2px 7px', borderRadius: 999, background: `${NM.SAGE}24`, fontFamily: NM.SANS, fontSize: 9.5, color: NM.SAGE, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase' as const }}>
+                    Otázka
+                  </span>
+                )}
+              </div>
+              <div style={{ fontFamily: NM.SERIF, fontSize: 16, fontWeight: 500, color: NM.DEEP, lineHeight: 1.45, letterSpacing: '-0.005em', marginBottom: 10 }}>
+                {featured.text}
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <svg width="13" height="13" viewBox="0 0 17 17" fill="none">
+                    <path d="M8.5 14.5s-5.5-3.5-5.5-8a3 3 0 015.5-1.5 3 3 0 015.5 1.5c0 4.5-5.5 8-5.5 8z" stroke={NM.MUTED} strokeWidth="1.3" strokeLinejoin="round" />
+                  </svg>
+                  <span style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.TERTIARY }}>{featured.likes}</span>
+                </div>
+                <span style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.TERTIARY }}>{featured.comments} odpovedí</span>
+              </div>
+            </div>
+          </button>
+        </div>
       )}
 
+      {/* ─── Section 2 · Compose ──────────────────────────────────── */}
       {activeTab === 'posts' && (
-        <div style={{ padding: '0 24px 10px' }}>
-          <Eye>Novinky</Eye>
+        <div style={{ padding: '0 24px 26px' }}>
+          <Eye color={NM.TERRA} style={{ marginBottom: 12 }}>Zdieľaj svoj príbeh</Eye>
+          <button
+            onClick={() => navigate('/komunita/new')}
+            style={{
+              all: 'unset',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              width: '100%',
+              padding: '14px 14px 14px 12px',
+              background: '#fff',
+              border: `1px solid ${NM.HAIR_2}`,
+              borderRadius: 999,
+              boxSizing: 'border-box',
+            }}
+          >
+            <Avatar size={32} initial="K" tone="terra" />
+            <div style={{ flex: 1, fontFamily: NM.SANS, fontSize: 13, color: NM.TERTIARY, textAlign: 'left' }}>Napíš niečo, spýtaj sa…</div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: 999, background: NM.DEEP }}>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M7 3v8M3 7h8" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" />
+              </svg>
+            </div>
+          </button>
+        </div>
+      )}
+
+      {/* ─── Section 3 · New posts feed + type sub-tabs ──────────── */}
+      {activeTab === 'posts' && (
+        <div style={{ padding: '0 24px 12px' }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 12 }}>
+            <Eye>Nové príspevky</Eye>
+          </div>
+          <div style={{ display: 'flex', gap: 6, padding: 4, background: 'rgba(255,255,255,0.55)', border: `1px solid ${NM.HAIR}`, borderRadius: 999 }}>
+            {([
+              { k: 'all',       label: 'Všetko' },
+              { k: 'posts',     label: 'Príspevky' },
+              { k: 'questions', label: 'Otázky' },
+            ] as const).map((t) => {
+              const active = feedType === t.k;
+              return (
+                <button
+                  key={t.k}
+                  onClick={() => setFeedType(t.k)}
+                  style={{
+                    all: 'unset',
+                    cursor: 'pointer',
+                    flex: 1,
+                    textAlign: 'center',
+                    padding: '8px 0',
+                    borderRadius: 999,
+                    background: active ? NM.DEEP : 'transparent',
+                    color: active ? '#fff' : NM.DEEP,
+                    fontFamily: NM.SANS,
+                    fontSize: 12,
+                    fontWeight: 500,
+                    transition: 'all .15s',
+                  }}
+                >
+                  {t.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
       )}
 
