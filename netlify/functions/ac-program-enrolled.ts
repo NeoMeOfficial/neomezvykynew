@@ -58,9 +58,9 @@ export async function handler(event: any) {
       firstName: meta.firstName || meta.first_name || '',
       lastName: meta.lastName || meta.last_name || '',
     });
-    await addTag(contactId, `program:${programSlug}`);
+    await addTag(contactId, `app_${programSlug}`);
 
-    return jsonResponse({ ok: true, contactId, tag: `program:${programSlug}` });
+    return jsonResponse({ ok: true, contactId, tag: `app_${programSlug}` });
   } catch (err: any) {
     console.error('ac-program-enrolled error:', err);
     return jsonResponse({ error: err.message }, 500);

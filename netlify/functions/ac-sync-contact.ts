@@ -1,16 +1,22 @@
 // netlify/functions/ac-sync-contact.ts
 //
-// Called by a Supabase Database Webhook on INSERT into auth.users (and
-// optionally UPDATE, when the user finishes filling out their profile).
+// Called by a Supabase Database Webhook on INSERT into public.profiles
+// (and optionally UPDATE, when the user fills in their name later).
+//
+// public.profiles is auto-populated by the on_auth_user_created trigger,
+// so one signup → one row → one webhook fire. We webhook on profiles
+// (not auth.users) because Supabase's dashboard only allows webhooks on
+// the public schema.
 //
 // Body shape (Supabase webhook envelope):
 //   {
 //     type: 'INSERT' | 'UPDATE',
-//     table: 'users',
+//     table: 'profiles',
 //     record: {
 //       id: '<uuid>',
 //       email: '<email>',
-//       raw_user_meta_data: { firstName, lastName, ... }
+//       full_name: '<name>',
+//       ...
 //     }
 //   }
 //
@@ -49,13 +55,18 @@ export async function handler(event: any) {
     const record = payload.record;
     if (!record?.email) return jsonResponse({ error: 'No email in record' }, 400);
 
-    const meta = record.raw_user_meta_data || {};
+    // Split full_name into first/last on the first space — best-effort
+    // since the column is a single text field.
+    const fullName: string = (record.full_name || '').trim();
+    const [firstName = '', ...rest] = fullName.split(/\s+/);
+    const lastName = rest.join(' ');
+
     const contactId = await syncContact({
       email: record.email,
-      firstName: meta.firstName || meta.first_name || '',
-      lastName: meta.lastName || meta.last_name || '',
+      firstName,
+      lastName,
     });
-    await addTag(contactId, 'new-signup');
+    await addTag(contactId, 'app_new_signup');
 
     return jsonResponse({ ok: true, contactId });
   } catch (err: any) {
