@@ -1,4 +1,4 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { useSupabaseAuth } from '../../contexts/SupabaseAuthContext';
 import { useConsents } from '../../hooks/useConsents';
 import { CONSENT_TYPES } from '../../lib/consents';
@@ -27,6 +27,15 @@ export function TosConsentGate({ children }: { children: ReactNode }) {
   const { signOut } = useSupabaseAuth();
   const { isGranted, grant, loading } = useConsents();
   const [submitting, setSubmitting] = useState(false);
+  const blocking = !loading && !isGranted(CONSENT_TYPES.TOS_PRIVACY);
+
+  useEffect(() => {
+    if (!blocking) return;
+    window.dispatchEvent(new CustomEvent('neome:consent-gate', { detail: { active: true } }));
+    return () => {
+      window.dispatchEvent(new CustomEvent('neome:consent-gate', { detail: { active: false } }));
+    };
+  }, [blocking]);
 
   if (loading) {
     return (
@@ -62,7 +71,8 @@ export function TosConsentGate({ children }: { children: ReactNode }) {
         padding: 'calc(env(safe-area-inset-top) + 32px) 22px calc(env(safe-area-inset-bottom) + 32px)',
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
+        overflowY: 'auto',
         fontFamily: NM.SANS,
         color: NM.DEEP,
       }}

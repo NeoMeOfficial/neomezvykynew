@@ -46,6 +46,16 @@ function isIOSSafari(): boolean {
 export default function InstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showIosHint, setShowIosHint] = useState(false);
+  const [consentBlocking, setConsentBlocking] = useState(false);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const ce = e as CustomEvent<{ active: boolean }>;
+      setConsentBlocking(!!ce.detail?.active);
+    };
+    window.addEventListener('neome:consent-gate', handler as EventListener);
+    return () => window.removeEventListener('neome:consent-gate', handler as EventListener);
+  }, []);
 
   useEffect(() => {
     if (isStandalone() || dismissedRecently()) return;
@@ -89,18 +99,183 @@ export default function InstallPrompt() {
   };
 
   if (!deferredPrompt && !showIosHint) return null;
+  if (consentBlocking) return null;
 
   const isIOS = !deferredPrompt && showIosHint;
+
+  if (isIOS) {
+    const ShareIcon = (
+      <svg
+        aria-hidden="true"
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        style={{ flexShrink: 0 }}
+      >
+        <path d="M12 3v13" />
+        <path d="M7 8l5-5 5 5" />
+        <path d="M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5" />
+      </svg>
+    );
+    const PlusIcon = (
+      <svg
+        aria-hidden="true"
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        style={{ flexShrink: 0 }}
+      >
+        <rect x="3" y="3" width="18" height="18" rx="4" />
+        <path d="M12 8v8M8 12h8" />
+      </svg>
+    );
+
+    return (
+      <div
+        role="dialog"
+        aria-label="Pridať NeoMe na plochu"
+        style={{
+          position: 'fixed',
+          left: 12,
+          right: 12,
+          top: 'calc(env(safe-area-inset-top) + 12px)',
+          zIndex: 9997,
+          maxWidth: 520,
+          margin: '0 auto',
+          background: 'rgba(255, 255, 255, 0.55)',
+          WebkitBackdropFilter: 'blur(22px) saturate(160%)',
+          backdropFilter: 'blur(22px) saturate(160%)',
+          border: '1px solid rgba(255, 255, 255, 0.55)',
+          borderRadius: 20,
+          boxShadow: '0 18px 48px rgba(46, 34, 24, 0.22)',
+          padding: '16px 16px 14px',
+          fontFamily: '"DM Sans", system-ui, sans-serif',
+          color: '#2E2218',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+          <div
+            style={{
+              width: 38,
+              height: 38,
+              borderRadius: 10,
+              background: '#B8965A',
+              color: '#3D2921',
+              display: 'grid',
+              placeItems: 'center',
+              fontFamily: '"Gilda Display", Georgia, serif',
+              fontSize: 18,
+              fontStyle: 'italic',
+              fontWeight: 500,
+              flexShrink: 0,
+            }}
+          >
+            N
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 14, fontWeight: 600, color: '#2E2218' }}>
+              Pridaj NeoMe na plochu
+            </div>
+            <div style={{ fontSize: 11.5, color: '#6B5A48', marginTop: 2 }}>
+              Rýchlejšie spustenie, plný režim aplikácie.
+            </div>
+          </div>
+          <button
+            onClick={dismiss}
+            aria-label="Zavrieť"
+            style={{
+              all: 'unset',
+              cursor: 'pointer',
+              padding: '6px 10px',
+              borderRadius: 999,
+              background: 'rgba(46, 34, 24, 0.08)',
+              fontSize: 12,
+              fontWeight: 500,
+              color: '#2E2218',
+            }}
+          >
+            OK
+          </button>
+        </div>
+
+        <ol
+          style={{
+            listStyle: 'none',
+            padding: 0,
+            margin: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 8,
+          }}
+        >
+          <li style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, lineHeight: 1.45, color: '#2E2218' }}>
+            <span
+              style={{
+                width: 22,
+                height: 22,
+                borderRadius: 999,
+                background: '#3D2921',
+                color: '#fff',
+                fontSize: 11,
+                fontWeight: 600,
+                display: 'grid',
+                placeItems: 'center',
+                flexShrink: 0,
+              }}
+            >
+              1
+            </span>
+            <span>Stlač</span>
+            <span style={{ color: '#1D6BD9' }}>{ShareIcon}</span>
+            <span>
+              dole v Safari
+            </span>
+          </li>
+          <li style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, lineHeight: 1.45, color: '#2E2218' }}>
+            <span
+              style={{
+                width: 22,
+                height: 22,
+                borderRadius: 999,
+                background: '#3D2921',
+                color: '#fff',
+                fontSize: 11,
+                fontWeight: 600,
+                display: 'grid',
+                placeItems: 'center',
+                flexShrink: 0,
+              }}
+            >
+              2
+            </span>
+            <span>Vyber</span>
+            <span style={{ color: '#2E2218' }}>{PlusIcon}</span>
+            <span style={{ fontWeight: 500 }}>„Pridať na plochu"</span>
+          </li>
+        </ol>
+      </div>
+    );
+  }
 
   return (
     <div
       role="dialog"
-      aria-label="Pridať na plochu"
+      aria-label="Inštaluj NeoMe"
       style={{
         position: 'fixed',
         left: 12,
         right: 12,
-        bottom: 'calc(env(safe-area-inset-bottom) + 84px)', // sit above BottomNav
+        bottom: 'calc(env(safe-area-inset-bottom) + 84px)',
         zIndex: 9997,
         background: '#3D2921',
         color: '#fff',
@@ -134,64 +309,40 @@ export default function InstallPrompt() {
         N
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: 13, fontWeight: 500 }}>
-          {isIOS ? 'Pridaj NeoMe na plochu' : 'Inštaluj NeoMe'}
-        </div>
+        <div style={{ fontSize: 13, fontWeight: 500 }}>Inštaluj NeoMe</div>
         <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.62)', marginTop: 2, lineHeight: 1.4 }}>
-          {isIOS
-            ? 'Stlač Zdieľať a vyber "Pridať na plochu".'
-            : 'Rýchlejší prístup, plnoobrazovková aplikácia.'}
+          Rýchlejší prístup, plnoobrazovková aplikácia.
         </div>
       </div>
-      {isIOS ? (
-        <button
-          onClick={dismiss}
-          style={{
-            all: 'unset',
-            cursor: 'pointer',
-            padding: '8px 12px',
-            borderRadius: 999,
-            background: 'rgba(255,255,255,0.10)',
-            fontSize: 12,
-            fontWeight: 500,
-            color: '#fff',
-          }}
-        >
-          OK
-        </button>
-      ) : (
-        <>
-          <button
-            onClick={install}
-            style={{
-              all: 'unset',
-              cursor: 'pointer',
-              padding: '9px 14px',
-              borderRadius: 999,
-              background: '#fff',
-              fontSize: 12.5,
-              fontWeight: 500,
-              color: '#3D2921',
-            }}
-          >
-            Pridať
-          </button>
-          <button
-            onClick={dismiss}
-            aria-label="Zavrieť"
-            style={{
-              all: 'unset',
-              cursor: 'pointer',
-              padding: 4,
-              color: 'rgba(255,255,255,0.55)',
-              fontSize: 18,
-              lineHeight: 1,
-            }}
-          >
-            ×
-          </button>
-        </>
-      )}
+      <button
+        onClick={install}
+        style={{
+          all: 'unset',
+          cursor: 'pointer',
+          padding: '9px 14px',
+          borderRadius: 999,
+          background: '#fff',
+          fontSize: 12.5,
+          fontWeight: 500,
+          color: '#3D2921',
+        }}
+      >
+        Pridať
+      </button>
+      <button
+        onClick={dismiss}
+        aria-label="Zavrieť"
+        style={{
+          all: 'unset',
+          cursor: 'pointer',
+          padding: 4,
+          color: 'rgba(255,255,255,0.55)',
+          fontSize: 18,
+          lineHeight: 1,
+        }}
+      >
+        ×
+      </button>
     </div>
   );
 }
