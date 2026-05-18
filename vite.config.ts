@@ -38,6 +38,17 @@ export default defineConfig(({ mode }) => ({
       // registration via the React hook — don't also inject a
       // separate <script> registration, or registerSW runs twice.
       injectRegister: false,
+      // injectManifest strategy so we own the service worker source
+      // (src/sw.ts). Needed for the Web Push 'push' + 'notificationclick'
+      // event handlers. Workbox is still imported inside sw.ts for the
+      // precache + runtime cache.
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.ts',
+      injectManifest: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff2}'],
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+      },
       includeAssets: [
         'favicon.ico',
         'favicon-32.png',
