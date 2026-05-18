@@ -8,6 +8,8 @@ import { ConsentGuardProvider } from './contexts/ConsentGuardContext';
 import AppLayout from './layouts/v2/AppLayout';
 import ErrorBoundary from './components/v2/ErrorBoundary';
 import { Toaster } from '@/components/ui/toaster';
+import CookieBanner from './components/v2/CookieBanner';
+import InstallPrompt from './components/v2/InstallPrompt';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -205,6 +207,8 @@ export default function AppV2() {
     <ConsentGuardProvider>
       <Toaster />
       <BrowserRouter>
+        <CookieBanner />
+        <InstallPrompt />
         <Suspense fallback={<LoadingSpinner />}>
             <Routes>
             {/* Public routes */}

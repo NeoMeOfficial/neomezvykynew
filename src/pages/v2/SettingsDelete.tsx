@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useWorkoutHistory } from '../../hooks/useWorkoutHistory';
 import { useFavorites } from '../../hooks/useFavorites';
@@ -39,11 +40,17 @@ export default function SettingsDelete() {
   const { signOut } = useSupabaseAuth();
   const { toast } = useToast();
   const [deleting, setDeleting] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmText, setConfirmText] = useState('');
 
-  const onDelete = async () => {
+  const onDelete = () => {
     if (deleting) return;
-    const ok = window.confirm('Naozaj chceš zmazať svoj účet? Túto akciu nemožno vrátiť.');
-    if (!ok) return;
+    // Open the proper confirmation sheet — no native window.confirm.
+    setConfirmText('');
+    setConfirmOpen(true);
+  };
+
+  const doDelete = async () => {
     setDeleting(true);
     try {
       const { data: sess } = await supabase.auth.getSession();
@@ -159,6 +166,113 @@ export default function SettingsDelete() {
           Vrátiť sa
         </button>
       </div>
+
+      {/* Hard-confirm sheet — GDPR-friendly explicit checklist of what
+          gets deleted, plus a typed confirmation so a misclick can't
+          irreversibly wipe a user's account. */}
+      {confirmOpen && createPortal(
+        <div
+          role="dialog"
+          aria-modal="true"
+          onClick={() => !deleting && setConfirmOpen(false)}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 9999,
+            background: 'rgba(42,26,20,0.55)', backdropFilter: 'blur(6px)',
+            display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              width: '100%', maxWidth: 480,
+              background: NM.BG ?? '#F8F5F0',
+              borderTopLeftRadius: 24, borderTopRightRadius: 24,
+              padding: '24px 22px calc(env(safe-area-inset-bottom) + 28px)',
+              boxShadow: '0 -10px 32px rgba(61,41,33,0.25)',
+              maxHeight: '85vh', overflowY: 'auto',
+            }}
+          >
+            <div style={{ width: 36, height: 4, borderRadius: 999, background: 'rgba(61,41,33,0.18)', margin: '0 auto 16px' }} />
+            <div style={{ fontFamily: NM.SERIF, fontSize: 22, fontWeight: 500, color: NM.DEEP, letterSpacing: '-0.01em' }}>
+              Toto sa <em style={{ color: NM.TERRA, fontStyle: 'italic', fontWeight: 500 }}>nedá vrátiť</em>.
+            </div>
+            <div style={{ marginTop: 10, fontFamily: NM.SANS, fontSize: 13, color: NM.MUTED, fontWeight: 400, lineHeight: 1.55 }}>
+              Po zmazaní stratíš nasledovné údaje bez možnosti obnovenia:
+            </div>
+
+            <ul style={{ marginTop: 16, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 9 }}>
+              {[
+                'Profil a prihlasovacie údaje',
+                'Cyklus, symptómy a fázové záznamy',
+                'Denník, reflexie a meditačnú históriu',
+                'Návyky, streak a pokrok v programe',
+                'Príspevky, komentáre a srdcia v komunite',
+                'Uložené recepty, jedálničky a obľúbené',
+                'Body, odznaky a referal kredity',
+                'Aktívne predplatné (zrušíme aj v Stripe)',
+              ].map((item) => (
+                <li key={item} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', fontFamily: NM.SANS, fontSize: 13, color: NM.DEEP, lineHeight: 1.45 }}>
+                  <span style={{ color: NM.TERRA, fontWeight: 700, marginTop: 1 }}>×</span>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+
+            <div style={{ marginTop: 18, padding: 12, background: 'rgba(193,133,106,0.10)', borderRadius: 12, fontFamily: NM.SANS, fontSize: 11.5, color: NM.MUTED, lineHeight: 1.5 }}>
+              Tip: ak chceš mať svoje dáta pred zmazaním, najprv si ich stiahni cez <strong style={{ color: NM.DEEP }}>Nastavenia → Súkromie → Export údajov</strong>.
+            </div>
+
+            <div style={{ marginTop: 18 }}>
+              <label style={{ fontFamily: NM.SANS, fontSize: 12, fontWeight: 500, color: NM.DEEP, display: 'block', marginBottom: 6 }}>
+                Napíš <strong>ZMAZAŤ</strong> pre potvrdenie
+              </label>
+              <input
+                type="text"
+                value={confirmText}
+                onChange={(e) => setConfirmText(e.target.value)}
+                autoFocus
+                style={{
+                  width: '100%', boxSizing: 'border-box',
+                  padding: '12px 14px',
+                  background: '#fff', border: `1px solid ${NM.HAIR_2 ?? 'rgba(61,41,33,0.14)'}`, borderRadius: 12,
+                  fontFamily: NM.SANS, fontSize: 14, color: NM.DEEP, outline: 'none',
+                  letterSpacing: '0.04em',
+                }}
+              />
+            </div>
+
+            <div style={{ display: 'flex', gap: 10, marginTop: 18 }}>
+              <button
+                onClick={() => !deleting && setConfirmOpen(false)}
+                disabled={deleting}
+                style={{
+                  flex: 1, padding: '13px 0', borderRadius: 999,
+                  background: 'transparent', color: NM.DEEP,
+                  border: `1px solid ${NM.HAIR_2 ?? 'rgba(61,41,33,0.14)'}`,
+                  fontFamily: NM.SANS, fontSize: 13, fontWeight: 500,
+                  cursor: deleting ? 'default' : 'pointer', opacity: deleting ? 0.6 : 1,
+                }}
+              >
+                Zrušiť
+              </button>
+              <button
+                onClick={doDelete}
+                disabled={deleting || confirmText.trim() !== 'ZMAZAŤ'}
+                style={{
+                  flex: 1, padding: '13px 0', borderRadius: 999,
+                  background: NM.TERRA, color: '#fff', border: 0,
+                  fontFamily: NM.SANS, fontSize: 13, fontWeight: 500,
+                  cursor: (deleting || confirmText.trim() !== 'ZMAZAŤ') ? 'not-allowed' : 'pointer',
+                  opacity: (deleting || confirmText.trim() !== 'ZMAZAŤ') ? 0.5 : 1,
+                }}
+              >
+                {deleting ? 'Mažem…' : 'Zmazať natrvalo'}
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body,
+      )}
     </Page>
   );
 }

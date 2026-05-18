@@ -1,6 +1,7 @@
 import { Component, type ReactNode } from 'react';
 import { AlertCircle, RotateCcw } from 'lucide-react';
 import { colors, glassCard } from '../../theme/warmDusk';
+import { Sentry } from '../../lib/sentry';
 
 interface Props {
   children: ReactNode;
@@ -24,6 +25,11 @@ export default class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error('ErrorBoundary caught:', error, errorInfo);
+    // Report to Sentry with React component stack so the dashboard
+    // shows where the throw happened. No-op in DEV.
+    Sentry.captureException(error, {
+      contexts: { react: { componentStack: errorInfo.componentStack } },
+    });
     this.setState({ error });
   }
 
