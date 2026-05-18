@@ -80,6 +80,32 @@ export function useConsents() {
     [consents]
   );
 
+  /**
+   * Authoritative remote check — bypasses local cache, always hits the
+   * current_consents view. Use this from the ConsentGuard so that a
+   * withdrawal made in Settings (which has its own useConsents instance)
+   * is reflected immediately even though the guard's local state hasn't
+   * been refreshed yet.
+   */
+  const checkRemoteGranted = useCallback(
+    async (type: ConsentType): Promise<boolean> => {
+      if (!user) return false;
+      if (!isSupabaseConfigured()) {
+        const row = consents[type];
+        return !!row && row.granted === true && row.policy_version === CONSENT_POLICY_VERSION;
+      }
+      const { data, error } = await supabase
+        .from('current_consents')
+        .select('granted, policy_version')
+        .eq('user_id', user.id)
+        .eq('consent_type', type)
+        .maybeSingle();
+      if (error || !data) return false;
+      return data.granted === true && data.policy_version === CONSENT_POLICY_VERSION;
+    },
+    [user, consents]
+  );
+
   const grant = useCallback(
     async (type: ConsentType, source: 'app' | 'signup' | 'settings' = 'settings') => {
       return record(type, true, source);
@@ -135,6 +161,7 @@ export function useConsents() {
     consents,
     isGranted,
     hasDecision,
+    checkRemoteGranted,
     grant,
     withdraw,
     reload,

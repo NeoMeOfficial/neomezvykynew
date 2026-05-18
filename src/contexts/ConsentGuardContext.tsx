@@ -57,29 +57,29 @@ interface PendingPrompt {
 }
 
 export function ConsentGuardProvider({ children }: { children: ReactNode }) {
-  const { isGranted, grant, reload } = useConsents();
+  const { checkRemoteGranted, grant } = useConsents();
   const [pending, setPending] = useState<PendingPrompt | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   // Stable ref so the requireConsent callback doesn't churn on every
   // re-render (which would re-run effects in consumers that include it
   // in dep arrays).
-  const isGrantedRef = useRef(isGranted);
-  isGrantedRef.current = isGranted;
+  const checkRef = useRef(checkRemoteGranted);
+  checkRef.current = checkRemoteGranted;
 
   const requireConsent = useCallback<RequireConsentFn>(
     async (type, copy) => {
-      // Fast path — already granted, no UI.
-      if (isGrantedRef.current(type)) return true;
-      // Make sure we have fresh consent state (avoid showing the sheet
-      // for a consent that was granted in another tab a second ago).
-      await reload();
-      if (isGrantedRef.current(type)) return true;
+      // Always do an authoritative remote check, not a local-state
+      // check — withdrawals in Settings use a SEPARATE useConsents
+      // hook instance so the Provider's local cache can lag.
+      // current_consents is an indexed view; lookup is a few ms.
+      const granted = await checkRef.current(type);
+      if (granted) return true;
       return new Promise<boolean>((resolve) => {
         setPending({ type, copy, resolve });
       });
     },
-    [reload]
+    []
   );
 
   const onAccept = async () => {
