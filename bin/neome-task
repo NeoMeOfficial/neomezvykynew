@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Convenience wrapper: run `./bin/neome-task ...` from the repo root.
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
+exec node "$DIR/tools/kanban/cli.mjs" "$@"

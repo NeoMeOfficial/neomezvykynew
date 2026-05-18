@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Wrapper so chats can run `./bin/neome-task ...` from anywhere in the repo.
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
+exec node "$DIR/cli.mjs" "$@"

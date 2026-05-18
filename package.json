@@ -8,7 +8,10 @@
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "kanban": "cd tools/kanban && node bootstrap.mjs",
+    "kanban:dev": "cd tools/kanban && npm run dev",
+    "task": "node tools/kanban/cli.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

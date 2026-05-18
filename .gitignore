@@ -34,6 +34,9 @@ dist-ssr
 # Maintenance & migration scripts (not app code)
 *.cjs
 *.mjs
+# …but keep the kanban tool source
+!tools/**/*.mjs
+!tools/**/*.cjs
 better-translation-examples.js
 clean-api-only.js
 debug-strava-clicks.js

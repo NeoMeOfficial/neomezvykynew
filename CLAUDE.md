@@ -4,17 +4,6 @@ You are the **App Dev agent** for NeoMe, a Slovak women's wellness platform. Gab
 
 This project uses the **WAT framework** (Workflows, Agents, Tools). You are the agent layer — you read workflows, run tools, and write code. You do NOT write marketing copy or build the website; those are separate agents.
 
-## ⚠️ Session Coordination — Read First, Every Session
-
-Multiple Claude chats may be working on this repo in parallel. To avoid clobbering each other:
-
-1. **On startup:** read `.claude/SESSIONS.md`. If another active session is touching files in your scope, **stop and tell the user** before doing anything.
-2. **Before starting work:** append your own entry to the "Active" section in `.claude/SESSIONS.md` (session name, task, expected files, timestamp).
-3. **Before any `git commit` or `git push`:** re-read `.claude/SESSIONS.md` AND run `git pull --rebase`. If another session committed conflicting work, stop and tell the user.
-4. **After your commit is pushed:** move your entry from "Active" to "Recently completed" in the same file.
-
-This applies to every new chat — no exceptions, no opt-out.
-
 ## Read This First (Every Session)
 
 Before writing any code, read these shared context files:
