@@ -5,6 +5,8 @@ import { useCycleSymptoms } from '../../hooks/useDailyRituals';
 import { Page, Eye, Ser, Body, PlusTag, ConfirmSheet, NM } from '../../components/v2/neome';
 import { getCycleTipByDay } from '../../data/cycleTips';
 import type { DerivedState, CycleData } from '../../features/cycle/types';
+import { useConsentGuard } from '../../contexts/ConsentGuardContext';
+import { CONSENT_TYPES } from '../../lib/consents';
 
 /**
  * Cyklus / Periodka — R5 dashboard
@@ -868,6 +870,7 @@ export default function Periodka() {
   const navigate = useNavigate();
   const { cycleData, derivedState, setLastPeriodStart } = useCycleData();
   const [confirmStartOpen, setConfirmStartOpen] = useState(false);
+  const requireConsent = useConsentGuard();
 
   // ?free=1 still works for testing the upsell/setup view, but tier no
   // longer gates the dashboard — period tracking is open to all users.
@@ -876,7 +879,13 @@ export default function Periodka() {
   // Has data → rich dashboard. No data → setup prompt (no paywall).
   const showDashboard = hasCycleSetup && !forceFree;
 
-  const handleConfirmPeriodStart = () => {
+  const handleConfirmPeriodStart = async () => {
+    // Article 9(2)(a) GDPR — explicit consent before persisting any
+    // special-category health data (menstrual cycle start date).
+    const ok = await requireConsent(CONSENT_TYPES.HEALTH_DATA, {
+      acceptLabel: 'Súhlasím a uložiť',
+    });
+    if (!ok) return;
     setLastPeriodStart(new Date());
     setConfirmStartOpen(false);
   };

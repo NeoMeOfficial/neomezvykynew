@@ -5,6 +5,8 @@ import { useCycleLogs, toDateKey } from '../../features/cycle/useCycleLogs';
 import { Page, Eye, Ser, NM } from '../../components/v2/neome';
 import { useAchievements } from '../../hooks/useAchievements';
 import { usePointsLedger } from '../../hooks/usePointsLedger';
+import { useConsentGuard } from '../../contexts/ConsentGuardContext';
+import { CONSENT_TYPES } from '../../lib/consents';
 
 /**
  * Cyklus log — R11 sheet (rendered as full-page screen here)
@@ -58,6 +60,7 @@ function energyLabel(v: number): string {
 
 export default function CyklusLog() {
   const navigate = useNavigate();
+  const requireConsent = useConsentGuard();
   const { derivedState } = useCycleData();
   const { logs, saveLog } = useCycleLogs();
   const { addActivity } = useAchievements();
@@ -97,7 +100,14 @@ export default function CyklusLog() {
     fn(next);
   };
 
-  const onSave = () => {
+  const onSave = async () => {
+    // Article 9(2)(a) GDPR — explicit consent required before persisting
+    // any special-category health data. If missing, the guard opens a
+    // bottom sheet and resolves after the user's choice.
+    const ok = await requireConsent(CONSENT_TYPES.HEALTH_DATA, {
+      acceptLabel: 'Súhlasím a uložiť',
+    });
+    if (!ok) return;
     const now = new Date();
     saveLog(now, {
       flow,

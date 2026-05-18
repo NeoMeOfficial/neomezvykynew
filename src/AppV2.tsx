@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SupabaseAuthProvider, useSupabaseAuth } from './contexts/SupabaseAuthContext';
 import { supabase } from './lib/supabase';
 import { SubscriptionProvider } from './contexts/SubscriptionContext';
+import { ConsentGuardProvider } from './contexts/ConsentGuardContext';
 import AppLayout from './layouts/v2/AppLayout';
 import ErrorBoundary from './components/v2/ErrorBoundary';
 import { Toaster } from '@/components/ui/toaster';
@@ -90,7 +91,6 @@ const WorkoutDemo = lazy(() => import('./pages/v2/WorkoutDemo'));
 const BuddySystem = lazy(() => import('./pages/v2/BuddySystem'));
 const Blog = lazy(() => import('./pages/v2/Blog'));
 const PrivacyPolicy = lazy(() => import('./pages/v2/PrivacyPolicy'));
-import { HealthDataConsentGate } from './components/v2/HealthDataConsentGate';
 const SubscriptionManagement = lazy(() => import('./pages/v2/SubscriptionManagement'));
 const CheckoutSuccess = lazy(() => import('./pages/v2/CheckoutSuccess'));
 const CheckoutCanceled = lazy(() => import('./pages/v2/CheckoutCanceled'));
@@ -201,6 +201,7 @@ export default function AppV2() {
     <QueryClientProvider client={queryClient}>
     <SupabaseAuthProvider>
     <SubscriptionProvider>
+    <ConsentGuardProvider>
       <Toaster />
       <BrowserRouter>
         <Suspense fallback={<LoadingSpinner />}>
@@ -298,7 +299,7 @@ export default function AppV2() {
               <Route path="/completion/workout" element={<CompletionWorkout />} />
               <Route path="/completion/program" element={<CompletionProgram />} />
               <Route path="/dennik/new" element={<ReflectionEntry />} />
-              <Route path="/kniznica/periodka/log" element={<HealthDataConsentGate><CyklusLog /></HealthDataConsentGate>} />
+              <Route path="/kniznica/periodka/log" element={<CyklusLog />} />
               <Route path="/navyky/new" element={<HabitCompose />} />
               <Route path="/komunita/new" element={<KomunitaCompose />} />
               <Route path="/komunita/:id" element={<KomunitaPostDetail />} />
@@ -313,7 +314,7 @@ export default function AppV2() {
               <Route path="/body/odmeny" element={<PointsRewards />} />
               <Route path="/body/odznaky" element={<Odznaky />} />
               <Route path="/hladat" element={<Search />} />
-              <Route path="/kniznica/periodka/insights" element={<HealthDataConsentGate><CyklusInsights /></HealthDataConsentGate>} />
+              <Route path="/kniznica/periodka/insights" element={<CyklusInsights />} />
               <Route path="/blog/:id" element={<BlogArticle />} />
               <Route path="/kniznica/telo" element={<Telo />} />
               <Route path="/kniznica/telo/programy" element={<TeloPrograms />} />
@@ -322,12 +323,12 @@ export default function AppV2() {
               <Route path="/kniznica/strava" element={<Strava />} />
               <Route path="/kniznica/mysel" element={<MyselNew />} />
               <Route path="/kniznica/blog" element={<Blog />} />
-              <Route path="/kniznica/periodka" element={<HealthDataConsentGate><Periodka /></HealthDataConsentGate>} />
-              <Route path="/kniznica/periodka/nastavenia" element={<HealthDataConsentGate><PeriodkaSettings /></HealthDataConsentGate>} />
+              <Route path="/kniznica/periodka" element={<Periodka />} />
+              <Route path="/kniznica/periodka/nastavenia" element={<PeriodkaSettings />} />
               <Route path="/kniznica/periodka/testing" element={<PeriodkaTestingConsole />} />
               <Route path="/kniznica/dennik" element={<DennikHistory />} />
               <Route path="/kniznica/navyky" element={<NavykyHistory />} />
-              <Route path="/kniznica/symptomy" element={<HealthDataConsentGate><SymptomCalendar /></HealthDataConsentGate>} />
+              <Route path="/kniznica/symptomy" element={<SymptomCalendar />} />
               <Route path="/program/:programId/info" element={<PostpartumInfo />} />
               {/* Per-program purchase removed — single NeoMe Plus
                   subscription replaces it. Any stale link gracefully
@@ -374,6 +375,7 @@ export default function AppV2() {
             </Routes>
           </Suspense>
       </BrowserRouter>
+    </ConsentGuardProvider>
     </SubscriptionProvider>
     </SupabaseAuthProvider>
     </QueryClientProvider>

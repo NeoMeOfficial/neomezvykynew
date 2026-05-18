@@ -94,8 +94,12 @@ export default function AuthReal() {
   const [formData, setFormData] = useState({
     email: '', password: '', firstName: '', lastName: '',
     confirmPassword: '',
-    tosPrivacyConsent: false,   // required — Article 13/14 transparency acknowledgment
-    marketingConsent: false,    // optional — Article 6(1)(a) consent for marketing
+    // Required — Article 13/14 transparency acknowledgment.
+    // Marketing / community consents are NOT collected at signup —
+    // they're prompted contextually when the user first triggers the
+    // relevant action (Art. 7(4) — consent must be freely given and
+    // granular per Recital 32).
+    tosPrivacyConsent: false,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
@@ -142,7 +146,6 @@ export default function AuthReal() {
     // Stash chosen consents — drained on first authed session.
     stashPendingConsents({
       [CONSENT_TYPES.TOS_PRIVACY]: true,
-      [CONSENT_TYPES.MARKETING]: formData.marketingConsent,
     });
     setSubmitting(true);
     try {
@@ -198,7 +201,6 @@ export default function AuthReal() {
       }
       stashPendingConsents({
         [CONSENT_TYPES.TOS_PRIVACY]: true,
-        [CONSENT_TYPES.MARKETING]: formData.marketingConsent,
       });
     }
     setErrors({});
@@ -445,20 +447,6 @@ export default function AuthReal() {
                 </span>
               </label>
               {errors.gdpr && <FieldError>{errors.gdpr}</FieldError>}
-
-              {/* Optional: marketing consent — must be unticked by default
-                  (Planet49 ruling, pre-ticked boxes invalid under GDPR). */}
-              <label style={{ display: 'flex', alignItems: 'flex-start', gap: 10, cursor: 'pointer' }}>
-                <input
-                  type="checkbox"
-                  checked={formData.marketingConsent}
-                  onChange={(e) => setFormData((p) => ({ ...p, marketingConsent: e.target.checked }))}
-                  style={{ marginTop: 3, width: 16, height: 16, accentColor: T.INK, flexShrink: 0 }}
-                />
-                <span style={{ fontSize: 11.5, color: T.FG_2, lineHeight: 1.5, fontWeight: 300 }}>
-                  Chcem dostávať občasné e-maily o novinkách a tipoch od NeoMe. (Voliteľné — môžeš sa kedykoľvek odhlásiť.)
-                </span>
-              </label>
             </div>
             {errors.submit && <Banner tone="error">{errors.submit}</Banner>}
             {errors.success && <Banner tone="info">{errors.success}</Banner>}

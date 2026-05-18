@@ -4,6 +4,8 @@ import { useCommunityPosts } from '../../hooks/useCommunityPosts';
 import { useSupabaseAuth } from '../../contexts/SupabaseAuthContext';
 import { usePointsLedger } from '../../hooks/usePointsLedger';
 import { Page, Eye, NM } from '../../components/v2/neome';
+import { useConsentGuard } from '../../contexts/ConsentGuardContext';
+import { CONSENT_TYPES } from '../../lib/consents';
 
 // Points award for publishing a community post. Daily cap of 5 pts —
 // effectively one rewarded post per day, so spam posting doesn't farm
@@ -44,6 +46,7 @@ export default function KomunitaCompose() {
   const { submitPost } = useCommunityPosts();
   const { user } = useSupabaseAuth();
   const { addEntry } = usePointsLedger();
+  const requireConsent = useConsentGuard();
   const [type, setType] = useState<'post' | 'question'>('post');
   const [text, setText] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -55,6 +58,13 @@ export default function KomunitaCompose() {
 
   const onShare = async () => {
     if (text.trim().length === 0 || submitting) return;
+    // Contextual community consent — Recital 32 / Article 7(2) GDPR
+    // (granular). Prompted at first post; persisted thereafter.
+    const ok = await requireConsent(CONSENT_TYPES.COMMUNITY, {
+      acceptLabel: 'Súhlasím a zverejniť',
+      declineLabel: 'Nezverejňovať',
+    });
+    if (!ok) return;
     setSubmitting(true);
     setError(null);
     try {

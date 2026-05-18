@@ -1,7 +1,9 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { NM, Eye } from '../../components/v2/neome';
 import { useSubscription } from '../../contexts/SubscriptionContext';
+import { useConsentGuard } from '../../contexts/ConsentGuardContext';
+import { CONSENT_TYPES } from '../../lib/consents';
 
 /**
  * Post-checkout confirmation — full-screen celebration + CTA.
@@ -27,6 +29,8 @@ export default function CheckoutSuccess() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const { isPremium, hasMealPlanner, refreshSubscription, loading } = useSubscription();
+  const requireConsent = useConsentGuard();
+  const askedMarketingRef = useRef(false);
 
   const type: CheckoutType = useMemo(() => {
     // Default to 'subscription' if the param is missing — that's the
@@ -81,6 +85,26 @@ export default function CheckoutSuccess() {
       window.history.replaceState(null, '', '/checkout/success');
     }
   }, [phase, params, devOverride]);
+
+  // Contextual marketing-consent prompt — fires once when the purchase
+  // is confirmed. Transactional emails about the purchase itself don't
+  // need consent (Art. 6(1)(b) — performance of contract); this prompt
+  // is for ongoing marketing (newsletters, product news). Truly
+  // optional: decline closes the sheet and the user proceeds normally.
+  useEffect(() => {
+    if (phase !== 'confirmed') return;
+    if (askedMarketingRef.current) return;
+    askedMarketingRef.current = true;
+    requireConsent(CONSENT_TYPES.MARKETING, {
+      title: 'Chceš dostávať novinky od NeoMe?',
+      description:
+        'Občasné e-maily o nových programoch, receptoch a tipoch pre teba. (Tvoj nákup ti potvrdíme bez ohľadu na túto voľbu.)',
+      acceptLabel: 'Áno, posielajte',
+      declineLabel: 'Iba potrebné správy',
+    }).catch(() => {
+      // Non-fatal — the user can always opt in later from Settings → Súkromie.
+    });
+  }, [phase, requireConsent]);
 
   const onRetry = () => {
     setAttempt(0);
