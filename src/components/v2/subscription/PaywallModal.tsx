@@ -145,10 +145,10 @@ export default function PaywallModal({ isOpen, onClose, feature, title }: Paywal
           </div>
           <div className="text-center p-3 rounded-2xl border-2 border-yellow-300 bg-yellow-50">
             <div className="text-lg font-bold" style={{ color: colors.textPrimary }}>
-              €143
+              €199
             </div>
             <div className="text-xs" style={{ color: colors.textSecondary }}>
-              ročne (-20%)
+              ročne (-33%)
             </div>
           </div>
         </div>

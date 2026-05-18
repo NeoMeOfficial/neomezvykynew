@@ -160,7 +160,7 @@ export default function KniznicaPreview() {
               >
                 Aktivovať Plus
               </button>
-              <div style={{ textAlign: 'center', marginTop: 10, fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>Prvý mesiac 4,99 €</div>
+              <div style={{ textAlign: 'center', marginTop: 10, fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>24,90 € / mesiac · zrušíš kedykoľvek</div>
             </div>
           </div>
         </div>

@@ -7,7 +7,7 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
     description: 'Mesačný prístup k všetkým funkciám',
     price_monthly: 24.90,
     currency: 'EUR',
-    trial_days: 7,
+    trial_days: 0,
     features: [
       'Všetky cvičebné programy',
       'Personalizované jedálne plány', 
@@ -20,12 +20,12 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
   {
     id: 'yearly',
     name: 'Ročné predplatné',
-    description: 'Ušetri 20% s ročným predplatným',
-    price_monthly: 11.92, // €143/year ÷ 12 months
-    price_yearly: 143,
+    description: 'Ušetri 33% s ročným predplatným',
+    price_monthly: 16.58, // €199/year ÷ 12 months
+    price_yearly: 199,
     currency: 'EUR',
     popular: true,
-    trial_days: 14,
+    trial_days: 0,
     features: [
       'Všetky cvičebné programy',
       'Personalizované jedálne plány',

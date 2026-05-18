@@ -101,7 +101,7 @@ export function PromotionalBanner({
                   color: color,
                 }}
               >
-                €47 / mesiac
+                €57 jednorazovo
               </div>
               
               <div 

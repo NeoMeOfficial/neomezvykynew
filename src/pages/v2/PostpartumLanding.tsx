@@ -450,13 +450,13 @@ export default function PostpartumLanding() {
           
           <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-6 mb-6 shadow-sm">
             <div className="text-center">
-              <div className="text-4xl font-black text-[#2E2218] mb-2">€97</div>
-              <p className="text-sm text-[#8B7560] mb-4">Jednorazová platba • Prístup na 2 mesiace</p>
-              
+              <div className="text-4xl font-black text-[#2E2218] mb-2">24,90 €</div>
+              <p className="text-sm text-[#8B7560] mb-4">mesačne · zrušíš kedykoľvek</p>
+
               <div className="text-left space-y-2 mb-6">
                 <div className="flex items-center gap-2 text-sm">
                   <Check size={16} color="#059669" strokeWidth={3} />
-                  <span>Prístup do programu na 2 mesiace</span>
+                  <span>Plný prístup k Postpartum programu</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <Check size={16} color="#059669" strokeWidth={3} />
@@ -468,19 +468,19 @@ export default function PostpartumLanding() {
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <Check size={16} color="#059669" strokeWidth={3} />
-                  <span>Bonusy v hodnote skoro 200 Eur</span>
+                  <span>Cyklus, návyky, denník a celá knižnica</span>
                 </div>
               </div>
-              
-              <button 
+
+              <button
                 className="w-full py-4 bg-[#6B4C3B] text-white font-bold text-lg rounded-2xl shadow-lg active:scale-[0.98] transition-transform"
                 onClick={() => navigate('/paywall')}
               >
-                Pridať do košíka
+                Aktivovať NeoMe Plus
               </button>
-              
+
               <p className="text-xs text-[#8B7560] mt-3">
-                ⭐ 7-dňová garancia vrátenia peňazí
+                Ročne 199 € · ušetríš 33 %
               </p>
             </div>
           </div>
@@ -512,7 +512,7 @@ export default function PostpartumLanding() {
             className="bg-white text-[#6B4C3B] font-bold py-4 px-8 rounded-2xl shadow-lg active:scale-[0.98] transition-transform"
             onClick={() => navigate('/paywall')}
           >
-            Začať program za €97
+            Aktivovať NeoMe Plus
           </button>
           <p className="text-xs text-pink-200 mt-3">
             * Program obsahuje iba bezpečné cvičenia s progresívnou záťažou

@@ -8,8 +8,8 @@ import { Button } from '@/components/ui/button';
  * Used at the bottom of onboarding steps and paywalls.
  *
  * <CTASticky
- *   label="Aktivovať Plus · 4,99 €"
- *   sub="prvý mesiac, potom 9,99 € / mesiac"
+ *   label="Aktivovať Plus · 24,90 €"
+ *   sub="mesačne, zrušíš kedykoľvek"
  *   skipLabel="Pokračovať zdarma"
  *   onClick={…}
  *   onSkip={…}

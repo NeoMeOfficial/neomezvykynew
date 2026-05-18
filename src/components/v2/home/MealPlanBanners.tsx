@@ -71,7 +71,7 @@ function MealPlanBanner1({ onPurchase }: { onPurchase: () => void }) {
             background: `linear-gradient(135deg, ${colors.strava}, ${colors.strava}DD)`,
           }}
         >
-          Vytvor si plán €47
+          Vytvor si plán €57
           <ArrowRight size={18} />
         </button>
       </div>
@@ -135,7 +135,7 @@ function MealPlanBanner2({ onPurchase }: { onPurchase: () => void }) {
               background: `linear-gradient(135deg, ${colors.periodka}, ${colors.periodka}DD)`,
             }}
           >
-            Získať personalizovaný plán €47
+            Získať personalizovaný plán €57
           </button>
         </div>
       </div>
@@ -196,7 +196,7 @@ function MealPlanBanner3({ onPurchase }: { onPurchase: () => void }) {
         <button
           className="w-full py-3 bg-green-600 text-white font-bold rounded-2xl shadow-lg transition-all active:scale-95"
         >
-          Začať plánovať €47
+          Začať plánovať €57
         </button>
       </div>
     </div>
@@ -248,7 +248,7 @@ function MealPlanBanner4({ onPurchase }: { onPurchase: () => void }) {
             background: `linear-gradient(135deg, ${colors.strava}, ${colors.accent})`,
           }}
         >
-          Vytvoriť môj plán €47
+          Vytvoriť môj plán €57
         </button>
         
         <p className="text-xs mt-3" style={{ color: colors.textSecondary }}>

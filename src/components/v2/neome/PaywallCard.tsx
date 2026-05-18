@@ -10,7 +10,7 @@ interface Props {
   ctaLabel?: string;
   /** Where the CTA navigates. Default /checkout. */
   ctaTo?: string;
-  /** Footer line under the CTA. Default "Prvý mesiac 4,99 €". */
+  /** Footer line under the CTA. Default "24,90 € / mesiac · zrušíš kedykoľvek". */
   footnote?: string;
 }
 
@@ -22,7 +22,7 @@ export function PaywallCard({
   headline = { before: 'Odomkni celú', emphasis: 'knižnicu.' },
   ctaLabel = 'Aktivovať Plus',
   ctaTo = '/checkout',
-  footnote = 'Prvý mesiac 4,99 €',
+  footnote = '24,90 € / mesiac · zrušíš kedykoľvek',
 }: Props) {
   const navigate = useNavigate();
   return (

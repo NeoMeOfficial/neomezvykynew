@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 /**
  * PriceDisplay — large serif price with period + optional strikethrough.
  *
- * <PriceDisplay amount="4,99 €" period="prvý mesiac" strike="9,99 €" />
+ * <PriceDisplay amount="24,90 €" period="mesačne" />
  */
 export interface PriceDisplayProps extends React.HTMLAttributes<HTMLDivElement> {
   amount: string;

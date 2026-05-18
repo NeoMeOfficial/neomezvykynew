@@ -31,8 +31,8 @@ export function PaywallModal({
           {
             tier: 'neome_plus' as const,
             icon: Crown,
-            name: 'NeoMe+',
-            price: `€24.90/mesiac`,
+            name: 'NeoMe Plus',
+            price: `24,90 € / mesiac`,
             description: 'Neobmedzený obsah + ukladanie údajov',
             color: colors.accent,
             primary: true,
@@ -40,31 +40,31 @@ export function PaywallModal({
           {
             tier: 'program_bundle' as const,
             icon: Sparkles,
-            name: 'Program Bundle',
-            price: `€143 ročne`,
-            description: 'Všetko v NeoMe+ + programy + jedálničky',
+            name: 'NeoMe Plus ročne',
+            price: `199 € ročne`,
+            description: 'Ušetríš 33 % oproti mesačnému',
             color: colors.mysel,
             primary: false,
           },
         ];
-      
+
       case 'meal_planner':
         return [
           {
             tier: 'meal_planner_tokens' as const,
             icon: Sparkles,
-            name: '6-týždňový jedálniček',
-            price: `€79 jednorazovo`,
-            description: 'Kompletný plán na mieru · alebo €49 so zľavovým kódom',
+            name: 'Jedálniček',
+            price: `57 € jednorazovo`,
+            description: 'Personalizovaný plán s receptami a nákupným zoznamom',
             color: colors.periodka,
             primary: true,
           },
           {
             tier: 'program_bundle' as const,
             icon: Crown,
-            name: 'Program Bundle',
-            price: `€143 ročne`,
-            description: 'Všetko vrátane neobmedzených jedálničkov',
+            name: 'NeoMe Plus ročne',
+            price: `199 € ročne`,
+            description: 'Celá knižnica + cyklus + návyky',
             color: colors.mysel,
             primary: false,
           },
@@ -74,8 +74,8 @@ export function PaywallModal({
           {
             tier: 'neome_plus' as const,
             icon: Crown,
-            name: 'NeoMe+',
-            price: `€24.90/mesiac`,
+            name: 'NeoMe Plus',
+            price: `24,90 € / mesiac`,
             description: 'Neobmedzený obsah + ukladanie údajov',
             color: colors.accent,
             primary: true,

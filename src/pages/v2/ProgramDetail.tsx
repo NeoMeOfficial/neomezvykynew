@@ -615,7 +615,7 @@ export default function ProgramDetail() {
                   Aktivovať Plus
                 </button>
                 <div style={{ textAlign: 'center', marginTop: 8, fontFamily: NM.SANS, fontSize: 11, color: 'rgba(255,255,255,0.5)', fontWeight: 300 }}>
-                  Prvý mesiac 4,99 €
+                  24,90 € / mesiac · zrušíš kedykoľvek
                 </div>
               </div>
             </div>

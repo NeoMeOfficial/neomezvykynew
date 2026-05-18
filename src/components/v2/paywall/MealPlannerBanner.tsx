@@ -42,17 +42,6 @@ export function MealPlannerBanner({ onPurchase, className = "" }: MealPlannerBan
         <li>• Export do PDF na tlač / zdieľanie</li>
       </ul>
 
-      {/* Discount badge */}
-      <div
-        className="flex items-center gap-2 px-3 py-2 rounded-xl mb-3"
-        style={{ background: 'rgba(184,134,74,0.10)' }}
-      >
-        <Tag size={13} style={{ color: '#B8864A' }} />
-        <span className="text-xs font-medium" style={{ color: '#B8864A' }}>
-          Zľava €30 dostupná — uplatniteľná priamo v appke
-        </span>
-      </div>
-
       {/* CTA */}
       <button
         onClick={onPurchase}
@@ -65,11 +54,11 @@ export function MealPlannerBanner({ onPurchase, className = "" }: MealPlannerBan
       >
         <span className="flex items-center justify-center gap-2">
           <Sparkles size={15} />
-          Získať jedálniček — €79
+          Získať jedálniček — €57
         </span>
       </button>
       <p className="text-center text-[10px] mt-2" style={{ color: colors.textTertiary }}>
-        alebo €49 so zľavovým kódom
+        jednorazovo · zostáva ti navždy
       </p>
     </div>
   );
