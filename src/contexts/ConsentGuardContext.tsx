@@ -2,11 +2,11 @@ import {
   createContext,
   useCallback,
   useContext,
-  useMemo,
   useRef,
   useState,
   ReactNode,
 } from 'react';
+import { createPortal } from 'react-dom';
 import { NM } from '../components/v2/neome';
 import { useConsents } from '../hooks/useConsents';
 import { CONSENT_LABELS, CONSENT_TYPES, ConsentType } from '../lib/consents';
@@ -104,14 +104,15 @@ export function ConsentGuardProvider({ children }: { children: ReactNode }) {
   return (
     <ConsentGuardCtx.Provider value={requireConsent}>
       {children}
-      {pending && (
+      {pending && typeof document !== 'undefined' && createPortal(
         <ConsentSheet
           type={pending.type}
           copy={pending.copy}
           submitting={submitting}
           onAccept={onAccept}
           onDecline={onDecline}
-        />
+        />,
+        document.body,
       )}
     </ConsentGuardCtx.Provider>
   );
@@ -151,7 +152,7 @@ function ConsentSheet({ type, copy, submitting, onAccept, onDecline }: SheetProp
       style={{
         position: 'fixed',
         inset: 0,
-        zIndex: 200,
+        zIndex: 1000,
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'flex-end',
