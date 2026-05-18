@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSubscription } from '../../contexts/SubscriptionContext';
-import { SUBSCRIPTION_PLANS } from '../../lib/stripe';
 import { NM, Eye, Ser } from '../../components/v2/neome';
 
 /**
@@ -9,8 +8,12 @@ import { NM, Eye, Ser } from '../../components/v2/neome';
  *
  * Reads the priceId the user picked on /onboarding/plan (stored in
  * localStorage as `intended_price_id`), then kicks off Stripe Checkout.
- * Falls back to the monthly priceId if missing. Shows a minimal "moment
- * please" surface while Stripe redirects.
+ *
+ * If `intended_price_id` is missing (private browsing cleared
+ * localStorage, email-confirm opened in a different browser, etc.),
+ * we redirect back to /onboarding/plan so the user picks an explicit
+ * tier. Previously we silently fell back to monthly, which could
+ * charge a user who intended yearly the wrong amount.
  *
  * Protected by RequireAuth — user must be signed in for Stripe to
  * attach the subscription to a customer.
@@ -30,17 +33,23 @@ export default function CheckoutLauncher() {
     if (fired.current) return;
     fired.current = true;
 
-    const stored = localStorage.getItem(INTENDED_PRICE_ID_KEY);
-    const priceId = stored || SUBSCRIPTION_PLANS.premium.priceId;
+    const priceId = localStorage.getItem(INTENDED_PRICE_ID_KEY);
+    if (!priceId) {
+      // No tier choice on this device — send the user back to pick.
+      // Replace history so the back button doesn't loop them through
+      // an empty /checkout.
+      navigate('/onboarding/plan', { replace: true });
+      return;
+    }
     // Clear so a back-button visit doesn't silently re-trigger the
     // wrong checkout.
-    if (stored) localStorage.removeItem(INTENDED_PRICE_ID_KEY);
+    localStorage.removeItem(INTENDED_PRICE_ID_KEY);
 
     startCheckout(priceId).catch((err) => {
       console.error('[checkout] failed', err);
       setError(err?.message || 'Nepodarilo sa otvoriť platbu.');
     });
-  }, [startCheckout]);
+  }, [startCheckout, navigate]);
 
   return (
     <div style={{ background: NM.BG, minHeight: '100vh', padding: '48px 22px', fontFamily: NM.SANS, color: NM.DEEP }}>

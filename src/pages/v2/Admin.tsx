@@ -754,11 +754,18 @@ function CommunityModerationTab() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 22, fontWeight: 500, color: _A.DEEP }}>Community Moderácia</div>
         <div style={{ display: 'flex', gap: 8 }}>
-          {(['all', 'removed'] as const).map(f => (
-            <button key={f} onClick={() => setFilter(f)} style={{ padding: '8px 14px', borderRadius: 10, border: 'none', cursor: 'pointer', fontFamily: 'DM Sans, system-ui', fontSize: 12, fontWeight: 500, background: filter === f ? _A.DEEP : _A.CREAM2, color: filter === f ? '#fff' : _A.DEEP }}>
-              {f === 'all' ? 'Všetky' : 'Odstránené'}
-            </button>
-          ))}
+          {(['unreviewed', 'all', 'removed'] as const).map(f => {
+            const labels: Record<typeof f, string> = { unreviewed: 'Nepreskúmané', all: 'Všetky', removed: 'Odstránené' };
+            const badge = f === 'unreviewed' ? unreviewedCount : 0;
+            return (
+              <button key={f} onClick={() => setFilter(f)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 10, border: 'none', cursor: 'pointer', fontFamily: 'DM Sans, system-ui', fontSize: 12, fontWeight: 500, background: filter === f ? _A.DEEP : _A.CREAM2, color: filter === f ? '#fff' : _A.DEEP }}>
+                {labels[f]}
+                {badge > 0 && (
+                  <span style={{ minWidth: 16, height: 16, padding: '0 5px', borderRadius: 999, background: filter === f ? _A.GOLD : _A.TERRA, color: '#fff', fontSize: 9, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{badge > 99 ? '99+' : badge}</span>
+                )}
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -791,6 +798,12 @@ function CommunityModerationTab() {
                           {isRemoved && (
                             <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', padding: '3px 8px', borderRadius: 999, background: 'rgba(193,133,106,0.15)', color: _A.TERRA }}>Odstránené</span>
                           )}
+                          {!isRemoved && !post.reviewed_at && (
+                            <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', padding: '3px 8px', borderRadius: 999, background: 'rgba(184,134,74,0.15)', color: _A.GOLD }}>Nové</span>
+                          )}
+                          {!isRemoved && post.reviewed_at && (
+                            <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', padding: '3px 8px', borderRadius: 999, background: 'rgba(139,158,136,0.15)', color: _A.SAGE }}>Preskúmané</span>
+                          )}
                         </div>
                         <p style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.DEEP, lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>{post.content}</p>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 6, fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.TERTIARY }}>
@@ -800,6 +813,11 @@ function CommunityModerationTab() {
                       </div>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+                      {!isRemoved && (
+                        <button onClick={() => toggleReviewed(post.id, post.reviewed_at)} disabled={isBusy} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 8, border: 'none', cursor: isBusy ? 'not-allowed' : 'pointer', fontFamily: 'DM Sans, system-ui', fontSize: 11, fontWeight: 500, background: post.reviewed_at ? _A.CREAM2 : 'rgba(184,134,74,0.15)', color: post.reviewed_at ? _A.MUTED : _A.GOLD, opacity: isBusy ? 0.5 : 1 }}>
+                          <Check style={{ width: 12, height: 12 }} />{post.reviewed_at ? 'Odznačiť' : 'Označiť'}
+                        </button>
+                      )}
                       {isRemoved ? (
                         <button onClick={() => setStatus(post.id, 'visible')} disabled={isBusy} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 8, border: 'none', cursor: isBusy ? 'not-allowed' : 'pointer', fontFamily: 'DM Sans, system-ui', fontSize: 11, fontWeight: 500, background: 'rgba(139,158,136,0.15)', color: _A.SAGE, opacity: isBusy ? 0.5 : 1 }}>
                           <Check style={{ width: 12, height: 12 }} />Obnoviť
