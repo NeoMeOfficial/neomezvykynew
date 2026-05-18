@@ -239,7 +239,6 @@ export async function createCheckoutSessionMock(priceId: string, userId: string,
   console.log('✅ Demo subscription created successfully!', {
     subscriptionId: mockSubscription.id,
     status: mockSubscription.status,
-    trialDays: 7,
     price: formatPrice(SUBSCRIPTION_PLANS.premium.price)
   });
   

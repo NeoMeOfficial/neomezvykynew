@@ -48,6 +48,17 @@ const isStripeConfigured = () => {
   return !!(key && (key.startsWith('pk_test_') || key.startsWith('pk_live_')));
 };
 
+// Hard guard: in a production build, missing Stripe config would let
+// createCheckoutSessionMock silently grant a fake subscription to a
+// real user. Throw at module load so the deploy fails loudly instead.
+if (import.meta.env.PROD && !isStripeConfigured()) {
+  throw new Error(
+    '[SubscriptionContext] VITE_STRIPE_PUBLISHABLE_KEY (or _TEST) is missing in production. ' +
+    'Refusing to boot — would silently grant fake subscriptions via createCheckoutSessionMock. ' +
+    'Set the Stripe publishable key in Netlify env vars and redeploy.'
+  );
+}
+
 // True when Supabase is configured (auth available)
 const isAuthConfigured = () =>
   !!(import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY);
