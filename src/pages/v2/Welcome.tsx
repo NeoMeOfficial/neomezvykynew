@@ -99,6 +99,17 @@ export default function Welcome() {
             Demo
           </span>
         </div>
+        {/* Real <a> so Google's OAuth-verification crawler can discover the
+            privacy policy link from the public homepage. Must be an anchor,
+            not an onClick span — crawlers don't execute JS handlers. */}
+        <div style={{ textAlign: 'center', marginTop: 10, fontFamily: 'DM Sans', fontSize: 11, color: 'rgba(255,255,255,0.45)', fontWeight: 400 }}>
+          <a
+            href="/privacy"
+            style={{ color: 'rgba(255,255,255,0.72)', textDecoration: 'underline', textUnderlineOffset: 3 }}
+          >
+            Zásady ochrany osobných údajov
+          </a>
+        </div>
       </div>
     </div>
   );
