@@ -12,7 +12,7 @@ import { supabase } from '../../lib/supabase';
 import { uploadContentImage } from '../../lib/storage';
 import BlogEditor from '../../components/admin/BlogEditor';
 import ContentManager from '../../components/admin/ContentManager';
-import { useAdminMessages } from '../../hooks/useMessages';
+import { useAdminMessages, useUnreviewedPostsCount, useUnreadAdminMessagesCount } from '../../hooks/useMessages';
 import { recipes as staticRecipesData } from '../../data/recipes';
 import { TeloExtraStaticData } from '../../data/teloExtraData';
 import { TeloStrecingStaticData } from '../../data/teloStrecingData';
@@ -662,12 +662,13 @@ interface AdminPost {
   comments_count: number;
   status: 'visible' | 'removed';
   created_at: string;
+  reviewed_at: string | null;
 }
 
 function CommunityModerationTab() {
   const [posts, setPosts] = useState<AdminPost[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<'all' | 'removed'>('all');
+  const [filter, setFilter] = useState<'unreviewed' | 'all' | 'removed'>('unreviewed');
   const [busy, setBusy] = useState<string | null>(null);
 
   // Admin sees ALL posts including removed ones — so they can restore.
@@ -677,16 +678,34 @@ function CommunityModerationTab() {
     setLoading(true);
     const { data, error } = await supabase
       .from('community_posts')
-      .select('id, user_id, author_name, type, content, likes_count, comments_count, status, created_at')
+      .select('id, user_id, author_name, type, content, likes_count, comments_count, status, created_at, reviewed_at')
       .order('created_at', { ascending: false })
       .limit(100);
     if (!error && data) {
       setPosts(data.map(r => ({
         ...r,
         status: (r.status as 'visible' | 'removed') ?? 'visible',
+        reviewed_at: r.reviewed_at ?? null,
       })));
     }
     setLoading(false);
+  };
+
+  const toggleReviewed = async (id: string, current: string | null) => {
+    if (busy) return;
+    setBusy(id);
+    const nextValue = current ? null : new Date().toISOString();
+    const { data: { user } } = await supabase.auth.getUser();
+    const { error } = await supabase
+      .from('community_posts')
+      .update({ reviewed_at: nextValue, reviewed_by: nextValue ? user?.id : null })
+      .eq('id', id);
+    if (error) {
+      alert('Chyba pri označení: ' + error.message);
+    } else {
+      setPosts(prev => prev.map(p => p.id === id ? { ...p, reviewed_at: nextValue } : p));
+    }
+    setBusy(null);
   };
 
   useEffect(() => { load(); }, []);
@@ -715,9 +734,14 @@ function CommunityModerationTab() {
     setBusy(null);
   };
 
-  const visible = posts.filter(p => filter === 'all' ? true : p.status === 'removed');
+  const visible = posts.filter(p => {
+    if (filter === 'removed') return p.status === 'removed';
+    if (filter === 'unreviewed') return p.status !== 'removed' && !p.reviewed_at;
+    return true;
+  });
   const removedCount = posts.filter(p => p.status === 'removed').length;
   const visibleCount = posts.length - removedCount;
+  const unreviewedCount = posts.filter(p => p.status !== 'removed' && !p.reviewed_at).length;
 
   const statNum = (val: number, color: string) => (
     <div style={{ textAlign: 'center' }}>
@@ -1916,11 +1940,20 @@ function MessagesTab() {
   const {
     conversations, loading, sending,
     selectedUserId, setSelectedUserId,
-    thread, sendReply, totalUnread,
+    thread, sendReply, totalUnread, setAssignment,
   } = useAdminMessages();
   const [reply, setReply] = React.useState('');
   const [userNames, setUserNames] = React.useState<Record<string, string>>({});
+  const [filter, setFilter] = React.useState<'all' | 'gabi' | 'admin' | 'unassigned'>('all');
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  const filteredConversations = React.useMemo(() => {
+    if (filter === 'all') return conversations;
+    if (filter === 'unassigned') return conversations.filter(c => c.assigned_to === null);
+    return conversations.filter(c => c.assigned_to === filter);
+  }, [conversations, filter]);
+
+  const selectedConv = conversations.find(c => c.user_id === selectedUserId);
 
   // Fetch display names for conversation user IDs
   React.useEffect(() => {
@@ -1971,16 +2004,41 @@ function MessagesTab() {
         {/* Conversation list */}
         <div style={{ background: _A.CARD, borderRadius: 16, border: `1px solid ${_A.HAIR}`, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
           <div style={{ padding: '14px 18px', borderBottom: `1px solid ${_A.HAIR}`, fontFamily: 'DM Sans, system-ui', fontSize: 9.5, letterSpacing: '0.18em', textTransform: 'uppercase', color: _A.EYEBROW, fontWeight: 500 }}>Conversations</div>
+          {/* Filter pills */}
+          <div style={{ display: 'flex', gap: 6, padding: '10px 14px', borderBottom: `1px solid ${_A.HAIR}`, flexWrap: 'wrap' }}>
+            {([
+              { id: 'all', label: 'All' },
+              { id: 'gabi', label: 'Gabi' },
+              { id: 'admin', label: 'Admin' },
+              { id: 'unassigned', label: 'Unassigned' },
+            ] as const).map(p => {
+              const active = filter === p.id;
+              return (
+                <button
+                  key={p.id}
+                  onClick={() => setFilter(p.id)}
+                  style={{
+                    all: 'unset', cursor: 'pointer',
+                    fontFamily: 'DM Sans, system-ui', fontSize: 10, fontWeight: 600,
+                    padding: '4px 10px', borderRadius: 999,
+                    background: active ? _A.DEEP : 'transparent',
+                    color: active ? '#fff' : _A.MUTED,
+                    border: `1px solid ${active ? _A.DEEP : _A.HAIR}`,
+                  }}
+                >{p.label}</button>
+              );
+            })}
+          </div>
           <div style={{ flex: 1, overflowY: 'auto' }}>
             {loading ? (
               <p style={{ padding: 16, fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>Loading…</p>
-            ) : conversations.length === 0 ? (
+            ) : filteredConversations.length === 0 ? (
               <div style={{ padding: '24px 16px', textAlign: 'center' }}>
                 <MessageSquare style={{ width: 28, height: 28, color: _A.MUTED, margin: '0 auto 8px' }} />
-                <p style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>No messages yet</p>
+                <p style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>{filter === 'all' ? 'No messages yet' : 'No conversations match this filter'}</p>
               </div>
             ) : (
-              conversations.map((conv) => (
+              filteredConversations.map((conv) => (
                 <button
                   key={conv.user_id}
                   onClick={() => setSelectedUserId(conv.user_id)}
@@ -1996,6 +2054,15 @@ function MessagesTab() {
                         <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10, color: _A.TERTIARY, flexShrink: 0 }}>{formatTime(conv.last_time)}</span>
                       </div>
                       <p style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: 2 }}>{conv.last_message}</p>
+                      {conv.assigned_to && (
+                        <span style={{
+                          display: 'inline-block', marginTop: 4,
+                          fontFamily: 'DM Sans, system-ui', fontSize: 9, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase',
+                          padding: '2px 7px', borderRadius: 999,
+                          background: conv.assigned_to === 'gabi' ? 'rgba(193,122,110,0.15)' : 'rgba(184,134,74,0.15)',
+                          color: conv.assigned_to === 'gabi' ? _A.TERRA : _A.GOLD,
+                        }}>{conv.assigned_to === 'gabi' ? 'Gabi' : 'Admin'}</span>
+                      )}
                     </div>
                     {conv.unread > 0 && (
                       <span style={{ width: 18, height: 18, borderRadius: 999, background: _A.TERRA, color: '#fff', fontSize: 9, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{conv.unread}</span>
@@ -2024,9 +2091,24 @@ function MessagesTab() {
                   <ArrowLeft style={{ width: 15, height: 15, color: _A.MUTED }} />
                 </button>
                 <div style={{ width: 28, height: 28, borderRadius: 999, background: _A.CREAM2, color: _A.DEEP, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Gilda Display, Georgia, serif', fontSize: 13, fontWeight: 500 }}>{displayName(selectedUserId!).charAt(0).toUpperCase()}</div>
-                <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 13, fontWeight: 500, color: _A.DEEP }}>
+                <span style={{ flex: 1, fontFamily: 'DM Sans, system-ui', fontSize: 13, fontWeight: 500, color: _A.DEEP }}>
                   {displayName(selectedUserId)}
                 </span>
+                {/* Assignment dropdown */}
+                <label style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10, color: _A.EYEBROW, fontWeight: 500, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Assign</label>
+                <select
+                  value={selectedConv?.assigned_to ?? ''}
+                  onChange={e => setAssignment(selectedUserId, (e.target.value || null) as 'gabi' | 'admin' | null)}
+                  style={{
+                    fontFamily: 'DM Sans, system-ui', fontSize: 12, fontWeight: 500, color: _A.DEEP,
+                    padding: '4px 10px', borderRadius: 8, border: `1px solid ${_A.HAIR}`,
+                    background: _A.CARD, cursor: 'pointer',
+                  }}
+                >
+                  <option value="">Unassigned</option>
+                  <option value="gabi">Gabi</option>
+                  <option value="admin">Admin</option>
+                </select>
               </div>
 
               {/* Messages */}
@@ -3270,6 +3352,12 @@ export default function AdminNew() {
   const [activeTab, setActiveTab] = useState<string>('overview');
   const [analytics, setAnalytics] = useState<AdminAnalytics | null>(null);
   const [analyticsLoading, setAnalyticsLoading] = useState(true);
+  const unreadMessagesCount = useUnreadAdminMessagesCount();
+  const unreviewedPostsCount = useUnreviewedPostsCount();
+  const badgeCounts: Record<string, number> = {
+    messages: unreadMessagesCount,
+    community: unreviewedPostsCount,
+  };
 
   useEffect(() => {
     if (activeTab !== 'overview') return;
@@ -3297,6 +3385,7 @@ export default function AdminNew() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
           {navigationItems.map((item) => {
             const isActive = activeTab === item.id;
+            const badge = badgeCounts[item.id] ?? 0;
             return (
               <button
                 key={item.id}
@@ -3317,6 +3406,14 @@ export default function AdminNew() {
                   <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12.5, fontWeight: 500, color: isActive ? '#fff' : A.DEEP, lineHeight: 1.2 }}>{item.label}</div>
                   <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10, color: isActive ? 'rgba(255,255,255,0.6)' : A.TERTIARY, fontWeight: 400, marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.description}</div>
                 </div>
+                {badge > 0 && (
+                  <span style={{
+                    minWidth: 18, height: 18, padding: '0 6px', borderRadius: 999,
+                    background: isActive ? A.GOLD : _A.TERRA, color: '#fff',
+                    fontFamily: 'DM Sans, system-ui', fontSize: 10, fontWeight: 700,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                  }}>{badge > 99 ? '99+' : badge}</span>
+                )}
               </button>
             );
           })}

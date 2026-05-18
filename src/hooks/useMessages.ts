@@ -135,11 +135,14 @@ export function useMessages() {
 
 // ── Admin-facing hook (Gabi's inbox) ─────────────────────────────────────────
 
+export type AssignedTo = 'gabi' | 'admin' | null;
+
 export interface Conversation {
   user_id: string;
   last_message: string;
   last_time: string;
   unread: number; // messages from user that admin hasn't read
+  assigned_to: AssignedTo;
 }
 
 export function useAdminMessages() {
@@ -160,33 +163,59 @@ export function useAdminMessages() {
           last_message: msgs[msgs.length - 1]?.body ?? '',
           last_time: msgs[msgs.length - 1]?.created_at ?? new Date().toISOString(),
           unread: msgs.filter(m => !m.is_from_admin && !m.read_at).length,
+          assigned_to: null,
         },
       ]);
       setLoading(false);
       return;
     }
 
-    const { data } = await supabase
-      .from('messages')
-      .select('user_id, body, created_at, is_from_admin, read_at')
-      .order('created_at', { ascending: false });
+    const [{ data: msgs }, { data: assigns }] = await Promise.all([
+      supabase
+        .from('messages')
+        .select('user_id, body, created_at, is_from_admin, read_at')
+        .order('created_at', { ascending: false }),
+      supabase
+        .from('message_assignments')
+        .select('user_id, assigned_to'),
+    ]);
 
-    if (data) {
-      const grouped: Record<string, typeof data> = {};
-      for (const m of data) {
+    if (msgs) {
+      const assignMap: Record<string, AssignedTo> = {};
+      for (const a of assigns ?? []) assignMap[a.user_id] = a.assigned_to as AssignedTo;
+
+      const grouped: Record<string, typeof msgs> = {};
+      for (const m of msgs) {
         if (!grouped[m.user_id]) grouped[m.user_id] = [];
         grouped[m.user_id].push(m);
       }
       setConversations(
-        Object.entries(grouped).map(([user_id, msgs]) => ({
+        Object.entries(grouped).map(([user_id, list]) => ({
           user_id,
-          last_message: msgs[0].body,
-          last_time: msgs[0].created_at,
-          unread: msgs.filter(m => !m.is_from_admin && !m.read_at).length,
+          last_message: list[0].body,
+          last_time: list[0].created_at,
+          unread: list.filter(m => !m.is_from_admin && !m.read_at).length,
+          assigned_to: assignMap[user_id] ?? null,
         }))
       );
     }
     setLoading(false);
+  }, []);
+
+  // Set / clear assignment on a conversation. Pass null to clear.
+  const setAssignment = useCallback(async (userId: string, value: AssignedTo) => {
+    if (!isSupabaseConfigured()) {
+      setConversations(prev => prev.map(c => c.user_id === userId ? { ...c, assigned_to: value } : c));
+      return;
+    }
+    if (value === null) {
+      await supabase.from('message_assignments').delete().eq('user_id', userId);
+    } else {
+      await supabase
+        .from('message_assignments')
+        .upsert({ user_id: userId, assigned_to: value, assigned_at: new Date().toISOString() }, { onConflict: 'user_id' });
+    }
+    setConversations(prev => prev.map(c => c.user_id === userId ? { ...c, assigned_to: value } : c));
   }, []);
 
   // Load messages for a specific user thread
@@ -262,6 +291,55 @@ export function useAdminMessages() {
     thread,
     sendReply,
     totalUnread,
+    setAssignment,
     refetch: fetchConversations,
   };
+}
+
+// ── Lightweight count hook: unread user→admin messages ─────────────────────
+// Polls every 30s. Used by the admin sidebar to badge the Messages tab.
+export function useUnreadAdminMessagesCount() {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    let cancelled = false;
+    const fetchCount = async () => {
+      if (!isSupabaseConfigured()) return;
+      const { count: c } = await supabase
+        .from('messages')
+        .select('id', { count: 'exact', head: true })
+        .eq('is_from_admin', false)
+        .is('read_at', null);
+      if (!cancelled && typeof c === 'number') setCount(c);
+    };
+    fetchCount();
+    const timer = setInterval(fetchCount, 30_000);
+    return () => { cancelled = true; clearInterval(timer); };
+  }, []);
+
+  return count;
+}
+
+// ── Lightweight count hook: unreviewed community posts ──────────────────────
+// Polls every 30s. Used by the admin sidebar to badge the Community tab.
+export function useUnreviewedPostsCount() {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    let cancelled = false;
+    const fetchCount = async () => {
+      if (!isSupabaseConfigured()) return;
+      const { count: c } = await supabase
+        .from('community_posts')
+        .select('id', { count: 'exact', head: true })
+        .is('reviewed_at', null)
+        .neq('status', 'removed');
+      if (!cancelled && typeof c === 'number') setCount(c);
+    };
+    fetchCount();
+    const timer = setInterval(fetchCount, 30_000);
+    return () => { cancelled = true; clearInterval(timer); };
+  }, []);
+
+  return count;
 }
