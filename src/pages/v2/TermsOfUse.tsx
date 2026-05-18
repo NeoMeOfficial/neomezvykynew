@@ -25,7 +25,7 @@ const OPERATOR = {
   name: 'NeoMe Group Pty Ltd',
   abn: '93690647137',
   address: '4 Maidstone Street, Melbourne 3018, Australia',
-  email: 'klientky@neome.com.au',
+  email: 'gabi@neome.com.au',
 };
 
 interface SectionProps {

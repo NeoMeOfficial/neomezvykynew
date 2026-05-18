@@ -248,6 +248,82 @@ export default function PrivacyPolicy() {
           </P>
         </Section>
 
+        <Section no="4a" title="Osobitné ochranné opatrenia pre údaje o zdraví">
+          <P>
+            Údaje o menštruačnom cykle, symptómoch, nálade, plodnosti, spánku
+            a ďalších telesných funkciách patria do <Strong>osobitnej kategórie
+            osobných údajov podľa čl. 9 GDPR</Strong>. Vzhľadom na ich citlivú povahu
+            uplatňujeme nad rámec všeobecných opatrení tieto dodatočné záruky:
+          </P>
+          <Bullet>
+            <Strong>Výslovný a granulárny súhlas.</Strong> Tieto údaje spracúvame výlučne
+            na základe vášho výslovného súhlasu podľa čl. 9 ods. 2 písm. a GDPR, ktorý
+            si vyžiadame priamo v aplikácii pred prvým záznamom citlivého údaja.
+            Súhlas je <Strong>samostatný od ostatných súhlasov</Strong> (komunita,
+            marketing) a môžete ho udeliť alebo odvolať nezávisle.
+          </Bullet>
+          <Bullet>
+            <Strong>Nikdy nezdieľame, nepredávame ani neprenajímame</Strong> údaje
+            o zdraví poisťovniam, zamestnávateľom, reklamným sieťam, sociálnym
+            platformám ani inkasným spoločnostiam. Údaje o zdraví zostávajú v rámci
+            úzkeho okruhu sprostredkovateľov uvedených v bode 4 výlučne pre prevádzku
+            samotnej Služby a <Strong>nikdy neopúšťajú</Strong> tento okruh.
+          </Bullet>
+          <Bullet>
+            <Strong>Princíp minimalizácie a obmedzenia účelu.</Strong> Zaznamenávame
+            iba tie údaje, ktoré sami zadáte v aplikácii. Nezbierame skryté zdravotné
+            údaje z biometrických senzorov zariadenia, zo zdravotných služieb tretích
+            strán (Apple Health, Google Fit a pod.) ani z iných zdrojov bez vášho
+            výslovného povolenia. Údaje o zdraví používame výhradne na účely, ktoré
+            ste výslovne odsúhlasili — najmä personalizáciu odporúčaní, predikcie cyklu
+            a vašu vlastnú spätnú väzbu.
+          </Bullet>
+          <Bullet>
+            <Strong>Dôsledky odvolania súhlasu.</Strong> Súhlas môžete kedykoľvek
+            odvolať v sekcii <Strong>Nastavenia → Súkromie</Strong>. Po odvolaní:
+            (i) okamžite zastavíme akúkoľvek personalizáciu a odvodzovanie nových
+            predikcií zo zdravotných údajov, (ii) <Strong>existujúce záznamy zostanú
+            uchované vo vašom účte iba pre vaše osobné nahliadnutie</Strong>, kým ich
+            sami nezmažete, (iii) môžete si ich kedykoľvek individuálne odstrániť,
+            stiahnuť cez Export údajov, alebo zmazať spolu s celým účtom (sekcia
+            <Strong> Nastavenia → Zmazať účet</Strong>). Odvolanie súhlasu nemá
+            spätné účinky na zákonnosť spracúvania pred jeho odvolaním (čl. 7 ods. 3
+            druhá veta GDPR).
+          </Bullet>
+          <Bullet>
+            <Strong>Automatické predikcie a profilovanie.</Strong> Aplikácia z vašich
+            záznamov automaticky vypočíta odhadovanú fázu cyklu, predpokladaný dátum
+            ďalšej menštruácie, plodné okno a odporúčania prispôsobené fáze. Tieto
+            odvodené údaje sú <Strong>výhradne informatívne</Strong>. Nemajú pre vás
+            právne účinky ani vás podobne významne neovplyvňujú v zmysle čl. 22 GDPR
+            — neslúžia na rozhodovanie o vašom zdraví, antikoncepcii ani plánovaní
+            rodičovstva. <Strong>Nenahrádzajú lekársku diagnostiku ani profesionálne
+            poradenstvo.</Strong> Pri závažných zdravotných otázkach kontaktujte
+            kvalifikovaného zdravotníckeho pracovníka.
+          </Bullet>
+          <Bullet>
+            <Strong>Audit prístupu zamestnancov.</Strong> Každý prístup oprávneného
+            zamestnanca k údajom o zdraví konkrétnej používateľky je technicky zaznamenaný
+            do <Strong>auditného logu</Strong> s časovou pečiatkou a uvedením dôvodu
+            (najčastejšie technická podpora na vašu výslovnú žiadosť alebo riešenie
+            bezpečnostného incidentu). Zamestnanci sú viazaní zmluvnou mlčanlivosťou
+            a interné zaobchádzanie s týmito údajmi podlieha pravidelnému internému auditu.
+          </Bullet>
+          <Bullet>
+            <Strong>Posúdenie vplyvu na ochranu údajov (DPIA).</Strong> Vzhľadom na
+            rozsiahle spracúvanie osobitnej kategórie údajov sme v zmysle čl. 35 GDPR
+            vypracovali Posúdenie vplyvu na ochranu osobných údajov, ktoré pravidelne
+            aktualizujeme. Zhrnutie poskytneme dotknutým osobám alebo dozornému orgánu
+            na požiadanie.
+          </Bullet>
+          <Bullet>
+            <Strong>Šifrovanie v pokoji aj v prenose.</Strong> Údaje o zdraví sú
+            šifrované počas prenosu (TLS 1.2+) aj v databáze poskytovateľa hostingu
+            (AES-256 at-rest). Heslá ukladáme výlučne v podobe jednosmerného
+            kryptografického hashu (bcrypt / argon2).
+          </Bullet>
+        </Section>
+
         <Section no="5" title="Prenos údajov mimo EÚ / EHP">
           <P>
             Prevádzkovateľ má sídlo v Austrálii a niektorí naši sprostredkovatelia
