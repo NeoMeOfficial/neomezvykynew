@@ -91,6 +91,7 @@ const WorkoutDemo = lazy(() => import('./pages/v2/WorkoutDemo'));
 const BuddySystem = lazy(() => import('./pages/v2/BuddySystem'));
 const Blog = lazy(() => import('./pages/v2/Blog'));
 const PrivacyPolicy = lazy(() => import('./pages/v2/PrivacyPolicy'));
+import { TosConsentGate } from './components/v2/TosConsentGate';
 const SubscriptionManagement = lazy(() => import('./pages/v2/SubscriptionManagement'));
 const CheckoutSuccess = lazy(() => import('./pages/v2/CheckoutSuccess'));
 const CheckoutCanceled = lazy(() => import('./pages/v2/CheckoutCanceled'));
@@ -267,7 +268,7 @@ export default function AppV2() {
             <Route path="/privacy" element={<PrivacyPolicy />} />
 
             {/* Full-screen protected routes — no BottomNav */}
-            <Route element={<RequireAuth><Outlet /></RequireAuth>}>
+            <Route element={<RequireAuth><TosConsentGate><Outlet /></TosConsentGate></RequireAuth>}>
               <Route path="/paywall" element={<Paywall />} />
               <Route path="/checkout" element={<CheckoutLauncher />} />
               <Route path="/checkout/success" element={<CheckoutSuccess />} />
@@ -290,7 +291,7 @@ export default function AppV2() {
             <Route path="/onboarding-plus/hotovo" element={<PlusFinal />} />
 
             {/* Protected routes */}
-            <Route element={<RequireAuth><AppLayout /></RequireAuth>}>
+            <Route element={<RequireAuth><TosConsentGate><AppLayout /></TosConsentGate></RequireAuth>}>
               <Route path="/domov" element={<Navigate to="/domov-new" replace />} />
               <Route path="/domov-new" element={<DomovNew />} />
               <Route path="/new-home" element={<DomovNew />} />
