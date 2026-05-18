@@ -2,6 +2,29 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { useSupabaseAuth } from '../../contexts/SupabaseAuthContext';
 import { supabase, isSupabaseConfigured } from '../../lib/supabase';
+import { CONSENT_POLICY_VERSION, CONSENT_TYPES, ConsentType } from '../../lib/consents';
+
+// Bridge for capturing consent intent BEFORE the user has an authed
+// session (signup-with-email-confirm and OAuth redirects both leave a
+// window where auth.uid() is null). SupabaseAuthProvider drains this
+// on the first authed session and writes the consent_events rows.
+const PENDING_CONSENTS_KEY = 'pending_consents_v1';
+function stashPendingConsents(decisions: Partial<Record<ConsentType, boolean>>) {
+  try {
+    localStorage.setItem(
+      PENDING_CONSENTS_KEY,
+      JSON.stringify({
+        decisions,
+        policy_version: CONSENT_POLICY_VERSION,
+        source: 'signup',
+        stashed_at: new Date().toISOString(),
+      })
+    );
+  } catch {
+    // localStorage may be unavailable (private mode) — non-fatal; consent
+    // can still be captured in Settings post-signup.
+  }
+}
 
 // Where to send the user after a successful login or signup. The
 // onboarding-plan screen writes this before sending the user here, so
@@ -70,7 +93,9 @@ export default function AuthReal() {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: '', password: '', firstName: '', lastName: '',
-    confirmPassword: '', gdprConsent: false,
+    confirmPassword: '',
+    tosPrivacyConsent: false,   // required — Article 13/14 transparency acknowledgment
+    marketingConsent: false,    // optional — Article 6(1)(a) consent for marketing
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
@@ -110,10 +135,15 @@ export default function AuthReal() {
       setErrors({ name: 'Vyplňte meno a priezvisko' });
       return;
     }
-    if (!formData.gdprConsent) {
-      setErrors({ gdpr: 'Súhlas so spracovaním údajov je povinný' });
+    if (!formData.tosPrivacyConsent) {
+      setErrors({ gdpr: 'Súhlas s Podmienkami a Zásadami ochrany je povinný' });
       return;
     }
+    // Stash chosen consents — drained on first authed session.
+    stashPendingConsents({
+      [CONSENT_TYPES.TOS_PRIVACY]: true,
+      [CONSENT_TYPES.MARKETING]: formData.marketingConsent,
+    });
     setSubmitting(true);
     try {
       // If another user is already signed in on this device, sign them
@@ -126,7 +156,7 @@ export default function AuthReal() {
       if (existing) {
         await supabase.auth.signOut();
       }
-      const { error } = await signUp(formData.email, formData.password, formData.firstName, formData.lastName, true);
+      const { error } = await signUp(formData.email, formData.password, formData.firstName, formData.lastName, formData.tosPrivacyConsent);
       if (error) {
         setErrors({ submit: error.message });
       } else {
@@ -153,6 +183,23 @@ export default function AuthReal() {
     if (!isSupabaseConfigured()) {
       setErrors({ submit: 'Prihlásenie cez sociálne siete je v príprave.' });
       return;
+    }
+    // When a user clicks Google from the register form, treat it as
+    // signup: require the TOS+Privacy checkbox and stash the consent
+    // intent so it's recorded on the post-OAuth session callback.
+    // From the choose/login screen we allow Google directly — if the
+    // user turns out to be brand-new, the post-auth gate (see TODO in
+    // SupabaseAuthProvider) will prompt for TOS consent before granting
+    // app access.
+    if (mode === 'register') {
+      if (!formData.tosPrivacyConsent) {
+        setErrors({ gdpr: 'Súhlas s Podmienkami a Zásadami ochrany je povinný' });
+        return;
+      }
+      stashPendingConsents({
+        [CONSENT_TYPES.TOS_PRIVACY]: true,
+        [CONSENT_TYPES.MARKETING]: formData.marketingConsent,
+      });
     }
     setErrors({});
     setSubmitting(true);
@@ -378,22 +425,40 @@ export default function AuthReal() {
                 autoComplete="new-password"
               />
               {errors.confirmPassword && <FieldError>{errors.confirmPassword}</FieldError>}
+              {/* Required: TOS + Privacy Policy acknowledgment. Splitting
+                  health-data consent into a separate prompt on first
+                  cycle-screen visit keeps consent "freely given" per
+                  Art. 7(4) GDPR (not bundled with sign-up). */}
               <label style={{ display: 'flex', alignItems: 'flex-start', gap: 10, paddingTop: 4, cursor: 'pointer' }}>
                 <input
                   type="checkbox"
-                  checked={formData.gdprConsent}
-                  onChange={(e) => { setFormData((p) => ({ ...p, gdprConsent: e.target.checked })); if (errors.gdpr) setErrors((p) => ({ ...p, gdpr: '' })); }}
+                  checked={formData.tosPrivacyConsent}
+                  onChange={(e) => { setFormData((p) => ({ ...p, tosPrivacyConsent: e.target.checked })); if (errors.gdpr) setErrors((p) => ({ ...p, gdpr: '' })); }}
                   style={{ marginTop: 3, width: 16, height: 16, accentColor: T.INK, flexShrink: 0 }}
                 />
                 <span style={{ fontSize: 11.5, color: T.FG_2, lineHeight: 1.5, fontWeight: 300 }}>
-                  Súhlasím so{' '}
-                  <a href="https://neome.sk/privacy" target="_blank" rel="noreferrer" style={{ color: T.INK, textDecoration: 'underline', textUnderlineOffset: 2 }}>
-                    spracovaním osobných údajov
-                  </a>{' '}
-                  vrátane zdravotných dát (cyklus, symptómy) v súlade s GDPR.
+                  Prečítala som si a súhlasím s{' '}
+                  <a href="/privacy" target="_blank" rel="noreferrer" style={{ color: T.INK, textDecoration: 'underline', textUnderlineOffset: 2 }}>
+                    Zásadami ochrany osobných údajov
+                  </a>
+                  {' '}a Podmienkami používania. <span style={{ color: T.TERRA }}>*</span>
                 </span>
               </label>
               {errors.gdpr && <FieldError>{errors.gdpr}</FieldError>}
+
+              {/* Optional: marketing consent — must be unticked by default
+                  (Planet49 ruling, pre-ticked boxes invalid under GDPR). */}
+              <label style={{ display: 'flex', alignItems: 'flex-start', gap: 10, cursor: 'pointer' }}>
+                <input
+                  type="checkbox"
+                  checked={formData.marketingConsent}
+                  onChange={(e) => setFormData((p) => ({ ...p, marketingConsent: e.target.checked }))}
+                  style={{ marginTop: 3, width: 16, height: 16, accentColor: T.INK, flexShrink: 0 }}
+                />
+                <span style={{ fontSize: 11.5, color: T.FG_2, lineHeight: 1.5, fontWeight: 300 }}>
+                  Chcem dostávať občasné e-maily o novinkách a tipoch od NeoMe. (Voliteľné — môžeš sa kedykoľvek odhlásiť.)
+                </span>
+              </label>
             </div>
             {errors.submit && <Banner tone="error">{errors.submit}</Banner>}
             {errors.success && <Banner tone="info">{errors.success}</Banner>}

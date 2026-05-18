@@ -4,6 +4,8 @@ import { useSupabaseAuth } from '../../contexts/SupabaseAuthContext';
 import { supabase } from '../../lib/supabase';
 import { useToast } from '@/hooks/use-toast';
 import { Page, BackHeader, Eye, Ser, NM } from '../../components/v2/neome';
+import { useConsents } from '../../hooks/useConsents';
+import { CONSENT_LABELS, CONSENT_TYPES, ConsentType } from '../../lib/consents';
 
 /**
  * Settings · Privacy & data — R10
@@ -29,17 +31,45 @@ const PERMS = [
 
 const DATA_ACTIONS = [
   { id: 'export', t: 'Stiahnuť moje dáta', d: 'PDF export všetkých zápisov a štatistík' },
-  { id: 'rules', t: 'Pravidlá ochrany', d: 'Ako používame tvoje dáta' },
-  { id: 'thirdparty', t: 'Tretie strany', d: 'Stripe, Supabase, Sentry' },
+  { id: 'rules', t: 'Zásady ochrany osobných údajov', d: 'Ako spracúvame tvoje údaje (GDPR)' },
+  { id: 'thirdparty', t: 'Tretie strany', d: 'Stripe, Supabase, Google, Netlify' },
+];
+
+// Order in which consents appear in the UI — TOS first (most important),
+// health-data second (Article 9 / cycle features), then optional ones.
+const CONSENT_DISPLAY_ORDER: ConsentType[] = [
+  CONSENT_TYPES.TOS_PRIVACY,
+  CONSENT_TYPES.HEALTH_DATA,
+  CONSENT_TYPES.MARKETING,
+  CONSENT_TYPES.COMMUNITY,
 ];
 
 export default function SettingsPrivacy() {
   const navigate = useNavigate();
   const { profile, updateProfile } = useSupabaseAuth();
   const { toast } = useToast();
+  const { consents, isGranted, grant, withdraw, loading: consentsLoading } = useConsents();
   const [visibility, setVisibility] = useState<'public' | 'private'>('public');
   const [perms, setPerms] = useState<Record<string, boolean>>(() => Object.fromEntries(PERMS.map((p) => [p.id, p.defaultOn])));
   const [exporting, setExporting] = useState(false);
+  const [consentBusy, setConsentBusy] = useState<ConsentType | null>(null);
+
+  const toggleConsent = async (type: ConsentType, nextValue: boolean) => {
+    if (consentBusy) return;
+    setConsentBusy(type);
+    const { error } = nextValue
+      ? await grant(type, 'settings')
+      : await withdraw(type, 'settings');
+    setConsentBusy(null);
+    if (error) {
+      toast({ title: 'Nepodarilo sa uložiť', variant: 'destructive' });
+    } else {
+      toast({
+        title: nextValue ? 'Súhlas udelený' : 'Súhlas odvolaný',
+        description: nextValue ? undefined : 'Záznam zostáva v audit logu pre účely preukázania.',
+      });
+    }
+  };
 
   useEffect(() => {
     const prefs = (profile?.privacy_prefs ?? {}) as Record<string, boolean | string>;
@@ -169,6 +199,77 @@ export default function SettingsPrivacy() {
       </div>
 
       <div style={{ margin: '22px 18px 0' }}>
+        <Eye size={10} style={{ marginBottom: 10 }}>Súhlasy (GDPR)</Eye>
+        <div style={{ background: '#fff', borderRadius: 14, border: `1px solid ${NM.HAIR}`, overflow: 'hidden' }}>
+          {CONSENT_DISPLAY_ORDER.map((type, i) => {
+            const label = CONSENT_LABELS[type];
+            const granted = isGranted(type);
+            const required = type === CONSENT_TYPES.TOS_PRIVACY;
+            const row = consents[type];
+            const effective = row?.effective_at
+              ? new Date(row.effective_at).toLocaleDateString('sk-SK', { day: 'numeric', month: 'long', year: 'numeric' })
+              : null;
+            const busy = consentBusy === type;
+            return (
+              <div
+                key={type}
+                style={{
+                  padding: '14px 16px',
+                  borderBottom: i < CONSENT_DISPLAY_ORDER.length - 1 ? `1px solid ${NM.HAIR}` : 'none',
+                  display: 'flex',
+                  gap: 12,
+                  alignItems: 'flex-start',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontFamily: NM.SANS, fontSize: 13, color: NM.DEEP, fontWeight: 500, display: 'flex', alignItems: 'center', gap: 6 }}>
+                    {label.title}
+                    {required && <span style={{ fontSize: 10, color: NM.TERRA, fontWeight: 500 }}>· povinné</span>}
+                  </div>
+                  <div style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.MUTED, marginTop: 3, fontWeight: 300, lineHeight: 1.5 }}>
+                    {label.description}
+                  </div>
+                  <div style={{ fontFamily: NM.SANS, fontSize: 10.5, color: NM.TERTIARY, marginTop: 6, letterSpacing: '0.02em' }}>
+                    {consentsLoading
+                      ? 'Načítavam…'
+                      : granted
+                        ? `Udelené${effective ? ` · ${effective}` : ''}`
+                        : row && !row.granted
+                          ? `Odvolané${effective ? ` · ${effective}` : ''}`
+                          : 'Nezaznamenané'}
+                  </div>
+                </div>
+                <button
+                  onClick={() => toggleConsent(type, !granted)}
+                  disabled={busy || (required && granted)}
+                  aria-pressed={granted}
+                  title={required && granted ? 'Tento súhlas je povinný na používanie aplikácie. Pre odvolanie zruš účet.' : undefined}
+                  style={{
+                    all: 'unset',
+                    cursor: busy || (required && granted) ? 'not-allowed' : 'pointer',
+                    opacity: busy ? 0.5 : 1,
+                    width: 40,
+                    height: 24,
+                    borderRadius: 999,
+                    background: granted ? NM.DEEP : NM.HAIR_2,
+                    position: 'relative',
+                    flexShrink: 0,
+                    marginTop: 2,
+                  }}
+                >
+                  <div style={{ position: 'absolute', top: 2, left: granted ? 18 : 2, width: 20, height: 20, borderRadius: 999, background: '#fff', transition: 'all .2s' }} />
+                </button>
+              </div>
+            );
+          })}
+        </div>
+        <div style={{ fontFamily: NM.SANS, fontSize: 10.5, color: NM.TERTIARY, marginTop: 8, lineHeight: 1.55, padding: '0 4px' }}>
+          Tvoje rozhodnutia o súhlasoch sú zaznamenané v nemennom audit logu (čl. 7 GDPR). Odvolanie súhlasu nemá spätné účinky na predchádzajúce spracovanie.
+        </div>
+      </div>
+
+      <div style={{ margin: '22px 18px 0' }}>
         <Eye size={10} style={{ marginBottom: 10 }}>Dáta</Eye>
         <div style={{ background: '#fff', borderRadius: 14, border: `1px solid ${NM.HAIR}`, overflow: 'hidden' }}>
           {DATA_ACTIONS.map((it, i) => (
@@ -178,9 +279,11 @@ export default function SettingsPrivacy() {
                 if (it.id === 'export') {
                   onExport();
                 } else if (it.id === 'rules') {
-                  window.open('https://neome.sk/privacy', '_blank');
+                  navigate('/privacy');
                 } else if (it.id === 'thirdparty') {
-                  window.open('https://neome.sk/third-party', '_blank');
+                  // Third-party processors are documented in section 4
+                  // of the privacy policy itself — point there.
+                  navigate('/privacy');
                 }
               }}
               style={{

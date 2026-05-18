@@ -1,6 +1,62 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, AuthError, Session } from '@supabase/supabase-js';
 import { supabase, isSupabaseConfigured, UserProfile } from '../lib/supabase';
+import { CONSENT_POLICY_VERSION, ConsentType } from '../lib/consents';
+
+const PENDING_CONSENTS_KEY = 'pending_consents_v1';
+
+/**
+ * Drain any consent decisions captured at signup (before the user had an
+ * authed session — e.g. email-confirm or OAuth redirect) and write them
+ * to consent_events via the record_consent RPC. Idempotent: clears the
+ * localStorage key after a successful write so it can't double-fire.
+ */
+async function drainPendingConsents(): Promise<void> {
+  if (typeof window === 'undefined') return;
+  let raw: string | null = null;
+  try {
+    raw = localStorage.getItem(PENDING_CONSENTS_KEY);
+  } catch {
+    return;
+  }
+  if (!raw) return;
+  let parsed: {
+    decisions?: Partial<Record<ConsentType, boolean>>;
+    policy_version?: string;
+    source?: 'signup' | 'app' | 'settings';
+  } | null = null;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    localStorage.removeItem(PENDING_CONSENTS_KEY);
+    return;
+  }
+  if (!parsed?.decisions) {
+    localStorage.removeItem(PENDING_CONSENTS_KEY);
+    return;
+  }
+  // Use the stashed policy_version (the one the user actually saw at
+  // signup), not the current constant — important if the policy gets
+  // bumped between the user clicking signup and their email confirm.
+  const version = parsed.policy_version || CONSENT_POLICY_VERSION;
+  const source = parsed.source || 'signup';
+  const entries = Object.entries(parsed.decisions) as [ConsentType, boolean][];
+  for (const [type, granted] of entries) {
+    const { error } = await supabase.rpc('record_consent', {
+      p_consent_type: type,
+      p_granted: granted,
+      p_policy_version: version,
+      p_source: source,
+      p_user_agent: navigator.userAgent.slice(0, 500),
+    });
+    if (error) {
+      // Leave the stash in place so we retry on next session; bail out.
+      console.warn('[consents] drain failed:', error.message);
+      return;
+    }
+  }
+  localStorage.removeItem(PENDING_CONSENTS_KEY);
+}
 
 interface AuthContextType {
   user: User | null;
@@ -30,6 +86,7 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
       if (session?.user) {
         loadUserProfile(session.user.id);
         setAdminRoleIfBootstrap();
+        drainPendingConsents();
       }
       setLoading(false);
     });
@@ -40,6 +97,7 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
       if (session?.user) {
         loadUserProfile(session.user.id);
         setAdminRoleIfBootstrap();
+        drainPendingConsents();
       } else {
         setProfile(null);
       }

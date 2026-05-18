@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { format, differenceInDays, startOfDay } from 'date-fns';
 import { toast } from 'sonner';
@@ -142,8 +143,12 @@ function DatePickerSheet({ open, value, onClose, onChange }: { open: boolean; va
   if (!open) return null;
   const iso = format(draft, 'yyyy-MM-dd');
 
-  return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(42,26,20,0.55)', backdropFilter: 'blur(6px)', zIndex: 100, display: 'flex', alignItems: 'flex-end' }}>
+  // Render via portal so the sheet escapes the AppLayout's z-10 main
+  // stacking context — without this, the BottomNav (zIndex: 50, but a
+  // sibling of <main>) draws over the sheet's actions despite the
+  // sheet's own zIndex: 100.
+  return createPortal(
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(42,26,20,0.55)', backdropFilter: 'blur(6px)', zIndex: 9999, display: 'flex', alignItems: 'flex-end' }}>
       <div onClick={onClose} style={{ position: 'absolute', inset: 0 }} />
       <div style={{ position: 'relative', width: '100%', background: T.BG, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: '22px 22px calc(env(safe-area-inset-bottom) + 22px)', boxShadow: '0 -10px 32px rgba(61,41,33,0.18)' }}>
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 14 }}>
@@ -173,7 +178,8 @@ function DatePickerSheet({ open, value, onClose, onChange }: { open: boolean; va
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 
