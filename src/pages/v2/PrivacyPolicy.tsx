@@ -151,8 +151,11 @@ export default function PrivacyPolicy() {
           </Definition>
           <Definition term="Údaje o zdraví (osobitná kategória — čl. 9 GDPR)">
             dátumy menštruácie, dĺžka cyklu, symptómy (bolesť, nálada, energia, libido),
-            poznámky k cyklu, údaje o cvičení a stravovaní, ciele v oblasti zdravia
-            a telesnej hmotnosti.
+            kvalita spánku, údaje o cervikálnom hliene a plodnosti, poznámky k cyklu,
+            údaje o cvičení a stravovaní, ciele v oblasti zdravia a telesnej hmotnosti.
+            Súčasťou sú aj <Strong>odvodené údaje</Strong>, ktoré aplikácia automaticky
+            vypočíta z vašich záznamov — najmä predpokladaná fáza cyklu, plodné okno
+            a predikcie nasledujúcej menštruácie.
           </Definition>
           <Definition term="Údaje o používaní aplikácie">
             navštívené obrazovky, dokončené cvičenia, prehrané meditácie, uložené recepty,
@@ -237,7 +240,11 @@ export default function PrivacyPolicy() {
           </Definition>
           <P>
             Vaše údaje <Strong>nepredávame</Strong> tretím stranám a nepoužívame ich
-            na reklamné cielenie mimo NeoMe.
+            na reklamné cielenie mimo NeoMe. Údaje o zdraví (cyklus, symptómy, nálada)
+            sú zo zásady dostupné <Strong>iba vám</Strong>; oprávnení zamestnanci NeoMe
+            k nim môžu pristúpiť výlučne v <Strong>nevyhnutnom rozsahu pri riešení
+            technickej podpory alebo bezpečnostných incidentov</Strong>, vždy pod
+            povinnosťou mlčanlivosti a s auditným záznamom prístupu.
           </P>
         </Section>
 
