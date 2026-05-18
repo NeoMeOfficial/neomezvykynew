@@ -93,6 +93,7 @@ const WorkoutDemo = lazy(() => import('./pages/v2/WorkoutDemo'));
 const BuddySystem = lazy(() => import('./pages/v2/BuddySystem'));
 const Blog = lazy(() => import('./pages/v2/Blog'));
 const PrivacyPolicy = lazy(() => import('./pages/v2/PrivacyPolicy'));
+const TermsOfUse = lazy(() => import('./pages/v2/TermsOfUse'));
 import { TosConsentGate } from './components/v2/TosConsentGate';
 const SubscriptionManagement = lazy(() => import('./pages/v2/SubscriptionManagement'));
 const CheckoutSuccess = lazy(() => import('./pages/v2/CheckoutSuccess'));
@@ -270,6 +271,8 @@ export default function AppV2() {
                 Google's OAuth verification crawler can fetch them. */}
             <Route path="/zasady-ochrany-osobnych-udajov" element={<PrivacyPolicy />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/podmienky-pouzivania" element={<TermsOfUse />} />
+            <Route path="/terms" element={<TermsOfUse />} />
 
             {/* Full-screen protected routes — no BottomNav */}
             <Route element={<RequireAuth><TosConsentGate><Outlet /></TosConsentGate></RequireAuth>}>

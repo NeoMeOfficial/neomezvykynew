@@ -43,6 +43,7 @@ export default function SettingsHub() {
             }}
           />
           <SettingsRow label="Zásady súkromia" onClick={() => navigate('/settings/privacy')} />
+          <SettingsRow label="Podmienky používania" onClick={() => navigate('/terms')} />
         </SettingsGroup>
 
         <SettingsGroup>

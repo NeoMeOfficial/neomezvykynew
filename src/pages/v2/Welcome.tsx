@@ -107,7 +107,14 @@ export default function Welcome() {
             href="/privacy"
             style={{ color: 'rgba(255,255,255,0.72)', textDecoration: 'underline', textUnderlineOffset: 3 }}
           >
-            Zásady ochrany osobných údajov
+            Zásady ochrany
+          </a>
+          {' · '}
+          <a
+            href="/terms"
+            style={{ color: 'rgba(255,255,255,0.72)', textDecoration: 'underline', textUnderlineOffset: 3 }}
+          >
+            Podmienky používania
           </a>
         </div>
       </div>
