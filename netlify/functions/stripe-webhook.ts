@@ -1,6 +1,7 @@
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import { stripeEnv } from './_stripeEnv';
+import { sendTransactionalEmail, renderBrandedEmail } from './_resend';
 
 const stripe = new Stripe(stripeEnv('STRIPE_SECRET_KEY')!, {
   apiVersion: '2023-10-16',
@@ -62,7 +63,9 @@ export async function handler(event: any) {
         // Subscription renewal payment failed — user's card was declined
         // or has insufficient funds. Logged so the UI can surface a
         // "please update card" prompt and so Gabi can email-retarget.
-        await logPaymentEvent(stripeEvent.data.object as Stripe.Invoice, 'invoice_payment_failed');
+        const inv = stripeEvent.data.object as Stripe.Invoice;
+        await logPaymentEvent(inv, 'invoice_payment_failed');
+        await notifyPaymentFailed(inv);
         break;
       }
       case 'checkout.session.expired': {
@@ -125,6 +128,74 @@ async function logPaymentEvent(invoice: Stripe.Invoice, eventType: 'invoice_paym
   } else {
     console.log(`Payment event logged — ${eventType} for user ${userId ?? '(unknown)'}, invoice ${invoice.id}`);
   }
+}
+
+/**
+ * Send a transactional "card declined" email via Resend on payment
+ * failure. Best-effort: never throws — webhook must still return 200
+ * to Stripe even if the email fails (Stripe will retry the webhook
+ * otherwise, which would re-send the email).
+ */
+async function notifyPaymentFailed(invoice: Stripe.Invoice): Promise<void> {
+  try {
+    // Pull customer email. Invoice has it expanded if charge succeeded
+    // earlier; otherwise fetch the customer object.
+    let email: string | null = null;
+    let firstName: string | null = null;
+    if (invoice.customer_email) {
+      email = invoice.customer_email;
+    } else if (typeof invoice.customer === 'string') {
+      const cust = await stripe.customers.retrieve(invoice.customer);
+      if (!cust.deleted) {
+        email = cust.email ?? null;
+        firstName = (cust.metadata?.firstName as string | undefined) ?? null;
+      }
+    }
+    if (!email) {
+      console.warn('notifyPaymentFailed: no email for invoice', invoice.id);
+      return;
+    }
+
+    const attempt = invoice.attempt_count ?? 1;
+    const nextAttempt = invoice.next_payment_attempt
+      ? new Date(invoice.next_payment_attempt * 1000).toLocaleDateString('sk-SK')
+      : null;
+    const hello = firstName ? `Ahoj ${escapeForHtml(firstName)},` : 'Ahoj,';
+
+    const body = `
+      <p>${hello}</p>
+      <p>Pri obnovení tvojho predplatného NeoMe nám banka odmietla platbu (pokus č. ${attempt}).
+      Najčastejšie ide o vypršanú kartu, nedostatok prostriedkov alebo bezpečnostné overenie.</p>
+      <p>Aby si nestratila prístup k Plus funkciám, prosíme ťa o aktualizáciu platobnej karty.
+      ${nextAttempt ? `Ďalší automatický pokus prebehne <strong>${nextAttempt}</strong>.` : ''}</p>
+    `;
+
+    const html = renderBrandedEmail({
+      preheader: 'Platba kartou bola odmietnutá — aktualizuj kartu, aby si nestratila prístup.',
+      headline: 'Platba sa nepodarila',
+      body,
+      ctaLabel: 'Aktualizovať kartu',
+      ctaHref: 'https://app.neome.com.au/profil/predplatne',
+      footnote: 'Ak si platbu nezadávala alebo si si predplatné neobjednala, napíš nám a hneď to vyriešime.',
+    });
+
+    await sendTransactionalEmail({
+      to: email,
+      subject: 'NeoMe · Platba kartou bola odmietnutá',
+      html,
+    });
+    console.log(`notifyPaymentFailed: sent to ${email} for invoice ${invoice.id}`);
+  } catch (err) {
+    console.error('notifyPaymentFailed failed (non-fatal):', err);
+  }
+}
+
+function escapeForHtml(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }
 
 // Log an abandoned / failed checkout session to payment_events. Used for
