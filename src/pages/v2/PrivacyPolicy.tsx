@@ -17,15 +17,15 @@ const LAST_UPDATED = '18. máj 2026';
 
 // === REPLACE WITH REAL LEGAL DATA BEFORE GO-LIVE ===
 const OPERATOR = {
-  name: '[TODO: NeoMe Pty Ltd — presná obchodná firma podľa Austrálskeho registra]',
-  abn: '[TODO: ABN]',
-  address: '[TODO: registrované sídlo, Austrália]',
-  email: '[TODO: privacy@neome.com.au]',
+  name: 'NeoMe Group Pty Ltd',
+  abn: '93690647137',
+  address: '4 Maidstone Street, Melbourne 3018, Australia',
+  email: 'gabi@neome.com.au',
 };
 const EU_REPRESENTATIVE = {
-  name: '[TODO: Meno zástupcu v EÚ podľa čl. 27 GDPR]',
-  address: '[TODO: adresa zástupcu v EÚ / EHP]',
-  email: '[TODO: eu-rep@neome.com.au]',
+  name: 'Meno zástupcu v EÚ podľa čl. 27 GDPR- bude zverejnený pred spustením služby v EÚ',
+  address: 'Adresa zástupcu v EÚ / EHP- bude zverejnený pred spustením služby v EÚ',
+  email: ' Email bude zverejnený pred spustením služby v EÚ',
 };
 // ===================================================
 
