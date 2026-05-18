@@ -7,10 +7,35 @@ import ErrorBoundary from '../../components/v2/ErrorBoundary';
  * Routes where the layout BottomNav should be hidden so the screen
  * gets a distraction-free "focus mode". Any path matching one of
  * these prefixes suppresses the nav.
+ *
+ * Includes deep screens under the five top-level tabs
+ * (/domov-new, /kniznica, /komunita, /spravy, /profil) — those are
+ * detail / compose / thread / player pages where a text input or
+ * action sheet at the bottom of the viewport would otherwise be
+ * covered by the BottomNav. Top-level tab roots themselves are
+ * matched by exact-path checks below, not by these prefixes, so the
+ * tab still shows the nav.
  */
 const FOCUS_ROUTE_PREFIXES = [
   '/jedalnicek/onboarding',
   '/onboarding-plus/',
+  // Deep screens under top-level tabs (compose, detail, thread,
+  // player, history, settings)
+  '/komunita/',
+  '/spravy/',
+  '/kniznica/',
+  '/profil/',
+  // Stand-alone deep screens reachable from various tabs
+  '/program/',
+  '/recepty/',
+  '/meditacie/',
+  '/workout/',
+  '/reflection/',
+  '/cyklus/',
+  '/navyky/',
+  '/settings/',
+  '/checkout',
+  '/paywall',
 ];
 
 /**
