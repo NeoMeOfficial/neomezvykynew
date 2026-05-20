@@ -2,7 +2,7 @@ import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import { useUserProgram } from '@/hooks/useUserProgram';
 import { useMealPlan } from '@/features/nutrition/useMealPlan';
-import { useCycleData } from '@/features/cycle/useCycleData';
+import { useCycle } from '@/hooks/use-cycle';
 
 export interface UserProfile {
   name: string;
@@ -21,7 +21,7 @@ export function useUser(): UserProfile {
   const { tier, hasMealPlanner } = useSubscription();
   const { userProgram } = useUserProgram();
   const { todayPlan } = useMealPlan();
-  const { derivedState } = useCycleData();
+  const { hasData: hasCycleData } = useCycle();
 
   const firstName = profile?.first_name ?? profile?.full_name?.split(' ')[0] ?? 'Eva';
 
@@ -31,6 +31,6 @@ export function useUser(): UserProfile {
     hasProgram: !!userProgram,
     hasMealPlanAddon: hasMealPlanner,
     hasMealPlan: !!todayPlan,
-    hasCycleData: !!derivedState?.lastPeriodStart,
+    hasCycleData,
   };
 }
