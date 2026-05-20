@@ -1,12 +1,13 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import { Play, Pause, RotateCcw, Share2 } from 'lucide-react';
+import { useEffect, useRef } from 'react';
+import Player from '@vimeo/player';
+import { Share2 } from 'lucide-react';
 import { TopBar } from '@/components/v2/top-bar';
 import { Eyebrow } from '@/components/ui/eyebrow';
 import { BodyText } from '@/components/ui/body-text';
 import { exercises } from '../../data/exercises';
 import FavoriteButton from '../../components/v2/favorites/FavoriteButton';
-import { useSubscription } from '../../contexts/SubscriptionContext';
+import { useEntitlement } from '../../hooks/useEntitlement';
 
 const INTENSITY_LABEL: Record<string, string> = {
   low: 'Nízka intenzita',
@@ -23,10 +24,6 @@ const INTENSITY_CLASS: Record<string, string> = {
 export default function ExercisePlayer() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isPremium, isLoading: subLoading } = useSubscription();
-
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [progress, setProgress] = useState(0);
 
   let exercise = location.state?.exercise;
   if (!exercise) {
@@ -35,30 +32,57 @@ export default function ExercisePlayer() {
   }
   if (!exercise) exercise = exercises[0];
 
-  // Subscription gate: free users can only access exercises explicitly
-  // marked `free: true` (curated preview set). Everything else routes to
-  // /paywall. Waits for the subscription load so paid users don't flash.
-  const isLocked = !exercise.free && !isPremium;
-  useEffect(() => {
-    if (!subLoading && isLocked) {
-      navigate('/paywall', { replace: true });
-    }
-  }, [subLoading, isLocked, navigate]);
-  if (isLocked) return null;
-
   const isVimeo = !!exercise.videoUrl && /^\d+$/.test(exercise.videoUrl);
 
-  const handlePlayPause = () => {
-    setIsPlaying(!isPlaying);
-    if (!isPlaying) {
-      const interval = setInterval(() => {
-        setProgress(prev => {
-          if (prev >= 100) { clearInterval(interval); setIsPlaying(false); return 100; }
-          return prev + 1;
-        });
-      }, 100);
+  // Entitlement: stretches and exercises are separate quota buckets
+  // (2 unique each per rolling 7 days). logView fires after 10s of
+  // accumulated Vimeo playback — see the player effect below.
+  const contentType = exercise.category === 'stretch' ? 'stretch' : 'exercise';
+  const entitlement = useEntitlement(contentType, exercise.id);
+
+  const vimeoMountRef = useRef<HTMLDivElement | null>(null);
+  const playedSecRef = useRef(0);
+  const lastTimeRef = useRef(0);
+  const viewLoggedRef = useRef(false);
+
+  // Quota exhausted → redirect before render.
+  useEffect(() => {
+    if (entitlement.loading) return;
+    if (!entitlement.allowed) {
+      navigate('/paywall', { replace: true });
     }
-  };
+  }, [entitlement.loading, entitlement.allowed, navigate]);
+
+  // Vimeo SDK player — gives real playback + the timeupdate events we
+  // need to measure 10s of accumulated play for the entitlement log.
+  useEffect(() => {
+    if (!isVimeo || !vimeoMountRef.current) return;
+    if (entitlement.loading || !entitlement.allowed) return;
+
+    const player = new Player(vimeoMountRef.current, {
+      id: Number(exercise.videoUrl),
+      responsive: true,
+    });
+
+    const onTimeUpdate = (data: { seconds: number }) => {
+      const delta = data.seconds - lastTimeRef.current;
+      // Skip large jumps (user scrubbed); count only natural playback.
+      if (delta > 0 && delta < 1.5) {
+        playedSecRef.current += delta;
+        if (playedSecRef.current >= 10 && !viewLoggedRef.current) {
+          viewLoggedRef.current = true;
+          entitlement.logView();
+        }
+      }
+      lastTimeRef.current = data.seconds;
+    };
+
+    player.on('timeupdate', onTimeUpdate);
+    return () => {
+      player.off('timeupdate', onTimeUpdate);
+      player.destroy().catch(() => { /* element already gone */ });
+    };
+  }, [isVimeo, exercise.videoUrl, entitlement.loading, entitlement.allowed]);
 
   const handleShare = async () => {
     const videoUrl = exercise.videoUrl
@@ -79,6 +103,10 @@ export default function ExercisePlayer() {
     return '/kniznica/telo/extra';
   };
 
+  // While entitlement resolves, or if quota is exhausted (redirect in
+  // flight), render nothing — avoids a flash of paid content.
+  if (entitlement.loading || !entitlement.allowed) return null;
+
   return (
     <div className="min-h-screen bg-cream pb-12">
       <TopBar
@@ -86,16 +114,6 @@ export default function ExercisePlayer() {
         onBack={() => navigate(getBackPath())}
         right={
           <div className="flex items-center gap-1">
-            <span
-              className={`px-2 py-0.5 rounded-full text-[10px] font-medium tracking-[0.12em] uppercase ${
-                exercise.free
-                  ? 'bg-pillar-strava/[0.12] text-pillar-strava'
-                  : 'bg-gold/[0.12] text-gold'
-              }`}
-              title={exercise.free ? 'Voľne dostupné' : 'Súčasť NeoMe Plus'}
-            >
-              {exercise.free ? 'Free' : 'Plus'}
-            </span>
             <FavoriteButton
               itemId={exercise.id}
               type="workout"
@@ -118,13 +136,11 @@ export default function ExercisePlayer() {
         {/* Video */}
         <div className="rounded-card bg-black overflow-hidden">
           <div className="relative aspect-video">
-            {exercise.videoUrl ? (
+            {isVimeo ? (
+              <div ref={vimeoMountRef} className="w-full h-full" />
+            ) : exercise.videoUrl ? (
               <iframe
-                src={
-                  isVimeo
-                    ? `https://player.vimeo.com/video/${exercise.videoUrl}?badge=0&autopause=0&player_id=0&app_id=58479`
-                    : `https://www.youtube.com/embed/${exercise.videoUrl}?rel=0&modestbranding=1&playsinline=1&iv_load_policy=3&showinfo=0`
-                }
+                src={`https://www.youtube.com/embed/${exercise.videoUrl}?rel=0&modestbranding=1&playsinline=1&iv_load_policy=3&showinfo=0`}
                 title={exercise.name}
                 allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
                 referrerPolicy="strict-origin-when-cross-origin"
@@ -135,19 +151,7 @@ export default function ExercisePlayer() {
               <>
                 <img src={exercise.thumb} alt={exercise.name} className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-ink/40 flex items-center justify-center">
-                  <button
-                    onClick={handlePlayPause}
-                    className="h-16 w-16 rounded-full bg-white/90 flex items-center justify-center active:scale-95 transition-transform shadow-nm"
-                  >
-                    {isPlaying
-                      ? <Pause className="size-7 text-terra" />
-                      : <Play className="size-7 ml-1 text-terra" fill="currentColor" strokeWidth={0} />
-                    }
-                  </button>
-                </div>
-                {/* Progress bar */}
-                <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20">
-                  <div className="h-full bg-white transition-all duration-300" style={{ width: `${progress}%` }} />
+                  <span className="font-sans text-sm text-white/80">Video čoskoro</span>
                 </div>
                 <div className="absolute top-3 right-3 bg-ink/60 text-white text-[11px] px-2 py-1 rounded-full">
                   {exercise.duration}
@@ -155,20 +159,6 @@ export default function ExercisePlayer() {
               </>
             )}
           </div>
-
-          {/* Restart control — fallback only */}
-          {!exercise.videoUrl && (
-            <div className="px-4 py-3 flex items-center justify-between bg-white border-t border-ink/[0.08]">
-              <button
-                onClick={() => { setProgress(0); setIsPlaying(false); }}
-                className="flex items-center gap-2 text-ink/60 font-sans text-sm"
-              >
-                <RotateCcw className="size-4" />
-                Reštart
-              </button>
-              <span className="font-sans text-xs text-ink/40">{Math.round(progress)}% dokončené</span>
-            </div>
-          )}
         </div>
 
         {/* Tags */}

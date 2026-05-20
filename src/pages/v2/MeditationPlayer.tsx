@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { NM } from '../../components/v2/neome';
 import { useAchievements } from '../../hooks/useAchievements';
 import { useMeditation } from '../../hooks/useMeditations';
+import { useEntitlement } from '../../hooks/useEntitlement';
 
 /**
  * Meditation player — real HTML5 audio backed by the `meditations` table.
@@ -44,6 +45,21 @@ export default function MeditationPlayer() {
   const [currentSec, setCurrentSec] = useState(0);
   const [durationSec, setDurationSec] = useState(0);
 
+  // Entitlement: 2 unique meditations per rolling 7 days for free users.
+  // logView fires after 10s of accumulated audio play (see useEffect below).
+  const entitlement = useEntitlement('meditation', meditationId);
+  const playedSecRef = useRef(0);
+  const lastTimeRef = useRef(0);
+  const viewLoggedRef = useRef(false);
+
+  // Quota exhausted → redirect before render.
+  useEffect(() => {
+    if (entitlement.loading) return;
+    if (!entitlement.allowed) {
+      navigate('/paywall', { replace: true });
+    }
+  }, [entitlement.loading, entitlement.allowed, navigate]);
+
   // Reset transport when the meditation changes.
   useEffect(() => {
     setIsPlaying(false);
@@ -56,7 +72,20 @@ export default function MeditationPlayer() {
     const audio = audioRef.current;
     if (!audio) return;
 
-    const onTime = () => setCurrentSec(audio.currentTime);
+    const onTime = () => {
+      const t = audio.currentTime;
+      setCurrentSec(t);
+      // Accumulate play time, skipping large jumps that indicate scrubbing.
+      const delta = t - lastTimeRef.current;
+      if (delta > 0 && delta < 1.5) {
+        playedSecRef.current += delta;
+        if (playedSecRef.current >= 10 && !viewLoggedRef.current) {
+          viewLoggedRef.current = true;
+          entitlement.logView();
+        }
+      }
+      lastTimeRef.current = t;
+    };
     const onMeta = () => {
       if (audio.duration && Number.isFinite(audio.duration)) {
         setDurationSec(audio.duration);

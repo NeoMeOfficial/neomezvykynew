@@ -1,10 +1,13 @@
 /**
- * Unified Subscription Module
+ * Subscription module — tier state, billing actions, paywall gate.
  *
- * Single provider + hook that replaces:
- *  - SimpleSubscriptionContext (deleted)
- *  - old usePaywall hook (deleted)
- *  - old SubscriptionContext (this file, rewritten)
+ * Owns: Stripe subscription record, derived tier (free/premium), meal-planner
+ * add-on flag, billing actions (checkout, portal, cancel), paywall modal
+ * visibility, dev-mode tier override.
+ *
+ * Does NOT own: content quotas / per-view metering. That's `useEntitlement`
+ * (see docs/adr/0001-entitlement-separate-from-subscription.md). Free users
+ * are gated at consumption time by Entitlement, not here.
  *
  * Dual-mode:
  *  - Demo (no Stripe key): everything unlocked, checkout is a no-op
@@ -29,16 +32,9 @@ import { supabase } from '../lib/supabase';
 // Types
 // ---------------------------------------------------------------------------
 
-export type ContentType = 'recipes' | 'exercises' | 'meditations' | 'stretches';
 export type Tier = 'free' | 'premium';
 
 const MEAL_PLANNER_KEY = 'neome_meal_planner_purchased';
-
-/** Per-tier content limits. -1 = unlimited. */
-const TIER_LIMITS: Record<Tier, Record<ContentType, number>> = {
-  free: { recipes: 10, exercises: 3, meditations: 3, stretches: 3 },
-  premium: { recipes: -1, exercises: -1, meditations: -1, stretches: -1 },
-};
 
 // True when a real Stripe publishable key is configured. Honors the
 // _TEST suffix override so deploy previews (test mode) are detected too.
@@ -78,10 +74,6 @@ interface SubscriptionContextType {
   daysLeft: number;
   loading: boolean;
   isLoading: boolean; // alias for loading (used by SubscriptionManagement)
-
-  // Content access
-  canAccess: (content: ContentType) => boolean;
-  getRemaining: (content: ContentType) => number | null; // null = unlimited
 
   // Meal planner (separate one-time purchase)
   hasMealPlanner: boolean;
@@ -239,25 +231,6 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   const daysLeft = demoMode ? 999 : getDaysUntilExpiration(subscription);
   const tier: Tier = isPremium ? 'premium' : 'free';
 
-  const canAccess = useCallback(
-    (content: ContentType): boolean => {
-      if (demoMode) return true;
-      if (isPremium) return true;
-      const limit = TIER_LIMITS.free[content];
-      // For now, free tier has a static limit — usage tracking comes later
-      return limit > 0;
-    },
-    [demoMode, isPremium]
-  );
-
-  const getRemaining = useCallback(
-    (content: ContentType): number | null => {
-      if (demoMode || isPremium) return null; // unlimited
-      return TIER_LIMITS.free[content];
-    },
-    [demoMode, isPremium]
-  );
-
   // ------ Paywall gate ------
   const gate = useCallback(() => {
     if (demoMode || isPremium) return; // no-op in demo or premium
@@ -393,8 +366,6 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     daysLeft,
     loading,
     isLoading: loading,
-    canAccess,
-    getRemaining,
     hasMealPlanner: hasMealPlannerValue,
     canUseMealPlanner: hasMealPlannerValue,
     purchaseMealPlanner,
@@ -421,22 +392,6 @@ export function useSubscription() {
     throw new Error('useSubscription must be used within a SubscriptionProvider');
   }
   return context;
-}
-
-/**
- * Convenience hook for the most common pattern: check content access + gate.
- *
- *   const { allowed, gate } = useAccess('recipes');
- *   if (!allowed) return gate();
- */
-export function useAccess(content: ContentType) {
-  const { canAccess, getRemaining, gate, loading } = useSubscription();
-  return {
-    allowed: canAccess(content),
-    remaining: getRemaining(content),
-    gate,
-    loading,
-  };
 }
 
 /** Quick boolean check. */

@@ -6,7 +6,11 @@ import { Page, BackHeader, Eye, NM } from '../../components/v2/neome';
 
 /**
  * Recepty / Recipe browser — reads from Supabase public.recipes
- * Free tier: first 10 per slot. Plus: all 263.
+ *
+ * Gating model (ADR-0001): no catalog-level lock on the listing. Free users
+ * can browse the full catalog and tap any recipe. The detail page enforces
+ * the per-user quota (15 unique recipes per rolling 30 days) via
+ * useEntitlement and routes to /paywall when the quota is exhausted.
  */
 
 const CATEGORY_QUERY_MAP: Record<string, SupabaseRecipe['slot']> = {
@@ -31,19 +35,10 @@ function recipeImg(r: SupabaseRecipe): string {
   return 'section-nutrition.jpg';
 }
 
-function LockIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-      <path d="M7 11V7a5 5 0 0110 0v4" />
-    </svg>
-  );
-}
-
 export default function Recepty() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
-  const { recipes, freeIds, loading } = useRecipes();
+  const { recipes, loading } = useRecipes();
   const { isPremium } = useSubscription();
   const [query, setQuery] = useState(params.get('q') ?? '');
   const [activeFast, setActiveFast] = useState(false);
@@ -64,12 +59,8 @@ export default function Recepty() {
   }, [recipes, slotFilter, activeFast, query]);
 
   const handleClick = (r: SupabaseRecipe) => {
-    const accessible = isPremium || freeIds.has(r.id);
-    if (accessible) {
-      navigate(`/recept/${r.id}`);
-    } else {
-      navigate('/paywall');
-    }
+    // Detail page enforces the per-user quota; listing taps are always permitted.
+    navigate(`/recept/${r.id}`);
   };
 
   return (
@@ -131,7 +122,7 @@ export default function Recepty() {
         <Eye>{loading ? 'Načítavam…' : `Výsledky · ${filtered.length}`}</Eye>
         {!isPremium && !loading && (
           <span style={{ fontFamily: NM.SANS, fontSize: 10.5, color: NM.TERTIARY, letterSpacing: '0.01em' }}>
-            30 zadarmo · <span style={{ color: NM.GOLD }}>Plus</span> odomkne všetky
+            15 zadarmo / mesiac · <span style={{ color: NM.GOLD }}>Plus</span> odomkne všetky
           </span>
         )}
       </div>
@@ -154,7 +145,6 @@ export default function Recepty() {
           </div>
         ) : (
           filtered.map((r) => {
-            const accessible = isPremium || freeIds.has(r.id);
             return (
               <button
                 key={r.id}
@@ -168,18 +158,8 @@ export default function Recepty() {
                       width: '100%', height: '100%', borderRadius: 14,
                       backgroundImage: `url(/images/r9/${recipeImg(r)})`,
                       backgroundSize: 'cover', backgroundPosition: 'center',
-                      filter: accessible ? 'none' : 'brightness(0.55)',
                     }}
                   />
-                  {!accessible && (
-                    <div style={{
-                      position: 'absolute', inset: 0, borderRadius: 14,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      color: '#fff', opacity: 0.9,
-                    }}>
-                      <LockIcon />
-                    </div>
-                  )}
                 </div>
 
                 {/* Text */}
@@ -190,20 +170,14 @@ export default function Recepty() {
                   </Eye>
                   <div style={{
                     fontFamily: NM.SERIF, fontSize: 16, fontWeight: 500,
-                    color: accessible ? NM.DEEP : NM.TERTIARY,
+                    color: NM.DEEP,
                     letterSpacing: '-0.008em', lineHeight: 1.25, marginBottom: 6,
                   }}>
                     {r.name}
                   </div>
-                  {accessible ? (
-                    <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.SAGE, fontWeight: 500, letterSpacing: '0.02em' }}>
-                      + Pridať do plánu
-                    </div>
-                  ) : (
-                    <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.GOLD, fontWeight: 500, letterSpacing: '0.02em' }}>
-                      NeoMe Plus
-                    </div>
-                  )}
+                  <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.SAGE, fontWeight: 500, letterSpacing: '0.02em' }}>
+                    + Pridať do plánu
+                  </div>
                 </div>
               </button>
             );
@@ -211,8 +185,8 @@ export default function Recepty() {
         )}
       </div>
 
-      {/* Upsell banner — shown when there are locked recipes visible */}
-      {!isPremium && !loading && filtered.some((r) => !freeIds.has(r.id)) && (
+      {/* Upsell banner — shown to free users */}
+      {!isPremium && !loading && filtered.length > 0 && (
         <div style={{ margin: '8px 18px 24px', padding: '18px 20px', background: NM.DEEP, borderRadius: 16 }}>
           <div style={{ fontFamily: NM.SANS, fontSize: 9.5, letterSpacing: '0.22em', textTransform: 'uppercase', color: NM.GOLD, marginBottom: 8, fontWeight: 500 }}>
             NeoMe Plus

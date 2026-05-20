@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useUniversalFavorites } from '../../hooks/useUniversalFavorites';
 import { useRecipe, SLOT_LABEL } from '@/hooks/useRecipes';
 import { useMealPlan } from '../../features/nutrition/useMealPlan';
 import { useSubscription } from '../../contexts/SubscriptionContext';
+import { useEntitlement } from '../../hooks/useEntitlement';
 import { BackHeader, Eye, Ser, Body, NM } from '../../components/v2/neome';
 
 /**
@@ -38,6 +39,18 @@ export default function RecipeDetail() {
   const { recipe, loading } = useRecipe(id);
   const { plan, setRecipeForSlot } = useMealPlan();
   const { hasMealPlanner } = useSubscription();
+  const entitlement = useEntitlement('recipe', id);
+
+  // Detail-page mount counts as a "view" of this recipe (per ADR-0001).
+  // For free users at quota, redirect to paywall before rendering.
+  useEffect(() => {
+    if (entitlement.loading) return;
+    if (!entitlement.allowed) {
+      navigate('/paywall', { replace: true });
+      return;
+    }
+    entitlement.logView();
+  }, [entitlement.loading, entitlement.allowed]);
   const [checkedIngredients, setCheckedIngredients] = useState<Set<number>>(new Set());
   const [showPicker, setShowPicker] = useState(false);
   const [picked, setPicked] = useState<{ dayIndex: number; slotIndex: number } | null>(null);
@@ -73,7 +86,7 @@ export default function RecipeDetail() {
     }, 700);
   };
 
-  if (loading) {
+  if (loading || entitlement.loading) {
     return (
       <div style={{ background: NM.BG, minHeight: '100vh', fontFamily: NM.SANS }}>
         <BackHeader title="Recept" showSearch={false} />
@@ -85,6 +98,9 @@ export default function RecipeDetail() {
       </div>
     );
   }
+
+  // Quota exhausted — render nothing while the useEffect handles redirect.
+  if (!entitlement.allowed) return null;
 
   if (!recipe) {
     return (
