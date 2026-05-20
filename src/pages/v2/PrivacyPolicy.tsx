@@ -234,6 +234,14 @@ export default function PrivacyPolicy() {
           <Definition term="Netlify, Inc. (USA)">
             hosting webovej aplikácie a doručovanie obsahu.
           </Definition>
+          <Definition term="ActiveCampaign, LLC (USA)">
+            zasielanie automatizovaných e-mailov o programe a životnom cykle používateľky;
+            spracúva e-mailovú adresu a meno.
+          </Definition>
+          <Definition term="Resend (USA)">
+            doručovanie transakčných e-mailov (potvrdenie registrácie, upozornenia
+            o platbe); spracúva e-mailovú adresu a meno.
+          </Definition>
           <Definition term="Spoonacular (USA)">
             poskytovanie receptov a nutričných údajov (iba anonymizované požiadavky;
             neprenášajú sa vaše osobné údaje).
@@ -327,8 +335,8 @@ export default function PrivacyPolicy() {
         <Section no="5" title="Prenos údajov mimo EÚ / EHP">
           <P>
             Prevádzkovateľ má sídlo v Austrálii a niektorí naši sprostredkovatelia
-            (Supabase, Netlify, Stripe, Google) majú servery alebo materské spoločnosti
-            mimo Európskeho hospodárskeho priestoru. V takom prípade prenos prebieha
+            (Supabase, Netlify, Stripe, Google, ActiveCampaign, Resend) majú servery
+            alebo materské spoločnosti mimo Európskeho hospodárskeho priestoru. V takom prípade prenos prebieha
             výlučne na základe primeraných záruk podľa kapitoly V GDPR, najmä:
           </P>
           <Bullet>
