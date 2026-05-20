@@ -73,7 +73,7 @@ export function RecipePromoBanner({ onDismiss, onViewMore }: RecipePromoBannerPr
           <div className="mb-4">
             <div className="grid grid-cols-3 gap-3 mb-4">
               <div className="text-center">
-                <div className="text-2xl font-black" style={{ color: colors.strava }}>108</div>
+                <div className="text-2xl font-black" style={{ color: colors.strava }}>120+</div>
                 <p className="text-xs text-gray-600">receptov</p>
               </div>
               <div className="text-center">

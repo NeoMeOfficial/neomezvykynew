@@ -247,7 +247,7 @@ export default function AuthDemo() {
             </div>
             <div className="w-px" style={{ background: 'rgba(184,134,74,0.2)' }} />
             <div className="flex-1 text-center">
-              <p className="text-[18px] font-semibold" style={{ color: colors.textPrimary }}>105</p>
+              <p className="text-[18px] font-semibold" style={{ color: colors.textPrimary }}>120+</p>
               <p className="text-[10px] mt-0.5" style={{ color: colors.textSecondary }}>receptov</p>
             </div>
             <div className="w-px" style={{ background: 'rgba(184,134,74,0.2)' }} />

@@ -61,7 +61,7 @@ export const SUBSCRIPTION_FEATURES: SubscriptionFeature[] = [
     description: 'Personalizované jedálničky prispôsobené tvojim potrebám',
     icon: '🥗',
     benefits: [
-      '108 ručne vybraných receptov',
+      '120+ ručne vybraných receptov',
       'Označenie 15 najčastejších alergénov',
       'Vyvážené makronutrienty',
       'Automatické nákupné zoznamy'
