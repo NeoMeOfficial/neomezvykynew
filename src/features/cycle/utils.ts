@@ -38,9 +38,12 @@ function splitSegment(
   return [a1, a2, a3];
 }
 
-// Calculate detailed phase ranges including subphases
+// Calculate detailed phase ranges including subphases.
+// ovulationDay uses the SAME formula as getPhaseRanges (max-guarded) so the
+// coarse phase and the subphase can never disagree about which phase a day
+// falls in — see ADR-0002 context.
 export function getDetailedPhaseRanges(cycleLength: number, periodLength: number, lutealLength: number = 14) {
-  const ovulationDay = cycleLength - lutealLength;
+  const ovulationDay = Math.max(periodLength + 1, cycleLength - lutealLength);
 
   // Basic phases
   const M_start = 1;
@@ -225,48 +228,17 @@ export function getPhaseRanges(cycleLength: number, periodLength: number): Phase
     ranges.push({ key: "luteal", name: "Luteálna", start: lutealStart, end: cycleLength });
   }
 
-  console.log('🔥 getPhaseRanges DEBUG:', {
-    cycleLength,
-    periodLength,
-    follicularStart,
-    ovulationDay,
-    lutealStart,
-    follicularCondition: follicularStart <= ovulationDay - 1,
-    lutealCondition: lutealStart <= cycleLength,
-    totalRanges: ranges.length,
-    ranges: ranges.map(r => `${r.key}: ${r.start}-${r.end}`)
-  });
-
   return ranges;
 }
 
 export function getPhaseByDay(day: number, ranges: PhaseRange[], cycleLength?: number): PhaseRange {
-  console.log('🔥 getPhaseByDay DEBUG:', {
-    day,
-    ranges,
-    cycleLength,
-    rangesDetails: ranges.map(r => `${r.key}: ${r.start}-${r.end}`)
-  });
-  
-  // Ak deň presahuje dĺžku cyklu (menštruácia mešká), zostávame v luteálnej fáze
+  // If the day exceeds the cycle length (period is late), stay in the luteal phase.
   if (cycleLength && day > cycleLength) {
-    const result = ranges.find(r => r.key === 'luteal') || ranges[ranges.length - 1];
-    console.log('🔥 Late period result:', result);
-    return result;
+    return ranges.find(r => r.key === 'luteal') || ranges[ranges.length - 1];
   }
-  
+
   const matchingRange = ranges.find(range => day >= range.start && day <= range.end);
-  const result = matchingRange || ranges[0];
-  
-  console.log('🔥 getPhaseByDay DETAILED:', {
-    day,
-    ranges: ranges.map(r => ({ key: r.key, start: r.start, end: r.end, matches: day >= r.start && day <= r.end })),
-    matchingRange,
-    fallbackUsed: !matchingRange,
-    result
-  });
-  
-  return result;
+  return matchingRange || ranges[0];
 }
 
 export function getCurrentCycleDay(lastPeriodStart: string, today: Date, cycleLength: number): number {

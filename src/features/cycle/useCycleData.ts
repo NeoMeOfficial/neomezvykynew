@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { format, differenceInDays } from 'date-fns';
-import { CycleData, DerivedState, CustomSettings, PeriodIntensity, DailyPeriodData, PeriodLog } from './types';
+import { CycleData, CustomSettings, PeriodIntensity, DailyPeriodData, PeriodLog } from './types';
 
 // Calculate weighted average cycle length from history
 // More recent cycles have higher weight for better predictions
@@ -57,7 +57,7 @@ export function calculateAverageCycleLength(history: PeriodLog[]): { average: nu
   };
 }
 import { getDerivedState } from './utils';
-import { syncToSupabase, loadFromSupabase } from '../supabaseSync';
+import { loadCycleData as loadFromStore, saveCycleData as saveToStore } from './cycleDataStore';
 
 const STORAGE_KEY = 'cycle_data';
 
@@ -80,8 +80,11 @@ const defaultCycleData: CycleData = {
 export function useCycleData(accessCode?: string) {
   const [cycleData, setCycleData] = useState<CycleData>(defaultCycleData);
   const [loading, setLoading] = useState(false); // Changed to false for instant loading
-  const [derivedState, setDerivedState] = useState<DerivedState | null>(null);
   const saveTimeoutRef = useRef<NodeJS.Timeout>();
+
+  // Derived state is pure — recompute on every cycleData change, no extra
+  // render cycle. (Previously a useState+useEffect that flashed null first.)
+  const derivedState = useMemo(() => getDerivedState(cycleData), [cycleData]);
 
   // Generate storage key with access code
   const getStorageKey = useCallback(() => {
@@ -107,20 +110,20 @@ export function useCycleData(accessCode?: string) {
       console.error('Failed to load cycle data from localStorage:', error);
     }
 
-    // Step 2: hydrate from Supabase in the background (fresher data wins)
-    loadFromSupabase<CycleData>('cycle_data').then(remoteData => {
+    // Step 2: hydrate from the canonical cycle_data table in the background.
+    // The table (or the lazily-migrated legacy blob) is authoritative — it
+    // wins over localStorage when it has a recorded period start.
+    loadFromStore().then(remoteData => {
       if (!remoteData) return;
       const merged = {
         ...defaultCycleData,
         ...remoteData,
         customSettings: { ...defaultCustomSettings, ...remoteData.customSettings }
       };
-      // Only update if remote data is more complete (has lastPeriodStart or more history)
       setCycleData(current => {
         const remoteHistoryLen = merged.history?.length ?? 0;
         const localHistoryLen = current.history?.length ?? 0;
         if (merged.lastPeriodStart && remoteHistoryLen >= localHistoryLen) {
-          // Persist the fresher remote data to localStorage too
           try {
             localStorage.setItem(getStorageKey(), JSON.stringify(merged));
           } catch (_) { /* ignore */ }
@@ -128,7 +131,7 @@ export function useCycleData(accessCode?: string) {
         }
         return current;
       });
-    }).catch(err => console.warn('Failed to hydrate cycle data from Supabase:', err));
+    }).catch(err => console.warn('Failed to hydrate cycle data:', err));
   }, [getStorageKey]);
 
   // Save data to storage with debouncing
@@ -147,8 +150,8 @@ export function useCycleData(accessCode?: string) {
           detail: { accessCode, data }
         }));
 
-        // Sync to Supabase (fire-and-forget, non-blocking)
-        syncToSupabase('cycle_data', data);
+        // Persist to the canonical cycle_data table (fire-and-forget).
+        saveToStore(data);
       } catch (error) {
         console.error('Failed to save cycle data:', error);
       }
@@ -258,11 +261,6 @@ export function useCycleData(accessCode?: string) {
     const dailyPeriodData = cycleData.dailyPeriodData || [];
     return dailyPeriodData.find(entry => entry.date === date)?.intensity;
   }, [cycleData.dailyPeriodData]);
-
-  // Calculate derived state immediately when cycle data changes
-  useEffect(() => {
-    setDerivedState(getDerivedState(cycleData));
-  }, [cycleData]);
 
   // Load data on mount and access code change (synchronous for instant loading)
   useEffect(() => {
