@@ -2,8 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronRight, Heart } from 'lucide-react';
 import GlassCard from '../GlassCard';
 import { colors, innerGlass, iconContainer, sectionLabel as sectionLabelStyle } from '../../../theme/warmDusk';
-import { useCycleData } from '../../../features/cycle/useCycleData';
-import { getPhaseRanges, getPhaseByDay, getCurrentCycleDay, getNextPeriodDate } from '../../../features/cycle/utils';
+import { useCycle } from '../../../hooks/use-cycle';
 import { suggestForDay } from '../../../features/cycle/suggestions';
 import type { PhaseKey } from '../../../features/cycle/types';
 import { differenceInDays } from 'date-fns';
@@ -19,18 +18,13 @@ const PHASE_MESSAGES: Record<PhaseKey, string> = {
 
 export default function PeriodkaSnippet() {
   const navigate = useNavigate();
-  const { cycleData } = useCycleData();
+  const { cycleData, currentDay, phase, phaseRanges, nextPeriodDate } = useCycle();
 
   const cycleLength = cycleData.cycleLength || 28;
-  const periodLength = cycleData.periodLength || 5;
   const today = new Date();
-  const currentDay = cycleData.lastPeriodStart
-    ? getCurrentCycleDay(cycleData.lastPeriodStart, today, cycleLength) : 14;
-  const ranges = getPhaseRanges(cycleLength, periodLength);
-  const phase = getPhaseByDay(currentDay, ranges, cycleLength);
-  const suggestion = suggestForDay(currentDay, ranges, cycleLength);
-  const daysUntilPeriod = cycleData.lastPeriodStart
-    ? Math.max(0, differenceInDays(getNextPeriodDate(cycleData.lastPeriodStart, cycleLength), today))
+  const suggestion = suggestForDay(currentDay, phaseRanges, cycleLength);
+  const daysUntilPeriod = nextPeriodDate
+    ? Math.max(0, differenceInDays(nextPeriodDate, today))
     : cycleLength - currentDay;
   const phaseColor = PHASE_COLORS[phase.key];
 

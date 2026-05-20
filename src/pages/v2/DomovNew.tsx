@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '@/hooks/use-user';
-import { useCycle } from '@/hooks/use-cycle';
+import { useCycleInfo } from '@/hooks/use-cycle';
 import { useUserProgram } from '@/hooks/useUserProgram';
 import { useMealPlan } from '@/features/nutrition/useMealPlan';
 import { useDailyMeditation } from '@/hooks/useDailyContent';
@@ -1042,7 +1042,7 @@ export default function DomovNew() {
   const [showPointsInfo, setShowPointsInfo] = useState(false);
   const [selectedDay,   setSelectedDay]   = useState<Date | null>(null);
   const user = useUser();
-  const cycle = useCycle();
+  const cycle = useCycleInfo();
   const { userProgram } = useUserProgram();
   const { todayPlan } = useMealPlan();
   const { meditation } = useDailyMeditation();

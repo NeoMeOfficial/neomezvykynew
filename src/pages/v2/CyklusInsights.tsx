@@ -3,10 +3,10 @@ import { TopBar } from '@/components/v2/top-bar';
 import { Eyebrow } from '@/components/ui/eyebrow';
 import { SerifHeader } from '@/components/ui/serif-header';
 import { BodyText } from '@/components/ui/body-text';
-import { useCycleData, calculateAverageCycleLength } from '@/features/cycle/useCycleData';
+import { calculateAverageCycleLength } from '@/features/cycle/useCycleData';
+import { useCycle } from '@/hooks/use-cycle';
 import { useCycleLogs } from '@/features/cycle/useCycleLogs';
 import { PHASE_LABELS } from '@/features/cycle/insights';
-import { getNextPeriodDate } from '@/features/cycle/utils';
 import { TrendingUp, Calendar, Activity, BookOpen } from 'lucide-react';
 
 const PHASE_COLORS: Record<string, string> = {
@@ -36,9 +36,9 @@ function daysBetween(a: string, b: string): number {
 
 export default function CyklusInsights() {
   const navigate = useNavigate();
-  const { cycleData } = useCycleData();
+  const { cycleData, nextPeriodDate } = useCycle();
   const { logs } = useCycleLogs();
-  const { lastPeriodStart, cycleLength, history = [] } = cycleData;
+  const { cycleLength, history = [] } = cycleData;
 
   // Most recent 10 daily logs, newest first
   const sortedLogs = Object.entries(logs)
@@ -53,9 +53,7 @@ export default function CyklusInsights() {
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   );
 
-  const nextPeriod = lastPeriodStart
-    ? getNextPeriodDate(lastPeriodStart, cycleLength)
-    : null;
+  const nextPeriod = nextPeriodDate;
 
   const daysUntilNext = nextPeriod
     ? Math.max(0, Math.round((nextPeriod.getTime() - Date.now()) / 86_400_000))

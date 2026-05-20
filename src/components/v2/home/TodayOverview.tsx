@@ -7,8 +7,7 @@ import GlassCard from '../GlassCard';
 import { colors, innerGlass, iconContainer, sectionLabel as sectionLabelStyle } from '../../../theme/warmDusk';
 import { useMealPlan } from '../../../features/nutrition/useMealPlan';
 import { recipes as recipesData, getRecipeImage } from '../../../data/recipes';
-import { useCycleData } from '../../../features/cycle/useCycleData';
-import { getPhaseRanges, getPhaseByDay, getCurrentCycleDay, getNextPeriodDate } from '../../../features/cycle/utils';
+import { useCycle } from '../../../hooks/use-cycle';
 import { suggestForDay } from '../../../features/cycle/suggestions';
 import { differenceInDays } from 'date-fns';
 import type { PhaseKey } from '../../../features/cycle/types';
@@ -54,15 +53,8 @@ function TeloSection({ showPromoBanner }: { showPromoBanner: boolean }) {
   const navigate = useNavigate();
   const { userProgram, hasProgram } = useUserProgram();
   const { activeOffer } = usePromotionalOffers();
-  const { cycleData } = useCycleData();
-  
-  const cycleLength = cycleData.cycleLength || 28;
-  const periodLength = cycleData.periodLength || 5;
-  const today = new Date();
-  const currentDay = cycleData.lastPeriodStart ? getCurrentCycleDay(cycleData.lastPeriodStart, today, cycleLength) : 18;
-  const ranges = getPhaseRanges(cycleLength, periodLength);
-  const phase = getPhaseByDay(currentDay, ranges, cycleLength);
-  
+  const { phase } = useCycle();
+
   // Get smart exercise recommendation based on cycle phase
   const recommendedExercise = getRecommendedExercise(phase.key);
 
@@ -369,18 +361,13 @@ function MyselSection() {
 /* ── Periodka ──────────────────────────────── */
 function PeriodkaSection() {
   const navigate = useNavigate();
-  const { cycleData } = useCycleData();
+  const { cycleData, hasData, currentDay, phase, phaseRanges, nextPeriodDate } = useCycle();
   const cycleLength = cycleData.cycleLength || 28;
-  const periodLength = cycleData.periodLength || 5;
   const today = new Date();
-  const hasData = !!cycleData.lastPeriodStart;
-  const currentDay = hasData ? getCurrentCycleDay(cycleData.lastPeriodStart!, today, cycleLength) : 14;
-  const ranges = getPhaseRanges(cycleLength, periodLength);
-  const phase = getPhaseByDay(currentDay, ranges, cycleLength);
-  const suggestion = suggestForDay(currentDay, ranges, cycleLength);
+  const suggestion = suggestForDay(currentDay, phaseRanges, cycleLength);
   const phaseColor = PHASE_COLORS[phase.key];
-  const daysUntilPeriod = hasData
-    ? Math.max(0, differenceInDays(getNextPeriodDate(cycleData.lastPeriodStart!, cycleLength), today))
+  const daysUntilPeriod = nextPeriodDate
+    ? Math.max(0, differenceInDays(nextPeriodDate, today))
     : cycleLength - currentDay;
 
   const handleClick = () => {
