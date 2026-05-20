@@ -103,7 +103,7 @@ export default function JedalnicekPromo() {
           <div className="flex justify-around">
             {[
               { value: '2 400+', label: 'žien používa' },
-              { value: '116', label: 'receptov' },
+              { value: '120+', label: 'receptov' },
               { value: '4.9', label: 'hodnotenie' },
             ].map(({ value, label }) => (
               <div key={label} className="text-center">

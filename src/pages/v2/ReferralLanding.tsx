@@ -116,7 +116,7 @@ export default function ReferralLanding() {
 
         {/* Trust strip */}
         <div style={{ marginTop: 24, padding: '16px 18px', background: '#fff', borderRadius: 16, border: `1px solid ${HAIR}`, display: 'flex', justifyContent: 'space-around' }}>
-          {[['2 400+', 'žien'], ['105', 'receptov'], ['17', 'meditácií']].map(([n, l]) => (
+          {[['2 400+', 'žien'], ['120+', 'receptov'], ['17', 'meditácií']].map(([n, l]) => (
             <div key={l} style={{ textAlign: 'center' }}>
               <div style={{ fontFamily: 'Gilda Display, serif', fontSize: 22, color: DEEP, fontWeight: 500, letterSpacing: '-0.01em', lineHeight: 1 }}>{n}</div>
               <div style={{ fontFamily: 'DM Sans', fontSize: 10, color: MUTED, marginTop: 4, letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 500 }}>{l}</div>

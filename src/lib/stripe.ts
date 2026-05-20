@@ -66,7 +66,7 @@ export const SUBSCRIPTION_PLANS = {
     name: 'NeoMe Plus',
     features: [
       'Všetky fitness programy (4 úrovne)',
-      'Neobmedzený prístup k 108+ receptom',
+      'Neobmedzený prístup k 120+ receptom',
       'Sledovanie menštruačného cyklu a symptómov',
       'Komunita slovenských žien a buddy systém',
       'Osobný denník a sledovanie návykov',

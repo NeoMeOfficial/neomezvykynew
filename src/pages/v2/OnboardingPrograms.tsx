@@ -22,11 +22,15 @@ import { syncToSupabase, loadFromSupabase } from '@/features/supabaseSync';
  * Mounted at /onboarding/programs.
  */
 
+// The four canonical Telo programmes — see src/data/programs.ts.
+// TODO: program-hormonal.jpg / program-mindful.jpg are placeholder images
+// reused for ElasticBands / Strong&Sexy until dedicated tile art is added
+// (program-elastic-bands.jpg, program-strong-sexy.jpg).
 const PROGRAMS = [
-  { k: 'postpartum',    t: 'Postpartum',           sub: '12 týždňov · jemné obnovenie', img: 'program-postpartum.jpg',   c: NM.SAGE },
-  { k: 'body-forming',  t: 'BodyForming',           sub: '8 týždňov · sila a tonus',    img: 'program-body-forming.jpg', c: NM.TERRA },
-  { k: 'hormon',        t: 'Hormón v rovnováhe',    sub: '6 týždňov · s cyklom',         img: 'program-hormonal.jpg',     c: NM.MAUVE },
-  { k: 'pokoj',         t: 'Pokoj v hlave',         sub: '4 týždne · meditácie a dych', img: 'program-mindful.jpg',      c: NM.DUSTY },
+  { k: 'postpartum',    t: 'Postpartum',   sub: '8 týždňov · jemné obnovenie', img: 'program-postpartum.jpg',   c: NM.SAGE },
+  { k: 'body-forming',  t: 'BodyForming',  sub: '6 týždňov · sila a tonus',    img: 'program-body-forming.jpg', c: NM.TERRA },
+  { k: 'elastic-bands', t: 'ElasticBands', sub: '6 týždňov · dynamický odpor', img: 'program-hormonal.jpg',     c: NM.MAUVE },
+  { k: 'strong-sexy',   t: 'Strong&Sexy',  sub: '6 týždňov · sila s činkami',  img: 'program-mindful.jpg',      c: NM.DUSTY },
 ] as const;
 
 const STORAGE_KEY = 'neome_onboarding_programs';

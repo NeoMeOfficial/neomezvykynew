@@ -343,11 +343,14 @@ function StepCycle({ state, setState, onContinue, onBack }: { state: FlowState; 
 
 // ─── Step 2 · Programs ────────────────────────────────────────
 function StepPrograms({ state, setState, onContinue, onBack, onSkip }: { state: FlowState; setState: (s: FlowState) => void; onContinue: () => void; onBack: () => void; onSkip: () => void }) {
+  // Canonical Telo programmes — see src/data/programs.ts. program-hormonal.jpg
+  // / program-mindful.jpg are placeholder images reused for ElasticBands /
+  // Strong&Sexy until dedicated tile art exists.
   const programs = [
-    { k: 'postpartum', t: 'Postpartum', sub: '12 týždňov · jemné obnovenie', img: 'program-postpartum.jpg', c: NM.SAGE },
-    { k: 'body-forming', t: 'BodyForming', sub: '8 týždňov · sila a tonus', img: 'program-body-forming.jpg', c: NM.TERRA },
-    { k: 'hormon', t: 'Hormón v rovnováhe', sub: '6 týždňov · s cyklom', img: 'program-hormonal.jpg', c: NM.MAUVE },
-    { k: 'pokoj', t: 'Pokoj v hlave', sub: '4 týždne · meditácie a dych', img: 'program-mindful.jpg', c: NM.DUSTY },
+    { k: 'postpartum', t: 'Postpartum', sub: '8 týždňov · jemné obnovenie', img: 'program-postpartum.jpg', c: NM.SAGE },
+    { k: 'body-forming', t: 'BodyForming', sub: '6 týždňov · sila a tonus', img: 'program-body-forming.jpg', c: NM.TERRA },
+    { k: 'elastic-bands', t: 'ElasticBands', sub: '6 týždňov · dynamický odpor', img: 'program-hormonal.jpg', c: NM.MAUVE },
+    { k: 'strong-sexy', t: 'Strong&Sexy', sub: '6 týždňov · sila s činkami', img: 'program-mindful.jpg', c: NM.DUSTY },
   ];
   const toggle = (k: string) => {
     const next = new Set(state.programs);

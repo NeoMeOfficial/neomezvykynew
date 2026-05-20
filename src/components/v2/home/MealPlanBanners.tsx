@@ -233,7 +233,7 @@ function MealPlanBanner4({ onPurchase }: { onPurchase: () => void }) {
         
         <div className="grid grid-cols-2 gap-4 mb-6">
           <div className="text-center">
-            <div className="text-2xl font-black" style={{ color: colors.strava }}>108</div>
+            <div className="text-2xl font-black" style={{ color: colors.strava }}>120+</div>
             <div className="text-xs" style={{ color: colors.textSecondary }}>ručne vybraných receptov</div>
           </div>
           <div className="text-center">

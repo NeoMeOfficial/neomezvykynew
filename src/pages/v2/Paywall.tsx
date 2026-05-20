@@ -49,7 +49,7 @@ function CloseButton({ dark = false, onClick }: { dark?: boolean; onClick: () =>
 // ─── Variant A · Warm editorial ────────────────────────────────
 function PaywallWarm({ onContinueFree, onClose, onActivate }: { onContinueFree: () => void; onClose: () => void; onActivate: () => void }) {
   const benefits = [
-    { t: '4 programy na výber', d: 'Postpartum · BodyForming · Hormón · Pokoj v hlave' },
+    { t: '4 programy na výber', d: 'Postpartum · BodyForming · ElasticBands · Strong&Sexy' },
     { t: 'Cyklus s odporúčaniami', d: 'Fázy, nálady, potraviny, pohyb na mieru' },
     { t: 'Vlastné návyky a reflexia s históriou', d: 'Denník bez limitu, štatistiky, exporty' },
     { t: 'Prístup k celej knižnici', d: 'Stovky meditácií, cvičení, receptov' },
