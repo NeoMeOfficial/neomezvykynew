@@ -3,6 +3,7 @@ import { useSupabaseAuth } from '../../contexts/SupabaseAuthContext';
 import { useConsents } from '../../hooks/useConsents';
 import { CONSENT_TYPES } from '../../lib/consents';
 import { NM } from './neome';
+import { ConsentPromptShell } from './consent/ConsentPromptShell';
 
 /**
  * Universal TOS + Privacy consent gate.
@@ -22,6 +23,9 @@ import { NM } from './neome';
  * Also re-prompts every user when the policy version is bumped
  * (CONSENT_POLICY_VERSION change in src/lib/consents.ts) — required by
  * Art. 7(3) GDPR for any material change to the terms of consent.
+ *
+ * Visual content is rendered by ConsentPromptShell (shared with
+ * ConsentGuardContext). This component owns the full-screen chrome only.
  */
 export function TosConsentGate({ children }: { children: ReactNode }) {
   const { signOut } = useSupabaseAuth();
@@ -77,108 +81,36 @@ export function TosConsentGate({ children }: { children: ReactNode }) {
         color: NM.DEEP,
       }}
     >
-      <div
-        style={{
-          fontFamily: NM.SANS,
-          fontSize: 11,
-          letterSpacing: '0.24em',
-          textTransform: 'uppercase',
-          color: NM.GOLD,
-          fontWeight: 500,
-          marginBottom: 10,
-        }}
-      >
-        GDPR · Súhlas
-      </div>
-      <div
-        style={{
-          fontFamily: NM.SERIF,
-          fontSize: 30,
-          lineHeight: 1.15,
-          letterSpacing: '-0.015em',
-          color: NM.DEEP,
-          marginBottom: 16,
-          fontWeight: 500,
-        }}
-      >
-        Pred pokračovaním potrebujeme tvoj súhlas
-      </div>
-
-      <div
-        style={{
-          background: '#fff',
-          border: `1px solid ${NM.HAIR}`,
-          borderRadius: 16,
-          padding: 16,
-          marginBottom: 22,
-        }}
-      >
-        <div style={{ fontFamily: NM.SANS, fontSize: 14, color: NM.DEEP, lineHeight: 1.65, fontWeight: 400, marginBottom: 12 }}>
-          Aby si mohla používať NeoMe, potrebujeme tvoj súhlas s našimi <strong style={{ fontWeight: 500 }}>Podmienkami používania</strong> a so spracovaním osobných údajov podľa <strong style={{ fontWeight: 500 }}>Zásad ochrany osobných údajov</strong>.
-        </div>
-        <div style={{ fontFamily: NM.SANS, fontSize: 13, color: NM.MUTED, lineHeight: 1.65, fontWeight: 300 }}>
-          Súhlas zahŕňa iba základné údaje účtu (e-mail, meno). Údaje o cykle, marketing a komunitné príspevky si vyžiadame zvlášť — a iba vtedy, keď ich budeš chcieť používať.
-        </div>
-        <a
-          href="/privacy"
-          target="_blank"
-          rel="noreferrer"
-          style={{
-            display: 'inline-block',
-            marginTop: 12,
-            fontFamily: NM.SANS,
-            fontSize: 12.5,
-            color: NM.DEEP,
-            textDecoration: 'underline',
-            textUnderlineOffset: 3,
-            fontWeight: 500,
-          }}
-        >
-          Prečítať Zásady ochrany osobných údajov →
-        </a>
-      </div>
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-        <button
-          onClick={onAccept}
-          disabled={submitting}
-          style={{
-            all: 'unset',
-            cursor: submitting ? 'not-allowed' : 'pointer',
-            opacity: submitting ? 0.5 : 1,
-            textAlign: 'center',
-            padding: '16px 22px',
-            borderRadius: 999,
-            background: NM.DEEP,
-            color: '#fff',
-            fontFamily: NM.SANS,
-            fontSize: 14,
-            fontWeight: 500,
-            letterSpacing: '0.03em',
-          }}
-        >
-          {submitting ? 'Spracovávam…' : 'Súhlasím a pokračovať'}
-        </button>
-        <button
-          onClick={onDecline}
-          disabled={submitting}
-          style={{
-            all: 'unset',
-            cursor: submitting ? 'not-allowed' : 'pointer',
-            textAlign: 'center',
-            padding: '13px 22px',
-            borderRadius: 999,
-            background: 'transparent',
-            color: NM.MUTED,
-            border: `1px solid ${NM.HAIR_2}`,
-            fontFamily: NM.SANS,
-            fontSize: 13.5,
-            fontWeight: 400,
-          }}
-        >
-          Nesúhlasím — odhlásiť sa
-        </button>
-      </div>
+      <ConsentPromptShell
+        title="Pred pokračovaním potrebujeme tvoj súhlas"
+        description="Súhlas zahŕňa iba základné údaje účtu (e-mail, meno). Údaje o cykle, marketing a komunitné príspevky si vyžiadame zvlášť — a iba vtedy, keď ich budeš chcieť používať."
+        preDescription={
+          <div
+            style={{
+              background: '#fff',
+              border: `1px solid ${NM.HAIR}`,
+              borderRadius: 16,
+              padding: 16,
+              marginBottom: 14,
+              fontFamily: NM.SANS,
+              fontSize: 14,
+              color: NM.DEEP,
+              lineHeight: 1.65,
+              fontWeight: 400,
+            }}
+          >
+            Aby si mohla používať NeoMe, potrebujeme tvoj súhlas s našimi{' '}
+            <strong style={{ fontWeight: 500 }}>Podmienkami používania</strong> a so spracovaním osobných údajov podľa{' '}
+            <strong style={{ fontWeight: 500 }}>Zásad ochrany osobných údajov</strong>.
+          </div>
+        }
+        acceptLabel="Súhlasím a pokračovať"
+        declineLabel="Nesúhlasím — odhlásiť sa"
+        titleSize={30}
+        submitting={submitting}
+        onAccept={onAccept}
+        onDecline={onDecline}
+      />
     </div>
   );
 }

@@ -8,6 +8,7 @@ import {
 } from 'react';
 import { createPortal } from 'react-dom';
 import { NM } from '../components/v2/neome';
+import { ConsentPromptShell } from '../components/v2/consent/ConsentPromptShell';
 import { useConsents } from '../hooks/useConsents';
 import { CONSENT_LABELS, CONSENT_TYPES, ConsentType } from '../lib/consents';
 
@@ -178,125 +179,37 @@ function ConsentSheet({ type, copy, submitting, onAccept, onDecline }: SheetProp
         {/* Drag handle */}
         <div style={{ width: 36, height: 4, borderRadius: 2, background: NM.HAIR_2, margin: '0 auto 16px' }} />
 
-        <div
-          style={{
-            fontFamily: NM.SANS,
-            fontSize: 11,
-            letterSpacing: '0.22em',
-            textTransform: 'uppercase',
-            color: NM.GOLD,
-            fontWeight: 500,
-            marginBottom: 6,
-          }}
-        >
-          GDPR · Súhlas
-        </div>
-        <div
-          style={{
-            fontFamily: NM.SERIF,
-            fontSize: 22,
-            lineHeight: 1.2,
-            color: NM.DEEP,
-            marginBottom: 12,
-            fontWeight: 500,
-            letterSpacing: '-0.01em',
-          }}
-        >
-          {title}
-        </div>
-
-        <div
-          style={{
-            fontFamily: NM.SANS,
-            fontSize: 14,
-            lineHeight: 1.6,
-            color: NM.MUTED,
-            fontWeight: 300,
-            marginBottom: 14,
-          }}
-        >
-          {description}
-        </div>
-
-        {isHealthData && (
-          <div
-            style={{
-              background: NM.BG,
-              borderRadius: 12,
-              padding: '12px 14px',
-              fontFamily: NM.SANS,
-              fontSize: 12.5,
-              color: NM.MUTED,
-              lineHeight: 1.6,
-              marginBottom: 14,
-              border: `1px solid ${NM.HAIR}`,
-            }}
-          >
-            <strong style={{ color: NM.DEEP, fontWeight: 500 }}>Čl. 9 ods. 2 písm. a) GDPR.</strong>{' '}
-            Údaje o zdraví ukladáme šifrovane a sú dostupné iba tebe. Súhlas
-            môžeš kedykoľvek odvolať v Nastaveniach → Súkromie.
-          </div>
-        )}
-
-        <a
-          href="/privacy"
-          target="_blank"
-          rel="noreferrer"
-          style={{
-            display: 'inline-block',
-            fontFamily: NM.SANS,
-            fontSize: 12.5,
-            color: NM.DEEP,
-            textDecoration: 'underline',
-            textUnderlineOffset: 3,
-            fontWeight: 500,
-            marginBottom: 18,
-          }}
-        >
-          Viac v Zásadách ochrany osobných údajov →
-        </a>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <button
-            onClick={onAccept}
-            disabled={submitting}
-            style={{
-              all: 'unset',
-              cursor: submitting ? 'not-allowed' : 'pointer',
-              opacity: submitting ? 0.5 : 1,
-              textAlign: 'center',
-              padding: '15px 22px',
-              borderRadius: 999,
-              background: NM.DEEP,
-              color: '#fff',
-              fontFamily: NM.SANS,
-              fontSize: 14,
-              fontWeight: 500,
-              letterSpacing: '0.03em',
-            }}
-          >
-            {submitting ? 'Spracovávam…' : acceptLabel}
-          </button>
-          <button
-            onClick={onDecline}
-            disabled={submitting}
-            style={{
-              all: 'unset',
-              cursor: submitting ? 'not-allowed' : 'pointer',
-              textAlign: 'center',
-              padding: '13px 22px',
-              borderRadius: 999,
-              background: 'transparent',
-              color: NM.MUTED,
-              border: `1px solid ${NM.HAIR_2}`,
-              fontFamily: NM.SANS,
-              fontSize: 13.5,
-              fontWeight: 400,
-            }}
-          >
-            {declineLabel}
-          </button>
-        </div>
+        <ConsentPromptShell
+          title={title}
+          description={description}
+          legalNote={
+            isHealthData ? (
+              <div
+                style={{
+                  background: NM.BG,
+                  borderRadius: 12,
+                  padding: '12px 14px',
+                  fontFamily: NM.SANS,
+                  fontSize: 12.5,
+                  color: NM.MUTED,
+                  lineHeight: 1.6,
+                  marginBottom: 14,
+                  border: `1px solid ${NM.HAIR}`,
+                }}
+              >
+                <strong style={{ color: NM.DEEP, fontWeight: 500 }}>Čl. 9 ods. 2 písm. a) GDPR.</strong>{' '}
+                Údaje o zdraví ukladáme šifrovane a sú dostupné iba tebe. Súhlas
+                môžeš kedykoľvek odvolať v Nastaveniach → Súkromie.
+              </div>
+            ) : undefined
+          }
+          acceptLabel={acceptLabel}
+          declineLabel={declineLabel}
+          titleSize={22}
+          submitting={submitting}
+          onAccept={onAccept}
+          onDecline={onDecline}
+        />
       </div>
     </div>
   );
