@@ -328,6 +328,15 @@ def match(name, raw=""):
     for z in _ZERO_NORM:
         if z in n:
             return {"kcal": 0, "p": 0, "c": 0, "f": 0, "fiber": 0, "zero": True}
+    # plain white yogurt — fat content varies per recipe; read it from `raw`
+    if "jogurt" in n and not any(k in n for k in (
+            "bielkov", "skyr", "grecky", "sojov", "kozi",
+            "gazdovsk", "cucoriedk")):
+        if "0,3" in rawn or "0.3" in rawn or "0,5" in rawn:
+            return {"kcal": 38, "p": 4.5, "c": 5.8, "f": 0.3, "fiber": 0}
+        if "3,5" in rawn or "3.5" in rawn:
+            return {"kcal": 61, "p": 3.5, "c": 4.7, "f": 3.5, "fiber": 0}
+        return {"kcal": 56, "p": 5.0, "c": 5.5, "f": 1.5, "fiber": 0}
     for kw, macro in _FOOD_INDEX:
         if kw in n:
             m = dict(macro)

@@ -14,7 +14,7 @@ values
   ('Jogurt s opečeným ananásom a kokosom', 'ranajky', 25, 'Ananás nakrájajte na kocky. Marinujte v citrónovej šťave vymiešanej s medom. Ananás orestujte na panvici alebo na
 grile. Primiešajte jogurt a posypte kokosom. Môžete podávať teplé alebo studené.',
    '[{"raw": "2 x balenie jogurt biely napr. Rajo Active Protein (360 g)", "name": "jogurt biely", "grams": 360.0}, {"raw": "1 a 1⁄2 koliesko ananás (210 g)", "name": "ananás", "grams": 210.0}, {"raw": "2 ČL kokos mletý (10 g)", "name": "kokos mletý", "grams": 10.0}, {"raw": "1⁄2 ČL med včelí (3.5 g)", "name": "med včelí", "grams": 3.5}, {"raw": "1 PL šťava citrónová (12 g)", "name": "šťava citrónová", "grams": 12.0}]'::jsonb,
-   401, 18.1, 53.4, 13.2, 4.9, 100, 1, true),
+   387, 19.9, 53.4, 12.1, 4.9, 100, 1, true),
   ('Lososová nátierka s pečivom', 'ranajky', 15, 'Lučinu/cottage cheese, lososa a kyslú smotanu (ak uvádza recept) vložte do mixéra a rozmixujte dohladka. Dochuťte bielym korením a štipkou soli. Nakoniec pridajte červenú papriku a všetko spolu dôkladne zamiešajte. Pečivo môžete opiecť z oboch strán na suchej panvici. Nátierku natrite na pečivo a podávajte so zeleninou. Pokiaľ si želáte pripraviť nátierku na viac dní, množstvá jednotlivých ingrediencií vynásobte počtom porcií.
 
 Ďalšie ingrediencie: biele mleté korenie, soľ, mletá červená paprika (ak na prísady nie ste alergická)',
@@ -35,7 +35,7 @@ grile. Primiešajte jogurt a posypte kokosom. Môžete podávať teplé alebo st
    266, 6.5, 47.3, 8.4, 7.5, 100, 1, true),
   ('Chia jogurt s ovocím', 'ranajky', 5, 'Jogurt vylejte do misky, pridajte chia semienka a ovocie.',
    '[{"raw": "2 a 1⁄2 x balenie jogurt biely napr. Rajo Active Protein (450 g)", "name": "jogurt biely", "grams": 450.0}, {"raw": "2 ks kiwi (178 g)", "name": "kiwi", "grams": 178.0}, {"raw": "2 ČL chia semienka (6 g)", "name": "chia semienka", "grams": 6.0}]'::jsonb,
-   408, 23.2, 54.0, 10.8, 7.4, 100, 1, true),
+   390, 25.5, 54.0, 9.5, 7.4, 100, 1, true),
   ('Cottage cheese s pestom, zeleninou a pečivom', 'ranajky', 5, 'Do cottage cheese vmiešajte pesto. Zmes rovnomerne naneste na pečivo. Konzumujte spolu s nakrájanou zeleninou, pokiaľ je tak uvedené. Pridajte ľubovoľné bylinky a koreniny.
 
 Ďalšie ingrediencie: bylinky (kurkuma, medvedí cesnak, bazalka), koreniny, pažítka (ak na prísady nie ste alergická)',
@@ -51,7 +51,7 @@ grile. Primiešajte jogurt a posypte kokosom. Môžete podávať teplé alebo st
    291, 8.8, 27.8, 17.6, 4.4, 100, 1, true),
   ('Amarantová kaša s ovocím', 'ranajky', 5, 'Amarantové vločky namočte do jogurtu (alebo mlieka, podľa toho ako uvádza recept) a pomiešajte. Pridajte čučoriedky (alebo najemno nastrúhané/nakrájané jablko, podľa toho ako uvádza recept), tvaroh a posypte rozmixovanými semienkami.',
    '[{"raw": "9 a 1⁄2 PL amarantové perličky napr. Mariana (66.5 g)", "name": "amarantové perličky", "grams": 66.5}, {"raw": "3 balenie jogurt biely (max. 0,3 % tuku) (450 g)", "name": "jogurt biely", "grams": 450.0}, {"raw": "2 PL tvaroh jemný hrudkový 2,5 % napr. Pilos (34 g)", "name": "tvaroh jemný hrudkový 2,5 %", "grams": 34.0}, {"raw": "2 ČL chia semienka (6 g)", "name": "chia semienka", "grams": 6.0}, {"raw": "4 x 5 bobúľ čučoriedky (36 g)", "name": "čučoriedky", "grams": 36.0}]'::jsonb,
-   600, 34.9, 76.7, 16.3, 7.6, 100, 1, true),
+   501, 34.9, 78.1, 9.5, 7.6, 100, 1, true),
   ('Paprikovo-paradajková nátierka s pečivom', 'ranajky', 60, 'Nátierku je praktickejšie si pripraviť vopred na viac porcií. Množstvá jednotlivých ingrediencií vynásobte počtom porcií. Očistenú papriku vložte do mixéra s papričkami chilli a paradajkami a rozmixujte. Vylejte do hrnca. Dochuťte soľou. Varte na miernom ohni cca 2 hodiny, kým sa voda neodparí. Občas premiešajte. Nakoniec pridajte olivový olej a zamiešajte. Keď je zmes uvarená, naplňte malé fľaštičky po okraj. Utrite vrch fľaštičiek a uzatvorte viečkom. Otočte hore dnom. Prikryte utierkou a nechajte vychladnúť. Pre viac porcií, roznásobte ingrediencie. Pridajte cottage cheese a podávajte s pečivom.
 
 Ďalšie ingrediencie: chilli, soľ (ak na prísady nie ste alergická)',
@@ -121,7 +121,7 @@ Alternatíva 4: 4 a 1⁄2 PL kukuričné vločky (49.5 g); 7 PL tvaroh jemný hr
    635, 48.3, 51.1, 25.6, 9.0, 100, 1, true),
   ('Ovseno-jogurtová kaša s ovocím', 'ranajky', 5, 'Vločky nasypte do misky, zalejte jogurtom a pridajte pokrájané ovocie. Na záver rozdrvte niekoľko orechov (prilejte olej, ak tak uvádza recept) a vysypte do misky. V prípade, že vločky pomaly mäknú alebo sa vám zdá, že jedlo má príliš hustú konzistenciu, prilejte trochu prevarenej vody. Doslaďte medom/sirupom.',
    '[{"raw": "8 a 1⁄2 PL ovsené vločky (93.5 g)", "name": "ovsené vločky", "grams": 93.5}, {"raw": "10 a 1⁄2 PL jogurt biely (min. 3,5 % tuku) (210 g)", "name": "jogurt biely", "grams": 210.0}, {"raw": "5 ks orechy lieskové (5 g)", "name": "orechy lieskové", "grams": 5.0}, {"raw": "45 g mrazené jahody", "name": "mrazené jahody", "grams": 45.0}, {"raw": "1⁄2 PL čakankový sirup (9 g)", "name": "čakankový sirup", "grams": 9.0}]'::jsonb,
-   534, 22.8, 77.8, 13.5, 13.0, 100, 1, true),
+   536, 20.7, 76.1, 17.1, 13.0, 100, 1, true),
   ('Cuketové lečo s vajcom', 'ranajky', 30, 'Na panvici zohrejte olej. Všetku zeleninu očistite, nakrájajte na požadované kúsky a dajte restovať. Keď trochu zmäkne podlejte ju ešte pohárom vody. Ochuťte soľou, čiernym mletým korením, majoránkou, prípadne podľa chuti môžete pridať aj chilli. Podávajte s vajcom uvareným na tvrdo a pokiaľ recept uvádza aj s pečivom/ryžou. Ak recept uvádza samostatne vaječný bielok, vajce klasicky uvarte na tvrdo a k leču pridajte už len uvedenú porciu bielka. Ak recept uvádza, lečo posypte semienkami.
 
 Ďalšie ingrediencie: štipka soli, čierne mleté korenie, majoránka, chilli (ak na prísady nie ste alergická)',
@@ -222,7 +222,7 @@ Na celú várku (Tofu muffiny 9x) potrebuješ: 1 a 1⁄2 x balenie tofu biele (2
    614, 43.8, 72.2, 18.6, 16.6, 100, 1, true),
   ('Amarantová kaša s ovocím', 'ranajky', 5, 'Amarantové vločky namočte do jogurtu alebo mlieka (podľa toho ako uvádza recept) a pomiešajte. Pridajte čučoriedky alebo najemno nastrúhané jablko (podľa toho ako uvádza recept), tvaroh a posypte rozmixovanými semienkami.',
    '[{"raw": "10 a 1⁄2 PL amarantové perličky napr. Mariana (73.5 g)", "name": "amarantové perličky", "grams": 73.5}, {"raw": "3 balenie jogurt biely (max. 0,3 % tuku) (450 g)", "name": "jogurt biely", "grams": 450.0}, {"raw": "2 ČL konopné semienka lúpané napr. Bio Nebio (7 g)", "name": "konopné semienka lúpané", "grams": 7.0}, {"raw": "2 ČL sezamové semená (6 g)", "name": "sezamové semená", "grams": 6.0}, {"raw": "2 PL tvaroh jemný hrudkový 2,5 % napr. Pilos (34 g)", "name": "tvaroh jemný hrudkový 2,5 %", "grams": 34.0}, {"raw": "4 x 5 bobúľ čučoriedky (36 g)", "name": "čučoriedky", "grams": 36.0}]'::jsonb,
-   670, 38.2, 80.7, 21.3, 7.0, 100, 1, true),
+   571, 38.2, 82.0, 14.6, 7.0, 100, 1, true),
   ('Plnená paprika s vajíčkom', 'ranajky', 20, 'Papriku umyte, opatrne odrežte vrch a vnútro jemne vyberte, aby ste odstránili jadierka. Na doske nakrájajte šunku a jarnú cibuľku. V miske zmiešajte lučinu, šunku, cibuľku s rozdrveným vajcom na tvrdo. Jemne osoľte, okoreňte a podľa chuti pridajte bylinky. Zmesou naplňte papriku. Ak je zmesi veľa, prípadne máte v recepte štvrtinu alebo polovicu papriky, konzumujte ich následne s pečivom a zeleninou uvedenou v recepte.
 
 Ďalšie ingrediencie: soľ, mleté čierne korenie, bylinky (ak na prísady nie ste alergická)',
@@ -237,7 +237,7 @@ Na celú várku (Tofu muffiny 9x) potrebuješ: 1 a 1⁄2 x balenie tofu biele (2
 
 Ďalšie ingrediencie: štipka soli, čierne mleté korenie, citrónová šťava (ak na prísady nie ste alergická)',
    '[{"raw": "2 x balenie jogurt biely (min. 3,5 % tuku) (300 g)", "name": "jogurt biely", "grams": 300.0}, {"raw": "1 a 1⁄2 x krajec chlieb celozrnný pšeničný (ideálne kváskový) (75 g)", "name": "chlieb celozrnný pšeničný", "grams": 75.0}, {"raw": "6 x plátok hydinová šunka (120 g)", "name": "hydinová šunka", "grams": 120.0}, {"raw": "40 g mrazený hrášok", "name": "mrazený hrášok", "grams": 40.0}, {"raw": "45 g Cream Cheese Spread light K-Classic", "name": "Cream Cheese Spread light K-Classic", "grams": 45.0}, {"raw": "1⁄2 x stredne veľká cibuľa (37.5 g)", "name": "cibuľa", "grams": 37.5}, {"raw": "1⁄2 ČL horčica plnotučná (4.5 g)", "name": "horčica plnotučná", "grams": 4.5}, {"raw": "1⁄2 (8 cm) ks uhorky zavárané kyslé (17 g)", "name": "uhorky zavárané kyslé", "grams": 17.0}]'::jsonb,
-   604, 47.4, 62.4, 16.3, 8.2, 100, 1, true),
+   607, 44.4, 60.0, 21.4, 8.2, 100, 1, true),
   ('Chlieb s tvarohom a ovocím', 'ranajky', 10, 'Ovocie umyte, nakrájajte, rozpoľte, zbavte jadier a nahrubo nastrúhajte (jednu štvrtinu si nechajte celú). Štvrtinu z ovocia nakrájajte na tenké plátky. Všetko pokvapkajte citrónovou šťavou. Tvaroh rozšľahajte s trochou vody. Premiešajte postrúhané ovocie s orechami (orechy môžete konzumovať aj zvlášť). Plátky chleba potrite tvarohom a ozdobte nakrájaným ovocím.
 
 Ďalšie ingrediencie: citrónová šťava (ak na prísady nie ste alergická)',
@@ -341,7 +341,7 @@ Nápoj: 3 dl sójové mlieko (300 g)',
 
 Ďalšie ingrediencie: škorica (ak na prísady nie ste alergická)',
    '[{"raw": "5 a 1⁄2 PL ovsené vločky (60.5 g)", "name": "ovsené vločky", "grams": 60.5}, {"raw": "4 a 1⁄2 PL jogurt biely (min. 3,5 % tuku) (90 g)", "name": "jogurt biely", "grams": 90.0}, {"raw": "2 ČL ľanové semená (6 g)", "name": "ľanové semená", "grams": 6.0}, {"raw": "4 ks jahody záhradné (52 g)", "name": "jahody záhradné", "grams": 52.0}, {"raw": "1⁄2 ČL javorový sirup (2 g)", "name": "javorový sirup", "grams": 2.0}]'::jsonb,
-   332, 13.4, 48.3, 8.5, 8.7, 100, 1, true),
+   333, 12.5, 47.6, 10.1, 8.7, 100, 1, true),
   ('Celozrnné chrumkavé tortilly plnené ovocím', 'ranajky', 15, 'Tortillu opečte na panvici až kým jemne zhnedne. Ovocie nakrájajte a krátko poduste (max. 2 min.) Opečte nasucho sezamové semienka. Tortillu na tanieri naplňte ovocím, polejte džemom, sezamovým alebo olivovým olejom a posypte sezamom, prípadne kakaom, podľa toho ako uvádza recept. Pridajte tvaroh, ak je uvedené.
 
 Príprava — Tortilla špaldová domáca: Všetky ingrediencie vypracujte v hladké tuhšie cesto pomocou elektrického robota alebo ručne. Vypracujte v miske bochník a cesto nechajte odpočinúť pod potravinovou fóliou aspoň 30 minút. Cesto si rozdeľte na 10 menších častí a každý kúsok ešte prepracujte a pomúčte. Cesto vyvaľkajte na 3 mm hrubú tortillu. Rozohrejte si nepriľnavú panvicu a tortillu opečte z každej strany 20 - 30 sekúnd. Hotové tortilly ukladajte do vlhkej utierky, aby vám nestvrdli.
@@ -420,7 +420,7 @@ Na celú várku (Tortilla špaldová domáca) potrebuješ: 350 g špaldová celo
 
 Ďalšie ingrediencie: soľ, čierne mleté korenie, oregano (ak na prísady nie ste alergická)',
    '[{"raw": "70 g kukuričné cestoviny napr. Marianna (neuvarené)", "name": "kukuričné cestoviny", "grams": 70.0}, {"raw": "115 g kuracie prsia bez kostí", "name": "kuracie prsia bez kostí", "grams": 115.0}, {"raw": "1 a 1⁄2 ČL olivový olej (7.5 g)", "name": "olivový olej", "grams": 7.5}, {"raw": "2 a 1⁄2 PL jogurt biely (min. 3,5 % tuku) (50 g)", "name": "jogurt biely", "grams": 50.0}, {"raw": "1 strúčik cesnak (3 g)", "name": "cesnak", "grams": 3.0}]'::jsonb,
-   477, 33.8, 58.9, 11.2, 1.5, 100, 1, true),
+   478, 33.3, 58.5, 12.0, 1.5, 100, 1, true),
   ('Cestoviny s boloňskou omáčkou', 'hlavne', 25, 'Kukuričné cestoviny pripravte podľa návodu. Cibuľu ošúpte a nakrájajte nadrobno. Dajte restovať na panvicu s olejom. Cesnak ošúpte a prelisujte k jemne opraženej cibuli. Pridajte mleté mäso a restujte približne 10 minút. Dochuťte štipkou soli a mletým čiernym korením. Pridajte pretlak a podľa potreby trochu vody. Duste ďalších 10 minút. Pridajte podľa chuti bylinky (bazalku, majoránku). Akonáhle je mäso mäkké, omáčka je hotová, podľa potreby podlievajte vodou. Na záver posypte bylinkami a dochuťte ľubovoľným korením.
 
 Ďalšie ingrediencie: bylinky, korenie, zeleninová soľ, kari (ak na prísady nie ste alergická)',
@@ -464,7 +464,7 @@ plátkov citrónu si nechajte aj na vrch a pridajte nakrájané plátky cesnaku.
 
 Ďalšie ingrediencie: grilovacie korenie, bylinky, balzamiko - podľa chuti (ak na prísady nie ste alergická)',
    '[{"raw": "150 g morčacie prsia bez kostí", "name": "morčacie prsia bez kostí", "grams": 150.0}, {"raw": "5 a 1⁄2 PL cícer varený (110 g)", "name": "cícer varený", "grams": 110.0}, {"raw": "1 a 1⁄2 ks uhorky (450 g)", "name": "uhorky", "grams": 450.0}, {"raw": "3 a 1⁄2 PL jogurt biely živý napr. Tami (70 g)", "name": "jogurt biely živý", "grams": 70.0}, {"raw": "1 ČL olivový olej (5 g)", "name": "olivový olej", "grams": 5.0}]'::jsonb,
-   455, 49.6, 43.9, 11.2, 8.9, 100, 1, true),
+   451, 50.4, 44.3, 10.2, 8.9, 100, 1, true),
   ('Syr so zeleninou', 'hlavne', 10, 'Ľahké jedlo v podobe cottage cheese alebo mozzarelly spolu s pečivom (ak sa v recepte nachádza) a zeleninovou prílohou. Ak uvádza recept, pridajte šunku. Ľubovoľne dochuťte bylinkami, štipkou zeleninovej soli, prípadne balzamika (podľa chuti).
 
 Ďalšie ingrediencie: korenie, zeleninová soľ, bylinky, balzamiko, medvedí cesnak - natrhajte do syru (ak na prísady nie ste alergická)',
@@ -625,7 +625,7 @@ Na celú várku (Zemiakovo-kelové komíny) potrebuješ: 9 x stredný kus zemiak
 
 Ďalšie ingrediencie: štipka soli, chilli, čierne korenie, kôpor, štipka sušeného cesnaku (ak na prísady nie ste alergická)',
    '[{"raw": "70 x g fazuľa biela napr. ALBERT BIO", "name": "fazuľa biela", "grams": 70.0}, {"raw": "2 ks slepačie vajce (110 g)", "name": "slepačie vajce", "grams": 110.0}, {"raw": "2 a 1⁄2 x PL špaldová celozrnná hrubá múka (37.5 g)", "name": "špaldová celozrnná hrubá múka", "grams": 37.5}, {"raw": "10 PL jogurt biely (max. 0,3 % tuku) (200 g)", "name": "jogurt biely", "grams": 200.0}, {"raw": "1⁄2 PL olivový olej (6 g)", "name": "olivový olej", "grams": 6.0}, {"raw": "20 g kukurica z konzervy", "name": "kukurica z konzervy", "grams": 20.0}, {"raw": "1⁄2 ks paprika červená (37.5 g)", "name": "paprika červená", "grams": 37.5}, {"raw": "20 g šalát hlávkový", "name": "šalát hlávkový", "grams": 20.0}, {"raw": "1⁄2 miska objem (300 ml) špenát (10 g)", "name": "špenát", "grams": 10.0}]'::jsonb,
-   695, 44.3, 80.5, 22.3, 15.3, 100, 1, true),
+   651, 44.3, 81.1, 19.3, 15.3, 100, 1, true),
   ('Falafel s červenou repou', 'hlavne', 30, 'Všetky suroviny okrem múky, oleja a smotany/jogurtu rozmixujte na jemnú zmes. Postupne pridávajte múku a koreniny a spracujte na cesto, ktoré sa dá dobre tvarovať. Vytvarujte fašírky. Na panvici rozohrejte olej a krátko falafel opražte. Falafel namáčajte do smotany alebo jogurtu.',
    '[{"raw": "8 a 1⁄2 x PL cícer varený (161.5 g)", "name": "cícer varený", "grams": 161.5}, {"raw": "4 PL múka pšeničná hladká napr. Zlatý Klas (40 g)", "name": "múka pšeničná hladká", "grams": 40.0}, {"raw": "10 a 1⁄2 PL jogurt sójový biely BIO napr. SOJADE (210 g)", "name": "jogurt sójový biely BIO", "grams": 210.0}, {"raw": "2 ČL olivový olej (10 g)", "name": "olivový olej", "grams": 10.0}, {"raw": "2 x veľkosť M slepačí bielok (74 g)", "name": "M slepačí bielok", "grams": 74.0}, {"raw": "70 x g červená repa (cvikla)", "name": "červená repa", "grams": 70.0}, {"raw": "1⁄2 x stredne veľká cibuľa (37.5 g)", "name": "cibuľa", "grams": 37.5}, {"raw": "1⁄2 strúčik cesnak (1.5 g)", "name": "cesnak", "grams": 1.5}]'::jsonb,
    635, 33.5, 81.5, 19.2, 14.4, 100, 1, true),
@@ -751,7 +751,7 @@ Na celú várku (Špaldové cesto na pizzu chrumkové) potrebuješ: 300 g špald
 
 Ďalšie ingrediencie: soľ, čierne mleté korenie, drvená rasca (ak na prísady nie ste alergická)',
    '[{"raw": "135 g tvrdý syr 20 %, napr. Madeland", "name": "tvrdý syr 20 %", "grams": 135.0}, {"raw": "2 x stredný kus zemiaky neskoré (180 g)", "name": "zemiaky neskoré", "grams": 180.0}, {"raw": "1 a 1⁄2 x lyžica polievková (zarovnaná) pohánková krupica (18 g)", "name": "pohánková krupica", "grams": 18.0}, {"raw": "175 g brokolica mrazená napr. Bonduelle", "name": "brokolica mrazená", "grams": 175.0}, {"raw": "1 a 1⁄2 x priemerný kus zeler buľvový (75 g)", "name": "zeler buľvový", "grams": 75.0}, {"raw": "1⁄2 ČL repkový olej rafinovaný (2.5 g)", "name": "repkový olej rafinovaný", "grams": 2.5}, {"raw": "3 PL jogurt biely (max. 0,3 % tuku) (60 g)", "name": "jogurt biely", "grams": 60.0}, {"raw": "25 x g uhorky", "name": "uhorky", "grams": 25.0}]'::jsonb,
-   704, 55.0, 66.4, 25.3, 11.1, 100, 1, true),
+   690, 55.0, 66.6, 24.4, 11.1, 100, 1, true),
   ('Losos so šampiňónovou omáčkou a prílohou', 'hlavne', 25, 'Lososa umyte, osušte, osoľte. Opečte na oleji z oboch strán asi 5 minút a dajte na tanier. Na masle poduste nadrobno nakrájanú cibuľu a na plátky nakrájané očistené, umyté šampiňóny. Pokvapkajte citrónovou šťavou. Potom zalejte smotanou a krátko povarte. Omáčkou polejte lososa. Konzumujte s prílohou.
 
 Ďalšie ingrediencie: citrónová šťava, štipka soli (ak na prísady nie ste alergická)',
@@ -803,7 +803,7 @@ Na celú várku (Cuketový prívarok) potrebuješ: 1 x stredný kus cuketa (cuki
 
 Ďalšie ingrediencie: soľ, čierne mleté korenie (ak na prísady nie ste alergická)',
    '[{"raw": "1 a 1⁄2 x krajec chlieb rascový (75 g)", "name": "chlieb rascový", "grams": 75.0}, {"raw": "1 a 1⁄2 PL olivový olej (18 g)", "name": "olivový olej", "grams": 18.0}, {"raw": "115 g kuracie prsia bez kostí", "name": "kuracie prsia bez kostí", "grams": 115.0}, {"raw": "5 PL jogurt biely (max. 0,3 % tuku) (100 g)", "name": "jogurt biely", "grams": 100.0}, {"raw": "1⁄2 miska objem (300 ml) ľadový šalát (40 g)", "name": "ľadový šalát", "grams": 40.0}, {"raw": "1⁄2 x PL sójová omáčka (5.5 g)", "name": "sójová omáčka", "grams": 5.5}, {"raw": "1⁄2 strúčik cesnak (1.5 g)", "name": "cesnak", "grams": 1.5}, {"raw": "1⁄2 x PL šťava citrónová (6 g)", "name": "šťava citrónová", "grams": 6.0}]'::jsonb,
-   546, 37.9, 44.0, 23.8, 4.5, 100, 1, true),
+   524, 37.9, 44.3, 22.3, 4.5, 100, 1, true),
   ('Špargľový šalát s cottage cheese, cícerom a avokádom', 'hlavne', 20, 'Špargľu umyte, vysušte a uložte na plech vystlaný papierom na pečenie. Pripravenú špargľu osoľte, okoreňte a pečte 15 minút pri 170 stupňoch. Upečenú špargľu podávajte so šunkou, cottage cheese, cícerom a avokádom nakrájaným nadrobno.
 
 Ďalšie ingrediencie: štipka morskej soli, mleté čierne korenie, cesnakové korenie (ak na prísady nie ste alergická)',
@@ -831,10 +831,10 @@ Na celú várku (Cuketový prívarok) potrebuješ: 1 x stredný kus cuketa (cuki
 
 Ďalšie ingrediencie: soľ, čierne mleté korenie, drvená rasca (ak na prísady nie ste alergická)',
    '[{"raw": "110 g tvrdý syr 20 %, napr. Madeland", "name": "tvrdý syr 20 %", "grams": 110.0}, {"raw": "35 g strúhanka", "name": "strúhanka", "grams": 35.0}, {"raw": "1 x malý kus zemiaky neskoré (60 g)", "name": "zemiaky neskoré", "grams": 60.0}, {"raw": "1 ČL olivový olej (5 g)", "name": "olivový olej", "grams": 5.0}, {"raw": "95 g brokolica", "name": "brokolica", "grams": 95.0}, {"raw": "4 PL jogurt biely (max. 0,3 % tuku) (80 g)", "name": "jogurt biely", "grams": 80.0}, {"raw": "1⁄2 x priemerný kus zeler buľvový (25 g)", "name": "zeler buľvový", "grams": 25.0}, {"raw": "30 g uhorky", "name": "uhorky", "grams": 30.0}]'::jsonb,
-   594, 45.2, 49.1, 24.9, 5.8, 100, 1, true),
+   577, 45.2, 49.3, 23.7, 5.8, 100, 1, true),
   ('Špenátové lievance s kuracím mäsom', 'hlavne', 20, 'Kuracie prsia nakrájajte na kúsky a ugrilujte na panvici. Keď sú hotové, prikryte ich, aby nevychladli. Všetky suroviny na špenátové lievance (špenát, vločky, bielky, jogurt) spolu zmixujte v mixéri čo najviac dohladka. Následne cesto dávkujte na rozohriatu panvicu do tvaru lievancov a každý lievanec opekajte zhruba 1 minútu z každej strany.',
    '[{"raw": "6 PL ovsené vločky (66 g)", "name": "ovsené vločky", "grams": 66.0}, {"raw": "110 g kuracie prsia bez kostí", "name": "kuracie prsia bez kostí", "grams": 110.0}, {"raw": "4 PL jogurt biely (min. 3,5 % tuku) (80 g)", "name": "jogurt biely", "grams": 80.0}, {"raw": "3 x veľkosť M slepačí bielok (111 g)", "name": "M slepačí bielok", "grams": 111.0}, {"raw": "1 ČL olivový olej (5 g)", "name": "olivový olej", "grams": 5.0}, {"raw": "2 miska objem (300 ml) špenát (40 g)", "name": "špenát", "grams": 40.0}]'::jsonb,
-   524, 50.9, 46.2, 13.1, 7.5, 100, 1, true),
+   525, 50.0, 45.6, 14.5, 7.5, 100, 1, true),
   ('Hydinový guláš', 'hlavne', 25, 'Zeleninu a huby očistite, opláchnite, prípadne olúpte. Pór nakrájajte na kolieska. Mrkvu po dĺžke rozkrojte a nakrájajte na štvrtiny. Šampiňóny prekrojte napolovicu. Mäso pokrájajte na menšie kocky. Na panvici rozpálte olej (maslo) a mäso sprudka orestujte. Pridajte pripravenú zeleninu, nakrájané jablká na kocky (ak uvádza recept) a všetko za občasného miešania duste asi 10 minút. Jedlo osoľte a okoreňte jemne pálivou paprikou. Smotanu zrieďte 3 lyžicami vody a podlejte guláš. Prikryjte a nechajte dusiť.
 
 Ďalšie ingrediencie: štipka soli, pálivá paprika, bylinková soľ (ak na prísady nie ste alergická)',
@@ -882,7 +882,7 @@ Na celú várku (Bazalkový dressing) potrebuješ: 1⁄2 150 g balenie jogurt bi
 
 Ďalšie ingrediencie: balzamiko, zeleninová soľ, korenie (ak na prísady nie ste alergická)',
    '[{"raw": "1 a 1⁄2 x krajec chlieb celozrnný pšeničný “graham” (75 g)", "name": "chlieb celozrnný pšeničný “graham”", "grams": 75.0}, {"raw": "2 a 1⁄2 x malá konzerva tuniak vo vlastnej šťave (140 g)", "name": "konzerva tuniak vo vlastnej šťave", "grams": 140.0}, {"raw": "5 a 1⁄2 porcia bazalkový dressing (110 g)", "name": "bazalkový dressing", "grams": 110.0}, {"raw": "1 ks rajčiny (75 g)", "name": "rajčiny", "grams": 75.0}, {"raw": "1⁄2 x stredne veľká cibuľa (37.5 g)", "name": "cibuľa", "grams": 37.5}, {"raw": "2 x miska rukola (34 g)", "name": "rukola", "grams": 34.0}]'::jsonb,
-   495, 46.7, 46.4, 14.2, 8.6, 100, 1, true),
+   496, 46.2, 46.0, 15.2, 8.6, 100, 1, true),
   ('Omeleta s ovčou bryndzou', 'hlavne', 10, 'Bryndzu rozmiešajte v mlieku, zašľahajte k nim vaječné bielky spolu so žltkami (len v prípade, že tak uvádza recept). Na panvici si rozohrejte tuk a zmes na ňu vylejte. Omeletu osoľte a zakryté pečte asi 2 - 3 minúty. Následne otočte a pridajte syr (len v prípade, že tak uvádza recept), pečte ešte 1 minútu. Konzumujte spolu s uvedenou zeleninou a chlebom (len v prípade, že tak uvádza recept).
 
 Ďalšie ingrediencie: soľ (ak na prísady nie ste alergická)',
@@ -933,7 +933,7 @@ Na celú várku (Chlieb kukuričný (Írsky bez kvasníc a mlieka)) potrebuješ:
 
 Ďalšie ingrediencie: grilovacie korenie, bylinky, balzamiko - podľa chuti (ak na prísady nie ste alergická)',
    '[{"raw": "6 a 1⁄2 x PL cícer varený (123.5 g)", "name": "cícer varený", "grams": 123.5}, {"raw": "140 g morčacie prsia bez kostí", "name": "morčacie prsia bez kostí", "grams": 140.0}, {"raw": "1 PL olivový olej (12 g)", "name": "olivový olej", "grams": 12.0}, {"raw": "3 PL jogurt biely živý napr. Tami (60 g)", "name": "jogurt biely živý", "grams": 60.0}, {"raw": "2 ks rajčiny (150 g)", "name": "rajčiny", "grams": 150.0}, {"raw": "1⁄2 ks uhorky (150 g)", "name": "uhorky", "grams": 150.0}, {"raw": "1⁄2 miska objem (300 ml) ľadový šalát (40 g)", "name": "ľadový šalát", "grams": 40.0}]'::jsonb,
-   505, 47.4, 42.6, 18.2, 10.4, 100, 1, true),
+   502, 48.0, 42.9, 17.3, 10.4, 100, 1, true),
   ('Šalát tuniakový', 'hlavne', 10, 'Tuniakový šalát okorenený ľubovoľným korením a štipkou zeleninovej soli. Pokiaľ recept uvádza, konzumujte spolu s varenými zemiakmi v šupke, cícerom alebo pečivom.
 
 Ďalšie ingrediencie: balzamiko, zeleninová soľ, korenie (ak na prísady nie ste alergická)',
@@ -956,7 +956,7 @@ Na celú várku (Bylinkový dressing) potrebuješ: 2 PL olivový olej (24 g); 1 
    2080, 128.1, 179.8, 101.3, 21.8, 100, 1, true),
   ('Jogurt s malinami a vlašskými orechami', 'snack', 5, 'Do malého hrnca dajte maliny, pridajte smotanu (ak je uvedená v recepte), kakao a med. Na záver môžete na malej panvici opražiť zľahka podrvené kukuričné lupienky a vlašské orechy. Do pohára dajte maliny, na to jogurt a lupienky s orechami.',
    '[{"raw": "13 PL jogurt biely (max. 0,3 % tuku) (260 g)", "name": "jogurt biely", "grams": 260.0}, {"raw": "4 ks orechy vlašské (12 g)", "name": "orechy vlašské", "grams": 12.0}, {"raw": "6 PL maliny (126 g)", "name": "maliny", "grams": 126.0}, {"raw": "1 ČL kakaový prášok, 12 % obsah tuku (8 g)", "name": "kakaový prášok, 12 % obsah tuku", "grams": 8.0}, {"raw": "1⁄2 x ČL med včelí (3.5 g)", "name": "med včelí", "grams": 3.5}]'::jsonb,
-   339, 16.8, 38.0, 14.3, 11.0, 100, 1, true),
+   281, 16.8, 38.8, 10.4, 11.0, 100, 1, true),
   ('Muffiny', 'snack', 30, 'Príprava — Muffiny: Ovsené vločky rozmixujte na múku. V miske ich zmiešajte s roztlačenými banánmi, roztopenou horkou čokoládou a následne so všetkými ostatnými surovinami. Cesto dávkujte do foriem na muffiny (najlepšie silikónových). Muffiny pečte 20 - 25 minút na 200 stupňoch do zlatista. Konzumujte predpísané množstvo muffinov. Ingrediencie sú uvádzané v surovom stave pred tým, ako ich dáte do rúry.
 
 Na celú várku (Muffiny) potrebuješ: 200 g ovsené vločky; 220 g grécky jogurt; 2 ks banány (260 g); 1⁄2 dl mlieko polotučné 1,5 % (75 g); 2 ks slepačie vajce (110 g); 8 g kypriaci prášok do pečiva; 2 x kocka (4×4,5 cm) čokoláda horká 81 % napr. Arriba Superieur (20 g); 6 ks orechy vlašské (18 g); 4 PL čakankový sirup (72 g)',
@@ -1032,7 +1032,7 @@ Príprava — Raw sladké guličky: Datle a marhule namočte do studenej vody ce
 
 Na celú várku (Raw sladké guličky) potrebuješ: 20 x kus bez kôstky datle sušené napr. Dr. Ensa (140 g); 100 g sušené marhule; 66 ks orechy kešu (100 g); 30 g mak biely',
    '[{"raw": "3 a 1⁄2 x gulička Raw sladké guličky (52.5 g)", "name": "Raw sladké guličky", "grams": 52.5}, {"raw": "16 PL jogurt biely (max. 0,3 % tuku) (320 g)", "name": "jogurt biely", "grams": 320.0}]'::jsonb,
-   383, 18.7, 46.9, 13.9, 3.9, 100, 1, true),
+   313, 18.7, 47.8, 9.1, 3.9, 100, 1, true),
   ('Marhuľové smoothie', 'snack', 5, 'Ingrediencie dajte do mixéra a pomixujte.',
    '[{"raw": "5 PL tvaroh jemný hrudkovitý 2,5 % (85 g)", "name": "tvaroh jemný hrudkovitý 2,5 %", "grams": 85.0}, {"raw": "3 x stredný kus marhule (180 g)", "name": "marhule", "grams": 180.0}, {"raw": "2 dl mlieko polotučné 1,5 % (200 g)", "name": "mlieko polotučné 1,5 %", "grams": 200.0}, {"raw": "1 ČL konopné semienka lúpané napr. Bio Nebio (3.5 g)", "name": "konopné semienka lúpané", "grams": 3.5}, {"raw": "1 ČL ľanové semená (3 g)", "name": "ľanové semená", "grams": 3.0}]'::jsonb,
    301, 21.2, 33.5, 10.5, 4.5, 100, 1, true),
@@ -1043,7 +1043,7 @@ Na celú várku (Raw sladké guličky) potrebuješ: 20 x kus bez kôstky datle s
    192, 16.9, 8.0, 10.1, 2.3, 100, 1, true),
   ('Jogurt s tvarohom a ovocím', 'snack', 5, 'Jednoduché jedlo pozostávajúce z orechov, jogurtu, tvarohu a ovocia. Orechy (semienka), v prípade, že sú uvedené v recepte, podrvte na malé kúsky a nasypte spolu s ovocím do misky s jogurtom a tvarohom. Na záver prisypte niekoľko goji, pomiešajte a konzumujte.',
    '[{"raw": "5 PL tvaroh tučný (85 g)", "name": "tvaroh tučný", "grams": 85.0}, {"raw": "1 a 1⁄2 x PL goji - kustovnica čínska (sušená) (18 g)", "name": "goji - kustovnica čínska", "grams": 18.0}, {"raw": "3 PL jogurt biely živý napr. Tami (60 g)", "name": "jogurt biely živý", "grams": 60.0}, {"raw": "70 g mrazené maliny", "name": "mrazené maliny", "grams": 70.0}, {"raw": "2 PL maliny (42 g)", "name": "maliny", "grams": 42.0}, {"raw": "1⁄2 PL čakankový sirup (9 g)", "name": "čakankový sirup", "grams": 9.0}]'::jsonb,
-   310, 15.7, 38.7, 12.0, 11.9, 100, 1, true),
+   307, 16.3, 39.0, 11.1, 11.9, 100, 1, true),
   ('Pšenové guľky', 'snack', 25, 'Guľky pripravte podľa receptu nižšie. Zapite mliekom, pokiaľ máte uvedené.
 
 Príprava — Pšenové guľky: Pšeno prelejte 2x horúcou vodou. Nechajte odkvapkať a varte v mandľovom mlieku do mäkka až kašovita, za občasného premiešania. Nechajte vychladnúť. V mixéri vymixujte na kašu kustovnicu a datle. Dôkladne vmiešajte do pšena tak, aby sa zafarbilo a spojili sa ingrediencie. Pridajte škoricu, kurkumu, 2 lyžice kokosu, pistácie a miešajte. Musí vzniknúť hustá lepivá hmota. V miske so studenou vodou si namočte občas prsty a vytvarujte menšie guľky s priemerom cca 3,5 cm. Obaľte v pistáciach alebo v strúhanom kokose. Uložte do košíkov a dajte na 2 hod do chladničky.
@@ -1107,12 +1107,12 @@ Príprava — Nepravá jablková štrúdľa: Jablko umyte a nastrúhajte na hrub
 
 Na celú várku (Nepravá jablková štrúdľa) potrebuješ: 1 ks tortilla napr. Dijo fresh wraps pšeničná (63 g); 1 x stredný kus jablká (140 g); 4 PL tvaroh jemný hrudkovitý 2,5 % (68 g); 1⁄2 PL hrozienka (11 g); 1 PL živočíšne maslo (17 g); 2 g škorica; 5 g trstinový cukor',
    '[{"raw": "1 x porcia Nepravá jablková štrúdľa (100 g)", "name": "Nepravá jablková štrúdľa", "grams": 100.0}, {"raw": "6 a 1⁄2 PL jogurt biely napr. Rajo Active Protein (130 g)", "name": "jogurt biely", "grams": 130.0}]'::jsonb,
-   244, 10.5, 29.6, 9.4, 2.4, 100, 1, true),
+   239, 11.1, 29.6, 9.0, 2.4, 100, 1, true),
   ('Ovocie mierneho pásma s orechami, prípadne s jogurtom', 'snack', 5, 'Ovocie si nakrájajte do misky (večer odložte do chladničky) a na olovrant skonzumujte. V prípade, že máte ako ovocie určené jablko, vyberajte si kyslejšie odrody.
 
 Ďalšie ingrediencie: podľa chuti pokvapkajte citrónovou šťavou (ak na prísady nie ste alergická)',
    '[{"raw": "2 x balenie jogurt biely (min. 3,5 % tuku) (300 g)", "name": "jogurt biely", "grams": 300.0}, {"raw": "1 ks broskyne (135 g)", "name": "broskyne", "grams": 135.0}]'::jsonb,
-   233, 14.7, 30.0, 5.8, 2.0, 100, 1, true),
+   236, 11.7, 27.6, 10.9, 2.0, 100, 1, true),
   ('Batátové nepečené brownies', 'snack', 60, 'Brownies pripravte podľa receptu zobrazeného nižšie. Uvedenú porciu konzumujte s jogurtom, pokiaľ tak recept uvádza.
 
 Príprava — Batátové nepečené brownies: Batát umyte a poriadne poprepichujte vidličkou alebo nožom. Zabaľte do alobalu a dajte piecť do rúry na 200 stupňov 45 minút. Opečený batát ošúpte a ešte teplý ho zmiešajte s nastrúhanou čokoládou a následne zamiešajte proteín (ideálne čokoládový). Cesto dajte do formy, z ktorej ho viete vyklopiť alebo ho následne viete v nej krájať. Formu dajte do mrazničky na 2 - 3 hodiny. Pred konzumáciou z mrazničky vyberte, nechajte postáť pri izbovej teplote a nakrájajte. Zvyšnú časť skladujte v mrazničke.

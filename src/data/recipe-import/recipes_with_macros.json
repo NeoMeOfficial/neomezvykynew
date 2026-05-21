@@ -32,10 +32,10 @@
         "grams": 12.0
       }
     ],
-    "kcal": 401,
-    "protein": 18.1,
+    "kcal": 387,
+    "protein": 19.9,
     "carbs": 53.4,
-    "fat": 13.2,
+    "fat": 12.1,
     "fiber": 4.9,
     "coverage_pct": 100,
     "is_batch": false,
@@ -212,10 +212,10 @@
         "grams": 6.0
       }
     ],
-    "kcal": 408,
-    "protein": 23.2,
+    "kcal": 390,
+    "protein": 25.5,
     "carbs": 54.0,
-    "fat": 10.8,
+    "fat": 9.5,
     "fiber": 7.4,
     "coverage_pct": 100,
     "is_batch": false,
@@ -370,10 +370,10 @@
         "grams": 36.0
       }
     ],
-    "kcal": 600,
+    "kcal": 501,
     "protein": 34.9,
-    "carbs": 76.7,
-    "fat": 16.3,
+    "carbs": 78.1,
+    "fat": 9.5,
     "fiber": 7.6,
     "coverage_pct": 100,
     "is_batch": false,
@@ -879,10 +879,10 @@
         "grams": 9.0
       }
     ],
-    "kcal": 534,
-    "protein": 22.8,
-    "carbs": 77.8,
-    "fat": 13.5,
+    "kcal": 536,
+    "protein": 20.7,
+    "carbs": 76.1,
+    "fat": 17.1,
     "fiber": 13.0,
     "coverage_pct": 100,
     "is_batch": false,
@@ -1891,10 +1891,10 @@
         "grams": 36.0
       }
     ],
-    "kcal": 670,
+    "kcal": 571,
     "protein": 38.2,
-    "carbs": 80.7,
-    "fat": 21.3,
+    "carbs": 82.0,
+    "fat": 14.6,
     "fiber": 7.0,
     "coverage_pct": 100,
     "is_batch": false,
@@ -2052,10 +2052,10 @@
         "grams": 17.0
       }
     ],
-    "kcal": 604,
-    "protein": 47.4,
-    "carbs": 62.4,
-    "fat": 16.3,
+    "kcal": 607,
+    "protein": 44.4,
+    "carbs": 60.0,
+    "fat": 21.4,
     "fiber": 8.2,
     "coverage_pct": 100,
     "is_batch": false,
@@ -2917,10 +2917,10 @@
         "grams": 2.0
       }
     ],
-    "kcal": 332,
-    "protein": 13.4,
-    "carbs": 48.3,
-    "fat": 8.5,
+    "kcal": 333,
+    "protein": 12.5,
+    "carbs": 47.6,
+    "fat": 10.1,
     "fiber": 8.7,
     "coverage_pct": 100,
     "is_batch": false,
@@ -3621,10 +3621,10 @@
         "grams": 3.0
       }
     ],
-    "kcal": 477,
-    "protein": 33.8,
-    "carbs": 58.9,
-    "fat": 11.2,
+    "kcal": 478,
+    "protein": 33.3,
+    "carbs": 58.5,
+    "fat": 12.0,
     "fiber": 1.5,
     "coverage_pct": 100,
     "is_batch": false,
@@ -3952,10 +3952,10 @@
         "grams": 5.0
       }
     ],
-    "kcal": 455,
-    "protein": 49.6,
-    "carbs": 43.9,
-    "fat": 11.2,
+    "kcal": 451,
+    "protein": 50.4,
+    "carbs": 44.3,
+    "fat": 10.2,
     "fiber": 8.9,
     "coverage_pct": 100,
     "is_batch": false,
@@ -5653,10 +5653,10 @@
         "grams": 10.0
       }
     ],
-    "kcal": 695,
+    "kcal": 651,
     "protein": 44.3,
-    "carbs": 80.5,
-    "fat": 22.3,
+    "carbs": 81.1,
+    "fat": 19.3,
     "fiber": 15.3,
     "coverage_pct": 100,
     "is_batch": false,
@@ -6946,10 +6946,10 @@
         "grams": 25.0
       }
     ],
-    "kcal": 704,
+    "kcal": 690,
     "protein": 55.0,
-    "carbs": 66.4,
-    "fat": 25.3,
+    "carbs": 66.6,
+    "fat": 24.4,
     "fiber": 11.1,
     "coverage_pct": 100,
     "is_batch": false,
@@ -7491,10 +7491,10 @@
         "grams": 6.0
       }
     ],
-    "kcal": 546,
+    "kcal": 524,
     "protein": 37.9,
-    "carbs": 44.0,
-    "fat": 23.8,
+    "carbs": 44.3,
+    "fat": 22.3,
     "fiber": 4.5,
     "coverage_pct": 100,
     "is_batch": false,
@@ -7813,10 +7813,10 @@
         "grams": 30.0
       }
     ],
-    "kcal": 594,
+    "kcal": 577,
     "protein": 45.2,
-    "carbs": 49.1,
-    "fat": 24.9,
+    "carbs": 49.3,
+    "fat": 23.7,
     "fiber": 5.8,
     "coverage_pct": 100,
     "is_batch": false,
@@ -7860,10 +7860,10 @@
         "grams": 40.0
       }
     ],
-    "kcal": 524,
-    "protein": 50.9,
-    "carbs": 46.2,
-    "fat": 13.1,
+    "kcal": 525,
+    "protein": 50.0,
+    "carbs": 45.6,
+    "fat": 14.5,
     "fiber": 7.5,
     "coverage_pct": 100,
     "is_batch": false,
@@ -8226,10 +8226,10 @@
         "grams": 34.0
       }
     ],
-    "kcal": 495,
-    "protein": 46.7,
-    "carbs": 46.4,
-    "fat": 14.2,
+    "kcal": 496,
+    "protein": 46.2,
+    "carbs": 46.0,
+    "fat": 15.2,
     "fiber": 8.6,
     "coverage_pct": 100,
     "is_batch": true,
@@ -8689,10 +8689,10 @@
         "grams": 40.0
       }
     ],
-    "kcal": 505,
-    "protein": 47.4,
-    "carbs": 42.6,
-    "fat": 18.2,
+    "kcal": 502,
+    "protein": 48.0,
+    "carbs": 42.9,
+    "fat": 17.3,
     "fiber": 10.4,
     "coverage_pct": 100,
     "is_batch": false,
@@ -8954,10 +8954,10 @@
         "grams": 3.5
       }
     ],
-    "kcal": 339,
+    "kcal": 281,
     "protein": 16.8,
-    "carbs": 38.0,
-    "fat": 14.3,
+    "carbs": 38.8,
+    "fat": 10.4,
     "fiber": 11.0,
     "coverage_pct": 100,
     "is_batch": false,
@@ -9407,10 +9407,10 @@
         "grams": 320.0
       }
     ],
-    "kcal": 383,
+    "kcal": 313,
     "protein": 18.7,
-    "carbs": 46.9,
-    "fat": 13.9,
+    "carbs": 47.8,
+    "fat": 9.1,
     "fiber": 3.9,
     "coverage_pct": 100,
     "is_batch": true,
@@ -9543,10 +9543,10 @@
         "grams": 9.0
       }
     ],
-    "kcal": 310,
-    "protein": 15.7,
-    "carbs": 38.7,
-    "fat": 12.0,
+    "kcal": 307,
+    "protein": 16.3,
+    "carbs": 39.0,
+    "fat": 11.1,
     "fiber": 11.9,
     "coverage_pct": 100,
     "is_batch": false,
@@ -9932,10 +9932,10 @@
         "grams": 130.0
       }
     ],
-    "kcal": 244,
-    "protein": 10.5,
+    "kcal": 239,
+    "protein": 11.1,
     "carbs": 29.6,
-    "fat": 9.4,
+    "fat": 9.0,
     "fiber": 2.4,
     "coverage_pct": 100,
     "is_batch": true,
@@ -9959,10 +9959,10 @@
         "grams": 135.0
       }
     ],
-    "kcal": 233,
-    "protein": 14.7,
-    "carbs": 30.0,
-    "fat": 5.8,
+    "kcal": 236,
+    "protein": 11.7,
+    "carbs": 27.6,
+    "fat": 10.9,
     "fiber": 2.0,
     "coverage_pct": 100,
     "is_batch": false,
