@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { recipes } from '@/data/recipes';
-import { useDailyRecipe } from '@/hooks/useDailyContent';
+import { useRecipes, SLOT_LABEL, type SupabaseRecipe } from '@/hooks/useRecipes';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import { TopBar } from '@/components/v2/top-bar';
 import { SerifHeader } from '@/components/ui/serif-header';
@@ -9,25 +8,11 @@ import { BodyText } from '@/components/ui/body-text';
 import { Eyebrow } from '@/components/ui/eyebrow';
 import { ChevronRight } from 'lucide-react';
 
-const CATEGORIES = [
-  { key: 'ranajky', label: 'Raňajky',  recipeCat: 'ranajky' as const },
-  { key: 'obed',    label: 'Obedy',    recipeCat: 'obed' as const },
-  { key: 'vecera',  label: 'Večera',   recipeCat: 'vecera' as const },
-  { key: 'snack',   label: 'Snacky',   recipeCat: 'snack' as const },
-  { key: 'smoothie',label: 'Nápoje',   recipeCat: 'smoothie' as const },
+const CATEGORIES: { slot: SupabaseRecipe['slot']; label: string; img: string }[] = [
+  { slot: 'ranajky', label: 'Raňajky',      img: 'testimonial-recipe.jpg' },
+  { slot: 'hlavne',  label: 'Hlavné jedlá', img: 'section-nutrition.jpg' },
+  { slot: 'snack',   label: 'Snacky',       img: 'hero-yoga.jpg' },
 ];
-
-const CAT_LABEL: Record<string, string> = {
-  ranajky: 'Raňajky', obed: 'Obed', vecera: 'Večera', snack: 'Snacky', smoothie: 'Nápoje',
-};
-
-const CAT_IMG: Record<string, string> = {
-  ranajky: 'testimonial-recipe.jpg',
-  obed:    'section-nutrition.jpg',
-  vecera:  'lifestyle-core-workout.jpg',
-  snack:   'hero-yoga.jpg',
-  smoothie:'lifestyle-yoga-pose.jpg',
-};
 
 function dayOfYear(d = new Date()): number {
   return Math.floor((d.getTime() - new Date(d.getFullYear(), 0, 0).getTime()) / 86400000);
@@ -36,17 +21,17 @@ function dayOfYear(d = new Date()): number {
 export default function Strava() {
   const navigate = useNavigate();
   const { hasMealPlanner } = useSubscription();
-  const { recipe: serverRecipe } = useDailyRecipe();
+  const { recipes, loading } = useRecipes();
 
   const categories = useMemo(() =>
-    CATEGORIES.map(c => ({ ...c, count: recipes.filter(r => r.category === c.recipeCat).length })),
-  []);
+    CATEGORIES.map(c => ({ ...c, count: recipes.filter(r => r.slot === c.slot).length })),
+  [recipes]);
 
+  // Deterministic recipe-of-the-day: stable per calendar day.
   const featured = useMemo(() => {
-    if (serverRecipe) return { id: serverRecipe.id, title: serverRecipe.title, category: serverRecipe.category, prepTime: serverRecipe.prep_time };
     if (!recipes.length) return null;
     return recipes[dayOfYear() % recipes.length];
-  }, [serverRecipe]);
+  }, [recipes]);
 
   return (
     <div className="min-h-screen bg-cream pb-12">
@@ -94,10 +79,10 @@ export default function Strava() {
             <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.05) 30%, rgba(0,0,0,0.78) 100%)' }} />
             <div style={{ position: 'absolute', left: 20, right: 20, bottom: 20, color: '#fff', textAlign: 'left' }}>
               <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.8)', marginBottom: 10 }}>
-                {CAT_LABEL[featured.category] ?? featured.category} · {featured.prepTime ?? 25} min
+                {SLOT_LABEL[featured.slot]} · {featured.prep_minutes ?? 25} min
               </div>
               <div style={{ fontFamily: 'Gilda Display, serif', fontSize: 26, fontWeight: 500, letterSpacing: '-0.01em', lineHeight: 1.1 }}>
-                {featured.title}
+                {featured.name}
               </div>
             </div>
           </button>
@@ -109,13 +94,13 @@ export default function Strava() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {categories.map(c => (
             <button
-              key={c.key}
-              onClick={() => navigate(`/recepty?cat=${c.key}`)}
+              key={c.slot}
+              onClick={() => navigate(`/recepty?cat=${c.slot}`)}
               style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '2px 0', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}
             >
               <div style={{
                 width: 72, height: 72, borderRadius: 14, flexShrink: 0,
-                backgroundImage: `url(/images/r9/${CAT_IMG[c.key]})`,
+                backgroundImage: `url(/images/r9/${c.img})`,
                 backgroundSize: 'cover', backgroundPosition: 'center',
               }} />
               <div style={{ flex: 1 }}>
@@ -123,7 +108,7 @@ export default function Strava() {
                   {c.label}
                 </div>
                 <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: 'rgba(61,41,33,0.72)' }}>
-                  {c.count} receptov
+                  {loading ? '…' : `${c.count} receptov`}
                 </div>
               </div>
               <ChevronRight size={16} color="rgba(61,41,33,0.42)" strokeWidth={1.3} />
