@@ -6775,7 +6775,7 @@
     "slot": "hlavne",
     "name": "Polievka slepačia (bez rezancov)",
     "prep_minutes": 120,
-    "instructions": "Slepačie mäso očistite a spolu s kosťami vložte do studenej vody. Pridajte očistenú zeleninu a koreniny, a varte do mäkka cca 2 hodiny. Po uvarení mäsa a zeleniny, polievku preceďte. Slepačie mäso a mrkvu pokrájajte na drobné kúsky a spolu s pokrájanou petržlenovou vňaťou alebo pažítkou vložte do polievky. V prípade potreby dochuťte.\n\nĎalšie ingrediencie: 4 ks nové korenie, 4 ks čierne korenie, petržlenová vňať, soľ (ak na prísady nie ste alergická)",
+    "instructions": "Slepačie mäso očistite a spolu s kosťami vložte do studenej vody. Pridajte očistenú zeleninu a koreniny, a varte do mäkka cca 2 hodiny. Po uvarení mäsa a zeleniny, polievku preceďte. Slepačie mäso a mrkvu pokrájajte na drobné kúsky a spolu s pokrájanou petržlenovou vňaťou alebo pažítkou vložte do polievky. V prípade potreby dochuťte.\n\nĎalšie ingrediencie: 4 ks nové korenie, 4 ks čierne korenie, petržlenová vňať, soľ (ak na prísady nie ste alergická)\n\nPorcia: 1 tanier. Várka má približne 10 porcií. Hodnoty sú uvedené na jednu porciu.",
     "ingredients": [
       {
         "raw": "1⁄2 x kus sliepka domáca (1500 g)",
@@ -6813,16 +6813,15 @@
         "grams": 170.0
       }
     ],
-    "kcal": 3447,
-    "protein": 305.1,
-    "carbs": 32.8,
-    "fat": 226.1,
-    "fiber": 9.0,
+    "kcal": 345,
+    "protein": 30.5,
+    "carbs": 3.3,
+    "fat": 22.6,
+    "fiber": 0.9,
     "coverage_pct": 100,
     "is_batch": false,
     "has_alternatives": false,
-    "portion_scaled": 1.0,
-    "needs_portion": true
+    "portion_scaled": 0.1
   },
   {
     "src_num": 81,
@@ -9030,7 +9029,7 @@
     "slot": "snack",
     "name": "Domáca musli tyčinka",
     "prep_minutes": 30,
-    "instructions": "Rúru predhrejte na 180 °C. Potom si pripravte plech cca 20 cm, ktorý prestriete papierom na pečenie. Zmiešajte quinoa vločky spolu s orieškami semienkami a kokosovým olejom. Vymiešanú masu natrite na pripravený plech a pečite v rúre približne 6 minút. Po upečení premiestnite zmes na tácku a nechajte vychladnúť. Vychladnutú zmes spojte so zvyšnými prísadami a miešajte, kým sa všetky ingrediencie dokonale nespoja. Vymiešané cesto roztiahnite rovnomerne do pripravenej formy na pečenie a nechajte v rúre približne 14 minút, kým nebude povrch upečený do zlatista. Vyberte plech z rúry a nechajte vychladnúť.",
+    "instructions": "Rúru predhrejte na 180 °C. Potom si pripravte plech cca 20 cm, ktorý prestriete papierom na pečenie. Zmiešajte quinoa vločky spolu s orieškami semienkami a kokosovým olejom. Vymiešanú masu natrite na pripravený plech a pečite v rúre približne 6 minút. Po upečení premiestnite zmes na tácku a nechajte vychladnúť. Vychladnutú zmes spojte so zvyšnými prísadami a miešajte, kým sa všetky ingrediencie dokonale nespoja. Vymiešané cesto roztiahnite rovnomerne do pripravenej formy na pečenie a nechajte v rúre približne 14 minút, kým nebude povrch upečený do zlatista. Vyberte plech z rúry a nechajte vychladnúť.\n\nPorcia: 1 tyčinka. Várka má približne 10 tyčiniek. Hodnoty sú uvedené na jednu porciu.",
     "ingredients": [
       {
         "raw": "100 g quinoa vločky",
@@ -9098,16 +9097,15 @@
         "grams": 20.0
       }
     ],
-    "kcal": 2080,
-    "protein": 128.1,
-    "carbs": 179.8,
-    "fat": 101.3,
-    "fiber": 21.8,
+    "kcal": 208,
+    "protein": 12.8,
+    "carbs": 18.0,
+    "fat": 10.1,
+    "fiber": 2.2,
     "coverage_pct": 100,
     "is_batch": false,
     "has_alternatives": false,
-    "portion_scaled": 1.0,
-    "needs_portion": true
+    "portion_scaled": 0.1
   },
   {
     "src_num": 4,
@@ -9157,7 +9155,7 @@
     "slot": "snack",
     "name": "Muffiny",
     "prep_minutes": 30,
-    "instructions": "Príprava — Muffiny: Ovsené vločky rozmixujte na múku. V miske ich zmiešajte s roztlačenými banánmi, roztopenou horkou čokoládou a následne so všetkými ostatnými surovinami. Cesto dávkujte do foriem na muffiny (najlepšie silikónových). Muffiny pečte 20 - 25 minút na 200 stupňoch do zlatista. Konzumujte predpísané množstvo muffinov. Ingrediencie sú uvádzané v surovom stave pred tým, ako ich dáte do rúry.\n\nNa celú várku (Muffiny) potrebuješ: 200 g ovsené vločky; 220 g grécky jogurt; 2 ks banány (260 g); 1⁄2 dl mlieko polotučné 1,5 % (75 g); 2 ks slepačie vajce (110 g); 8 g kypriaci prášok do pečiva; 2 x kocka (4×4,5 cm) čokoláda horká 81 % napr. Arriba Superieur (20 g); 6 ks orechy vlašské (18 g); 4 PL čakankový sirup (72 g)",
+    "instructions": "Príprava — Muffiny: Ovsené vločky rozmixujte na múku. V miske ich zmiešajte s roztlačenými banánmi, roztopenou horkou čokoládou a následne so všetkými ostatnými surovinami. Cesto dávkujte do foriem na muffiny (najlepšie silikónových). Muffiny pečte 20 - 25 minút na 200 stupňoch do zlatista. Konzumujte predpísané množstvo muffinov. Ingrediencie sú uvádzané v surovom stave pred tým, ako ich dáte do rúry.\n\nNa celú várku (Muffiny) potrebuješ: 200 g ovsené vločky; 220 g grécky jogurt; 2 ks banány (260 g); 1⁄2 dl mlieko polotučné 1,5 % (75 g); 2 ks slepačie vajce (110 g); 8 g kypriaci prášok do pečiva; 2 x kocka (4×4,5 cm) čokoláda horká 81 % napr. Arriba Superieur (20 g); 6 ks orechy vlašské (18 g); 4 PL čakankový sirup (72 g)\n\nPorcia: 1 muffin. Várka má približne 12 muffinov. Hodnoty sú uvedené na jednu porciu.",
     "ingredients": [
       {
         "raw": "200 g ovsené vločky",
@@ -9205,16 +9203,15 @@
         "grams": 72.0
       }
     ],
-    "kcal": 1704,
-    "protein": 63.9,
-    "carbs": 251.0,
-    "fat": 55.3,
-    "fiber": 48.0,
+    "kcal": 142,
+    "protein": 5.3,
+    "carbs": 20.9,
+    "fat": 4.6,
+    "fiber": 4.0,
     "coverage_pct": 100,
     "is_batch": true,
     "has_alternatives": false,
-    "portion_scaled": 1.0,
-    "needs_portion": true
+    "portion_scaled": 0.083
   },
   {
     "src_num": 7,
