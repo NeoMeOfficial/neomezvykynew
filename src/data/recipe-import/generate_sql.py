@@ -13,7 +13,7 @@ import json
 from pathlib import Path
 
 HERE = Path(__file__).parent
-IN = HERE / "recipes_with_macros.json"
+IN = HERE / "recipes_capped.json"      # portion-capped library recipes
 OUT = HERE / "seed_recipes.sql"
 
 
