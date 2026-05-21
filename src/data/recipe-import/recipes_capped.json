@@ -4903,43 +4903,43 @@
     "slot": "hlavne",
     "name": "Hrachová polievka",
     "prep_minutes": 60,
-    "instructions": "Do hrnca si dajte rozohriať olej, na ktorom opečte nakrájaný cesnak. Do hrnca si nasypte sušený hrach, očistené a nakrájané zemiaky na malé kocky, osoľte a zalejte vodou. Polievku varte, kým zemiaky a hrach nezmäknú a následne všetko rozmixujte do hladka.",
+    "instructions": "Do hrnca si dajte rozohriať olej, na ktorom opečte nakrájaný cesnak. Do hrnca si nasypte sušený hrach, očistené a nakrájané zemiaky na malé kocky, osoľte a zalejte vodou. Polievku varte, kým zemiaky a hrach nezmäknú a následne všetko rozmixujte do hladka.\n\nPorcia: 1 tanier. Celý recept dá približne 6 porcií. Hodnoty sú uvedené na jednu porciu.",
     "ingredients": [
       {
-        "raw": "zemiaky neskoré (80 g)",
+        "raw": "2 x stredný kus zemiaky neskoré (180 g)",
         "name": "zemiaky neskoré",
-        "grams": 80
+        "grams": 180.0
       },
       {
-        "raw": "hrach sušený (110 g)",
+        "raw": "250 x g hrach sušený (alebo mrazený)",
         "name": "hrach sušený",
-        "grams": 110
+        "grams": 250.0
       },
       {
-        "raw": "olivový olej (5 g)",
+        "raw": "1 PL olivový olej (12 g)",
         "name": "olivový olej",
-        "grams": 5
+        "grams": 12.0
       },
       {
-        "raw": "cesnak (1 g)",
+        "raw": "1 strúčik cesnak (3 g)",
         "name": "cesnak",
-        "grams": 1
+        "grams": 3.0
       },
       {
-        "raw": "voda pitná (680 g / 680 ml)",
+        "raw": "1500 ml voda pitná (1500 g)",
         "name": "voda pitná",
-        "grams": 680
+        "grams": 1500.0
       }
     ],
-    "kcal": 500,
-    "protein": 27.9,
-    "carbs": 82.6,
-    "fat": 6.9,
-    "fiber": 26.8,
+    "kcal": 183,
+    "protein": 10.2,
+    "carbs": 30.2,
+    "fat": 2.5,
+    "fiber": 9.8,
     "coverage_pct": 100,
     "is_batch": false,
     "has_alternatives": false,
-    "portion_scaled": 0.455
+    "portion_scaled": 0.167
   },
   {
     "src_num": 46,
@@ -5017,68 +5017,68 @@
     "slot": "hlavne",
     "name": "Tekvicová hokkaido polievka",
     "prep_minutes": 60,
-    "instructions": "Na olivovom oleji orestujte krátko cibuľu spolu s drvenými horčicovými semienkami, rascou a očistenou kurkumou asi 3 cm kúsok (prípadne sušená kurkuma). Musí sa pridať do oleja. Pridajte 4 paradajky rozkrojené na polovicu a orestujte ich. Hokkaido tekvicu dôkladne umyte – nešúpe sa – vydlabte dužinu a pár menších tekvicových semien prihoďte do polievky. Suroviny pridávajte v tomto poradí: na kocky nakrájanú tekvicu spolu s mrkvou nakrájanou na kolieska, 3 cm kúsok očisteného zázvoru, tymián a bobkový list, mleté korenie z mlynčeka a za hrsť čerstvého koriandru – vňate. Zalejte vodou. Povarte necelú hodinu, kým bude všetko mäkké. Vyberte z polievky koreň zázvoru a šupky z paradajok, bobkový list a všetko zmixujte ponorným tyčovým mixérom. Pridajte soľ. Pred jedením posypte ľanovými a sezamovými semienkami. Dochuťte ešte tekvicovým olejom.\n\nĎalšie ingrediencie: soľ, zázvor, drevené horčicové semienka, malá lyžička rasce, nové korenie 5 ks, 2 čerstvé bobkové listy, hrsť čerstvých byliniek tymiánu a koriandru, mleté čierne korenie, štipka sušeného chilli (podľa chuti - nemusí byť)",
+    "instructions": "Na olivovom oleji orestujte krátko cibuľu spolu s drvenými horčicovými semienkami, rascou a očistenou kurkumou asi 3 cm kúsok (prípadne sušená kurkuma). Musí sa pridať do oleja. Pridajte 4 paradajky rozkrojené na polovicu a orestujte ich. Hokkaido tekvicu dôkladne umyte – nešúpe sa – vydlabte dužinu a pár menších tekvicových semien prihoďte do polievky. Suroviny pridávajte v tomto poradí: na kocky nakrájanú tekvicu spolu s mrkvou nakrájanou na kolieska, 3 cm kúsok očisteného zázvoru, tymián a bobkový list, mleté korenie z mlynčeka a za hrsť čerstvého koriandru – vňate. Zalejte vodou. Povarte necelú hodinu, kým bude všetko mäkké. Vyberte z polievky koreň zázvoru a šupky z paradajok, bobkový list a všetko zmixujte ponorným tyčovým mixérom. Pridajte soľ. Pred jedením posypte ľanovými a sezamovými semienkami. Dochuťte ešte tekvicovým olejom.\n\nĎalšie ingrediencie: soľ, zázvor, drevené horčicové semienka, malá lyžička rasce, nové korenie 5 ks, 2 čerstvé bobkové listy, hrsť čerstvých byliniek tymiánu a koriandru, mleté čierne korenie, štipka sušeného chilli (podľa chuti - nemusí byť)\n\nPorcia: 1 tanier. Celý recept dá približne 8 porcií. Hodnoty sú uvedené na jednu porciu.",
     "ingredients": [
       {
-        "raw": "cibuľa (30 g)",
+        "raw": "1 x stredne veľká cibuľa (75 g)",
         "name": "cibuľa",
-        "grams": 30
+        "grams": 75.0
       },
       {
-        "raw": "tekvica Hokkaido (320 g)",
+        "raw": "2 x polovica ks tekvica Hokkaido (800 g)",
         "name": "tekvica Hokkaido",
-        "grams": 320
+        "grams": 800.0
       },
       {
-        "raw": "olivový olej (30 g)",
+        "raw": "6 PL olivový olej (72 g)",
         "name": "olivový olej",
-        "grams": 30
+        "grams": 72.0
       },
       {
-        "raw": "rajčiny (120 g)",
+        "raw": "4 ks rajčiny (300 g)",
         "name": "rajčiny",
-        "grams": 120
+        "grams": 300.0
       },
       {
-        "raw": "mrkva (70 g)",
+        "raw": "2 ks mrkva (170 g)",
         "name": "mrkva",
-        "grams": 70
+        "grams": 170.0
       },
       {
-        "raw": "kurkuma (3 g)",
+        "raw": "8 g kurkuma",
         "name": "kurkuma",
-        "grams": 3
+        "grams": 8.0
       },
       {
-        "raw": "ľanové semená (2 g)",
+        "raw": "2 ČL ľanové semená (6 g)",
         "name": "ľanové semená",
-        "grams": 2
+        "grams": 6.0
       },
       {
-        "raw": "sezamové semená (2 g)",
+        "raw": "2 ČL sezamové semená (6 g)",
         "name": "sezamové semená",
-        "grams": 2
+        "grams": 6.0
       },
       {
-        "raw": "olej tekvicový (2 g)",
+        "raw": "1⁄2 PL olej tekvicový (6 g)",
         "name": "olej tekvicový",
-        "grams": 2
+        "grams": 6.0
       },
       {
-        "raw": "voda (600 g / 600 ml)",
+        "raw": "1500 ml voda (1500 g)",
         "name": "voda",
-        "grams": 600
+        "grams": 1500.0
       }
     ],
-    "kcal": 500,
-    "protein": 6.4,
-    "carbs": 46.2,
-    "fat": 34.1,
-    "fiber": 13.4,
+    "kcal": 157,
+    "protein": 2.0,
+    "carbs": 14.5,
+    "fat": 10.7,
+    "fiber": 4.2,
     "coverage_pct": 100,
     "is_batch": false,
     "has_alternatives": false,
-    "portion_scaled": 0.398
+    "portion_scaled": 0.125
   },
   {
     "src_num": 49,
@@ -5897,7 +5897,7 @@
     "slot": "hlavne",
     "name": "Zeleninová krémová polievka",
     "prep_minutes": 45,
-    "instructions": "Zeleninu očistite a nakrájajte na menšie časti. Vložte do hrnca, zalejte vodou a varte, kým zelenina nie je mäkká. Pridajte čierne korenie a soľ. Polievku vymixujte ponorným mixérom dohladka.\n\nĎalšie ingrediencie: štipka soli, (štipka čierneho korenia - jedine, ak máte vyskúšané). Korenie, najmäčierne vo väčšom množstve môže spôsobovať problémy.",
+    "instructions": "Zeleninu očistite a nakrájajte na menšie časti. Vložte do hrnca, zalejte vodou a varte, kým zelenina nie je mäkká. Pridajte čierne korenie a soľ. Polievku vymixujte ponorným mixérom dohladka.\n\nĎalšie ingrediencie: štipka soli, (štipka čierneho korenia - jedine, ak máte vyskúšané). Korenie, najmäčierne vo väčšom množstve môže spôsobovať problémy.\n\nPorcia: 1 tanier. Celý recept dá približne 7 porcií. Hodnoty sú uvedené na jednu porciu.",
     "ingredients": [
       {
         "raw": "3 ks mrkva (255 g)",
@@ -5930,15 +5930,15 @@
         "grams": 1500.0
       }
     ],
-    "kcal": 423,
-    "protein": 18.4,
-    "carbs": 90.3,
-    "fat": 2.1,
-    "fiber": 22.8,
+    "kcal": 60,
+    "protein": 2.6,
+    "carbs": 12.9,
+    "fat": 0.3,
+    "fiber": 3.3,
     "coverage_pct": 100,
     "is_batch": false,
     "has_alternatives": false,
-    "portion_scaled": 1.0
+    "portion_scaled": 0.143
   },
   {
     "src_num": 65,
@@ -6437,68 +6437,68 @@
     "slot": "hlavne",
     "name": "Polievka zeleninová - jarná (bez rezancov a halušiek)",
     "prep_minutes": 25,
-    "instructions": "Zeleninu očistite a najkrájajte nadrobno. Do hrnca nalejte olej a osmažte cibuľu. Ak je zlatistá, pridajte nakrájanú zeleninu spolu s nakrájanými zemiakmi a posmažte na oleji. Na konci pridajte cesnak, soľ a koreniny, a prilejte vodu. Keď začne voda vrieť, pridajte zelerovú a petržlenovú vňať, a povarte asi 10 min. Keď je zelenina skoro uvarená pridajte karfiol a brokolicu. Varte ďalej, až kým bude zelenina mäkká. Ak je mäkká pridajte na záver mrazený hrach. Ľubovoľne dochuťte koreninami.\n\nĎalšie ingrediencie: vegeta bez glutamánu sodného, korenie čierne drvené (iba ak tolerujete), paprika červená mletá sladká, zelerová vňať, petržlenová vňať",
+    "instructions": "Zeleninu očistite a najkrájajte nadrobno. Do hrnca nalejte olej a osmažte cibuľu. Ak je zlatistá, pridajte nakrájanú zeleninu spolu s nakrájanými zemiakmi a posmažte na oleji. Na konci pridajte cesnak, soľ a koreniny, a prilejte vodu. Keď začne voda vrieť, pridajte zelerovú a petržlenovú vňať, a povarte asi 10 min. Keď je zelenina skoro uvarená pridajte karfiol a brokolicu. Varte ďalej, až kým bude zelenina mäkká. Ak je mäkká pridajte na záver mrazený hrach. Ľubovoľne dochuťte koreninami.\n\nĎalšie ingrediencie: vegeta bez glutamánu sodného, korenie čierne drvené (iba ak tolerujete), paprika červená mletá sladká, zelerová vňať, petržlenová vňať\n\nPorcia: 1 tanier. Celý recept dá približne 9 porcií. Hodnoty sú uvedené na jednu porciu.",
     "ingredients": [
       {
-        "raw": "zemiaky neskoré (170 g)",
+        "raw": "4 x väčšia naberačka zemiaky neskoré (240 g)",
         "name": "zemiaky neskoré",
-        "grams": 170
+        "grams": 240.0
       },
       {
-        "raw": "mrkva (120 g)",
+        "raw": "2 ks mrkva (170 g)",
         "name": "mrkva",
-        "grams": 120
+        "grams": 170.0
       },
       {
-        "raw": "petržlen (45 g)",
+        "raw": "1 x stredne veľký petržlen (60 g)",
         "name": "petržlen",
-        "grams": 45
+        "grams": 60.0
       },
       {
-        "raw": "cibuľa (50 g)",
+        "raw": "1 x stredne veľká cibuľa (75 g)",
         "name": "cibuľa",
-        "grams": 50
+        "grams": 75.0
       },
       {
-        "raw": "cesnak (2 g)",
+        "raw": "1 strúčik cesnak (3 g)",
         "name": "cesnak",
-        "grams": 2
+        "grams": 3.0
       },
       {
-        "raw": "brokolica mrazená (140 g)",
+        "raw": "200 g brokolica mrazená napr. Bonduelle",
         "name": "brokolica mrazená",
-        "grams": 140
+        "grams": 200.0
       },
       {
-        "raw": "karfiol (70 g)",
+        "raw": "100 g karfiol",
         "name": "karfiol",
-        "grams": 70
+        "grams": 100.0
       },
       {
-        "raw": "hrach mrazený (160 g)",
+        "raw": "230 g hrach mrazený",
         "name": "hrach mrazený",
-        "grams": 160
+        "grams": 230.0
       },
       {
-        "raw": "olivový olej (9 g)",
+        "raw": "1 PL olivový olej (12 g)",
         "name": "olivový olej",
-        "grams": 9
+        "grams": 12.0
       },
       {
-        "raw": "voda (1440 g / 1440 ml)",
+        "raw": "2000 ml voda (2000 g)",
         "name": "voda",
-        "grams": 1440
+        "grams": 2000.0
       }
     ],
-    "kcal": 500,
-    "protein": 20.2,
-    "carbs": 86.4,
-    "fat": 10.9,
-    "fiber": 23.1,
+    "kcal": 77,
+    "protein": 3.1,
+    "carbs": 13.4,
+    "fat": 1.7,
+    "fiber": 3.6,
     "coverage_pct": 100,
     "is_batch": false,
     "has_alternatives": false,
-    "portion_scaled": 0.718
+    "portion_scaled": 0.111
   },
   {
     "src_num": 75,
@@ -6775,7 +6775,7 @@
     "slot": "hlavne",
     "name": "Polievka slepačia (bez rezancov)",
     "prep_minutes": 120,
-    "instructions": "Slepačie mäso očistite a spolu s kosťami vložte do studenej vody. Pridajte očistenú zeleninu a koreniny, a varte do mäkka cca 2 hodiny. Po uvarení mäsa a zeleniny, polievku preceďte. Slepačie mäso a mrkvu pokrájajte na drobné kúsky a spolu s pokrájanou petržlenovou vňaťou alebo pažítkou vložte do polievky. V prípade potreby dochuťte.\n\nĎalšie ingrediencie: 4 ks nové korenie, 4 ks čierne korenie, petržlenová vňať, soľ (ak na prísady nie ste alergická)\n\nPorcia: 1 tanier. Várka má približne 10 porcií. Hodnoty sú uvedené na jednu porciu.",
+    "instructions": "Slepačie mäso očistite a spolu s kosťami vložte do studenej vody. Pridajte očistenú zeleninu a koreniny, a varte do mäkka cca 2 hodiny. Po uvarení mäsa a zeleniny, polievku preceďte. Slepačie mäso a mrkvu pokrájajte na drobné kúsky a spolu s pokrájanou petržlenovou vňaťou alebo pažítkou vložte do polievky. V prípade potreby dochuťte.\n\nĎalšie ingrediencie: 4 ks nové korenie, 4 ks čierne korenie, petržlenová vňať, soľ (ak na prísady nie ste alergická)\n\nPorcia: 1 tanier. Celý recept dá približne 9 porcií. Hodnoty sú uvedené na jednu porciu.",
     "ingredients": [
       {
         "raw": "1⁄2 x kus sliepka domáca (1500 g)",
@@ -6813,15 +6813,15 @@
         "grams": 170.0
       }
     ],
-    "kcal": 345,
-    "protein": 30.5,
-    "carbs": 3.3,
-    "fat": 22.6,
-    "fiber": 0.9,
+    "kcal": 191,
+    "protein": 17.2,
+    "carbs": 3.6,
+    "fat": 12.6,
+    "fiber": 1.0,
     "coverage_pct": 100,
     "is_batch": false,
     "has_alternatives": false,
-    "portion_scaled": 0.1
+    "portion_scaled": 0.111
   },
   {
     "src_num": 81,
@@ -9029,7 +9029,7 @@
     "slot": "snack",
     "name": "Domáca musli tyčinka",
     "prep_minutes": 30,
-    "instructions": "Rúru predhrejte na 180 °C. Potom si pripravte plech cca 20 cm, ktorý prestriete papierom na pečenie. Zmiešajte quinoa vločky spolu s orieškami semienkami a kokosovým olejom. Vymiešanú masu natrite na pripravený plech a pečite v rúre približne 6 minút. Po upečení premiestnite zmes na tácku a nechajte vychladnúť. Vychladnutú zmes spojte so zvyšnými prísadami a miešajte, kým sa všetky ingrediencie dokonale nespoja. Vymiešané cesto roztiahnite rovnomerne do pripravenej formy na pečenie a nechajte v rúre približne 14 minút, kým nebude povrch upečený do zlatista. Vyberte plech z rúry a nechajte vychladnúť.\n\nPorcia: 1 tyčinka. Várka má približne 10 tyčiniek. Hodnoty sú uvedené na jednu porciu.",
+    "instructions": "Rúru predhrejte na 180 °C. Potom si pripravte plech cca 20 cm, ktorý prestriete papierom na pečenie. Zmiešajte quinoa vločky spolu s orieškami semienkami a kokosovým olejom. Vymiešanú masu natrite na pripravený plech a pečite v rúre približne 6 minút. Po upečení premiestnite zmes na tácku a nechajte vychladnúť. Vychladnutú zmes spojte so zvyšnými prísadami a miešajte, kým sa všetky ingrediencie dokonale nespoja. Vymiešané cesto roztiahnite rovnomerne do pripravenej formy na pečenie a nechajte v rúre približne 14 minút, kým nebude povrch upečený do zlatista. Vyberte plech z rúry a nechajte vychladnúť.\n\nPorcia: 1 tyčinka. Celý recept dá približne 10 tyčiniek. Hodnoty sú uvedené na jednu porciu.",
     "ingredients": [
       {
         "raw": "100 g quinoa vločky",
@@ -9155,7 +9155,7 @@
     "slot": "snack",
     "name": "Muffiny",
     "prep_minutes": 30,
-    "instructions": "Príprava — Muffiny: Ovsené vločky rozmixujte na múku. V miske ich zmiešajte s roztlačenými banánmi, roztopenou horkou čokoládou a následne so všetkými ostatnými surovinami. Cesto dávkujte do foriem na muffiny (najlepšie silikónových). Muffiny pečte 20 - 25 minút na 200 stupňoch do zlatista. Konzumujte predpísané množstvo muffinov. Ingrediencie sú uvádzané v surovom stave pred tým, ako ich dáte do rúry.\n\nNa celú várku (Muffiny) potrebuješ: 200 g ovsené vločky; 220 g grécky jogurt; 2 ks banány (260 g); 1⁄2 dl mlieko polotučné 1,5 % (75 g); 2 ks slepačie vajce (110 g); 8 g kypriaci prášok do pečiva; 2 x kocka (4×4,5 cm) čokoláda horká 81 % napr. Arriba Superieur (20 g); 6 ks orechy vlašské (18 g); 4 PL čakankový sirup (72 g)\n\nPorcia: 1 muffin. Várka má približne 12 muffinov. Hodnoty sú uvedené na jednu porciu.",
+    "instructions": "Príprava — Muffiny: Ovsené vločky rozmixujte na múku. V miske ich zmiešajte s roztlačenými banánmi, roztopenou horkou čokoládou a následne so všetkými ostatnými surovinami. Cesto dávkujte do foriem na muffiny (najlepšie silikónových). Muffiny pečte 20 - 25 minút na 200 stupňoch do zlatista. Konzumujte predpísané množstvo muffinov. Ingrediencie sú uvádzané v surovom stave pred tým, ako ich dáte do rúry.\n\nNa celú várku (Muffiny) potrebuješ: 200 g ovsené vločky; 220 g grécky jogurt; 2 ks banány (260 g); 1⁄2 dl mlieko polotučné 1,5 % (75 g); 2 ks slepačie vajce (110 g); 8 g kypriaci prášok do pečiva; 2 x kocka (4×4,5 cm) čokoláda horká 81 % napr. Arriba Superieur (20 g); 6 ks orechy vlašské (18 g); 4 PL čakankový sirup (72 g)\n\nPorcia: 1 muffin. Celý recept dá približne 12 muffinov. Hodnoty sú uvedené na jednu porciu.",
     "ingredients": [
       {
         "raw": "200 g ovsené vločky",

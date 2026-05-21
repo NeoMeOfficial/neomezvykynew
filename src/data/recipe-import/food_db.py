@@ -87,7 +87,9 @@ FOODS = [
     (["tuniak"], 110, 25, 0, 1, 0),
     (["sardinky"], 180, 22, 0, 10, 0),
     (["krevety"], 99, 21, 0.2, 1.4, 0),
-    (["sliepka domaca"], 220, 20, 0, 15, 0),
+    # bone-in stewing hen (carcass weight) — ~50 % edible yield, so per 100 g
+    # of the half-hen the usable meat contributes far less than pure meat
+    (["sliepka domaca"], 105, 10, 0, 7.5, 0),
 
     # ── plant proteins ──
     (["sojovy syr tofu", "tofu"], 120, 12, 1.5, 7, 1),
