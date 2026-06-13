@@ -1,0 +1,392 @@
+{
+  "week_1": {
+    "automation_id": 48,
+    "days": [
+      {
+        "day": 1,
+        "campaign_id": 121,
+        "message_id": "123",
+        "name": "Day1_Week1 (BodyForming)",
+        "subject": "BodyForming (Týždeň 1 / Deň 1) Cíť sa skvele vo svojom tele",
+        "preheader": "Vítam ťa na začiatku programu Body Forming a tvojej cesty, aby si sa opäť cítila skvele vo svojom tele.",
+        "fromname": "Gabi z Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "Ahoj %FIRSTNAME%, \n\nVítam ťa na začiatku programu Body Forming a tvojej cesty, aby si sa\nopäť cítila skvele vo svojom tele.\n\nRozhodla si sa urobiť niečo pre svoje telo, pre svoje zdravie, čo je\nprvý veľký krok k úspechu. \n\nDnešným cvičením odštartuješ svoju 6-týždňovú cestu. Každý\ndeň si spríjemníš tým, že sa na 15 minút stretneme,  odsunieš\nvšetky povinnosti na stranu a upriamiš svoju pozornosť na seba. Na\ntýchto 15-minút budeš prioritou ty a nič iné.  \n\nDnešné cvičenie\n<https://member.neome.com.au/products/body-forming-program-2/categories/2150396620/posts/2158065850>\n\nNezabúdaj, na tvojej ceste je dôležitá kombinácia pohybu a zdravej\nstravy. Čo do tela dáš, to ti aj vráti späť. \n\nZdravý recept na dnes\n<https://drive.google.com/file/d/14oVbPjLF-fQdtexH5lh7RKrTkb3DtaoJ/view>\n\nKrásny deň.\n\nGabi\n\n⭐ \n\n**PS: **Naša komunikácia bude cez Slack, ak si sa ešte nepridala do\nnašej skupiny, stačí ak klikneš sem.\n<https://join.slack.com/t/neometribeofficial/shared_invite/zt-17qbtcdio-S8cwN3V~aoh7Y3I5JKjpjQ>\n\nPráve cez Slack môžeme jednoducho a rýchlo komunikovať, dostaneš\nodomňa dennú dávku motivácie a od našej komunity inšpiráciu,\nvďaka ktorej sa ti určite program podarí dokončit.\n\n** Preto sa určite pridaj aj ty!**\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 14859
+      },
+      {
+        "day": 2,
+        "campaign_id": 122,
+        "message_id": "124",
+        "name": "Day2_Week1 (BodyForming)",
+        "subject": "BodyForming (Týždeň 1 / Deň 2) Cíť sa skvele vo svojom tele",
+        "preheader": "Včera si úspešne odštartovala svoju cestu za svojim cieľom.   Či už tvoj cieľ je mať pevnejšie, krajšie, silnejšie telo alebo cítiť sa lepšie, zdravšie a viac fit. Si na správnej ceste a Body Forming program ti pomôže.",
+        "fromname": "Gabi z Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "Ahoj %FIRSTNAME%, \n\nVčera si úspešne odštartovala svoju cestu za svojim cieľom. \n\nČi už tvoj cieľ je mať pevnejšie, krajšie, silnejšie telo alebo\ncítiť sa lepšie, zdravšie a viac fit. Si na správnej ceste a Body\nForming program ti pomôže.\n\nCesta za cieľ si vyžaduje veľa malých krokov. Tie budeme\nspoločne každý deň robiť a postupne sa do cieľa dostaneš.\n\nOceň a teš sa aj z týchto malých krokov, z tvojho progresu a\nnečakaj nato, kým dosiahneš svoj cieľ. Každý deň počas týchto 6\ntýždňov môžes oslavovať, že pre seba niečo robíš a pracuješ\nna sebe.\n\nDnešné cvičenie\n<https://member.neome.com.au/products/body-forming-program-2/categories/2150396620/posts/2158065851>\n\nNezabúdaj, na tvojej ceste je dôležitá kombinácia pohybu a zdravej\nstravy. Čo do tela dáš, to ti aj vráti späť.\n\nZdravý recept na dnes\n<https://drive.google.com/file/d/1o94-mom-BhV7QFmTwi2PJ6d3YR_9HbaU/view?usp=sharing>\n\nUži si svoje dnešné cvičenie a maj krásny deň ☀️\n\nGabi\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 13379
+      },
+      {
+        "day": 3,
+        "campaign_id": 123,
+        "message_id": "125",
+        "name": "Day3_Week1 (BodyForming)",
+        "subject": "BodyForming (Týždeň 1 / Deň 3) Cíť sa skvele vo svojom tele",
+        "preheader": "Stredy a piatky sú v Body Forming programe venované strečingu a meditácií. Dnes si ideme dopriať príjemný strečing na uvoľnenie napätia, emócií, tela a mysle. ",
+        "fromname": "Gabi z Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "Ahoj %FIRSTNAME%, \n\nStredy a piatky sú v Body Forming programe venované strečingu a\nmeditácií. Dnes si ideme dopriať príjemný strečing na uvoľnenie\nnapätia, emócií, tela a mysle. \n\nEmócie pri deťoch vedia byť pekne intenzívne. Minimálne raz za deň\nsa zo zdanlivo bežnej a jednoduchej situácie vie stať búrka plná\nemócií. Musíme hľadať spôsoby, ako z týchto mračien urobiť\nopäť slniečko. Ale taktiež by sme mali hľadať spôsoby, ako\nemócie, ktoré ostali u nás nespracované, prefiltrovať. Spracúvame\nemócie našich deti, naše osobné emócie, partnerské, kamarátske.\n\nDopraj si sa aj dnes svojich 15 minút, daj si priestor a nechaj svoje\nemócie voľne plynúť.\n\nDnešné cvičenie\n<https://member.neome.com.au/products/body-forming-program-2/categories/2150396620/posts/2158065852>\n\nNezabúdaj, na tvojej ceste je dôležitá kombinácia pohybu a zdravej\nstravy. Čo do tela dáš, to ti aj vráti späť.\n\nZdravý recept na dnes\n<https://drive.google.com/file/d/1Bm8VlwiNTKZMPNapM3gIp1bt4-obPK4k/view?usp=sharing>\n\nVerím, že si dnešné cvičenie užiješ a dodá ti endorfíny.\n\nKrásny deň,\n\nGabi\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 13095
+      },
+      {
+        "day": 4,
+        "campaign_id": 119,
+        "message_id": "121",
+        "name": "Day 4_Week1 (BodyForming)",
+        "subject": "BodyForming (Týždeň 1 / Deň 4) Cíť sa skvele vo svojom tele",
+        "preheader": "Naše detičky učíme byť trpezlivé, ale sme my samé trpezlivé?  Nato, aby sa nám podarilo dosiahnuť akýkoľvek cieľ, musíme byť konzistentní v tom, čo robíme.",
+        "fromname": "Gabi z Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "Ahoj %FIRSTNAME%, \n\nNaše detičky učíme byť trpezlivé, ale sme my samé trpezlivé?\n\nNato, aby sa nám podarilo dosiahnuť akýkoľvek cieľ, musíme byť\nkonzistentní v tom, čo robíme. To prvotné nadšenie, ktoré nám vie\nna začiatku pomôcť prekonať prekážky vie rýchlo vyprchať. Čo\npotom?\n\nNa to aby si svoje nadšenie dokázala udržať potrebuješ vedieť a\npripomínať si prečo si sa na Body Forming dala a prečo je pre teba\npodstatné ho dokončiť.\n\nChoď postupne, neprepáľ sa na začiatku. Vychutnaj si týchto 6\ntýždňov, počas ktorých sa každý deň venuješ sebe. Oceň to,\nčo pre seba robíš.\n\nDnešné cvičenie\n<https://member.neome.com.au/products/body-forming-program-2/categories/2150396620/posts/2158065853>\n\nNezabúdaj, na tvojej ceste je dôležitá kombinácia pohybu a zdravej\nstravy.  Čo do tela dáš, to ti aj vráti späť. \n\nZdravý recept na dnes\n<https://drive.google.com/file/d/1aoK-mRM3pqLjiBQRdkXbOOYda7Ti3xMC/view?usp=sharing>\n\nKrásny deň a uži si aj dnes svoje cvičko ☀️\n\nGabi\n\n⭐ \n\n**PS: **Naša komunikácia bude cez Slack, ak si sa ešte nepridala do\nnašej skupiny, stačí ak klikneš sem.\n<https://join.slack.com/t/neometribeofficial/shared_invite/zt-17qbtcdio-S8cwN3V~aoh7Y3I5JKjpjQ>\n\nPráve cez Slack môžeme jednoducho a rýchlo komunikovať, dostaneš\nodomňa dennú dávku motivácie a od našej komunity inšpiráciu,\nvďaka ktorej sa ti určite program podarí dokončit.\n\n** Preto sa určite pridaj aj ty!**\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 13906
+      },
+      {
+        "day": 5,
+        "campaign_id": 120,
+        "message_id": "122",
+        "name": "Week1_Day 5 (BodyForming)",
+        "subject": "BodyForming (Týždeň 1 / Deň 5) Cíť sa skvele vo svojom tele",
+        "preheader": "Gratulujem Ti 👏.      Máme tu záver týždňa a s ním aj príjemný a uvoľňujúci strečing.   Za posledných pár dní si si dokázala dopriať 15 minút pre seba.",
+        "fromname": "Gabi z Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "Ahoj %FIRSTNAME%, \n\nGratulujem Ti .  \n\nMáme tu záver týždňa a s ním aj príjemný a uvoľňujúci\nstrečing. \n\nZa posledných pár dní si si dokázala dopriať 15 minút pre seba.\nČas, priestor, ktorý každý človek potrebuje, ale bohužiaľ, my\nmatky si ho veľakrát nevieme zobrať. Si skvelá!\n\nNa to, aby sme dokázali dávať našim deťom, partnerovi, rodine je\ndôležité, aby sme dávali aj sebe.\n\nAj 15 minút denne v spojení s pohybom ti dokáže poskytnúť priestor\nna prepojenie tela a mysle, na odfiltrovanie emócií a sprítomnenie\nsa. Uži si svoj čas, priestor a oceň seba samu, že si si ho aj dnes\ndopriala. \n\nDnešné cvičenie\n<https://member.neome.com.au/products/body-forming-program-2/categories/2150396620/posts/2158065854>\n\nNezabúdaj, na tvojej ceste je dôležitá kombinácia pohybu a zdravej\nstravy.  Čo do tela dáš, to ti aj vráti späť. Ak by si chcela\npomôcť so stravou, pokojne mi napíš. \n\nVenujem sa aj prípravou stravovacích plánov na mieru pre busy maminy,\nktoré potrebujú viac energie a menej cm.\n\nZdravý recept na dnes\n<https://drive.google.com/file/d/15IoX0pn99gWQ2rMuvy_fe04okaTqbXyX/view?usp=sharing>\n\nKrásny deň ☀️\n\nGabi\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 13857
+      }
+    ]
+  },
+  "week_2": {
+    "automation_id": 51,
+    "days": [
+      {
+        "day": 1,
+        "campaign_id": 134,
+        "message_id": "136",
+        "name": "Day1_Week2 (BodyForming)",
+        "subject": "BodyForming (Týždeň 2 / Deň 1) cesta za tvojou Neo.Me",
+        "preheader": "Verím, že si mala príjemný víkend a podarilo sa ti trošku zresetovať hlavu a mať príjemný čas s rodinou.   Dnes začínaš svoj druhý týždeň, ktorý odštartujeme cvičeniami zameranými na rovnováhu.",
+        "fromname": "Gabi Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "Ahoj %FIRSTNAME%, \n\nVerím, že si mala príjemný víkend a podarilo sa ti trošku zresetovať hlavu a mať príjemný čas s rodinou. \n\nDnes začínaš svoj druhý týždeň, ktorý odštartujeme cvičeniami zameranými na rovnováhu. Rovnováha je dôležitá pre naše fyzické aj psychické zdravie. \n\nŽivot v rovnováhe znamená, že dávaš pozornosť a venuješ čas všetkým oblastiam svojho života: vzťahom, práci (momentálne pre veľa z nás sú prácou detičky), fitness-u, zdraviu a emočnému well-being.\n\nVšetci sa častokrát necháme pohltiť jednou oblasťou života a tie ostatné nechávame zanedbané.\n\nFungujeme takto nejakú dobu, až kým nepríde niečo: začneš mať bolesti chrbta, kolien, hlavy, nefunguje ti zažívanie, haprujú partnerské či kamarátstve vzťahy alebo si všimneš, že nemáš tvoje reakcie pod kontrolou, lebo si predráždená. Toto všetko sú signály, že sa z tvojho života vytratil balans. \n\nDopraj si pre seba 15 minút denne, daj si priestor, aby si vnímala, čo v živote máš a tiež, čo ti chýba. Dnešné cvičenie ti v tom pomôže.\n\nDnešné cvičenie https://member.neome.com.au/products/body-forming-program-2/categories/2150396621/posts/2158065855\n\nNezabúdaj, na tvojej ceste je dôležitá kombinácia pohybu a zdravej stravy.  Čo do tela dáš, to ti aj vráti späť. \n\nZdravý recept na dnes https://drive.google.com/file/d/1T-4uWSfemK_grMVlsqZlwPHoFPnqjXsx/view?usp=sharing\n\nKrásny deň.\n\nGabi\n\nSent to: %EMAIL%\n\nUnsubscribe %UNSUBSCRIBELINK%\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 14093
+      },
+      {
+        "day": 2,
+        "campaign_id": 135,
+        "message_id": "137",
+        "name": "Day2_Week2 (BodyForming)",
+        "subject": "BodyForming (Týždeň 2 / Deň 2) cesta za tvojou vnútornou Neo.Me",
+        "preheader": "Verím, že sa tešíš na dnešné cvičenie rovnako ako ja. Ak sa ti dnes úplne nechce alebo máš toho veľa, skús si pripomenúť ten skvelý pocit PO odcvičení. ",
+        "fromname": "Gabi Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "Ahoj %FIRSTNAME%, \n\nVerím, že sa tešíš na dnešné cvičenie rovnako ako ja. Ak sa ti dnes úplne nechce alebo máš toho veľa, skús si pripomenúť ten skvelý pocit PO odcvičení. Stojí to za to!\n\nAko matka potrebuješ pre dosiahnutie cieľa nájsť dlhodobo udržateľný spôsob.\n\nAk sa chceš teda cítiť skvele vo svojom tele, nehľadaj extrémne riešenia. Ak budeš týždeň jesť len polievky z cvikle, nebude to fungovať dlhodobo. Sama dobre vieš, že takéto prístupy nie sú udržateľné a hlavne, s takýmto prístupom by si nedokázala dlhodobo fungovať. \n\nPreto sú aj naše cvičenia navrhnuté tak, aby sme išli postupne, prinavrátili tvojmu telu silu a vytónovali svaly.  Ak by sme išli na všetko zhurta, tvoje telo by bolo vyčerpané, malo svalovicu a ty mala čo robiť, aby si sa dokázala postarať o svoje deti, prípadne ešte aj chodiť do práce.\n\nVyberaj si dlhodobo udržateľnú cestu, ktorá ťa privedie k cieľu a ty sa budeš na nej cítiť skvele.\n\nPrihlásiť do Neo.Me https://member.neome.com.au/products/body-forming-program-2/categories/2150396621/posts/2158065856\n\nNezabúdaj, na tvojej ceste je dôležitá kombinácia pohybu a zdravej stravy.  Čo do tela dáš, to ti aj vráti späť. \n\nZdravý recept na dnes https://drive.google.com/file/d/1RrrHqyT40sSQnNNfYIVLGzS-Mj6NWFgf/view?usp=sharing\n\nKrásny deň ☀️\n\nGabi\n\nSent to: %EMAIL%\n\nUnsubscribe %UNSUBSCRIBELINK%\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 13559
+      },
+      {
+        "day": 3,
+        "campaign_id": 136,
+        "message_id": "138",
+        "name": "Day3_Week2 (BodyForming)",
+        "subject": "BodyForming (Týždeň 2 / Deň 3) Cesta za tvojou vnútornou Neo.Me",
+        "preheader": "Je tu streda a s ňou aj obľúbený strečing a meditácia.   Jedna z áreí našich životov, ktorej nevenujeme veľa priestoru sú emócie voči samej sebe.",
+        "fromname": "Gabi Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "Ahoj %FIRSTNAME%, \n\nJe tu streda a s ňou aj obľúbený strečing a meditácia. \n\nJedna z oblastí našich životov, ktorej nevenujeme veľa priestoru sú emócie voči samej sebe.\n\nVieme si veľa vyčítať a potom to potláčať. Náš vnútorný kritik, nám niekedy hovorí: „vždy si bola silná a pozitívna, prečo teraz nie si. Čo sa deje. Čo je s tebou zle?” \n\nA odpoveď? NIČ. Nič sa nedeje, nič s tebou nie je zle, len máš jednoducho pretlak a potrebuješ ventil. \n\nDopraj si ventil. Buď pre seba prioritou aspoň na 15 minút a nechaj si priestor pre seba, na to aká si, so všetkými pocitmi. Počúvaj sa a naplň svoje potreby.\n\nPrihlásiť do Neo.Me https://member.neome.com.au/products/body-forming-program-2/categories/2150396621/posts/2158065857\n\nNezabúdaj, na tvojej ceste je dôležitá kombinácia pohybu a zdravej stravy.  Čo do tela dáš, to ti aj vráti späť. \n\nZdravý recept na dnes https://drive.google.com/file/d/1A8e4dpwfVB1_1iFAXRdRq35FfebPWi-h/view?usp=sharing\n\nKrásny deň,\n\nGabi\n\nSent to: %EMAIL%\n\nUnsubscribe %UNSUBSCRIBELINK%\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 13652
+      },
+      {
+        "day": 4,
+        "campaign_id": 137,
+        "message_id": "139",
+        "name": "Day 4_Week2 (BodyForming)",
+        "subject": "BodyForming (Týždeň 2 / Deň 4) Cesta za tvojou vnútornou Neo.Me",
+        "preheader": "Kompromis je v živote matky súčasť denno-denného fungovania. Nauč sa však nerobiť kompromis na sebe.",
+        "fromname": "Gabi Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "Ahoj %FIRSTNAME% , \n\nKompromis je v živote matky súčasť denno-denného fungovania. Nauč sa však nerobiť kompromis na sebe.\n\nPoznáš to - ty by si sa chcela ísť prejsť, ale tvoje malé by radšej išlo na preliezky. Ty by si si rada pustila svoju obľúbenú pesničku, ale tvoje malé miluje pesničku od Mira Jaroša a chce ju počúvať stále dokola. \n\nJe prirodzené, že chceš najprv vyhovieť jednému, dvom, trom detičkám. Samozrejme aj manžel má svoje potreby, ktoré treba brať do úvahy. \n\nAle čo ty? Pri robení kompromisov nezabúdaj na seba.\n\nPomenuj sama pre seba, čo potrebuješ na to, aby si dokázala byť prioritou aspoň na 15 minút a zacvičiť si.\n\nPorozprávaj sa o svojich potrebách so svojim manželom a nájdite spôsob, ako ti s tým vie pomôcť. Tak ako sa staráš o svoje deti a manžela, musíš sa starať aj o seba. \n\nDnešné cvičenie https://member.neome.com.au/products/body-forming-program-2/categories/2150396621/posts/2158065858\n\nNezabúdaj, na tvojej ceste je dôležitá kombinácia pohybu a zdravej stravy.  Čo do tela dáš, to ti aj vráti späť. \n\nZdravý recept na dnes https://drive.google.com/file/d/127sNWr6giW_Ji3VhxSuTFdqvW3Hwjx9o/view?usp=sharing\n\nKrásny deň ☀️\n\nGabi\n\nSent to: %EMAIL%\n\nUnsubscribe %UNSUBSCRIBELINK%\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 14760
+      },
+      {
+        "day": 5,
+        "campaign_id": 138,
+        "message_id": "140",
+        "name": "Day 5_Week2 (BodyForming)",
+        "subject": " BodyForming (Týždeň 2 / Deň 5) ",
+        "preheader": "Máme tu záver týždňa a s ním aj príjemných 15 minút, počas ktorých uvoľníš všetko nahromadené napätie a stres z tela. ",
+        "fromname": "Gabi Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "Ahoj %FIRSTNAME%, \n\nMáme tu záver týždňa a s ním aj príjemných 15 minút, počas ktorých uvoľníš všetko nahromadené napätie a stres z tela. \n\nTvoje telo je len jedno a treba sa o neho pravidelne starať, lebo už nikdy nikto ti nedá nové telo. Pravidelný pohyb v kombinácii s vyváženou stravou, spánkom a mentálnou hygienou ti pomôžu cítiť sa skvele vo svojom tele.\n\nJe to ale cesta, ktorá sa skladá z krokov, ktoré je potrebné robiť pravidelne a po určitú dobu na to, aby si videla, cítila výsledky. \n\nPreto aj tvoje fyzické a psychické zdravie by mali byť tvojim celoživotným cieľom, ku ktorému smeruješ vďaka svojim správnym denným návykom. \n\nDnešné cvičenie https://member.neome.com.au/products/body-forming-program-2/categories/2150396621/posts/2158065859\n\nNezabúdaj, na tvojej ceste je dôležitá kombinácia pohybu a zdravej stravy.  Čo do tela dáš, to ti aj vráti späť. \n\nZdravý recept na dnes https://drive.google.com/file/d/1EMks8n4BwD9edPZKa9UdSIGKYMWgDdVZ/view?usp=sharing\n\nPS: Na cvičenia v 5.týždni budeme potrebovať elastické gumy, ako napríklad tieto\nhttps://www.decathlon.sk/sada-elastickych-popruhov-100-id_8528803.html\n\nhttps://www.decathlon.sk/elasticky-popruh-100--id_8527897.html https://www.decathlon.sk/sada-elastickych-popruhov-100-id_8528803.html\n\nKrásny deň ☀️\n\nGabi\n\nSent to: %EMAIL%\n\nUnsubscribe %UNSUBSCRIBELINK%\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 14117
+      }
+    ]
+  },
+  "week_3": {
+    "automation_id": 52,
+    "days": [
+      {
+        "day": 1,
+        "campaign_id": 139,
+        "message_id": "141",
+        "name": "Day1_Week3 (BodyForming)",
+        "subject": "BodyForming (Týždeň 3 / Deň 1) cesta za tvojou Neo.Me",
+        "preheader": "Vítam ťa v treťom týždni. Je úžasné a veľmi sa teším, že môžeme spoločne aj naďalej pracovať na tvojich cieľoch.",
+        "fromname": "Gabi Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "Ahoj %FIRSTNAME%, \n\nVítam ťa v treťom týždni. Je úžasné a veľmi sa teším, že\nmôžeme spoločne aj naďalej pracovať na tvojich cieľoch. Pevne\nverím, že aj ty pociťuješ ten pocit radosti z toho, že robíš\nniečo pre seba každý deň. Len tak ďalej.\n\nNa dosahovanie akýchkoľvek cieľov je potrebná motivácia, vízia,\nproces a disciplína. \n\n**Motiváciou**sú tvoje osobné dôvody nato, prečo chceš niečo\nzmeniť a ísť si za svojim cieľom - mám veľké bruško, som\nmotivovaná s tým niečo spraviť. Motivácia vie často vyprchať.\nDá sa však prinavrátiť, pokiaľ si spomenieš na dôvody, pre ktoré\nsi sa rozhodla svoju cestu začat.\n\n**Vízia** potom pomenúva aj to, čo chceš dosiahnuť. Povedať si,\nže chcem menšie bruško nestačí. Prečo?\nLebo to nie je merateľné a to, čo nie je merateľné sa len ťažko\nvyhodnocuje. Pokiaľ nevieš vyhodnotiť progres, len ťažko s ním\nbudeš spokojná.\n\n**Proces** je tvoj nástroj na dosiahnutie cieľa. Môže to byť Body\nForming, alebo to môže byť bežecký plán poprípade denná\nmeditácia.\n\n**Disciplína** je schopnosť vytrvať aj napriek tomu, že sa ti\nnechce. Množstvo úsilia, ktoré musíš vynaložiť na dosiahnutie\nsvojho cieľa. \n\nZajtra ti poskytnem tri jednoduché kroky nato, ako si môžeš\nvybudovať svoju disciplínu a zaručiť tak svoj úspech z dosiahnutia\nakéhokoľvek cieľu. \n\nDnešné cvičenie\n<https://member.neome.com.au/products/body-forming-program-2/categories/2150396622/posts/2158065860>\n\n PS:  na dnešné cvičenie budeš potrebovať stoličku.\n\nNezabúdaj, na tvojej ceste je dôležitá kombinácia pohybu a zdravej\nstravy. Čo do tela dáš, to ti aj vráti späť.\n\nZdravý recept na dnes\n<https://drive.google.com/file/d/1lSQ42NMRjrOV_3cr7YeDUKZgfDQpo1xO/view?usp=sharing>\n\nKrásny deň ☀️\n\nGabi\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 15486
+      },
+      {
+        "day": 2,
+        "campaign_id": 140,
+        "message_id": "142",
+        "name": "Day2_Week3 (BodyForming)",
+        "subject": "BodyForming (Týždeň 3 / Deň 2) cesta za tvojou Neo.Me",
+        "preheader": "Pri ceste za dosahovaním akéhokoľvek cieľa sú dôležité motivácia, cieľ, proces a disciplína. Disciplína je často tá, ktorá nás delí od dosiahnutia cieľa. ",
+        "fromname": "Gabi Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "Ahoj %FIRSTNAME%, \n\nPri ceste za dosahovaním akéhokoľvek cieľa sú\ndôležité motivácia, cieľ, proces a disciplína. \n\nDisciplína je často tá, ktorá nás delí od dosiahnutia\ncieľa. Každá z nás má dni, kedy sa ti nechce nič a už vôbec\nnie cvičiť. Motivácia nestačí a na rad prichádza disciplína. Ale\nako si ju vybudovať? \n\n**Tieto tri kroky ti pomôžu si vybudovať disciplínu. **\n\n**Jasne stanovený cieľ -** musíš vedieť, kam ideš a či si sa\ntam už dostala. \nPreto napríklad nestačí povedať \"chcem trošku schudnúť\". Koľko\nje \"trošku\"? Buď špecifická vo svojich cieľoch. Veľké si rozmeň\nna menšie. Bude sa ti jednoduchšie sledovať progres, z ktorého sa\nmôžeš tešiť. \n\n**Nájdi si tzv. accountibility buddy**- človek, s ktorým si\nvytvoríš bezpečnú a transparentnú väzbu, pričom sa nikdy\nnemusíte osobne stretnúť. Navzájom sa podporujete a dávate jeden na\ndruhého pozor, aby ste dodržiavali svoje čiastkové, každodenné\nciele, ktoré ste si naplánovali. Aj na to ti môže poslúžiť naša\nNeoMe komunita. \n\n**Oceň svoje úspechy**- oceň svoje malé víťazstvá a prekonanie\nprekážok. Dopraj si odmenu. Cieľom je, aby si si postupne zvykla, že\nvyhrávať sama nad sebou sa dá. Ten pocit, ktorý budeš mať je\nfantastický a dosahovanie cieľov je návykové.\n\nNeoMe tu je pre teba a pomôže ti na ceste dosahovania tvojich cieľov.\n\nDnešné cvičenie\n<https://member.neome.com.au/products/body-forming-program-2/categories/2150396622/posts/2158065861>\n\n  \n\n**PS:  na dnešné cvičenie budeš potrebovať stoličku.**\n\nNezabúdaj, na tvojej ceste je dôležitá kombinácia pohybu a zdravej\nstravy.  Čo do tela dáš, to ti aj vráti späť. \n\nZdravý recept na dnes\n<https://drive.google.com/file/d/1sY067Hf307C6y5NiU8KgsJxM0i2HxWtD/view?usp=sharing>\n\nKrásny deň ☀️\n\nGabi\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 14319
+      },
+      {
+        "day": 3,
+        "campaign_id": 141,
+        "message_id": "143",
+        "name": "Day3_Week3 (BodyForming)",
+        "subject": "BodyForming (Týždeň 3 / Deň 3) cesta za tvojou Neo.Me",
+        "preheader": "Máme tu stred týždňa a s ním aj príjemný a uvoľňujúci strečing. Dopraj si dnes čas a priestor pre seba.",
+        "fromname": "Gabi Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "Ahoj %FIRSTNAME%, \n\nMáme tu stred týždňa a s ním aj príjemný a uvoľňujúci\nstrečing. \n\nDopraj si dnes čas a priestor pre seba. Nechaj svoje pocity voľne\nplynúť a len ich pozoruj. Upriam sa na svoje dýchanie. Skús\nodstrihnúť všetky okolité vzruchy a vytiahnuť sa z toho denno\ndenného kolobehu. Spomaľ sa. Zastav sa aspoň na 15 minút. \n\nAk sa ti nepodarí nájsť si 15 minút pre seba počas dňa, toto\ncvičenie je ideálne aj na večer, keď už máš ticho v dome a\nvšetci spia. \n\nTvoje telo, tvoja myseľ sa ti odmenia kľudom a pokojom, ktorý ta\nzaleje. \n\nDnešné cvičenie\n<https://member.neome.com.au/products/body-forming-program-2/categories/2150396622/posts/2158065862>\n\nNezabúdaj, na tvojej ceste je dôležitá kombinácia pohybu a zdravej\nstravy.  Čo do tela dáš, to ti aj vráti späť. \n\nZdravý recept na dnes\n<https://drive.google.com/file/d/1W4fUFilxoFJ57ZhPErTNhMS6GLNflZy3/view?usp=sharing>\n\nKrásny deň ☀️\n\nGabi\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 13018
+      },
+      {
+        "day": 4,
+        "campaign_id": 142,
+        "message_id": "144",
+        "name": "Day 4_Week3 (BodyForming)",
+        "subject": "BodyForming (Týždeň 3 / Deň 4) cesta za tvojou Neo.Me",
+        "preheader": "Verím, že po včerajšom príjemnom a relaxačnom strečingu si pripravená a máš chuť dnes pokračovať. Už si takmer v polovici Body Forming programu.",
+        "fromname": "Gabi Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "Ahoj %FIRSTNAME% , \n\nVerím, že po včerajšom príjemnom a relaxačnom strečingu si\npripravená a máš chuť dnes pokračovať. \n\nUž si takmer v polovici Body Forming programu. Gratulujem ti, že si\nsa dostala až sem. Svojou snahou, úsilím, a denno-dennými krokmi si\nsi dokázala nájsť na sebe 15 minút - a urobiť tak niečo pre seba\na svoje zdravie. Si skvelá!\n\nChcelo to určite štipku motivácie, disciplíny a kreativity, aby sa\nti to dalo zosúladiť s chodom rodiny. Verím, že po dvoch\ntýždňoch sa ti podarilo nájsť si trochu rutiny v tom celom a\nvnímaš, ako sa cvičenie stáva súčasťou tvojich dní,\ntvojim novým zdravým návykom na každý deň.\n\nDenne sa staráme o svoje detičky. Nezabúdajme sa teda starať sa aj o\nseba.\n\nDnešné cvičenie\n<https://member.neome.com.au/products/body-forming-program-2/categories/2150396622/posts/2158065863>\n\nNezabúdaj, na tvojej ceste je dôležitá kombinácia pohybu a zdravej\nstravy.  Čo do tela dáš, to ti aj vráti späť. \n\nZdravý recept na dnes\n<https://drive.google.com/file/d/17pKBqtGqB8W9AlDsmHmANMwDjss75k14/view?usp=sharing>\n\nKrásny deň ☀️\n\nGabi\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 13558
+      },
+      {
+        "day": 5,
+        "campaign_id": 143,
+        "message_id": "145",
+        "name": "Day5_Week3 (BodyForming)",
+        "subject": " BodyForming (Týždeň 3 / Deň 5) cesta za tvojou Neo.Me",
+        "preheader": "Blíži sa záver týždňa. S dnešným strečingom a časom pre seba sa skús na chvíľu zastaviť a retrospektívne si spomenúť na momenty, ktoré ti utkveli v pamäti z uplynulého týždňa.",
+        "fromname": "Gabi Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "Ahoj %FIRSTNAME%, \n\nBlíži sa záver týždňa. S dnešným strečingom a časom pre seba\nsa skús na chvíľu zastaviť a retrospektívne si spomenúť na\nmomenty, ktoré ti utkveli v pamäti z uplynulého týždňa.\n\nNemusí to byť nič výnimočné. Niekedy práve tie bežné,\njednoduché momenty sú tie, ktoré v nás rezonujú. \nPodarilo sa ti počas týždňa sa na chvíľu zastaviť, pozrieť sa na\nsvoju krásnu rodinu a uvedomiť si, čo všetko máš? Byť vďačná\na oceniť to čo máš? Pocit vďaky priamo súvisí s tvojim\nšťastím.\n\nVďační ľudia prežívajú viac pozitívnych emócií, vedia si\nlepšie vychutnávať bežné skúsenosti, majú pevnejšie\nduševné zdravie, dokážu sa lepšie vyrovnávať s nepriazňou osudu\na dokážu si budovať pevné medziľudské vzťahy. \n\nSkús si teda dnes dať priestor na vďačnosť.\n\nDnešné cvičenie\n<https://member.neome.com.au/products/body-forming-program-2/categories/2150396622/posts/2158065864>\n\nNezabúdaj, na tvojej ceste je dôležitá kombinácia pohybu a zdravej\nstravy.  Čo do tela dáš, to ti aj vráti späť. \n\nZdravý recept na dnes\n<https://drive.google.com/file/d/1YTvnnszQx86qW_yuwivWeDbRX-SHP4xe/view?usp=sharing>\n\nKrásny deň ☀️\n\nGabi\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 13133
+      }
+    ]
+  },
+  "week_4": {
+    "automation_id": 53,
+    "days": [
+      {
+        "day": 1,
+        "campaign_id": 144,
+        "message_id": "146",
+        "name": "Day1_Week4 (BodyForming)",
+        "subject": "BodyForming (Týždeň 4 / Deň 1) cesta za tvojou Neo.Me",
+        "preheader": "Dnešným cvičením sa oficiálne prechádzaš do druhej polovice Body Forming programu. Si úžasná - gratulujem ti! ",
+        "fromname": "Gabi Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "Ahoj %FIRSTNAME%, \n\nDnešným cvičením sa oficiálne prechádzaš do druhej polovice Body\nForming programu.\n\n**Si úžasná - gratulujem ti!**  Snažíš sa denne urobiť niečo\npre svoje zdravie a pre svoju vnútornú pohodu a dávaš si prioritu.\n\nPrvé tri týždne sme sa venovali konceptom, ktoré ti pomôžu\núspešne dosiahnuť svoj cieľ   mať víziu, motiváciu,\ndisciplínu, oceniť svoj progres a mať jasne stanovený cieľ.\n\nV druhej polovici Body Forming programu budeme venovať väčšiu \n\n**pozornosť strave, stravovacím návykom a tomu, ako sa naučiť\nrobiť tie správne voľby. **\n\nStrava je palivo, ktoré naše telo denne potrebuje. To, aké palivo do\ntela dáš priamo určuje, ako tvoje telo bude fungovať. \n\nPre maminy je ťažké vybudovať si zdravé návyky, hlavne keď\nnemáme niekedy čas ani na sprchu, nie to si ešte uvariť a\npozrieť zdravé recepty. Pri nutrične chudobnej strave bude však\ntvoje telo náročnejšie zvládať  denno-denné výzvy, ktoré ťa\nčakajú, lebo nebude mať nato energiu.\n\nPreto ani ty nechoď za perfekcionizmom, začni s tým, že si\nuvedomíš čo ješ, zaradíš správne zložky stravy do\njedálnička a potom vyrieš množstvá.\n\n**TIP: Pamätaj na pravidlo 80/20. 80% výsledku príde z 20% zmien,\nktoré urobíš.**\n\nUrčite budú dni, kedy si dáš biely rožok so šunkou, horalku, či\nsi urobíš rýchlu cestovinu so syrovou omáčkou. Po takejto kaloricky\nvýdatnej strave, ktorá je ale chudobná na nutríciu sa však budeš\npravdepodobne cítiť unavene, bez energie a veľmi rýchlo budeš\nopäť hladná. \n\nPreto ti v nasledujúcich dňoch  dám tipy nato, ako si môžeš\nvytvoriť \n\n**nové stravovacie návyky ľahko a rýchlo a prijímať jedlo bez\nvýčitky, s pôžitkom a radosťou. **\n\nDnešné cvičenie\n<https://member.neome.com.au/products/body-forming-program-2/categories/2150396624/posts/2158065870>\n\n PS:  na dnešné cvičenie budeš potrebovať stoličku.\n\nNezabúdaj, na tvojej ceste je dôležitá kombinácia pohybu a zdravej\nstravy. Čo do tela dáš, to ti aj vráti späť.\n\nZdravý recept na dnes\n<https://drive.google.com/file/d/1G5pPeLYgCRM4xhPpzAROR5_Osaa1PXqf/view?usp=sharing>\n\nKrásny deň ☀️\n\nGabi\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 18763
+      },
+      {
+        "day": 2,
+        "campaign_id": 145,
+        "message_id": "147",
+        "name": "Day2_Week4 (BodyForming)",
+        "subject": "BodyForming (Týždeň 4 / Deň 2) cesta za tvojou Neo.Me",
+        "preheader": "Verím, že sa ti včera dobre cvičilo a si pripravená nájsť si aj dnes pre seba 15 minút. Ak by sa ti dnes aj nie úplne chcelo cvičit, spomeň si na svoje dôvody, prečo si sa rozhodla začať Body Forming program.",
+        "fromname": "Gabi Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "Ahoj %FIRSTNAME%, \n\nVerím, že sa ti včera dobre cvičilo a si pripravená nájsť si aj\ndnes pre seba 15 minút. \n\nAk by sa ti dnes aj nie úplne chcelo cvičiť, spomeň si na svoje\ndôvody, prečo si sa rozhodla začať Body Forming program - chcela si\nsi zvýšiť svoj fitness level, schudnúť, vyformovať postavu,\nurobiť niečo pre svoje zdravie, mať zo seba lepší pocit alebo\nvšetko dokopy?\n\nNech už tvoje dôvody boli akékoľvek, tieto dôvody ti môžu\nposlúžiť ako hnací motor vpred.\n\nV tvojej premene zohráva dôležitú úlohu aj strava, preto je\ndôležité pozrieť sa na to, \n\n**čo tvorí aktuálne základ tvojej stravy.** \n\n**To čo chceš dosiahnuť nemusí byť vôbec, také vzdialené**.\nNiekedy \n\n**stačia malé zmeny**, len sa musíš na pár minút zastaviť a\nuvedomiť si ktoré procesy-potraviny-recepty-návyky sú už\nautomatické a nevenuješ im pozornosť.\n\nOsobne verím, že cesta za vytúženou postavou \n\n**nie je cez diétu**, ale cez správne návyky a stravu, ktorá\nobsahuje všetky dôležité makro živiny = bielkoviny, sacharidy,\ntuky. \n\nAk si osvojíš vyváženú stravu, budeš sa cítiť skvele vo svojom\ntele a \n\n**nebudú ťa prepadávať návaly na sladké,** tvoj cukor v krvi bude\nstabilizovaný a ty dáš telu to čo potrebuje nato aby dobre a\ndlhodobo fungovalo.\n\nNapríklad, \n\n**návaly na sladké** sú najčastejšie spôsobené tým, že tvoje \n\n**telo si potrebuje niečo vykompenzovať**- príliš málo ješ\n(kalorický deficit), chýbajú ti komplexné sacharidy, alebo práve\nnaopak, tvoja strava je zložená z jednoduchých sacharidov = rýchlych\ncukrov (koláče, keksíky, biela ryža, biele cestoviny, biele\npečivo….). \n\nCieľom je nájsť a osvojiť si životný štandard, ktorý ti v\njedálničku poskytne všetky tri dôležité makro živiny a \n\n**uspokojí tak potreby tvojho tela** nato, aby dobre fungovalo.  \n\n**Vyvarujeme sa akýmkoľvek diétám**, \n\n**ktoré ťa obmedzujú a ktoré nie sú dlhodobo udržateľné**.\n\nDopraj svojmu telu, čo potrebuje, sebe to, na čo máš chuť a oboje v\nsprávnych množstvách.\n\nZajtra si povieme zase niečo viac o tom, ako sa vyznať v tom, čo a\nkoľko jesť ☺️. \n\nVychutnaj si jedlo bez výčitky, a cíť sa energicky, plná síl a\nchute ísť za svojimi s nami ☺️. \n\nDnešné cvičenie\n<https://member.neome.com.au/products/body-forming-program-2/categories/2150396624/posts/2158065871>\n\nJesť zdravo, s chuťou a bez výčitky v spojení s pravidelným\npohybom ti prinesie tvoje vytúžené výsledky.\n\nZdravý recept na dnes\n<https://drive.google.com/file/d/1dbeGzH50dPw-yXUnE_HqOZ5DCgRKVT8Q/view?usp=sharing>\n\nKrásny deň ☀️\n\nGabi\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 19329
+      },
+      {
+        "day": 3,
+        "campaign_id": 146,
+        "message_id": "148",
+        "name": "Day3_Week4 (BodyForming)",
+        "subject": "BodyForming (Týždeň 4 / Deň 3) cesta za tvojou Neo.Me",
+        "preheader": "Dnes ťa čaká strečing a s ním aj uvoľnenie tela a mysle. Tak ako tvoje telo potrebuje posilniť svaly, aby boli silné, potrebuje ich aj natiahnuť, aby boli plne funkčné. ",
+        "fromname": "Gabi Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "Ahoj %FIRSTNAME%, \n\nDnes ťa čaká strečing a s ním aj uvoľnenie tela a mysle. Tak ako\ntvoje telo potrebuje posilniť svaly, aby boli silné, potrebuje ich aj\nnatiahnuť, aby boli plne funkčné. \n\nDocieliť dlhodobo funkčné telo môžeš tým, že sa oň budeš\nstarať\n\n**zvonka - pohybom a zvnútra - zdravou stravou.**\n\nPrikladám \n\n**pyramídu zdravého stravovania**, ktorá ukazuje, že komplexná,\nzdravá strava sa skladá zo širokého spektra potravy. Všetky\nzákladné makro živiny sú potrebné a \n\n**netreba sa teda vyhýbať ani chlebu, cestovinám,** len treba\nvyberať tie \n\n**zdravé alternatívy ** celozrnný chlieb namiesto bieleho,\nhnedú ryžu namiesto bielej a pod. +  prispôsobiť množstvá.\n\nTypická slovenská kuchyňa sa skladá z bieleho rožku, šunky a syru\nna raňajky alebo zemiakovej kaše s mäsom na obed.\n\nCieľom udržateľnej zmeny nie je vynechať všetko čo ješ, ale\n\n**zmeniť pomery** jednotlivých zložiek stravy, nájsť \n\n**zdravé alternatívy** a doplniť ich o \n\n**nutrične bohaté potraviny**, tak aby si mala všetkého dostatok a\nzároveň \n\n**nemala kalorický prebytok, ale pôžitkový deficit**. Zaraď do\nsvojho jedálnička viac zeleniny, ovocia, strukovín, zdravých tukov,\ncelozrnných výrobkov. \n\nMnožstvo jednotlivých potravín a zloženie stravy je kľúčové.\nPovieme si o tom viac už zajtra ☺️\n\nDnešné cvičenie\n<https://member.neome.com.au/products/body-forming-program-2/categories/2150396624/posts/2158065872>\n\nJesť zdravo, s chuťou a bez výčitky v spojení s pravidelným\npohybom ti prinesie tvoje vytúžené výsledky.\n\nZdravý recept na dnes\n<https://drive.google.com/file/d/1WIGCpE34BPgWyGlHJnCGZGHvBZodJ30O/view?usp=sharing>\n\nKrásny deň ☀️\n\nGabi\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 17234
+      },
+      {
+        "day": 4,
+        "campaign_id": 147,
+        "message_id": "149",
+        "name": "Day 4_Week4 (BodyForming)",
+        "subject": "BodyForming (Týždeň 4 / Deň 4) cesta za tvojou Neo.Me",
+        "preheader": "Po včerajšom strečingu by si mala mať telo príjemne uvoľnené, rozpohybované a pripravené tak na dnešné cvičenie. Včera sme si hovorili o jednotlivých zložkách potraviny a o tom, ako každá z nich má svoje dôležité zastúpenie v tvojom jedálničku.",
+        "fromname": "Gabi Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "Ahoj %FIRSTNAME% , \n\nPo včerajšom strečingu by si mala mať telo príjemne uvoľnené,\nrozpohybované a pripravené tak na dnešné cvičenie. \n\nVčera sme si hovorili o jednotlivých zložkách potraviny a o tom, ako\n\n**každá z nich má svoje dôležité zastúpenie** v tvojom\njedálničku.\n\nDnes si povieme, aké sú \n\n**správne pomery jednotlivých zložiek stravy**  a ako by mal\nvyzerať tvoj zdravý tanier.\n\nPoskytnem ti jednoduchý návod, ktorý môžeš mať vždy “pri\nsebe”, a ktorý ti pomôže vyskladať sebe aj celej tvojej rodine\nzdravé a vyvážené jedlo.\n\nTvoj tanier by sa mal tvoriť :\n\n* ovocie a zelenina ½ taniera\n\n* celozrnné potraviny ¼ taniera\n\n* bielkoviny ¼ taniera\n\n* zdravé rastlinné oleje - striedmo\n\n* voda\n\n**A čo patrí do jednotlivých skupín?**\n\n**Väčšinu jedla tvorí zelenina a ovocie - ½ taniera**.\n\nSnaž sa o farebnosť a pestrosť a nezabudni, že zemiaky sa na tanieri\nzdravej výživy nepočítajú medzi zeleninu, pretože majú negatívny\nvplyv na hladinu cukru v krvi.\n\n**Preferuj celozrnné výrobky - ¼ taniera.**\n\nCelé a neporušené zrná - celozrnná pšenica, jačmeň, pšeničné\nbobule, quinoa, ovos, hnedá ryža a potraviny z nich vyrobené,\nnapríklad celozrnné cestoviny - majú miernejší vplyv na hladinu\ncukru v krvi a inzulínu ako biely chlieb, biela ryža a iné\nrafinované zrná.\n\n**Bielkoviny - ¼ taniera.**\n\nRyby, hydina, fazuľa a orechy sú zdravými a univerzálnymi zdrojmi\nbielkovín - dajú sa miešať do šalátov a na tanieri sa dobre\nkombinujú so zeleninou. Obmedz červené mäso a vyhýbajte sa\nspracovanému mäsu, ako je slanina a klobásy.\n\n**Zdravé rastlinné oleje - striedmo.**\n\nVyberaj si zdravé rastlinné oleje, ako sú olivový, repkový,\nsójový, kukuričný, slnečnicový, arašidový a iné, a vyhýbaj sa\nčiastočne hydrogenovaným olejom, ktoré obsahujú nezdravé\ntransmastné kyseliny. Nezabudnite, že nízkotučný neznamená\n\"zdravý\".\n\n**Pi dostatok vody. **\n\nVynechaj sladké nápoje rovnako ako aj džúsy. Dopraj si jeden pohár\nkávy a čaju denne.  \n\n**Buď aktívna.**\n\nSnaž byť počas dňa v pohybe. Vymeň auto za prechádzku, výťah za\nschody a doplň svoje bežné dni o pravidelné posilňovacie cvičenia.\n\n**TIP:** Pri skladaní svojich hlavných jedál si predstav takýto\ntanier a potom  už len dopĺňaj jednotlivé zložky. Dosiahneš tak\nvyvážené, zdravé a chutné jedlo, ktoré ťa zasýti na dlhú dobu.\n\nDnešné cvičenie\n<https://member.neome.com.au/products/body-forming-program-2/categories/2150396624/posts/2158065873>\n\nJesť zdravo, s chuťou a bez výčitky v spojení s pravidelným\npohybom ti prinesie tvoje vytúžené výsledky. \n\nZdravý recept na dnes\n<https://drive.google.com/file/d/1k-0Y6AVZUsH6JVayCwGDhEsbfBm8jkj5/view?usp=sharing>\n\nKrásny deň ☀️\n\nGabi\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 25062
+      },
+      {
+        "day": 5,
+        "campaign_id": 148,
+        "message_id": "150",
+        "name": "Day5_Week4 (BodyForming)",
+        "subject": " BodyForming (Týždeň 4 / Deň 5) cesta za tvojou Neo.Me",
+        "preheader": "Máme tu záver týždňa a s ním aj strečing a meditácia, ktorá ti určite urobí dobre ☺️. Tento týždeň sme sa venovali strave a jej zloženiu.",
+        "fromname": "Gabi Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "Ahoj %FIRSTNAME%, \n\nMáme tu záver týždňa a s ním aj strečing a meditácia, ktorá ti\nurčite urobí dobre ☺️. \n\nTento týždeň sme sa venovali strave a jej zloženiu. Vedieť, ako si\nsprávne poskladať stravu, aby \n\n**naše telo bolo, čo najvýkonnejšie** a z toho prameniaca \n\n**nálada, čo najlepšia** by malo byť súčasťou výučby na\nškolách. Tie najzákladnejšie princípy pritom nie sú vôbec\nzložité. Tento týždeň sme preto začali práve s nimi. V ďalších\ndvoch týždňoch sa dozvieš ešte oveľa viac ☺️\n\nAk máme nevyváženú stravu, zloženú z nutrične chudobných\npotravín naše telo nám pošle hneď niekoľko signálov - \n\n**zlé trávenie, nepravidelné vyprázdňovanie, zlá pleť, pochmúrna\nnálada, nízky level energie, návaly na sladké.** Sme letargické,\npodráždené a nič sa nám nechce. To isté sa deje aj s našimi\ndeťmi. Naučme sa teda robiť tie \n\n**správne voľby**, vyberať si tie správne potraviny pre seba aj pre\nnaše deti. Nemôžeme sa deťom čudovať, že nechcú brokolicu a\nfazuľu, keď ich my sami nejeme ☺️\n\n**Hlavné body z tohto týždňa:** \n\n tvoje telo potrebuje všetky tri makro zložky - bielkoviny,\nsacharidy, tuky,\n spomeň si na „tanier”, keď si budeš pripravovať svoje\nďalšie jedlo. Dokážeš tak obsiahnuť všetky tri makro zložky v\ntých správnych pomeroch,\n ak máš návaly na sladké je to signál, že tvojmu telu niečo\nchýba,\n nechoď do diét, ktoré ponúkajú rýchle riešenie. Nájdi si\nsvoj nový životný štandard, ktorý ti poskytne dlhodobo,\nudržateľný prístup k zdravému stravovaniu,\n buď pre svoje deti príkladom - poďakujú sa ti.\n\nDnešné cvičenie\n<https://member.neome.com.au/products/body-forming-program-2/categories/2150396624/posts/2158065874>\n\nJesť zdravo, s chuťou a bez výčitky v spojení s pravidelným\npohybom ti prinesie tvoje vytúžené výsledky. \n\nZdravý recept na dnes\n<https://drive.google.com/file/d/1Uc0jU1ShCqnSr2ESBenFCHwEX5aJMjqU/view?usp=sharing>\n\nPS: Na cvičenia v 5. týždni budeme potrebovať elastické gumy, ako\nnapríklad tieto\n\nhttps://www.decathlon.sk/sada-elastickych-popruhov-100-id_8528803.html\nhttps://www.decathlon.sk/elasticky-popruh-100--id_8527897.htm\n<https://www.decathlon.sk/sada-elastickych-popruhov-100-id_8528803.html>\n\nKrásny deň ☀️\n\nGabi\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 16756
+      }
+    ]
+  },
+  "week_5": {
+    "automation_id": 54,
+    "days": [
+      {
+        "day": 1,
+        "campaign_id": 149,
+        "message_id": "151",
+        "name": "Day1_Week5 (BodyForming)",
+        "subject": "BodyForming (Týždeň 5 / Deň 1) cesta za tvojou Neo.Me",
+        "preheader": "Verím, že si si cez víkend oddýchla aspoň mentálne (a vypla tak od denno-dennej týždňovej rutiny) 🤗. Dnes začíname tvoj predposledný týždeň Body Forming programu a ty môžeš byť na seba právom hrdá.",
+        "fromname": "Gabi Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "Ahoj %FIRSTNAME%, \n\nVerím, že si si cez víkend oddýchla aspoň mentálne (a vypla tak od\ndenno-dennej týždňovej rutiny) . \n\nDnes začíname tvoj predposledný týždeň Body Forming programu a ty\nmôžeš byť na seba právom hrdá, že už \n\n**mesiac si dokázala nájsť si na seba 15 minút** denne a urobila\ntak niečo preto, aby si sa cítila skvele vo svojom tele. \n\nMinulý týždeň sme nazreli do \n\n**oblasti stravy a jej zloženia**. Ak  chceš urobiť nejaké zmeny je\ndôležité najprv získať základné informácie a porozumenie v danej\noblasti a až potom robiť rozhodnutie = zmeny. \n\nTento týždeň budeme rozoberať veľmi diskutovanú tému  \n\n**chudnutie**. Začnem rovno s otázkou, ktorú sa ma mamičky často\npýtajú - \n\n**Akú veľkú rolu hrá pri postave genetika? **\n\npozri sa na svoju rodinu\nmá tvoj otec zvýšené množstvo tuku v oblasti brucha?\nmá tvoja sestra zvýšené množstvo tuku v oblasti bokov?\nmá tvoja mama veľké lýtka?\n\nKeď sa pozrieš na členov svojej rodiny a to, kde majú uložené\nzvýšené množstvo tuku, dá ti to dobrú indikáciu toho,  aká je\ntvoje\n\n**stavba tela a predispozícia**. To však neznamená, že si \n\n**predurčená **nato, aby si aj ty mala takú postavu. Znamená to\nlen, že\n\n**tvoje telo je geneticky náchylnejšie** ukladať si tuk práve do\ntýchto miest. \n\nKeď budeš chudnúť je prirodzené, že tieto miesta budú tie\nposledné, z ktorých stratíš tuk. \n\n**Genetika** teda hrá úlohu v tom, ako postava môže vyzerať, ale \n\n**nie je dôvodom ani neprekonateľnou prekážkou** na to, aby si\nnemohla mať aj ty štíhle brucho alebo boky.\n\nBežné ženské telo by malo mať okolo \n\n**18 - 20% tuku**.  Čokoľvek navyše sú len voľby a stravovacie\nnávyky. Aké sú tie tvoje? Ak chceš zmenu, musíš byť k sebe\núprimná.\n\n**To, ako tvoje telo vyzerá a aj to ako sa v ňom cítiš máš plne v\nrukách. **\n\nDnešné cvičenie\n<https://member.neome.com.au/products/body-forming-program-2/categories/2150396623/posts/2158065865>\n\nJesť zdravo, s chuťou a bez výčitky v spojení s pravidelným\npohybom ti prinesie tvoje vytúžené výsledky. \n\nZdravý recept na dnes\n<https://drive.google.com/file/d/1ZLGFScdpkL_XjCNcKa7rYOZUMQ6-Edim/view?usp=sharing>\n\nPS: na tohto týždňové cvičenia budeš potrebovať elastickú\ngumu. \n\nKrásny deň ☀️\n\nGabi\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 19312
+      },
+      {
+        "day": 2,
+        "campaign_id": 150,
+        "message_id": "152",
+        "name": "Day2_Week5 (BodyForming)",
+        "subject": "BodyForming (Týždeň 5 / Deň 2) cesta za tvojou Neo.Me",
+        "preheader": "Po úspešnom odštartovaní tohto týždňa môžeme pokračovať v príjemne rozbehnutom tempe. Dnes ti chcem povedať niečo o energickej rovnováhe. ",
+        "fromname": "Gabi Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "Ahoj %FIRSTNAME%, \n\nPo úspešnom odštartovaní tohto týždňa môžeme pokračovať v\npríjemne rozbehnutom tempe. \n\nDnes ti chcem povedať niečo o \n\n**energickej rovnováhe.** \n\nTvoje telo potrebuje jedlo ako svoje palivo. Každé jedlo obsahuje\nkalórie.  \n\n Ak si chceš \n\n**udržať váhu,** potrebuješ dostať do tela toľko kalórií koľko\nspáliš =\n\n**kalorická rovnováha.**\n Ak chceš \n\n**schudnúť**potrebuješ prijať menej kalórií alebo sa viac hýbať,\naby si dosiahla \n\n**kalorický deficit.**\n\nPri chudnutí je dôležité rozumieť, cca koľko kalórií má aké\njedlo. \n\nAko môžeš vidieť na obrázku, 100 kalórií môžeš prijať v\njednom pohári šampanského, v celom balení bieleho jogurtu, či v\npolievkovej lyžici olivového oleja. \n\nJa viem, ten rajčinový šalát s mozzarellou, bazalkou a olivovým\nolejom. Ja viem  \n\nJe dôležité poznať aspoň orientačne, koľko kalórií do tela\nprijímaš a vedieť tak urobiť tie správne voľby nato, aby \n\n**kalórie, ktoré prijmeš neboli prázdne kalórie**, ale aby ťa \n\n**zasýtili a nenechali hladnú. **\n\nNa začiatok to môže chvíľu trvať, kým sa zorientuješ, aké jedlo\nje kaloricky bohaté a naopak. Táto vedomosť ti však už ostane\nnavždy a ty ju budeš môcť používať pri každodennom výbere\nsvojich jedál. \n\nAk sa aj rozhodneš\n\n**schudnúť**, \n\n**nemusí to zákonite znamenať, že tvoj kalorický deficit ti\nspôsobí hladovku**. Vyber si potraviny, ktoré majú \n\n**nízky kalorický objem a vysokú nutričnú hodnotu** a \n\n**vyvaruj sa tak prázdnym kalóriám,** ktoré nájdeš v koláčoch,\ndžemoch, čipsoch, hranolkách, zmrzline, dresingoch a pod. \n\nDnešné cvičenie\n<https://member.neome.com.au/products/body-forming-program-2/categories/2150396623/posts/2158065866>\n\nJesť zdravo, s chuťou a bez výčitky v spojení s pravidelným\npohybom ti prinesie tvoje vytúžené výsledky.\n\nZdravý recept na dnes\n<https://drive.google.com/file/d/1j5PnvePtDc_6g9jREaZ55r0u0rfKvXuz/view?usp=sharing>\n\nPS: na tohto týždňové cvičenia budeš potrebovať elastickú gumu.\n\nKrásny deň ☀️\n\nGabi\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 21650
+      },
+      {
+        "day": 3,
+        "campaign_id": 151,
+        "message_id": "153",
+        "name": "Day3_Week5 (BodyForming)",
+        "subject": "BodyForming (Týždeň 5 / Deň 3) cesta za tvojou Neo.Me",
+        "preheader": "Máme stred týždňa a to u nás v NeoMe znamená čas na strečing a meditáciu 🤗. Včera sme si hovorili o kalorickej rovnováhe, ktorá je potrebná, ak si chceš váhu udržať a o kalorickom deficite, ktorý je potrebný pri chudnutí.",
+        "fromname": "Gabi Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "Ahoj %FIRSTNAME%, \n\nMáme stred týždňa a to u nás v NeoMe znamená čas na strečing a\nmeditáciu .\n\nVčera sme si hovorili o \n\n**kalorickej rovnováhe**, ktorá je potrebná, ak si chceš váhu\nudržať a o\n\n**kalorickom deficite**, ktorý je potrebný pri chudnutí.\n\nVo všeobecnosti platí, že Ideálny kalorický deficit pri chudnutí\npredstavuje cca \n\n**500 kalórií na deň. **\n\nKeď sa pozrieš na obrázok dole uvidíš porovnanie toho, ako môže\nvyzerať \n\n**500 kalórií v tvojom žalúdku.**\n\n pri chudnutí a kalorickom deficite začni tým, že si dáš pozor\na \n\n**pri príprave jedál zredukuješ množstvo olejov**, tukov, masla.  \n o trochu menej oleja v šaláte, o trochu menej mandlí v raných\nvločkách a o niečo menej syra na večeru a práve si ušetrila 500\nkalórií.\n\nČasto sa stretávam s tým, že ženy robia\n\n**drastické zmeny**, pričom u väčšiny sú to práve tie \n\n**malé zmeny, ktoré zavážia** a nechajú ťa jesť, čo máš rada.\n\nCieľom teda nie je sa vyhladovať, ale\n\n**vedieť čo jesť**, a\n\n**robiť malé zmeny**pri potravinách, ktoré už vieš, že sú\nkaloricky plné ale nutrične prázdne.\n\n**Ak budeš robiť, zdravé voľby, budeš sa cítiť, že ješ viac,\nale vážiš menej.**\n\nDnešné cvičenie\n<https://member.neome.com.au/products/body-forming-program-2/categories/2150396623/posts/2158065867>\n\nJesť zdravo, s chuťou a bez výčitky v spojení s pravidelným\npohybom ti prinesie tvoje vytúžené výsledky.\n\nZdravý recept na dnes\n<https://drive.google.com/file/d/1YaG36HPJHSvadXQkzL1_ktp5O9eMq4Fh/view?usp=sharing>\n\nPS: na tohto týždňové cvičenia budeš potrebovať elastickú\ngumu. \n\nKrásny deň ☀️\n\nGabi\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 18085
+      },
+      {
+        "day": 4,
+        "campaign_id": 152,
+        "message_id": "154",
+        "name": "Day 4_Week5 (BodyForming)",
+        "subject": "BodyForming (Týždeň 5 / Deň 4) cesta za tvojou Neo.Me",
+        "preheader": "Tento týždeň venujeme chudnutiu a učíme sa, ako robiť tie správne voľby pri výbere potravín/jedál, aby tvoja strava bola nutrične bohatá a zároveň aj kaloricky optimálna na dosiahnutie tvojho cieľu. ",
+        "fromname": "Gabi Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "Ahoj %FIRSTNAME% , \n\nTento týždeň venujeme chudnutiu a učíme sa, ako robiť tie správne\nvoľby pri výbere potravín/jedál, aby tvoja strava bola\n\n** nutrične bohatá a zároveň aj kaloricky optimálna**na\ndosiahnutie tvojho cieľu. \n\nChcem, aby si vedela, že ak sa rozhodneš a dáš sa na chudnutie, je\ndôležité, aby si si pripomínala:\n\n chudnúť neznamená hladovať,\n chudnúť sa dá s rozumom,\n dopraj si dostatočný čas na výsledky, rýchle riešenia nie sú\nudržateľné,\n hľadaj zdravé alternatívy jedál,\n nevynechávaj jedlá.\n\n✅ Ak si vyberieš tie správne jedlá, tvoj žalúdok sa bude cítiť\nzasýtený.\n\n✅ Džúsy a smoothies môžu byť zdravé a bohaté na živiny, ale\nrovnako môžu byť bohaté aj na kalórie. Stačí, ak sú zložené z\nplnotučného mlieka, orieškov, arašidového masla, banánu a pod.\nVyberaj si teda smoothies ktoré obsahujú viac ovocia a zeleniny a\nmenej mlieka, krému, orieškov, sušených plodov…\n\n✅ Zvoľ si stravu, ktorá ti dovolí cítiť sa najedená, plná\nenergie a mať plný žalúdok po celý deň. \n\n✅ Väčšia porcia jedla nemusí za každú cenu znamenať viac\nkalórií. Ale o tom si už povieme viac zajtra. \n\nDnešné cvičenie\n<https://member.neome.com.au/products/body-forming-program-2/categories/2150396623/posts/2158065868>\n\nJesť zdravo, s chuťou a bez výčitky v spojení s pravidelným\npohybom ti prinesie tvoje vytúžené výsledky. \n\nZdravý recept na dnes\n<https://drive.google.com/file/d/16QlpxLa-3nSu4xAF7m2FdQBmeYCnc1XC/view?usp=sharing>\n\nPS: na tohto týždňové cvičenia budeš potrebovať elastickú gumu.\n\nKrásny deň ☀️\n\nGabi\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 18302
+      },
+      {
+        "day": 5,
+        "campaign_id": 153,
+        "message_id": "155",
+        "name": "Day5_Week5 (BodyForming)",
+        "subject": " BodyForming (Týždeň 5 / Deň 5) cesta za tvojou Neo.Me",
+        "preheader": "Dopracovala si sa na záver ďalšieho týždňa v NeoMe Body Forming programe. Gratulujem ti 👏. Nezabudni oceňovať svoje malé úspechy, lebo z nich sa skladajú tie veľké ☺️. ",
+        "fromname": "Gabi Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "Ahoj %FIRSTNAME%, \n\nDopracovala si sa na záver ďalšieho týždňa v NeoMe Body Forming\nprograme. \n\n**Gratulujem ti** . Nezabudni\n\n**oceňovať svoje malé úspechy,** lebo z nich sa skladajú tie\nveľké ☺️. \n\nOsvojením si tých správnych, zdravých návykov si môžeš \n\n**zlepšiť kvalitu svojho života**, ktorá ti už ostane. \n\nTento týždeň sme venovali veľkú pozornosť chudnutiu. Povedzme si\núprimne, ktorá z nás nemala obdobie vo svojom živote, kedy nechcela\nschudnúť?\n\nChudnutie je veľká téma a je okolo nej veľa zavádzajúcich\ninformácií, ktoré ti môžu skomplikovať tvoju cestu k vytúženej\npostave. \n\nZhrňme si teda \n\n**základné informácie**, ktoré sme si tento týždeň osvojili, a\nktoré ti pomôžu dostať sa k tvojmu cieľu:\n\n\n\n**Genetika** zohráva rolu v tom, akú máš stavbu tela, avšak skôr\nide o \n\n**predispozície, s ktorými sa dá pracovať**. To či máš krátke\nalebo dlhé nohy nezmeníš, ale to koľko tuku máš uloženého\nnapríklad na brušku alebo stehnách zmeniť môžeš. Áno, z \nurčitých partií pôjde  tuk dole ako posledný, ale podstatné je,\nže pôjde dole! \n\n**Len treba byť konzistentná a trpezlivá. **\n\n Každé jedlo, ktoré prijmeš predstavuje pre tvoje telo\n\n**kalorický príjem**. Maj prehľad o tom, koľko kalórií je\nobsiahnutých v jednotlivých potravinách a \n\n**manažuj si tak svoj kalorický príjem**. Ak chceš nejaké to\nkilečko schudnúť, musíš nejakú dobu fungovať \n\n**v kalorickom deficite** - odporúča sa 500 kalórií na deň. \n\n Chudnutie už dávno\n\n**neznamená hladovať**. Vyberaj si tie správne potraviny, ktoré sú \n\n**nutrične bohaté a kaloricky prijateľné** pre dosiahnutie tvojho\ncieľa. Ak prestaneš jesť, aby si rýchlejšie schudla, alebo ak si\nnastavíš príliš vysoký kalorický deficit a dáš si na raňajky\nvajíčko a na obed polievku, tvoje telo bude vyšťavené, ty\nfrustrovaná a postupne prejde tvoje telo do režimu, kedy si začne\nukladať všetko, čo prijmeš.\n\nZvoľ si pomalšiu, ale udržateľnú cestu, ktorá ti prinesie\nvytúžené výsledky. \n\nAk potrebuješ s niečim poradiť, kľudne mi napíš \n\nDnešné cvičenie\n<https://member.neome.com.au/products/body-forming-program-2/categories/2150396623/posts/2158065869>\n\nJesť zdravo, s chuťou a bez výčitky v spojení s pravidelným\npohybom ti prinesie tvoje vytúžené výsledky. \n\nZdravý recept na dnes\n<https://drive.google.com/file/d/1TS3Tg_OLdE85pKnu94eg5lbJHsSkvCwY/view?usp=sharing>\n\nKrásny deň ☀️\nGabi\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 19253
+      }
+    ]
+  },
+  "week_6": {
+    "automation_id": 55,
+    "days": [
+      {
+        "day": 1,
+        "campaign_id": 154,
+        "message_id": "156",
+        "name": "Day1_Week6 (BodyForming)",
+        "subject": "BodyForming (Týždeň 6 / Deň 1) cesta za tvojou Neo.Me",
+        "preheader": "Je úžasné, že si za posledných 5 týždňov dokázala urobiť zo seba prioritu a venovala si 15 minút denne niečomu, čo pomáha tvojmu fyzickému aj psychickému zdraviu. Robíš skvelý progres 👏.",
+        "fromname": "Gabi Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "Ahoj %FIRSTNAME%, \n\nJe úžasné, že si za posledných 5 týždňov dokázala urobiť zo\nseba prioritu a venovala si 15 minút denne niečomu, čo pomáha tvojmu\nfyzickému aj psychickému zdraviu. Robíš skvelý progres .\n\nMinulý týždeň sme sa v mailoch venovali veľkej téme a tou je\nchudnutie. Verím, že si sa dočítala  užitočné tipy, ktoré ti\npomôžu. \n\nTento týždeň bude naša \n\n**pozornosť upriamená na časté chyby,** ktorých sa dopúšťame aj\npri zdravom stravovaní a chudnutí. \n\n❌ \n\n**Chyba #1:Vynechávanie hlavných jedál**\n\nTvoju energiu, ktorú počas dňa potrebuješ, musíš odniekiaľ\nzískať. \n\nJe dôležité, aby si energiu prijímala z nutrične bohatých jedál,\nktoré obsahujú vitamíny, minerály, bielkoviny, zdravé tuky,\nkomplexné sacharidy, z ktorých sa ti energia spotrebúva postupne a\ncítiš sa tak dlhšie sýta. Z tejto energie dokážeš potom fungovať\nešte ďalšie hodiny. \n\nAk vynecháš hlavné jedlo, tvoje telo si bude pýtať \n\n**chýbajúcu energiu, čo najrýchlejšiou formou**a teda tvoja chuť\nna sladké bude o to väčšia. \n\n** Riešenie**\n\nAk nemáš veľa času na varenie, priprav si smoothie z ovocia a\nzeleniny, daj si celozrnný chlieb s vajíčkom a zeleninou, urob si\nsuper rýchly šalát z rajčiny, uhorky, špenátu a tuniaka. Tieto\njedlá ťa nebudú stáť veľa času, ale poskytnú ti nutrične\nvýdatné jedlo. \n\nS cieľom schudnúť veľa žien vynecháva hlavné jedlá, aby\nzredukovali svoje kalórie. Neurob aj ty túto chybu. Namiesto toho sa \n\n**zameraj na veľkosť a zloženie svojich porcií.**\n\nAj ty sa môžeš cítiť sa skvele vo svojom tele, mať dosť energie\nna denno-denné úlohy, mať funkčné trávenie a necítiť pocit hladu\npočas dňa.\n\nDnešné cvičenie\n<https://member.neome.com.au/products/body-forming-program-2/categories/2150396625/posts/2158065875>\n\nJesť zdravo, s chuťou a bez výčitky v spojení s pravidelným\npohybom ti prinesie tvoje vytúžené výsledky. \n\nZdravý recept na dnes\n<https://drive.google.com/file/d/1wJvK8MoiD3XKdFUdyrsAaghjlEss03EL/view?usp=sharing>\n\nKrásny deň ☀️\n\nGabi\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 19427
+      },
+      {
+        "day": 2,
+        "campaign_id": 155,
+        "message_id": "157",
+        "name": "Day2_Week6 (BodyForming)",
+        "subject": "BodyForming (Týždeň 6 / Deň 2) cesta za tvojou Neo.Me",
+        "preheader": "Verím, že po včerajšom príjmenom začiatku sa tešíš na svojich dnešných 15 minút a na to, že aj dnes budeš môcť urobiť niečo pre seba ❤️",
+        "fromname": "Gabi Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "Ahoj %FIRSTNAME%, \n\nVerím, že po včerajšom príjemnom začiatku sa tešíš na svojich\ndnešných 15 minút a na to, že aj dnes budeš môcť urobiť niečo\npre seba ❤️\n\nVčera sme si povedali, prečo nie je dobré vynechávať hlavné\njedlá. Dnes si povieme o ďalšej častej chybe, ktorej sa my ženy\nčasto dopúšťame a pritom ani nevieme, že ju robíme. \n\n❌ \n\n**Chyba #2: Aj zdravé jedlá môžu byť vysoko kalorické**\n\nAj ty si vieš dať ako snack za veľkú hrsť mandlí alebo iných\norieškov? Prípadne si nakrájaš polovicu avokáda do šalátu,\npridáš za hrsť mozzarelly a zaleješ to olivovým olejom? Poznáme to\nasi všetky \n\nOriešky, avokádo, losos, oleje, sušené ovocie, plnotučné výrobky,\nsmoothies, šaláty s dresingom...Tieto všetky jedlá sú síce \n\n**zdravé, pre telo dôležité a nutrične bohaté, ale sú taktiež\nbohaté aj na kalórie.**\n\nPreto je dôležité jesť ich s mierou a mať predstavu koľko\nkalórií približne obsahujú. \n\nNapríklad polovica avokáda obsahuje približne 100 kalórií rovnako\nako za hrsť orieškov alebo lyžička arašidového masla.\n\nOdporúčaná denná kalorická dávka u žien predstavuje okolo \n\n**1800 - 2000 kalórií.** \n\nKeď si dáš zopár takýchto lyžičiek arašidového masla na\nraňajky, dve tri hrste orieškov po obede + ešte nejakú tú tyčinku,\nsyr na šalát, pohár vínka, tvoj denný kalorický príjem sa\nnevedomky navýši a ty sa môžeš čudovať, prečo nechudneš.\n\n** Riešenie**\n\nNemusíš rátať kalórie a prepočítavať každé sústo, ktoré\nzješ. Maj iba na vedomí, že aj zdravé jedlá môžu byť kaloricky\nvýdatné. Cieľom je, aby si si postupne osvojila \n\n**intuitívne jedenie** -  prirodzene siahla po zdravom jedle, v\nsprávnom množstve.  \n\nJedz s mierou a s plným vedomím. Snaž sa vyvarovať sa situáciám,\nkedy si dávaš jedlo za volantom, alebo keď robíš nejaké iné\nčinnosti, pri ktorých si ani neuvedomíš, koľko si toho už\nzjedla.  Áno, plne ti rozumiem, že pri deťoch a iných povinnostiach\nje multitasking naše druhé Ja. \n\n**Dopraj si však na jedlo čas a uč tomu aj svoje deti**. Jedzte\nspolu, bez zbytočných rozptyľujúcich činností. \n\nDnešné cvičenie\n<https://member.neome.com.au/products/body-forming-program-2/categories/2150396625/posts/2158065876>\n\nJesť zdravo, s chuťou a bez výčitky v spojení s pravidelným\npohybom ti prinesie tvoje vytúžené výsledky.\n\nZdravý recept na dnes\n<https://drive.google.com/file/d/16FyvKMSMqQxHXOx8SfBn_k_qB-sRSPao/view?usp=sharing>\n\nPS: na tohto týždňové cvičenia budeš potrebovať elastickú gumu.\n\nKrásny deň ☀️\n\nGabi\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 20218
+      },
+      {
+        "day": 3,
+        "campaign_id": 156,
+        "message_id": "158",
+        "name": "Day3_Week6 (BodyForming)",
+        "subject": "BodyForming (Týždeň 6 / Deň 3) cesta za tvojou Neo.Me",
+        "preheader": "Máme tu poslednú stredu nášho Body Forming programu a ja verím, že dnešný strečing si naplno užiješ a uvoľníš tak svoje telo aj myseľ. ",
+        "fromname": "Gabi Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "Ahoj %FIRSTNAME%, \n\nMáme tu poslednú stredu nášho Body Forming programu a ja verím,\nže dnešný strečing si naplno užiješ a uvoľníš tak svoje telo\naj myseľ. \n\nČastokrát kupujeme potraviny a pritom ani nevieme, čo všetko sa v\nnich skrýva. \n\n❌ \n\n**Chyba #3: Prehliadanie etikety na potravinách **\n\nÁno viem, môže to znieť ako ďalšia vec, na ktorú musíš\nmyslieť. Ale neboj, dám ti tip na to, ako budeš vedieť preskenovať\netiketu na potravinách za pár sekúnd a zároveň z nej budeš vedieť\nvyčítať všetko, čo potrebuješ.\n\n❌ \n\n**Zloženie**\n\nCereálie 68,6 % (pšeničná múka 50,9 %, celozrnná pšeničná múka\n17,7 %), Cukor, Palmový tuk, Repkový olej, Pšeničný škrob,\nEmulgátory (E 472e, sójový lecitín), Kypriace látky (E 500, E 503),\nJedlá soľ, Sušené odtučnené mlieko, Zmes vitamínov a minerálnych\nlátok (vitamín E, vitamín B1, niacín, elementárne železo,\nuhličitan horečnatý), Arómy (maslová, vanilín), Regulátor\nkyslosti (kyselina citrónová), Múku upravujúca látka (disiričitan\nsodný).\n\n✅ Zloženiedatle 73%, kakaové bôby 18%, kakao 9%\n\n Preskenuj očami zloženie potravín, ktoré si hádžeš do\nnákupného košíka.\n Čím menej surovín daná potravina obsahuje, tým je daná\npotravina “čistejšia” a menej upravovaná.\n Ak sa v zložení nachádzajú látky, ktorým ty sama nerozumieš\n(E 500, E 503) a nevieš, čo si máš pod nimi predstaviť, nekupuj\nich.\n Cukor je pridávaný už takmer do všetkého - rajčinových\npretlakov, strukovín, omáčok, nátierok, slaných krekrov. Snaž sa\nnájsť alternatívy potravín, ktoré zbytočne neobsahujú pridaný\ncukor. \n\n**Cieľom je, aby tvoj nákupný košík a potraviny v ňom, boli čo\nnajčistejšie, čo znamená bez pridaných látok, konzervantov,\numelých sladidiel a pod. **\n\nDnešné cvičenie\n<https://member.neome.com.au/products/body-forming-program-2/categories/2150396625/posts/2158065877>\n\nJesť zdravo, s chuťou a bez výčitky v spojení s pravidelným\npohybom ti prinesie tvoje vytúžené výsledky.\n\nZdravý recept na dnes\n<https://drive.google.com/file/d/1GfCZW9s7s3U2YFuHzii5ZZMv6oe5u3lY/view?usp=sharing>\n\nKrásny deň ☀️\n\nGabi\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 19496
+      },
+      {
+        "day": 4,
+        "campaign_id": 157,
+        "message_id": "159",
+        "name": "Day 4_Week6 (BodyForming)",
+        "subject": "BodyForming (Týždeň 6 / Deň 4) cesta za tvojou Neo.Me",
+        "preheader": "Pomaly sa blížime k záveru tvojej 6 týždennej cesty v Body Forming programe. Neuveriteľné, ako rýchlo to celé prešlo. Tak ide čas. Neúprosne rýchlo. Preto netreba nič odkladať na neskôr a treba žiť naplno, tu a teraz. ",
+        "fromname": "Gabi Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "Ahoj %FIRSTNAME% , \n\nPomaly sa blížime k záveru tvojej 6 týždennej cesty v Body Forming\nprograme. Neuveriteľné, ako rýchlo to celé prešlo. Tak ide čas.\nNeúprosne rýchlo. Preto \n\n**netreba nič odkladať na neskôr a treba žiť naplno, tu a\nteraz.** \n\nAk chceš niečo zmeniť, začni už dnes. Či už sa to týka stravy,\ncvičenia alebo iných snov a cieľov, ktoré máš. \n\nDnes si rozoberieme ďalšiu častú chybu, ktorej sa my ženy často\ndopúšťame a potom nerozumieme, prečo sa nám nedarí dosiahnuť\nnašu vytúženú postavu.\n\n❌\n\n**Chyba #4: Nepoznáš svoj kalorický príjem**\n\nPri chudnutí je dôležité poznať svoj kalorický príjem, aby si ho\nmohla ľahko regulovať. Počítanie kalórií nie je praktické ani\ndlhodobo udržateľné avšak je dôležité mať aspoň približný\nprehľad o tom, koľko kalórií denne prijímaš.\n\nMožno ťa samú prekvapí, že najviac kalorií príjmaš\nprostredníctvom snackov a nie hlavných jedál alebo, že tvoj\nvečerný šalát nie je až tak kaloricky nízky, ako si si myslela.\n\n**Stačí len pár dní!**  Pár dní počítania kalórií a\nsledovania čo zješ, ti postačí a poskytne dobrú základňu nato,\naby si dokázala urobiť potrebné (častokrát minimalne) zmeny. \n\n\n\n**TIP: Vnímaj svoj týždenný kalorický príjem. **\n\nAk vieš, že máš v sobotu grilovačku, na ktorej budeš veľa piť a\njesť, skús si už počas týždňa trošku znížiť svoj kalorický\npríjem (o 100-200 kalórií denne)  a tým “\n\n**rezervovať” zopár kalórií**práve na túto grilovačku. Tvoj\ncelkový týždenný kalorický príjem bude vyrovnaný a ty si budeš\nmôcť bez výčitky dopriať dobroty, ktoré ťa na grilovačke\nčakajú. \n\nVeľa z nás používa smart hodinky, na ktorých sa dá pekne sledovať\nkoľko kalórií si denne spálila. Aj to ti môže dopomôcť k\nnastaveniu optimálne kalorického balansu a vedieť, aký by si mala\nmať kalorický príjem.\n\nDnešné cvičenie\n<https://member.neome.com.au/products/body-forming-program-2/categories/2150396625/posts/2158065878>\n\nJesť zdravo, s chuťou a bez výčitky v spojení s pravidelným\npohybom ti prinesie tvoje vytúžené výsledky. \n\nZdravý recept na dnes\n<https://drive.google.com/file/d/1AgigRG9rnQ7HDSndXfvpw_zsL6HWlYo1/view?usp=sharing>\n\nKrásny deň ☀️\n\nGabi\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 18281
+      },
+      {
+        "day": 5,
+        "campaign_id": 158,
+        "message_id": "160",
+        "name": "Day5_Week6 (BodyForming)",
+        "subject": " BodyForming (Týždeň 6 / Deň 5) cesta za tvojou Neo.Me",
+        "preheader": "Tak si to dokázala 👏. Prišla si až do cieľa svojej 6-týždennej cesty. Verím, že si spokojná so svojim progresom. Lebo o ten ide.",
+        "fromname": "Gabi Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "Ahoj %FIRSTNAME%, \n\nTak si to dokázala. Prišla si až do cieľa svojej 6-týždennej\ncesty. Verím, že si spokojná so svojim progresom. Lebo o ten ide.\n\nAk aj výsledky ešte nie sú také, ako by si si priala, skús \n\n**upriamiť svoju pozornosť na progres** a cestu, ktorú si za\nposledných 6-týždňov prešla. Náš život je ako taká jedna\nveľká cesta, na ktorej spoznávame okolitý svet, ale aj seba a to,\nčo na nás najlepšie funguje, za akých podmienok sme schopné byť\nnajviac produktívne a naopak, čo nám chýba, keď pociťujeme\nfrustráciu, nahromadené napätie, únavu nielen fyzickú, ale aj\nmentálnu…\n\n**Za posledných 6 týždňov si si dopriala **\n\n* prioritu\n\n* pravidelný pohyb, ktorým si rozhýbala celé telo a vyplavila\nendorfíny\n\n* cvičenia, ktoré ti posilnili svaly celého tela\n\n* uvoľnenie mysle prostredníctvom meditácií a emočný ventil,\nktorý každá z nás pravidelne potrebuje. \n\n**Taktiež si za posledných 6 týždňov získala**\n\n* praktické vedomosti o stravovaní, zložení potravy, častých\nchybách, ktorých sa dopúšťame\n\n* tipy na chudnutie\n\n* 30 skvelých, nutrične vyvážených receptov\n\n Verím, že ti s Neo.Me bolo príjemne a že sa ti podarilo vytvoriť\nsi svoju novú self-care rutinu, ktorú si budeš aj naďalej pestovať\n\n\nUži si svoj posledný strečing, ktorý som si pre teba dnes\npripravila \nPS: Budeš potrebovať vankúš.\n\nDnešné cvičenie\n<https://member.neome.com.au/products/body-forming-program-2/categories/2150396625/posts/2158065879>\n\nJesť zdravo, s chuťou a bez výčitky v spojení s pravidelným\npohybom ti prinesie tvoje vytúžené výsledky. \n\nZdravý recept na dnes\n<https://drive.google.com/file/d/1Afuh7QvgtC16uSLMn9su-vbF6maqZhIF/view?usp=sharing>\n\nĎakujem, že posledných šesť týždňov som mohla byť súčasťou\ntvojich bežných dní a že som ti mohla tak dopomôcť cítiť sa\nskvele vo svojom tele . \n\nAk by si s nami chcela pokračovať aj ďalej, stačí ak mi napíšeš\na rezervujem ti zľavu na náš nový program.\n\nKrásny deň a uži si svoju Neo Me ☀️\n\nGabi\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 19078
+      }
+    ]
+  }
+}

@@ -1,0 +1,459 @@
+{
+  "program": "postpartum",
+  "program_title": "Postpartum",
+  "from_name": "Gabi z Neo.Me",
+  "from_email": "gabi@neome.com.au",
+  "cta_label": "Spustiť dnešný tréning",
+  "cta_url_template": "https://app.neome.com.au/program/postpartum/week-{week}/day-{day}",
+  "_notes": "CTA URLs are placeholders — to be replaced with real deep links from app when routing is finalized. Voice: warm, intimate, mom-aware, 15-min framing, Gabi-style. All in Slovak.",
+
+  "emails": [
+    {
+      "week": 1, "day": 1, "topic_short": "Dýchanie",
+      "subject": "Začíname tým najjemnejším krokom — dýchaním",
+      "preheader": "Prvý tréning v programe Postpartum ťa čaká. Hlboký nádych a poďme na to.",
+      "body_paragraphs": [
+        "som rada, že si tu. Vítam ťa v prvom týždni Postpartum programu.",
+        "Dnes spolu spravíme ten najjemnejší prvý krok — <strong>bránicové dýchanie</strong>. Znie to možno banálne, no je to nástroj, na ktorom postavíme všetko ostatné.",
+        "Naučíš svoje telo zapájať hlboké brušné svaly bez napätia, bez tlaku, bez stresu pre panvové dno. Keď sa to raz naučíš, tento návyk už s tebou ostane — pri cvičení, pri kojení, pri nosení dieťatka, pri pracovnom dni.",
+        "<strong>Dopraj si čas. Nikam sa neponáhľaj. Čaká ťa tvojich 15 minút.</strong>"
+      ]
+    },
+    {
+      "week": 1, "day": 2, "topic_short": "Panvové dno",
+      "subject": "Dnes nájdeme svaly, o ktorých si možno zabudla",
+      "preheader": "Včera dýchanie. Dnes panvové dno — srdce celej rehabilitácie po pôrode.",
+      "body_paragraphs": [
+        "verím, že sa ti včera podarilo nájsť si tých svojich 15 minút.",
+        "Dnes si <strong>nájdeme a precvičíme svaly panvového dna</strong>. Sú to svaly, ktoré držia tvoje vnútorné orgány, kontrolujú močenie a hrajú obrovskú úlohu pri uzdravení po pôrode.",
+        "Prepájanie dýchania a panvového dna ti pomôže v rehabilitácii rýchlejšie než čokoľvek iné. Každý deň pridáme jemnú vrstvu — neunáhli sa, telo vie, čo robí.",
+        "<strong>Nájdi si 15 minút iba pre seba a poďme na to.</strong>"
+      ]
+    },
+    {
+      "week": 1, "day": 3, "topic_short": "Prepojenie",
+      "subject": "Keď sa dych a panva spoja v jeden pohyb",
+      "preheader": "Dnes prepojíme to, čo si sa naučila prvé dva dni. Telo si to bude pamätať.",
+      "body_paragraphs": [
+        "tvoje telo už po prvých dvoch tréningoch začína automaticky zapájať svaly panvového dna pri kýchaní, kašli alebo skoku. To je obrovský pokrok za dva dni.",
+        "Dnes sa zameriame na <strong>prepojenie dýchania a panvového dna</strong> v jeden plynulý pohyb. Tieto dve veci spolu neoddeliteľne súvisia — pracujú ako jeden tím.",
+        "Rozlož si podložku, pusti si príjemnú hudbu, klikni na link nižšie. 15 minút, ktoré stoja za to.",
+        "<strong>Tvoje telo si zaslúži tento čas.</strong>"
+      ]
+    },
+    {
+      "week": 1, "day": 4, "topic_short": "Cviky a sila",
+      "subject": "Predposledný tréning týždňa — pridávame komplexnejšie cviky",
+      "preheader": "Sériu nových cvikov, ktoré prepoja všetko, čo si sa doteraz naučila.",
+      "body_paragraphs": [
+        "dnes nás čaká predposledný tréning tohto týždňa. Máme pred sebou <strong>sériu nových cvikov</strong>, ktoré spoja všetko, čo si sa doteraz naučila.",
+        "Ak občas zacítiš jemný únik moču pri kýchaní, smiechu alebo behu, alebo ťahanie v panve, vedz, že tieto symptómy oslabeného panvového dna sa dajú jemnou rehabilitáciou postupne vyriešiť.",
+        "Práve preto sme tu — aby sme telu vrátili to, čo mu prislúcha. Pomaly, jemne, bez tlaku.",
+        "<strong>Dnes si jednoducho zacvičíš. 15 minút.</strong>"
+      ]
+    },
+    {
+      "week": 1, "day": 5, "topic_short": "Strečing",
+      "subject": "Gratulujem — prvý týždeň máš takmer za sebou 👏",
+      "preheader": "Záver týždňa s príjemným strečingom a meditáciou. Si skvelá.",
+      "body_paragraphs": [
+        "gratulujem ti. Prvý týždeň cvičení máme takmer za sebou. Zvládla si prekonať všetky prekážky — drobček sa zobudil skôr, ako mal, prerušený spánok, povinnosti, ktoré nepočkali.",
+        "A napriek tomu si bola pre seba prioritou aspoň na 15 minút denne. <strong>Môžeš byť na seba pyšná. Robíš perfektnú robotu.</strong>",
+        "Dnes som si pre teba pripravila niečo špeciálne — týždeň ukončíme príjemným strečingom a meditáciou.",
+        "<strong>Tento čas patrí iba tebe.</strong>"
+      ]
+    },
+
+    {
+      "week": 2, "day": 1, "topic_short": "Druhý týždeň",
+      "subject": "Druhý týždeň: priestor pre teba a tvoje telo",
+      "preheader": "Ak ti minulý týždeň niečo prišlo do cesty, je to v poriadku. Začíname znova.",
+      "body_paragraphs": [
+        "teším sa, že môžeme spolu odštartovať druhý týždeň.",
+        "Prvý týždeň si úspešne ukončila a ak ti do cvičenia niečo prišlo do cesty, <strong>je to v poriadku</strong>. Daj tento týždeň priestor sebe a svojmu telu, ktoré ti to zaslúži.",
+        "Tento týždeň budeme stavať na tom, čo si zvládla — pridáme nové cviky pre hlboké brušné svaly, ale s tým istým jemným prístupom.",
+        "<strong>Začni dnes. 15 minút.</strong>"
+      ]
+    },
+    {
+      "week": 2, "day": 2, "topic_short": "Hlboké brušné svaly",
+      "subject": "Nová séria cvikov pre tvoje hlboké brušné svaly",
+      "preheader": "Dnes budeme potrebovať loptu alebo vankúš. Telu aj mysli to dobre padne.",
+      "body_paragraphs": [
+        "dnes máme pred sebou ďalší pekný tréning, ktorý pomôže tvojmu telu aj mysli.",
+        "Pripravila som si pre teba <strong>novú sériu cvikov na posilnenie panvového dna a hlbokých brušných svalov</strong>. Aj na dnešný tréning budeš potrebovať loptu alebo vankúš.",
+        "Hlboké brušné svaly sú ako neviditeľný korzet, ktorý drží tvoju panvu, chrbticu a vnútorné orgány. Posilnené hlboké brušné = menej bolestí chrbta, lepšie držanie tela, silnejší celok.",
+        "<strong>Pripravená? Poďme na to.</strong>"
+      ]
+    },
+    {
+      "week": 2, "day": 3, "topic_short": "Strečing a meditácia",
+      "subject": "Aktívny oddych: strečing + meditácia",
+      "preheader": "Tvoje telo pracuje deň a noc. Dnes mu daj uvoľnenie a ticho.",
+      "body_paragraphs": [
+        "dnes som si pre teba pripravila aktívny oddych v podobe strečingu a meditácie.",
+        "<strong>Tvoje telo pracuje ťažko</strong> — deň aj noc, stará sa nielen o seba, ale aj o ďalšiu dušičku. Je preto dôležité dopriať mu uvoľnenie a poskytnúť priestor na prefiltrovanie všetkého, čo sa za týždeň nahromadilo.",
+        "Strečing povolí napätie v ramenách, šiji a chrbte (mama-bolesti, ktoré poznáš). Meditácia upokojí myseľ aspoň na pár minút.",
+        "<strong>Ľahni si, zatvor oči, daj si tých 15 minút.</strong>"
+      ]
+    },
+    {
+      "week": 2, "day": 4, "topic_short": "Aktivácia",
+      "subject": "Dnes sa špeciálne zameriame na hlboké brušné svaly",
+      "preheader": "Bez tlaku, bez napätia — len jemná aktivácia, ktorú telo potrebuje.",
+      "body_paragraphs": [
+        "verím, že včerajší strečing a meditácia ti padli vhod a tvoje telo aj myseľ sa zrelaxovali.",
+        "Dnes sa budeme <strong>špeciálne zameriavať na hlboké brušné svaly</strong>. Aj keď ich precvičujeme pri všetkých našich cvikoch, dnes na ne upriamim plnú pozornosť.",
+        "Spomenieš si na bránicové dýchanie z prvého týždňa? Práve to budeme používať ako základ — bez neho hlboké brušné svaly nezapojíš správne.",
+        "<strong>Tvoje brušné svaly si zaslúžia tento priestor.</strong>"
+      ]
+    },
+    {
+      "week": 2, "day": 5, "topic_short": "Záver týždňa",
+      "subject": "Skvelá práca — druhý týždeň ukončujeme strečingom",
+      "preheader": "Vieš sa odmeniť tými správnymi vecami. Strečing a meditácia ťa čakajú.",
+      "body_paragraphs": [
+        "tak sme sa prepracovali na koniec druhého týždňa. <strong>Skvelá práca.</strong>",
+        "Dnes nás čaká príjemný strečing a meditácia, ktorá uvoľní tvoje telo aj myseľ a pripraví ťa na víkendový relax.",
+        "Je dôležité <strong>vedieť sa odmeniť tými správnymi vecami</strong> — nie čokoládou pred zrkadlom, ale starostlivosťou o seba. Strečing a meditácia sú odmena, z ktorej telo profituje dlhodobo.",
+        "<strong>Krásny záver týždňa, %FIRSTNAME%.</strong>"
+      ]
+    },
+
+    {
+      "week": 3, "day": 1, "topic_short": "Tretí týždeň",
+      "subject": "Tretí týždeň — gratulujem k tvojmu progresu",
+      "preheader": "Mala si veľa malých-veľkých víťazstiev. Si skvelá.",
+      "body_paragraphs": [
+        "vítam ťa v treťom týždni.",
+        "Gratulujem ti k tvojmu progresu a teším sa z toho, že <strong>si pre seba prioritou</strong>. Mala si veľa malých-veľkých víťazstiev v podobe prekonávania denných prekážok.",
+        "Tento týždeň pridávame <strong>komplexnejšie cviky</strong>, ktoré prepoja viacero svalových skupín naraz. Možno trochu vyzývavejšie, ale stále jemné — tvoje telo už je pripravené.",
+        "<strong>Si skvelá. Poďme na to.</strong>"
+      ]
+    },
+    {
+      "week": 3, "day": 2, "topic_short": "Komplexné cviky",
+      "subject": "Komplexnejšie cviky — viaceré svaly v jednom pohybe",
+      "preheader": "Pri komplexných cvikoch je normálne, že na začiatku cítiš trochu viac. Tvoje telo sa adaptuje.",
+      "body_paragraphs": [
+        "tak máme za sebou úvod do tretieho týždňa.",
+        "Odštartovala si ho <strong>sériou komplexnejších cvikov</strong>, pri ktorých si si precvičila viaceré partie a prepojila niekoľko svalových skupín.",
+        "Pri komplexných cvikoch (hlavne na začiatku) môžeš mať pocit, že je toho viac. To je úplne normálne — telo sa adaptuje a po pár dňoch sa s tými istými cvikmi budeš cítiť ako doma.",
+        "<strong>Dnes pokračujeme. 15 minút.</strong>"
+      ]
+    },
+    {
+      "week": 3, "day": 3, "topic_short": "Strečing",
+      "subject": "Pauza pre telo: dnes strečing a meditácia",
+      "preheader": "Posilňovanie potrebuje aj svoj protipól. Dnes uvoľníme všetko, čo sme nazbierali.",
+      "body_paragraphs": [
+        "dúfam, že sa tak tešíš na svoj dnešný strečing ako ja.",
+        "Počas týždňa venujeme veľa pozornosti <strong>posilňovaniu svalov</strong>, a to si vyžaduje protipól — uvoľnenie a strečing. Bez neho by sa telo časom skrátilo a sťahovalo.",
+        "Dnes mu doprajeme presne to, čo potrebuje — pomalé naťahovanie, hlboké dýchanie a chvíľa pre myseľ.",
+        "<strong>Ľahni si pohodlne a poďme.</strong>"
+      ]
+    },
+    {
+      "week": 3, "day": 4, "topic_short": "Vizualizácia",
+      "subject": "Vizualizácia a 'zipovanie' — nová technika",
+      "preheader": "Dve veci, ktoré zmenia spôsob, akým cítiš svoje brušné svaly.",
+      "body_paragraphs": [
+        "po včerajšom príjemnom strečingu sa vraciame k posilňovaniu.",
+        "Dnes pridávame <strong>vizualizáciu dýchania a 'zipovanie'</strong> — predstavu, ktorá ti pomôže cítiť hlboké brušné svaly inak ako doteraz.",
+        "Zipovanie znamená jemné stiahnutie panvového dna a hlbokých brušných svalov, akoby si zapínala zips od panvy k pupku. Je to technika, ktorú budeš môcť používať pri každodenných aktivitách — pri zdvíhaní dieťatka, pri kojení, pri sedení pri počítači.",
+        "<strong>Vyskús to so mnou. 15 minút.</strong>"
+      ]
+    },
+    {
+      "week": 3, "day": 5, "topic_short": "Strečing — záver",
+      "subject": "Tretí týždeň za tebou — si vytrvalá, %FIRSTNAME% 👏",
+      "preheader": "Nepostavila si seba na vedľajšiu koľaj. Práve naopak. Si pre seba prioritou.",
+      "body_paragraphs": [
+        "dnešným strečingom ukončujeme tvoj tretí týždeň 👏.",
+        "Už teraz si prešla dlhú cestu. Popri tom, ako prežívaš denné radosti a starosti, <strong>si nepostavila seba na vedľajšiu koľaj — práve naopak</strong>.",
+        "Dokázala si si nájsť čas na seba a byť tak silnejšia pre svojich blízkych. To je darček, ktorý si dávaš ty aj oni.",
+        "<strong>Poď, dnes len uvoľníme.</strong>"
+      ]
+    },
+
+    {
+      "week": 4, "day": 1, "topic_short": "Polovica cesty",
+      "subject": "Polovica cesty — 15 spoločných tréningov, 15 víťazstiev",
+      "preheader": "Za posledné tri týždne si bola pre seba prioritou. Si skvelá.",
+      "body_paragraphs": [
+        "vítam ťa v štvrtom týždni.",
+        "Máš za sebou 15 tréningov, 15 našich 'stretnutí' a <strong>15 víťazstiev</strong>. Za posledné tri týždne si dokázala byť pre seba prioritou a odsunúť ostatné veci nabok — povinnosti, aktivity, extra spánok.",
+        "Tento týždeň pridávame posilnenie chrbtových svalov a hlbšiu prácu s panvovým dnom v rôznych polohách. Stále jemne, stále s rešpektom k tvojmu telu.",
+        "<strong>Si skvelá. Poďme do druhej polovice.</strong>"
+      ]
+    },
+    {
+      "week": 4, "day": 2, "topic_short": "Chrbtové svaly",
+      "subject": "Dnes pridávame chrbtové svaly",
+      "preheader": "Posilnený chrbát = menej bolestí, lepšie držanie tela, viac sily pri nosení dieťatka.",
+      "body_paragraphs": [
+        "pokračujeme v dobre rozbehnutom týždni.",
+        "Dnes ťa čaká podobný tréning ako včera. Budeme posilňovať nielen panvové dno a hlboké brušné svaly, ale opäť <strong>aj chrbtové svaly</strong>.",
+        "Mama-chrbát potrebuje silu — nosíš dieťa, dvíhaš ho z postieľky, ohýbaš sa pri prebaľovaní stokrát denne. Posilnené chrbtové svaly znamenajú menej bolesti, lepšie držanie tela a viac výdrže.",
+        "<strong>15 minút, ktoré sa ti vrátia tisícnásobne.</strong>"
+      ]
+    },
+    {
+      "week": 4, "day": 3, "topic_short": "Aktívny strečing",
+      "subject": "Aktívny strečing — prekrví celé telo",
+      "preheader": "Cirkulácia, pohyblivosť kĺbov, voľnosť svalov. Tri darčeky v 15 minútach.",
+      "body_paragraphs": [
+        "dnes ťa čaká <strong>aktívny strečing</strong>, ktorý ti prekrví všetky časti tela, natiahne stuhnuté svaly a šľachy a rozhýbe kĺby.",
+        "Aktívny strečing ti pomôže:<br>• zlepšiť cirkuláciu v tele<br>• zvýšiť pohyblivosť kĺbov<br>• uvoľniť stuhnuté svaly<br>• pripraviť telo na ďalšie cvičenia",
+        "Je to akoby si telu povedala 'ďakujem za prácu' — a telo ti odpovie viac energie a menej bolestí.",
+        "<strong>Poďme sa rozhýbať.</strong>"
+      ]
+    },
+    {
+      "week": 4, "day": 4, "topic_short": "Aktivácia v rôznych polohách",
+      "subject": "Dnes aktivácia panvového dna v rôznych polohách",
+      "preheader": "Naučíš svoje telo zapojiť svaly bez ohľadu na to, či stojíš, sedíš alebo ležíš.",
+      "body_paragraphs": [
+        "veľmi sa teším, že každý deň si nachádzaš svojich 15 minút. Nie je lepšia investícia, ako investícia do zdravia.",
+        "Dnes som si pre teba pripravila tréning, v ktorom <strong>budeme aktivovať svaly panvového dna v rôznych polohách</strong> — postojačky, posediačky, naležato.",
+        "Toto je dôležité — vo svojom dni neležíš stále. Telo potrebuje vedieť zapojiť panvové dno aj keď stojíš pri sporáku, sedíš v aute alebo zdvíhaš dieťa.",
+        "<strong>15 minút inteligentnej rehabilitácie.</strong>"
+      ]
+    },
+    {
+      "week": 4, "day": 5, "topic_short": "Strečing — záver",
+      "subject": "Štvrtý týždeň za tebou — obrovský pokrok 💪",
+      "preheader": "Tvoje telo prešlo vnútornou transformáciou. A hlavne — bola si pre seba prioritou.",
+      "body_paragraphs": [
+        "máš pred sebou posledné cvičenie štvrtého týždňa — príjemný strečing. Poď si ho užiť.",
+        "<strong>Urobila si obrovský pokrok</strong> a tvoje telo prešlo už teraz obrovskou vnútornou transformáciou.",
+        "A hlavne — <strong>bola si pre seba prioritou</strong>. Si skvelá.",
+        "<strong>15 minút, ktoré uvoľnia všetko, čo si tento týždeň nazbierala.</strong>"
+      ]
+    },
+
+    {
+      "week": 5, "day": 1, "topic_short": "Druhá polovica",
+      "subject": "Preklápame sa do druhej polovice cesty",
+      "preheader": "Celý mesiac si dokázala dať priestor sebe. Gratulujem.",
+      "body_paragraphs": [
+        "dnes sa preklápame do druhej polovice cesty za tvojou <strong>Novou Ja</strong>, ktorá je silnejšia, zdravšia a sebavedomejšia. Gratulujem ti.",
+        "Už celý mesiac si dokázala dať priestor sebe, svojmu telu a urobiť tak niečo preto, aby si sa cítila lepšie.",
+        "Tento týždeň pridávame <strong>cvičenie s gumou</strong> — jemnú progresiu, ktorá ti dá novú dimenziu sily. Nemusíš sa báť, je to stále jemné a bezpečné.",
+        "<strong>Druhá polovica začína dnes.</strong>"
+      ]
+    },
+    {
+      "week": 5, "day": 2, "topic_short": "Cvičenie s gumou",
+      "subject": "Nový kamarát: cvičebná guma",
+      "preheader": "Cvičenie, ktoré ťa príjemne naladí, uvoľní napätie a stres.",
+      "body_paragraphs": [
+        "pevne verím, že máš za sebou úspešný štart do nového týždňa.",
+        "A ak aj včerajší deň nebol podľa tvojich predstav, nevadí — <strong>dnes je nový deň a nové cvičenie</strong>, ktoré ťa:<br>• príjemne naladí<br>• uvoľní napätie a stres<br>• pridá silu, kde ju potrebuješ",
+        "Guma je super pomocník — ľahká, malá, ale dokáže pridať odpor presne tam, kde ho potrebuješ. A keď ju zložíš, zmestí sa do kabelky.",
+        "<strong>Pripravená? 15 minút.</strong>"
+      ]
+    },
+    {
+      "week": 5, "day": 3, "topic_short": "Aktívny strečing",
+      "subject": "Pauza od gúm — aktívny strečing",
+      "preheader": "Ponaťahuje celé telo a rozprúdi krv. Telo ti poďakuje.",
+      "body_paragraphs": [
+        "verím, že naše začiatky cvičenia s gumou sa ti páčia.",
+        "Na dnes si dáme pauzu od gúm a budeme sa venovať <strong>aktívnemu strečingu</strong>, ktorý ti nielen ponaťahuje celé telo, ale aj rozprúdi krv.",
+        "Aktívny strečing je niekde medzi cvičením a relaxom — pohybuješ sa, ale jemne. Po ňom sa cítiš osvieženejšia, ako keby si si dala šálku dobrej kávy.",
+        "<strong>Poďme na to.</strong>"
+      ]
+    },
+    {
+      "week": 5, "day": 4, "topic_short": "Postojačky s gumou",
+      "subject": "Dnes cvičenie s gumou — prevažne postojačky",
+      "preheader": "Sila na nohy, panvu a chrbát v stojacích polohách.",
+      "body_paragraphs": [
+        "verím, že včerajší aktívny strečing ti dobre padol a uvoľnil z tela všetku nahromadenú energiu.",
+        "<strong>Dnes ťa čaká cvičenie s gumou, ktoré bude prevažne postojačky</strong>. Hlavné zameranie bude na posilnenie svalov nôh, panvy a chrbta.",
+        "Cvičenie postojačky je veľmi praktické — presne tieto svaly používaš v každodennom živote pri varení, chodzi, hraní s dieťaťom alebo nákupoch.",
+        "<strong>Postav sa, nadýchni sa a poďme.</strong>"
+      ]
+    },
+    {
+      "week": 5, "day": 5, "topic_short": "Strečing — záver",
+      "subject": "Päť týždňov za tebou — vidíš zmenu?",
+      "preheader": "Cítiš sa silnejšia, vyrovnanejšia, prítomnejšia. To nie je náhoda.",
+      "body_paragraphs": [
+        "dnešným strečingom ukončuješ svoj piaty týždeň. Gratulujem ti.",
+        "Za týchto 5 týždňov si sa o sebe naučila veľa. O tom, <strong>aké je dôležité venovať čas sebe</strong> a urobiť tak niečo pre svoje fyzické aj psychické zdravie.",
+        "Už teraz určite vidíš aj cítiš zmenu — možno menej bolestí chrbta, možno silnejší core, možno pokojnejšia myseľ. Tieto zmeny sú výsledkom tvojho rozhodnutia byť pre seba prioritou.",
+        "<strong>Krásny záver týždňa, %FIRSTNAME%.</strong>"
+      ]
+    },
+
+    {
+      "week": 6, "day": 1, "topic_short": "Pomalý štart",
+      "subject": "Nový týždeň — nájdi vnútornú rovnováhu",
+      "preheader": "Či si mala víkend na relax alebo po ňom potrebuješ relax, 15 minút ti pomôže.",
+      "body_paragraphs": [
+        "dnes začínaš nový týždeň, nový deň a s ním je pre teba pripravené aj nové cvičenie.",
+        "Či už si mala víkend, kedy si mohla zrelaxovať, alebo si mala víkend, <strong>po ktorom potrebuješ zrelaxovať</strong>, dnešné 15-minútové cvičenie ti pomôže nájsť vnútornú rovnováhu.",
+        "Šiesty týždeň je o jemnom prepojení tela a mysle. Nepôjdeme do tvrdej fyzickej námahy — pôjdeme do hĺbky.",
+        "<strong>Začni sebou.</strong>"
+      ]
+    },
+    {
+      "week": 6, "day": 2, "topic_short": "Prítomnosť",
+      "subject": "Sprítomni sa — len na 15 minút",
+      "preheader": "V hektickom dni je čas pre seba naozaj vzácny. Tento je tvoj.",
+      "body_paragraphs": [
+        "nech už dnešný tréning odcvičíš ráno, na obed alebo večer, nezabudni, že je to <strong>čas, kedy sa môžeš sprítomniť</strong> a prepojiť opäť so svojou mysľou aj telom.",
+        "Je to čas pre teba, ktorý v tvojom hektickom a nepredvídateľnom dni je naozaj vzácny.",
+        "Tento týždeň prosím doprí svojej hlave aj telu, aby zaregistrovali, že existuješ ty — nielen mama, nielen partnerka, nielen tá, čo všetko vybaví. Existuje aj <strong>ona, %FIRSTNAME%</strong>.",
+        "<strong>15 minút iba pre teba.</strong>"
+      ]
+    },
+    {
+      "week": 6, "day": 3, "topic_short": "Uvoľňujúci strečing",
+      "subject": "Pomalý a uvoľňujúci strečing",
+      "preheader": "Telo a myseľ často vysielajú signály — dnes ich vypočujeme.",
+      "body_paragraphs": [
+        "po svižnom začiatku týždňa máš pred sebou <strong>pomalý a uvoľňujúci strečing</strong>.",
+        "Naše telo a myseľ dokáže absorbovať strašne veľa. Častokrát nám vysielajú malé signály, ktorými nám našepkávajú: <em>'spomaľ, lepšie sa stravuj, dopraj si čas pre seba'</em>.",
+        "Bohužiaľ, často ich ignorujeme alebo prehlušíme. Dnes im venujeme priestor — pomalé pohyby, hlboké dýchanie, ticho.",
+        "<strong>Ľahni si pohodlne.</strong>"
+      ]
+    },
+    {
+      "week": 6, "day": 4, "topic_short": "Hra s dychom",
+      "subject": "Dnes sa budeme 'hrať' s dychom",
+      "preheader": "Aktivácia panvového dna v rôznych polohách — telo dostane nové podnety.",
+      "body_paragraphs": [
+        "po včerajšom príjemnom uvoľnení tela aj duše ťa dnes čaká aktívnejšie cvičenie.",
+        "Budeme sa <strong>'hrať' s dychom</strong> — precvičovať aktiváciu panvového dna a hlbokých brušných svalov v rôznych polohách, čím budeš telo vystavovať novým stimulom.",
+        "Telo sa rado nudí — ak mu dáš tie isté cviky znova a znova, prestane na ne reagovať. Preto sa budeme hrať, meniť polohu, smer, intenzitu. Telo si to bude pamätať.",
+        "<strong>Pripravená na nový stimul? 15 minút.</strong>"
+      ]
+    },
+    {
+      "week": 6, "day": 5, "topic_short": "Dilema mamy",
+      "subject": "Voľná chvíľa: poriadiť, pospaž alebo si zacvičiť?",
+      "preheader": "Veľa z nás zápasí s touto otázkou. Aj ja sama.",
+      "body_paragraphs": [
+        "aj ty máš niekedy dilemu, keď máš náhodou voľných pár minút — či si ísť pospaž, niečo upratať alebo si zacvičiť?",
+        "Z feedbacku od žien vnímam, že <strong>veľa z nás zápasí s touto otázkou</strong>. Ja sama sa ju pýtam.",
+        "Niekedy je odpoveďou spánok, niekedy zacvičiť. Dôležité je vedieť, čo telo a myseľ v tej chvíli najviac potrebujú. A nechať to bez výčitiek.",
+        "<strong>Dnes si vyber. Ak je to cvičenie, čaká ťa.</strong>"
+      ]
+    },
+
+    {
+      "week": 7, "day": 1, "topic_short": "Šesť týždňov",
+      "subject": "Šesť týždňov si pre seba prioritou — to je úžasné",
+      "preheader": "Popri všetkom, čo zvládaš, sa stále dokážeš usmievať a venovať dieťaťu.",
+      "body_paragraphs": [
+        "je úžasné, že sa ti <strong>už šesť týždňov darí venovať čas sebe</strong>, popri tom, ako zvládaš milión iných vecí a povinností.",
+        "A stále sa dokážeš usmievať a venovať sa svojmu drobčekovi. Teším sa z teba, z tvojho progresu a z ďalšieho týždňa, ktorý ideme spolu.",
+        "Tento týždeň je o reflexii a rovnováhe. Pridáme niekoľko nových cvikov, ale hlavne ti pripomeniem, aká dlhá cesta to bola.",
+        "<strong>Si skvelá.</strong>"
+      ]
+    },
+    {
+      "week": 7, "day": 2, "topic_short": "Pripomeň si svoj progres",
+      "subject": "Zastav sa a pripomeň si, akú cestu si prešla",
+      "preheader": "Oceň svoj progres. Neporovnávaj sa s druhými — porovnaj sa so sebou pred 6 týždňami.",
+      "body_paragraphs": [
+        "počas dnešného dňa sa <strong>skús na pár sekúnd zastaviť</strong> a pripomenúť si, akú dlhú cestu si už prešla.",
+        "Či už je to pri tvojom cvičení, pri tvojich drobčekoch alebo s tvojou popôrodnou rehabilitáciou. 🤗",
+        "Oceň svoj progres a upriam sa naň. Neporovnávaj sa s druhými — porovnaj sa so <strong>sebou pred 6 týždňami</strong>. Ten rozdiel je veľký.",
+        "<strong>A teraz, poďme.</strong>"
+      ]
+    },
+    {
+      "week": 7, "day": 3, "topic_short": "Uvoľnenie mysle",
+      "subject": "Strečing pre telo aj pre prepracovanú myseľ",
+      "preheader": "Hlava sa nikdy nezastaví. Dnes ju jemne upokojíme.",
+      "body_paragraphs": [
+        "s dnešným strečingom ťa čaká príjemné uvoľnenie tela aj mysle.",
+        "Počas dňa sme my matky v jednom kole. A keď aj máme chvíľku času, naša <strong>hlava nám už rozmýšľa nad miliónom ďalších vecí</strong>, ktoré je treba spraviť.",
+        "Naše podvedomie je neustále zapnuté. Dnes mu doprajeme krátku pauzu — pomalé pohyby, dychové cvičenia, ticho.",
+        "<strong>Hlava si zaslúži pokoj.</strong>"
+      ]
+    },
+    {
+      "week": 7, "day": 4, "topic_short": "Sila a pozitivita",
+      "subject": "Pripomienka: aj v ťažkých dňoch si stačí ty",
+      "preheader": "Byť pozitívnou matkou každý deň je výzva. Dnes si to nahlas povieme.",
+      "body_paragraphs": [
+        "bežný deň mamičky vie byť veľakrát náročný. Zostať pozitívna a udržať si zdravé návyky môže byť výzva.",
+        "Ako matka potrebuješ byť každý deň silná a schopná urobiť, čo je treba pre svoju rodinu.",
+        "<strong>Nezabúdaj, že aj v tých ťažkých dňoch, kedy máš pocit, že nič nezvládaš — robíš to najlepšie, ako vieš.</strong> A to stačí.",
+        "<strong>Dnes si zacvičíme. 15 minút.</strong>"
+      ]
+    },
+    {
+      "week": 7, "day": 5, "topic_short": "Rovnováha",
+      "subject": "Strečing o rovnováhe — pravej a ľavej strany",
+      "preheader": "Život nám zamotá cestu. Ale rovnováha je dôležitá — vždy.",
+      "body_paragraphs": [
+        "dnešný strečing je o <strong>rovnováhe a vyváženosti tvojej ľavej a pravej strany</strong>.",
+        "Život nám neraz zamotá našu cestu a my vtedy obetujeme niečo z našej self-care rutiny, len aby sme dokázali danú cestu/projekt dokončiť.",
+        "Je však dôležité, aby sme sa vždy vrátili k <strong>rovnováhe</strong>. Telo o ňu prosí — keď je jedna strana silnejšia ako druhá, vznikajú bolesti, vykrivenia a únava.",
+        "<strong>Dnes telu vrátime rovnováhu. 15 minút.</strong>"
+      ]
+    },
+
+    {
+      "week": 8, "day": 1, "topic_short": "Posledný týždeň",
+      "subject": "Posledný týždeň: 5 cvičení a obrovská transformácia za tebou",
+      "preheader": "Cesta za tvojou Neo.Me bola viac, než len rehabilitácia. Pozri sa späť.",
+      "body_paragraphs": [
+        "náš 8-týždňový program sa pomaly blíži ku koncu a ty máš pred sebou <strong>svojich posledných 5 cvičení</strong>.",
+        "Cesta za tvojou Neo.Me bola oveľa viac, ako 'len' bezpečná rehabilitácia panvového dna a hlbokých brušných svalov:<br>• Naučila si sa byť pre seba prioritou<br>• Naučila si svoje telo zapájať správne svaly<br>• Vybudovala si si návyk — 15 minút denne pre seba<br>• Stala si sa silnejšou v tele aj v hlave",
+        "Tento týždeň si oslávime. Jemne, intenzívne, vďačne.",
+        "<strong>Začni so mnou. 15 minút.</strong>"
+      ]
+    },
+    {
+      "week": 8, "day": 2, "topic_short": "Najcennejšie — zdravie a čas",
+      "subject": "Najcennejšie máš v rukách: čas a zdravie",
+      "preheader": "Sedem týždňov si pre seba našla 15 minút. To nie je málo. To je investícia.",
+      "body_paragraphs": [
+        "ako matka dobre vieš, že <strong>čas a zdravie je to najcennejšie</strong> 😊.",
+        "Posledných sedem týždňov sa ti darí pre seba nachádzať aspoň 15 minút denne a skĺbiť to s niečím, z čoho dokážeš mať benefity nielen pre svoje psychické a fyzické zdravie, ale aj pre svoje vzťahy.",
+        "Žena, ktorá sa o seba stará, je lepšia matka, partnerka, kolegyňa. Nie preto, že by sa mala viac obetovať — ale preto, že má z čoho dávať.",
+        "<strong>Dnes ďalších 15 minút pre seba.</strong>"
+      ]
+    },
+    {
+      "week": 8, "day": 3, "topic_short": "Strečing — pauza",
+      "subject": "Strečing — vzácna pauza v hektickom dni",
+      "preheader": "Keď uspávaš dieťatko, 5 minút sa zdá ako večnosť. Tieto budú krásne.",
+      "body_paragraphs": [
+        "dnešný strečing ti určite pri tvojich zaneprázdnených dňoch padne vhod.",
+        "Čas je relevantný a pre nás mamičky úplne 🤯. Keď uspávaš svoje malé, ktoré plačká a ty nie a nie ho uspinkať, vtedy ti 5 minút príde ako celá večnosť.",
+        "<strong>Dnešných 15 minút bude ale prepadnutých v tom najlepšom zmysle slova</strong> — pomalé pohyby, hlboké dýchanie, pocit, že telo si vzdychne 'konečne'.",
+        "<strong>Doprajme telu pauzu.</strong>"
+      ]
+    },
+    {
+      "week": 8, "day": 4, "topic_short": "Tvoj feedback",
+      "subject": "Si spokojná s tým, ako sa cítiš?",
+      "preheader": "Veľmi mi záleží na tom, ako program ukončíš. Daj mi vedieť, ako si na tom.",
+      "body_paragraphs": [
+        "veľmi mi záleží na tom, aby si na konci Postpartum programu <strong>bola spokojná s tým, ako sa cítiš</strong> a s výsledkami, ktoré si dosiahla.",
+        "Ak máš chvíľku, napíš mi pár riadkov — čo ti program dal, čo by si zmenila, čo bolo najťažšie, čo najľahšie. Tvoj feedback mi pomôže program ďalej zlepšovať.",
+        "A samozrejme — ak je tu niečo, čo by si chcela riešiť individuálne, som tu pre teba.",
+        "<strong>Dnes zacvičíme spolu — predposledné cvičenie.</strong>"
+      ]
+    },
+    {
+      "week": 8, "day": 5, "topic_short": "Pilates — záver programu",
+      "subject": "Posledné cvičenie — pilates a vďačnosť 🤗",
+      "preheader": "Telo je zrehabilitované, silnejšie a pripravené pokračovať. Si na konci. A zároveň na začiatku.",
+      "body_paragraphs": [
+        "máš pred sebou svoje predposledné cvičenie. Verím, že sa naň tešíš 🤗",
+        "Dnes som si pre teba pripravila <strong>komplexnejší tréning s prvkami pilatesu</strong>. So záverom nášho programu je tvoje telo zrehabilitované, silnejšie a pripravené pokračovať ďalej — v ďalších programoch alebo v každodennom živote.",
+        "Ďakujem ti za týchto 8 týždňov. Za tvoju dôveru, vytrvalosť a za to, že si si pre seba našla čas. <strong>Si skvelá, %FIRSTNAME%.</strong>",
+        "<strong>Posledných 15 minút programu Postpartum. Užime si ich.</strong>"
+      ]
+    }
+  ]
+}
