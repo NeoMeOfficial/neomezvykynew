@@ -82,7 +82,7 @@ export default function PlusNutritionPrompt() {
                   textTransform: 'uppercase' as const,
                 }}
               >
-                Ušetríš 20 €
+                Jednorazová platba
               </div>
             </div>
 
@@ -145,7 +145,6 @@ export default function PlusNutritionPrompt() {
               }}
             >
               <span>Áno, pridať Jedálniček</span>
-              <span style={{ opacity: 0.7, textDecoration: 'line-through', fontWeight: 400 }}>77 €</span>
               <span style={{ fontWeight: 600 }}>57 €</span>
             </button>
 

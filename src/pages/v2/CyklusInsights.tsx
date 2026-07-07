@@ -38,7 +38,7 @@ export default function CyklusInsights() {
   const navigate = useNavigate();
   const { cycleData, nextPeriodDate } = useCycle();
   const { logs } = useCycleLogs();
-  const { cycleLength, history = [] } = cycleData;
+  const { cycleLength, history = [], lastPeriodStart } = cycleData;
 
   // Most recent 10 daily logs, newest first
   const sortedLogs = Object.entries(logs)
@@ -50,7 +50,7 @@ export default function CyklusInsights() {
   const cycleCount = avgResult?.cycleCount ?? 0;
 
   const sortedHistory = [...history].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    (a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
   );
 
   const nextPeriod = nextPeriodDate;
@@ -64,7 +64,7 @@ export default function CyklusInsights() {
     .map((entry, i, arr) => {
       const next = arr[i + 1];
       if (!next) return null;
-      return daysBetween(next.date, entry.date);
+      return daysBetween(next.startDate, entry.startDate);
     })
     .filter((n): n is number => n !== null && n >= 20 && n <= 45)
     .slice(0, 6);
@@ -219,16 +219,16 @@ export default function CyklusInsights() {
                 <div className="rounded-card bg-white border border-ink/[0.08] overflow-hidden">
                   {sortedHistory.slice(0, 8).map((entry, i, arr) => {
                     const prev = arr[i + 1];
-                    const length = prev ? daysBetween(prev.date, entry.date) : null;
+                    const length = prev ? daysBetween(prev.startDate, entry.startDate) : null;
                     const valid = length !== null && length >= 20 && length <= 45;
                     return (
                       <div
-                        key={entry.date}
+                        key={entry.startDate}
                         className="flex items-center justify-between px-4 py-3"
                         style={{ borderBottom: i < arr.length - 1 ? '1px solid rgba(61,41,33,0.06)' : 'none' }}
                       >
                         <div>
-                          <BodyText size="sm" className="font-medium">{fmtDate(entry.date)}</BodyText>
+                          <BodyText size="sm" className="font-medium">{fmtDate(entry.startDate)}</BodyText>
                           <Eyebrow tone="muted">Začiatok menštruácie</Eyebrow>
                         </div>
                         {valid && (

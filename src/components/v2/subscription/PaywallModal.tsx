@@ -160,7 +160,7 @@ export default function PaywallModal({ isOpen, onClose, feature, title }: Paywal
             className="w-full py-3 rounded-2xl text-white font-bold text-sm shadow-lg transition-transform active:scale-95"
             style={{ background: `linear-gradient(135deg, ${colors.accent}, ${colors.periodka})` }}
           >
-            Vyskúšať zadarmo (7 dní)
+            Odomknúť NeoMe Plus
           </button>
           
           <button

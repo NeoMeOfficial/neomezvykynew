@@ -337,7 +337,10 @@ export default function AppV2() {
               <Route path="/kniznica/blog" element={<Blog />} />
               <Route path="/kniznica/periodka" element={<Periodka />} />
               <Route path="/kniznica/periodka/nastavenia" element={<PeriodkaSettings />} />
-              <Route path="/kniznica/periodka/testing" element={<PeriodkaTestingConsole />} />
+              {/* Dev/QA harness — never ships to production users. */}
+              {import.meta.env.DEV && (
+                <Route path="/kniznica/periodka/testing" element={<PeriodkaTestingConsole />} />
+              )}
               <Route path="/kniznica/dennik" element={<DennikHistory />} />
               <Route path="/kniznica/navyky" element={<NavykyHistory />} />
               <Route path="/kniznica/symptomy" element={<SymptomCalendar />} />

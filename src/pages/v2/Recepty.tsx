@@ -192,7 +192,7 @@ export default function Recepty() {
             NeoMe Plus
           </div>
           <div style={{ fontFamily: NM.SERIF, fontSize: 18, color: '#F5EFE5', lineHeight: 1.25, marginBottom: 6 }}>
-            Odomkni všetkých 263 receptov
+            Odomkni všetkých 225 receptov
           </div>
           <div style={{ fontFamily: NM.SANS, fontSize: 12, color: 'rgba(245,239,229,0.65)', marginBottom: 14 }}>
             Raňajky, hlavné jedlá aj snacky — plná knižnica so živinami.

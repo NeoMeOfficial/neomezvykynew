@@ -167,7 +167,7 @@ export const FAQS: FAQ[] = [
   {
     id: '1',
     question: 'Môžem vyskúšať NeoMe zadarmo?',
-    answer: 'Áno! Ponúkame 7-dňovú bezplatnú skúšku pre mesačné predplatné a 14-dňovú pre ročné. Môžeš kedykoľvek zrušiť bez poplatkov.',
+    answer: 'Áno — základná verzia NeoMe je zadarmo: recepty, sledovanie cyklu aj časť tréningov si vyskúšaš bez platby. Predplatné Plus sa účtuje hneď pri objednaní a môžeš ho kedykoľvek zrušiť bez poplatkov.',
     category: 'pricing',
     order: 1
   },
@@ -263,5 +263,5 @@ export const PRICING_HIGHLIGHTS = [
   'Menej ako 1 káva denne',
   '20% zľava pri ročnom predplatnom',
   'Zrušiteľné kedykoľvek',
-  '30-dňová garancia vrátenia peňazí'
+  'Bez viazanosti a skrytých poplatkov'
 ];

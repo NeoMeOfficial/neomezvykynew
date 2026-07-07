@@ -4,13 +4,26 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { TopBar } from '@/components/v2/top-bar';
 import { Eyebrow } from '@/components/ui/eyebrow';
 import { BodyText } from '@/components/ui/body-text';
+import { useCycleSymptoms } from '@/hooks/useDailyRituals';
 
 interface SymptomEntry {
   date: string;
   symptom: string;
   intensity: number;
-  timestamp: string;
 }
+
+// Mirrors SYMPTOM_DEFS in Periodka.tsx — the canonical symptom store is
+// cycle_symptoms (english keys), chips are labelled in Slovak.
+const KEY_LABELS: Record<string, string> = {
+  energetic: 'Energická',
+  focused: 'Sústredená',
+  creative: 'Kreatívna',
+  social: 'Spoločenská',
+  headache: 'Bolesti hlavy',
+  breast_tenderness: 'Citlivé prsia',
+  bloating: 'Nafúknutá',
+  fatigue: 'Únava',
+};
 
 const WEEKDAYS = ['Po', 'Ut', 'St', 'Št', 'Pi', 'So', 'Ne'];
 
@@ -18,13 +31,21 @@ export default function SymptomCalendar() {
   const navigate = useNavigate();
   const [month, setMonth] = useState(() => new Date());
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  // Canonical source: cycle_symptoms via useCycleSymptoms (this page
+  // previously read a legacy localStorage key nothing writes anymore).
+  const { days, customDefs } = useCycleSymptoms();
 
   const entries = useMemo((): SymptomEntry[] => {
-    try {
-      const raw = localStorage.getItem('neome-symptom-log');
-      return raw ? JSON.parse(raw) : [];
-    } catch { return []; }
-  }, []);
+    const customLabels: Record<string, string> = {};
+    for (const def of customDefs) customLabels[def.k] = def.l;
+    return days.flatMap((d) =>
+      Object.keys(d.symptoms).map((key) => ({
+        date: d.date,
+        symptom: KEY_LABELS[key] ?? customLabels[key] ?? key,
+        intensity: 1,
+      })),
+    );
+  }, [days, customDefs]);
 
   const byDate = useMemo(() => {
     const map: Record<string, SymptomEntry[]> = {};
