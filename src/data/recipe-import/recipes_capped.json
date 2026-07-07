@@ -349,7 +349,7 @@
   {
     "src_num": 10,
     "slot": "ranajky",
-    "name": "Amarantová kaša s ovocím",
+    "name": "Amarantová kaša s ovocím a chia semienkami",
     "prep_minutes": 5,
     "instructions": "Amarantové vločky namočte do jogurtu (alebo mlieka, podľa toho ako uvádza recept) a pomiešajte. Pridajte čučoriedky (alebo najemno nastrúhané/nakrájané jablko, podľa toho ako uvádza recept), tvaroh a posypte rozmixovanými semienkami.",
     "ingredients": [
@@ -1360,7 +1360,7 @@
   {
     "src_num": 32,
     "slot": "ranajky",
-    "name": "Makovo-ovocné ovsené lievance",
+    "name": "Makovo-ovocné ovsené lievance s jablkom",
     "prep_minutes": 10,
     "instructions": "Ovocie nastrúhajte nahrubo. Ostatné ingrediencie si zmiešajte do hustejšieho cesta (okrem jogurtu), pridajte nastrúhané ovocie a opekajte na panvici potretej zľahka tukom/olejom. Ak sa vám bude zdať cesto tuhšie pridajte pár lyžíc mlieka, ak riedke, pridajte múku. Na záver pridajte jogurt. Ak uvádza recept, pridajte med/sirup.\n\nĎalšie ingrediencie: štipka soli (ak na prísady nie ste alergická)",
     "ingredients": [
@@ -1898,7 +1898,7 @@
   {
     "src_num": 43,
     "slot": "ranajky",
-    "name": "Amarantová kaša s ovocím",
+    "name": "Amarantová kaša s ovocím a sezamom",
     "prep_minutes": 5,
     "instructions": "Amarantové vločky namočte do jogurtu alebo mlieka (podľa toho ako uvádza recept) a pomiešajte. Pridajte čučoriedky alebo najemno nastrúhané jablko (podľa toho ako uvádza recept), tvaroh a posypte rozmixovanými semienkami.",
     "ingredients": [
@@ -2709,7 +2709,7 @@
   {
     "src_num": 63,
     "slot": "ranajky",
-    "name": "Makovo-ovocné ovsené lievance",
+    "name": "Makovo-ovocné ovsené lievance s broskyňou",
     "prep_minutes": 15,
     "instructions": "Ovocie nastrúhajte nahrubo. Ostatné ingrediencie si zmiešajte do hustejšieho cesta, pridajte nastrúhané ovocie a opekajte na panvici potretej zľahka tukom/olejom. Ak sa vám bude zdať cesto tuhšie pridajte pár lyžíc mlieka, ak riedke, pridajte múku. Na záver dozdobte čerstvým alebo mrazeným ovocím, posypte makom a pokvapkajte sladidlom alebo medom.\n\nĎalšie ingrediencie: štipka soli (ak na prísady nie ste alergická)",
     "ingredients": [
@@ -3258,7 +3258,7 @@
   {
     "src_num": 5,
     "slot": "hlavne",
-    "name": "Šalát (rukola, paradajka) s mäsom",
+    "name": "Šalát (rukola, paradajka) s kuracím mäsom",
     "prep_minutes": 15,
     "instructions": "Mäso umyte, nakrájajte na malé kúsky, osoľte, okoreňte a jemne osmahnite na panvici do mäkka. Dajte do misky spolu so zeleninou, pokvapkajte balzamikom a kvalitným olejom alebo posypaný ľanovými semienkami, orechami (podľa toho, ako uvádza recept). Pokiaľ je v recepte uvedené, konzumujte spolu s cícerom alebo pečivom.\n\nĎalšie ingrediencie: balzamiko - podľa chuti, zeleninová soľ, bylinky (ak na prísady nie ste alergická)",
     "ingredients": [
@@ -3425,7 +3425,7 @@
   {
     "src_num": 9,
     "slot": "hlavne",
-    "name": "Špenátové špagety so syrom",
+    "name": "Špenátové špagety so syrom a sušenými paradajkami",
     "prep_minutes": 20,
     "instructions": "Cestoviny (ideálne špagety) uvarte podľa návodu. 1 minútu pred dovarením vložte do vody so špagetami špenátové listy a prikryte pokrievkou. Spolu zlejte od prebytočnej vody. Do hotových, ešte teplých špagiet pridajte syr a nakrájané sušené paradajky. Prikvapkajte olej, ak ho máte v recepte uvedený.",
     "ingredients": [
@@ -3463,7 +3463,7 @@
   {
     "src_num": 10,
     "slot": "hlavne",
-    "name": "Cestoviny so zeleninou a tuniakom",
+    "name": "Cestoviny so zeleninou a tuniakom (kukuričné)",
     "prep_minutes": 20,
     "instructions": "Uvarte cestoviny podľa návodu na obale. Zeleninu pokrájajte na kocky, zjemnite jogurtom, pridajte semienka, dosoľte. Primiešajte tuniaka zbaveného šťavy a zmiešajte s uvarenými cestovinami.\n\nĎalšie ingrediencie: štipka soli (ak na prísady nie ste alergická)",
     "ingredients": [
@@ -3630,7 +3630,7 @@
   {
     "src_num": 15,
     "slot": "hlavne",
-    "name": "Cestoviny s fazuľou a kešu",
+    "name": "Cestoviny s bielou fazuľou a kešu",
     "prep_minutes": 30,
     "instructions": "V slanej vode uvarte cestoviny. Kešu orechy jemne podrvte a opražte na panvici alebo v hrnci. Pridajte fazuľu aj s omáčkou. Pár minút povarte, okoreňte podľa chuti a zmes zmiešajte s cestovinami. Pokiaľ recept uvádza, na záver pokvapkajte olivovým olejom a primiešajte syr.\n\nĎalšie ingrediencie: chilli, mletá sladká a štipľavá paprika, čierne korenie, oregano, bazalka (ak na prísady nie ste alergická)",
     "ingredients": [
@@ -3845,7 +3845,7 @@
   {
     "src_num": 20,
     "slot": "hlavne",
-    "name": "Šalát (rukola, paradajka) s mäsom",
+    "name": "Šalát (rukola, paradajka) s morčacím mäsom",
     "prep_minutes": 15,
     "instructions": "Mäso umyte, nakrájajte na malé kúsky, osoľte, okoreňte a jemne osmaže na panvici do mäkka. Dajte do misky spolu so zeleninou, pokvapkajte balzamikom a kvalitným olejom alebo posypte ľanovými semienkami, orechami (podľa toho, ako uvádza recept). Pokiaľ recept uvádza, konzumujte spolu s cícerom alebo pečivom.\n\nĎalšie ingrediencie: balzamiko - podľa chuti, zeleninová soľ, bylinky (ak na prísady nie ste alergická)",
     "ingredients": [
@@ -4012,7 +4012,7 @@
   {
     "src_num": 24,
     "slot": "hlavne",
-    "name": "Jogurtový šalát s mäsom",
+    "name": "Jogurtový šalát s mäsom a uhorkami",
     "prep_minutes": 15,
     "instructions": "Mäso nakrájajte na rezance, posypte grilovacím korením a opečte na oleji. Osoľte až na konci, aby mäso zostalo šťavnaté. Hotové mäso zmiešajte s nakrájanou zeleninou zaliatou jogurtom. Ak je v recepte uvedený cícer, pridajte ho k šalátu Ak sú vám uhorky na večeru \"ťažké\", vynechajte ich z receptu a pridajte viac inej zeleniny, ideálne listovej.\n\nĎalšie ingrediencie: grilovacie korenie, bylinky, balzamiko - podľa chuti (ak na prísady nie ste alergická)",
     "ingredients": [
@@ -4515,7 +4515,7 @@
   {
     "src_num": 36,
     "slot": "hlavne",
-    "name": "Kelový prívarok",
+    "name": "Kelový prívarok s chlebom",
     "prep_minutes": 50,
     "instructions": "Kel pokrájajte, zalejte primerane vodou, dochuťte soľou a rascou a nechajte variť. Zemiaky v šupke (ak sú v recepte uvedené) nakrájajte na kocky a pridajte ku kelu. Pred dovarením ku kelu pridajte soľ, podľa chuti mletú sladkú červenú papriku a múku (alebo škrob/hrašku, pokiaľ tak uvádza recept). Nechajte povariť, kým prívarok nezhustne. Medzitým si očistite a nakrájajte mäso. Na oleji (alebo masti, pokiaľ tak uvádza recept) opražte cesnak a pridajte kúsky mäsa. Dochuťte soľou, mletým čiernym korením, prípadne bylinkami. Potom podlejte mäso vodou a nechajte dusiť (môžete použiť aj vodu z prívarku, ak sa vám zdá redší). Takto pripravené mäso servirujte spolu s prívarkom a chlebom (ak uvádza recept).\n\nĎalšie ingrediencie: soľ, korenie, bylinky, mletá červená paprika sladká (ak na prísady nie ste alergická)",
     "ingredients": [
@@ -5451,7 +5451,7 @@
   {
     "src_num": 55,
     "slot": "hlavne",
-    "name": "Špenátové špagety so syrom",
+    "name": "Špenátové špagety so syrom a cherry paradajkami",
     "prep_minutes": 20,
     "instructions": "Cestoviny (ideálne špagety) uvarte podľa návodu. 1 minútu pred dovarením vložte do vody so špagetami špenátové listy a prikryte pokrievkou. Spolu zlejte od prebytočnej vody. Do hotových, ešte teplých špagiet pridajte syr a nakrájané paradajky. Prikvapkajte olej, ak ho máte v recepte uvedený.",
     "ingredients": [
@@ -6102,7 +6102,7 @@
   {
     "src_num": 68,
     "slot": "hlavne",
-    "name": "Cestoviny so zeleninou a tuniakom",
+    "name": "Cestoviny so zeleninou a tuniakom (šošovicové)",
     "prep_minutes": 20,
     "instructions": "Uvarte cestoviny. Zeleninu pokrájajte na kocky, zjemnite jogurtom, pridajte semienka, dosoľte. Primiešajte tuniaka a zmiešajte s uvarenými cestovinami.\n\nĎalšie ingrediencie: štipka soli (ak na prísady nie ste alergická)",
     "ingredients": [
@@ -6995,7 +6995,7 @@
   {
     "src_num": 84,
     "slot": "hlavne",
-    "name": "Špenátové lievance s kuracím mäsom",
+    "name": "Špenátové lievance s kuracím mäsom a rajčinami",
     "prep_minutes": 20,
     "instructions": "Kuracie prsia nakrájajte na kúsky a ugrilujte na panvici. Keď sú hotové, prikryte ich, aby nevychladli. Všetky suroviny na špenátové lievance (špenát, vločky, vajcia, jogurt) spolu zmixujte v mixéri čo najviac dohladka. Následne cesto dávkujte na rozohriatu panvicu do tvaru lievancov a každý lievanec opekajte zhruba 1 minútu z každej strany. Keď sú lievance hotové, naservírujte všetky suroviny na tanier buď navrstvením na seba alebo podľa vašej fantázie.",
     "ingredients": [
@@ -7159,7 +7159,7 @@
   {
     "src_num": 87,
     "slot": "hlavne",
-    "name": "Cestoviny s fazuľou a kešu",
+    "name": "Cestoviny s červenou fazuľou, tofu a kešu",
     "prep_minutes": 30,
     "instructions": "V slanej vode uvarte cestoviny. Kešu orechy jemne podrvte a opražte na panvici alebo v hrnci. Pridajte paradajkový pretlak, fazuľu a kukuricu (pokiaľ ju máte v recepte uvedenú). Pár minút povarte, okoreňte podľa chuti a pridajte chia semienka. Zmes zmiešajte s cestovinami. Pokiaľ recept uvádza, na záver pokvapkajte olivovým olejom a primiešajte syr.\n\nĎalšie ingrediencie: chilli, mletá sladká a štipľavá paprika, čierne korenie, oregano, bazalka (ak na prísady nie ste alergická)",
     "ingredients": [
@@ -7883,7 +7883,7 @@
   {
     "src_num": 100,
     "slot": "hlavne",
-    "name": "Losos so šampiňónovou omáčkou a prílohou",
+    "name": "Losos so šampiňónovou omáčkou (so sójovou smotanou)",
     "prep_minutes": 25,
     "instructions": "Lososa umyte, osušte, osoľte. Opečte na oleji z oboch strán asi 5 minút a dajte na tanier. Poduste nadrobno nakrájanú cibuľu a na plátky nakrájané očistené, umyté šampiňóny. Pokvapkajte citrónovou šťavou. Potom zalejte smotanou a krátko povarte. Omáčkou polejte lososa. Konzumujte s prílohou.\n\nĎalšie ingrediencie: citrónová šťava, štipka soli (ak na prísady nie ste alergická)",
     "ingredients": [
@@ -8830,7 +8830,7 @@
   {
     "src_num": 121,
     "slot": "hlavne",
-    "name": "Jogurtový šalát s mäsom",
+    "name": "Jogurtový šalát s mäsom a rajčinami",
     "prep_minutes": 15,
     "instructions": "Mäso nakrájajte na rezance, posypte grilovacím korením a opečte na oleji. Osoľte až na konci, aby mäso zostalo šťavnaté. Hotové mäso zmiešajte s nakrájanou zeleninou zaliatou jogurtom. Ak je to v recepte uvedené, pridajte aj cícer. Ak sú Vám uhorky na večeru \"ťažké\", vynechajte ich z receptu a pridajte viac inej zeleniny, ideálne listovej.\n\nĎalšie ingrediencie: grilovacie korenie, bylinky, balzamiko - podľa chuti (ak na prísady nie ste alergická)",
     "ingredients": [
@@ -9217,7 +9217,7 @@
     "src_num": 7,
     "slot": "snack",
     "name": "Čokoláda",
-    "prep_minutes": null,
+    "prep_minutes": 1,
     "instructions": "Kvalitná horká čokoláda. Konzumujte maximálne 3-krát v priebehu 7 dní.",
     "ingredients": [
       {
