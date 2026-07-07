@@ -86,17 +86,6 @@ export default function PlusProgramSelect() {
     if (!selected) return;
     localStorage.setItem(PROGRAM_KEY, selected);
     localStorage.setItem(START_DATE_KEY, startDate);
-    // Fire-and-forget AC tag — never block the user on a 3rd-party call.
-    // If unauthenticated (design QA), the function 401s and we ignore it.
-    supabase.auth.getSession().then(({ data }) => {
-      const token = data.session?.access_token;
-      if (!token) return;
-      fetch('/api/ac-program-enrolled', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ programSlug: selected, startDate }),
-      }).catch(() => {});
-    });
     navigate('/onboarding-plus/cyklus');
   };
 

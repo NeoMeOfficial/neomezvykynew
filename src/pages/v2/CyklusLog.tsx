@@ -19,11 +19,6 @@ import { CONSENT_TYPES } from '../../lib/consents';
  * Wired:
  * - Header date + phase from useCycleData.derivedState
  *
- * FEATURE-NEEDED-PERIODKA-SYMPTOMS / -CYKLUS-LOG-PERSIST: full-row
- * persistence (flow / symptoms / mood / energy / sleep / mucus /
- * note / custom fields) into a `cycle_logs` table keyed by date.
- * Currently selections are local state only — Uložiť navigates back
- * but doesn't persist. Listed in FEATURES_TO_BUILD as part of F-004.
  *
  * Behavior rule (BC-2): once persisted, the log feeds into a cross-
  * pillar nudge router (Telo / Strava / Myseľ recommendations).

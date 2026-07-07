@@ -91,7 +91,6 @@ const SymptomCalendar = lazy(() => import('./pages/v2/SymptomCalendar'));
 const Oblubene = lazy(() => import('./pages/v2/Oblubene'));
 const WorkoutHistory = lazy(() => import('./pages/v2/WorkoutHistory'));
 const WorkoutDemo = lazy(() => import('./pages/v2/WorkoutDemo'));
-const BuddySystem = lazy(() => import('./pages/v2/BuddySystem'));
 const Blog = lazy(() => import('./pages/v2/Blog'));
 const PrivacyPolicy = lazy(() => import('./pages/v2/PrivacyPolicy'));
 const TermsOfUse = lazy(() => import('./pages/v2/TermsOfUse'));
@@ -355,7 +354,6 @@ export default function AppV2() {
               <Route path="/oblubene" element={<Oblubene />} />
               <Route path="/workout-history" element={<WorkoutHistory />} />
               <Route path="/workout-demo" element={<WorkoutDemo />} />
-              <Route path="/buddy-system" element={<BuddySystem />} />
               <Route path="/profil" element={<Profil />} />
               <Route path="/profil/predplatne" element={<SubscriptionManagement />} />
               <Route path="/referral" element={<ReferralPage />} />

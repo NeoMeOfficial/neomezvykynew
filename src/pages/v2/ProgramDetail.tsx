@@ -185,16 +185,6 @@ export default function ProgramDetail() {
       });
       return;
     }
-    // Fire-and-forget AC tag removal — never block the user.
-    supabase.auth.getSession().then(({ data }) => {
-      const token = data.session?.access_token;
-      if (!token) return;
-      fetch('/api/ac-program-ended', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ programSlug: program.slug, reason: endReason }),
-      }).catch(() => {});
-    });
     const labels = { canceled: 'Program zrušený', paused: 'Program pozastavený', completed: 'Program dokončený' };
     toast({ title: labels[endReason], description: 'Vrátili sme ti odporúčané cvičenia na Domov.' });
     setEnding(false);

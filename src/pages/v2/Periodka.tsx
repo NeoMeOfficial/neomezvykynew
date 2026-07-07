@@ -26,12 +26,6 @@ import { CONSENT_TYPES } from '../../lib/consents';
  * interactions ("Náhľad bez ukladania"). Visuals only here; the
  * persistence guard is a separate behavior PR.
  *
- * FEATURE-NEEDED-PERIODKA-SYMPTOMS: symptom log persistence (today's
- * tap state currently does nothing — needs cycle.symptoms table or
- * useCycleData extension).
- * FEATURE-NEEDED-PERIODKA-ADVICE: phase-based "ako sa môžeš cítiť
- * lepšie" rotation (currently 3 static curated rows for folikulárna).
- *
  * Old version: Periodka.old.tsx.
  */
 
