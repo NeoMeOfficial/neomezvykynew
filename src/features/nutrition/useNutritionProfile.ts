@@ -1,7 +1,9 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import type { NutritionProfile } from './types';
+import { syncToSupabase, loadFromSupabase } from '../supabaseSync';
 
 const STORAGE_KEY = 'neome-nutrition-profile';
+const SUPABASE_KEY = 'nutrition_profile';
 
 const ACTIVITY_MULTIPLIERS: Record<NutritionProfile['activityLevel'], number> = {
   sedentary: 1.2,
@@ -112,6 +114,25 @@ function loadProfile(): NutritionProfile | null {
 export function useNutritionProfile() {
   const [profile, setProfile] = useState<NutritionProfile | null>(loadProfile);
 
+  // Hydrate from Supabase: the profile drives the paid €57 meal plan, so
+  // it must survive a reinstall / device switch. Remote fills the gap only
+  // when nothing exists locally — a fresh local edit always wins.
+  useEffect(() => {
+    if (profile !== null) return;
+    loadFromSupabase<NutritionProfile>(SUPABASE_KEY)
+      .then((remote) => {
+        if (!remote) return;
+        setProfile((current) => {
+          if (current) return current;
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(remote));
+          return remote;
+        });
+      })
+      .catch((err) => console.warn('Failed to hydrate nutrition profile:', err));
+    // Run once on mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const saveProfile = useCallback((p: NutritionProfile) => {
     const targets = calculateDailyTargets(
       p.weight,
@@ -125,11 +146,13 @@ export function useNutritionProfile() {
     const full: NutritionProfile = { ...p, ...targets };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(full));
     setProfile(full);
+    syncToSupabase(SUPABASE_KEY, full);
   }, []);
 
   const clearProfile = useCallback(() => {
     localStorage.removeItem(STORAGE_KEY);
     setProfile(null);
+    syncToSupabase(SUPABASE_KEY, null);
   }, []);
 
   return { profile, saveProfile, clearProfile };

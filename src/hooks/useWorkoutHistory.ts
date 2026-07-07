@@ -1,7 +1,27 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuthContext } from '../contexts/AuthContext';
 import { useAchievements } from './useAchievements';
+import { syncToSupabase, loadFromSupabase } from '../features/supabaseSync';
 import { WorkoutSession, WorkoutStreak, WorkoutStats, WorkoutCalendarDay } from '../types/workouts';
+
+const SUPABASE_KEY = 'workout_history';
+
+type WorkoutBlob = { history: WorkoutSession[]; streak: WorkoutStreak };
+
+/** Union by session id, newest first — device-switch safe. */
+function mergeHistories(a: WorkoutSession[], b: WorkoutSession[]): WorkoutSession[] {
+  const byId = new Map<string, WorkoutSession>();
+  for (const s of [...a, ...b]) byId.set(s.id, s);
+  return [...byId.values()].sort(
+    (x, y) => new Date(y.completedAt).getTime() - new Date(x.completedAt).getTime(),
+  );
+}
+
+function newerStreak(a: WorkoutStreak, b: WorkoutStreak): WorkoutStreak {
+  if (!a.lastWorkoutDate) return b;
+  if (!b.lastWorkoutDate) return a;
+  return a.lastWorkoutDate >= b.lastWorkoutDate ? a : b;
+}
 
 export function useWorkoutHistory() {
   const { user } = useAuthContext();
@@ -44,6 +64,24 @@ export function useWorkoutHistory() {
         console.error('Failed to parse workout streak', e);
       }
     }
+
+    // Hydrate from Supabase and merge — paying users must not lose their
+    // history and streaks when switching phones (localStorage is per-device).
+    loadFromSupabase<WorkoutBlob>(SUPABASE_KEY)
+      .then((remote) => {
+        if (!remote?.history?.length) return;
+        setWorkoutHistory((local) => {
+          const merged = mergeHistories(local, remote.history);
+          localStorage.setItem(historyKey, JSON.stringify(merged));
+          return merged;
+        });
+        setStreak((local) => {
+          const merged = newerStreak(local, remote.streak ?? { current: 0, longest: 0, lastWorkoutDate: null });
+          localStorage.setItem(streakKey, JSON.stringify(merged));
+          return merged;
+        });
+      })
+      .catch((err) => console.warn('Failed to hydrate workout history:', err));
   }, [user?.id]);
 
   // Save data to localStorage
@@ -55,6 +93,7 @@ export function useWorkoutHistory() {
 
     localStorage.setItem(historyKey, JSON.stringify(history));
     localStorage.setItem(streakKey, JSON.stringify(streakData));
+    syncToSupabase(SUPABASE_KEY, { history, streak: streakData } satisfies WorkoutBlob);
   }, [user?.id]);
 
   // Complete a workout
