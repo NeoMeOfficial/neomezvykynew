@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { initSentry } from '@/lib/sentry';
 
 /**
  * Cookie / storage consent banner.
@@ -53,6 +54,9 @@ export default function CookieBanner() {
   const accept = () => {
     setStoredConsent('accepted');
     setVisible(false);
+    // Start optional tooling immediately — main.tsx only initialises
+    // Sentry when consent was already stored at boot.
+    initSentry();
   };
   const decline = () => {
     setStoredConsent('declined');

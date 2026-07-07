@@ -8,7 +8,12 @@ import { clientsClaim } from 'workbox-core';
  * Responsibilities:
  *   1. Precache the app shell (Workbox; manifest injected at build)
  *   2. Handle Web Push events — show notification, route click
- *   3. Skip waiting + claim clients so updates propagate fast
+ *   3. Update via the PROMPT pattern: the new SW waits until the user
+ *      taps "Obnoviť" in the update banner (AppLayout), which posts
+ *      SKIP_WAITING and reloads. An unconditional skipWaiting() here
+ *      used to hijack live sessions mid-deploy — the fresh precache
+ *      replaced hashed chunks the running page still needed, so lazy
+ *      routes 404'd into the error boundary.
  *
  * Push event payload contract (sent by netlify/functions/send-push-notifications.ts):
  *   {
@@ -23,7 +28,15 @@ import { clientsClaim } from 'workbox-core';
 declare const self: ServiceWorkerGlobalScope;
 
 clientsClaim();
-self.skipWaiting();
+
+// Prompt-pattern update: stay in "waiting" until the page tells us to go.
+// vite-plugin-pwa's updateServiceWorker(true) posts this message when the
+// user accepts the update banner.
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
 
 cleanupOutdatedCaches();
 // Workbox injects the precache manifest here at build time.

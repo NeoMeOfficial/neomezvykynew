@@ -33,7 +33,9 @@ export default defineConfig(({ mode }) => ({
     mode === 'development' &&
     componentTagger(),
     VitePWA({
-      registerType: 'autoUpdate',
+      // 'prompt': new SW waits for the user's "Obnoviť" tap instead of
+      // seizing live sessions mid-deploy (stale-chunk 404s).
+      registerType: 'prompt',
       // useRegisterSW (in src/layouts/v2/AppLayout.tsx) handles
       // registration via the React hook — don't also inject a
       // separate <script> registration, or registerSW runs twice.
