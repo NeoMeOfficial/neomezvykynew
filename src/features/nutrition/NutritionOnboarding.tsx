@@ -81,7 +81,7 @@ const T = {
 type Goal = 'lose' | 'maintain' | 'gain';
 type RegularDay = 'sedentary_work' | 'on_feet' | 'with_kids';
 type StepsRange = '<5000' | '5000-10000' | '>10000';
-type DietType = 'standard' | 'semi-vegetarian' | 'vegetarian';
+type DietType = 'standard' | 'semi-vegetarian' | 'vegetarian' | 'vegan';
 type FavMeal = 'ranajky' | 'obed' | 'vecera' | 'snack';
 type Allergy =
   | 'gluten' | 'dairy' | 'eggs' | 'fish' | 'nuts'
@@ -655,7 +655,11 @@ export default function NutritionOnboarding({
       case 6: return sports.length === 0 || sportsFrequency !== null;
       case 7: return selectedMeals.length >= 1;
       case 8: return true;
-      case 9: return true;
+      // Vegan is a visible but honest dead-end: the recipe library has too
+      // few purely plant-based meals for a quality plan (4 mains as of the
+      // 1. séria import), so we point vegans to a nutritionist instead of
+      // selling them a plan we can't deliver.
+      case 9: return dietType !== 'vegan';
       case 10:
         if (lifePhase === null) return false;
         if (lifePhase === 'postpartum') return isBreastfeeding !== null;
@@ -1352,6 +1356,7 @@ function Step9Diet({ value, setValue }: { value: DietType; setValue: (v: DietTyp
     { key: 'standard' as const, icon: ICONS.Chicken, title: 'Univerzálny', sub: 'Všetky potraviny vrátane mäsa a rýb.' },
     { key: 'semi-vegetarian' as const, icon: ICONS.Fish, title: 'Semi-vegetariánsky', sub: 'Prevažne rastlinná strava a ryby. Chudé mäso cca 3× týždenne.' },
     { key: 'vegetarian' as const, icon: ICONS.Egg, title: 'Vegetariánsky', sub: 'Bez mäsa a rýb, vajcia a mliečne produkty sú OK.' },
+    { key: 'vegan' as const, icon: ICONS.Apple, title: 'Vegánsky', sub: 'Čisto rastlinná strava — bez mäsa, vajec a mliečnych produktov.' },
   ];
   return (
     <>
@@ -1369,6 +1374,27 @@ function Step9Diet({ value, setValue }: { value: DietType; setValue: (v: DietTyp
           />
         ))}
       </div>
+
+      {value === 'vegan' && (
+        <div
+          style={{
+            marginTop: 16,
+            padding: '14px 16px',
+            background: T.GOLD_SOFT,
+            border: `1px solid ${T.GOLD}30`,
+            borderRadius: 14,
+            fontFamily: T.SANS,
+            fontSize: 12,
+            color: T.GOLD,
+            lineHeight: 1.55,
+          }}
+        >
+          Naša knižnica receptov zatiaľ neobsahuje dosť čisto rastlinných jedál na to,
+          aby sme ti vedeli zostaviť kvalitný vegánsky jedálniček — a nechceme ti predať
+          niečo polovičaté. Odporúčame ti konzultáciu s výživovým poradcom. Ak ti
+          vyhovujú vajcia a mliečne produkty, vyber si vegetariánsky typ.
+        </div>
+      )}
     </>
   );
 }
