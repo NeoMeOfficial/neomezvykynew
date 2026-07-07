@@ -1,5 +1,6 @@
 import Stripe from 'stripe';
 import { stripeEnv } from './_stripeEnv';
+import { requireUser, serviceClient } from './_userAuth';
 
 const stripe = new Stripe(stripeEnv('STRIPE_SECRET_KEY')!, {
   apiVersion: '2023-10-16',
@@ -8,7 +9,7 @@ const stripe = new Stripe(stripeEnv('STRIPE_SECRET_KEY')!, {
 export async function handler(event: any) {
   const headers = {
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
   };
 
@@ -20,15 +21,27 @@ export async function handler(event: any) {
     return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method not allowed' }) };
   }
 
-  try {
-    const { subscriptionId } = JSON.parse(event.body);
+  // Identify the caller from their JWT — the subscription to cancel is
+  // looked up server-side. A client-supplied subscriptionId would let
+  // anyone cancel other customers' subscriptions.
+  const auth = await requireUser(event.headers?.authorization ?? event.headers?.Authorization);
+  if (!auth.ok) {
+    return { statusCode: auth.status, headers, body: JSON.stringify({ error: auth.error }) };
+  }
 
-    if (!subscriptionId) {
-      return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing subscriptionId' }) };
+  try {
+    const { data: sub } = await serviceClient()
+      .from('subscriptions')
+      .select('stripe_subscription_id')
+      .eq('user_id', auth.userId)
+      .maybeSingle();
+
+    if (!sub?.stripe_subscription_id) {
+      return { statusCode: 404, headers, body: JSON.stringify({ error: 'No active subscription found' }) };
     }
 
     // Cancel at period end (not immediately)
-    const subscription = await stripe.subscriptions.update(subscriptionId, {
+    const subscription = await stripe.subscriptions.update(sub.stripe_subscription_id, {
       cancel_at_period_end: true,
     });
 

@@ -1,45 +1,81 @@
 import Stripe from 'stripe';
 import { stripeEnv } from './_stripeEnv';
+import { requireUser, trustedOrigin, safePath } from './_userAuth';
 
 const stripe = new Stripe(stripeEnv('STRIPE_SECRET_KEY')!, {
   apiVersion: '2023-10-16',
 });
 
-export async function handler(event: any, context: any) {
+/**
+ * Server-side allowlist of purchasable prices. Mirrors the client's
+ * SUBSCRIPTION_PLANS (src/lib/stripe.ts) — env vars first, same hardcoded
+ * fallbacks — so both sides stay in sync when live env vars are set.
+ * Without this, any recurring price in the Stripe account could be
+ * checked out and would flip `subscriptions.active` via the webhook.
+ */
+function allowedPriceIds(): Set<string> {
+  return new Set(
+    [
+      process.env.VITE_STRIPE_SUBSCRIPTION_PRICE_ID || 'price_1TM4KREpPqBqxo4m0Swf5F88',
+      process.env.VITE_STRIPE_SUBSCRIPTION_QUARTERLY_PRICE_ID || 'price_1TY3sXEpPqBqxo4mJ6EhEPM3',
+      process.env.VITE_STRIPE_SUBSCRIPTION_YEARLY_PRICE_ID || 'price_1TY3d6EpPqBqxo4mtqFHOXOz',
+      process.env.VITE_STRIPE_MEAL_PRICE_ID || 'price_1TW8SeEpPqBqxo4mOwzTetog',
+    ].filter(Boolean),
+  );
+}
+
+export async function handler(event: any) {
   const headers = {
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
   };
 
   if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers,
-      body: '',
-    };
+    return { statusCode: 200, headers, body: '' };
   }
 
   if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      headers,
-      body: JSON.stringify({ error: 'Method not allowed' }),
-    };
+    return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method not allowed' }) };
+  }
+
+  // Identity comes from the caller's JWT — never from the request body.
+  // A client-supplied userId would let an attacker bind a paid session
+  // to an arbitrary account (the webhook grants whatever userId is in
+  // session metadata); a client-supplied email attaches the session to
+  // someone else's Stripe customer.
+  const auth = await requireUser(event.headers?.authorization ?? event.headers?.Authorization);
+  if (!auth.ok) {
+    return { statusCode: auth.status, headers, body: JSON.stringify({ error: auth.error }) };
   }
 
   try {
-    const { priceId, userId, email, mode, successUrl, cancelUrl } = JSON.parse(event.body);
+    const { priceId, mode, successPath, cancelPath } = JSON.parse(event.body || '{}');
 
-    if (!priceId || !userId || !email) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ error: 'Missing required parameters' }),
-      };
+    if (!priceId) {
+      return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing priceId' }) };
+    }
+    if (!allowedPriceIds().has(priceId)) {
+      return { statusCode: 400, headers, body: JSON.stringify({ error: 'Unknown priceId' }) };
+    }
+    if (!auth.email) {
+      return { statusCode: 400, headers, body: JSON.stringify({ error: 'Account has no email' }) };
     }
 
     const checkoutMode: 'subscription' | 'payment' = mode === 'payment' ? 'payment' : 'subscription';
+    const userId = auth.userId;
+    const email = auth.email;
+
+    // Redirect URLs are built server-side from the trusted origin; the
+    // client may only steer the PATH. Absolute client URLs would be an
+    // open redirect through the Stripe-branded checkout page.
+    const origin = trustedOrigin(event.headers?.origin ?? event.headers?.Origin);
+    const type = checkoutMode === 'payment' ? 'meal' : 'subscription';
+    const successUrl = origin + safePath(
+      successPath,
+      `/checkout/success?type=${type}&session_id={CHECKOUT_SESSION_ID}`,
+    );
+    const cancelUrl = origin + safePath(cancelPath, `/checkout/canceled?type=${type}`);
 
     // Create or retrieve customer
     let customer;

@@ -130,30 +130,40 @@ export interface SubscriptionData {
   customer_id: string;
 }
 
+import { supabase } from './supabase';
+
+async function authHeader(): Promise<Record<string, string>> {
+  const { data: { session } } = await supabase.auth.getSession();
+  return session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {};
+}
+
 // Create checkout session. `mode` defaults to 'subscription' for the
 // recurring NeoMe Plus plan; pass 'payment' for one-time purchases like
 // the €57 meal plan add-on (the Netlify function omits trial + subscription
 // metadata in payment mode and the webhook treats it as a one-shot flag flip).
 export async function createCheckoutSession(
   priceId: string,
-  userId: string,
-  email: string,
+  _userId: string,   // identity now derived server-side from the JWT
+  _email: string,    // kept in the signature for call-site compatibility
   mode: 'subscription' | 'payment' = 'subscription',
   options?: { successUrl?: string; cancelUrl?: string },
 ) {
   try {
+    // Server accepts PATHS only (open-redirect hardening) — strip any
+    // origin the caller passed in.
+    const toPath = (u?: string) =>
+      u ? u.replace(window.location.origin, '') : undefined;
     const response = await fetch('/.netlify/functions/create-checkout-session', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        ...(await authHeader()),
       },
       body: JSON.stringify({
         priceId,
-        userId,
-        email,
         mode,
-        successUrl: options?.successUrl ?? `${window.location.origin}/checkout/success?type=subscription&session_id={CHECKOUT_SESSION_ID}`,
-        cancelUrl: options?.cancelUrl ?? `${window.location.origin}/checkout/canceled?type=subscription`,
+        successPath: toPath(options?.successUrl),
+        cancelPath: toPath(options?.cancelUrl),
       }),
     });
 
@@ -169,17 +179,18 @@ export async function createCheckoutSession(
   }
 }
 
-// Create customer portal session
-export async function createPortalSession(customerId: string) {
+// Create customer portal session — the customer is resolved server-side
+// from the caller's JWT (customerId param kept for call-site compat).
+export async function createPortalSession(_customerId: string) {
   try {
     const response = await fetch('/.netlify/functions/create-portal-session', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        ...(await authHeader()),
       },
       body: JSON.stringify({
-        customerId,
-        returnUrl: `${window.location.origin}/profil/predplatne`
+        returnPath: '/profil/predplatne',
       }),
     });
 

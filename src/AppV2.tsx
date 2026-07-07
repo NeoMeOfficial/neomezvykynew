@@ -24,6 +24,7 @@ const queryClient = new QueryClient({
 });
 
 const AuthReal = lazy(() => import('./pages/v2/AuthReal'));
+const ResetPassword = lazy(() => import('./pages/v2/ResetPassword'));
 const AuthDemo = lazy(() => import('./pages/v2/AuthDemo'));
 const Welcome = lazy(() => import('./pages/v2/Welcome'));
 const Onboarding = lazy(() => import('./pages/v2/Onboarding'));
@@ -215,6 +216,9 @@ export default function AppV2() {
             {/* Public routes */}
             <Route path="/auth-demo" element={<AuthDemo />} />
             <Route path="/auth-real" element={<AuthReal />} />
+            {/* Landing page for the Supabase password-recovery email —
+                must stay public (the user arrives signed-out). */}
+            <Route path="/reset-password" element={<ResetPassword />} />
             {/* /auth, /register, /login on the admin subdomain bounce to
                 the minimal admin sign-in. On the main domain they render
                 the regular consumer auth screen. */}

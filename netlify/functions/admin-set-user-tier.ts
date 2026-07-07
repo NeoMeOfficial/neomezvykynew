@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { requireAdmin } from './_adminAuth';
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
@@ -7,7 +8,7 @@ const supabase = createClient(
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'Content-Type',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
@@ -16,6 +17,12 @@ const VALID_TIERS = ['free', 'neome_plus', 'program_bundle'];
 export async function handler(event: any) {
   if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers: CORS, body: '' };
   if (event.httpMethod !== 'POST') return { statusCode: 405, headers: CORS, body: JSON.stringify({ error: 'Method not allowed' }) };
+
+  // Admin-only: every caller must present a valid admin JWT.
+  const auth = await requireAdmin(event.headers?.authorization ?? event.headers?.Authorization);
+  if (!auth.ok) {
+    return { statusCode: auth.status, headers: CORS, body: JSON.stringify({ error: auth.error }) };
+  }
 
   try {
     const { userId, tier } = JSON.parse(event.body || '{}');

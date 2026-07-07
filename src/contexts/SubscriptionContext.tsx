@@ -332,11 +332,19 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     setLoading(true);
     try {
       if (isStripeConfigured()) {
-        await fetch('/.netlify/functions/cancel-subscription', {
+        const { data: { session } } = await supabase.auth.getSession();
+        const res = await fetch('/.netlify/functions/cancel-subscription', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ subscriptionId: subscription.id, userId }),
+          headers: {
+            'Content-Type': 'application/json',
+            ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+          },
+          body: JSON.stringify({}),
         });
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}));
+          throw new Error(body.error || 'Zrušenie predplatného zlyhalo');
+        }
       }
       const canceled = { ...subscription, cancel_at_period_end: true };
       setSubscription(canceled);

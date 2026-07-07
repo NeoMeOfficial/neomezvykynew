@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { requireAdmin } from './_adminAuth';
 
 // Service role bypasses RLS — required to read ALL content (including inactive)
 const SUPABASE_URL = process.env.SUPABASE_URL;
@@ -16,7 +17,7 @@ const supabase = createClient(
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'Content-Type',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
 };
 
@@ -36,6 +37,12 @@ const ORDER_BY: Record<string, { column: string; ascending: boolean }> = {
 
 export async function handler(event: any) {
   if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers: CORS, body: '' };
+
+  // Admin-only: every caller must present a valid admin JWT.
+  const auth = await requireAdmin(event.headers?.authorization ?? event.headers?.Authorization);
+  if (!auth.ok) {
+    return { statusCode: auth.status, headers: CORS, body: JSON.stringify({ error: auth.error }) };
+  }
 
   // Guard: fail fast with a clear message if env vars are missing
   if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {

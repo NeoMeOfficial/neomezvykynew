@@ -463,9 +463,13 @@ function PromoCodesTab() {
     const val = parseFloat(form.discountValueStr || '0');
     const maxU = parseInt(form.maxUsesStr || '100', 10);
     try {
+      const { data: { session } } = await supabase.auth.getSession();
       const res = await fetch('/.netlify/functions/admin-create-promo-code', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+        },
         body: JSON.stringify({
           code: form.code.toUpperCase(),
           discountType: form.discountType,
@@ -3360,10 +3364,13 @@ export default function AdminNew() {
   useEffect(() => {
     if (activeTab !== 'overview') return;
     setAnalyticsLoading(true);
-    fetch('/.netlify/functions/admin-get-analytics')
-      .then(r => r.json())
-      .then(data => { setAnalytics(data); setAnalyticsLoading(false); })
-      .catch(() => setAnalyticsLoading(false));
+    supabase.auth.getSession().then(({ data: { session } }) =>
+      fetch('/.netlify/functions/admin-get-analytics', {
+        headers: { ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}) },
+      })
+        .then(r => r.json())
+        .then(data => { setAnalytics(data); setAnalyticsLoading(false); })
+    ).catch(() => setAnalyticsLoading(false));
   }, [activeTab]);
 
   const renderSidebar = () => (

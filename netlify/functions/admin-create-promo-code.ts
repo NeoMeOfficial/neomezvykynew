@@ -1,5 +1,6 @@
 import Stripe from 'stripe';
 import { stripeEnv } from './_stripeEnv';
+import { requireAdmin } from './_adminAuth';
 
 const stripe = new Stripe(stripeEnv('STRIPE_SECRET_KEY')!, {
   apiVersion: '2023-10-16',
@@ -7,13 +8,19 @@ const stripe = new Stripe(stripeEnv('STRIPE_SECRET_KEY')!, {
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'Content-Type',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
 export async function handler(event: any) {
   if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers: CORS, body: '' };
   if (event.httpMethod !== 'POST') return { statusCode: 405, headers: CORS, body: JSON.stringify({ error: 'Method not allowed' }) };
+
+  // Admin-only: every caller must present a valid admin JWT.
+  const auth = await requireAdmin(event.headers?.authorization ?? event.headers?.Authorization);
+  if (!auth.ok) {
+    return { statusCode: auth.status, headers: CORS, body: JSON.stringify({ error: auth.error }) };
+  }
 
   try {
     const { code, discountType, discountValue, maxUses, expiryDate, description } = JSON.parse(event.body);
