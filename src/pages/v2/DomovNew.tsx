@@ -271,20 +271,40 @@ function CardBodyLocked({ href, free }: { href: string; free: boolean }) {
   );
 }
 
-// ─── Strava card — full meal plan ─────────────────────────────────────────────
+// ─── Strava card — full meal plan (real data from the user's plan) ────────────
 function CardNutrition({ href }: { href: string }) {
   const navigate = useNavigate();
-  const meals = [
-    { eye: 'Raňajky', title: 'Banánovo medové smoothie', sub: '195 kcal', img: '/images/r9/testimonial-recipe.jpg' },
-    { eye: 'Obed',    title: 'Buddha bowl s batátou',    sub: '520 kcal', img: '/images/r9/section-nutrition.jpg' },
-    { eye: 'Večera',  title: 'Tofu so zeleninou',        sub: '410 kcal', img: '/images/r9/testimonial-workout.jpg' },
-  ];
+  const { todayPlan } = useMealPlan();
+  const { recipes } = useRecipes();
+
+  const meals = (todayPlan?.meals ?? [])
+    .map((m) => {
+      const r = recipes.find((x) => x.id === m.options[m.selected]);
+      if (!r) return null;
+      return {
+        eye: m.label,
+        title: r.name,
+        sub: `${Math.round((r.kcal ?? 0) * m.portionMultiplier)} kcal`,
+        img: recipeImage(r),
+      };
+    })
+    .filter((m): m is NonNullable<typeof m> => m !== null)
+    .slice(0, 3);
+  const totalKcal = todayPlan?.totalCalories ?? 0;
+
+  // Plan exists but today's meals can't be resolved yet (recipes still
+  // loading, or the plan window ended) — send the user to the planner
+  // rather than showing fabricated meals.
+  if (meals.length === 0) return <CardNutritionSetup href={href} />;
+
   return (
     <div style={{ padding: '0 18px', marginBottom: 12 }}>
       <div style={{ background: WHITE, borderRadius: 20, border: `1px solid ${HAIR}`, overflow: 'hidden' }}>
         <div style={{ height: 110, position: 'relative', background: `url(/images/r9/section-nutrition.jpg) center/cover` }}>
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.55) 100%)' }} />
-          <div style={{ position: 'absolute', top: 14, right: 16, fontSize: 10, color: '#fff', opacity: 0.85, fontWeight: 500 }}>1 620 kcal</div>
+          {totalKcal > 0 && (
+            <div style={{ position: 'absolute', top: 14, right: 16, fontSize: 10, color: '#fff', opacity: 0.85, fontWeight: 500 }}>{totalKcal.toLocaleString('sk-SK')} kcal</div>
+          )}
           <div style={{ position: 'absolute', bottom: 12, left: 16, fontFamily: SERIF, fontSize: 18, color: '#fff' }}>Dnešné jedlá</div>
         </div>
         <div style={{ padding: '6px 16px 14px' }}>

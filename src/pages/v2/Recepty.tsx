@@ -38,7 +38,7 @@ function recipeImg(r: SupabaseRecipe): string {
 export default function Recepty() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
-  const { recipes, loading } = useRecipes();
+  const { recipes, loading, error } = useRecipes();
   const { isPremium } = useSubscription();
   const [query, setQuery] = useState(params.get('q') ?? '');
   const [activeFast, setActiveFast] = useState(false);
@@ -139,6 +139,18 @@ export default function Recepty() {
               </div>
             </div>
           ))
+        ) : error ? (
+          <div style={{ textAlign: 'center', padding: '40px 20px' }}>
+            <div style={{ color: NM.MUTED, fontSize: 13, marginBottom: 14 }}>
+              Recepty sa nepodarilo načítať. Skontroluj pripojenie.
+            </div>
+            <button
+              onClick={() => window.location.reload()}
+              style={{ all: 'unset', cursor: 'pointer', background: NM.DEEP, color: '#fff', padding: '10px 20px', borderRadius: 999, fontFamily: NM.SANS, fontSize: 12.5, fontWeight: 500 }}
+            >
+              Skúsiť znova
+            </button>
+          </div>
         ) : filtered.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '40px 20px', color: NM.MUTED, fontSize: 13 }}>
             Nič sa nenašlo. Skús inú frázu alebo zruš filter.

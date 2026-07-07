@@ -118,7 +118,7 @@ export function DayPlanSheet({ date, onClose }: { date: Date; onClose: () => voi
         ) : plan.exercise ? (
           <button
             type="button"
-            onClick={() => navigate(`/cvicenie/${date.toISOString().slice(0, 10)}`)}
+            onClick={() => navigate('/kniznica/telo')}
             style={cardStyle}
           >
             <div
@@ -246,7 +246,7 @@ export function DayPlanSheet({ date, onClose }: { date: Date; onClose: () => voi
         ) : (
           <Placeholder
             ctaLabel="Vygeneruj stravu"
-            onCta={() => navigate('/strava/planner')}
+            onCta={() => navigate('/jedalnicek')}
           >
             Vygeneruj si jedálniček a uvidíš tu, čo máš na ktorý deň jesť.
           </Placeholder>

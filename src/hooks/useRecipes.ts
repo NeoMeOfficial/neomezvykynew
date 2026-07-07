@@ -33,7 +33,11 @@ export const SLOT_LABEL: Record<SupabaseRecipe['slot'], string> = {
 // First FREE_PER_SLOT recipes per slot (sorted by name) are accessible on free tier.
 export const FREE_PER_SLOT = 10;
 
-const CACHE_KEY = 'neome_recipes_v1';
+const CACHE_KEY = 'neome_recipes_v2';
+// Recipe fixes must reach users promptly — iOS standalone PWAs keep a
+// session alive for days, so an unversioned sessionStorage entry served
+// stale data indefinitely. Entries older than this refetch.
+const CACHE_MAX_AGE_MS = 6 * 60 * 60 * 1000; // 6 h
 let memoryCache: SupabaseRecipe[] | null = null;
 let freeIdCache: Set<string> | null = null;
 
@@ -65,10 +69,12 @@ export function loadRecipes(): Promise<SupabaseRecipe[]> {
   const cached = sessionStorage.getItem(CACHE_KEY);
   if (cached) {
     try {
-      const parsed = JSON.parse(cached) as SupabaseRecipe[];
-      memoryCache = parsed;
-      freeIdCache = buildFreeIds(parsed);
-      return Promise.resolve(parsed);
+      const { at, list } = JSON.parse(cached) as { at: number; list: SupabaseRecipe[] };
+      if (Array.isArray(list) && Date.now() - at < CACHE_MAX_AGE_MS) {
+        memoryCache = list;
+        freeIdCache = buildFreeIds(list);
+        return Promise.resolve(list);
+      }
     } catch {}
   }
 
@@ -83,7 +89,7 @@ export function loadRecipes(): Promise<SupabaseRecipe[]> {
       const list = (data ?? []) as SupabaseRecipe[];
       memoryCache = list;
       freeIdCache = buildFreeIds(list);
-      sessionStorage.setItem(CACHE_KEY, JSON.stringify(list));
+      sessionStorage.setItem(CACHE_KEY, JSON.stringify({ at: Date.now(), list }));
       return list;
     });
   return loadPromise;

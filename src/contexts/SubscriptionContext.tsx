@@ -100,7 +100,12 @@ const SubscriptionContext = createContext<SubscriptionContextType | undefined>(u
 
 export function SubscriptionProvider({ children }: { children: ReactNode }) {
   const [subscription, setSubscription] = useState<SubscriptionData | null>(null);
-  const [loading, setLoading] = useState(false);
+  // Starts true when a real subscription read is coming (non-demo):
+  // gate-checking pages (JedalnicekPlanner) run their redirect effects
+  // BEFORE this provider's mount effect flips loading on, so a false
+  // initial value bounced paying customers to the promo page on a
+  // fresh device while the DB read was still in flight.
+  const [loading, setLoading] = useState(() => isStripeConfigured());
   const [paywallVisible, setPaywallVisible] = useState(false);
 
   const [mealPlannerPurchased, setMealPlannerPurchased] = useState<boolean>(

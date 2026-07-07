@@ -7,15 +7,16 @@ import { BodyText } from '@/components/ui/body-text';
 import { useRecipes, SLOT_LABEL, type SupabaseRecipe } from '@/hooks/useRecipes';
 import { programList } from '@/data/programs';
 
+// ids = meditations table slugs — numeric ids used to 404 in /meditacia/:id
 const MEDITATIONS = [
-  { id: '1', title: 'Ranná meditácia', category: 'Ráno' },
-  { id: '2', title: 'Hlboký spánok', category: 'Spánok' },
-  { id: '3', title: 'Zvládanie stresu', category: 'Stres' },
-  { id: '4', title: 'Fokus a koncentrácia', category: 'Fokus' },
-  { id: '5', title: 'Večerné uvoľnenie', category: 'Spánok' },
-  { id: '6', title: 'Dýchanie 4-7-8', category: 'Stres' },
-  { id: '7', title: 'Upokojenie úzkosti', category: 'Stres' },
-  { id: '8', title: 'Prijatie tela', category: 'Ráno' },
+  { id: 'ranna-meditacia',   title: 'Ranná meditácia',       category: 'Ráno'   },
+  { id: 'hlboky-spanok',     title: 'Hlboký spánok',          category: 'Spánok' },
+  { id: 'zvladanie-stresu',  title: 'Zvládanie stresu',       category: 'Stres'  },
+  { id: 'fokus',             title: 'Fokus a koncentrácia',   category: 'Fokus'  },
+  { id: 'vecerne-uvolnenie', title: 'Večerné uvoľnenie',      category: 'Spánok' },
+  { id: 'dychanie-4-7-8',    title: 'Dýchanie 4-7-8',         category: 'Stres'  },
+  { id: 'upokojenie-uzkosti', title: 'Upokojenie úzkosti',    category: 'Stres'  },
+  { id: 'prijatie-tela',     title: 'Prijatie tela',          category: 'Ráno'   },
 ];
 
 const SHORTCUTS = [
