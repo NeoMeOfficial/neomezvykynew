@@ -13,7 +13,6 @@ import { uploadContentImage } from '../../lib/storage';
 import BlogEditor from '../../components/admin/BlogEditor';
 import ContentManager from '../../components/admin/ContentManager';
 import { useAdminMessages, useUnreviewedPostsCount, useUnreadAdminMessagesCount } from '../../hooks/useMessages';
-import { recipes as staticRecipesData } from '../../data/recipes';
 import { TeloExtraStaticData } from '../../data/teloExtraData';
 import { TeloStrecingStaticData } from '../../data/teloStrecingData';
 
@@ -2354,25 +2353,9 @@ function RecipesTab() {
     } catch (e: any) { alert(e.message); }
   };
 
-  // Seed with static data from src/data/recipes.ts
-  const seedFromStatic = async () => {
-    setSeeding(true); setError(null);
-    try {
-      const payload = staticRecipesData.map((r: any) => ({
-        id: r.id, title: r.title, category: r.category, description: r.description ?? '',
-        prep_time: r.prepTime, servings: r.servings, calories: r.calories,
-        protein: r.protein, carbs: r.carbs, fat: r.fat, fiber: r.fiber,
-        ingredients: r.ingredients ?? [], steps: r.steps ?? [],
-        allergens: r.allergens ?? [], dietary: r.dietary ?? [], tags: r.tags ?? [],
-        image: r.image ?? '', difficulty: r.difficulty ?? 'easy', pdf_path: r.pdfPath ?? '',
-        active: true,
-      }));
-      const count = await adminSeed('recipes', payload);
-      alert(`✅ Importovaných ${count} receptov`);
-      await load();
-    } catch (e: any) { setError(e.message); }
-    setSeeding(false);
-  };
+  // NOTE: the old "seed from static" import was removed — the recipe library
+  // now lives in Supabase (recipe-import pipeline) and must not be overwritten
+  // by the retired src/data/recipes.ts dataset.
 
   const CATS = ['ranajky', 'obed', 'vecera', 'snack', 'smoothie'];
 
@@ -2381,9 +2364,6 @@ function RecipesTab() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 22, fontWeight: 500, color: _A.DEEP }}>Recipe Database</div>
         <div style={{ display: 'flex', gap: 10 }}>
-          <button onClick={seedFromStatic} disabled={seeding} style={btnSecondary}>
-            {seeding ? 'Importujem...' : 'Import statických receptov'}
-          </button>
           <button onClick={openAdd} style={{ ...btnPrimary, display: 'flex', alignItems: 'center', gap: 8 }}>
             <Plus style={{ width: 14, height: 14 }} />Nový recept
           </button>

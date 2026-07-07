@@ -6,7 +6,7 @@ import {
 import GlassCard from '../GlassCard';
 import { colors, innerGlass, iconContainer, sectionLabel as sectionLabelStyle } from '../../../theme/warmDusk';
 import { useMealPlan } from '../../../features/nutrition/useMealPlan';
-import { recipes as recipesData, getRecipeImage } from '../../../data/recipes';
+import { useRecipes, recipeImage } from '@/hooks/useRecipes';
 import { useCycle } from '../../../hooks/use-cycle';
 import { suggestForDay } from '../../../features/cycle/suggestions';
 import { differenceInDays } from 'date-fns';
@@ -221,11 +221,13 @@ function TeloSection({ showPromoBanner }: { showPromoBanner: boolean }) {
 function StravaSection() {
   const navigate = useNavigate();
   const { todayPlan } = useMealPlan();
+  const { recipes: recipesData } = useRecipes();
   const hasRealPlan = todayPlan && todayPlan.meals.length > 0;
 
+  // Deterministic daily sample — stable per calendar day (free-tier teaser).
   const todayStr = new Date().toISOString().split('T')[0];
   const seed = todayStr.split('-').reduce((acc, p) => acc + parseInt(p, 10), 0);
-  const sampleRecipe = recipesData[seed % recipesData.length];
+  const sampleRecipe = recipesData.length > 0 ? recipesData[seed % recipesData.length] : null;
 
   const handleCtaClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -243,17 +245,17 @@ function StravaSection() {
             {todayPlan!.meals.map((meal) => {
               const recipe = recipesData.find((r) => r.id === meal.options[meal.selected]);
               if (!recipe) return null;
-              const adjustedCal = Math.round(recipe.calories * meal.portionMultiplier);
+              const adjustedCal = Math.round((recipe.kcal ?? 0) * meal.portionMultiplier);
               return (
                 <div
                   key={meal.type}
                   className="flex items-center gap-3 p-2.5 rounded-xl"
                   style={innerGlass}
                 >
-                  <img src={getRecipeImage(recipe.title, recipe.category)} alt={recipe.title} className="w-11 h-11 rounded-lg object-cover shrink-0" />
+                  <img src={recipeImage(recipe)} alt={recipe.name} className="w-11 h-11 rounded-lg object-cover shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-[11px] font-medium" style={{ color: colors.textTertiary }}>{meal.label}</p>
-                    <p className="text-[13px] font-medium truncate" style={{ color: colors.textPrimary }}>{recipe.title}</p>
+                    <p className="text-[13px] font-medium truncate" style={{ color: colors.textPrimary }}>{recipe.name}</p>
                   </div>
                   <span className="text-[11px] shrink-0" style={{ color: colors.textTertiary }}>{adjustedCal} kcal</span>
                 </div>
@@ -267,11 +269,11 @@ function StravaSection() {
         <>
           <p className="text-[11px] font-medium mb-2" style={{ color: colors.textTertiary }}>Recept dňa</p>
           <div className="flex items-center gap-3 p-3 rounded-2xl" style={innerGlass}>
-            <img src={getRecipeImage(sampleRecipe.title, sampleRecipe.category)} alt={sampleRecipe.title} className="w-14 h-14 rounded-xl object-cover shrink-0" />
+            <img src={recipeImage(sampleRecipe)} alt={sampleRecipe.name} className="w-14 h-14 rounded-xl object-cover shrink-0" />
             <div className="flex-1 min-w-0">
-              <p className="text-[13px] font-medium truncate" style={{ color: colors.textPrimary }}>{sampleRecipe.title}</p>
+              <p className="text-[13px] font-medium truncate" style={{ color: colors.textPrimary }}>{sampleRecipe.name}</p>
               <p className="text-[11px] mt-0.5" style={{ color: colors.textTertiary }}>
-                {sampleRecipe.calories} kcal · {sampleRecipe.prepTime} min
+                {sampleRecipe.kcal ?? '–'} kcal · {sampleRecipe.prep_minutes ?? '–'} min
               </p>
             </div>
           </div>

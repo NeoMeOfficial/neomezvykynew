@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMealPlan } from '../../features/nutrition/useMealPlan';
 import { useSubscription } from '../../contexts/SubscriptionContext';
-import { recipes } from '../../data/recipes';
+import { useRecipes, recipeImage } from '@/hooks/useRecipes';
 import { Page, BackHeader, Eye, Ser, NM } from '../../components/v2/neome';
 import type { DayPlan, MealSlot } from '../../features/nutrition/types';
 
@@ -44,18 +44,11 @@ const SLOT_TIME: Record<MealSlot['type'], string> = {
   vecera: '19:00',
 };
 
-function recipeImg(recipeId: string): string {
-  const r = recipes.find((x) => x.id === recipeId);
-  if (!r) return 'testimonial-recipe.jpg';
-  if (r.category === 'obed') return 'section-nutrition.jpg';
-  if (r.category === 'vecera') return 'program-body-forming.jpg';
-  return 'testimonial-recipe.jpg';
-}
-
 export default function JedalnicekPlanner() {
   const navigate = useNavigate();
   const { hasMealPlanner, isLoading: subLoading } = useSubscription();
   const { plan, activeDay, setActiveDay } = useMealPlan();
+  const { recipes } = useRecipes();
 
   // Gate: this page is the €57 meal-plan add-on. Without the purchase
   // flag (set by Stripe webhook → profiles.nutrition_plan_purchased),
@@ -166,7 +159,7 @@ export default function JedalnicekPlanner() {
           {meals.map((m, i) => {
             const recipeId = m.options[m.selected];
             const r = recipes.find((x) => x.id === recipeId);
-            const kcal = r ? Math.round(r.calories * m.portionMultiplier) : 0;
+            const kcal = r ? Math.round((r.kcal ?? 0) * m.portionMultiplier) : 0;
             return (
               <div key={`${m.type}-${i}`} style={{ display: 'flex', gap: 14, paddingBottom: 18, position: 'relative' }}>
                 <div
@@ -193,7 +186,7 @@ export default function JedalnicekPlanner() {
                       width: 64,
                       height: 64,
                       borderRadius: 12,
-                      backgroundImage: `url(/images/r9/${recipeImg(recipeId)})`,
+                      backgroundImage: `url(${recipeImage(r)})`,
                       backgroundSize: 'cover',
                       backgroundPosition: 'center',
                       flexShrink: 0,
@@ -202,7 +195,7 @@ export default function JedalnicekPlanner() {
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <Eye size={9} style={{ marginBottom: 4 }}>{SLOT_LABEL[m.type]}</Eye>
                     <div style={{ fontFamily: NM.SERIF, fontSize: 14, fontWeight: 500, color: NM.DEEP, letterSpacing: '-0.005em', lineHeight: 1.3, marginBottom: 4 }}>
-                      {r?.title ?? 'Recept'}
+                      {r?.name ?? 'Recept'}
                     </div>
                     <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.MUTED }}>{kcal} kcal</div>
                   </div>

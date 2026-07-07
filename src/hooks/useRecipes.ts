@@ -51,6 +51,50 @@ function buildFreeIds(recipes: SupabaseRecipe[]): Set<string> {
   return ids;
 }
 
+let loadPromise: Promise<SupabaseRecipe[]> | null = null;
+
+/**
+ * Load the recipe library outside React (meal-plan generation, PDF export).
+ * Shares the module cache with useRecipes: memory → sessionStorage → Supabase,
+ * deduping concurrent fetches.
+ */
+export function loadRecipes(): Promise<SupabaseRecipe[]> {
+  if (memoryCache !== null) return Promise.resolve(memoryCache);
+  if (loadPromise) return loadPromise;
+
+  const cached = sessionStorage.getItem(CACHE_KEY);
+  if (cached) {
+    try {
+      const parsed = JSON.parse(cached) as SupabaseRecipe[];
+      memoryCache = parsed;
+      freeIdCache = buildFreeIds(parsed);
+      return Promise.resolve(parsed);
+    } catch {}
+  }
+
+  loadPromise = supabase
+    .from('recipes')
+    .select('*')
+    .eq('active', true)
+    .order('name')
+    .then(({ data, error }) => {
+      loadPromise = null;
+      if (error) throw new Error(error.message);
+      const list = (data ?? []) as SupabaseRecipe[];
+      memoryCache = list;
+      freeIdCache = buildFreeIds(list);
+      sessionStorage.setItem(CACHE_KEY, JSON.stringify(list));
+      return list;
+    });
+  return loadPromise;
+}
+
+/** Slot-based cover image (full path) for recipes without own photos. */
+export function recipeImage(r: Pick<SupabaseRecipe, 'slot'> | null | undefined): string {
+  if (r?.slot === 'hlavne') return '/images/r9/section-nutrition.jpg';
+  return '/images/r9/testimonial-recipe.jpg';
+}
+
 export function useRecipes() {
   const [recipes, setRecipes] = useState<SupabaseRecipe[]>(memoryCache ?? []);
   const [freeIds, setFreeIds] = useState<Set<string>>(freeIdCache ?? new Set());
@@ -62,39 +106,13 @@ export function useRecipes() {
     if (memoryCache !== null || fetched.current) return;
     fetched.current = true;
 
-    const cached = sessionStorage.getItem(CACHE_KEY);
-    if (cached) {
-      try {
-        const parsed = JSON.parse(cached) as SupabaseRecipe[];
-        const ids = buildFreeIds(parsed);
-        memoryCache = parsed;
-        freeIdCache = ids;
-        setRecipes(parsed);
-        setFreeIds(ids);
-        setLoading(false);
-        return;
-      } catch {}
-    }
-
-    supabase
-      .from('recipes')
-      .select('*')
-      .eq('active', true)
-      .order('name')
-      .then(({ data, error: err }) => {
-        if (err) {
-          setError(err.message);
-        } else {
-          const list = (data ?? []) as SupabaseRecipe[];
-          const ids = buildFreeIds(list);
-          memoryCache = list;
-          freeIdCache = ids;
-          sessionStorage.setItem(CACHE_KEY, JSON.stringify(list));
-          setRecipes(list);
-          setFreeIds(ids);
-        }
-        setLoading(false);
-      });
+    loadRecipes()
+      .then((list) => {
+        setRecipes(list);
+        setFreeIds(freeIdCache ?? new Set());
+      })
+      .catch((err: Error) => setError(err.message))
+      .finally(() => setLoading(false));
   }, []);
 
   return { recipes, freeIds, loading, error };

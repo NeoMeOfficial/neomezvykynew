@@ -66,6 +66,7 @@ export interface DayPlan {
   totalProtein: number;
   totalCarbs: number;
   totalFat: number;
+  totalFiber: number;
 }
 
 export interface WeekMeta {
@@ -76,6 +77,12 @@ export interface WeekMeta {
 }
 
 export interface MealPlan {
+  /**
+   * Plan schema version. v2 = recipe IDs reference Supabase public.recipes
+   * (uuid) instead of the retired static src/data/recipes.ts. Plans without
+   * this field (or with an older version) are invalidated on load.
+   */
+  planVersion: number;
   generatedAt: string;
   profileHash: string;
   profile: NutritionProfile;

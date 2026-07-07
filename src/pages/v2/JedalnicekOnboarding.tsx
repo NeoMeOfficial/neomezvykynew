@@ -21,9 +21,11 @@ export default function JedalnicekOnboarding() {
 
   return (
     <NutritionOnboarding
-      onComplete={(profile, startDate) => {
+      onComplete={async (profile, startDate) => {
         saveProfile(profile);
-        generatePlan(profile, startDate);
+        // Await: generation loads the Supabase recipe library on cold cache,
+        // and the destination page reads the finished plan from storage.
+        await generatePlan(profile, startDate);
         navigate(fromOnboardingPlus ? '/onboarding-plus/hotovo' : '/jedalnicek');
       }}
       onCancel={() => navigate(fromOnboardingPlus ? '/onboarding-plus/hotovo' : '/domov-new')}

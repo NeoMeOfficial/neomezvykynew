@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useActiveProgram } from './useDailyRituals';
 import { useMealPlan } from '../features/nutrition/useMealPlan';
-import { recipes } from '../data/recipes';
+import { useRecipes, recipeImage } from './useRecipes';
 import type { DayPlan, MealSlot } from '../features/nutrition/types';
 
 /**
@@ -65,6 +65,7 @@ function daysBetween(a: Date, b: Date): number {
 export function useDayPlan(date: Date): DayPlanResult {
   const { program } = useActiveProgram();
   const { plan } = useMealPlan();
+  const { recipes } = useRecipes();
   const [exercise, setExercise] = useState<DayExercise | null>(null);
   const [exerciseLoading, setExerciseLoading] = useState(false);
 
@@ -126,8 +127,8 @@ export function useDayPlan(date: Date): DayPlanResult {
       label: m.label,
       recipeId,
       recipeName: recipe?.name ?? '—',
-      recipeImage: recipe?.image ?? null,
-      recipeCategory: recipe?.category ?? null,
+      recipeImage: recipe ? recipeImage(recipe) : null,
+      recipeCategory: recipe?.slot ?? null,
     };
   });
 

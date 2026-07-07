@@ -1,19 +1,26 @@
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import type { NutritionProfile, MealPlan, DayPlan } from './types';
-import { generateMealPlan } from './mealPlanGenerator';
-import { recipes } from '../../data/recipes';
+import { generateMealPlan, computeDayTotals, PLAN_VERSION } from './mealPlanGenerator';
+import { useRecipes, loadRecipes } from '@/hooks/useRecipes';
+import type { SupabaseRecipe } from '@/hooks/useRecipes';
 import { syncToSupabase, loadFromSupabase } from '../supabaseSync';
 
 const STORAGE_KEY = 'neome-meal-plan';
 const SUPABASE_KEY = 'meal_plan';
+
+function isValidPlan(p: MealPlan | null | undefined): p is MealPlan {
+  // planVersion guard: v1 plans reference the retired static recipe IDs —
+  // their uuids don't resolve against Supabase, so they must regenerate.
+  return !!p && p.planVersion === PLAN_VERSION && p.totalDays === 42
+    && !!p.weeks && p.weeks.length === 6;
+}
 
 function loadPlan(): MealPlan | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as MealPlan;
-    // Version guard: old 7-day plans lack totalDays or weeks — clear them
-    if (parsed.totalDays !== 42 || !parsed.weeks || parsed.weeks.length !== 6) {
+    if (!isValidPlan(parsed)) {
       localStorage.removeItem(STORAGE_KEY);
       return null;
     }
@@ -23,32 +30,12 @@ function loadPlan(): MealPlan | null {
   }
 }
 
-function isValidPlan(p: MealPlan | null | undefined): p is MealPlan {
-  return !!p && p.totalDays === 42 && !!p.weeks && p.weeks.length === 6;
-}
-
 function savePlan(plan: MealPlan): void {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(plan));
 }
 
-function recalculateDayTotals(day: DayPlan): DayPlan {
-  let totalCalories = 0;
-  let totalProtein = 0;
-  let totalCarbs = 0;
-  let totalFat = 0;
-
-  for (const meal of day.meals) {
-    const recipeId = meal.options[meal.selected];
-    const recipe = recipes.find((r) => r.id === recipeId);
-    if (recipe) {
-      totalCalories += Math.round(recipe.calories * meal.portionMultiplier);
-      totalProtein += Math.round((recipe.protein ?? 0) * meal.portionMultiplier);
-      totalCarbs += Math.round((recipe.carbs ?? 0) * meal.portionMultiplier);
-      totalFat += Math.round((recipe.fat ?? 0) * meal.portionMultiplier);
-    }
-  }
-
-  return { ...day, totalCalories, totalProtein, totalCarbs, totalFat };
+function recalculateDayTotals(day: DayPlan, recipes: SupabaseRecipe[]): DayPlan {
+  return { ...day, ...computeDayTotals(day.meals, recipes) };
 }
 
 function getTodayDayIndex(plan: MealPlan): number {
@@ -62,6 +49,7 @@ function getWeekForDay(dayIndex: number): number {
 }
 
 export function useMealPlan() {
+  const { recipes } = useRecipes();
   const initialPlan = loadPlan();
   const initialDayIndex = initialPlan ? getTodayDayIndex(initialPlan) : 0;
   const initialWeek = getWeekForDay(initialDayIndex);
@@ -106,15 +94,22 @@ export function useMealPlan() {
     }, 500);
   }, []);
 
-  const generatePlan = useCallback((profile: NutritionProfile, startDate?: Date) => {
-    const newPlan = generateMealPlan(profile, startDate);
+  /**
+   * Generate a fresh plan. Async: waits for the recipe library if it isn't
+   * loaded yet (first visit, cold cache). Callers that navigate afterwards
+   * should await this so the destination page finds the plan in storage.
+   */
+  const generatePlan = useCallback(async (profile: NutritionProfile, startDate?: Date) => {
+    const list = recipes.length > 0 ? recipes : await loadRecipes();
+    const newPlan = generateMealPlan(profile, list, startDate);
     setPlan(newPlan);
     savePlan(newPlan);
     queueSync(newPlan);
     const todayIdx = getTodayDayIndex(newPlan);
     setActiveDay(todayIdx);
     setActiveWeek(getWeekForDay(todayIdx));
-  }, [queueSync]);
+    return newPlan;
+  }, [recipes, queueSync]);
 
   /**
    * Replace the currently-selected option of a specific meal slot with a
@@ -138,13 +133,13 @@ export function useMealPlan() {
         meal.portionMultiplier = 1;
 
         day.meals[mealIndex] = meal;
-        newPlan.days[dayIndex] = recalculateDayTotals(day);
+        newPlan.days[dayIndex] = recalculateDayTotals(day, recipes);
         savePlan(newPlan);
         queueSync(newPlan);
         return newPlan;
       });
     },
-    [queueSync],
+    [recipes, queueSync],
   );
 
   const swapMeal = useCallback((dayIndex: number, mealIndex: number) => {
@@ -156,24 +151,22 @@ export function useMealPlan() {
       meal.selected = meal.selected === 0 ? 1 : 0;
 
       // Recalculate portion multiplier for newly selected recipe
-      const recipeId = meal.options[meal.selected];
-      const recipe = recipes.find((r) => r.id === recipeId);
+      const recipe = recipes.find((r) => r.id === meal.options[meal.selected]);
       if (recipe) {
-        const oldRecipeId = meal.options[meal.selected === 0 ? 1 : 0];
-        const oldRecipe = recipes.find((r) => r.id === oldRecipeId);
+        const oldRecipe = recipes.find((r) => r.id === meal.options[meal.selected === 0 ? 1 : 0]);
         if (oldRecipe) {
-          const targetCal = meal.portionMultiplier * oldRecipe.calories;
-          meal.portionMultiplier = Math.round((targetCal / recipe.calories) * 100) / 100;
+          const targetCal = meal.portionMultiplier * (oldRecipe.kcal ?? 0);
+          meal.portionMultiplier = Math.round((targetCal / Math.max(recipe.kcal ?? 1, 1)) * 100) / 100;
         }
       }
 
       day.meals[mealIndex] = meal;
-      newPlan.days[dayIndex] = recalculateDayTotals(day);
+      newPlan.days[dayIndex] = recalculateDayTotals(day, recipes);
       savePlan(newPlan);
       queueSync(newPlan);
       return newPlan;
     });
-  }, [queueSync]);
+  }, [recipes, queueSync]);
 
   const handleWeekChange = useCallback((weekIndex: number) => {
     setActiveWeek(weekIndex);

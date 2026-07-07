@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import { BottomNav } from '@/components/v2/bottom-nav';
 import { SlidersHorizontal, ChevronRight, Salad, Dumbbell, Brain, BookOpen } from 'lucide-react';
-import { recipes } from '@/data/recipes';
+import { useRecipes, SLOT_LABEL, type SupabaseRecipe } from '@/hooks/useRecipes';
 import { programList } from '@/data/programs';
 
 const DEEP     = '#3D2921';
@@ -35,10 +35,6 @@ const MEDITATIONS = [
   { id: '8', title: 'Prijatie tela',          category: 'Ráno'   },
 ];
 
-const CAT_LABELS: Record<string, string> = {
-  ranajky: 'Raňajky', obed: 'Obed', vecera: 'Večera', snack: 'Snack', smoothie: 'Smoothie',
-};
-
 type ResultType = 'recipe' | 'program' | 'meditation';
 interface Result { id: string; type: ResultType; title: string; subtitle: string; path: string; }
 
@@ -52,14 +48,13 @@ const SHORTCUTS = [
   { label: 'Knižnica',  icon: BookOpen, accent: '#B8864A', path: '/kniznica'               },
 ];
 
-function runSearch(q: string): Result[] {
+function runSearch(q: string, recipes: SupabaseRecipe[]): Result[] {
   const term = q.toLowerCase().trim();
   if (!term) return [];
   const out: Result[] = [];
   recipes.forEach((r) => {
-    if (r.title.toLowerCase().includes(term) || r.description?.toLowerCase().includes(term) ||
-        r.tags?.some((t) => t.toLowerCase().includes(term)) || CAT_LABELS[r.category]?.toLowerCase().includes(term))
-      out.push({ id: r.id, type: 'recipe', title: r.title, subtitle: CAT_LABELS[r.category] ?? r.category, path: `/recept/${r.id}` });
+    if (r.name.toLowerCase().includes(term) || SLOT_LABEL[r.slot]?.toLowerCase().includes(term))
+      out.push({ id: r.id, type: 'recipe', title: r.name, subtitle: SLOT_LABEL[r.slot] ?? r.slot, path: `/recept/${r.id}` });
   });
   programList.forEach((p) => {
     if (p.name.toLowerCase().includes(term) || (p as any).tagline?.toLowerCase().includes(term))
@@ -75,13 +70,14 @@ function runSearch(q: string): Result[] {
 // ─── Search sheet ──────────────────────────────────────────────────────────────
 function SearchSheet({ onClose }: { onClose: () => void }) {
   const navigate   = useNavigate();
+  const { recipes } = useRecipes();
   const overlayRef = useRef<HTMLDivElement>(null);
   const inputRef   = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState('');
   const [bottomOffset, setBottomOffset] = useState(0);
   const [maxH, setMaxH] = useState('92dvh');
 
-  const results = runSearch(query);
+  const results = runSearch(query, recipes);
   const grouped = results.reduce<Record<ResultType, Result[]>>((acc, r) => {
     if (!acc[r.type]) acc[r.type] = [];
     acc[r.type].push(r);

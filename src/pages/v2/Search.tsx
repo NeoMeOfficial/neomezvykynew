@@ -4,7 +4,7 @@ import { Search as SearchIcon, X, ChevronRight, BookOpen, Dumbbell, Salad, Brain
 import { TopBar } from '@/components/v2/top-bar';
 import { Eyebrow } from '@/components/ui/eyebrow';
 import { BodyText } from '@/components/ui/body-text';
-import { recipes } from '@/data/recipes';
+import { useRecipes, SLOT_LABEL, type SupabaseRecipe } from '@/hooks/useRecipes';
 import { programList } from '@/data/programs';
 
 const MEDITATIONS = [
@@ -17,11 +17,6 @@ const MEDITATIONS = [
   { id: '7', title: 'Upokojenie úzkosti', category: 'Stres' },
   { id: '8', title: 'Prijatie tela', category: 'Ráno' },
 ];
-
-const CATEGORY_LABELS: Record<string, string> = {
-  ranajky: 'Raňajky', obed: 'Obed', vecera: 'Večera',
-  snack: 'Snack', smoothie: 'Smoothie',
-};
 
 const SHORTCUTS = [
   { label: 'Recepty', icon: Salad,    accent: '#8B9E88', path: '/recepty' },
@@ -40,7 +35,7 @@ interface Result {
   path: string;
 }
 
-function search(q: string): Result[] {
+function search(q: string, recipes: SupabaseRecipe[]): Result[] {
   const term = q.toLowerCase().trim();
   if (!term) return [];
 
@@ -48,16 +43,14 @@ function search(q: string): Result[] {
 
   recipes.forEach((r) => {
     if (
-      r.title.toLowerCase().includes(term) ||
-      r.description?.toLowerCase().includes(term) ||
-      r.tags?.some((t) => t.toLowerCase().includes(term)) ||
-      CATEGORY_LABELS[r.category]?.toLowerCase().includes(term)
+      r.name.toLowerCase().includes(term) ||
+      SLOT_LABEL[r.slot]?.toLowerCase().includes(term)
     ) {
       results.push({
         id: r.id,
         type: 'recipe',
-        title: r.title,
-        subtitle: CATEGORY_LABELS[r.category] ?? r.category,
+        title: r.name,
+        subtitle: SLOT_LABEL[r.slot] ?? r.slot,
         path: `/recept/${r.id}`,
       });
     }
@@ -114,9 +107,10 @@ const SANS   = '"DM Sans", system-ui, sans-serif';
 
 export default function Search() {
   const navigate = useNavigate();
+  const { recipes } = useRecipes();
   const [query, setQuery] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
-  const results = search(query);
+  const results = search(query, recipes);
 
   useEffect(() => {
     setTimeout(() => inputRef.current?.focus(), 100);

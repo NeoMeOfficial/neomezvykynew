@@ -2,12 +2,13 @@ import { useNavigate } from 'react-router-dom';
 import { Clock, Flame, ChevronRight } from 'lucide-react';
 import GlassCard from '../GlassCard';
 import { useMealPlan } from '../../../features/nutrition/useMealPlan';
-import { recipes } from '../../../data/recipes';
+import { useRecipes, recipeImage } from '@/hooks/useRecipes';
 import { colors, glassCard } from '../../theme/warmDusk';
 
 export default function TodayMealPlan() {
   const navigate = useNavigate();
   const { todayPlan } = useMealPlan();
+  const { recipes } = useRecipes();
 
   // No meal plan set up yet — show CTA
   if (!todayPlan) {
@@ -56,7 +57,7 @@ export default function TodayMealPlan() {
         {todayPlan.meals.map((meal, i) => {
           const recipe = recipes.find((r) => r.id === meal.options[meal.selected]);
           if (!recipe) return null;
-          const adjustedCal = Math.round(recipe.calories * meal.portionMultiplier);
+          const adjustedCal = Math.round((recipe.kcal ?? 0) * meal.portionMultiplier);
           const isNext = i === nextMealIdx;
 
           return isNext ? (
@@ -66,7 +67,7 @@ export default function TodayMealPlan() {
               onClick={() => navigate('/kniznica/strava')}
               className="relative w-full h-36 rounded-2xl overflow-hidden active:scale-[0.98] transition-transform text-left"
             >
-              <img src={recipe.image} alt={recipe.title} className="absolute inset-0 w-full h-full object-cover" />
+              <img src={recipeImage(recipe)} alt={recipe.name} className="absolute inset-0 w-full h-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/15 to-transparent" />
               <div className="absolute top-3 left-3">
                 <span className="text-[10px] font-medium text-white/80 bg-white/20 px-2 py-0.5 rounded-full backdrop-blur-sm">
@@ -74,10 +75,10 @@ export default function TodayMealPlan() {
                 </span>
               </div>
               <div className="absolute bottom-3 left-3 right-3">
-                <p className="text-white text-sm font-bold leading-tight drop-shadow-lg">{recipe.title}</p>
+                <p className="text-white text-sm font-bold leading-tight drop-shadow-lg">{recipe.name}</p>
                 <div className="flex items-center gap-3 mt-1">
                   <span className="text-white/70 text-xs flex items-center gap-1">
-                    <Clock className="w-3 h-3" />{recipe.prepTime} min
+                    <Clock className="w-3 h-3" />{recipe.prep_minutes ?? '–'} min
                   </span>
                   <span className="text-white/70 text-xs flex items-center gap-1">
                     <Flame className="w-3 h-3" />{adjustedCal} kcal
@@ -89,11 +90,11 @@ export default function TodayMealPlan() {
             // Compact row for other meals
             <GlassCard key={meal.type} className="!p-3 cursor-pointer" onClick={() => navigate('/kniznica/strava')}>
               <div className="flex items-center gap-3">
-                <img src={recipe.image} alt={recipe.title} className="w-12 h-12 rounded-xl object-cover flex-shrink-0" />
+                <img src={recipeImage(recipe)} alt={recipe.name} className="w-12 h-12 rounded-xl object-cover flex-shrink-0" />
                 <div className="flex-1 min-w-0">
                   <p className="text-[10px] text-[#888] font-medium">{meal.label}</p>
-                  <p className="text-[13px] font-medium text-[#2E2218] truncate">{recipe.title}</p>
-                  <p className="text-xs text-[#888]">{adjustedCal} kcal · {recipe.prepTime} min</p>
+                  <p className="text-[13px] font-medium text-[#2E2218] truncate">{recipe.name}</p>
+                  <p className="text-xs text-[#888]">{adjustedCal} kcal · {recipe.prep_minutes ?? '–'} min</p>
                 </div>
               </div>
             </GlassCard>

@@ -1,7 +1,6 @@
 import jsPDF from 'jspdf';
 import type { MealPlan, DayPlan, MealSlot } from './types';
-import { recipes } from '../../data/recipes';
-import type { Recipe } from '../../data/recipes';
+import type { SupabaseRecipe } from '@/hooks/useRecipes';
 
 // jsPDF default font cannot render Slovak diacritics — strip them
 function n(s: string): string {
@@ -16,22 +15,18 @@ function shortDate(dateStr: string): string {
   return `${d.getDate()}. ${MONTHS[d.getMonth()]}`;
 }
 
-function getRecipe(id: string): Recipe | undefined {
-  return recipes.find((r) => r.id === id);
+function getMealCalories(slot: MealSlot, recipes: SupabaseRecipe[]): number {
+  const r = recipes.find((x) => x.id === slot.options[slot.selected]);
+  return r ? Math.round((r.kcal ?? 0) * slot.portionMultiplier) : 0;
 }
 
-function getMealCalories(slot: MealSlot): number {
-  const r = getRecipe(slot.options[slot.selected]);
-  return r ? Math.round(r.calories * slot.portionMultiplier) : 0;
+function getMealTitle(slot: MealSlot, recipes: SupabaseRecipe[]): string {
+  const r = recipes.find((x) => x.id === slot.options[slot.selected]);
+  return r ? r.name : '-';
 }
 
-function getMealTitle(slot: MealSlot): string {
-  const r = getRecipe(slot.options[slot.selected]);
-  return r ? r.title : '-';
-}
-
-// Build shopping list: Map<ingredientName, amounts[]>
-function buildShoppingList(plan: MealPlan, weekIndex: number): Map<string, string[]> {
+// Build shopping list: Map<ingredientName, per-meal gram amounts (portion-scaled)>
+function buildShoppingList(plan: MealPlan, weekIndex: number, recipes: SupabaseRecipe[]): Map<string, string[]> {
   const map = new Map<string, string[]>();
   const week = plan.weeks[weekIndex];
   if (!week) return map;
@@ -40,14 +35,15 @@ function buildShoppingList(plan: MealPlan, weekIndex: number): Map<string, strin
     const day = plan.days[dayIdx];
     if (!day) continue;
     for (const slot of day.meals) {
-      const recipe = getRecipe(slot.options[slot.selected]);
+      const recipe = recipes.find((x) => x.id === slot.options[slot.selected]);
       if (!recipe) continue;
-      for (const ing of recipe.ingredients) {
-        const name = typeof ing === 'string' ? ing : ing.name;
-        const amount = typeof ing === 'string' ? '' : ing.amount;
-        const key = name.toLowerCase().trim();
+      for (const ing of recipe.ingredients ?? []) {
+        const key = (ing.name || ing.raw || '').toLowerCase().trim();
+        if (!key) continue;
         if (!map.has(key)) map.set(key, []);
-        if (amount) map.get(key)!.push(amount);
+        if (ing.grams) {
+          map.get(key)!.push(`${Math.round(ing.grams * slot.portionMultiplier)} g`);
+        }
       }
     }
   }
@@ -55,7 +51,7 @@ function buildShoppingList(plan: MealPlan, weekIndex: number): Map<string, strin
   return map;
 }
 
-export function exportMealPlanPDF(plan: MealPlan): void {
+export function exportMealPlanPDF(plan: MealPlan, recipes: SupabaseRecipe[]): void {
   const doc = new jsPDF('p', 'mm', 'a4');
   const pageW = 210;
   const pageH = 297;
@@ -143,8 +139,8 @@ export function exportMealPlanPDF(plan: MealPlan): void {
 
       // Meal rows
       for (const slot of day.meals) {
-        const title = getMealTitle(slot);
-        const kcal = getMealCalories(slot);
+        const title = getMealTitle(slot, recipes);
+        const kcal = getMealCalories(slot, recipes);
         doc.setFontSize(8);
         doc.setTextColor(107, 76, 59);
         doc.text(n(slot.label), margin + 4, y + 4);
@@ -166,7 +162,7 @@ export function exportMealPlanPDF(plan: MealPlan): void {
     const week = plan.weeks[wi];
     if (!week) continue;
 
-    const shoppingList = buildShoppingList(plan, wi);
+    const shoppingList = buildShoppingList(plan, wi, recipes);
     const items = [...shoppingList.entries()].sort(([a], [b]) => a.localeCompare(b));
 
     doc.addPage();
