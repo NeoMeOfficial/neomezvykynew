@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSubscription } from '../../contexts/SubscriptionContext';
 import { useExercises, DbExercise } from '../../hooks/useExercises';
 import { Page, BackHeader, Eye, Ser, Body, PlusTag, NM } from '../../components/v2/neome';
+import PlusUnlockBanner from '../../components/v2/paywall/PlusUnlockBanner';
 
 /**
  * Telo · Cvičenia — R9 sectioned list, now Supabase-backed.
@@ -202,6 +203,8 @@ export default function TeloExtra() {
           </div>
         </div>
       ))}
+
+      <PlusUnlockBanner label="Cvičenia označené + odomkneš s NeoMe Plus" />
     </Page>
   );
 }

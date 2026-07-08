@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useRecipes, SLOT_LABEL, type SupabaseRecipe } from '@/hooks/useRecipes';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import { Page, BackHeader, Eye, NM } from '../../components/v2/neome';
+import PlusUnlockBanner from '../../components/v2/paywall/PlusUnlockBanner';
 
 /**
  * Recepty / Recipe browser — reads from Supabase public.recipes
@@ -118,14 +119,13 @@ export default function Recepty() {
         </button>
       </div>
 
-      <div style={{ padding: '18px 18px 8px', display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+      <div style={{ padding: '18px 18px 8px' }}>
         <Eye>{loading ? 'Načítavam…' : `Výsledky · ${filtered.length}`}</Eye>
-        {!isPremium && !loading && (
-          <span style={{ fontFamily: NM.SANS, fontSize: 10.5, color: NM.TERTIARY, letterSpacing: '0.01em' }}>
-            15 zadarmo / mesiac · <span style={{ color: NM.GOLD }}>Plus</span> odomkne všetky
-          </span>
-        )}
       </div>
+
+      {!loading && (
+        <PlusUnlockBanner label="Zadarmo máš 15 receptov mesačne — všetkých 225 odomkneš s NeoMe Plus" />
+      )}
 
       <div style={{ padding: '0 18px 10px', display: 'flex', flexDirection: 'column', gap: 18 }}>
         {loading ? (

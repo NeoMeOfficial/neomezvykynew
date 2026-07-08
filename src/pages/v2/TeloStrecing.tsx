@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSubscription } from '../../contexts/SubscriptionContext';
 import { useStretches, DbStretch } from '../../hooks/useStretches';
 import { Page, BackHeader, Eye, Ser, Body, PlusTag, NM } from '../../components/v2/neome';
+import PlusUnlockBanner from '../../components/v2/paywall/PlusUnlockBanner';
 
 /**
  * Telo · Strečing — R9 sectioned list, Supabase-backed.
@@ -174,6 +175,8 @@ export default function TeloStrecing() {
           </div>
         </div>
       ))}
+
+      <PlusUnlockBanner label="Zostavy označené + odomkneš s NeoMe Plus" />
     </Page>
   );
 }
