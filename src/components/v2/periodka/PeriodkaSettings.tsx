@@ -11,6 +11,7 @@ import {
   getPhaseRanges,
 } from '../../../features/cycle/utils';
 import { PHASE_NAMES } from '../../../features/cycle/constants';
+import PlusUnlockBanner from '../paywall/PlusUnlockBanner';
 
 /**
  * PeriodkaSettings — Round 17 redesign.
@@ -521,6 +522,8 @@ export default function PeriodkaSettings() {
       />
 
       <HistoryEmpty />
+
+      <PlusUnlockBanner label="Náhľad bez ukladania — nastavenia cyklu sa uložia s NeoMe Plus" />
 
       <DatePickerSheet
         open={showPicker}

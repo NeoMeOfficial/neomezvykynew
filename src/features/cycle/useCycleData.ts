@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import { CycleData, CustomSettings, PeriodIntensity, DailyPeriodData, PeriodLog } from './types';
+import { useSubscription } from '@/contexts/SubscriptionContext';
 
 // Calculate weighted average cycle length from history
 // More recent cycles have higher weight for better predictions
@@ -78,6 +79,10 @@ const defaultCycleData: CycleData = {
 };
 
 export function useCycleData(accessCode?: string) {
+  // Persistence is the Plus perk (BC-4 "Náhľad bez ukladania"): free
+  // users get the full live UI, but entries stay in-memory only and
+  // vanish on reload. Plus members persist to localStorage + cycle_data.
+  const { isPremium } = useSubscription();
   const [cycleData, setCycleData] = useState<CycleData>(defaultCycleData);
   const [loading, setLoading] = useState(false); // Changed to false for instant loading
   const saveTimeoutRef = useRef<NodeJS.Timeout>();
@@ -136,6 +141,7 @@ export function useCycleData(accessCode?: string) {
 
   // Save data to storage with debouncing
   const saveCycleData = useCallback((data: CycleData) => {
+    if (!isPremium) return; // free tier: preview only, nothing persists
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
     }
@@ -156,7 +162,7 @@ export function useCycleData(accessCode?: string) {
         console.error('Failed to save cycle data:', error);
       }
     }, 500);
-  }, [getStorageKey, accessCode]);
+  }, [getStorageKey, accessCode, isPremium]);
 
   // Update cycle data and save
   const updateCycleData = useCallback((updates: Partial<CycleData>) => {

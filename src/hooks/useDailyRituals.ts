@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useSupabaseAuth } from '../contexts/SupabaseAuthContext';
+import { useSubscription } from '../contexts/SubscriptionContext';
 
 /**
  * Daily-ritual hooks — F-003 / F-004 / F-006
@@ -368,6 +369,7 @@ function saveCustomSymptomDefs(uid: string | undefined | null, defs: CustomSympt
 }
 
 export function useCycleSymptoms() {
+  const { isPremium } = useSubscription();
   const { user } = useSupabaseAuth();
   const [days, setDays] = useState<SymptomDay[]>([]);
   const [loading, setLoading] = useState(true);
@@ -415,6 +417,10 @@ export function useCycleSymptoms() {
         : [{ date: today, symptoms: nextMap }, ...otherDays];
       setDays(updatedDays);
 
+      // Free tier: toggles stay on-screen for the session only —
+      // persistence (demo localStorage or cycle_symptoms) is Plus-only.
+      if (!isPremium) return;
+
       if (!real) {
         saveDemoSymptoms(updatedDays);
         return;
@@ -435,7 +441,7 @@ export function useCycleSymptoms() {
           );
       }
     },
-    [days, real, todayMap, user?.id],
+    [days, real, todayMap, user?.id, isPremium],
   );
 
   // Helper: list of dates (YYYY-MM-DD) in the last 60 days that have any symptom logged.

@@ -14,6 +14,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { syncToSupabase, loadFromSupabase } from '../supabaseSync';
+import { useSubscription } from '@/contexts/SubscriptionContext';
 
 export interface CycleLogEntry {
   flow: string;
@@ -44,6 +45,7 @@ export function toDateKey(d: Date): string {
 }
 
 export function useCycleLogs() {
+  const { isPremium } = useSubscription();
   const [logs, setLogs] = useState<CycleLogs>(loadFromLocal);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
@@ -77,21 +79,25 @@ export function useCycleLogs() {
 
     setLogs((current) => {
       const next = { ...current, [key]: stamped };
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-      } catch {
-        // ignore quota errors
-      }
+      // Free tier: the entry lives in state for this session only
+      // ("Náhľad bez ukladania") — persistence is the Plus perk.
+      if (isPremium) {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+        } catch {
+          // ignore quota errors
+        }
 
-      // Debounced Supabase sync
-      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
-      saveTimeoutRef.current = setTimeout(() => {
-        syncToSupabase('cycle_logs', next);
-      }, 500);
+        // Debounced Supabase sync
+        if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+        saveTimeoutRef.current = setTimeout(() => {
+          syncToSupabase('cycle_logs', next);
+        }, 500);
+      }
 
       return next;
     });
-  }, []);
+  }, [isPremium]);
 
   return { logs, saveLog };
 }

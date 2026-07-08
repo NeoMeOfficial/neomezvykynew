@@ -7,6 +7,8 @@ import { useAchievements } from '../../hooks/useAchievements';
 import { usePointsLedger } from '../../hooks/usePointsLedger';
 import { useConsentGuard } from '../../contexts/ConsentGuardContext';
 import { CONSENT_TYPES } from '../../lib/consents';
+import { useSubscription } from '../../contexts/SubscriptionContext';
+import PlusUnlockBanner from '../../components/v2/paywall/PlusUnlockBanner';
 
 /**
  * Cyklus log — R11 sheet (rendered as full-page screen here)
@@ -58,6 +60,7 @@ export default function CyklusLog() {
   const requireConsent = useConsentGuard();
   const { derivedState } = useCycleData();
   const { logs, saveLog } = useCycleLogs();
+  const { isPremium } = useSubscription();
   const { addActivity } = useAchievements();
   const { addEntry } = usePointsLedger();
   const today = derivedState?.today ?? new Date();
@@ -113,8 +116,12 @@ export default function CyklusLog() {
       mucus,
       note,
     });
-    addEntry('cycle_log', 4, `cycle_${toDateKey(now)}`, 'cycle');
-    addActivity('cycle_log');
+    if (isPremium) {
+      // Points reward persistence — free-tier entries are session-only
+      // previews, so they don't earn (and can't be re-farmed on reload).
+      addEntry('cycle_log', 4, `cycle_${toDateKey(now)}`, 'cycle');
+      addActivity('cycle_log');
+    }
     navigate('/kniznica/periodka');
   };
 
@@ -129,6 +136,8 @@ export default function CyklusLog() {
           Uložiť
         </button>
       </div>
+
+      <PlusUnlockBanner label="Náhľad bez ukladania — s NeoMe Plus sa tvoje záznamy uložia a získaš za ne body" />
 
       <div style={{ padding: '0 18px' }}>
         <Ser size={28}>

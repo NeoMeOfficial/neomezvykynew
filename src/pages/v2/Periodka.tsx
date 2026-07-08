@@ -7,6 +7,7 @@ import { getCycleTipByDay } from '../../data/cycleTips';
 import type { DerivedState, CycleData } from '../../features/cycle/types';
 import { useConsentGuard } from '../../contexts/ConsentGuardContext';
 import { CONSENT_TYPES } from '../../lib/consents';
+import PlusUnlockBanner from '../../components/v2/paywall/PlusUnlockBanner';
 
 /**
  * Cyklus / Periodka — R5 dashboard
@@ -896,6 +897,8 @@ export default function Periodka() {
       ) : (
         <FreeView navigate={navigate} />
       )}
+
+      <PlusUnlockBanner label="Náhľad bez ukladania — s NeoMe Plus sa tvoje cyklus záznamy uložia natrvalo" />
 
       <ConfirmSheet
         open={confirmStartOpen}
