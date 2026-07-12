@@ -45,6 +45,7 @@ export default function Recepty() {
   const { isFavorite, toggleFavorite } = useUniversalFavorites();
   const [query, setQuery] = useState(params.get('q') ?? '');
   const [activeFast, setActiveFast] = useState(false);
+  const [favOnly, setFavOnly] = useState(false);
   const [slotFilter, setSlotFilter] = useState<SupabaseRecipe['slot'] | 'all'>(() => {
     const cat = params.get('cat');
     return cat ? CATEGORY_QUERY_MAP[cat] ?? 'all' : 'all';
@@ -54,12 +55,13 @@ export default function Recepty() {
     let list = recipes;
     if (slotFilter !== 'all') list = list.filter((r) => r.slot === slotFilter);
     if (activeFast) list = list.filter((r) => (r.prep_minutes ?? 99) <= 20);
+    if (favOnly) list = list.filter((r) => isFavorite(r.id, 'recipe'));
     if (query.trim().length > 0) {
       const q = query.toLowerCase();
       list = list.filter((r) => r.name.toLowerCase().includes(q));
     }
     return list;
-  }, [recipes, slotFilter, activeFast, query]);
+  }, [recipes, slotFilter, activeFast, favOnly, query, isFavorite]);
 
   const handleClick = (r: SupabaseRecipe) => {
     // Detail page enforces the per-user quota; listing taps are always permitted.
@@ -119,6 +121,22 @@ export default function Recepty() {
         >
           Do 20 min
         </button>
+        <button
+          onClick={() => setFavOnly((v) => !v)}
+          style={{
+            all: 'unset', cursor: 'pointer', padding: '8px 14px', borderRadius: 999,
+            background: favOnly ? NM.TERRA : 'transparent',
+            color: favOnly ? '#fff' : NM.DEEP,
+            border: favOnly ? 'none' : `1px solid ${NM.HAIR_2}`,
+            fontFamily: NM.SANS, fontSize: 12, whiteSpace: 'nowrap', flexShrink: 0,
+            display: 'inline-flex', alignItems: 'center', gap: 5,
+          }}
+        >
+          <svg width="11" height="11" viewBox="0 0 24 24" fill={favOnly ? '#fff' : 'none'} stroke={favOnly ? '#fff' : NM.DEEP} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" />
+          </svg>
+          Obľúbené
+        </button>
       </div>
 
       <div style={{ padding: '18px 18px 8px' }}>
@@ -155,7 +173,9 @@ export default function Recepty() {
           </div>
         ) : filtered.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '40px 20px', color: NM.MUTED, fontSize: 13 }}>
-            Nič sa nenašlo. Skús inú frázu alebo zruš filter.
+            {favOnly
+              ? 'Zatiaľ nemáš žiadne obľúbené recepty. Ulož si recept srdiečkom a nájdeš ho tu.'
+              : 'Nič sa nenašlo. Skús inú frázu alebo zruš filter.'}
           </div>
         ) : (
           filtered.map((r) => {
