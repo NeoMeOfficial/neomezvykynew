@@ -123,7 +123,7 @@ export default function Strava() {
 
           {/* Favourites — same row anatomy as the slot categories */}
           <button
-            onClick={() => navigate('/recepty?fav=1')}
+            onClick={() => navigate('/oblubene?tab=recipe')}
             style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '2px 0', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}
           >
             <div style={{
