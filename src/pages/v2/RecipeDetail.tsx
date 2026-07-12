@@ -10,11 +10,11 @@ import { BackHeader, Eye, Ser, Body, NM } from '../../components/v2/neome';
 /**
  * Recipe detail — reads from Supabase via useRecipe(id).
  *
- * "Pridať do jedálnička" CTA opens a sheet listing the user's meal-plan
+ * Primary CTA is "Pridať do obľúbených" (favourites toggle). Users who own
+ * the meal-plan add-on (hasMealPlanner) additionally get a secondary
+ * "Pridať do jedálnička" button that opens a sheet listing their meal-plan
  * days + slots; tapping a slot inserts the recipe via
- * useMealPlan.setRecipeForSlot and closes the sheet. Without the meal-plan
- * add-on (hasMealPlanner=false), the CTA routes to /jedalnicek-promo to
- * upsell the €57 purchase instead.
+ * useMealPlan.setRecipeForSlot and closes the sheet.
  */
 
 function recipeHeroImg(slot: string): string {
@@ -64,10 +64,6 @@ export default function RecipeDetail() {
   };
 
   const onAddToPlan = () => {
-    if (!hasMealPlanner) {
-      navigate('/jedalnicek-promo');
-      return;
-    }
     if (!plan) {
       navigate('/jedalnicek');
       return;
@@ -254,6 +250,24 @@ export default function RecipeDetail() {
           borderTop: `1px solid ${NM.HAIR}`, display: 'flex', gap: 10, zIndex: 50,
         }}
       >
+        {hasMealPlanner && (
+          <button
+            onClick={onAddToPlan}
+            aria-label="Pridať do jedálnička"
+            style={{
+              all: 'unset', cursor: 'pointer',
+              width: 52, height: 52, borderRadius: 999,
+              background: 'transparent',
+              border: `1px solid ${NM.HAIR_2}`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+            }}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={NM.DEEP} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" />
+              <path d="M16 2v4M8 2v4M3 10h18M12 14v4M10 16h4" />
+            </svg>
+          </button>
+        )}
         <button
           onClick={() => toggleFavorite({
             id: recipe.id,
@@ -263,28 +277,17 @@ export default function RecipeDetail() {
             kcal: recipe.kcal ?? 0,
             category: recipe.slot,
           })}
-          aria-label="Uložiť"
-          style={{
-            all: 'unset', cursor: 'pointer',
-            width: 52, height: 52, borderRadius: 999,
-            background: isFav ? `${NM.TERRA}18` : 'transparent',
-            border: `1px solid ${NM.HAIR_2}`,
-            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-          }}
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill={isFav ? NM.TERRA : 'none'} stroke={isFav ? NM.TERRA : NM.DEEP} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
-          </svg>
-        </button>
-        <button
-          onClick={onAddToPlan}
           style={{
             flex: 1, padding: '16px 20px',
-            background: NM.DEEP, color: '#fff', border: 'none', borderRadius: 999,
+            background: isFav ? NM.TERRA : NM.DEEP, color: '#fff', border: 'none', borderRadius: 999,
             fontFamily: NM.SANS, fontSize: 14, fontWeight: 500, letterSpacing: '0.02em', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
           }}
         >
-          Pridať do jedálnička
+          <svg width="15" height="15" viewBox="0 0 24 24" fill={isFav ? '#fff' : 'none'} stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" />
+          </svg>
+          {isFav ? 'V obľúbených' : 'Pridať do obľúbených'}
         </button>
       </div>
 

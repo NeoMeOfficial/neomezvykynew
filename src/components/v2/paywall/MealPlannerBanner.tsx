@@ -28,14 +28,14 @@ export function MealPlannerBanner({ onPurchase, className = "" }: MealPlannerBan
             Personalizovaný jedálniček
           </h3>
           <p className="text-xs" style={{ color: colors.textSecondary }}>
-            7-dňový plán na mieru — jednorazový nákup
+            6-týždňový plán na mieru — jednorazový nákup
           </p>
         </div>
       </div>
 
       {/* Features */}
       <ul className="text-xs mb-4 space-y-1" style={{ color: colors.textSecondary }}>
-        <li>• 7-dňový plán prispôsobený tvojim cieľom a alergénam</li>
+        <li>• 6-týždňový plán prispôsobený tvojim cieľom a alergénam</li>
         <li>• Porcie prepočítané na tvoje kalorické ciele</li>
         <li>• Denný prehľad makroživín (bielkoviny / sacharidy / tuky)</li>
         <li>• Zámiena jedál — 2 možnosti pre každý slot</li>

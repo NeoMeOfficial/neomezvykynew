@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useRecipes, SLOT_LABEL, type SupabaseRecipe } from '@/hooks/useRecipes';
 import { useSubscription } from '@/contexts/SubscriptionContext';
+import { useUniversalFavorites } from '@/hooks/useUniversalFavorites';
 import { Page, BackHeader, Eye, NM } from '../../components/v2/neome';
 import PlusUnlockBanner from '../../components/v2/paywall/PlusUnlockBanner';
 
@@ -41,6 +42,7 @@ export default function Recepty() {
   const [params] = useSearchParams();
   const { recipes, loading, error } = useRecipes();
   const { isPremium } = useSubscription();
+  const { isFavorite, toggleFavorite } = useUniversalFavorites();
   const [query, setQuery] = useState(params.get('q') ?? '');
   const [activeFast, setActiveFast] = useState(false);
   const [slotFilter, setSlotFilter] = useState<SupabaseRecipe['slot'] | 'all'>(() => {
@@ -157,11 +159,15 @@ export default function Recepty() {
           </div>
         ) : (
           filtered.map((r) => {
+            const fav = isFavorite(r.id, 'recipe');
             return (
-              <button
+              <div
                 key={r.id}
+                role="button"
+                tabIndex={0}
                 onClick={() => handleClick(r)}
-                style={{ all: 'unset', cursor: 'pointer', display: 'flex', gap: 14, width: '100%' }}
+                onKeyDown={(e) => { if (e.key === 'Enter') handleClick(r); }}
+                style={{ cursor: 'pointer', display: 'flex', gap: 14, width: '100%' }}
               >
                 {/* Thumbnail */}
                 <div style={{ position: 'relative', width: 92, height: 92, borderRadius: 14, flexShrink: 0 }}>
@@ -187,11 +193,32 @@ export default function Recepty() {
                   }}>
                     {r.name}
                   </div>
-                  <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.SAGE, fontWeight: 500, letterSpacing: '0.02em' }}>
-                    + Pridať do plánu
-                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleFavorite({
+                        id: r.id,
+                        type: 'recipe',
+                        title: r.name,
+                        duration: `${r.prep_minutes ?? 0} min`,
+                        kcal: r.kcal ?? 0,
+                        category: r.slot,
+                      });
+                    }}
+                    aria-label={fav ? `Odstrániť ${r.name} z obľúbených` : `Pridať ${r.name} do obľúbených`}
+                    style={{
+                      all: 'unset', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 5,
+                      fontFamily: NM.SANS, fontSize: 11, fontWeight: 500, letterSpacing: '0.02em',
+                      color: fav ? NM.TERRA : NM.SAGE, alignSelf: 'flex-start', padding: '2px 0',
+                    }}
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill={fav ? NM.TERRA : 'none'} stroke={fav ? NM.TERRA : NM.SAGE} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" />
+                    </svg>
+                    {fav ? 'V obľúbených' : 'Pridať do obľúbených'}
+                  </button>
                 </div>
-              </button>
+              </div>
             );
           })
         )}

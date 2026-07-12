@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Check, Star, ShieldCheck } from 'lucide-react';
+import { Check, X, Star, ShieldCheck } from 'lucide-react';
 import { TopBar } from '@/components/v2/top-bar';
 import { Eyebrow } from '@/components/ui/eyebrow';
 import { BodyText } from '@/components/ui/body-text';
@@ -18,12 +18,12 @@ const COMPARISON = [
 const STEPS = [
   { num: '1', title: 'Vyplň profil', desc: 'Vek, váha, výška, cieľ a aktivita' },
   { num: '2', title: 'Nastav preferencie', desc: 'Diéta, alergény, počet jedál denne' },
-  { num: '3', title: 'Získaj plán', desc: '7-dňový jedálniček ihneď na obrazovke' },
+  { num: '3', title: 'Získaj plán', desc: '6-týždňový jedálniček ihneď na obrazovke' },
   { num: '4', title: 'Jedz a dosahuj', desc: 'Recepty, nákupný zoznam, pokrok' },
 ];
 
 const INCLUDED = [
-  '7-dňový personalizovaný jedálniček',
+  '6-týždňový personalizovaný jedálniček',
   'Makrá a kalórie pre každý deň',
   'Recepty pre každé jedlo',
   'Nákupný zoznam automaticky',
@@ -78,15 +78,19 @@ export default function JedalnicekPromo() {
   };
 
   return (
-    <div className="min-h-screen bg-cream pb-28">
+    <div className="min-h-screen bg-cream" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 205px)' }}>
       <TopBar title="Jedálniček na mieru" onBack={() => navigate(-1)} />
 
       <div className="px-5 pt-2 flex flex-col gap-4">
-        {/* Hero photo card */}
-        <div className="rounded-card overflow-hidden relative" style={{ height: 240 }}>
+        {/* Hero photo card — gradient underlay keeps the card presentable
+            while the photo loads or if it ever fails. */}
+        <div
+          className="rounded-card overflow-hidden relative"
+          style={{ height: 240, background: 'linear-gradient(135deg, #7A9E78 0%, #5F7E5D 100%)' }}
+        >
           <div
             className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: 'url(/images/jedalnicek-hero.jpg)' }}
+            style={{ backgroundImage: 'url(/images/strava-hero.jpg)' }}
           />
           <div className="absolute inset-0 bg-ink/35" />
           <div className="absolute inset-0 flex flex-col justify-end p-5">
@@ -102,7 +106,7 @@ export default function JedalnicekPromo() {
         <div className="rounded-card bg-white border border-ink/[0.08] shadow-nm-sm p-4">
           <div className="flex justify-around">
             {[
-              { value: '2 400+', label: 'žien používa' },
+              { value: '350+', label: 'žien používa' },
               { value: '120+', label: 'receptov' },
               { value: '4.9', label: 'hodnotenie' },
             ].map(({ value, label }) => (
@@ -118,23 +122,28 @@ export default function JedalnicekPromo() {
         <div className="rounded-card bg-white border border-ink/[0.08] shadow-nm-sm p-5">
           <SerifHeader as="h3" size="h3" className="mb-1">Toto nie je diéta</SerifHeader>
           <BodyText tone="secondary" className="mb-4">Je to inteligentný plán, ktorý funguje dlhodobo.</BodyText>
-          <div className="rounded-xl overflow-hidden border border-ink/[0.08]">
-            <div className="grid grid-cols-2">
-              <div className="bg-cream-200 px-4 py-2">
-                <Eyebrow tone="muted">Diéta</Eyebrow>
-              </div>
-              <div className="bg-pillar-strava/[0.08] px-4 py-2">
-                <Eyebrow className="text-pillar-strava">NeoMe</Eyebrow>
-              </div>
+          <div className="flex gap-2 mb-2">
+            <div className="flex-1 text-center">
+              <Eyebrow tone="muted">Bežná diéta</Eyebrow>
             </div>
+            <div className="flex-1 text-center">
+              <Eyebrow className="text-pillar-strava">NeoMe</Eyebrow>
+            </div>
+          </div>
+          <div className="flex flex-col gap-2">
             {COMPARISON.map((row, i) => (
-              <div key={i} className={`grid grid-cols-2 ${i % 2 === 0 ? '' : 'bg-ink/[0.02]'}`}>
-                <div className="px-4 py-2.5 border-r border-ink/[0.06]">
-                  <BodyText size="sm" tone="secondary">{row.diet}</BodyText>
+              <div key={i} className="flex items-stretch gap-2">
+                <div className="flex-1 rounded-xl bg-cream-200 px-3 py-3 flex items-center gap-2.5">
+                  <div className="h-5 w-5 rounded-full bg-ink/[0.06] flex items-center justify-center flex-shrink-0">
+                    <X className="size-3 text-ink/40" strokeWidth={2.5} />
+                  </div>
+                  <BodyText size="sm" tone="muted">{row.diet}</BodyText>
                 </div>
-                <div className="px-4 py-2.5 flex items-center gap-1.5">
-                  <Check className="size-3.5 text-pillar-strava flex-shrink-0" strokeWidth={2.5} />
-                  <BodyText size="sm" className="text-pillar-strava">{row.neome}</BodyText>
+                <div className="flex-1 rounded-xl bg-pillar-strava/[0.08] px-3 py-3 flex items-center gap-2.5">
+                  <div className="h-5 w-5 rounded-full bg-pillar-strava flex items-center justify-center flex-shrink-0">
+                    <Check className="size-3 text-white" strokeWidth={2.5} />
+                  </div>
+                  <BodyText size="sm" className="text-pillar-strava font-medium">{row.neome}</BodyText>
                 </div>
               </div>
             ))}
@@ -259,8 +268,12 @@ export default function JedalnicekPromo() {
         </div>
       </div>
 
-      {/* Sticky CTA */}
-      <div className="fixed bottom-0 left-0 right-0 z-20 px-5 pb-8 pt-4 bg-cream border-t border-ink/[0.08]">
+      {/* Sticky CTA — sits above the floating BottomNav pill (fixed at
+          safe-area + 10px, ~64px tall) so the button is never covered. */}
+      <div
+        className="fixed left-0 right-0 z-40 px-5 pb-3 pt-3 bg-cream/95 backdrop-blur-md border-t border-ink/[0.08]"
+        style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 84px)' }}
+      >
         <button
           onClick={onPrimary}
           disabled={buying}

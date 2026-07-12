@@ -28,6 +28,7 @@ const FOCUS_ROUTE_PREFIXES = [
   // Stand-alone deep screens reachable from various tabs
   '/program/',
   '/recepty/',
+  '/recept/',
   '/meditacie/',
   '/workout/',
   '/reflection/',

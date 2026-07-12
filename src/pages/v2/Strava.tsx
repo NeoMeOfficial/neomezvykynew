@@ -140,15 +140,15 @@ export default function Strava() {
             }}
           >
             <div style={{ padding: '22px 20px 20px', position: 'relative' }}>
-              <div style={{ position: 'absolute', top: -12, right: 12, fontFamily: 'Gilda Display, serif', fontSize: 110, fontStyle: 'italic', lineHeight: 0.9, color: '#F5EFE5', opacity: 0.22, userSelect: 'none', pointerEvents: 'none' }}>7</div>
+              <div style={{ position: 'absolute', top: -12, right: 12, fontFamily: 'Gilda Display, serif', fontSize: 110, fontStyle: 'italic', lineHeight: 0.9, color: '#F5EFE5', opacity: 0.22, userSelect: 'none', pointerEvents: 'none' }}>6</div>
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '3px 9px', borderRadius: 999, background: 'rgba(255,255,255,0.16)', border: '1px solid rgba(245,239,229,0.4)', marginBottom: 12 }}>
                 <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 9.5, letterSpacing: '0.22em', textTransform: 'uppercase' as const, fontWeight: 500, color: '#F5EFE5' }}>Jedálniček</span>
               </div>
               <div style={{ fontFamily: 'Gilda Display, serif', fontSize: 22, lineHeight: 1.2, color: '#F5EFE5', marginBottom: 6 }}>
-                7-dňový plán <em style={{ color: '#F5EFE5', fontStyle: 'italic', opacity: 0.92 }}>na mieru</em>
+                6-týždňový plán <em style={{ color: '#F5EFE5', fontStyle: 'italic', opacity: 0.92 }}>na mieru</em>
               </div>
               <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: 'rgba(245,239,229,0.85)', lineHeight: 1.5, fontWeight: 300, marginBottom: 16, maxWidth: 280 }}>
-                Personalizovaný jedálniček s nákupným zoznamom a Gabinými receptami — každý týždeň nový.
+                Personalizovaný jedálniček s nákupným zoznamom a Gabinými receptami — na celých 6 týždňov.
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap' as const, gap: '6px 14px', marginBottom: 18 }}>
                 {['Nákupný zoznam', 'Makrá + kalórie', 'Gabine recepty', 'Cyklus-vedomé'].map(p => (
