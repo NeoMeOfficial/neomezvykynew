@@ -159,6 +159,19 @@ function RequireAuth({ children }: { children: React.ReactNode }) {
    back to JWT app_metadata.role to allow non-DB role grants and to
    short-circuit the profile query when the JWT already has the claim.
    Unauthenticated visitors land on the minimal /admin/login. */
+/**
+ * SPA route changes keep the previous scroll offset, so a page opened from
+ * mid-scroll rendered "somewhere in the middle". Reset to top on every
+ * pathname change (browser back/forward keeps native restoration).
+ */
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
+
 function RequireAdmin({ children }: { children: React.ReactNode }) {
   const { user, loading } = useSupabaseAuth();
   const { pathname, search } = useLocation();
@@ -208,6 +221,7 @@ export default function AppV2() {
     <ConsentGuardProvider>
       <Toaster />
       <BrowserRouter>
+        <ScrollToTop />
         <CookieBanner />
         <InstallPrompt />
         <Suspense fallback={<LoadingSpinner />}>

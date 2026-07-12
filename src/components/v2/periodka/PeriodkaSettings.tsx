@@ -439,6 +439,10 @@ export default function PeriodkaSettings() {
       setLastPeriodStart(selectedDate);
       updateCycleData({ lastPeriodStart: format(selectedDate, 'yyyy-MM-dd'), periodLength: 5 });
       toast.success('Menštruácia začatá — deň 1');
+      // Initial setup complete → take the user straight to her tracker
+      // (she arrived from the setup prompt; staying in settings left her
+      // hunting for the back arrow). Later edits keep her in settings.
+      navigate('/kniznica/periodka');
       return;
     }
 
@@ -469,7 +473,7 @@ export default function PeriodkaSettings() {
       periodLength: safePeriodLength,
     });
     toast.success(`Nová menštruácia nastavená — deň ${daysSince}`);
-  }, [lastPeriodStart, periodLength, cycleLength, today, setLastPeriodStart, updateCycleData]);
+  }, [lastPeriodStart, periodLength, cycleLength, today, setLastPeriodStart, updateCycleData, navigate]);
 
   return (
     <div style={{ minHeight: '100vh', background: T.BG, fontFamily: T.SANS, color: T.INK, paddingBottom: 100 }}>

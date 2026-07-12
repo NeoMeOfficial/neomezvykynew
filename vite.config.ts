@@ -49,6 +49,10 @@ export default defineConfig(({ mode }) => ({
       filename: 'sw.ts',
       injectManifest: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff2}'],
+        // Photos are cached at runtime (see sw.ts), not pre-downloaded on
+        // install — precaching them forced ~MBs of images onto every new
+        // visitor before first paint.
+        globIgnores: ['**/images/**'],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
       },
       includeAssets: [

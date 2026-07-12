@@ -1,5 +1,8 @@
 /// <reference lib="webworker" />
 import { precacheAndRoute, cleanupOutdatedCaches } from 'workbox-precaching';
+import { registerRoute } from 'workbox-routing';
+import { CacheFirst } from 'workbox-strategies';
+import { ExpirationPlugin } from 'workbox-expiration';
 import { clientsClaim } from 'workbox-core';
 
 /**
@@ -41,6 +44,18 @@ self.addEventListener('message', (event) => {
 cleanupOutdatedCaches();
 // Workbox injects the precache manifest here at build time.
 precacheAndRoute(self.__WB_MANIFEST);
+
+// Photos load lazily and cache on first use — excluded from the precache
+// so a fresh install doesn't download the whole gallery up front.
+registerRoute(
+  ({ url }) => url.origin === self.location.origin && url.pathname.startsWith('/images/'),
+  new CacheFirst({
+    cacheName: 'neome-images',
+    plugins: [
+      new ExpirationPlugin({ maxEntries: 80, maxAgeSeconds: 30 * 24 * 60 * 60, purgeOnQuotaError: true }),
+    ],
+  }),
+);
 
 // ─── Web Push ──────────────────────────────────────────────────────
 
