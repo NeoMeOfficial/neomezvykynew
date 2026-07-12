@@ -13,6 +13,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { requireAdmin } from './_adminAuth';
+import { auditLog } from './_auditLog';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -69,6 +70,13 @@ export async function handler(event: any) {
       // Non-fatal — the profiles update is the source of truth. Log.
       console.warn('admin-set-user-role: app_metadata update failed', authErr);
     }
+
+    await auditLog(supabase, {
+      actor: auth,
+      action: 'role_changed',
+      targetUserId: userId,
+      detail: { role },
+    });
 
     return jsonResponse({ ok: true, role });
   } catch (err: any) {

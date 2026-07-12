@@ -31,6 +31,7 @@ export async function handler(event: any) {
         full_name,
         role,
         onboarding_completed,
+        nutrition_plan_purchased,
         created_at,
         updated_at,
         subscriptions (

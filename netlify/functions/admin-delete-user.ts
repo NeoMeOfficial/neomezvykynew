@@ -20,6 +20,7 @@ import { createClient } from '@supabase/supabase-js';
 import Stripe from 'stripe';
 import { stripeEnv } from './_stripeEnv';
 import { requireAdmin } from './_adminAuth';
+import { auditLog } from './_auditLog';
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
@@ -84,6 +85,12 @@ export async function handler(event: any) {
       // we can identify the offending table and fix the schema.
       return jsonResponse({ error: delErr.message }, 500);
     }
+
+    await auditLog(supabase, {
+      actor: auth,
+      action: 'user_deleted',
+      targetUserId: userId,
+    });
 
     return jsonResponse({ deleted: true, stripeCustomerDeleted: !!stripeCustomerId });
   } catch (err: any) {

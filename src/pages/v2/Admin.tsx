@@ -914,41 +914,36 @@ function UsersTab() {
     setLoading(true);
     setError(null);
     try {
-      // Query Supabase directly — works in both local dev and production.
-      // Requires the "Admin read all profiles" RLS policy to be applied
-      // (migration 20260505_gdpr_consent.sql).
-      const { data: profiles, error: profilesError } = await supabase
-        .from('profiles')
-        .select('id, email, full_name, role, created_at, nutrition_plan_purchased')
-        .order('created_at', { ascending: false });
+      // Server fn with the service-role key: direct client reads returned
+      // only the admin's OWN subscriptions row (no admin RLS on that
+      // table), so every customer silently displayed as Free.
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch('/.netlify/functions/admin-get-users', {
+        headers: { ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}) },
+      });
+      const body = await res.json();
+      if (!res.ok) throw new Error(body.error || 'Failed to load users');
 
-      if (profilesError) throw new Error(profilesError.message);
-
-      const { data: subs } = await supabase
-        .from('subscriptions')
-        .select('user_id, tier, active, stripe_customer_id, stripe_subscription_id, current_period_end, cancel_at_period_end');
-
-      const subMap: Record<string, AdminUser['subscriptions']> = {};
-      for (const s of subs ?? []) {
-        subMap[s.user_id] = {
-          tier: s.tier,
-          active: s.active,
-          stripe_customer_id: s.stripe_customer_id,
-          stripe_subscription_id: s.stripe_subscription_id,
-          current_period_end: s.current_period_end,
-          cancel_at_period_end: s.cancel_at_period_end,
+      setUsers((body.users ?? []).map((p: any) => {
+        // PostgREST returns the joined subscriptions as an array.
+        const sub = Array.isArray(p.subscriptions) ? p.subscriptions[0] : p.subscriptions;
+        return {
+          ...p,
+          nutrition_plan_purchased: !!p.nutrition_plan_purchased,
+          subscriptions: sub
+            ? {
+                tier: sub.tier,
+                active: sub.active,
+                stripe_customer_id: sub.stripe_customer_id,
+                stripe_subscription_id: sub.stripe_subscription_id,
+                current_period_end: sub.current_period_end,
+                cancel_at_period_end: sub.cancel_at_period_end,
+              }
+            : null,
         };
-      }
-
-      setUsers((profiles ?? []).map(p => ({
-        ...p,
-        nutrition_plan_purchased: !!(p as any).nutrition_plan_purchased,
-        subscriptions: subMap[p.id] ?? null,
-      })));
+      }));
     } catch (err: any) {
-      // Likely cause: admin RLS policy not applied yet.
-      // Run migration 20260505_gdpr_consent.sql in Supabase dashboard.
-      setError(err.message || 'Failed to load users — check Supabase RLS admin policy');
+      setError(err.message || 'Failed to load users');
     } finally {
       setLoading(false);
     }
@@ -1067,14 +1062,20 @@ function UsersTab() {
   };
 
   const handleCancelSubscription = async (user: AdminUser) => {
-    const subId = user.subscriptions?.stripe_subscription_id;
-    if (!subId) return;
+    if (!user.subscriptions?.stripe_subscription_id) return;
+    if (!window.confirm(`Zrušiť predplatné ${user.email} ku koncu obdobia?`)) return;
     setCancelling(user.id);
     try {
-      const res = await fetch('/.netlify/functions/cancel-subscription', {
+      // Admin-specific fn: the self-service cancel-subscription cancels the
+      // CALLER's own subscription — pointing it here would cancel Gabi's.
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch('/.netlify/functions/admin-cancel-subscription', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ subscriptionId: subId }),
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+        },
+        body: JSON.stringify({ userId: user.id }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
@@ -1094,18 +1095,19 @@ function UsersTab() {
     setTierMenuOpen(null);
     const periodEnd = tier !== 'free' ? new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString() : null;
     try {
-      const { error } = await supabase
-        .from('subscriptions')
-        .upsert({
-          user_id: userId,
-          tier,
-          active: tier !== 'free',
-          stripe_subscription_id: null,
-          current_period_end: periodEnd,
-          cancel_at_period_end: false,
-          updated_at: new Date().toISOString(),
-        }, { onConflict: 'user_id' });
-      if (error) throw new Error(error.message);
+      // Server fn: subscriptions has no admin-write RLS, the old direct
+      // upsert always failed. The fn preserves the user's Stripe linkage.
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch('/.netlify/functions/admin-set-user-tier', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+        },
+        body: JSON.stringify({ userId, tier }),
+      });
+      const body = await res.json();
+      if (!res.ok) throw new Error(body.error);
       setUsers(prev => prev.map(u => u.id === userId ? {
         ...u,
         subscriptions: {
@@ -1147,6 +1149,9 @@ function UsersTab() {
       const body = await res.json();
       if (!res.ok) throw new Error(body.error);
       setUsers(prev => prev.map(u => (u.id === user.id ? { ...u, role: next } : u)));
+      if (next === 'admin') {
+        alert(`${user.email} je teraz admin. Dôležité: musí sa odhlásiť a znova prihlásiť, aby jej fungovali všetky admin akcie (nový token).`);
+      }
     } catch (err: any) {
       alert('Chyba pri zmene admin role: ' + err.message);
     } finally {
@@ -1161,11 +1166,20 @@ function UsersTab() {
     if (!window.confirm(confirmMsg)) return;
     setTogglingMeal(user.id);
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ nutrition_plan_purchased: next })
-        .eq('id', user.id);
-      if (error) throw new Error(error.message);
+      // Server fn required: the profiles trigger (20260707120000) rejects
+      // nutrition_plan_purchased changes from any non-service_role caller —
+      // the old direct update matched 0 rows and faked success.
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch('/.netlify/functions/admin-set-meal-plan', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+        },
+        body: JSON.stringify({ userId: user.id, purchased: next }),
+      });
+      const body = await res.json();
+      if (!res.ok) throw new Error(body.error);
       setUsers(prev => prev.map(u => (u.id === user.id ? { ...u, nutrition_plan_purchased: next } : u)));
     } catch (err: any) {
       alert('Chyba pri zmene jedálnička: ' + err.message);
@@ -2233,11 +2247,19 @@ async function adminFetch(type: string) {
 async function adminUpsert(type: string, item: Record<string, unknown>) {
   const { data, error } = await supabase.from(TABLES[type]).upsert([item], { onConflict: 'id' }).select();
   if (error) throw new Error(error.message);
+  if (!data || data.length === 0) {
+    // RLS matched nothing — without this check the UI reports success
+    // while the database is untouched (e.g. stale admin JWT).
+    throw new Error('Uloženie neprešlo — žiadny riadok nezmenený (skús sa odhlásiť a prihlásiť).');
+  }
   return data?.[0];
 }
 async function adminDelete(type: string, id: string) {
-  const { error } = await supabase.from(TABLES[type]).delete().eq('id', id);
+  const { data, error } = await supabase.from(TABLES[type]).delete().eq('id', id).select('id');
   if (error) throw new Error(error.message);
+  if (!data || data.length === 0) {
+    throw new Error('Zmazanie neprešlo — žiadny riadok nezmazaný (chýbajúce oprávnenie alebo neexistujúci záznam).');
+  }
 }
 async function adminSeed(type: string, items: Record<string, unknown>[]) {
   const chunkSize = 50;
@@ -2256,232 +2278,286 @@ const AdminCard = ({ children, className = '', title }: { children: React.ReactN
 );
 
 // ═══════════════════════════════════════════
-// RECIPES TAB — Supabase CRUD
+// RECIPES TAB — recipe library (public.recipes, 20260507 schema)
 // ═══════════════════════════════════════════
-interface RecipeRow {
-  id: string; title: string; category: string; description: string;
-  prep_time: number; servings: number; calories: number;
-  protein: number; carbs: number; fat: number; fiber: number;
-  ingredients: { name: string; amount: string }[];
-  steps: string[]; allergens: string[]; dietary: string[]; tags: string[];
-  image: string; difficulty: string; pdf_path: string; active: boolean;
+//
+// The library is service-role-write-only (curated content, seeded by the
+// recipe-import pipeline), so ALL reads+writes go through the gated
+// admin-content Netlify fn — a direct client write silently no-ops.
+interface RecipeIngredient { raw: string; name: string; grams: number | null }
+interface RecipeLibRow {
+  id: string;
+  name: string;
+  slot: 'ranajky' | 'hlavne' | 'snack';
+  prep_minutes: number | null;
+  instructions: string | null;
+  ingredients: RecipeIngredient[];
+  kcal: number | null;
+  protein: number | null;
+  carbs: number | null;
+  fat: number | null;
+  fiber: number | null;
+  active: boolean;
+}
+
+const RECIPE_SLOTS: { key: RecipeLibRow['slot']; label: string }[] = [
+  { key: 'ranajky', label: 'Raňajky' },
+  { key: 'hlavne', label: 'Hlavné jedlá' },
+  { key: 'snack', label: 'Snacky' },
+];
+
+/** ingredients jsonb ⇆ editable lines: "názov | gramy" */
+function ingredientsToText(ings: RecipeIngredient[]): string {
+  return (ings ?? []).map((i) => `${i.name} | ${i.grams ?? ''}`).join('\n');
+}
+function textToIngredients(text: string): RecipeIngredient[] {
+  return text
+    .split('\n')
+    .map((l) => l.trim())
+    .filter(Boolean)
+    .map((l) => {
+      const [name, gramsRaw] = l.split('|').map((x) => x.trim());
+      const grams = gramsRaw ? parseFloat(gramsRaw.replace(',', '.')) : NaN;
+      const g = Number.isFinite(grams) ? grams : null;
+      return { name: name ?? l, grams: g, raw: g != null ? `${name} (${g} g)` : (name ?? l) };
+    });
+}
+
+async function recipeApi(action: 'upsert' | 'delete', payload: Record<string, unknown>) {
+  const { data: { session } } = await supabase.auth.getSession();
+  const res = await fetch('/.netlify/functions/admin-content', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+    },
+    body: JSON.stringify({ type: 'recipes', action, ...payload }),
+  });
+  const body = await res.json();
+  if (!res.ok) throw new Error(body.error || 'Server error');
+  return body;
 }
 
 function RecipesTab() {
-  const [items, setItems] = useState<RecipeRow[]>([]);
+  const [items, setItems] = useState<RecipeLibRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [slotFilter, setSlotFilter] = useState<'all' | RecipeLibRow['slot']>('all');
+  const [query, setQuery] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-  const [seeding, setSeeding] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [form, setForm] = useState<Partial<RecipeRow>>({ category: 'ranajky', difficulty: 'easy', active: true });
-  // Multi-line text fields
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [form, setForm] = useState<Partial<RecipeLibRow>>({ slot: 'ranajky', active: true });
   const [ingText, setIngText] = useState('');
-  const [stepsText, setStepsText] = useState('');
-  const [allerText, setAllerText] = useState('');
-  const [tagsText, setTagsText] = useState('');
 
   const load = async () => {
     setLoading(true); setError(null);
-    try { setItems(await adminFetch('recipes')); } catch (e: any) { setError(e.message); }
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch('/.netlify/functions/admin-content?type=recipes', {
+        headers: { ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}) },
+      });
+      const body = await res.json();
+      if (!res.ok) throw new Error(body.error || 'Failed to load');
+      setItems((body.items ?? []) as RecipeLibRow[]);
+    } catch (e: any) { setError(e.message); }
     setLoading(false);
   };
   useEffect(() => { load(); }, []);
 
   const openAdd = () => {
-    setForm({ category: 'ranajky', difficulty: 'easy', active: true });
-    setIngText(''); setStepsText(''); setAllerText(''); setTagsText('');
-    setEditId(null); setShowForm(true); setError(null);
+    setForm({ slot: 'ranajky', active: true });
+    setIngText('');
+    setEditId(null); setShowForm(true); setSaveError(null);
   };
-  const openEdit = (r: RecipeRow) => {
+  const openEdit = (r: RecipeLibRow) => {
     setForm({ ...r });
-    setIngText((r.ingredients ?? []).map(i => `${i.name}: ${i.amount}`).join('\n'));
-    setStepsText((r.steps ?? []).join('\n'));
-    setAllerText((r.allergens ?? []).join(', '));
-    setTagsText((r.tags ?? []).join(', '));
-    setEditId(r.id); setShowForm(true); setError(null);
+    setIngText(ingredientsToText(r.ingredients ?? []));
+    setEditId(r.id); setShowForm(true); setSaveError(null);
   };
-  const closeForm = () => { setShowForm(false); setEditId(null); setError(null); };
-
-  const generateId = (title: string, cat: string) =>
-    `${cat}-${title.toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '-').slice(0, 40)}-${Date.now()}`;
-
-  const parseIngredients = (text: string) =>
-    text.split('\n').filter(Boolean).map(line => {
-      const idx = line.indexOf(':');
-      return idx > -1 ? { name: line.slice(0, idx).trim(), amount: line.slice(idx + 1).trim() } : { name: line.trim(), amount: '' };
-    });
+  const closeForm = () => { setShowForm(false); setSaveError(null); };
 
   const save = async () => {
-    if (!form.title) return;
-    setSaving(true); setError(null);
+    if (!form.name?.trim()) { setSaveError('Názov je povinný'); return; }
+    setSaving(true); setSaveError(null);
     try {
-      const payload: RecipeRow = {
-        id: editId ?? generateId(form.title!, form.category ?? 'ranajky'),
-        title: form.title!,
-        category: form.category ?? 'ranajky',
-        description: form.description ?? '',
-        prep_time: Number(form.prep_time) || 15,
-        servings: Number(form.servings) || 2,
-        calories: Number(form.calories) || 0,
-        protein: Number(form.protein) || 0,
-        carbs: Number(form.carbs) || 0,
-        fat: Number(form.fat) || 0,
-        fiber: Number(form.fiber) || 0,
-        ingredients: parseIngredients(ingText),
-        steps: stepsText.split('\n').filter(Boolean),
-        allergens: allerText.split(',').map(s => s.trim()).filter(Boolean),
-        dietary: form.dietary ?? [],
-        tags: tagsText.split(',').map(s => s.trim()).filter(Boolean),
-        image: form.image ?? '',
-        difficulty: form.difficulty ?? 'easy',
-        pdf_path: form.pdf_path ?? '',
+      const data: Record<string, unknown> = {
+        ...(editId ? { id: editId } : {}),
+        name: form.name.trim(),
+        slot: form.slot ?? 'ranajky',
+        prep_minutes: form.prep_minutes ?? null,
+        instructions: form.instructions ?? null,
+        ingredients: textToIngredients(ingText),
+        kcal: form.kcal ?? null,
+        protein: form.protein ?? null,
+        carbs: form.carbs ?? null,
+        fat: form.fat ?? null,
+        fiber: form.fiber ?? null,
         active: form.active ?? true,
       };
-      await adminUpsert('recipes', payload as unknown as Record<string, unknown>);
-      await load(); closeForm();
-    } catch (e: any) { setError(e.message); }
+      await recipeApi('upsert', { data });
+      closeForm();
+      await load();
+    } catch (e: any) { setSaveError(e.message); }
     setSaving(false);
   };
 
-  const remove = async (id: string) => {
-    if (!confirm('Naozaj chceš vymazať tento recept?')) return;
-    try { await adminDelete('recipes', id); setItems(p => p.filter(r => r.id !== id)); } catch (e: any) { alert(e.message); }
-  };
-
-  const toggleActive = async (r: RecipeRow) => {
+  const remove = async (r: RecipeLibRow) => {
+    if (!window.confirm(`Zmazať recept „${r.name}"? Táto akcia je nevratná.`)) return;
     try {
-      await adminUpsert('recipes', { ...r, active: !r.active } as unknown as Record<string, unknown>);
-      setItems(p => p.map(x => x.id === r.id ? { ...x, active: !r.active } : x));
-    } catch (e: any) { alert(e.message); }
+      await recipeApi('delete', { id: r.id });
+      setItems((prev) => prev.filter((x) => x.id !== r.id));
+    } catch (e: any) { alert('Chyba pri mazaní: ' + e.message); }
   };
 
-  // NOTE: the old "seed from static" import was removed — the recipe library
-  // now lives in Supabase (recipe-import pipeline) and must not be overwritten
-  // by the retired src/data/recipes.ts dataset.
+  const toggleActive = async (r: RecipeLibRow) => {
+    try {
+      await recipeApi('upsert', { data: { ...r, active: !r.active } });
+      setItems((prev) => prev.map((x) => (x.id === r.id ? { ...x, active: !x.active } : x)));
+    } catch (e: any) { alert('Chyba: ' + e.message); }
+  };
 
-  const CATS = ['ranajky', 'obed', 'vecera', 'snack', 'smoothie'];
+  const filtered = items.filter((r) => {
+    if (slotFilter !== 'all' && r.slot !== slotFilter) return false;
+    if (query.trim() && !r.name.toLowerCase().includes(query.trim().toLowerCase())) return false;
+    return true;
+  });
+
+  const num = (v: number | null | undefined) => (v == null ? '' : String(v));
+  const setNum = (key: keyof RecipeLibRow) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const v = e.target.value.trim();
+    setForm((f) => ({ ...f, [key]: v === '' ? null : parseFloat(v.replace(',', '.')) }));
+  };
+
+  const inputStyle: React.CSSProperties = { width: '100%', boxSizing: 'border-box', padding: '10px 12px', borderRadius: 10, border: '1px solid rgba(61,41,33,0.14)', fontFamily: 'DM Sans, system-ui', fontSize: 13, color: _A.DEEP, background: '#fff' };
+  const labelStyle: React.CSSProperties = { fontFamily: 'DM Sans, system-ui', fontSize: 9.5, letterSpacing: '0.14em', textTransform: 'uppercase', color: _A.EYEBROW, fontWeight: 500, marginBottom: 6, display: 'block' };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 22, fontWeight: 500, color: _A.DEEP }}>Recipe Database</div>
-        <div style={{ display: 'flex', gap: 10 }}>
-          <button onClick={openAdd} style={{ ...btnPrimary, display: 'flex', alignItems: 'center', gap: 8 }}>
-            <Plus style={{ width: 14, height: 14 }} />Nový recept
-          </button>
-        </div>
+        <button onClick={openAdd} style={{ ...btnPrimary, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Plus style={{ width: 14, height: 14 }} />Nový recept
+        </button>
       </div>
 
-      {error && <div style={{ padding: '12px 16px', borderRadius: 12, background: 'rgba(193,133,106,0.12)', border: `1px solid ${_A.TERRA}30`, fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.TERRA, display: 'flex', alignItems: 'center', gap: 8 }}><AlertTriangle style={{ width: 14, height: 14, flexShrink: 0 }} />{error}</div>}
+      {error && (
+        <AdminCard>
+          <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12.5, color: '#B4533E', marginBottom: 10 }}>{error}</div>
+          <button onClick={load} style={btnSecondary}>Skúsiť znova</button>
+        </AdminCard>
+      )}
 
       {showForm && (
         <AdminCard>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
-            <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 18, fontWeight: 500, color: _A.DEEP }}>{editId ? 'Upraviť recept' : 'Nový recept'}</div>
-            <button onClick={closeForm} style={{ all: 'unset', cursor: 'pointer' }}><X style={{ width: 16, height: 16, color: _A.MUTED }} /></button>
+          <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 17, color: _A.DEEP, marginBottom: 16 }}>
+            {editId ? 'Upraviť recept' : 'Nový recept'}
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-            <div style={{ gridColumn: '1 / -1' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: 12, marginBottom: 12 }}>
+            <div>
               <label style={labelStyle}>Názov *</label>
-              <input value={form.title ?? ''} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} style={inputStyle} />
+              <input style={inputStyle} value={form.name ?? ''} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} />
             </div>
             <div>
               <label style={labelStyle}>Kategória</label>
-              <select value={form.category ?? 'ranajky'} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} style={inputStyle}>
-                {CATS.map(c => <option key={c} value={c}>{c}</option>)}
+              <select style={inputStyle} value={form.slot ?? 'ranajky'} onChange={(e) => setForm((f) => ({ ...f, slot: e.target.value as RecipeLibRow['slot'] }))}>
+                {RECIPE_SLOTS.map((s) => <option key={s.key} value={s.key}>{s.label}</option>)}
               </select>
             </div>
             <div>
-              <label style={labelStyle}>Obtiažnosť</label>
-              <select value={form.difficulty ?? 'easy'} onChange={e => setForm(f => ({ ...f, difficulty: e.target.value }))} style={inputStyle}>
-                <option value="easy">Jednoduchý</option>
-                <option value="medium">Stredný</option>
-              </select>
-            </div>
-            {[['prep_time','Čas prípravy (min)'],['servings','Porcie'],['calories','Kalórie'],['protein','Bielkoviny (g)'],['carbs','Sacharidy (g)'],['fat','Tuky (g)']].map(([field, label]) => (
-              <div key={field}>
-                <label style={labelStyle}>{label}</label>
-                <input type="number" value={(form as any)[field] ?? ''} onChange={e => setForm(f => ({ ...f, [field]: e.target.value }))} style={inputStyle} />
-              </div>
-            ))}
-            <div style={{ gridColumn: '1 / -1' }}>
-              <label style={labelStyle}>URL obrázka</label>
-              <input value={form.image ?? ''} onChange={e => setForm(f => ({ ...f, image: e.target.value }))} placeholder="https://..." style={inputStyle} />
-            </div>
-            <div style={{ gridColumn: '1 / -1' }}>
-              <label style={labelStyle}>Popis</label>
-              <textarea value={form.description ?? ''} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} rows={2} style={{ ...inputStyle, resize: 'none' }} />
-            </div>
-            <div style={{ gridColumn: '1 / -1' }}>
-              <label style={labelStyle}>Ingrediencie (jeden na riadok, formát "Názov: Množstvo")</label>
-              <textarea value={ingText} onChange={e => setIngText(e.target.value)} rows={5} placeholder={'Avokádo: 1 ks\nVajíčko: 2 ks'} style={{ ...inputStyle, resize: 'none', fontFamily: 'monospace' }} />
-            </div>
-            <div style={{ gridColumn: '1 / -1' }}>
-              <label style={labelStyle}>Postup (jeden krok na riadok)</label>
-              <textarea value={stepsText} onChange={e => setStepsText(e.target.value)} rows={4} placeholder="Nakrájaj avokádo..." style={{ ...inputStyle, resize: 'none' }} />
-            </div>
-            <div>
-              <label style={labelStyle}>Alergény (čiarkou oddelené)</label>
-              <input value={allerText} onChange={e => setAllerText(e.target.value)} placeholder="dairy, gluten" style={inputStyle} />
-            </div>
-            <div>
-              <label style={labelStyle}>Tagy (čiarkou oddelené)</label>
-              <input value={tagsText} onChange={e => setTagsText(e.target.value)} placeholder="postpartum, proteín" style={inputStyle} />
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <button onClick={() => setForm(f => ({ ...f, active: !f.active }))} style={{ all: 'unset', cursor: 'pointer' }}>
-                {form.active ? <CheckSquare style={{ width: 18, height: 18, color: _A.SAGE }} /> : <Square style={{ width: 18, height: 18, color: _A.MUTED }} />}
-              </button>
-              <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.DEEP }}>Aktívny</span>
+              <label style={labelStyle}>Príprava (min)</label>
+              <input style={inputStyle} inputMode="numeric" value={num(form.prep_minutes)} onChange={setNum('prep_minutes')} />
             </div>
           </div>
-          {error && <div style={{ marginTop: 12, fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.TERRA, display: 'flex', alignItems: 'center', gap: 6 }}><AlertTriangle style={{ width: 13, height: 13 }} />{error}</div>}
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 18 }}>
+          <div style={{ marginBottom: 12 }}>
+            <label style={labelStyle}>Postup prípravy</label>
+            <textarea style={{ ...inputStyle, minHeight: 120, resize: 'vertical' }} value={form.instructions ?? ''} onChange={(e) => setForm((f) => ({ ...f, instructions: e.target.value }))} />
+          </div>
+          <div style={{ marginBottom: 12 }}>
+            <label style={labelStyle}>Suroviny — jeden riadok = „názov | gramy" (napr. „jogurt biely | 360")</label>
+            <textarea style={{ ...inputStyle, minHeight: 110, resize: 'vertical', fontFamily: 'ui-monospace, monospace', fontSize: 12 }} value={ingText} onChange={(e) => setIngText(e.target.value)} />
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12, marginBottom: 14 }}>
+            {([['kcal', 'Kcal'], ['protein', 'Bielkoviny (g)'], ['carbs', 'Sacharidy (g)'], ['fat', 'Tuky (g)'], ['fiber', 'Vláknina (g)']] as const).map(([key, label]) => (
+              <div key={key}>
+                <label style={labelStyle}>{label}</label>
+                <input style={inputStyle} inputMode="decimal" value={num(form[key] as number | null)} onChange={setNum(key)} />
+              </div>
+            ))}
+          </div>
+          <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED, marginBottom: 14 }}>
+            Pozn.: makrá sa pri úprave surovín neprepočítavajú automaticky — uprav ich ručne, alebo nechaj pôvodné hodnoty.
+          </div>
+          {saveError && <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12.5, color: '#B4533E', marginBottom: 12 }}>{saveError}</div>}
+          <div style={{ display: 'flex', gap: 10 }}>
+            <button onClick={save} disabled={saving} style={btnPrimary}>{saving ? 'Ukladám…' : 'Uložiť'}</button>
             <button onClick={closeForm} style={btnSecondary}>Zrušiť</button>
-            <button onClick={save} disabled={saving} style={{ ...btnPrimary, display: 'flex', alignItems: 'center', gap: 8, opacity: saving ? 0.7 : 1 }}>
-              {saving && <RefreshCw style={{ width: 13, height: 13, animation: 'spin 1s linear infinite' }} />}Uložiť
-            </button>
           </div>
         </AdminCard>
       )}
 
       <AdminCard>
-        {loading ? <div style={{ padding: '32px 0', textAlign: 'center', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>Načítavam...</div> : (
-          <>
-            <div style={{ marginBottom: 16, fontFamily: 'DM Sans, system-ui', fontSize: 9.5, letterSpacing: '0.18em', textTransform: 'uppercase', color: _A.EYEBROW, fontWeight: 500 }}>{items.length} receptov</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {items.length === 0 && <p style={{ padding: '24px 0', textAlign: 'center', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>Žiadne recepty. Pridaj prvý alebo importuj statické.</p>}
-              {items.map(r => (
-                <div key={r.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', borderRadius: 12, border: `1px solid ${_A.HAIR}`, background: _A.BG }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    {r.image && <img src={r.image} alt="" style={{ width: 40, height: 40, borderRadius: 10, objectFit: 'cover' }} />}
-                    <div>
-                      <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 13, fontWeight: 500, color: _A.DEEP }}>{r.title}</div>
-                      <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 3 }}>
-                        <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', padding: '2px 7px', borderRadius: 999, background: 'rgba(139,158,136,0.15)', color: _A.SAGE }}>{r.category}</span>
-                        <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED }}>{r.calories} kcal</span>
-                        <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED }}>{r.prep_time} min</span>
-                      </div>
-                    </div>
+        <div style={{ display: 'flex', gap: 10, marginBottom: 16, alignItems: 'center' }}>
+          <input
+            style={{ ...inputStyle, maxWidth: 260 }}
+            placeholder="Hľadať recept…"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+          {(['all', 'ranajky', 'hlavne', 'snack'] as const).map((k) => (
+            <button
+              key={k}
+              onClick={() => setSlotFilter(k)}
+              style={{
+                ...btnSecondary,
+                padding: '7px 13px',
+                background: slotFilter === k ? _A.DEEP : 'transparent',
+                color: slotFilter === k ? '#fff' : _A.DEEP,
+              }}
+            >
+              {k === 'all' ? `Všetko (${items.length})` : RECIPE_SLOTS.find((s) => s.key === k)?.label}
+            </button>
+          ))}
+        </div>
+
+        {loading ? (
+          <div style={{ padding: '32px 0', textAlign: 'center', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>Načítavam…</div>
+        ) : filtered.length === 0 ? (
+          <div style={{ padding: '32px 0', textAlign: 'center', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>Žiadne recepty.</div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            {filtered.map((r) => (
+              <div key={r.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: '1px solid rgba(61,41,33,0.06)' }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 13.5, fontWeight: 500, color: _A.DEEP, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {r.name}
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                    <button onClick={() => toggleActive(r)} title={r.active ? 'Deaktivácia' : 'Aktivácia'} style={{ all: 'unset', cursor: 'pointer', padding: 4 }}>
-                      {r.active ? <CheckSquare style={{ width: 16, height: 16, color: _A.SAGE }} /> : <Square style={{ width: 16, height: 16, color: _A.MUTED }} />}
-                    </button>
-                    <button onClick={() => openEdit(r)} style={{ all: 'unset', cursor: 'pointer', padding: 6, borderRadius: 8 }}><Edit3 style={{ width: 14, height: 14, color: _A.MUTED }} /></button>
-                    <button onClick={() => remove(r.id)} style={{ all: 'unset', cursor: 'pointer', padding: 6, borderRadius: 8 }}><Trash2 style={{ width: 14, height: 14, color: _A.TERRA }} /></button>
+                  <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED, marginTop: 2 }}>
+                    {RECIPE_SLOTS.find((s) => s.key === r.slot)?.label ?? r.slot}
+                    {r.kcal != null ? ` · ${r.kcal} kcal` : ''}
+                    {r.prep_minutes != null ? ` · ${r.prep_minutes} min` : ''}
+                    {` · ${(r.ingredients ?? []).length} surovín`}
                   </div>
                 </div>
-              ))}
-            </div>
-          </>
+                <button
+                  onClick={() => toggleActive(r)}
+                  title={r.active ? 'Skryť z appky' : 'Zobraziť v appke'}
+                  style={{ ...btnSecondary, padding: '5px 10px', fontSize: 10.5, color: r.active ? '#4E6B4C' : '#B4533E' }}
+                >
+                  {r.active ? 'Aktívny' : 'Skrytý'}
+                </button>
+                <button onClick={() => openEdit(r)} style={{ ...btnSecondary, padding: '5px 10px', fontSize: 10.5 }}>Upraviť</button>
+                <button onClick={() => remove(r)} style={{ ...btnSecondary, padding: '5px 10px', fontSize: 10.5, color: '#B4533E' }}>Zmazať</button>
+              </div>
+            ))}
+          </div>
         )}
       </AdminCard>
     </div>
   );
 }
+
 
 // ═══════════════════════════════════════════
 // EXERCISES TAB — Supabase CRUD
@@ -2605,9 +2681,6 @@ function ExercisesTab() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 22, fontWeight: 500, color: _A.DEEP }}>Exercise Library</div>
         <div style={{ display: 'flex', gap: 10 }}>
-          <button onClick={seedFromStatic} disabled={seeding} style={btnSecondary}>
-            {seeding ? 'Importujem...' : 'Import'}
-          </button>
           <button onClick={openAdd} style={{ ...btnPrimary, display: 'flex', alignItems: 'center', gap: 8 }}>
             <Plus style={{ width: 14, height: 14 }} />Nové cvičenie
           </button>
@@ -3138,9 +3211,9 @@ function ProgramsTab() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 22, fontWeight: 500, color: _A.DEEP }}>Fitness Programy</div>
         <div style={{ display: 'flex', gap: 10 }}>
-          <button onClick={seedFromStatic} disabled={seeding} style={btnSecondary}>
-            {seeding ? 'Importujem…' : 'Seed 4 programy'}
-          </button>
+          {/* Seed button intentionally lives only in the empty state below —
+              here it sat one misclick away from wiping live programme
+              schedules with empty defaults. */}
           <button onClick={openNew} style={{ ...btnPrimary, display: 'flex', alignItems: 'center', gap: 8 }}>
             <Plus style={{ width: 14, height: 14 }} />Nový program
           </button>
@@ -3301,7 +3374,17 @@ function ProgramsTab() {
             ? (
               <div style={{ padding: '32px 0', textAlign: 'center' }}>
                 <p style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED, marginBottom: 12 }}>Žiadne programy. Seed 4 základné alebo pridaj nový.</p>
-                <button onClick={seedFromStatic} disabled={seeding} style={btnPrimary}>
+                <button
+            onClick={() => {
+              // Destructive: overwrites schedule/image/description of the 4
+              // live programmes with empty defaults.
+              if (window.confirm('POZOR: Seed prepíše rozvrhy, obrázky a popisy všetkých 4 programov prázdnymi hodnotami. Naozaj pokračovať?')) {
+                seedFromStatic();
+              }
+            }}
+            disabled={seeding}
+            style={btnPrimary}
+          >
                   {seeding ? 'Importujem…' : 'Seed 4 programy'}
                 </button>
               </div>
@@ -3394,7 +3477,12 @@ export default function AdminNew() {
             return (
               <button
                 key={item.id}
-                onClick={() => setActiveTab(item.id)}
+                onClick={() => {
+                  // Referrals admin lives on its own route; the tab used to
+                  // fall through to the Dashboard silently.
+                  if (item.id === 'referrals') { navigate('/admin/referrals'); return; }
+                  setActiveTab(item.id);
+                }}
                 style={{
                   all: 'unset', cursor: 'pointer',
                   padding: '9px 12px',
@@ -3444,7 +3532,14 @@ export default function AdminNew() {
           <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: A.DEEP, fontWeight: 500 }}>Gabi</div>
           <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10, color: A.EYEBROW, fontWeight: 400, marginTop: 1 }}>Owner</div>
         </div>
-        <button onClick={() => navigate('/domov-new')} style={{ all: 'unset', cursor: 'pointer', width: 28, height: 28, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <button
+          onClick={async () => {
+            await supabase.auth.signOut();
+            navigate('/admin/login');
+          }}
+          title="Odhlásiť sa"
+          style={{ all: 'unset', cursor: 'pointer', width: 28, height: 28, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+        >
           <LogOut style={{ width: 14, height: 14, color: A.MUTED }} strokeWidth={1.7} />
         </button>
       </div>

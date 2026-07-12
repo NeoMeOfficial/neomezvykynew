@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { requireAdmin } from './_adminAuth';
+import { auditLog } from './_auditLog';
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
@@ -34,21 +35,36 @@ export async function handler(event: any) {
       return { statusCode: 400, headers: CORS, body: JSON.stringify({ error: `tier must be one of: ${VALID_TIERS.join(', ')}` }) };
     }
 
-    // Upsert subscription row
+    // Manual tier grants must not sever the user's Stripe linkage —
+    // nulling stripe_customer_id here would orphan a paying customer's
+    // billing history. Merge with whatever the row already holds.
+    const { data: existing } = await supabase
+      .from('subscriptions')
+      .select('stripe_customer_id, stripe_subscription_id')
+      .eq('user_id', userId)
+      .maybeSingle();
+
     const { error } = await supabase
       .from('subscriptions')
       .upsert({
         user_id: userId,
         tier,
         active: tier !== 'free',
-        stripe_customer_id: null,
-        stripe_subscription_id: null,
+        stripe_customer_id: existing?.stripe_customer_id ?? null,
+        stripe_subscription_id: existing?.stripe_subscription_id ?? null,
         current_period_end: tier !== 'free' ? new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString() : null,
         cancel_at_period_end: false,
         updated_at: new Date().toISOString(),
       }, { onConflict: 'user_id' });
 
     if (error) throw error;
+
+    await auditLog(supabase, {
+      actor: auth,
+      action: 'tier_changed_by_admin',
+      targetUserId: userId,
+      detail: { tier },
+    });
 
     return {
       statusCode: 200,

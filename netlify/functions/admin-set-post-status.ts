@@ -14,6 +14,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { requireAdmin } from './_adminAuth';
+import { auditLog } from './_auditLog';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -70,6 +71,12 @@ export async function handler(event: any) {
       if (authorErr) console.error('admin-set-post-status: author ledger delete failed', authorErr);
       reversedAuthor = authorRows?.length ?? 0;
     }
+
+    await auditLog(supabaseAdmin, {
+      actor: auth,
+      action: 'post_status_changed',
+      detail: { postId, status },
+    });
 
     return jsonResponse({ ok: true, status, reversedAuthor });
   } catch (err: any) {

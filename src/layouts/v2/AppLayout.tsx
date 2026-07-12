@@ -17,6 +17,8 @@ import ErrorBoundary from '../../components/v2/ErrorBoundary';
  * tab still shows the nav.
  */
 const FOCUS_ROUTE_PREFIXES = [
+  // Admin panel has its own sidebar — the consumer BottomNav floated over it.
+  '/admin',
   '/jedalnicek/onboarding',
   '/onboarding-plus/',
   // Deep screens under top-level tabs (compose, detail, thread,
