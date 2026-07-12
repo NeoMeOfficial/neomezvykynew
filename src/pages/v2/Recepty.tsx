@@ -45,7 +45,7 @@ export default function Recepty() {
   const { isFavorite, toggleFavorite } = useUniversalFavorites();
   const [query, setQuery] = useState(params.get('q') ?? '');
   const [activeFast, setActiveFast] = useState(false);
-  const [favOnly, setFavOnly] = useState(false);
+  const [favOnly, setFavOnly] = useState(params.get('fav') === '1');
   const [slotFilter, setSlotFilter] = useState<SupabaseRecipe['slot'] | 'all'>(() => {
     const cat = params.get('cat');
     return cat ? CATEGORY_QUERY_MAP[cat] ?? 'all' : 'all';

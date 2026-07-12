@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useUniversalFavorites, ContentType } from '../../hooks/useUniversalFavorites';
 import FavoriteButton from '../../components/v2/favorites/FavoriteButton';
 import { Heart, ChefHat, Dumbbell, Brain, FileText, Target } from 'lucide-react';
@@ -32,10 +32,25 @@ const TYPE_COLOR: Record<ContentType, string> = {
   program: 'text-pillar-telo',
 };
 
+/** Route to open a favourited item, per content type. */
+function itemPath(item: { id: string | number; type: ContentType; category?: string }): string {
+  switch (item.type) {
+    case 'recipe':     return `/recept/${item.id}`;
+    case 'meditation': return `/meditacia/${item.id}`;
+    case 'workout':    return item.category === 'stretch' ? `/stretch/${item.id}` : `/exercise/extra/${item.id}`;
+    case 'article':    return `/blog/${item.id}`;
+    case 'program':    return `/program/${item.id}`;
+  }
+}
+
 export default function Oblubene() {
   const navigate = useNavigate();
+  const [params] = useSearchParams();
   const { favorites, getFavoritesByType, getFavoriteCounts } = useUniversalFavorites();
-  const [activeTab, setActiveTab] = useState<ContentType | 'all'>('all');
+  const [activeTab, setActiveTab] = useState<ContentType | 'all'>(() => {
+    const tab = params.get('tab');
+    return tab && tab in TYPE_LABEL ? (tab as ContentType) : 'all';
+  });
 
   const counts = getFavoriteCounts();
 
@@ -50,11 +65,11 @@ export default function Oblubene() {
     { key: 'meditation' as const, label: 'Meditácie', count: counts.meditation },
     { key: 'article' as const, label: 'Články', count: counts.article },
     { key: 'program' as const, label: 'Programy', count: counts.program },
-  ].filter(t => t.key === 'all' || t.count > 0);
+  ].filter(t => t.key === 'all' || t.count > 0 || t.key === activeTab);
 
   return (
     <div className="min-h-screen bg-cream pb-12">
-      <TopBar title="Obľúbené" backHref="/profil" />
+      <TopBar title="Obľúbené" onBack={() => navigate(-1)} />
 
       {favorites.length === 0 ? (
         <div className="px-5 mt-12 text-center">
@@ -107,7 +122,11 @@ export default function Oblubene() {
                 return (
                   <div
                     key={`${item.type}-${item.id}`}
-                    className="rounded-card bg-white border border-ink/[0.08] shadow-nm-sm p-4 flex items-center gap-3"
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => navigate(itemPath(item))}
+                    onKeyDown={(e) => { if (e.key === 'Enter') navigate(itemPath(item)); }}
+                    className="rounded-card bg-white border border-ink/[0.08] shadow-nm-sm p-4 flex items-center gap-3 cursor-pointer transition-all active:scale-[0.99]"
                   >
                     <div className="h-12 w-12 rounded-xl bg-cream-200 flex items-center justify-center flex-shrink-0 overflow-hidden">
                       {item.image ? (

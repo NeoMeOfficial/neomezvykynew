@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Page, Eye, NM } from '../../components/v2/neome';
 import { useMeditations } from '../../hooks/useMeditations';
 import { useReflections } from '../../hooks/useDailyRituals';
+import { useUniversalFavorites } from '../../hooks/useUniversalFavorites';
 
 /**
  * Myseľ landing — Round 20.
@@ -35,6 +36,8 @@ export default function MyselNew() {
   const navigate = useNavigate();
   const { meditations } = useMeditations();
   const { entries } = useReflections();
+  const { getFavoriteCounts } = useUniversalFavorites();
+  const favMeditations = getFavoriteCounts().meditation;
 
   const today = new Date();
   const dateLabel = `${SK_DAYS[today.getDay()]} · ${today.getDate()}. ${today.getMonth() + 1}.`;
@@ -259,6 +262,36 @@ export default function MyselNew() {
               <path d="M12 4v16" />
             </svg>
             Všetky meditácie{meditations.length ? ` · ${meditations.length}` : ''}
+          </span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={NM.MAUVE} strokeWidth="2" strokeLinecap="round">
+            <path d="M9 6l6 6-6 6" />
+          </svg>
+        </button>
+
+        <button
+          onClick={() => navigate('/oblubene?tab=meditation')}
+          style={{
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '16px 20px',
+            marginTop: 10,
+            borderRadius: 18,
+            background: '#FFFFFF',
+            border: `1px solid ${NM.HAIR_2}`,
+            cursor: 'pointer',
+            fontFamily: NM.SANS,
+            fontSize: 13,
+            color: NM.DEEP,
+            fontWeight: 500,
+          }}
+        >
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10 }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill={favMeditations > 0 ? NM.MAUVE : 'none'} stroke={NM.MAUVE} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" />
+            </svg>
+            Obľúbené meditácie{favMeditations ? ` · ${favMeditations}` : ''}
           </span>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={NM.MAUVE} strokeWidth="2" strokeLinecap="round">
             <path d="M9 6l6 6-6 6" />

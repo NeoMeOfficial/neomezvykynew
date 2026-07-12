@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRecipes, SLOT_LABEL, type SupabaseRecipe } from '@/hooks/useRecipes';
 import { useSubscription } from '@/contexts/SubscriptionContext';
+import { useUniversalFavorites } from '@/hooks/useUniversalFavorites';
 import { TopBar } from '@/components/v2/top-bar';
 import { SerifHeader } from '@/components/ui/serif-header';
 import { BodyText } from '@/components/ui/body-text';
@@ -22,6 +23,11 @@ export default function Strava() {
   const navigate = useNavigate();
   const { hasMealPlanner } = useSubscription();
   const { recipes, loading } = useRecipes();
+  const { isFavorite } = useUniversalFavorites();
+  const favCount = useMemo(
+    () => recipes.filter(r => isFavorite(r.id, 'recipe')).length,
+    [recipes, isFavorite],
+  );
 
   const categories = useMemo(() =>
     CATEGORIES.map(c => ({ ...c, count: recipes.filter(r => r.slot === c.slot).length })),
@@ -114,6 +120,31 @@ export default function Strava() {
               <ChevronRight size={16} color="rgba(61,41,33,0.42)" strokeWidth={1.3} />
             </button>
           ))}
+
+          {/* Favourites — same row anatomy as the slot categories */}
+          <button
+            onClick={() => navigate('/recepty?fav=1')}
+            style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '2px 0', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}
+          >
+            <div style={{
+              width: 72, height: 72, borderRadius: 14, flexShrink: 0,
+              background: 'rgba(194,122,110,0.14)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <svg width="26" height="26" viewBox="0 0 24 24" fill={favCount > 0 ? '#C27A6E' : 'none'} stroke="#C27A6E" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" />
+              </svg>
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontFamily: 'Gilda Display, serif', fontSize: 20, fontWeight: 500, color: '#3D2921', letterSpacing: '-0.008em', marginBottom: 4 }}>
+                Obľúbené
+              </div>
+              <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: 'rgba(61,41,33,0.72)' }}>
+                {favCount > 0 ? `${favCount} ${favCount === 1 ? 'recept' : favCount < 5 ? 'recepty' : 'receptov'}` : 'Recepty uložené srdiečkom'}
+              </div>
+            </div>
+            <ChevronRight size={16} color="rgba(61,41,33,0.42)" strokeWidth={1.3} />
+          </button>
         </div>
       </div>
 

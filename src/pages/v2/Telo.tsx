@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useSubscription } from '@/contexts/SubscriptionContext';
+import { useUniversalFavorites } from '@/hooks/useUniversalFavorites';
 
 const DEEP     = '#3D2921';
 const TERRA    = '#C1856A';
@@ -58,6 +59,8 @@ const CARDS: Card[] = [
 export default function Telo() {
   const navigate = useNavigate();
   const { isPremium } = useSubscription();
+  const { getFavoriteCounts } = useUniversalFavorites();
+  const favWorkouts = getFavoriteCounts().workout;
 
   return (
     <div style={{ background: '#F8F5F0', minHeight: '100vh', paddingBottom: 120 }}>
@@ -153,6 +156,36 @@ export default function Telo() {
             </div>
           </button>
         ))}
+
+        {/* Favourites shortcut — compact row under the editorial cards */}
+        <button
+          onClick={() => navigate('/oblubene?tab=workout')}
+          style={{
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '16px 20px',
+            borderRadius: 18,
+            background: '#fff',
+            border: `1px solid ${HAIR}`,
+            cursor: 'pointer',
+            fontFamily: 'DM Sans',
+            fontSize: 13,
+            color: DEEP,
+            fontWeight: 500,
+          }}
+        >
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10 }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill={favWorkouts > 0 ? TERRA : 'none'} stroke={TERRA} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" />
+            </svg>
+            Obľúbené cvičenia{favWorkouts ? ` · ${favWorkouts}` : ''}
+          </span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={TERRA} strokeWidth="2" strokeLinecap="round">
+            <path d="M9 6l6 6-6 6" />
+          </svg>
+        </button>
       </div>
     </div>
   );
