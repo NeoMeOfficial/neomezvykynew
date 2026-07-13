@@ -706,3 +706,8 @@ All colors MUST be HSL.
   --neome-r9-radius-tile: 18px;
   --neome-r9-radius-pill: 999px;
 }
+
+/* Home "Dnes pre teba" horizontal picks — hide scrollbar (Chrome/Safari) */
+.today-picks-row::-webkit-scrollbar {
+  display: none;
+}

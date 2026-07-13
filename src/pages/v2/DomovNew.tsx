@@ -5,12 +5,12 @@ import { useUser } from '@/hooks/use-user';
 import { useCycleInfo } from '@/hooks/use-cycle';
 import { useUserProgram } from '@/hooks/useUserProgram';
 import { useMealPlan } from '@/features/nutrition/useMealPlan';
+import { useRecipes, recipeImage } from '@/hooks/useRecipes';
 import { useDailyMeditation } from '@/hooks/useDailyContent';
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { useReferral } from '@/hooks/useReferral';
 import { usePointsLedger } from '@/hooks/usePointsLedger';
 import SectionEyebrow from '@/components/v2/home/SectionEyebrow';
-import UpsellBanner from '@/components/v2/home/UpsellBanner';
 import { DayPlanSheet } from '@/components/v2/home/DayPlanSheet';
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
@@ -201,267 +201,74 @@ function WeekCalendar({ onSelectDay }: { onSelectDay: (d: Date) => void }) {
   );
 }
 
-// ─── Section header ───────────────────────────────────────────────────────────
-function SectionHeader({ children, right }: { children: React.ReactNode; right?: string }) {
-  return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '0 22px', margin: '26px 0 12px' }}>
-      <div style={{ fontSize: 10, letterSpacing: '0.2em', fontWeight: 500, color: INK, textTransform: 'uppercase' as const }}>{children}</div>
-      {right && <div style={{ fontSize: 10, letterSpacing: '0.2em', fontWeight: 400, color: 'rgba(61,41,33,0.35)', textTransform: 'uppercase' as const }}>{right}</div>}
-    </div>
-  );
+// ─── "Dnes pre teba" — compact horizontal picks (Telo · Výživa · Myseľ) ──────
+// Replaces the former full-width pillar cards. Fixed 135px cards so a 375px
+// viewport shows ~2.5 of them — the peeking half-card signals scrollability.
+export interface TodayPick {
+  eyebrow: string;
+  color: string;
+  title: string;
+  desc: string;
+  img: string;
+  href: string;
 }
 
-// ─── Telo card — Plus with active program ─────────────────────────────────────
-function CardBody({ week, day, title, duration, href }: { week: number; day: number; title: string; duration?: string; href: string }) {
+function TodayPicksRow({ items }: { items: TodayPick[] }) {
   const navigate = useNavigate();
   return (
-    <div style={{ padding: '0 18px', marginBottom: 12 }}>
-      <div onClick={() => navigate(href)} style={{ background: WHITE, borderRadius: 20, border: `1px solid ${HAIR}`, overflow: 'hidden', cursor: 'pointer', touchAction: 'manipulation' }}>
-        <div style={{ position: 'relative', aspectRatio: '16/10', background: `url(/images/r9/section-body.jpg) center/cover` }}>
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(0,0,0,0.5) 100%)', pointerEvents: 'none' }} />
-          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: 54, height: 54, borderRadius: 999, background: 'rgba(255,255,255,0.95)', display: 'grid', placeItems: 'center', pointerEvents: 'none' }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill={INK}><path d="M8 5v14l11-7z"/></svg>
-          </div>
-          {duration && <div style={{ position: 'absolute', bottom: 10, right: 10, padding: '4px 10px', borderRadius: 999, background: 'rgba(0,0,0,0.55)', color: '#fff', fontSize: 10.5, fontWeight: 500, pointerEvents: 'none' }}>{duration}</div>}
-        </div>
-        <div style={{ padding: 18 }}>
-          <div style={{ fontFamily: SERIF, fontSize: 20, lineHeight: 1.2, color: INK }}>{title} · Týž. {week}, Deň {day}</div>
-          <div style={{ fontSize: 12.5, color: FG2, marginTop: 4, lineHeight: 1.45, fontWeight: 300 }}>Pokračuj tam, kde si skončila</div>
-          <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 500, color: TELO }}>
-            Spustiť tréning
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={TELO} strokeWidth="2" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── Telo card — Free / no program ────────────────────────────────────────────
-function CardBodyLocked({ href, free }: { href: string; free: boolean }) {
-  const navigate = useNavigate();
-  // Free users click anywhere on the card → exercise library (free exercises available there)
-  const cardHref = free ? '/kniznica/telo' : href;
-  return (
-    <div style={{ padding: '0 18px', marginBottom: 12 }}>
-      <div
-        onClick={() => navigate(cardHref)}
-        style={{ background: WHITE, borderRadius: 20, border: `1px solid ${HAIR}`, overflow: 'hidden', cursor: 'pointer', touchAction: 'manipulation' }}
-      >
-        <div style={{ position: 'relative', aspectRatio: '16/10', background: `url(/images/r9/section-body.jpg) center/cover`, filter: 'saturate(0.85)' }}>
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.6) 100%)', pointerEvents: 'none' }} />
-          <div style={{ position: 'absolute', bottom: 12, left: 16, right: 16, pointerEvents: 'none' }}>
-            <div style={{ fontFamily: SERIF, fontSize: 18, color: '#fff', lineHeight: 1.2 }}>Ranná energia · 12 min</div>
-            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.8)', marginTop: 2 }}>Rýchly štart na dnešok</div>
-          </div>
-        </div>
-        <div style={{ padding: 16 }}>
-          <div style={{ fontSize: 11.5, color: FG2, lineHeight: 1.45, fontWeight: 300, marginBottom: 12 }}>
-            {free
-              ? 'Jeden cvik denne je voľný. Štruktúrované programy — BodyForming, Postpartum a ďalšie — sú súčasťou predplatného.'
-              : 'Vyber si program a začni trénovať s Gabi.'}
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 500, color: TELO }}>
-            {free ? 'Spustiť cvik' : 'Vybrať program'}
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={TELO} strokeWidth="2" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── Strava card — full meal plan (real data from the user's plan) ────────────
-function CardNutrition({ href }: { href: string }) {
-  const navigate = useNavigate();
-  const { todayPlan } = useMealPlan();
-  const { recipes } = useRecipes();
-
-  const meals = (todayPlan?.meals ?? [])
-    .map((m) => {
-      const r = recipes.find((x) => x.id === m.options[m.selected]);
-      if (!r) return null;
-      return {
-        eye: m.label,
-        title: r.name,
-        sub: `${Math.round((r.kcal ?? 0) * m.portionMultiplier)} kcal`,
-        img: recipeImage(r),
-      };
-    })
-    .filter((m): m is NonNullable<typeof m> => m !== null)
-    .slice(0, 3);
-  const totalKcal = todayPlan?.totalCalories ?? 0;
-
-  // Plan exists but today's meals can't be resolved yet (recipes still
-  // loading, or the plan window ended) — send the user to the planner
-  // rather than showing fabricated meals.
-  if (meals.length === 0) return <CardNutritionSetup href={href} />;
-
-  return (
-    <div style={{ padding: '0 18px', marginBottom: 12 }}>
-      <div style={{ background: WHITE, borderRadius: 20, border: `1px solid ${HAIR}`, overflow: 'hidden' }}>
-        <div style={{ height: 110, position: 'relative', background: `url(/images/r9/section-nutrition.jpg) center/cover` }}>
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.55) 100%)' }} />
-          {totalKcal > 0 && (
-            <div style={{ position: 'absolute', top: 14, right: 16, fontSize: 10, color: '#fff', opacity: 0.85, fontWeight: 500 }}>{totalKcal.toLocaleString('sk-SK')} kcal</div>
-          )}
-          <div style={{ position: 'absolute', bottom: 12, left: 16, fontFamily: SERIF, fontSize: 18, color: '#fff' }}>Dnešné jedlá</div>
-        </div>
-        <div style={{ padding: '6px 16px 14px' }}>
-          {meals.map((r, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: i < meals.length - 1 ? `1px solid ${HAIR}` : 'none' }}>
-              <div style={{ width: 44, height: 44, borderRadius: 10, background: `url(${r.img}) center/cover`, flexShrink: 0 }} />
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 9.5, letterSpacing: '0.16em', textTransform: 'uppercase' as const, color: FG3, fontWeight: 500 }}>{r.eye}</div>
-                <div style={{ fontFamily: SERIF, fontSize: 14.5, fontWeight: 500, color: INK, marginTop: 2, lineHeight: 1.2 }}>{r.title}</div>
-                <div style={{ fontSize: 11.5, color: FG2, marginTop: 1, fontWeight: 300 }}>{r.sub}</div>
-              </div>
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={FG3} strokeWidth="2" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
-            </div>
-          ))}
-          <button onClick={() => navigate(href)} style={{ marginTop: 10, background: 'transparent', border: 0, padding: 0, cursor: 'pointer', fontSize: 12, fontWeight: 500, color: STRAVA, display: 'flex', alignItems: 'center', gap: 6 }}>
-            Otvoriť jedálniček
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={STRAVA} strokeWidth="2" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── Strava card — purchased but no plan generated yet ───────────────────────
-function CardNutritionSetup({ href }: { href: string }) {
-  const navigate = useNavigate();
-  return (
-    <div style={{ padding: '0 18px', marginBottom: 12 }}>
-      <div
-        onClick={() => navigate(href)}
-        style={{
-          background: WHITE,
-          borderRadius: 20,
-          border: `1px solid ${HAIR}`,
-          overflow: 'hidden',
-          cursor: 'pointer',
-        }}
-      >
-        <div style={{ height: 110, position: 'relative', background: `url(/images/r9/section-nutrition.jpg) center/cover` }}>
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.55) 100%)' }} />
-          <div style={{ position: 'absolute', top: 14, left: 16, fontSize: 9.5, color: '#fff', opacity: 0.85, letterSpacing: '0.18em', textTransform: 'uppercase' as const, fontWeight: 500 }}>
-            Jedálniček · odomknutý
-          </div>
-          <div style={{ position: 'absolute', bottom: 12, left: 16, right: 16, fontFamily: SERIF, fontSize: 19, color: '#fff', lineHeight: 1.2 }}>
-            Tvoj jedálniček čaká na pár detailov
-          </div>
-        </div>
-        <div style={{ padding: 16 }}>
-          <div style={{ fontSize: 12, color: FG2, lineHeight: 1.55, fontWeight: 300, marginBottom: 12 }}>
-            Vyplň krátky dotazník o cieli, dni a chutiach a pripravíme ti prvý týždenný plán. Trvá to asi 2 minúty.
-          </div>
-          <button
-            onClick={(e) => { e.stopPropagation(); navigate(href); }}
-            style={{
-              background: 'transparent',
-              border: 0,
-              padding: 0,
-              cursor: 'pointer',
-              fontSize: 12,
-              fontWeight: 500,
-              color: STRAVA,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-            }}
-          >
-            Vyplniť teraz
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={STRAVA} strokeWidth="2" strokeLinecap="round">
-              <path d="M9 6l6 6-6 6" />
-            </svg>
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── Strava card — recipes only (no meal plan add-on) ─────────────────────────
-function CardRecipeOnly({ href }: { href: string }) {
-  const navigate = useNavigate();
-  return (
-    <div style={{ padding: '0 18px', marginBottom: 12 }}>
-      <div onClick={() => navigate(href)} style={{ background: WHITE, borderRadius: 20, border: `1px solid ${HAIR}`, overflow: 'hidden', cursor: 'pointer' }}>
-        <div style={{ height: 130, position: 'relative', background: `url(/images/r9/testimonial-recipe.jpg) center/cover` }}>
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.55) 100%)' }} />
-          <div style={{ position: 'absolute', bottom: 12, left: 16, right: 16 }}>
-            <div style={{ fontFamily: SERIF, fontSize: 19, color: '#fff', lineHeight: 1.2 }}>Buddha bowl s batátou</div>
-            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.85)', marginTop: 3, display: 'flex', gap: 10, letterSpacing: '0.08em', textTransform: 'uppercase' as const, fontWeight: 500 }}>
-              <span>20 min</span><span>·</span><span>Vegetariánske</span>
-            </div>
-          </div>
-        </div>
-        <div style={{ padding: 16 }}>
-          <button onClick={() => navigate(href)} style={{ background: 'transparent', border: 0, padding: 0, cursor: 'pointer', fontSize: 12, fontWeight: 500, color: STRAVA, display: 'flex', alignItems: 'center', gap: 6 }}>
-            Otvoriť recept
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={STRAVA} strokeWidth="2" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── Strava card — Free ───────────────────────────────────────────────────────
-function CardNutritionFree({ href }: { href: string }) {
-  const navigate = useNavigate();
-  return (
-    <div style={{ padding: '0 18px', marginBottom: 12 }}>
-      <div onClick={() => navigate(href)} style={{ background: WHITE, borderRadius: 20, border: `1px solid ${HAIR}`, overflow: 'hidden', cursor: 'pointer' }}>
-        <div style={{ height: 110, position: 'relative', background: `url(/images/r9/section-nutrition.jpg) center/cover` }}>
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.5) 100%)' }} />
-          <div style={{ position: 'absolute', bottom: 12, left: 16, fontFamily: SERIF, fontSize: 18, color: '#fff' }}>3 voľné recepty od Gabi</div>
-        </div>
-        <div style={{ padding: 16 }}>
-          <div style={{ fontSize: 11.5, color: FG2, lineHeight: 1.45, fontWeight: 300, marginBottom: 12 }}>
-            Plnohodnotný jedálniček s nákupným zoznamom je súčasťou <span style={{ color: GOLD, fontWeight: 500 }}>Plus</span> + jedálniček.
-          </div>
-          <button onClick={() => navigate(href)} style={{ background: 'transparent', border: 0, padding: 0, cursor: 'pointer', fontSize: 12, fontWeight: 500, color: STRAVA, display: 'flex', alignItems: 'center', gap: 6 }}>
-            Pozrieť recepty
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={STRAVA} strokeWidth="2" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
-          </button>
-        </div>
-        {/* Upsell strip (kept for free users — points back to /paywall) */}
-        <button
-          onClick={(e) => { e.stopPropagation(); navigate('/paywall'); }}
-          style={{ all: 'unset', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, width: '100%', boxSizing: 'border-box', padding: '12px 16px', background: 'rgba(122,158,120,0.08)', borderTop: `1px solid rgba(122,158,120,0.18)` }}
+    <div
+      className="today-picks-row"
+      style={{
+        display: 'flex',
+        gap: 10,
+        overflowX: 'auto',
+        padding: '0 18px 6px',
+        scrollSnapType: 'x mandatory',
+        WebkitOverflowScrolling: 'touch' as any,
+        scrollbarWidth: 'none' as any,
+        marginBottom: 6,
+      }}
+    >
+      {items.map((p, i) => (
+        <div
+          key={i}
+          onClick={() => navigate(p.href)}
+          style={{
+            flex: '0 0 135px',
+            scrollSnapAlign: 'start',
+            background: WHITE,
+            borderRadius: 16,
+            border: `1px solid ${HAIR}`,
+            overflow: 'hidden',
+            cursor: 'pointer',
+            touchAction: 'manipulation',
+          }}
         >
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 11, fontWeight: 500, color: STRAVA, letterSpacing: '0.01em' }}>NeoMe Plus · Jedálniček</div>
-            <div style={{ fontSize: 10.5, color: FG2, fontWeight: 300, marginTop: 1 }}>Personalizovaný plán, nákupný zoznam, Gabine recepty.</div>
+          <div style={{ aspectRatio: '4/3', position: 'relative', background: `url(${p.img}) center/cover` }}>
+            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(0,0,0,0.28) 100%)', pointerEvents: 'none' }} />
           </div>
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={STRAVA} strokeWidth="2" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
-        </button>
-      </div>
-    </div>
-  );
-}
-
-// ─── Myseľ card ───────────────────────────────────────────────────────────────
-function CardMindset({ title, subtitle, href }: { title: string; subtitle: string; href: string }) {
-  const navigate = useNavigate();
-  return (
-    <div style={{ padding: '0 18px', marginBottom: 12 }}>
-      <div style={{ background: WHITE, borderRadius: 20, border: `1px solid ${HAIR}`, overflow: 'hidden' }}>
-        <div style={{ height: 130, position: 'relative', background: `url(/images/r9/testimonial-meditation.jpg) center/cover` }}>
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.45) 100%)' }} />
+          <div style={{ padding: '9px 11px 12px' }}>
+            <div style={{ fontSize: 8.5, letterSpacing: '0.16em', textTransform: 'uppercase' as const, color: p.color, fontWeight: 500 }}>{p.eyebrow}</div>
+            <div
+              style={{
+                fontFamily: SERIF,
+                fontSize: 13.5,
+                color: INK,
+                marginTop: 3,
+                lineHeight: 1.25,
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical' as const,
+                overflow: 'hidden',
+                minHeight: '2.5em',
+              }}
+            >
+              {p.title}
+            </div>
+            <div style={{ fontSize: 10.5, color: FG2, marginTop: 3, fontWeight: 300, whiteSpace: 'nowrap' as const, overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.desc}</div>
+          </div>
         </div>
-        <div style={{ padding: 18 }}>
-          <div style={{ fontFamily: SERIF, fontSize: 20, lineHeight: 1.2, color: INK }}>{title}</div>
-          <div style={{ fontSize: 12.5, color: FG2, marginTop: 4, lineHeight: 1.45, fontWeight: 300 }}>{subtitle}</div>
-          <button onClick={() => navigate(href)} style={{ marginTop: 12, background: 'transparent', border: 0, padding: 0, display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: 12, fontWeight: 500, color: MYSEL }}>
-            Spustiť meditáciu
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={MYSEL} strokeWidth="2" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
-          </button>
-        </div>
-      </div>
+      ))}
     </div>
   );
 }
@@ -1065,6 +872,7 @@ export default function DomovNew() {
   const cycle = useCycleInfo();
   const { userProgram } = useUserProgram();
   const { todayPlan } = useMealPlan();
+  const { recipes } = useRecipes();
   const { meditation } = useDailyMeditation();
   const { profile } = useSupabaseAuth();
   const { referralCode } = useReferral();
@@ -1081,7 +889,88 @@ export default function DomovNew() {
   const streakDays = getDaysSince((profile as any)?.created_at);
 
   const meditationTitle = meditation?.title ?? 'Ranný pokoj';
-  const meditationSub   = meditation?.category ?? 'Krátka ranná meditácia na uzemnenie pred dňom.';
+
+  // ── "Dnes pre teba" picks ──────────────────────────────────────────────
+  const bodyPick: TodayPick = isPlus && userProgram
+    ? {
+        eyebrow: 'Telo',
+        color: TELO,
+        title: userProgram.todaysExercise?.title ?? 'Tréning dňa',
+        desc: [`Týž. ${userProgram.week} · deň ${userProgram.day}`, userProgram.todaysExercise?.duration].filter(Boolean).join(' · '),
+        img: '/images/r9/section-body.jpg',
+        href: `/program/${userProgram.id}`,
+      }
+    : {
+        eyebrow: 'Telo',
+        color: TELO,
+        title: isPlus ? 'Vyber si program' : 'Ranná energia',
+        desc: isPlus ? 'Začni trénovať s Gabi' : '12 min · voľný cvik',
+        img: '/images/r9/section-body.jpg',
+        href: isPlus ? '/kniznica/telo/programy' : '/kniznica/telo',
+      };
+
+  const firstMeal = (() => {
+    const m = todayPlan?.meals?.[0];
+    if (!m) return null;
+    const r = recipes.find((x) => x.id === m.options[m.selected]);
+    if (!r) return null;
+    return { recipe: r, kcal: Math.round((r.kcal ?? 0) * m.portionMultiplier) };
+  })();
+
+  // Deterministic "recipe of the day" — same recipe for everyone all day.
+  const dailyRecipe = recipes.length > 0
+    ? recipes[Math.floor(Date.now() / 86_400_000) % recipes.length]
+    : null;
+
+  const nutritionPick: TodayPick = hasMealPlan && firstMeal
+    ? {
+        eyebrow: 'Výživa',
+        color: STRAVA,
+        title: firstMeal.recipe.name,
+        desc: `${firstMeal.kcal} kcal · dnešné menu`,
+        img: recipeImage(firstMeal.recipe),
+        href: '/jedalnicek',
+      }
+    : mealPlanNeedsSetup
+    ? {
+        eyebrow: 'Výživa',
+        color: STRAVA,
+        title: 'Dokonči svoj jedálniček',
+        desc: 'Krátky dotazník · 2 min',
+        img: '/images/r9/section-nutrition.jpg',
+        href: '/jedalnicek/onboarding',
+      }
+    : dailyRecipe
+    ? {
+        eyebrow: 'Výživa',
+        color: STRAVA,
+        title: dailyRecipe.name,
+        desc: [
+          dailyRecipe.prep_minutes ? `${dailyRecipe.prep_minutes} min` : null,
+          dailyRecipe.kcal ? `${dailyRecipe.kcal} kcal` : null,
+        ].filter(Boolean).join(' · ') || 'Recept dňa',
+        img: recipeImage(dailyRecipe),
+        href: '/kniznica/strava',
+      }
+    : {
+        eyebrow: 'Výživa',
+        color: STRAVA,
+        title: 'Recept dňa',
+        desc: 'Gabine recepty',
+        img: '/images/r9/section-nutrition.jpg',
+        href: '/kniznica/strava',
+      };
+
+  const mindPick: TodayPick = {
+    eyebrow: 'Myseľ',
+    color: MYSEL,
+    title: meditationTitle,
+    desc: [meditation?.duration, meditation?.category].filter(Boolean).join(' · ') || 'Krátka meditácia',
+    img: '/images/r9/testimonial-meditation.jpg',
+    href: '/meditacie',
+  };
+
+  const picks = [bodyPick, nutritionPick, mindPick];
 
   return (
     <div style={{ minHeight: '100vh', background: CREAM, paddingBottom: 90, fontFamily: SANS }}>
@@ -1099,59 +988,7 @@ export default function DomovNew() {
 
       {selectedDay && <DayPlanSheet date={selectedDay} onClose={() => setSelectedDay(null)} />}
 
-      {/* Telo */}
-      <SectionEyebrow color={TELO}>Telo · rýchly štart na dnes</SectionEyebrow>
-      {isPlus && userProgram ? (
-        <CardBody
-          week={userProgram.week}
-          day={userProgram.day}
-          title={userProgram.todaysExercise?.title ?? 'Tréning dňa'}
-          duration={userProgram.todaysExercise?.duration}
-          href={`/program/${userProgram.id}`}
-        />
-      ) : (
-        <CardBodyLocked href={isPlus ? '/kniznica/telo/programy' : '/paywall'} free={!isPlus} />
-      )}
-      <UpsellBanner
-        color={TELO}
-        eyebrow="Plus · Programy"
-        title="Pridaj sa k programu"
-        sub="8-týždňová cesta s Gabi · krok za krokom."
-        cta="Pozrieť"
-        onClick={() => navigate('/paywall')}
-      />
-
-      {/* Výživa */}
-      <SectionEyebrow color={STRAVA}>Výživa · dnes</SectionEyebrow>
-      {hasMealPlan ? (
-        <CardNutrition href="/jedalnicek" />
-      ) : mealPlanNeedsSetup ? (
-        <CardNutritionSetup href="/jedalnicek/onboarding" />
-      ) : isPlus ? (
-        <CardRecipeOnly href="/kniznica/strava" />
-      ) : (
-        <CardNutritionFree href="/kniznica/strava" />
-      )}
-      {/* Upsell appears only when the user has not yet purchased the
-          €57 add-on. Once purchased — even if the plan isn't generated
-          yet — we don't push for another purchase. */}
-      {!hasMealPlanAddon && (
-        <UpsellBanner
-          color={STRAVA}
-          eyebrow="Doplnok · Jedálniček"
-          title="Naplánuj celý týždeň"
-          sub="Jedlá na mieru + nákupný zoznam."
-          cta="Pridať"
-          price="57 €"
-          onClick={() => navigate('/jedalnicek-promo')}
-        />
-      )}
-
-      {/* Myseľ */}
-      <SectionEyebrow color={MYSEL}>Myseľ</SectionEyebrow>
-      <CardMindset title={meditationTitle} subtitle={meditationSub} href="/meditacie" />
-
-      {/* Periodka */}
+      {/* 1 · Periodka */}
       <SectionEyebrow color={CYKLUS}>Periodka</SectionEyebrow>
       {hasCycle && cycle ? (
         <CardCyklus day={cycle.dayOfCycle} total={cycle.totalDays} phaseName={cycle.phaseName} note={cycle.note} />
@@ -1161,12 +998,13 @@ export default function DomovNew() {
         <CardCyklusFree />
       )}
 
-      {/* Návyky */}
-      <SectionEyebrow color={GOLD}>Návyky</SectionEyebrow>
-      <CardHabits free={!isPlus} onAddHabit={() => navigate('/navyky/new')} />
+      {/* 2 · Dnes pre teba — Telo / Výživa / Myseľ v kompaktnom riadku */}
+      <SectionEyebrow color={GOLD}>Dnes pre teba</SectionEyebrow>
+      <TodayPicksRow items={picks} />
 
-      {/* Denník */}
-      <SectionEyebrow color={GOLD}>Denník</SectionEyebrow>
+      {/* 3 · Pracuj na sebe — návyky + reflexia */}
+      <SectionEyebrow color={GOLD}>Pracuj na sebe</SectionEyebrow>
+      <CardHabits free={!isPlus} onAddHabit={() => navigate('/navyky/new')} />
       <CardReflections free={!isPlus} onOpen={() => setShowDiary(true)} />
 
       {/* Komunita divider — plain, no bullet (visual separator between personal and community sections) */}
