@@ -259,37 +259,40 @@ function TodayPicksRow({ items }: { items: TodayPick[] }) {
           onClick={() => navigate(p.href)}
           style={{
             flex: '0 0 135px',
+            height: 172,
+            position: 'relative',
             scrollSnapAlign: 'start',
-            background: WHITE,
             borderRadius: 16,
             border: `1px solid ${HAIR}`,
             overflow: 'hidden',
             cursor: 'pointer',
             touchAction: 'manipulation',
+            background: `url(${p.img}) center/cover`,
           }}
         >
-          <div style={{ aspectRatio: '4/3', position: 'relative', background: `url(${p.img}) center/cover` }}>
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(0,0,0,0.28) 100%)', pointerEvents: 'none' }} />
-          </div>
-          <div style={{ padding: '9px 11px 12px' }}>
-            <div style={{ fontSize: 8.5, letterSpacing: '0.16em', textTransform: 'uppercase' as const, color: p.color, fontWeight: 500 }}>{p.eyebrow}</div>
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.08) 30%, rgba(0,0,0,0.42) 62%, rgba(0,0,0,0.74) 100%)', pointerEvents: 'none' }} />
+          <div style={{ position: 'absolute', left: 11, right: 11, bottom: 11 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+              <span aria-hidden style={{ width: 5, height: 5, borderRadius: 999, background: p.color, flexShrink: 0 }} />
+              <span style={{ fontSize: 8.5, letterSpacing: '0.16em', textTransform: 'uppercase' as const, color: 'rgba(255,255,255,0.85)', fontWeight: 500 }}>{p.eyebrow}</span>
+            </div>
             <div
               style={{
                 fontFamily: SERIF,
                 fontSize: 13.5,
-                color: INK,
-                marginTop: 3,
+                color: '#fff',
+                marginTop: 4,
                 lineHeight: 1.25,
                 display: '-webkit-box',
                 WebkitLineClamp: 2,
                 WebkitBoxOrient: 'vertical' as const,
                 overflow: 'hidden',
-                minHeight: '2.5em',
+                textShadow: '0 1px 3px rgba(0,0,0,0.35)',
               }}
             >
               {p.title}
             </div>
-            <div style={{ fontSize: 10.5, color: FG2, marginTop: 3, fontWeight: 300, whiteSpace: 'nowrap' as const, overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.desc}</div>
+            <div style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.78)', marginTop: 3, fontWeight: 300, whiteSpace: 'nowrap' as const, overflow: 'hidden', textOverflow: 'ellipsis', textShadow: '0 1px 2px rgba(0,0,0,0.35)' }}>{p.desc}</div>
           </div>
         </div>
       ))}
