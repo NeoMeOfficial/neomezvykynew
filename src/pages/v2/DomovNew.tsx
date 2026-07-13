@@ -259,7 +259,7 @@ function TodayPicksRow({ items }: { items: TodayPick[] }) {
           onClick={() => navigate(p.href)}
           style={{
             flex: '0 0 135px',
-            height: 172,
+            height: 210,
             position: 'relative',
             scrollSnapAlign: 'start',
             borderRadius: 16,
@@ -313,14 +313,13 @@ function CardHabits({ free, onAddHabit }: { free: boolean; onAddHabit: () => voi
   return (
     <div style={{ padding: '0 18px', marginBottom: 12 }}>
       <div style={{ background: WHITE, borderRadius: 20, border: `1px solid ${HAIR}`, overflow: 'hidden' }}>
-        <div style={{ height: 100, position: 'relative', background: `url(/images/r9/lifestyle-yoga-pose.jpg) center/cover` }}>
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.5) 100%)' }} />
+        <div style={{ padding: '14px 16px 0', display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10 }}>
+          <div style={{ fontFamily: SERIF, fontSize: 16, color: INK, lineHeight: 1.25 }}>Malé kroky, veľký rozdiel</div>
           {free && (
-            <div style={{ position: 'absolute', top: 14, right: 16, fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase' as const, color: 'rgba(255,255,255,0.85)', fontWeight: 500, fontStyle: 'italic' }}>neukladá sa</div>
+            <div style={{ fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase' as const, color: GOLD, fontWeight: 500, fontStyle: 'italic', flexShrink: 0 }}>neukladá sa</div>
           )}
-          <div style={{ position: 'absolute', bottom: 12, left: 16, fontFamily: SERIF, fontSize: 18, color: '#fff' }}>Malé kroky, veľký rozdiel</div>
         </div>
-        <div style={{ padding: '6px 16px 10px' }}>
+        <div style={{ padding: '0 16px 10px' }}>
           {habits.map((h, i) => (
             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '9px 0', borderBottom: `1px solid ${HAIR}` }}>
               {/* Tappable checkbox — toggles done state */}
@@ -353,14 +352,13 @@ function CardReflections({ free, onOpen }: { free: boolean; onOpen: () => void }
   return (
     <div style={{ padding: '0 18px', marginBottom: 12 }}>
       <div style={{ background: WHITE, borderRadius: 20, border: `1px solid ${HAIR}`, overflow: 'hidden', cursor: 'pointer' }} onClick={onOpen}>
-        <div style={{ height: 110, position: 'relative', background: `url(/images/r9/section-diary.jpg) center/cover` }}>
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.5) 100%)' }} />
+        <div style={{ padding: '14px 16px 0', display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10 }}>
+          <div style={{ fontFamily: SERIF, fontSize: 16, color: INK, lineHeight: 1.25 }}>Čo ti dnes dalo najviac energie?</div>
           {free && (
-            <div style={{ position: 'absolute', top: 14, right: 16, fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase' as const, color: 'rgba(255,255,255,0.85)', fontWeight: 500, fontStyle: 'italic' }}>neukladá sa</div>
+            <div style={{ fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase' as const, color: GOLD, fontWeight: 500, fontStyle: 'italic', flexShrink: 0 }}>neukladá sa</div>
           )}
-          <div style={{ position: 'absolute', bottom: 12, left: 16, right: 16, fontFamily: SERIF, fontSize: 18, color: '#fff', lineHeight: 1.25 }}>Čo ti dnes dalo najviac energie?</div>
         </div>
-        <div style={{ padding: 18 }}>
+        <div style={{ padding: '12px 16px 16px' }}>
           <div style={{ padding: '12px 14px', borderRadius: 12, background: 'rgba(61,41,33,0.04)', border: `1px dashed ${HAIR2}`, fontFamily: SERIF, fontSize: 13, color: FG3, lineHeight: 1.5 }}>
             Napíš jednu vetu…
           </div>
