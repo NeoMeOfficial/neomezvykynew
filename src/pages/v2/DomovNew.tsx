@@ -11,6 +11,7 @@ import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { useReferral } from '@/hooks/useReferral';
 import { usePointsLedger } from '@/hooks/usePointsLedger';
 import SectionEyebrow from '@/components/v2/home/SectionEyebrow';
+import UpsellBanner from '@/components/v2/home/UpsellBanner';
 import { DayPlanSheet } from '@/components/v2/home/DayPlanSheet';
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
@@ -47,6 +48,29 @@ function getTimeGreeting(): string {
 function getDaysSince(iso: string | null | undefined): number {
   if (!iso) return 1;
   return Math.max(1, Math.floor((Date.now() - new Date(iso).getTime()) / 86_400_000));
+}
+
+// ─── Periodic promo gate ─────────────────────────────────────────────────────
+// Upsell banners appear only on every PROMO_INTERVAL-th visit, so the home
+// page isn't selling something on every open. A "visit" is one app session
+// (sessionStorage guard) — moving around the app and coming back to the home
+// page within the same session doesn't advance the counter.
+const PROMO_INTERVAL = 4;
+
+function countHomeVisit(): number {
+  try {
+    const KEY = 'neome_home_visits';
+    const SESSION_KEY = 'neome_home_visit_counted';
+    let n = parseInt(localStorage.getItem(KEY) ?? '0', 10) || 0;
+    if (!sessionStorage.getItem(SESSION_KEY)) {
+      n += 1;
+      localStorage.setItem(KEY, String(n));
+      sessionStorage.setItem(SESSION_KEY, '1');
+    }
+    return n;
+  } catch {
+    return 0;
+  }
 }
 
 // ─── Greeting ─────────────────────────────────────────────────────────────────
@@ -972,6 +996,19 @@ export default function DomovNew() {
 
   const picks = [bodyPick, nutritionPick, mindPick];
 
+  // ── Periodic upsell banner ─────────────────────────────────────────────
+  // On every 4th visit show ONE banner, alternating between the eligible
+  // offers (program for users without one, jedálniček for users without
+  // the €57 add-on). Nothing to sell → nothing shown.
+  const [visitCount] = useState(countHomeVisit);
+  const promoCandidates: Array<'program' | 'jedalnicek'> = [];
+  if (!(isPlus && userProgram)) promoCandidates.push('program');
+  if (!hasMealPlanAddon) promoCandidates.push('jedalnicek');
+  const promoBanner =
+    visitCount > 0 && visitCount % PROMO_INTERVAL === 0 && promoCandidates.length > 0
+      ? promoCandidates[Math.floor(visitCount / PROMO_INTERVAL) % promoCandidates.length]
+      : null;
+
   return (
     <div style={{ minHeight: '100vh', background: CREAM, paddingBottom: 90, fontFamily: SANS }}>
       <Greeting
@@ -1001,6 +1038,28 @@ export default function DomovNew() {
       {/* 2 · Dnes pre teba — Telo / Výživa / Myseľ v kompaktnom riadku */}
       <SectionEyebrow color={GOLD}>Dnes pre teba</SectionEyebrow>
       <TodayPicksRow items={picks} />
+
+      {promoBanner === 'program' && (
+        <UpsellBanner
+          color={TELO}
+          eyebrow="Plus · Programy"
+          title="Pridaj sa k programu"
+          sub="8-týždňová cesta s Gabi · krok za krokom."
+          cta="Pozrieť"
+          onClick={() => navigate(isPlus ? '/kniznica/telo/programy' : '/paywall')}
+        />
+      )}
+      {promoBanner === 'jedalnicek' && (
+        <UpsellBanner
+          color={STRAVA}
+          eyebrow="Doplnok · Jedálniček"
+          title="Naplánuj celý týždeň"
+          sub="Jedlá na mieru + nákupný zoznam."
+          cta="Pridať"
+          price="57 €"
+          onClick={() => navigate('/jedalnicek-promo')}
+        />
+      )}
 
       {/* 3 · Pracuj na sebe — návyky + reflexia */}
       <SectionEyebrow color={GOLD}>Pracuj na sebe</SectionEyebrow>
