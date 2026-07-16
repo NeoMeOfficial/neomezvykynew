@@ -62,6 +62,14 @@ import { loadCycleData as loadFromStore, saveCycleData as saveToStore } from './
 
 const STORAGE_KEY = 'cycle_data';
 
+// In-memory copy of the latest saved state, shared by every hook instance
+// in this tab. Two jobs: (1) free tier never touches localStorage (BC-4
+// preview-only), yet each page mounts its own useCycleData — without this,
+// entering data and navigating to another page silently lost the preview;
+// (2) it lets a freshly mounted instance see data whose debounced
+// localStorage write hasn't landed yet.
+let sessionCycleData: CycleData | null = null;
+
 const defaultCustomSettings: CustomSettings = {
   notifications: true,
   symptomTracking: false,
@@ -110,6 +118,10 @@ export function useCycleData(accessCode?: string) {
           customSettings: { ...defaultCustomSettings, ...parsed.customSettings }
         };
         setCycleData(merged);
+      } else if (sessionCycleData) {
+        // Nothing persisted, but another instance saved in-memory this
+        // session (free-tier preview, or a debounced write still pending).
+        setCycleData(sessionCycleData);
       }
     } catch (error) {
       console.error('Failed to load cycle data from localStorage:', error);
@@ -139,30 +151,54 @@ export function useCycleData(accessCode?: string) {
     }).catch(err => console.warn('Failed to hydrate cycle data:', err));
   }, [getStorageKey]);
 
-  // Save data to storage with debouncing
-  const saveCycleData = useCallback((data: CycleData) => {
-    if (!isPremium) return; // free tier: preview only, nothing persists
-    if (saveTimeoutRef.current) {
-      clearTimeout(saveTimeoutRef.current);
+  // Save data to storage with debouncing. The pending write is FLUSHED on
+  // unmount, never dropped — the old clearTimeout-only cleanup cancelled
+  // the save whenever a component navigated away within the debounce
+  // window (the first-setup flow always did: save → navigate immediately),
+  // so the entered period silently never persisted.
+  const pendingSaveRef = useRef<CycleData | null>(null);
+
+  const flushSave = useCallback(() => {
+    const data = pendingSaveRef.current;
+    if (!data) return;
+    pendingSaveRef.current = null;
+    try {
+      localStorage.setItem(getStorageKey(), JSON.stringify(data));
+
+      // Dispatch custom event for cross-tab sync
+      window.dispatchEvent(new CustomEvent('cycleDataChanged', {
+        detail: { accessCode, data }
+      }));
+
+      // Persist to the canonical cycle_data table (fire-and-forget).
+      saveToStore(data);
+    } catch (error) {
+      console.error('Failed to save cycle data:', error);
     }
+  }, [getStorageKey, accessCode]);
 
-    saveTimeoutRef.current = setTimeout(() => {
-      try {
-        const storageKey = getStorageKey();
-        localStorage.setItem(storageKey, JSON.stringify(data));
+  const saveCycleData = useCallback((data: CycleData) => {
+    sessionCycleData = data;
 
-        // Dispatch custom event for cross-tab sync
+    if (!isPremium) {
+      // Free tier: preview only, nothing persists. sessionCycleData keeps
+      // the preview alive across route changes; the (debounced) event just
+      // syncs instances mounted right now.
+      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+      saveTimeoutRef.current = setTimeout(() => {
         window.dispatchEvent(new CustomEvent('cycleDataChanged', {
           detail: { accessCode, data }
         }));
+      }, 0);
+      return;
+    }
 
-        // Persist to the canonical cycle_data table (fire-and-forget).
-        saveToStore(data);
-      } catch (error) {
-        console.error('Failed to save cycle data:', error);
-      }
-    }, 500);
-  }, [getStorageKey, accessCode, isPremium]);
+    pendingSaveRef.current = data;
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+    saveTimeoutRef.current = setTimeout(flushSave, 500);
+  }, [accessCode, isPremium, flushSave]);
 
   // Update cycle data and save
   const updateCycleData = useCallback((updates: Partial<CycleData>) => {
@@ -301,8 +337,10 @@ export function useCycleData(accessCode?: string) {
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
       }
+      // Unmounting mid-debounce must not lose the write.
+      flushSave();
     };
-  }, [getStorageKey, accessCode]);
+  }, [getStorageKey, accessCode, flushSave]);
 
   return {
     cycleData,

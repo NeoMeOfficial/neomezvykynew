@@ -12,6 +12,8 @@ import {
 } from '../../../features/cycle/utils';
 import { PHASE_NAMES } from '../../../features/cycle/constants';
 import PlusUnlockBanner from '../paywall/PlusUnlockBanner';
+import { useConsentGuard } from '../../../contexts/ConsentGuardContext';
+import { CONSENT_TYPES } from '../../../lib/consents';
 
 /**
  * PeriodkaSettings — Round 17 redesign.
@@ -374,6 +376,7 @@ function HistoryEmpty() {
 // ─── Page ──────────────────────────────────────────────────────────
 export default function PeriodkaSettings() {
   const navigate = useNavigate();
+  const requireConsent = useConsentGuard();
   const { cycleData, setLastPeriodStart, setCycleLength, setPeriodLength, updateCycleData } = useCycleData();
   const { lastPeriodStart, cycleLength, periodLength } = cycleData;
 
@@ -434,7 +437,14 @@ export default function PeriodkaSettings() {
   }, [lastPeriodStart, currentDay, cycleLength, phase]);
 
   // Actions
-  const handlePeriodStarted = useCallback((selectedDate: Date) => {
+  const handlePeriodStarted = useCallback(async (selectedDate: Date) => {
+    // Article 9(2)(a) GDPR — same explicit health-data consent the tracker
+    // page requires before persisting a menstruation date.
+    const consented = await requireConsent(CONSENT_TYPES.HEALTH_DATA, {
+      acceptLabel: 'Súhlasím a uložiť',
+    });
+    if (!consented) return;
+
     if (!lastPeriodStart) {
       setLastPeriodStart(selectedDate);
       updateCycleData({ lastPeriodStart: format(selectedDate, 'yyyy-MM-dd'), periodLength: 5 });
@@ -473,7 +483,7 @@ export default function PeriodkaSettings() {
       periodLength: safePeriodLength,
     });
     toast.success(`Nová menštruácia nastavená — deň ${daysSince}`);
-  }, [lastPeriodStart, periodLength, cycleLength, today, setLastPeriodStart, updateCycleData, navigate]);
+  }, [lastPeriodStart, periodLength, cycleLength, today, setLastPeriodStart, updateCycleData, navigate, requireConsent]);
 
   return (
     <div style={{ minHeight: '100vh', background: T.BG, fontFamily: T.SANS, color: T.INK, paddingBottom: 100 }}>
