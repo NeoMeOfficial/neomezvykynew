@@ -448,11 +448,10 @@ export default function PeriodkaSettings() {
     if (!lastPeriodStart) {
       setLastPeriodStart(selectedDate);
       updateCycleData({ lastPeriodStart: format(selectedDate, 'yyyy-MM-dd'), periodLength: 5 });
-      toast.success('Menštruácia začatá — deň 1');
-      // Initial setup complete → take the user straight to her tracker
-      // (she arrived from the setup prompt; staying in settings left her
-      // hunting for the back arrow). Later edits keep her in settings.
-      navigate('/kniznica/periodka');
+      // Stay in settings: the user still needs to confirm cycle length and
+      // bleeding length right below. The "Hotovo" CTA takes her to the
+      // tracker once she's checked them.
+      toast.success('Zaznačené — skontroluj ešte dĺžku cyklu a krvácania');
       return;
     }
 
@@ -536,6 +535,29 @@ export default function PeriodkaSettings() {
       />
 
       <HistoryEmpty />
+
+      {lastPeriodStart && (
+        <div style={{ padding: '18px 20px 0' }}>
+          <button
+            onClick={() => navigate('/kniznica/periodka')}
+            style={{
+              width: '100%',
+              padding: '15px 20px',
+              background: T.MAUVE,
+              color: '#fff',
+              border: 'none',
+              borderRadius: 999,
+              fontFamily: T.SANS,
+              fontSize: 13.5,
+              fontWeight: 500,
+              letterSpacing: '0.02em',
+              cursor: 'pointer',
+            }}
+          >
+            Hotovo — zobraziť môj cyklus
+          </button>
+        </div>
+      )}
 
       <PlusUnlockBanner label="Náhľad bez ukladania — nastavenia cyklu sa uložia s NeoMe Plus" />
 
