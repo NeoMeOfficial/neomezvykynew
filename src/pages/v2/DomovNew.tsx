@@ -225,9 +225,17 @@ function WeekCalendar({ onSelectDay }: { onSelectDay: (d: Date) => void }) {
   );
 }
 
-// ─── "Dnes pre teba" — compact horizontal picks (Telo · Výživa · Myseľ) ──────
-// Replaces the former full-width pillar cards. Fixed 135px cards so a 375px
-// viewport shows ~2.5 of them — the peeking half-card signals scrollability.
+// ─── "Dnes pre teba" — horizontal picks (Telo · Výživa · Myseľ) ───────────────
+// Card size matches the Periodka card's visual weight (~264px tall). Two
+// variants: full-bleed photo (default), and a white "menu card" when the
+// pick carries `meals` — the subscriber's prescribed plan for today.
+export interface TodayPickMeal {
+  label: string;   // slot — Raňajky / Obed / Večera…
+  name: string;    // recipe name
+  img: string;
+  kcal: number;
+}
+
 export interface TodayPick {
   eyebrow: string;
   color: string;
@@ -235,6 +243,102 @@ export interface TodayPick {
   desc: string;
   img: string;
   href: string;
+  /** Daily meal-plan variant: renders a menu list instead of a photo card. */
+  meals?: TodayPickMeal[];
+  /** Footer line for the menu variant, e.g. total kcal. */
+  footer?: string;
+}
+
+const PICK_W = 216;
+const PICK_H = 264;
+
+function PickMenuCard({ p, onOpen }: { p: TodayPick; onOpen: () => void }) {
+  return (
+    <div
+      onClick={onOpen}
+      style={{
+        flex: `0 0 ${PICK_W}px`,
+        height: PICK_H,
+        scrollSnapAlign: 'start',
+        borderRadius: 16,
+        border: `1px solid ${HAIR}`,
+        overflow: 'hidden',
+        cursor: 'pointer',
+        touchAction: 'manipulation',
+        background: WHITE,
+        display: 'flex',
+        flexDirection: 'column',
+        padding: '13px 13px 12px',
+        boxSizing: 'border-box',
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+        <span aria-hidden style={{ width: 5, height: 5, borderRadius: 999, background: p.color, flexShrink: 0 }} />
+        <span style={{ fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase' as const, color: p.color, fontWeight: 500 }}>{p.eyebrow}</span>
+      </div>
+      <div style={{ fontFamily: SERIF, fontSize: 16, color: INK, marginTop: 5, lineHeight: 1.2 }}>{p.title}</div>
+      <div style={{ flex: 1, minHeight: 0, marginTop: 4 }}>
+        {(p.meals ?? []).slice(0, 3).map((m, i, arr) => (
+          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '8px 0', borderBottom: i < arr.length - 1 ? `1px solid ${HAIR}` : 'none' }}>
+            <div style={{ width: 32, height: 32, borderRadius: 8, background: `url(${m.img}) center/cover`, flexShrink: 0 }} />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 8.5, letterSpacing: '0.14em', textTransform: 'uppercase' as const, color: FG3, fontWeight: 500 }}>{m.label}</div>
+              <div style={{ fontFamily: SERIF, fontSize: 12, color: INK, marginTop: 1, lineHeight: 1.2, whiteSpace: 'nowrap' as const, overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.name}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 8, borderTop: `1px solid ${HAIR}` }}>
+        <span style={{ fontSize: 10.5, color: FG2, fontWeight: 400 }}>{p.footer ?? p.desc}</span>
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={p.color} strokeWidth="2" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
+      </div>
+    </div>
+  );
+}
+
+function PickPhotoCard({ p, onOpen }: { p: TodayPick; onOpen: () => void }) {
+  return (
+    <div
+      onClick={onOpen}
+      style={{
+        flex: `0 0 ${PICK_W}px`,
+        height: PICK_H,
+        position: 'relative',
+        scrollSnapAlign: 'start',
+        borderRadius: 16,
+        border: `1px solid ${HAIR}`,
+        overflow: 'hidden',
+        cursor: 'pointer',
+        touchAction: 'manipulation',
+        background: `url(${p.img}) center/cover`,
+      }}
+    >
+      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.08) 30%, rgba(0,0,0,0.42) 62%, rgba(0,0,0,0.74) 100%)', pointerEvents: 'none' }} />
+      <div style={{ position: 'absolute', left: 14, right: 14, bottom: 14 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <span aria-hidden style={{ width: 5, height: 5, borderRadius: 999, background: p.color, flexShrink: 0 }} />
+          <span style={{ fontSize: 9.5, letterSpacing: '0.16em', textTransform: 'uppercase' as const, color: 'rgba(255,255,255,0.85)', fontWeight: 500 }}>{p.eyebrow}</span>
+        </div>
+        <div
+          style={{
+            fontFamily: SERIF,
+            fontSize: 17,
+            color: '#fff',
+            marginTop: 5,
+            lineHeight: 1.25,
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical' as const,
+            overflow: 'hidden',
+            textShadow: '0 1px 3px rgba(0,0,0,0.35)',
+          }}
+        >
+          {p.title}
+        </div>
+        <div style={{ fontSize: 11.5, color: 'rgba(255,255,255,0.78)', marginTop: 4, fontWeight: 300, whiteSpace: 'nowrap' as const, overflow: 'hidden', textOverflow: 'ellipsis', textShadow: '0 1px 2px rgba(0,0,0,0.35)' }}>{p.desc}</div>
+      </div>
+    </div>
+  );
 }
 
 function TodayPicksRow({ items }: { items: TodayPick[] }) {
@@ -253,49 +357,11 @@ function TodayPicksRow({ items }: { items: TodayPick[] }) {
         marginBottom: 6,
       }}
     >
-      {items.map((p, i) => (
-        <div
-          key={i}
-          onClick={() => navigate(p.href)}
-          style={{
-            flex: '0 0 135px',
-            height: 210,
-            position: 'relative',
-            scrollSnapAlign: 'start',
-            borderRadius: 16,
-            border: `1px solid ${HAIR}`,
-            overflow: 'hidden',
-            cursor: 'pointer',
-            touchAction: 'manipulation',
-            background: `url(${p.img}) center/cover`,
-          }}
-        >
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.08) 30%, rgba(0,0,0,0.42) 62%, rgba(0,0,0,0.74) 100%)', pointerEvents: 'none' }} />
-          <div style={{ position: 'absolute', left: 11, right: 11, bottom: 11 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-              <span aria-hidden style={{ width: 5, height: 5, borderRadius: 999, background: p.color, flexShrink: 0 }} />
-              <span style={{ fontSize: 8.5, letterSpacing: '0.16em', textTransform: 'uppercase' as const, color: 'rgba(255,255,255,0.85)', fontWeight: 500 }}>{p.eyebrow}</span>
-            </div>
-            <div
-              style={{
-                fontFamily: SERIF,
-                fontSize: 13.5,
-                color: '#fff',
-                marginTop: 4,
-                lineHeight: 1.25,
-                display: '-webkit-box',
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: 'vertical' as const,
-                overflow: 'hidden',
-                textShadow: '0 1px 3px rgba(0,0,0,0.35)',
-              }}
-            >
-              {p.title}
-            </div>
-            <div style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.78)', marginTop: 3, fontWeight: 300, whiteSpace: 'nowrap' as const, overflow: 'hidden', textOverflow: 'ellipsis', textShadow: '0 1px 2px rgba(0,0,0,0.35)' }}>{p.desc}</div>
-          </div>
-        </div>
-      ))}
+      {items.map((p, i) =>
+        p.meals && p.meals.length > 0
+          ? <PickMenuCard key={i} p={p} onOpen={() => navigate(p.href)} />
+          : <PickPhotoCard key={i} p={p} onOpen={() => navigate(p.href)} />
+      )}
     </div>
   );
 }
@@ -934,27 +1000,35 @@ export default function DomovNew() {
         href: isPlus ? '/kniznica/telo/programy' : '/kniznica/telo',
       };
 
-  const firstMeal = (() => {
-    const m = todayPlan?.meals?.[0];
-    if (!m) return null;
-    const r = recipes.find((x) => x.id === m.options[m.selected]);
-    if (!r) return null;
-    return { recipe: r, kcal: Math.round((r.kcal ?? 0) * m.portionMultiplier) };
-  })();
+  // Subscriber's prescribed meals for today → menu-card variant.
+  const planMeals: TodayPickMeal[] = (todayPlan?.meals ?? [])
+    .map((m) => {
+      const r = recipes.find((x) => x.id === m.options[m.selected]);
+      if (!r) return null;
+      return {
+        label: m.label,
+        name: r.name,
+        img: recipeImage(r),
+        kcal: Math.round((r.kcal ?? 0) * m.portionMultiplier),
+      };
+    })
+    .filter((m): m is TodayPickMeal => m !== null);
 
   // Deterministic "recipe of the day" — same recipe for everyone all day.
   const dailyRecipe = recipes.length > 0
     ? recipes[Math.floor(Date.now() / 86_400_000) % recipes.length]
     : null;
 
-  const nutritionPick: TodayPick = hasMealPlan && firstMeal
+  const nutritionPick: TodayPick = hasMealPlan && planMeals.length > 0
     ? {
-        eyebrow: 'Výživa',
+        eyebrow: 'Výživa · tvoj plán',
         color: STRAVA,
-        title: firstMeal.recipe.name,
-        desc: `${firstMeal.kcal} kcal · dnešné menu`,
-        img: recipeImage(firstMeal.recipe),
+        title: 'Dnešný jedálniček',
+        desc: 'dnešné menu',
+        img: recipeImage(null),
         href: '/jedalnicek',
+        meals: planMeals,
+        footer: `${(todayPlan?.totalCalories ?? planMeals.reduce((s, m) => s + m.kcal, 0)).toLocaleString('sk-SK')} kcal · celý deň`,
       }
     : mealPlanNeedsSetup
     ? {
