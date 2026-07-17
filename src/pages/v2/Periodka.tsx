@@ -454,35 +454,84 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart }: Paid
         ))}
       </div>
 
-      <div style={{ padding: '18px 18px 0' }}>
-        <button
-          onClick={onMarkPeriodStart}
-          style={{
-            all: 'unset',
-            cursor: 'pointer',
-            display: 'flex',
-            width: '100%',
-            padding: '14px 16px',
-            borderRadius: 20,
-            background: '#fff',
-            border: `1.5px solid ${PHASE.MENSTR}`,
-            alignItems: 'center',
-            gap: 14,
-            boxSizing: 'border-box',
-          }}
-        >
-          <div style={{ width: 44, height: 44, borderRadius: 999, background: TINT.MENSTR_50, display: 'grid', placeItems: 'center', flexShrink: 0 }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill={PHASE.MENSTR}>
-              <path d="M12 3c-3 4-6 7.5-6 12a6 6 0 1 0 12 0c0-4.5-3-8-6-12z" />
-            </svg>
+      {/* Period-start action adapts to where the user is in her cycle:
+          during menstruation → informational card (no "started today" CTA);
+          mid-cycle → quiet one-line link (early periods still recordable);
+          ≤3 days before prediction or late → full prominent card. */}
+      {currentDay <= periodLength ? (
+        <div style={{ padding: '18px 18px 0' }}>
+          <div
+            style={{
+              display: 'flex',
+              width: '100%',
+              padding: '14px 16px',
+              borderRadius: 20,
+              background: TINT.MENSTR_50,
+              border: `1px solid ${PHASE.MENSTR}40`,
+              alignItems: 'center',
+              gap: 14,
+              boxSizing: 'border-box',
+            }}
+          >
+            <div style={{ width: 44, height: 44, borderRadius: 999, background: '#fff', display: 'grid', placeItems: 'center', flexShrink: 0 }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill={PHASE.MENSTR}>
+                <path d="M12 3c-3 4-6 7.5-6 12a6 6 0 1 0 12 0c0-4.5-3-8-6-12z" />
+              </svg>
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontFamily: NM.SERIF, fontSize: 16, color: NM.DEEP, letterSpacing: '-0.005em' }}>Menštruácia · deň {currentDay} z {periodLength}</div>
+              <div style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.EYEBROW, marginTop: 3, fontWeight: 300 }}>Prebieha — opatruj sa</div>
+            </div>
+            <button
+              onClick={() => navigate('/kniznica/periodka/nastavenia')}
+              style={{ all: 'unset', cursor: 'pointer', fontFamily: NM.SANS, fontSize: 11.5, color: PHASE.MENSTR, fontWeight: 500, padding: 6 }}
+            >
+              Upraviť
+            </button>
           </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontFamily: NM.SERIF, fontSize: 16, color: NM.DEEP, letterSpacing: '-0.005em' }}>Dnes mi začala menštruácia</div>
-            <div style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.EYEBROW, marginTop: 3, fontWeight: 300 }}>Zaznamenať začiatok cyklu</div>
-          </div>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={NM.TERTIARY} strokeWidth="1.8" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
-        </button>
-      </div>
+        </div>
+      ) : daysToMenstruation <= 3 || isLate ? (
+        <div style={{ padding: '18px 18px 0' }}>
+          <button
+            onClick={onMarkPeriodStart}
+            style={{
+              all: 'unset',
+              cursor: 'pointer',
+              display: 'flex',
+              width: '100%',
+              padding: '14px 16px',
+              borderRadius: 20,
+              background: '#fff',
+              border: `1.5px solid ${PHASE.MENSTR}`,
+              alignItems: 'center',
+              gap: 14,
+              boxSizing: 'border-box',
+            }}
+          >
+            <div style={{ width: 44, height: 44, borderRadius: 999, background: TINT.MENSTR_50, display: 'grid', placeItems: 'center', flexShrink: 0 }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill={PHASE.MENSTR}>
+                <path d="M12 3c-3 4-6 7.5-6 12a6 6 0 1 0 12 0c0-4.5-3-8-6-12z" />
+              </svg>
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontFamily: NM.SERIF, fontSize: 16, color: NM.DEEP, letterSpacing: '-0.005em' }}>Dnes mi začala menštruácia</div>
+              <div style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.EYEBROW, marginTop: 3, fontWeight: 300 }}>
+                {isLate ? 'Keď príde, zaznač jej začiatok' : 'Zaznamenať začiatok cyklu'}
+              </div>
+            </div>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={NM.TERTIARY} strokeWidth="1.8" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+      ) : (
+        <div style={{ padding: '14px 18px 0', textAlign: 'center' }}>
+          <button
+            onClick={onMarkPeriodStart}
+            style={{ all: 'unset', cursor: 'pointer', fontFamily: NM.SANS, fontSize: 12, color: NM.MUTED, padding: 6 }}
+          >
+            Prišla ti menštruácia skôr? <span style={{ color: PHASE.MENSTR, fontWeight: 500 }}>Zaznačiť začiatok</span>
+          </button>
+        </div>
+      )}
 
       <div style={{ padding: '28px 20px 10px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 14 }}>
