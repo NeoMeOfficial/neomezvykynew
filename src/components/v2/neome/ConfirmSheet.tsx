@@ -33,6 +33,9 @@ export interface ConfirmSheetProps {
   accent?: string;
   /** Variant: 'default' for normal action, 'danger' for destructive. */
   tone?: 'default' | 'danger';
+  /** Optional secondary action rendered between confirm and cancel. */
+  secondaryLabel?: string;
+  onSecondary?: () => void;
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -46,6 +49,8 @@ export function ConfirmSheet({
   cancelLabel = 'Späť',
   accent = NM.TERRA,
   tone = 'default',
+  secondaryLabel,
+  onSecondary,
   onConfirm,
   onCancel,
 }: ConfirmSheetProps) {
@@ -148,6 +153,28 @@ export function ConfirmSheet({
           >
             {confirmLabel}
           </button>
+          {secondaryLabel && onSecondary && (
+            <button
+              type="button"
+              onClick={onSecondary}
+              style={{
+                all: 'unset',
+                cursor: 'pointer',
+                textAlign: 'center',
+                padding: '13px 20px',
+                borderRadius: 999,
+                background: 'transparent',
+                border: `1px solid ${primaryBg}66`,
+                color: primaryBg,
+                fontFamily: NM.SANS,
+                fontSize: 13.5,
+                fontWeight: 500,
+                letterSpacing: '0.02em',
+              }}
+            >
+              {secondaryLabel}
+            </button>
+          )}
           <button
             type="button"
             onClick={onCancel}

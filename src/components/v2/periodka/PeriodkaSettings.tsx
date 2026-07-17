@@ -380,7 +380,11 @@ export default function PeriodkaSettings() {
   const { cycleData, setLastPeriodStart, setCycleLength, setPeriodLength, updateCycleData } = useCycleData();
   const { lastPeriodStart, cycleLength, periodLength, currentPeriodEnd } = cycleData;
 
-  const [showPicker, setShowPicker] = useState(false);
+  // ?pick=1 (from the tracker's "Začala skôr — vybrať dátum") opens the
+  // date picker immediately so backdating a period start is one tap.
+  const [showPicker, setShowPicker] = useState(() =>
+    typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('pick') === '1'
+  );
   const [periodHistory, setPeriodHistory] = useState<PeriodHistoryEntry[]>([]);
   const today = useMemo(() => new Date(), []);
 

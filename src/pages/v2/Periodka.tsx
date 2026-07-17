@@ -200,7 +200,7 @@ interface PaidViewProps {
   cycleData: CycleData;
   derivedState: DerivedState | null;
   onMarkPeriodStart: () => void;
-  onMarkPeriodEnd: () => void;
+  onMarkPeriodEnd: (date: Date) => void;
 }
 
 const SK_MONTHS_FULL = ['január', 'február', 'marec', 'apríl', 'máj', 'jún', 'júl', 'august', 'september', 'október', 'november', 'december'];
@@ -297,6 +297,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     setBleedPromptDismissed(true);
     try { sessionStorage.setItem('neome_bleed_prompt_dismissed', format(new Date(), 'yyyy-MM-dd')); } catch { /* ignore */ }
   };
+  const [endPickerOpen, setEndPickerOpen] = useState(false);
   const bleedOverduePrompt = !periodEnded
     && !bleedPromptDismissed
     && currentDay > periodLength
@@ -510,7 +511,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
               <div style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.EYEBROW, marginTop: 3, fontWeight: 300 }}>Prebieha — opatruj sa</div>
             </div>
             <button
-              onClick={onMarkPeriodEnd}
+              onClick={() => onMarkPeriodEnd(new Date())}
               style={{ all: 'unset', cursor: 'pointer', fontFamily: NM.SANS, fontSize: 11.5, color: PHASE.MENSTR, fontWeight: 500, padding: '8px 12px', borderRadius: 999, background: '#fff', border: `1px solid ${PHASE.MENSTR}55`, flexShrink: 0 }}
             >
               Skončila dnes
@@ -533,20 +534,43 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
             <div style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.EYEBROW, marginTop: 3, fontWeight: 300 }}>
               Máš nastavených {periodLength} dní — zaznač, kedy menštruácia skončila, a appka sa to naučí.
             </div>
-            <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
-              <button
-                onClick={onMarkPeriodEnd}
-                style={{ all: 'unset', cursor: 'pointer', fontFamily: NM.SANS, fontSize: 12, color: '#fff', fontWeight: 500, padding: '9px 16px', borderRadius: 999, background: PHASE.MENSTR }}
-              >
-                Skončila dnes
-              </button>
-              <button
-                onClick={dismissBleedPrompt}
-                style={{ all: 'unset', cursor: 'pointer', fontFamily: NM.SANS, fontSize: 12, color: PHASE.MENSTR, fontWeight: 500, padding: '9px 16px', borderRadius: 999, background: '#fff', border: `1px solid ${PHASE.MENSTR}55` }}
-              >
-                Áno, ešte prebieha
-              </button>
-            </div>
+            {endPickerOpen ? (
+              <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
+                {[
+                  { n: 0, l: 'Dnes' },
+                  { n: 1, l: 'Včera' },
+                  { n: 2, l: 'Pred 2 dňami' },
+                  { n: 3, l: 'Pred 3 dňami' },
+                ].map(({ n, l }) => (
+                  <button
+                    key={n}
+                    onClick={() => {
+                      const d = new Date();
+                      d.setDate(d.getDate() - n);
+                      onMarkPeriodEnd(d);
+                    }}
+                    style={{ all: 'unset', cursor: 'pointer', fontFamily: NM.SANS, fontSize: 12, color: PHASE.MENSTR, fontWeight: 500, padding: '8px 14px', borderRadius: 999, background: '#fff', border: `1px solid ${PHASE.MENSTR}55` }}
+                  >
+                    {l}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+                <button
+                  onClick={() => setEndPickerOpen(true)}
+                  style={{ all: 'unset', cursor: 'pointer', fontFamily: NM.SANS, fontSize: 12, color: '#fff', fontWeight: 500, padding: '9px 16px', borderRadius: 999, background: PHASE.MENSTR }}
+                >
+                  Už skončila
+                </button>
+                <button
+                  onClick={dismissBleedPrompt}
+                  style={{ all: 'unset', cursor: 'pointer', fontFamily: NM.SANS, fontSize: 12, color: PHASE.MENSTR, fontWeight: 500, padding: '9px 16px', borderRadius: 999, background: '#fff', border: `1px solid ${PHASE.MENSTR}55` }}
+                >
+                  Áno, ešte prebieha
+                </button>
+              </div>
+            )}
           </div>
         </div>
       ) : daysToMenstruation <= 3 || isLate ? (
@@ -1013,12 +1037,12 @@ export default function Periodka() {
   const [confirmStartOpen, setConfirmStartOpen] = useState(false);
   const requireConsent = useConsentGuard();
 
-  const handleMarkPeriodEnded = async () => {
+  const handleMarkPeriodEnded = async (date: Date) => {
     const ok = await requireConsent(CONSENT_TYPES.HEALTH_DATA, {
       acceptLabel: 'Súhlasím a uložiť',
     });
     if (!ok) return;
-    markPeriodEnded(new Date());
+    markPeriodEnded(date);
   };
 
   // ?free=1 still works for testing the upsell/setup view, but tier no
@@ -1059,8 +1083,13 @@ export default function Periodka() {
         open={confirmStartOpen}
         eyebrow="Cyklus"
         title="Označiť dnešok ako začiatok menštruácie?"
-        message="Tým sa znovu nastaví tvoj cyklus tak, aby dnešný deň bol deň 1. Môžeš to kedykoľvek opraviť v nastaveniach cyklu."
+        message="Tým sa znovu nastaví tvoj cyklus tak, aby dnešný deň bol deň 1. Ak začala už skôr (napr. keď si appku pár dní neotvorila), vyber presný dátum."
         confirmLabel="Áno, dnes mi začala"
+        secondaryLabel="Začala skôr — vybrať dátum"
+        onSecondary={() => {
+          setConfirmStartOpen(false);
+          navigate('/kniznica/periodka/nastavenia?pick=1');
+        }}
         cancelLabel="Späť"
         accent={PHASE.MENSTR}
         onConfirm={handleConfirmPeriodStart}
