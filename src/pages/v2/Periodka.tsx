@@ -235,7 +235,10 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart }: Paid
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const selectedPhaseKey = selectedDay !== null ? phaseKeyForCalendarDay(selectedDay) : null;
 
-  const daysToMenstruation = Math.max(0, totalDays - currentDay);
+  // Next period starts on day totalDays + 1 (day `totalDays` is still part
+  // of the current cycle) — `totalDays - currentDay` predicted one day
+  // early and disagreed with getNextPeriodDate used by settings.
+  const daysToMenstruation = Math.max(0, totalDays + 1 - currentDay);
   const ovulationStart = phases.find((p) => p.key === 'ovulation')?.start ?? 14;
   const daysToOvulation = ovulationStart > currentDay ? ovulationStart - currentDay : Math.max(0, totalDays + ovulationStart - currentDay);
 
