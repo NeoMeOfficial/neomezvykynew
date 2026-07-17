@@ -274,6 +274,10 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart }: Paid
   nextPeriodDate.setDate(today.getDate() + daysToMenstruation);
   const nextPeriodLabel = `${nextPeriodDate.getDate()}. ${SK_MONTHS_SHORT_LOWER[nextPeriodDate.getMonth()]}.`;
 
+  const ovulationDate = new Date(today);
+  ovulationDate.setDate(today.getDate() + daysToOvulation);
+  const fmtShortDate = (d: Date) => `${d.getDate()}. ${SK_MONTHS_SHORT_LOWER[d.getMonth()]}.`;
+
   // When the period is late the cycle-day counter keeps incrementing
   // past totalDays (29, 30, 31…) on purpose — so we know how late
   // we are. But "deň 31 z 28" reads as a bug to users, so swap the
@@ -759,8 +763,8 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart }: Paid
         <Eye>Čaká ťa</Eye>
         <div style={{ marginTop: 16 }}>
           {[
-            { w: inDaysLabel(daysToOvulation), t: 'Začiatok ovulácie', c: PHASE.OVULAT },
-            { w: inDaysLabel(daysToMenstruation), t: 'Nasledujúca menštruácia', c: PHASE.MENSTR },
+            { w: inDaysLabel(daysToOvulation), d: fmtShortDate(ovulationDate), t: 'Začiatok ovulácie', c: PHASE.OVULAT },
+            { w: inDaysLabel(daysToMenstruation), d: fmtShortDate(nextPeriodDate), t: 'Nasledujúca menštruácia', c: PHASE.MENSTR },
           ].map((u, i, arr) => (
             <div
               key={u.t}
@@ -774,7 +778,10 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart }: Paid
             >
               <div style={{ width: 8, height: 8, borderRadius: 999, background: u.c, flexShrink: 0 }} />
               <div style={{ flex: 1, fontFamily: NM.SANS, fontSize: 13, color: NM.DEEP, fontWeight: 400 }}>{u.t}</div>
-              <div style={{ fontFamily: NM.SERIF, fontSize: 15, color: NM.DEEP, letterSpacing: '-0.005em' }}>{u.w}</div>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontFamily: NM.SERIF, fontSize: 15, color: NM.DEEP, letterSpacing: '-0.005em' }}>{u.d}</div>
+                <div style={{ fontFamily: NM.SANS, fontSize: 10.5, color: NM.TERTIARY, fontWeight: 400, marginTop: 2 }}>{u.w.toLowerCase()}</div>
+              </div>
             </div>
           ))}
         </div>
