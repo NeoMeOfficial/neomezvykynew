@@ -34,6 +34,12 @@ export interface CycleData {
   customSettings: CustomSettings;
   history?: PeriodLog[];
   dailyPeriodData?: DailyPeriodData[]; // Track daily period intensity
+  /** Actual end of the CURRENT period ("Skončila dnes"), ISO YYYY-MM-DD.
+   *  Reset to null when a new period starts. */
+  currentPeriodEnd?: string | null;
+  /** Actual bleed lengths of recent periods (newest last, max 6) — feeds
+   *  the periodLength auto-calibration after ≥3 recorded periods. */
+  bleedLengths?: number[];
 }
 
 export interface DerivedState {

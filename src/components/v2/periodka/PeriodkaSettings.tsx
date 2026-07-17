@@ -378,7 +378,7 @@ export default function PeriodkaSettings() {
   const navigate = useNavigate();
   const requireConsent = useConsentGuard();
   const { cycleData, setLastPeriodStart, setCycleLength, setPeriodLength, updateCycleData } = useCycleData();
-  const { lastPeriodStart, cycleLength, periodLength } = cycleData;
+  const { lastPeriodStart, cycleLength, periodLength, currentPeriodEnd } = cycleData;
 
   const [showPicker, setShowPicker] = useState(false);
   const [periodHistory, setPeriodHistory] = useState<PeriodHistoryEntry[]>([]);
@@ -447,7 +447,7 @@ export default function PeriodkaSettings() {
 
     if (!lastPeriodStart) {
       setLastPeriodStart(selectedDate);
-      updateCycleData({ lastPeriodStart: format(selectedDate, 'yyyy-MM-dd'), periodLength: 5 });
+      updateCycleData({ lastPeriodStart: format(selectedDate, 'yyyy-MM-dd'), periodLength: 5, currentPeriodEnd: null });
       // Stay in settings: the user still needs to confirm cycle length and
       // bleeding length right below. The "Hotovo" CTA takes her to the
       // tracker once she's checked them.
@@ -459,13 +459,23 @@ export default function PeriodkaSettings() {
     const actualCycle = differenceInDays(startOfDay(selectedDate), startOfDay(previousStart));
 
     if (actualCycle >= 21 && actualCycle <= 45) {
-      const previousEnd = new Date(previousStart);
-      previousEnd.setDate(previousEnd.getDate() + periodLength - 1);
+      // Prefer the actual recorded end ("Skončila dnes") over the assumed
+      // setting-based length for the closing period.
+      const hasActualEnd = !!currentPeriodEnd && currentPeriodEnd >= lastPeriodStart;
+      const previousEnd = hasActualEnd
+        ? new Date(currentPeriodEnd + 'T00:00:00')
+        : (() => {
+            const e = new Date(previousStart);
+            e.setDate(e.getDate() + periodLength - 1);
+            return e;
+          })();
       const entry: PeriodHistoryEntry = {
         id: `${previousStart.getTime()}-${Date.now()}`,
         startDate: format(previousStart, 'yyyy-MM-dd'),
         endDate: format(previousEnd, 'yyyy-MM-dd'),
-        periodLength,
+        periodLength: hasActualEnd
+          ? differenceInDays(startOfDay(previousEnd), startOfDay(previousStart)) + 1
+          : periodLength,
         cycleLength: actualCycle,
         createdAt: new Date().toISOString(),
       };
@@ -480,9 +490,10 @@ export default function PeriodkaSettings() {
       lastPeriodStart: format(selectedDate, 'yyyy-MM-dd'),
       cycleLength: actualCycle >= 21 && actualCycle <= 45 ? actualCycle : cycleLength,
       periodLength: safePeriodLength,
+      currentPeriodEnd: null,
     });
     toast.success(`Nová menštruácia nastavená — deň ${daysSince}`);
-  }, [lastPeriodStart, periodLength, cycleLength, today, setLastPeriodStart, updateCycleData, navigate, requireConsent]);
+  }, [lastPeriodStart, periodLength, cycleLength, currentPeriodEnd, today, setLastPeriodStart, updateCycleData, navigate, requireConsent]);
 
   return (
     <div style={{ minHeight: '100vh', background: T.BG, fontFamily: T.SANS, color: T.INK, paddingBottom: 100 }}>

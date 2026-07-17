@@ -209,11 +209,40 @@ export function useCycleData(accessCode?: string) {
     });
   }, [saveCycleData]);
 
-  // Set last period start date
+  // Set last period start date — a new period invalidates the previous
+  // "period ended" marker.
   const setLastPeriodStart = useCallback((date: Date) => {
     const dateString = format(date, 'yyyy-MM-dd');
-    updateCycleData({ lastPeriodStart: dateString });
+    updateCycleData({ lastPeriodStart: dateString, currentPeriodEnd: null });
   }, [updateCycleData]);
+
+  // Mark the current period as ended ("Skončila dnes"). Records the actual
+  // bleed length and — after 3 recorded periods — auto-calibrates
+  // periodLength the same way cycle length learns from history.
+  const markPeriodEnded = useCallback((date: Date) => {
+    setCycleData(current => {
+      if (!current.lastPeriodStart) return current;
+      const start = new Date(current.lastPeriodStart + 'T00:00:00');
+      const actualLength = differenceInDays(date, start) + 1;
+      if (actualLength < 1) return current;
+
+      const bleedLengths = [...(current.bleedLengths ?? []), Math.min(actualLength, 14)].slice(-6);
+      let learnedPeriodLength = current.periodLength;
+      if (bleedLengths.length >= 3) {
+        const avg = Math.round(bleedLengths.reduce((s, n) => s + n, 0) / bleedLengths.length);
+        learnedPeriodLength = Math.max(2, Math.min(10, avg));
+      }
+
+      const updated = {
+        ...current,
+        currentPeriodEnd: format(date, 'yyyy-MM-dd'),
+        bleedLengths,
+        periodLength: learnedPeriodLength,
+      };
+      saveCycleData(updated);
+      return updated;
+    });
+  }, [saveCycleData]);
 
   // Set cycle length
   const setCycleLength = useCallback((length: number) => {
@@ -349,6 +378,7 @@ export function useCycleData(accessCode?: string) {
     setLastPeriodStart,
     setCycleLength,
     setPeriodLength,
+    markPeriodEnded,
     addPeriodToHistory,
     updateCustomSettings,
     updateCycleData,

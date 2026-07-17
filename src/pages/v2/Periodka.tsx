@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { useCycleData } from '../../features/cycle/useCycleData';
 import { useCycleSymptoms } from '../../hooks/useDailyRituals';
@@ -199,12 +200,13 @@ interface PaidViewProps {
   cycleData: CycleData;
   derivedState: DerivedState | null;
   onMarkPeriodStart: () => void;
+  onMarkPeriodEnd: () => void;
 }
 
 const SK_MONTHS_FULL = ['január', 'február', 'marec', 'apríl', 'máj', 'jún', 'júl', 'august', 'september', 'október', 'november', 'december'];
 const SK_MONTHS_SHORT_LOWER = ['jan', 'feb', 'mar', 'apr', 'máj', 'jún', 'júl', 'aug', 'sep', 'okt', 'nov', 'dec'];
 
-function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart }: PaidViewProps) {
+function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMarkPeriodEnd }: PaidViewProps) {
   const totalDays = cycleData.cycleLength ?? 28;
   const periodLength = cycleData.periodLength ?? 5;
   const currentDay = derivedState?.currentDay ?? 1;
@@ -277,6 +279,28 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart }: Paid
   const ovulationDate = new Date(today);
   ovulationDate.setDate(today.getDate() + daysToOvulation);
   const fmtShortDate = (d: Date) => `${d.getDate()}. ${SK_MONTHS_SHORT_LOWER[d.getMonth()]}.`;
+
+  // Actual bleed tracking: "Skončila dnes" sets currentPeriodEnd, which
+  // overrides the assumed periodLength for this cycle's card states.
+  const periodEnded = !!cycleData.currentPeriodEnd
+    && !!cycleData.lastPeriodStart
+    && cycleData.currentPeriodEnd >= cycleData.lastPeriodStart;
+  const bleedingOngoing = !periodEnded && currentDay <= periodLength;
+  // Just past the assumed length with no recorded end — ask instead of
+  // silently assuming. Dismissable for the rest of the day.
+  const [bleedPromptDismissed, setBleedPromptDismissed] = useState(() => {
+    try {
+      return sessionStorage.getItem('neome_bleed_prompt_dismissed') === format(new Date(), 'yyyy-MM-dd');
+    } catch { return false; }
+  });
+  const dismissBleedPrompt = () => {
+    setBleedPromptDismissed(true);
+    try { sessionStorage.setItem('neome_bleed_prompt_dismissed', format(new Date(), 'yyyy-MM-dd')); } catch { /* ignore */ }
+  };
+  const bleedOverduePrompt = !periodEnded
+    && !bleedPromptDismissed
+    && currentDay > periodLength
+    && currentDay <= periodLength + 3;
 
   // When the period is late the cycle-day counter keeps incrementing
   // past totalDays (29, 30, 31…) on purpose — so we know how late
@@ -455,10 +479,13 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart }: Paid
       </div>
 
       {/* Period-start action adapts to where the user is in her cycle:
-          during menstruation → informational card (no "started today" CTA);
-          mid-cycle → quiet one-line link (early periods still recordable);
-          ≤3 days before prediction or late → full prominent card. */}
-      {currentDay <= periodLength ? (
+          during menstruation → informational card with a "Skončila dnes"
+          action (records the real bleed length; after 3 periods the
+          default length auto-calibrates); just past the expected length
+          with no recorded end → "ešte krvácaš?" prompt; mid-cycle →
+          quiet one-line link; ≤3 days before prediction or late → full
+          prominent card. */}
+      {bleedingOngoing ? (
         <div style={{ padding: '18px 18px 0' }}>
           <div
             style={{
@@ -483,11 +510,43 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart }: Paid
               <div style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.EYEBROW, marginTop: 3, fontWeight: 300 }}>Prebieha — opatruj sa</div>
             </div>
             <button
-              onClick={() => navigate('/kniznica/periodka/nastavenia')}
-              style={{ all: 'unset', cursor: 'pointer', fontFamily: NM.SANS, fontSize: 11.5, color: PHASE.MENSTR, fontWeight: 500, padding: 6 }}
+              onClick={onMarkPeriodEnd}
+              style={{ all: 'unset', cursor: 'pointer', fontFamily: NM.SANS, fontSize: 11.5, color: PHASE.MENSTR, fontWeight: 500, padding: '8px 12px', borderRadius: 999, background: '#fff', border: `1px solid ${PHASE.MENSTR}55`, flexShrink: 0 }}
             >
-              Upraviť
+              Skončila dnes
             </button>
+          </div>
+        </div>
+      ) : bleedOverduePrompt ? (
+        <div style={{ padding: '18px 18px 0' }}>
+          <div
+            style={{
+              width: '100%',
+              padding: '14px 16px',
+              borderRadius: 20,
+              background: TINT.MENSTR_50,
+              border: `1px solid ${PHASE.MENSTR}40`,
+              boxSizing: 'border-box',
+            }}
+          >
+            <div style={{ fontFamily: NM.SERIF, fontSize: 16, color: NM.DEEP, letterSpacing: '-0.005em' }}>Ešte stále krvácaš?</div>
+            <div style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.EYEBROW, marginTop: 3, fontWeight: 300 }}>
+              Máš nastavených {periodLength} dní — zaznač, kedy menštruácia skončila, a appka sa to naučí.
+            </div>
+            <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+              <button
+                onClick={onMarkPeriodEnd}
+                style={{ all: 'unset', cursor: 'pointer', fontFamily: NM.SANS, fontSize: 12, color: '#fff', fontWeight: 500, padding: '9px 16px', borderRadius: 999, background: PHASE.MENSTR }}
+              >
+                Skončila dnes
+              </button>
+              <button
+                onClick={dismissBleedPrompt}
+                style={{ all: 'unset', cursor: 'pointer', fontFamily: NM.SANS, fontSize: 12, color: PHASE.MENSTR, fontWeight: 500, padding: '9px 16px', borderRadius: 999, background: '#fff', border: `1px solid ${PHASE.MENSTR}55` }}
+              >
+                Áno, ešte prebieha
+              </button>
+            </div>
           </div>
         </div>
       ) : daysToMenstruation <= 3 || isLate ? (
@@ -950,9 +1009,17 @@ function FreeView({ navigate }: { navigate: (p: string) => void }) {
 
 export default function Periodka() {
   const navigate = useNavigate();
-  const { cycleData, derivedState, setLastPeriodStart } = useCycleData();
+  const { cycleData, derivedState, setLastPeriodStart, markPeriodEnded } = useCycleData();
   const [confirmStartOpen, setConfirmStartOpen] = useState(false);
   const requireConsent = useConsentGuard();
+
+  const handleMarkPeriodEnded = async () => {
+    const ok = await requireConsent(CONSENT_TYPES.HEALTH_DATA, {
+      acceptLabel: 'Súhlasím a uložiť',
+    });
+    if (!ok) return;
+    markPeriodEnded(new Date());
+  };
 
   // ?free=1 still works for testing the upsell/setup view, but tier no
   // longer gates the dashboard — period tracking is open to all users.
@@ -980,6 +1047,7 @@ export default function Periodka() {
           cycleData={cycleData}
           derivedState={derivedState}
           onMarkPeriodStart={() => setConfirmStartOpen(true)}
+          onMarkPeriodEnd={handleMarkPeriodEnded}
         />
       ) : (
         <FreeView navigate={navigate} />
