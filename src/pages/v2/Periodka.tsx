@@ -70,6 +70,14 @@ function TopBar({ title, showLock = false, onBack, onSettings }: { title: string
   );
 }
 
+// "O X dní" with Slovak declension; 0 → Dnes, 1 → Zajtra.
+function inDaysLabel(n: number): string {
+  if (n <= 0) return 'Dnes';
+  if (n === 1) return 'Zajtra';
+  if (n < 5) return `O ${n} dni`;
+  return `O ${n} dní`;
+}
+
 interface RingDialProps {
   faded?: boolean;
   totalDays?: number;
@@ -731,8 +739,8 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart }: Paid
         <Eye>Čaká ťa</Eye>
         <div style={{ marginTop: 16 }}>
           {[
-            { w: 'O 7 dní', t: 'Začiatok ovulácie', c: PHASE.OVULAT },
-            { w: 'O 21 dní', t: 'Nasledujúca menštruácia', c: PHASE.MENSTR },
+            { w: inDaysLabel(daysToOvulation), t: 'Začiatok ovulácie', c: PHASE.OVULAT },
+            { w: inDaysLabel(daysToMenstruation), t: 'Nasledujúca menštruácia', c: PHASE.MENSTR },
           ].map((u, i, arr) => (
             <div
               key={u.t}
