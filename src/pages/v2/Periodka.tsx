@@ -85,7 +85,18 @@ interface RingDialProps {
   phaseLabel?: string;
   phaseColor?: string;
   daysToNextLabel?: string;
+  /** Real phase ranges (1-indexed, inclusive) from derivedState. Without
+   *  them the dial falls back to a generic 28-day split — only for the
+   *  faded FreeView preview. */
+  phaseRanges?: { key: string; start: number; end: number }[];
 }
+
+const RING_PHASE_COLOR: Record<string, string> = {
+  menstrual: PHASE.MENSTR,
+  follicular: PHASE.FOLLIC,
+  ovulation: PHASE.OVULAT,
+  luteal: PHASE.LUTEAL,
+};
 
 function RingDial({
   faded = false,
@@ -94,18 +105,24 @@ function RingDial({
   phaseLabel = 'Folikulárna',
   phaseColor = PHASE.FOLLIC,
   daysToNextLabel = 'ďalšia o 21 dní',
+  phaseRanges,
 }: RingDialProps) {
   const size = 230;
   const strokeW = 16;
   const r = (size - strokeW) / 2;
   const cx = size / 2;
   const cy = size / 2;
-  const phases = [
-    { s: 0, e: 5, c: PHASE.MENSTR },
-    { s: 5, e: 13, c: PHASE.FOLLIC },
-    { s: 13, e: 16, c: PHASE.OVULAT },
-    { s: 16, e: 28, c: PHASE.LUTEAL },
-  ];
+  // Arcs from the user's real phase boundaries; day N occupies the arc
+  // segment (N-1, N], so a range start..end maps to (start-1)..end.
+  const phases = (phaseRanges && phaseRanges.length > 0
+    ? phaseRanges.map((p) => ({ s: p.start - 1, e: p.end, c: RING_PHASE_COLOR[p.key] ?? PHASE.FOLLIC }))
+    : [
+        { s: 0, e: 5, c: PHASE.MENSTR },
+        { s: 5, e: 13, c: PHASE.FOLLIC },
+        { s: 13, e: 16, c: PHASE.OVULAT },
+        { s: 16, e: totalDays, c: PHASE.LUTEAL },
+      ]
+  );
   const polar = (d: number) => {
     const a = (d / totalDays) * Math.PI * 2 - Math.PI / 2;
     return [cx + r * Math.cos(a), cy + r * Math.sin(a)] as const;
@@ -116,7 +133,9 @@ function RingDial({
     const large = e - s > totalDays / 2 ? 1 : 0;
     return `M ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2}`;
   };
-  const [mx, my] = polar(currentDay);
+  // A late period pushes currentDay past totalDays — clamp the marker to
+  // the cycle end instead of letting it wrap into "menstruation" again.
+  const [mx, my] = polar(Math.min(currentDay, totalDays));
   return (
     <div style={{ display: 'flex', justifyContent: 'center', padding: '6px 0 14px', opacity: faded ? 0.55 : 1 }}>
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
@@ -403,6 +422,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart }: Paid
       <RingDial
         currentDay={currentDay}
         totalDays={totalDays}
+        phaseRanges={phases}
         phaseLabel={isLate ? 'Cyklus predĺžený' : currentPhaseName}
         phaseColor={phaseColor}
         daysToNextLabel={

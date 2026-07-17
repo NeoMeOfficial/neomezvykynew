@@ -65,14 +65,17 @@ export default function CyklusLog() {
   const { addEntry } = usePointsLedger();
   const today = derivedState?.today ?? new Date();
   const dateLabel = `${SK_DAYS[today.getDay()]} · ${today.getDate()}. ${SK_MONTHS[today.getMonth()]}`;
-  const phaseLabel = derivedState?.currentPhase ? PHASE_LABEL[derivedState.currentPhase.key] : 'Folikulárna fáza';
+  const phaseLabel = derivedState?.currentPhase ? PHASE_LABEL[derivedState.currentPhase.key] : null;
 
-  const [flow, setFlow] = useState<string>('medium');
-  const [symptoms, setSymptoms] = useState<Set<string>>(new Set(['Kŕče', 'Nafukovanie']));
-  const [moods, setMoods] = useState<Set<string>>(new Set(['Radosť', 'Únava']));
-  const [energy, setEnergy] = useState<number>(68);
-  const [sleep, setSleep] = useState<string>('OK');
-  const [mucus, setMucus] = useState<string>('Krémový');
+  // Neutral defaults — nothing pre-selected. These used to ship with fake
+  // demo values (Kŕče+Nafukovanie, Radosť+Únava, energy 68…) that rendered
+  // as the user's own entry and could be saved verbatim.
+  const [flow, setFlow] = useState<string>('none');
+  const [symptoms, setSymptoms] = useState<Set<string>>(new Set());
+  const [moods, setMoods] = useState<Set<string>>(new Set());
+  const [energy, setEnergy] = useState<number>(50);
+  const [sleep, setSleep] = useState<string>('');
+  const [mucus, setMucus] = useState<string>('');
   const [note, setNote] = useState<string>('');
 
   // Prefill from today's saved log (if any) — runs once when logs hydrate
@@ -146,7 +149,7 @@ export default function CyklusLog() {
           <em style={{ color: NM.MAUVE, fontStyle: 'italic', fontWeight: 500 }}>cítiš</em>?
         </Ser>
         <div style={{ fontFamily: NM.SANS, fontSize: 12, color: NM.EYEBROW, marginTop: 6, fontWeight: 400 }}>
-          {dateLabel} · {phaseLabel}
+          {phaseLabel ? `${dateLabel} · ${phaseLabel}` : dateLabel}
         </div>
       </div>
 

@@ -4,6 +4,7 @@ import { Eyebrow } from '@/components/ui/eyebrow';
 import { SerifHeader } from '@/components/ui/serif-header';
 import { BodyText } from '@/components/ui/body-text';
 import { calculateAverageCycleLength } from '@/features/cycle/useCycleData';
+import { getPhaseRanges } from '@/features/cycle/utils';
 import { useCycle } from '@/hooks/use-cycle';
 import { useCycleLogs } from '@/features/cycle/useCycleLogs';
 import { PHASE_LABELS } from '@/features/cycle/insights';
@@ -14,13 +15,6 @@ const PHASE_COLORS: Record<string, string> = {
   follicular: '#8B9E88',
   ovulation:  '#B8864A',
   luteal:     '#A8848B',
-};
-
-const PHASE_DURATIONS: Record<string, number> = {
-  menstrual: 5,
-  follicular: 9,
-  ovulation: 3,
-  luteal: 11,
 };
 
 const SK_MONTHS = ['jan', 'feb', 'mar', 'apr', 'máj', 'jún', 'júl', 'aug', 'sep', 'okt', 'nov', 'dec'];
@@ -38,7 +32,13 @@ export default function CyklusInsights() {
   const navigate = useNavigate();
   const { cycleData, nextPeriodDate } = useCycle();
   const { logs } = useCycleLogs();
-  const { cycleLength, history = [], lastPeriodStart } = cycleData;
+  const { cycleLength, periodLength, history = [], lastPeriodStart } = cycleData;
+
+  // Real per-user phase lengths — this block used to render a hardcoded
+  // 5/9/3/11 split regardless of the user's cycle.
+  const phaseDurations: Record<string, number> = Object.fromEntries(
+    getPhaseRanges(cycleLength, periodLength).map((p) => [p.key, p.end - p.start + 1])
+  );
 
   // Most recent 10 daily logs, newest first
   const sortedLogs = Object.entries(logs)
@@ -139,8 +139,8 @@ export default function CyklusInsights() {
               <Eyebrow className="mb-4">Rozloženie fáz</Eyebrow>
               <div className="flex flex-col gap-3">
                 {(Object.entries(PHASE_LABELS) as [string, string][]).map(([key, label]) => {
-                  const days = PHASE_DURATIONS[key] ?? 7;
-                  const pct = Math.round((days / avgLength) * 100);
+                  const days = phaseDurations[key] ?? 7;
+                  const pct = Math.round((days / Math.max(cycleLength, 1)) * 100);
                   const color = PHASE_COLORS[key] ?? '#8B9E88';
                   return (
                     <div key={key}>
