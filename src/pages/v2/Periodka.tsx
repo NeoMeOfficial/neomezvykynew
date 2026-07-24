@@ -424,6 +424,11 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     ? `${selectedIsToday ? 'Nachádzaš sa' : selectedIsPast ? 'Bola si' : 'Budeš'} ${PHASE_LOCATIVE[selectedInfo.key]}.`
     : null;
 
+  // Custom-symptom input inside the day-detail sheet (separate state from
+  // the main section's input so the two never fight over focus).
+  const [sheetAddingSymptom, setSheetAddingSymptom] = useState(false);
+  const [sheetNewSymptomText, setSheetNewSymptomText] = useState('');
+
   const dayDetailSheet = selectedDay !== null && (
     <div
       role="dialog"
@@ -483,6 +488,49 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
                   </button>
                 );
               })}
+
+              {sheetAddingSymptom ? (
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    const def = addCustomSymptom(sheetNewSymptomText);
+                    if (def) toggleSymptomForDate(selectedDateISO, def.k);
+                    setSheetNewSymptomText('');
+                    setSheetAddingSymptom(false);
+                  }}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 6px 4px 14px', borderRadius: 999, background: '#fff', border: `1px solid ${NM.HAIR_2}` }}
+                >
+                  <input
+                    autoFocus
+                    value={sheetNewSymptomText}
+                    onChange={(e) => setSheetNewSymptomText(e.target.value)}
+                    onBlur={() => {
+                      if (!sheetNewSymptomText.trim()) setSheetAddingSymptom(false);
+                    }}
+                    maxLength={28}
+                    placeholder="Vlastný príznak…"
+                    style={{ all: 'unset', fontFamily: NM.SANS, fontSize: 12.5, color: NM.DEEP, minWidth: 0, width: 130 }}
+                  />
+                  <button
+                    type="submit"
+                    disabled={!sheetNewSymptomText.trim()}
+                    style={{ all: 'unset', cursor: sheetNewSymptomText.trim() ? 'pointer' : 'not-allowed', background: NM.DEEP, color: '#fff', padding: '4px 10px', borderRadius: 999, fontFamily: NM.SANS, fontSize: 11.5, fontWeight: 500, opacity: sheetNewSymptomText.trim() ? 1 : 0.5 }}
+                  >
+                    Pridať
+                  </button>
+                </form>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setSheetAddingSymptom(true)}
+                  style={{ all: 'unset', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4, padding: '7px 12px', borderRadius: 999, background: 'transparent', color: NM.MUTED, border: `1px dashed ${NM.HAIR_2}`, fontFamily: NM.SANS, fontSize: 12.5, fontWeight: 500 }}
+                >
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+                    <path d="M12 5v14M5 12h14" />
+                  </svg>
+                  Pridať vlastný
+                </button>
+              )}
             </div>
             <div style={{ fontFamily: NM.SANS, fontSize: 10.5, color: NM.TERTIARY, fontWeight: 400, marginTop: 10, lineHeight: 1.45 }}>
               Zmeny sa ukladajú automaticky.
