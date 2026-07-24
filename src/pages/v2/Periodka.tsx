@@ -6,6 +6,7 @@ import { useCycleSymptoms } from '../../hooks/useDailyRituals';
 import { Page, Eye, Ser, Body, PlusTag, ConfirmSheet, NM } from '../../components/v2/neome';
 import { getCycleTipByDay } from '../../data/cycleTips';
 import type { DerivedState, CycleData } from '../../features/cycle/types';
+import { PHASE_HEADLINES } from '../../features/cycle/constants';
 import { useConsentGuard } from '../../contexts/ConsentGuardContext';
 import { CONSENT_TYPES } from '../../lib/consents';
 import PlusUnlockBanner from '../../components/v2/paywall/PlusUnlockBanner';
@@ -313,21 +314,27 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     ? `menštruácia mešká · ${daysLate} ${daysLate === 1 ? 'deň' : daysLate < 5 ? 'dni' : 'dní'}`
     : `deň ${currentDay} z ${totalDays}`;
 
-  // Headline copy adapts to phase
-  const phaseHeadline: Record<string, { eye: string; before: string; em: string; body: string }> = {
-    menstrual: { eye: `${monthLabel} · ${dayLabel} · menštruácia`, before: 'Telo sa', em: 'reštartuje.', body: 'Doprajte si pokoj, teplo a jemný pohyb.' },
-    follicular: { eye: `${monthLabel} · ${dayLabel} · folikulárna`, before: 'Energia sa', em: 'vracia.', body: 'Estrogén stúpa. Skvelý čas začať niečo nové alebo vrátiť sa k náročnejším tréningom.' },
-    ovulation: { eye: `${monthLabel} · ${dayLabel} · ovulácia`, before: 'Vrchol', em: 'sily.', body: 'Najvyššia energia a sebavedomie. Sociálny, kreatívny čas.' },
-    luteal: {
-      eye: `${monthLabel} · ${dayLabel}${isLate ? '' : ' · luteálna'}`,
-      before: isLate ? 'Cyklus je' : 'Spomaľ a',
-      em: isLate ? 'predĺžený.' : 'uzemni sa.',
-      body: isLate
-        ? 'Ak ti menštruácia ešte nezačala, môže to byť normálne. Keď príde, označ jej začiatok v nastaveniach a cyklus sa zarovná.'
-        : 'Telo sa pripravuje na ďalší cyklus. Buď k sebe jemnejšia.',
-    },
+  // Headline copy adapts to phase. Text comes from the shared
+  // PHASE_HEADLINES so the home Periodka card reads identically; only
+  // the eyebrow and the late-period override are tracker-specific.
+  const EYE_SUFFIX: Record<string, string> = {
+    menstrual: ' · menštruácia',
+    follicular: ' · folikulárna',
+    ovulation: ' · ovulácia',
+    luteal: ' · luteálna',
   };
-  const head = phaseHeadline[currentPhaseKey] ?? phaseHeadline.follicular;
+  const baseHeadline = PHASE_HEADLINES[currentPhaseKey as keyof typeof PHASE_HEADLINES] ?? PHASE_HEADLINES.follicular;
+  const head = isLate
+    ? {
+        eye: `${monthLabel} · ${dayLabel}`,
+        before: 'Cyklus je',
+        em: 'predĺžený.',
+        body: 'Ak ti menštruácia ešte nezačala, môže to byť normálne. Keď príde, označ jej začiatok v nastaveniach a cyklus sa zarovná.',
+      }
+    : {
+        eye: `${monthLabel} · ${dayLabel}${EYE_SUFFIX[currentPhaseKey] ?? ''}`,
+        ...baseHeadline,
+      };
 
   // Build calendar grid for the current month, Mon-first
   type Cell = { d: number; mute?: boolean };

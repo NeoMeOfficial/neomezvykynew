@@ -36,5 +36,18 @@ export const PHASE_DESCRIPTIONS: Record<PhaseKey, string> = {
   luteal: 'Telo sa pripravuje na ďalší cyklus. Progesterón stúpa, môžeš cítiť potrebu spomalenia a starostlivosti o seba.',
 };
 
+/**
+ * Single source for the daily phase headline. Shown on BOTH the home
+ * Periodka card (as one line: "before em") and the tracker hero (split
+ * across two lines with `em` accented) — the two must never diverge.
+ * The tracker adds its own late-period override on top of `luteal`.
+ */
+export const PHASE_HEADLINES: Record<PhaseKey, { before: string; em: string; body: string }> = {
+  menstrual:  { before: 'Telo sa', em: 'reštartuje.', body: 'Doprajte si pokoj, teplo a jemný pohyb.' },
+  follicular: { before: 'Energia sa', em: 'vracia.', body: 'Estrogén stúpa. Skvelý čas začať niečo nové alebo vrátiť sa k náročnejším tréningom.' },
+  ovulation:  { before: 'Vrchol', em: 'sily.', body: 'Najvyššia energia a sebavedomie. Sociálny, kreatívny čas.' },
+  luteal:     { before: 'Spomaľ a', em: 'uzemni sa.', body: 'Telo sa pripravuje na ďalší cyklus. Buď k sebe jemnejšia.' },
+};
+
 export const FERTILITY_COLOR = '#E91E63';
 export const FERTILITY_NAME = 'Plodné dni';

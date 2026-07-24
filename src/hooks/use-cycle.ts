@@ -19,6 +19,7 @@ import {
   getFertilityWindow,
   getSubphase,
 } from '@/features/cycle/utils';
+import { PHASE_HEADLINES } from '@/features/cycle/constants';
 import type { PhaseKey, PhaseRange } from '@/features/cycle/types';
 
 const PHASE_NAME: Record<PhaseKey, string> = {
@@ -28,12 +29,12 @@ const PHASE_NAME: Record<PhaseKey, string> = {
   luteal:     'Luteálna',
 };
 
-const PHASE_NOTE: Record<PhaseKey, string> = {
-  menstrual:  'Čas na odpočinok a mierny pohyb.',
-  follicular: 'Energia rastie. Dobrý deň na intenzívny pohyb.',
-  ovulation:  'Vrchol energie. Ideálny čas na výzvy.',
-  luteal:     'Spomaľ a zaobstarávaj sa.',
-};
+// Note shown on the home Periodka card — MUST read identically to the
+// tracker hero headline, so both derive from the shared PHASE_HEADLINES.
+const PHASE_NOTE: Record<PhaseKey, string> = Object.fromEntries(
+  (Object.entries(PHASE_HEADLINES) as [PhaseKey, { before: string; em: string }][])
+    .map(([k, h]) => [k, `${h.before} ${h.em}`])
+) as Record<PhaseKey, string>;
 
 export interface CycleView {
   /** False until the user has logged a first period — derived fields hold safe defaults. */
@@ -82,7 +83,8 @@ export function useCycle() {
       phase,
       phaseKey,
       phaseName: PHASE_NAME[phaseKey],
-      phaseNote: PHASE_NOTE[phaseKey],
+      // Late period → same override the tracker hero shows.
+      phaseNote: derivedState.currentDay > cycleLength ? 'Cyklus je predĺžený.' : PHASE_NOTE[phaseKey],
       subphase: sub.subphase,
       phaseRanges: derivedState.phaseRanges,
       isLate: derivedState.currentDay > cycleLength,
