@@ -354,39 +354,42 @@ function CardGoals() {
 
   return (
     <div style={{ padding: '0 18px', marginBottom: 10 }}>
-      <div style={{ background: WHITE, borderRadius: 18, border: `1px solid ${HAIR}`, minHeight: PILLAR_CARD_MIN_H, padding: '14px 16px 14px', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
-        <PillarEyebrow
-          color={GOLD}
-          label="Moje návyky a ciele"
-          right={hasHabits ? <div style={{ fontSize: 10.5, color: FG3, fontWeight: 500, flexShrink: 0 }}>{doneCount}/{habits.length} dnes</div> : undefined}
-        />
-        {hasHabits ? (
-          <div style={{ marginTop: 6 }}>
-            {shown.map((h, i) => {
-              const done = (h.completions?.[today] ?? 0) > 0;
-              return (
-                <div key={h.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 0', borderBottom: i < shown.length - 1 ? `1px solid ${HAIR}` : 'none' }}>
-                  <button onClick={() => handleToggle(h.id)} style={{ all: 'unset', cursor: 'pointer', width: 19, height: 19, borderRadius: 10, flexShrink: 0, border: `1.5px solid ${done ? TELO : HAIR2}`, background: done ? TELO : 'transparent', display: 'grid', placeItems: 'center' }}>
-                    {done && <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12l5 5 9-11"/></svg>}
-                  </button>
-                  <div style={{ flex: 1, minWidth: 0, fontFamily: SERIF, fontSize: 15, fontWeight: 400, color: done ? FG3 : INK, textDecoration: done ? 'line-through' : 'none', whiteSpace: 'nowrap' as const, overflow: 'hidden', textOverflow: 'ellipsis' }}>{h.name}</div>
-                </div>
-              );
-            })}
+      <div style={{ background: WHITE, borderRadius: 18, border: `1px solid ${HAIR}`, overflow: 'hidden', minHeight: PILLAR_CARD_MIN_H, display: 'flex', alignItems: 'stretch' }}>
+        <div style={{ flex: '0 0 112px', background: 'url(/images/r9/lifestyle-yoga-pose.jpg) center/cover' }} />
+        <div style={{ flex: 1, minWidth: 0, padding: '14px 15px 14px', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
+          <PillarEyebrow
+            color={GOLD}
+            label="Moje návyky a ciele"
+            right={hasHabits ? <div style={{ fontSize: 10.5, color: FG3, fontWeight: 500, flexShrink: 0 }}>{doneCount}/{habits.length} dnes</div> : undefined}
+          />
+          {hasHabits ? (
+            <div style={{ marginTop: 6 }}>
+              {shown.map((h, i) => {
+                const done = (h.completions?.[today] ?? 0) > 0;
+                return (
+                  <div key={h.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: i < shown.length - 1 ? `1px solid ${HAIR}` : 'none' }}>
+                    <button onClick={() => handleToggle(h.id)} style={{ all: 'unset', cursor: 'pointer', width: 19, height: 19, borderRadius: 10, flexShrink: 0, border: `1.5px solid ${done ? TELO : HAIR2}`, background: done ? TELO : 'transparent', display: 'grid', placeItems: 'center' }}>
+                      {done && <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12l5 5 9-11"/></svg>}
+                    </button>
+                    <div style={{ flex: 1, minWidth: 0, fontFamily: SERIF, fontSize: 14.5, fontWeight: 400, color: done ? FG3 : INK, textDecoration: done ? 'line-through' : 'none', whiteSpace: 'nowrap' as const, overflow: 'hidden', textOverflow: 'ellipsis' }}>{h.name}</div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <>
+              <div style={{ fontFamily: SERIF, fontSize: 17.5, color: INK, lineHeight: 1.22, marginTop: 7 }}>Malé kroky, veľký rozdiel</div>
+              <div style={{ fontSize: 11.5, color: FG2, fontWeight: 300, marginTop: 4, lineHeight: 1.4 }}>Vytvor si prvý návyk, ktorý sa počíta každý deň.</div>
+            </>
+          )}
+          <div style={{ marginTop: 'auto', paddingTop: 10 }}>
+            <button
+              onClick={() => navigate(hasHabits ? '/navyky' : '/navyky/new')}
+              style={{ all: 'unset', cursor: 'pointer' }}
+            >
+              <CtaPill label={hasHabits ? 'Zisti viac' : 'Pridať návyk'} />
+            </button>
           </div>
-        ) : (
-          <>
-            <div style={{ fontFamily: SERIF, fontSize: 17.5, color: INK, lineHeight: 1.22, marginTop: 7 }}>Malé kroky, veľký rozdiel</div>
-            <div style={{ fontSize: 11.5, color: FG2, fontWeight: 300, marginTop: 4, lineHeight: 1.4 }}>Vytvor si prvý návyk, ktorý sa počíta každý deň.</div>
-          </>
-        )}
-        <div style={{ marginTop: 'auto', paddingTop: 10 }}>
-          <button
-            onClick={() => navigate(hasHabits ? '/navyky' : '/navyky/new')}
-            style={{ all: 'unset', cursor: 'pointer' }}
-          >
-            <CtaPill label={hasHabits ? 'Zisti viac' : 'Pridať návyk'} />
-          </button>
         </div>
       </div>
     </div>
@@ -399,17 +402,20 @@ function CardDiary({ free, prompt, onOpen }: { free: boolean; prompt: string; on
     <div style={{ padding: '0 18px', marginBottom: 12 }}>
       <div
         onClick={onOpen}
-        style={{ background: WHITE, borderRadius: 18, border: `1px solid ${HAIR}`, minHeight: PILLAR_CARD_MIN_H, padding: '14px 16px 14px', display: 'flex', flexDirection: 'column', boxSizing: 'border-box', cursor: 'pointer', touchAction: 'manipulation' }}
+        style={{ background: WHITE, borderRadius: 18, border: `1px solid ${HAIR}`, overflow: 'hidden', minHeight: PILLAR_CARD_MIN_H, display: 'flex', alignItems: 'stretch', cursor: 'pointer', touchAction: 'manipulation' }}
       >
-        <PillarEyebrow
-          color={GOLD}
-          label="Denník"
-          right={free ? <div style={{ fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase' as const, color: GOLD, fontWeight: 500, fontStyle: 'italic', flexShrink: 0 }}>neukladá sa</div> : undefined}
-        />
-        <div style={{ fontFamily: SERIF, fontSize: 17.5, color: INK, lineHeight: 1.22, marginTop: 7 }}>{prompt}</div>
-        <div style={{ fontSize: 11.5, color: FG2, fontWeight: 300, marginTop: 4, lineHeight: 1.4 }}>Krátka reflexia — stačí jedna veta.</div>
-        <div style={{ marginTop: 'auto', paddingTop: 10 }}>
-          <CtaPill label="Napísať" />
+        <div style={{ flex: '0 0 112px', background: 'url(/images/r9/section-diary.jpg) center/cover' }} />
+        <div style={{ flex: 1, minWidth: 0, padding: '14px 15px 14px', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
+          <PillarEyebrow
+            color={GOLD}
+            label="Denník"
+            right={free ? <div style={{ fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase' as const, color: GOLD, fontWeight: 500, fontStyle: 'italic', flexShrink: 0 }}>neukladá sa</div> : undefined}
+          />
+          <div style={{ fontFamily: SERIF, fontSize: 17.5, color: INK, lineHeight: 1.22, marginTop: 7 }}>{prompt}</div>
+          <div style={{ fontSize: 11.5, color: FG2, fontWeight: 300, marginTop: 4, lineHeight: 1.4 }}>Krátka reflexia — stačí jedna veta.</div>
+          <div style={{ marginTop: 'auto', paddingTop: 10 }}>
+            <CtaPill label="Napísať" />
+          </div>
         </div>
       </div>
     </div>
