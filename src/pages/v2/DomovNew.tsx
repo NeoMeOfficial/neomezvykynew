@@ -235,12 +235,28 @@ function CtaPill({ label }: { label: string }) {
   );
 }
 
-// Whisper-light wash of the pillar color over white, so each card carries
-// its section hue without hurting text contrast.
+// Light wash of the pillar color over white, so each card carries its
+// section hue without hurting text contrast.
 const cardTint = (hex: string) => ({
   backgroundColor: WHITE,
-  backgroundImage: `linear-gradient(0deg, ${hex}12, ${hex}12)`,
+  backgroundImage: `linear-gradient(0deg, ${hex}1F, ${hex}1F)`,
 });
+
+// Photo pinned to the card's left edge, fading out to the right so it
+// melts into the tinted background instead of ending in a hard seam.
+function CardPhoto({ img }: { img: string }) {
+  const mask = 'linear-gradient(90deg, #000 38%, rgba(0,0,0,0.5) 68%, transparent 100%)';
+  return (
+    <div
+      aria-hidden
+      style={{
+        position: 'absolute', top: 0, bottom: 0, left: 0, width: 152,
+        background: `url(${img}) center/cover`,
+        WebkitMaskImage: mask, maskImage: mask,
+      }}
+    />
+  );
+}
 
 function PillarEyebrow({ color, label, right }: { color: string; label: string; right?: React.ReactNode }) {
   return (
@@ -261,18 +277,16 @@ function PillarPhotoCard({ p }: { p: PillarItem }) {
       onClick={() => navigate(p.href)}
       style={{
         ...cardTint(p.color),
+        position: 'relative',
         borderRadius: 18,
         border: `1px solid ${HAIR}`,
         overflow: 'hidden',
         cursor: 'pointer',
         touchAction: 'manipulation',
-        display: 'flex',
-        alignItems: 'stretch',
-        minHeight: PILLAR_CARD_MIN_H,
       }}
     >
-      <div style={{ flex: '0 0 112px', background: `url(${p.img}) center/cover` }} />
-      <div style={{ flex: 1, minWidth: 0, padding: '14px 15px 14px', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
+      <CardPhoto img={p.img} />
+      <div style={{ position: 'relative', minHeight: PILLAR_CARD_MIN_H, minWidth: 0, padding: '14px 15px 14px 126px', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
         <PillarEyebrow color={p.color} label={p.label} />
         <div
           style={{
@@ -339,10 +353,10 @@ function CardGoals() {
     <div style={{ padding: '0 18px', marginBottom: 10 }}>
       <div
         onClick={() => navigate(hasHabits ? '/navyky' : '/navyky/new')}
-        style={{ ...cardTint(GOLD), borderRadius: 18, border: `1px solid ${HAIR}`, overflow: 'hidden', minHeight: PILLAR_CARD_MIN_H, display: 'flex', alignItems: 'stretch', cursor: 'pointer', touchAction: 'manipulation' }}
+        style={{ ...cardTint(GOLD), position: 'relative', borderRadius: 18, border: `1px solid ${HAIR}`, overflow: 'hidden', cursor: 'pointer', touchAction: 'manipulation' }}
       >
-        <div style={{ flex: '0 0 112px', background: 'url(/images/r9/lifestyle-yoga-pose.jpg) center/cover' }} />
-        <div style={{ flex: 1, minWidth: 0, padding: '14px 15px 14px', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
+        <CardPhoto img="/images/r9/lifestyle-yoga-pose.jpg" />
+        <div style={{ position: 'relative', minHeight: PILLAR_CARD_MIN_H, minWidth: 0, padding: '14px 15px 14px 126px', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
           <PillarEyebrow
             color={GOLD}
             label="Moje návyky a ciele"
@@ -384,10 +398,10 @@ function CardDiary({ free, prompt, onOpen }: { free: boolean; prompt: string; on
     <div style={{ padding: '0 18px', marginBottom: 12 }}>
       <div
         onClick={onOpen}
-        style={{ ...cardTint(GOLD), borderRadius: 18, border: `1px solid ${HAIR}`, overflow: 'hidden', minHeight: PILLAR_CARD_MIN_H, display: 'flex', alignItems: 'stretch', cursor: 'pointer', touchAction: 'manipulation' }}
+        style={{ ...cardTint(GOLD), position: 'relative', borderRadius: 18, border: `1px solid ${HAIR}`, overflow: 'hidden', cursor: 'pointer', touchAction: 'manipulation' }}
       >
-        <div style={{ flex: '0 0 112px', background: 'url(/images/r9/section-diary.jpg) center/cover' }} />
-        <div style={{ flex: 1, minWidth: 0, padding: '14px 15px 14px', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
+        <CardPhoto img="/images/r9/section-diary.jpg" />
+        <div style={{ position: 'relative', minHeight: PILLAR_CARD_MIN_H, minWidth: 0, padding: '14px 15px 14px 126px', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
           <PillarEyebrow
             color={GOLD}
             label="Denník"
