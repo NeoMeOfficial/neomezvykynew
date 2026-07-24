@@ -233,6 +233,8 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
   const phaseColor = phaseColorByKey[currentPhaseKey];
   const currentPhaseName = derivedState?.currentPhase?.name ?? 'Folikulárna';
   const today = derivedState?.today ?? new Date();
+  // Entered via the home card's 'Zisti viac' → today-first section order.
+  const fromHome = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('from') === 'home';
   const todayDate = today.getDate();
   const monthIdx = today.getMonth();
   const yearIdx = today.getFullYear();
@@ -430,7 +432,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     };
   });
 
-  return (
+  const headerBlock = (
     <>
       {/* Round 18 top bar — back chevron + centered Gilda title + calendar shortcut */}
       <div style={{ padding: 'calc(env(safe-area-inset-top) + 14px) 20px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -455,6 +457,11 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
         <Body style={{ marginTop: 12, maxWidth: 320 }}>{head.body}</Body>
       </div>
 
+    </>
+  );
+
+  const ringBlock = (
+    <>
       <RingDial
         currentDay={currentDay}
         totalDays={totalDays}
@@ -468,7 +475,10 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
         }
       />
       <PhaseLegend activeKey={currentPhaseKey} />
+    </>
+  );
 
+  const statsBlock = (
       <div style={{ padding: '0 18px 0', display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 8 }}>
         {[
           { eye: 'Priemer',   v: String(totalDays), suf: 'dní', c: NM.DEEP },
@@ -485,7 +495,10 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
           </div>
         ))}
       </div>
+  );
 
+  const periodCtaBlock = (
+    <>
       {/* Period-start action adapts to where the user is in her cycle:
           during menstruation → informational card with a "Skončila dnes"
           action (records the real bleed length; after 3 periods the
@@ -622,7 +635,10 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
           </button>
         </div>
       )}
+    </>
+  );
 
+  const calendarBlock = (
       <div style={{ padding: '28px 20px 10px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 14 }}>
           <Eye>Kalendár cyklu</Eye>
@@ -723,7 +739,9 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
           })}
         </div>
       </div>
+  );
 
+  const symptomsBlock = (
       <div style={{ padding: '28px 18px 0' }}>
         <Eye style={{ marginBottom: 14 }}>Ako sa dnes cítiš</Eye>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
@@ -864,7 +882,9 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
           )}
         </div>
       </div>
+  );
 
+  const adviceBlock = (
       <div style={{ padding: '32px 22px 0' }}>
         <Eye color={NM.GOLD}>Pre {currentPhaseName.toLowerCase()} fázu · deň {dayInPhase}</Eye>
         <Ser size={28} style={{ marginTop: 12, lineHeight: 1.1 }}>
@@ -897,7 +917,9 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
           ))}
         </div>
       </div>
+  );
 
+  const upcomingBlock = (
       <div style={{ padding: '28px 22px 8px' }}>
         <Eye>Čaká ťa</Eye>
         <div style={{ marginTop: 16 }}>
@@ -925,6 +947,31 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
           ))}
         </div>
       </div>
+  );
+
+  return (
+    <>
+      {headerBlock}
+      {ringBlock}
+      {fromHome ? (
+        <>
+          {periodCtaBlock}
+          {symptomsBlock}
+          {adviceBlock}
+          {upcomingBlock}
+          {statsBlock}
+          {calendarBlock}
+        </>
+      ) : (
+        <>
+          {statsBlock}
+          {periodCtaBlock}
+          {calendarBlock}
+          {symptomsBlock}
+          {adviceBlock}
+          {upcomingBlock}
+        </>
+      )}
     </>
   );
 }
