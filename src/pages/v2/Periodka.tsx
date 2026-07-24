@@ -920,7 +920,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
         <div style={{ padding: '14px 12px', background: '#fff', border: `1px solid ${NM.HAIR}`, borderRadius: 18, textAlign: 'center' }}>
           <Eye size={9} color={NM.TERTIARY}>Dnes</Eye>
           <div style={{ marginTop: 8, fontFamily: NM.SERIF, fontSize: 21, fontWeight: 400, color: NM.DEEP, letterSpacing: '-0.01em', lineHeight: 1.1 }}>
-            {currentDay}. deň cyklu
+            {currentDay}. deň z {totalDays}
           </div>
           <div style={{ marginTop: 4, fontFamily: NM.SANS, fontSize: 11, color: NM.MUTED, fontWeight: 400 }}>
             {isLate ? 'cyklus predĺžený' : ((PHASE_NAMES as Record<string, string>)[currentPhaseKey] ?? currentPhaseName).toLowerCase()}
@@ -1126,7 +1126,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
         </div>
 
         <Ser size={21} style={{ lineHeight: 1.18 }}>
-          Čo by ti mohlo dnes <em style={{ color: NM.GOLD, fontWeight: 400, fontStyle: 'italic' }}>pomôcť?</em>
+          Čo by ti mohlo <em style={{ color: NM.GOLD, fontWeight: 400, fontStyle: 'italic' }}>dnes pomôcť?</em>
         </Ser>
         <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column' }}>
           {advice.map((r, i) => (
