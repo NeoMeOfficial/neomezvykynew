@@ -638,25 +638,6 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     </>
   );
 
-  const statsBlock = (
-      <div style={{ padding: '0 18px 0', display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 8 }}>
-        {[
-          { eye: 'Priemer',   v: String(totalDays), suf: 'dní', c: NM.DEEP },
-          { eye: 'Predpoveď', v: nextPeriodLabel.replace(/\.$/, ''), suf: '', c: PHASE.MENSTR },
-          { eye: 'Ovulácia',  v: String(daysToOvulation), suf: 'dní', c: PHASE.OVULAT, prefix: 'o' },
-        ].map((s) => (
-          <div key={s.eye} style={{ padding: '14px 12px', background: '#fff', border: `1px solid ${NM.HAIR}`, borderRadius: 18, textAlign: 'center' }}>
-            <Eye size={9} color={NM.TERTIARY}>{s.eye}</Eye>
-            <div style={{ marginTop: 10, display: 'inline-flex', alignItems: 'baseline', gap: 4 }}>
-              {s.prefix && <span style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.TERTIARY, fontWeight: 500 }}>{s.prefix}</span>}
-              <span style={{ fontFamily: NM.SERIF, fontSize: 26, fontWeight: 400, color: s.c, letterSpacing: '-0.01em', lineHeight: 1 }}>{s.v}</span>
-              {s.suf && <span style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.TERTIARY, fontWeight: 500, letterSpacing: '0.04em' }}>{s.suf}</span>}
-            </div>
-          </div>
-        ))}
-      </div>
-  );
-
   const periodCtaBlock = (
     <>
       {/* Period-start action adapts to where the user is in her cycle:
@@ -1162,8 +1143,9 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
         <Eye>Čaká ťa</Eye>
         <div style={{ marginTop: 16 }}>
           {[
-            { w: inDaysLabel(daysToOvulation), d: fmtShortDate(ovulationDate), t: 'Začiatok ovulácie', c: PHASE.OVULAT },
-            { w: inDaysLabel(daysToMenstruation), d: fmtShortDate(nextPeriodDate), t: 'Nasledujúca menštruácia', c: PHASE.MENSTR },
+            { w: inDaysLabel(daysToMenstruation), d: fmtShortDate(nextPeriodDate), t: 'Nasledujúca perióda', c: PHASE.MENSTR },
+            { w: inDaysLabel(daysToOvulation), d: fmtShortDate(ovulationDate), t: 'Nasledujúca ovulácia', c: PHASE.OVULAT },
+            { w: 'priemer', d: `${totalDays} dní`, t: 'Dĺžka cyklu', c: NM.GOLD },
           ].map((u, i, arr) => (
             <div
               key={u.t}
@@ -1199,13 +1181,11 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
           {periodCtaBlock}
           {ringBlock}
           {upcomingBlock}
-          {statsBlock}
           {calendarBlock}
         </>
       ) : (
         <>
           {ringBlock}
-          {statsBlock}
           {periodCtaBlock}
           {calendarBlock}
           {wellbeingBlock}
