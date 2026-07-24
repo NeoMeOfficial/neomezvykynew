@@ -228,12 +228,15 @@ function WeekCalendar({ onSelectDay }: { onSelectDay: (d: Date) => void }) {
 }
 
 // ─── "Dnes pre teba" — pillar stack ──────────────────────────────────────────
-// Six equal pillars stacked under each other, each with today's featured
-// info. Periodka, Telo, Strava a Myseľ keep their section photos as a
-// full-bleed left panel; Moje ciele and Denník are interactive cards
-// without photos. Deliberately NOT the Kniznica photo-tile grid — same
-// photos and type language, but the home stack is about today, not
-// browsing.
+// Six equal cards stacked under each other. Each card = ONE concrete tip
+// for today from that pillar (today's cycle day + headline, today's
+// exercise, today's recipe, today's meditation, the user's habit, the
+// diary prompt). The pillar name is only a small sub-label for
+// orientation; the personalized content carries the card. Every card
+// closes with a "Zisti viac" pill so they read as actions, not as a
+// browsing catalogue (that's Kniznica's job).
+const PILLAR_CARD_MIN_H = 148;
+
 export interface PillarItem {
   key: string;
   label: string;
@@ -241,7 +244,29 @@ export interface PillarItem {
   img: string;
   title: string;
   sub?: string;
+  cta?: string;
   href: string;
+}
+
+function CtaPill({ label }: { label: string }) {
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: INK, color: '#fff', padding: '8px 15px', borderRadius: 999, fontSize: 11.5, fontWeight: 500 }}>
+      {label}
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
+    </span>
+  );
+}
+
+function PillarEyebrow({ color, label, right }: { color: string; label: string; right?: React.ReactNode }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+        <span aria-hidden style={{ width: 6, height: 6, borderRadius: 999, background: color, flexShrink: 0 }} />
+        <span style={{ fontSize: 9.5, letterSpacing: '0.16em', textTransform: 'uppercase' as const, color, fontWeight: 500, whiteSpace: 'nowrap' as const, overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</span>
+      </div>
+      {right}
+    </div>
+  );
 }
 
 function PillarPhotoCard({ p }: { p: PillarItem }) {
@@ -258,19 +283,16 @@ function PillarPhotoCard({ p }: { p: PillarItem }) {
         touchAction: 'manipulation',
         display: 'flex',
         alignItems: 'stretch',
-        minHeight: 104,
+        minHeight: PILLAR_CARD_MIN_H,
       }}
     >
       <div style={{ flex: '0 0 112px', background: `url(${p.img}) center/cover` }} />
-      <div style={{ flex: 1, minWidth: 0, padding: '13px 14px 12px', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span aria-hidden style={{ width: 6, height: 6, borderRadius: 999, background: p.color, flexShrink: 0 }} />
-          <span style={{ fontSize: 9.5, letterSpacing: '0.16em', textTransform: 'uppercase' as const, color: p.color, fontWeight: 500 }}>{p.label}</span>
-        </div>
+      <div style={{ flex: 1, minWidth: 0, padding: '14px 15px 14px', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
+        <PillarEyebrow color={p.color} label={p.label} />
         <div
           style={{
             fontFamily: SERIF,
-            fontSize: 16.5,
+            fontSize: 17.5,
             color: INK,
             marginTop: 7,
             lineHeight: 1.22,
@@ -282,9 +304,11 @@ function PillarPhotoCard({ p }: { p: PillarItem }) {
         >
           {p.title}
         </div>
-        <div style={{ marginTop: 'auto', paddingTop: 6, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 6 }}>
-          <div style={{ fontSize: 10.5, color: FG2, fontWeight: 300, whiteSpace: 'nowrap' as const, overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{p.sub ?? ''}</div>
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={FG3} strokeWidth="2" strokeLinecap="round" style={{ flexShrink: 0 }}><path d="M9 6l6 6-6 6"/></svg>
+        {p.sub && (
+          <div style={{ fontSize: 11.5, color: FG2, fontWeight: 300, marginTop: 4, lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }}>{p.sub}</div>
+        )}
+        <div style={{ marginTop: 'auto', paddingTop: 10 }}>
+          <CtaPill label={p.cta ?? 'Zisti viac'} />
         </div>
       </div>
     </div>
@@ -309,7 +333,8 @@ function CardGoals() {
   const { addEntry } = usePointsLedger();
   const { addActivity } = useAchievements();
   const today = new Date().toISOString().split('T')[0];
-  const shown = habits.slice(0, 4);
+  // Max 2 rows so the card keeps the same height as the other pillars.
+  const shown = habits.slice(0, 2);
   const doneCount = habits.filter((h) => (h.completions?.[today] ?? 0) > 0).length;
 
   const handleToggle = async (habitId: string) => {
@@ -323,50 +348,43 @@ function CardGoals() {
     }
   };
 
+  const hasHabits = shown.length > 0;
+
   return (
     <div style={{ padding: '0 18px', marginBottom: 10 }}>
-      <div style={{ background: WHITE, borderRadius: 18, border: `1px solid ${HAIR}`, overflow: 'hidden' }}>
-        <div style={{ padding: '13px 16px 0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span aria-hidden style={{ width: 6, height: 6, borderRadius: 999, background: GOLD, flexShrink: 0 }} />
-              <span style={{ fontSize: 9.5, letterSpacing: '0.16em', textTransform: 'uppercase' as const, color: GOLD, fontWeight: 500 }}>Moje ciele</span>
-            </div>
-            {habits.length > 0 && (
-              <div style={{ fontSize: 10.5, color: FG3, fontWeight: 500 }}>{doneCount}/{habits.length} dnes</div>
-            )}
+      <div style={{ background: WHITE, borderRadius: 18, border: `1px solid ${HAIR}`, minHeight: PILLAR_CARD_MIN_H, padding: '14px 16px 14px', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
+        <PillarEyebrow
+          color={GOLD}
+          label="Moje návyky a ciele"
+          right={hasHabits ? <div style={{ fontSize: 10.5, color: FG3, fontWeight: 500, flexShrink: 0 }}>{doneCount}/{habits.length} dnes</div> : undefined}
+        />
+        {hasHabits ? (
+          <div style={{ marginTop: 6 }}>
+            {shown.map((h, i) => {
+              const done = (h.completions?.[today] ?? 0) > 0;
+              return (
+                <div key={h.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 0', borderBottom: i < shown.length - 1 ? `1px solid ${HAIR}` : 'none' }}>
+                  <button onClick={() => handleToggle(h.id)} style={{ all: 'unset', cursor: 'pointer', width: 19, height: 19, borderRadius: 10, flexShrink: 0, border: `1.5px solid ${done ? TELO : HAIR2}`, background: done ? TELO : 'transparent', display: 'grid', placeItems: 'center' }}>
+                    {done && <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12l5 5 9-11"/></svg>}
+                  </button>
+                  <div style={{ flex: 1, minWidth: 0, fontFamily: SERIF, fontSize: 15, fontWeight: 400, color: done ? FG3 : INK, textDecoration: done ? 'line-through' : 'none', whiteSpace: 'nowrap' as const, overflow: 'hidden', textOverflow: 'ellipsis' }}>{h.name}</div>
+                </div>
+              );
+            })}
           </div>
-          <div style={{ fontFamily: SERIF, fontSize: 16.5, color: INK, lineHeight: 1.25, marginTop: 7 }}>Malé kroky, veľký rozdiel</div>
-        </div>
-        <div style={{ padding: '2px 16px 10px' }}>
-          {shown.length === 0 && (
-            <div style={{ fontSize: 12, color: FG2, fontWeight: 300, lineHeight: 1.5, padding: '8px 0 4px' }}>
-              Vytvor si prvý návyk — malý krok, ktorý sa počíta každý deň.
-            </div>
-          )}
-          {shown.map((h) => {
-            const done = (h.completions?.[today] ?? 0) > 0;
-            return (
-              <div key={h.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '9px 0', borderBottom: `1px solid ${HAIR}` }}>
-                <button onClick={() => handleToggle(h.id)} style={{ all: 'unset', cursor: 'pointer', width: 18, height: 18, borderRadius: 9, flexShrink: 0, border: `1.5px solid ${done ? TELO : HAIR2}`, background: done ? TELO : 'transparent', display: 'grid', placeItems: 'center' }}>
-                  {done && <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12l5 5 9-11"/></svg>}
-                </button>
-                <div style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 400, color: done ? FG3 : INK, textDecoration: done ? 'line-through' : 'none', whiteSpace: 'nowrap' as const, overflow: 'hidden', textOverflow: 'ellipsis' }}>{h.name}</div>
-              </div>
-            );
-          })}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0 4px' }}>
-            <button onClick={() => navigate('/navyky/new')} style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'transparent', border: 0, cursor: 'pointer', padding: 0 }}>
-              <div style={{ width: 18, height: 18, borderRadius: 9, flexShrink: 0, border: `1.5px dashed ${HAIR2}`, display: 'grid', placeItems: 'center' }}>
-                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke={FG3} strokeWidth="2.5" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
-              </div>
-              <div style={{ fontSize: 12.5, color: FG2, fontWeight: 400, fontStyle: 'italic', fontFamily: SERIF }}>Pridať návyk</div>
-            </button>
-            <button onClick={() => navigate('/navyky')} style={{ background: 'transparent', border: 0, padding: 0, cursor: 'pointer', fontSize: 11, color: FG3, display: 'flex', alignItems: 'center', gap: 4 }}>
-              Všetky
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={FG3} strokeWidth="2" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
-            </button>
-          </div>
+        ) : (
+          <>
+            <div style={{ fontFamily: SERIF, fontSize: 17.5, color: INK, lineHeight: 1.22, marginTop: 7 }}>Malé kroky, veľký rozdiel</div>
+            <div style={{ fontSize: 11.5, color: FG2, fontWeight: 300, marginTop: 4, lineHeight: 1.4 }}>Vytvor si prvý návyk, ktorý sa počíta každý deň.</div>
+          </>
+        )}
+        <div style={{ marginTop: 'auto', paddingTop: 10 }}>
+          <button
+            onClick={() => navigate(hasHabits ? '/navyky' : '/navyky/new')}
+            style={{ all: 'unset', cursor: 'pointer' }}
+          >
+            <CtaPill label={hasHabits ? 'Zisti viac' : 'Pridať návyk'} />
+          </button>
         </div>
       </div>
     </div>
@@ -377,23 +395,19 @@ function CardGoals() {
 function CardDiary({ free, prompt, onOpen }: { free: boolean; prompt: string; onOpen: () => void }) {
   return (
     <div style={{ padding: '0 18px', marginBottom: 12 }}>
-      <div style={{ background: WHITE, borderRadius: 18, border: `1px solid ${HAIR}`, overflow: 'hidden', cursor: 'pointer' }} onClick={onOpen}>
-        <div style={{ padding: '13px 16px 0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span aria-hidden style={{ width: 6, height: 6, borderRadius: 999, background: GOLD, flexShrink: 0 }} />
-              <span style={{ fontSize: 9.5, letterSpacing: '0.16em', textTransform: 'uppercase' as const, color: GOLD, fontWeight: 500 }}>Denník</span>
-            </div>
-            {free && (
-              <div style={{ fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase' as const, color: GOLD, fontWeight: 500, fontStyle: 'italic', flexShrink: 0 }}>neukladá sa</div>
-            )}
-          </div>
-          <div style={{ fontFamily: SERIF, fontSize: 16.5, color: INK, lineHeight: 1.25, marginTop: 7 }}>{prompt}</div>
-        </div>
-        <div style={{ padding: '12px 16px 16px' }}>
-          <div style={{ padding: '12px 14px', borderRadius: 12, background: 'rgba(61,41,33,0.04)', border: `1px dashed ${HAIR2}`, fontFamily: SERIF, fontSize: 13, color: FG3, lineHeight: 1.5 }}>
-            Napíš jednu vetu…
-          </div>
+      <div
+        onClick={onOpen}
+        style={{ background: WHITE, borderRadius: 18, border: `1px solid ${HAIR}`, minHeight: PILLAR_CARD_MIN_H, padding: '14px 16px 14px', display: 'flex', flexDirection: 'column', boxSizing: 'border-box', cursor: 'pointer', touchAction: 'manipulation' }}
+      >
+        <PillarEyebrow
+          color={GOLD}
+          label="Denník"
+          right={free ? <div style={{ fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase' as const, color: GOLD, fontWeight: 500, fontStyle: 'italic', flexShrink: 0 }}>neukladá sa</div> : undefined}
+        />
+        <div style={{ fontFamily: SERIF, fontSize: 17.5, color: INK, lineHeight: 1.22, marginTop: 7 }}>{prompt}</div>
+        <div style={{ fontSize: 11.5, color: FG2, fontWeight: 300, marginTop: 4, lineHeight: 1.4 }}>Krátka reflexia — stačí jedna veta.</div>
+        <div style={{ marginTop: 'auto', paddingTop: 10 }}>
+          <CtaPill label="Napísať" />
         </div>
       </div>
     </div>
@@ -884,8 +898,8 @@ export default function DomovNew() {
           label: 'Periodka',
           color: CYKLUS,
           img: '/images/r9/section-period.jpg',
-          title: `${cycle.dayOfCycle}. deň z ${cycle.totalDays}`,
-          sub: `${cycle.phaseName.toLowerCase()} fáza`,
+          title: `${cycle.dayOfCycle}. deň · ${cycle.phaseName.toLowerCase()} fáza`,
+          sub: cycle.note,
           href: '/kniznica/periodka?from=home',
         }
       : {
@@ -894,8 +908,9 @@ export default function DomovNew() {
           color: CYKLUS,
           img: '/images/r9/section-period.jpg',
           title: 'Zapni si cyklus',
-          sub: 'fázy a predpovede',
+          sub: 'Fázy a predpovede pre tvoje telo.',
           href: '/kniznica/periodka',
+          cta: 'Zapnúť',
         },
     isPlus && userProgram
       ? {
@@ -962,12 +977,10 @@ export default function DomovNew() {
   ];
 
   // ── Periodic upsell banner ─────────────────────────────────────────────
-  // On every 4th visit show ONE banner, alternating between the eligible
-  // offers (program for users without one, jedálniček for users without
-  // the €57 add-on). Nothing to sell → nothing shown.
+  // On every 4th visit show ONE banner. Program banner is paused for now
+  // (Gabi 2026-07-24) — only the jedálniček add-on rotates in.
   const [visitCount] = useState(countHomeVisit);
   const promoCandidates: Array<'program' | 'jedalnicek'> = [];
-  if (!(isPlus && userProgram)) promoCandidates.push('program');
   if (!hasMealPlanAddon) promoCandidates.push('jedalnicek');
   const promoBanner =
     visitCount > 0 && visitCount % PROMO_INTERVAL === 0 && promoCandidates.length > 0
@@ -996,16 +1009,6 @@ export default function DomovNew() {
       <CardGoals />
       <CardDiary free={!isPlus} prompt={diaryPrompt} onOpen={() => setShowDiary(true)} />
 
-      {promoBanner === 'program' && (
-        <UpsellBanner
-          color={TELO}
-          eyebrow="Plus · Programy"
-          title="Pridaj sa k programu"
-          sub="8-týždňová cesta s Gabi · krok za krokom."
-          cta="Pozrieť"
-          onClick={() => navigate(isPlus ? '/kniznica/telo/programy' : '/paywall')}
-        />
-      )}
       {promoBanner === 'jedalnicek' && (
         <UpsellBanner
           color={STRAVA}
