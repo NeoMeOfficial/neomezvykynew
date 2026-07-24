@@ -6,7 +6,7 @@ import { Page, BackHeader, Eye, Ser, Body, PlusTag, NM } from '../../components/
 import PlusUnlockBanner from '../../components/v2/paywall/PlusUnlockBanner';
 import {
   FocusKey, EquipKey, BandKey,
-  FOCUS_ORDER, EQUIP_ORDER, FOCUS_LABEL, EQUIP_LABEL, EQUIP_SHORT,
+  FOCUS_ORDER, EQUIP_ORDER, FOCUS_LABEL, EQUIP_LABEL, EQUIP_SHORT, BAND_LABEL,
   parseFocus, parseEquip, durationBand, seriesTitle,
 } from '../../features/telo/exerciseTaxonomy';
 
@@ -70,15 +70,23 @@ export default function TeloExtra() {
     });
   }, [exercises]);
 
-  const list = useMemo(
+  const matchesExceptBand = useMemo(
     () => enriched.filter((p) =>
-      p.band === band
-      && (focus === 'all' || p.focus === focus)
+      (focus === 'all' || p.focus === focus)
       && (equip === null || p.equip === equip)
       && (!diastOnly || p.e.diastasis_safe)
     ),
-    [enriched, band, focus, equip, diastOnly],
+    [enriched, focus, equip, diastOnly],
   );
+  const list = useMemo(
+    () => matchesExceptBand.filter((p) => p.band === band),
+    [matchesExceptBand, band],
+  );
+  // Same filters have hits in the OTHER duration band → offer the switch
+  // instead of a dead "nič tu nie je" (e.g. nohy & zadok exist only as
+  // 5-min dopaľovačky today).
+  const otherBand: BandKey = band === '15' ? '5' : '15';
+  const otherBandCount = matchesExceptBand.length - list.length;
 
   const openExercise = (p: EnrichedExercise) => {
     const locked = !p.isFree && !isPremium;
@@ -204,7 +212,20 @@ export default function TeloExtra() {
 
       {!loading && list.length === 0 && (
         <div style={{ margin: '26px 18px', color: NM.MUTED, fontFamily: NM.SANS, fontSize: 13 }}>
-          Žiadne cvičenia pre tieto filtre.
+          {otherBandCount > 0 ? (
+            <>
+              <div>V kategórii {BAND_LABEL[band].toLowerCase()} zatiaľ takéto cvičenie nie je.</div>
+              <button
+                onClick={() => setBand(otherBand)}
+                style={{ all: 'unset', cursor: 'pointer', marginTop: 10, display: 'inline-flex', alignItems: 'center', gap: 6, padding: '9px 16px', borderRadius: 999, background: NM.DEEP, color: '#fff', fontFamily: NM.SANS, fontSize: 12, fontWeight: 500 }}
+              >
+                Pozrieť {BAND_LABEL[otherBand].toLowerCase()} ({otherBandCount})
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
+              </button>
+            </>
+          ) : (
+            'Žiadne cvičenia pre tieto filtre.'
+          )}
         </div>
       )}
 
