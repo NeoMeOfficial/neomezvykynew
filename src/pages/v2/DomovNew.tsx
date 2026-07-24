@@ -235,6 +235,13 @@ function CtaPill({ label }: { label: string }) {
   );
 }
 
+// Whisper-light wash of the pillar color over white, so each card carries
+// its section hue without hurting text contrast.
+const cardTint = (hex: string) => ({
+  backgroundColor: WHITE,
+  backgroundImage: `linear-gradient(0deg, ${hex}12, ${hex}12)`,
+});
+
 function PillarEyebrow({ color, label, right }: { color: string; label: string; right?: React.ReactNode }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
@@ -253,7 +260,7 @@ function PillarPhotoCard({ p }: { p: PillarItem }) {
     <div
       onClick={() => navigate(p.href)}
       style={{
-        background: WHITE,
+        ...cardTint(p.color),
         borderRadius: 18,
         border: `1px solid ${HAIR}`,
         overflow: 'hidden',
@@ -332,7 +339,7 @@ function CardGoals() {
     <div style={{ padding: '0 18px', marginBottom: 10 }}>
       <div
         onClick={() => navigate(hasHabits ? '/navyky' : '/navyky/new')}
-        style={{ background: WHITE, borderRadius: 18, border: `1px solid ${HAIR}`, overflow: 'hidden', minHeight: PILLAR_CARD_MIN_H, display: 'flex', alignItems: 'stretch', cursor: 'pointer', touchAction: 'manipulation' }}
+        style={{ ...cardTint(GOLD), borderRadius: 18, border: `1px solid ${HAIR}`, overflow: 'hidden', minHeight: PILLAR_CARD_MIN_H, display: 'flex', alignItems: 'stretch', cursor: 'pointer', touchAction: 'manipulation' }}
       >
         <div style={{ flex: '0 0 112px', background: 'url(/images/r9/lifestyle-yoga-pose.jpg) center/cover' }} />
         <div style={{ flex: 1, minWidth: 0, padding: '14px 15px 14px', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
@@ -377,7 +384,7 @@ function CardDiary({ free, prompt, onOpen }: { free: boolean; prompt: string; on
     <div style={{ padding: '0 18px', marginBottom: 12 }}>
       <div
         onClick={onOpen}
-        style={{ background: WHITE, borderRadius: 18, border: `1px solid ${HAIR}`, overflow: 'hidden', minHeight: PILLAR_CARD_MIN_H, display: 'flex', alignItems: 'stretch', cursor: 'pointer', touchAction: 'manipulation' }}
+        style={{ ...cardTint(GOLD), borderRadius: 18, border: `1px solid ${HAIR}`, overflow: 'hidden', minHeight: PILLAR_CARD_MIN_H, display: 'flex', alignItems: 'stretch', cursor: 'pointer', touchAction: 'manipulation' }}
       >
         <div style={{ flex: '0 0 112px', background: 'url(/images/r9/section-diary.jpg) center/cover' }} />
         <div style={{ flex: 1, minWidth: 0, padding: '14px 15px 14px', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
