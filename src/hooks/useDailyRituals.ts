@@ -429,18 +429,20 @@ export function useCycleSymptoms() {
       }
       // Upsert by (user_id, date)
       if (Object.keys(nextMap).length === 0) {
-        await supabase
+        const { error } = await supabase
           .from('cycle_symptoms')
           .delete()
           .eq('user_id', user!.id)
           .eq('date', date);
+        if (error) console.warn('[symptoms] delete failed', error.message);
       } else {
-        await supabase
+        const { error } = await supabase
           .from('cycle_symptoms')
           .upsert(
             { user_id: user!.id, date, symptoms: nextMap },
             { onConflict: 'user_id,date' },
           );
+        if (error) console.warn('[symptoms] upsert failed', error.message);
       }
     },
     [days, real, user?.id, isPremium],
