@@ -1007,12 +1007,21 @@ export default function DomovNew() {
 
       {!isPlus && <PersistenceNotice />}
 
-      <WeekCalendar onSelectDay={(d) => setSelectedDay(d)} />
-
       {selectedDay && <DayPlanSheet date={selectedDay} onClose={() => setSelectedDay(null)} />}
 
-      {/* Dnes pre teba — six equal pillars, stacked */}
-      <SectionEyebrow color={GOLD}>Dnes pre teba</SectionEyebrow>
+      {/* Dnes pre teba — six equal pillars, stacked. Big serif header so
+          the section reads as the heart of the page, not one label among
+          many. */}
+      <div style={{ padding: '30px 22px 16px' }}>
+        <div style={{ fontFamily: SERIF, fontSize: 26, lineHeight: 1.1, color: INK, letterSpacing: '-0.01em', fontWeight: 500 }}>
+          Dnes <em style={{ fontStyle: 'italic', color: GOLD }}>pre teba</em>
+        </div>
+        {/* Keep this honest — picks aren't cycle-driven yet (phase→content
+            linking is a planned feature), so no "vybrané pre tvoju fázu". */}
+        <div style={{ marginTop: 6, fontSize: 12, color: FG2, fontWeight: 300, lineHeight: 1.5 }}>
+          Tvoj výber na dnešný deň — pohyb, jedlo aj pokoj.
+        </div>
+      </div>
       <PillarStack items={pillars} />
       <CardGoals />
       <CardDiary free={!isPlus} prompt={diaryPrompt} onOpen={() => setShowDiary(true)} />
@@ -1038,6 +1047,13 @@ export default function DomovNew() {
 
       {/* Subscription upsell for free users; referral only for Plus */}
       {!isPlus ? <CardSubscriptionUpsell /> : <CardReferral code={code} />}
+
+      {/* Week calendar — parked at the bottom for now (Gabi 2026-07-24:
+          no strong use for it up top yet) */}
+      <SectionEyebrow color={GOLD}>Tvoj týždeň</SectionEyebrow>
+      <div style={{ marginTop: -20 }}>
+        <WeekCalendar onSelectDay={(d) => setSelectedDay(d)} />
+      </div>
 
       {showDiary      && <DiarySheet free={!isPlus} onClose={() => setShowDiary(false)} />}
       {showPointsInfo && <PointsInfoSheet points={points} onClose={() => setShowPointsInfo(false)} />}
