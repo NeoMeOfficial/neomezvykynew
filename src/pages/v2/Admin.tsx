@@ -2656,12 +2656,21 @@ function ExercisesTab() {
   const seedFromStatic = async () => {
     setSeeding(true); setError(null);
     try {
+      // Retire the old demo rows first (everything that isn't the real
+      // cv-* catalog) so fakes don't mix into the library, then upsert
+      // the recorded catalog. Idempotent — safe to re-run.
+      const { error: archErr } = await supabase
+        .from('exercises')
+        .update({ status: 'archived', active: false })
+        .eq('content_type', 'exercise')
+        .not('id', 'like', 'cv-%');
+      if (archErr) throw new Error(archErr.message);
       const payload = [
-        ...TeloExtraStaticData.map((e: any) => ({ ...e, content_type: 'exercise' })),
+        ...TeloExtraStaticData.map((e: any) => ({ ...e, content_type: 'exercise', status: 'published', active: true })),
         ...TeloStrecingStaticData.map((s: any) => ({ ...s, content_type: 'stretch' })),
       ];
       const count = await adminSeed('exercises', payload);
-      alert(`✅ Importovaných ${count} cvičení`);
+      alert(`✅ Importovaných ${count} cvičení — staré demo záznamy zarchivované`);
       await load();
     } catch (e: any) { setError(e.message); }
     setSeeding(false);
@@ -2685,6 +2694,9 @@ function ExercisesTab() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 22, fontWeight: 500, color: _A.DEEP }}>Exercise Library</div>
         <div style={{ display: 'flex', gap: 10 }}>
+          <button onClick={seedFromStatic} disabled={seeding} style={btnSecondary}>
+            {seeding ? 'Importujem…' : `Import katalógu (${TeloExtraStaticData.length})`}
+          </button>
           <button onClick={openAdd} style={{ ...btnPrimary, display: 'flex', alignItems: 'center', gap: 8 }}>
             <Plus style={{ width: 14, height: 14 }} />Nové cvičenie
           </button>
