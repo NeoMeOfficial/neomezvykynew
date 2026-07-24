@@ -451,7 +451,10 @@ function CardCyklus({ day, total, phaseName, note }: { day: number; total: numbe
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.55) 100%)' }} />
           <div style={{ position: 'absolute', top: 14, right: 16, fontSize: 10.5, color: 'rgba(255,255,255,0.85)' }}>Deň {day} / {total}</div>
           <div style={{ position: 'absolute', bottom: 12, left: 16, right: 16, display: 'flex', alignItems: 'flex-end', gap: 10 }}>
-            <div style={{ fontFamily: SERIF, fontSize: 56, lineHeight: 0.9, color: '#fff', fontWeight: 500, letterSpacing: '-0.04em' }}>{day}</div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+              <div style={{ fontFamily: SERIF, fontSize: 56, lineHeight: 0.9, color: '#fff', fontWeight: 500, letterSpacing: '-0.04em' }}>{day}.</div>
+              <div style={{ fontFamily: SERIF, fontSize: 18, fontStyle: 'italic', color: 'rgba(255,255,255,0.9)', fontWeight: 500 }}>deň</div>
+            </div>
             <div style={{ paddingBottom: 4 }}>
               <div style={{ fontFamily: SERIF, fontSize: 18, fontStyle: 'italic', color: '#fff', fontWeight: 500, lineHeight: 1.1 }}>{phaseName}</div>
               <div style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.78)', marginTop: 2 }}>fáza</div>
