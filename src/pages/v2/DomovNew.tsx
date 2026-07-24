@@ -442,8 +442,6 @@ function CardCyklus({ day, total, phaseName, note }: { day: number; total: numbe
     { w: 5/total, c: '#C6758A' }, { w: 8/total, c: '#B48499' },
     { w: 3/total, c: '#A36C8E' }, { w: (total-16)/total, c: '#7A5A72' },
   ];
-  const months = ['januára','februára','marca','apríla','mája','júna','júla','augusta','septembra','októbra','novembra','decembra'];
-  const monthLabel = months[new Date().getMonth()];
   return (
     <div style={{ padding: '0 18px', marginBottom: 12 }}>
       <div style={{ background: WHITE, borderRadius: 22, border: `1px solid ${HAIR}`, overflow: 'hidden' }}>
@@ -471,7 +469,7 @@ function CardCyklus({ day, total, phaseName, note }: { day: number; total: numbe
           </div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ fontSize: 11.5, color: FG2, fontWeight: 300 }}>
-              {monthLabel} · {Math.max(0, total + 1 - day)} dní do ďalšej
+              {Math.max(0, total + 1 - day)} dní do ďalšej
             </div>
             <button onClick={() => navigate('/kniznica/periodka')} style={{ background: INK, color: '#fff', border: 0, padding: '9px 16px', borderRadius: 999, fontSize: 11.5, fontWeight: 500, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
               Čo ťa dnes čaká
