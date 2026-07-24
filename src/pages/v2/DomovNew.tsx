@@ -330,7 +330,10 @@ function CardGoals() {
 
   return (
     <div style={{ padding: '0 18px', marginBottom: 10 }}>
-      <div style={{ background: WHITE, borderRadius: 18, border: `1px solid ${HAIR}`, overflow: 'hidden', minHeight: PILLAR_CARD_MIN_H, display: 'flex', alignItems: 'stretch' }}>
+      <div
+        onClick={() => navigate(hasHabits ? '/navyky' : '/navyky/new')}
+        style={{ background: WHITE, borderRadius: 18, border: `1px solid ${HAIR}`, overflow: 'hidden', minHeight: PILLAR_CARD_MIN_H, display: 'flex', alignItems: 'stretch', cursor: 'pointer', touchAction: 'manipulation' }}
+      >
         <div style={{ flex: '0 0 112px', background: 'url(/images/r9/lifestyle-yoga-pose.jpg) center/cover' }} />
         <div style={{ flex: 1, minWidth: 0, padding: '14px 15px 14px', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
           <PillarEyebrow
@@ -344,7 +347,8 @@ function CardGoals() {
                 const done = (h.completions?.[today] ?? 0) > 0;
                 return (
                   <div key={h.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: i < shown.length - 1 ? `1px solid ${HAIR}` : 'none' }}>
-                    <button onClick={() => handleToggle(h.id)} style={{ all: 'unset', cursor: 'pointer', width: 19, height: 19, borderRadius: 10, flexShrink: 0, border: `1.5px solid ${done ? TELO : HAIR2}`, background: done ? TELO : 'transparent', display: 'grid', placeItems: 'center' }}>
+                    {/* Check-in must not bubble into the card's navigate. */}
+                    <button onClick={(e) => { e.stopPropagation(); handleToggle(h.id); }} style={{ all: 'unset', cursor: 'pointer', width: 19, height: 19, borderRadius: 10, flexShrink: 0, border: `1.5px solid ${done ? TELO : HAIR2}`, background: done ? TELO : 'transparent', display: 'grid', placeItems: 'center' }}>
                       {done && <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12l5 5 9-11"/></svg>}
                     </button>
                     <div style={{ flex: 1, minWidth: 0, fontFamily: SERIF, fontSize: 14.5, fontWeight: 400, color: done ? FG3 : INK, textDecoration: done ? 'line-through' : 'none', whiteSpace: 'nowrap' as const, overflow: 'hidden', textOverflow: 'ellipsis' }}>{h.name}</div>
@@ -359,12 +363,7 @@ function CardGoals() {
             </>
           )}
           <div style={{ marginTop: 'auto', paddingTop: 10 }}>
-            <button
-              onClick={() => navigate(hasHabits ? '/navyky' : '/navyky/new')}
-              style={{ all: 'unset', cursor: 'pointer' }}
-            >
-              <CtaPill label={hasHabits ? 'Zisti viac' : 'Pridať návyk'} />
-            </button>
+            <CtaPill label={hasHabits ? 'Zisti viac' : 'Pridať návyk'} />
           </div>
         </div>
       </div>
