@@ -472,7 +472,7 @@ function CardCyklus({ day, total, phaseName, note }: { day: number; total: numbe
               {Math.max(0, total + 1 - day)} dní do ďalšej periódy
             </div>
             <button onClick={() => navigate('/kniznica/periodka')} style={{ background: INK, color: '#fff', border: 0, padding: '9px 16px', borderRadius: 999, fontSize: 11.5, fontWeight: 500, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-              Čo ťa dnes čaká
+              Zisti viac
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
             </button>
           </div>
