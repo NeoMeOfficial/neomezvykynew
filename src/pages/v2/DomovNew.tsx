@@ -5,7 +5,7 @@ import { useUser } from '@/hooks/use-user';
 import { useCycleInfo } from '@/hooks/use-cycle';
 import { useUserProgram } from '@/hooks/useUserProgram';
 import { useMealPlan } from '@/features/nutrition/useMealPlan';
-import { useRecipes, recipeImage } from '@/hooks/useRecipes';
+import { useRecipes } from '@/hooks/useRecipes';
 import { useDailyMeditation } from '@/hooks/useDailyContent';
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { useReferral } from '@/hooks/useReferral';
@@ -225,300 +225,66 @@ function WeekCalendar({ onSelectDay }: { onSelectDay: (d: Date) => void }) {
   );
 }
 
-// ─── "Dnes pre teba" — horizontal picks (Telo · Výživa · Myseľ) ───────────────
-// Card size matches the Periodka card's visual weight (~264px tall). Two
-// variants: full-bleed photo (default), and a white "menu card" when the
-// pick carries `meals` — the subscriber's prescribed plan for today.
-export interface TodayPickMeal {
-  label: string;   // slot — Raňajky / Obed / Večera…
-  name: string;    // recipe name
-  img: string;
-  kcal: number;
-}
-
-export interface TodayPick {
-  eyebrow: string;
+// ─── "Dnes pre teba" — six equal pillars, 2×3 grid ───────────────────────────
+// One simple grid for everything NeoMe stands on: Periodka, Telo, Strava,
+// Myseľ, Moje ciele, Denník. Each card = pillar label + today's featured
+// info. Equal weight, nothing hidden behind a scroll.
+export interface PillarItem {
+  key: string;
+  label: string;
   color: string;
   title: string;
-  desc: string;
-  img: string;
-  href: string;
-  /** Daily meal-plan variant: renders a menu list instead of a photo card. */
-  meals?: TodayPickMeal[];
-  /** Footer line for the menu variant, e.g. total kcal. */
-  footer?: string;
+  sub?: string;
+  href?: string;
+  onTap?: () => void;
 }
 
-const PICK_W = 216;
-const PICK_H = 264;
-
-function PickMenuCard({ p, onOpen }: { p: TodayPick; onOpen: () => void }) {
+function PillarGrid({ items }: { items: PillarItem[] }) {
+  const navigate = useNavigate();
   return (
-    <div
-      onClick={onOpen}
-      style={{
-        flex: `0 0 ${PICK_W}px`,
-        height: PICK_H,
-        scrollSnapAlign: 'start',
-        borderRadius: 16,
-        border: `1px solid ${HAIR}`,
-        overflow: 'hidden',
-        cursor: 'pointer',
-        touchAction: 'manipulation',
-        background: WHITE,
-        display: 'flex',
-        flexDirection: 'column',
-        padding: '13px 13px 12px',
-        boxSizing: 'border-box',
-      }}
-    >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-        <span aria-hidden style={{ width: 5, height: 5, borderRadius: 999, background: p.color, flexShrink: 0 }} />
-        <span style={{ fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase' as const, color: p.color, fontWeight: 500 }}>{p.eyebrow}</span>
-      </div>
-      <div style={{ fontFamily: SERIF, fontSize: 16, color: INK, marginTop: 5, lineHeight: 1.2 }}>{p.title}</div>
-      <div style={{ flex: 1, minHeight: 0, marginTop: 4 }}>
-        {(p.meals ?? []).slice(0, 3).map((m, i, arr) => (
-          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '8px 0', borderBottom: i < arr.length - 1 ? `1px solid ${HAIR}` : 'none' }}>
-            <div style={{ width: 32, height: 32, borderRadius: 8, background: `url(${m.img}) center/cover`, flexShrink: 0 }} />
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 8.5, letterSpacing: '0.14em', textTransform: 'uppercase' as const, color: FG3, fontWeight: 500 }}>{m.label}</div>
-              <div style={{ fontFamily: SERIF, fontSize: 12, color: INK, marginTop: 1, lineHeight: 1.2, whiteSpace: 'nowrap' as const, overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.name}</div>
-            </div>
-          </div>
-        ))}
-      </div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 8, borderTop: `1px solid ${HAIR}` }}>
-        <span style={{ fontSize: 10.5, color: FG2, fontWeight: 400 }}>{p.footer ?? p.desc}</span>
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={p.color} strokeWidth="2" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
-      </div>
-    </div>
-  );
-}
-
-function PickPhotoCard({ p, onOpen }: { p: TodayPick; onOpen: () => void }) {
-  return (
-    <div
-      onClick={onOpen}
-      style={{
-        flex: `0 0 ${PICK_W}px`,
-        height: PICK_H,
-        position: 'relative',
-        scrollSnapAlign: 'start',
-        borderRadius: 16,
-        border: `1px solid ${HAIR}`,
-        overflow: 'hidden',
-        cursor: 'pointer',
-        touchAction: 'manipulation',
-        background: `url(${p.img}) center/cover`,
-      }}
-    >
-      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.08) 30%, rgba(0,0,0,0.42) 62%, rgba(0,0,0,0.74) 100%)', pointerEvents: 'none' }} />
-      <div style={{ position: 'absolute', left: 14, right: 14, bottom: 14 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span aria-hidden style={{ width: 5, height: 5, borderRadius: 999, background: p.color, flexShrink: 0 }} />
-          <span style={{ fontSize: 9.5, letterSpacing: '0.16em', textTransform: 'uppercase' as const, color: 'rgba(255,255,255,0.85)', fontWeight: 500 }}>{p.eyebrow}</span>
-        </div>
+    <div style={{ padding: '0 18px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
+      {items.map((p) => (
         <div
+          key={p.key}
+          onClick={() => (p.onTap ? p.onTap() : p.href && navigate(p.href))}
           style={{
-            fontFamily: SERIF,
-            fontSize: 17,
-            color: '#fff',
-            marginTop: 5,
-            lineHeight: 1.25,
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical' as const,
-            overflow: 'hidden',
-            textShadow: '0 1px 3px rgba(0,0,0,0.35)',
+            background: WHITE,
+            borderRadius: 18,
+            border: `1px solid ${HAIR}`,
+            padding: '13px 14px 12px',
+            cursor: 'pointer',
+            touchAction: 'manipulation',
+            minHeight: 108,
+            display: 'flex',
+            flexDirection: 'column',
+            boxSizing: 'border-box',
           }}
         >
-          {p.title}
-        </div>
-        <div style={{ fontSize: 11.5, color: 'rgba(255,255,255,0.78)', marginTop: 4, fontWeight: 300, whiteSpace: 'nowrap' as const, overflow: 'hidden', textOverflow: 'ellipsis', textShadow: '0 1px 2px rgba(0,0,0,0.35)' }}>{p.desc}</div>
-      </div>
-    </div>
-  );
-}
-
-function TodayPicksRow({ items }: { items: TodayPick[] }) {
-  const navigate = useNavigate();
-  return (
-    <div
-      className="today-picks-row"
-      style={{
-        display: 'flex',
-        gap: 10,
-        overflowX: 'auto',
-        padding: '0 18px 6px',
-        scrollSnapType: 'x mandatory',
-        WebkitOverflowScrolling: 'touch' as any,
-        scrollbarWidth: 'none' as any,
-        marginBottom: 6,
-      }}
-    >
-      {items.map((p, i) =>
-        p.meals && p.meals.length > 0
-          ? <PickMenuCard key={i} p={p} onOpen={() => navigate(p.href)} />
-          : <PickPhotoCard key={i} p={p} onOpen={() => navigate(p.href)} />
-      )}
-    </div>
-  );
-}
-
-// ─── Habits card ──────────────────────────────────────────────────────────────
-function CardHabits({ free, onAddHabit }: { free: boolean; onAddHabit: () => void }) {
-  const navigate = useNavigate();
-  const [habits, setHabits] = useState([
-    { label: 'Piť 2 l vody',      done: true  },
-    { label: '10 minút pohybu',    done: true  },
-    { label: 'Večerná meditácia',  done: false },
-  ]);
-  const toggle = (i: number) => setHabits(prev => prev.map((h, idx) => idx === i ? { ...h, done: !h.done } : h));
-  const done = habits.filter(h => h.done).length;
-  return (
-    <div style={{ padding: '0 18px', marginBottom: 12 }}>
-      <div style={{ background: WHITE, borderRadius: 20, border: `1px solid ${HAIR}`, overflow: 'hidden' }}>
-        <div style={{ padding: '14px 16px 0', display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10 }}>
-          <div style={{ fontFamily: SERIF, fontSize: 16, color: INK, lineHeight: 1.25 }}>Malé kroky, veľký rozdiel</div>
-          {free && (
-            <div style={{ fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase' as const, color: GOLD, fontWeight: 500, fontStyle: 'italic', flexShrink: 0 }}>neukladá sa</div>
-          )}
-        </div>
-        <div style={{ padding: '0 16px 10px' }}>
-          {habits.map((h, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '9px 0', borderBottom: `1px solid ${HAIR}` }}>
-              {/* Tappable checkbox — toggles done state */}
-              <button onClick={() => toggle(i)} style={{ all: 'unset', cursor: 'pointer', width: 18, height: 18, borderRadius: 9, flexShrink: 0, border: `1.5px solid ${h.done ? TELO : HAIR2}`, background: h.done ? TELO : 'transparent', display: 'grid', placeItems: 'center' }}>
-                {h.done && <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12l5 5 9-11"/></svg>}
-              </button>
-              <div style={{ flex: 1, fontSize: 13, fontWeight: 400, color: h.done ? FG3 : INK, textDecoration: h.done ? 'line-through' : 'none' }}>{h.label}</div>
-            </div>
-          ))}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0 4px' }}>
-            <button onClick={onAddHabit} style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'transparent', border: 0, cursor: 'pointer', padding: 0 }}>
-              <div style={{ width: 18, height: 18, borderRadius: 9, flexShrink: 0, border: `1.5px dashed ${HAIR2}`, display: 'grid', placeItems: 'center' }}>
-                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke={FG3} strokeWidth="2.5" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
-              </div>
-              <div style={{ fontSize: 12.5, color: FG2, fontWeight: 400, fontStyle: 'italic', fontFamily: SERIF }}>Pridať návyk</div>
-            </button>
-            <button onClick={() => navigate('/navyky')} style={{ background: 'transparent', border: 0, padding: 0, cursor: 'pointer', fontSize: 11, color: FG3, display: 'flex', alignItems: 'center', gap: 4 }}>
-              Všetky
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={FG3} strokeWidth="2" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
-            </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span aria-hidden style={{ width: 6, height: 6, borderRadius: 999, background: p.color, flexShrink: 0 }} />
+            <span style={{ fontSize: 9.5, letterSpacing: '0.16em', textTransform: 'uppercase' as const, color: p.color, fontWeight: 500 }}>{p.label}</span>
+          </div>
+          <div
+            style={{
+              fontFamily: SERIF,
+              fontSize: 15.5,
+              color: INK,
+              marginTop: 8,
+              lineHeight: 1.22,
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical' as const,
+              overflow: 'hidden',
+            }}
+          >
+            {p.title}
+          </div>
+          <div style={{ marginTop: 'auto', paddingTop: 6, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 6 }}>
+            <div style={{ fontSize: 10.5, color: FG2, fontWeight: 300, whiteSpace: 'nowrap' as const, overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{p.sub ?? ''}</div>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={FG3} strokeWidth="2" strokeLinecap="round" style={{ flexShrink: 0 }}><path d="M9 6l6 6-6 6"/></svg>
           </div>
         </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── Reflections card ─────────────────────────────────────────────────────────
-function CardReflections({ free, onOpen }: { free: boolean; onOpen: () => void }) {
-  return (
-    <div style={{ padding: '0 18px', marginBottom: 12 }}>
-      <div style={{ background: WHITE, borderRadius: 20, border: `1px solid ${HAIR}`, overflow: 'hidden', cursor: 'pointer' }} onClick={onOpen}>
-        <div style={{ padding: '14px 16px 0', display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10 }}>
-          <div style={{ fontFamily: SERIF, fontSize: 16, color: INK, lineHeight: 1.25 }}>Čo ti dnes dalo najviac energie?</div>
-          {free && (
-            <div style={{ fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase' as const, color: GOLD, fontWeight: 500, fontStyle: 'italic', flexShrink: 0 }}>neukladá sa</div>
-          )}
-        </div>
-        <div style={{ padding: '12px 16px 16px' }}>
-          <div style={{ padding: '12px 14px', borderRadius: 12, background: 'rgba(61,41,33,0.04)', border: `1px dashed ${HAIR2}`, fontFamily: SERIF, fontSize: 13, color: FG3, lineHeight: 1.5 }}>
-            Napíš jednu vetu…
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── Cyklus card — full data ───────────────────────────────────────────────────
-function CardCyklus({ day, total, phaseName, note }: { day: number; total: number; phaseName: string; note: string }) {
-  const navigate = useNavigate();
-  const todayPct = day / total;
-  const phases = [
-    { w: 5/total, c: '#C6758A' }, { w: 8/total, c: '#B48499' },
-    { w: 3/total, c: '#A36C8E' }, { w: (total-16)/total, c: '#7A5A72' },
-  ];
-  return (
-    <div style={{ padding: '0 18px', marginBottom: 12 }}>
-      <div style={{ background: WHITE, borderRadius: 22, border: `1px solid ${HAIR}`, overflow: 'hidden' }}>
-        <div style={{ height: 130, position: 'relative', background: `url(/images/r9/section-period.jpg) center/cover` }}>
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.55) 100%)' }} />
-          <div style={{ position: 'absolute', top: 14, right: 16, fontSize: 10.5, color: 'rgba(255,255,255,0.85)' }}>Deň {day} / {total}</div>
-          <div style={{ position: 'absolute', bottom: 12, left: 16, right: 16, display: 'flex', alignItems: 'baseline', gap: 2 }}>
-            <div style={{ fontFamily: SERIF, fontSize: 56, lineHeight: 0.9, color: '#fff', fontWeight: 500, letterSpacing: '-0.04em' }}>{day}</div>
-            <div style={{ fontFamily: SERIF, fontSize: 18, fontStyle: 'italic', color: 'rgba(255,255,255,0.85)', fontWeight: 500, whiteSpace: 'nowrap' as const }}>. deň</div>
-            <div style={{ fontFamily: SERIF, fontSize: 26, fontStyle: 'italic', color: '#fff', fontWeight: 500, marginLeft: 6, whiteSpace: 'nowrap' as const, overflow: 'hidden', textOverflow: 'ellipsis', textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>{phaseName} fáza</div>
-          </div>
-        </div>
-        <div style={{ padding: 18 }}>
-          <div style={{ fontFamily: SERIF, fontSize: 17, color: INK, lineHeight: 1.25, marginBottom: 14 }}>{note}</div>
-          <div style={{ position: 'relative', marginBottom: 12 }}>
-            <div style={{ display: 'flex', height: 5, borderRadius: 3, overflow: 'hidden', background: HAIR2 }}>
-              {phases.map((p, i) => <div key={i} style={{ flex: p.w, background: p.c, opacity: 0.9 }} />)}
-            </div>
-            <div style={{ position: 'absolute', top: -4, left: `calc(${todayPct * 100}% - 7px)`, width: 13, height: 13, borderRadius: 999, background: WHITE, border: `2.5px solid ${INK}`, boxShadow: '0 2px 6px rgba(61,41,33,0.18)' }} />
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ fontSize: 11.5, color: FG2, fontWeight: 300 }}>
-              {Math.max(0, total + 1 - day)} dní do ďalšej periódy
-            </div>
-            <button onClick={() => navigate('/kniznica/periodka?from=home')} style={{ background: INK, color: '#fff', border: 0, padding: '9px 16px', borderRadius: 999, fontSize: 11.5, fontWeight: 500, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-              Zisti viac
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── Cyklus card — setup prompt (Plus, no tracker) ────────────────────────────
-function CardCyklusSetup() {
-  const navigate = useNavigate();
-  return (
-    <div style={{ padding: '0 18px', marginBottom: 12 }}>
-      <div style={{ background: WHITE, borderRadius: 22, border: `1px solid ${HAIR}`, overflow: 'hidden' }}>
-        <div style={{ height: 110, position: 'relative', background: `url(/images/r9/section-period.jpg) center/cover`, filter: 'saturate(0.9)' }}>
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.55) 100%)' }} />
-          <div style={{ position: 'absolute', bottom: 12, left: 16, right: 16, fontFamily: SERIF, fontSize: 19, fontStyle: 'italic', color: '#fff', lineHeight: 1.2 }}>Trénuj v rytme svojho tela</div>
-        </div>
-        <div style={{ padding: 18 }}>
-          <div style={{ fontSize: 12.5, color: FG2, lineHeight: 1.5, fontWeight: 300 }}>Zaznač si jeden deň menštruácie a NeoMe ti začne odporúčať pohyb a stravu podľa fázy.</div>
-          <button onClick={() => navigate('/kniznica/periodka')} style={{ marginTop: 14, background: CYKLUS, color: '#fff', border: 0, padding: '10px 18px', borderRadius: 999, fontSize: 12, fontWeight: 500, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-            Zapnúť cyklus
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── Cyklus card — Free ───────────────────────────────────────────────────────
-function CardCyklusFree() {
-  const navigate = useNavigate();
-  return (
-    <div style={{ padding: '0 18px', marginBottom: 12 }}>
-      <div style={{ background: WHITE, borderRadius: 22, border: `1px solid ${HAIR}`, overflow: 'hidden' }}>
-        <div style={{ height: 110, position: 'relative', background: `url(/images/r9/section-period.jpg) center/cover` }}>
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.55) 100%)' }} />
-          <div style={{ position: 'absolute', bottom: 12, left: 16, fontFamily: SERIF, fontSize: 19, color: '#fff', lineHeight: 1.2 }}>Tvoj rytmus, zaznamenaný</div>
-        </div>
-        <div style={{ padding: 16 }}>
-          <div style={{ fontSize: 11.5, color: FG2, lineHeight: 1.45, fontWeight: 300 }}>
-            Plnohodnotný tracker s fázami, energiou a odporúčaniami je súčasťou <span style={{ color: GOLD, fontWeight: 500 }}>Plus</span>.
-          </div>
-          <button onClick={() => navigate('/paywall')} style={{ marginTop: 12, background: 'transparent', border: 0, padding: 0, cursor: 'pointer', fontSize: 12, fontWeight: 500, color: CYKLUS, display: 'flex', alignItems: 'center', gap: 6 }}>
-            Vyskúšať Plus
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={CYKLUS} strokeWidth="2" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
-          </button>
-        </div>
-      </div>
+      ))}
     </div>
   );
 }
@@ -966,7 +732,6 @@ export default function DomovNew() {
   const { balance: points } = usePointsLedger();
 
   const isPlus    = user.tier === 'plus';
-  const hasCycle  = isPlus && user.hasCycleData;
   const hasMealPlanAddon = user.hasMealPlanAddon;
   const hasMealPlan = hasMealPlanAddon && user.hasMealPlan;
   // Purchased the add-on but hasn't filled the questionnaire yet —
@@ -977,95 +742,120 @@ export default function DomovNew() {
 
   const meditationTitle = meditation?.title ?? 'Ranný pokoj';
 
-  // ── "Dnes pre teba" picks ──────────────────────────────────────────────
-  const bodyPick: TodayPick = isPlus && userProgram
-    ? {
-        eyebrow: 'Telo',
-        color: TELO,
-        title: userProgram.todaysExercise?.title ?? 'Tréning dňa',
-        desc: [`Týž. ${userProgram.week} · deň ${userProgram.day}`, userProgram.todaysExercise?.duration].filter(Boolean).join(' · '),
-        img: '/images/r9/section-body.jpg',
-        href: `/program/${userProgram.id}`,
-      }
-    : {
-        eyebrow: 'Telo',
-        color: TELO,
-        title: isPlus ? 'Vyber si program' : 'Ranná energia',
-        desc: isPlus ? 'Začni trénovať s Gabi' : '12 min · voľný cvik',
-        img: '/images/r9/section-body.jpg',
-        href: isPlus ? '/kniznica/telo/programy' : '/kniznica/telo',
-      };
-
-  // Subscriber's prescribed meals for today → menu-card variant.
-  const planMeals: TodayPickMeal[] = (todayPlan?.meals ?? [])
-    .map((m) => {
-      const r = recipes.find((x) => x.id === m.options[m.selected]);
-      if (!r) return null;
-      return {
-        label: m.label,
-        name: r.name,
-        img: recipeImage(r),
-        kcal: Math.round((r.kcal ?? 0) * m.portionMultiplier),
-      };
-    })
-    .filter((m): m is TodayPickMeal => m !== null);
-
+  // ── "Dnes pre teba" — six pillars, each with today's featured info ──
   // Deterministic "recipe of the day" — same recipe for everyone all day.
   const dailyRecipe = recipes.length > 0
     ? recipes[Math.floor(Date.now() / 86_400_000) % recipes.length]
     : null;
 
-  const nutritionPick: TodayPick = hasMealPlan && planMeals.length > 0
-    ? {
-        eyebrow: 'Výživa · tvoj plán',
-        color: STRAVA,
-        title: 'Dnešný jedálniček',
-        desc: 'dnešné menu',
-        img: recipeImage(null),
-        href: '/jedalnicek',
-        meals: planMeals,
-        footer: `${(todayPlan?.totalCalories ?? planMeals.reduce((s, m) => s + m.kcal, 0)).toLocaleString('sk-SK')} kcal · celý deň`,
-      }
-    : mealPlanNeedsSetup
-    ? {
-        eyebrow: 'Výživa',
-        color: STRAVA,
-        title: 'Dokonči svoj jedálniček',
-        desc: 'Krátky dotazník · 2 min',
-        img: '/images/r9/section-nutrition.jpg',
-        href: '/jedalnicek/onboarding',
-      }
-    : dailyRecipe
-    ? {
-        eyebrow: 'Výživa',
-        color: STRAVA,
-        title: dailyRecipe.name,
-        desc: [
-          dailyRecipe.prep_minutes ? `${dailyRecipe.prep_minutes} min` : null,
-          dailyRecipe.kcal ? `${dailyRecipe.kcal} kcal` : null,
-        ].filter(Boolean).join(' · ') || 'Recept dňa',
-        img: recipeImage(dailyRecipe),
-        href: '/kniznica/strava',
-      }
-    : {
-        eyebrow: 'Výživa',
-        color: STRAVA,
-        title: 'Recept dňa',
-        desc: 'Gabine recepty',
-        img: '/images/r9/section-nutrition.jpg',
-        href: '/kniznica/strava',
-      };
+  // Subscriber's first prescribed meal today (if a plan exists).
+  const firstMeal = (() => {
+    const m = todayPlan?.meals?.[0];
+    if (!m) return null;
+    const r = recipes.find((x) => x.id === m.options[m.selected]);
+    if (!r) return null;
+    return { name: r.name, kcal: Math.round((r.kcal ?? 0) * m.portionMultiplier) };
+  })();
 
-  const mindPick: TodayPick = {
-    eyebrow: 'Myseľ',
-    color: MYSEL,
-    title: meditationTitle,
-    desc: [meditation?.duration, meditation?.category].filter(Boolean).join(' · ') || 'Krátka meditácia',
-    img: '/images/r9/testimonial-meditation.jpg',
-    href: '/meditacie',
-  };
+  const diaryPrompts = [
+    'Čo ti dnes dalo najviac energie?',
+    'Na čo si dnes hrdá?',
+    'Čo by si zajtra urobila inak?',
+    'Čo ti dnes prinieslo radosť?',
+  ];
+  const diaryPrompt = diaryPrompts[new Date().getDay() % diaryPrompts.length];
 
-  const picks = [bodyPick, nutritionPick, mindPick];
+  const pillars: PillarItem[] = [
+    cycle
+      ? {
+          key: 'periodka',
+          label: 'Periodka',
+          color: CYKLUS,
+          title: `${cycle.dayOfCycle}. deň z ${cycle.totalDays}`,
+          sub: `${cycle.phaseName.toLowerCase()} fáza`,
+          href: '/kniznica/periodka?from=home',
+        }
+      : {
+          key: 'periodka',
+          label: 'Periodka',
+          color: CYKLUS,
+          title: 'Zapni si cyklus',
+          sub: 'fázy a predpovede',
+          href: '/kniznica/periodka',
+        },
+    isPlus && userProgram
+      ? {
+          key: 'telo',
+          label: 'Telo',
+          color: TELO,
+          title: userProgram.todaysExercise?.title ?? 'Tréning dňa',
+          sub: [`týž. ${userProgram.week} · deň ${userProgram.day}`, userProgram.todaysExercise?.duration].filter(Boolean).join(' · '),
+          href: `/program/${userProgram.id}`,
+        }
+      : {
+          key: 'telo',
+          label: 'Telo',
+          color: TELO,
+          title: isPlus ? 'Vyber si program' : 'Ranná energia',
+          sub: isPlus ? 'začni trénovať s Gabi' : '12 min · voľný cvik',
+          href: isPlus ? '/kniznica/telo/programy' : '/kniznica/telo',
+        },
+    hasMealPlan && firstMeal
+      ? {
+          key: 'strava',
+          label: 'Strava',
+          color: STRAVA,
+          title: firstMeal.name,
+          sub: `${firstMeal.kcal} kcal · dnešné menu`,
+          href: '/jedalnicek',
+        }
+      : mealPlanNeedsSetup
+      ? {
+          key: 'strava',
+          label: 'Strava',
+          color: STRAVA,
+          title: 'Dokonči svoj jedálniček',
+          sub: 'dotazník · 2 min',
+          href: '/jedalnicek/onboarding',
+        }
+      : {
+          key: 'strava',
+          label: 'Strava',
+          color: STRAVA,
+          title: dailyRecipe?.name ?? 'Recept dňa',
+          sub: dailyRecipe
+            ? [
+                dailyRecipe.prep_minutes ? `${dailyRecipe.prep_minutes} min` : null,
+                dailyRecipe.kcal ? `${dailyRecipe.kcal} kcal` : null,
+              ].filter(Boolean).join(' · ') || 'recept dňa'
+            : 'Gabine recepty',
+          href: '/kniznica/strava',
+        },
+    {
+      key: 'mysel',
+      label: 'Myseľ',
+      color: MYSEL,
+      title: meditationTitle,
+      sub: [meditation?.duration, meditation?.category].filter(Boolean).join(' · ').toLowerCase() || 'krátka meditácia',
+      href: '/meditacie',
+    },
+    {
+      key: 'ciele',
+      label: 'Moje ciele',
+      color: GOLD,
+      title: 'Malé kroky, veľký rozdiel',
+      sub: 'tvoje návyky na dnes',
+      href: '/navyky',
+    },
+    {
+      key: 'dennik',
+      label: 'Denník',
+      color: GOLD,
+      title: diaryPrompt,
+      sub: 'napíš jednu vetu',
+      onTap: () => setShowDiary(true),
+    },
+  ];
 
   // ── Periodic upsell banner ─────────────────────────────────────────────
   // On every 4th visit show ONE banner, alternating between the eligible
@@ -1096,19 +886,9 @@ export default function DomovNew() {
 
       {selectedDay && <DayPlanSheet date={selectedDay} onClose={() => setSelectedDay(null)} />}
 
-      {/* 1 · Periodka */}
-      <SectionEyebrow color={CYKLUS}>Periodka</SectionEyebrow>
-      {hasCycle && cycle ? (
-        <CardCyklus day={cycle.dayOfCycle} total={cycle.totalDays} phaseName={cycle.phaseName} note={cycle.note} />
-      ) : isPlus ? (
-        <CardCyklusSetup />
-      ) : (
-        <CardCyklusFree />
-      )}
-
-      {/* 2 · Dnes pre teba — Telo / Výživa / Myseľ v kompaktnom riadku */}
+      {/* Dnes pre teba — six equal pillars */}
       <SectionEyebrow color={GOLD}>Dnes pre teba</SectionEyebrow>
-      <TodayPicksRow items={picks} />
+      <PillarGrid items={pillars} />
 
       {promoBanner === 'program' && (
         <UpsellBanner
@@ -1131,11 +911,6 @@ export default function DomovNew() {
           onClick={() => navigate('/jedalnicek-promo')}
         />
       )}
-
-      {/* 3 · Pracuj na sebe — návyky + reflexia */}
-      <SectionEyebrow color={GOLD}>Pracuj na sebe</SectionEyebrow>
-      <CardHabits free={!isPlus} onAddHabit={() => navigate('/navyky/new')} />
-      <CardReflections free={!isPlus} onOpen={() => setShowDiary(true)} />
 
       {/* Komunita divider — plain, no bullet (visual separator between personal and community sections) */}
       <div style={{ padding: '0 22px', margin: '32px 0 0', fontSize: 10.5, letterSpacing: '0.24em', textTransform: 'uppercase' as const, fontWeight: 500, color: FG3, fontFamily: SANS }}>Komunita</div>
