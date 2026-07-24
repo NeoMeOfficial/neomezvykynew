@@ -401,20 +401,22 @@ export function useCycleSymptoms() {
 
   const todayMap: SymptomMap = days.find((d) => d.date === todayISODate())?.symptoms ?? {};
 
-  const toggleSymptom = useCallback(
-    async (key: string) => {
-      const today = todayISODate();
-      const current = todayMap[key] ?? 0;
+  // Toggle a symptom for ANY date — today's chips and retroactive edits
+  // from the calendar day-detail sheet share this path.
+  const toggleSymptomForDate = useCallback(
+    async (date: string, key: string) => {
+      const entry = days.find((d) => d.date === date)?.symptoms ?? {};
+      const current = entry[key] ?? 0;
       const next = current > 0 ? 0 : 1;
-      const nextMap = { ...todayMap };
+      const nextMap = { ...entry };
       if (next > 0) nextMap[key] = next;
       else delete nextMap[key];
 
       // Optimistic local update
-      const otherDays = days.filter((d) => d.date !== today);
+      const otherDays = days.filter((d) => d.date !== date);
       const updatedDays = Object.keys(nextMap).length === 0
         ? otherDays
-        : [{ date: today, symptoms: nextMap }, ...otherDays];
+        : [{ date, symptoms: nextMap }, ...otherDays];
       setDays(updatedDays);
 
       // Free tier: toggles stay on-screen for the session only —
@@ -431,17 +433,22 @@ export function useCycleSymptoms() {
           .from('cycle_symptoms')
           .delete()
           .eq('user_id', user!.id)
-          .eq('date', today);
+          .eq('date', date);
       } else {
         await supabase
           .from('cycle_symptoms')
           .upsert(
-            { user_id: user!.id, date: today, symptoms: nextMap },
+            { user_id: user!.id, date, symptoms: nextMap },
             { onConflict: 'user_id,date' },
           );
       }
     },
-    [days, real, todayMap, user?.id, isPremium],
+    [days, real, user?.id, isPremium],
+  );
+
+  const toggleSymptom = useCallback(
+    (key: string) => toggleSymptomForDate(todayISODate(), key),
+    [toggleSymptomForDate],
   );
 
   // Helper: list of dates (YYYY-MM-DD) in the last 60 days that have any symptom logged.
@@ -486,6 +493,7 @@ export function useCycleSymptoms() {
     symptomDates,
     loading,
     toggleSymptom,
+    toggleSymptomForDate,
     refresh,
     customDefs,
     addCustomSymptom,

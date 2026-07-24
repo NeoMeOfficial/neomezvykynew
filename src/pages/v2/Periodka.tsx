@@ -370,6 +370,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     todayMap,
     symptomDates,
     toggleSymptom,
+    toggleSymptomForDate,
     customDefs,
     addCustomSymptom,
     removeCustomSymptom,
@@ -447,11 +448,49 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
           <Ser size={22} style={{ marginTop: 10, lineHeight: 1.2 }}>Mimo zaznamenaného cyklu</Ser>
         )}
 
-        {selectedSymptomLabels.length > 0 ? (
+        {selectedIsPast && selectedDateISO ? (
+          // Past days are editable — retroactively add or fix symptoms.
           <>
-            <Eye size={10} style={{ marginTop: 18, marginBottom: 10 }}>
-              {selectedIsToday ? 'Ako sa cítiš' : 'Ako si sa cítila'}
-            </Eye>
+            <Eye size={10} style={{ marginTop: 18, marginBottom: 10 }}>Cítila som sa</Eye>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              {allSymptomDefs.map((s) => {
+                const on = !!(symptomDayEntries.find((e) => e.date === selectedDateISO)?.symptoms ?? {})[s.k];
+                return (
+                  <button
+                    key={s.k}
+                    type="button"
+                    onClick={() => toggleSymptomForDate(selectedDateISO, s.k)}
+                    style={{
+                      all: 'unset',
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 5,
+                      padding: '7px 13px',
+                      borderRadius: 999,
+                      background: on ? TINT.GOLD_SOFT : '#fff',
+                      color: on ? NM.GOLD : NM.DEEP,
+                      border: `1px solid ${on ? NM.GOLD : NM.HAIR_2}`,
+                      fontFamily: NM.SANS,
+                      fontSize: 12.5,
+                      fontWeight: on ? 500 : 400,
+                    }}
+                  >
+                    {on && (
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12l5 5L20 6" /></svg>
+                    )}
+                    {s.l}
+                  </button>
+                );
+              })}
+            </div>
+            <div style={{ fontFamily: NM.SANS, fontSize: 10.5, color: NM.TERTIARY, fontWeight: 400, marginTop: 10, lineHeight: 1.45 }}>
+              Zmeny sa ukladajú automaticky.
+            </div>
+          </>
+        ) : selectedSymptomLabels.length > 0 ? (
+          <>
+            <Eye size={10} style={{ marginTop: 18, marginBottom: 10 }}>Ako sa cítiš</Eye>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
               {selectedSymptomLabels.map((l) => (
                 <div key={l} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '7px 13px', borderRadius: 999, background: TINT.GOLD_SOFT, color: NM.GOLD, border: `1px solid ${NM.GOLD}`, fontFamily: NM.SANS, fontSize: 12.5, fontWeight: 500 }}>
@@ -461,10 +500,6 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
               ))}
             </div>
           </>
-        ) : selectedInfo && (selectedIsPast || selectedIsToday) && isPremium ? (
-          <Body size={12} color={NM.MUTED} style={{ marginTop: 16 }}>
-            Pre tento deň nie sú zaznamenané žiadne príznaky.
-          </Body>
         ) : null}
 
         {!isPremium && (
