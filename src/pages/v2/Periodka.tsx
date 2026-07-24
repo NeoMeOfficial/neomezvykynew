@@ -8,6 +8,7 @@ import { getCycleTipByDay } from '../../data/cycleTips';
 import type { DerivedState, CycleData } from '../../features/cycle/types';
 import { PHASE_HEADLINES } from '../../features/cycle/constants';
 import { useConsentGuard } from '../../contexts/ConsentGuardContext';
+import { useSubscription } from '../../contexts/SubscriptionContext';
 import { CONSENT_TYPES } from '../../lib/consents';
 import PlusUnlockBanner from '../../components/v2/paywall/PlusUnlockBanner';
 
@@ -244,7 +245,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
   // Day-of-month → cycle-day → phase key. Maps a calendar date in the
   // visible month back to a phase. Both the cell tint AND the legend
   // highlight derive from this so they're guaranteed to agree.
-  const phaseKeyForCalendarDay = (d: number): string | null => {
+  const cycleInfoForCalendarDay = (d: number): { cycleDay: number; key: string | null } | null => {
     if (!cycleData.lastPeriodStart) return null;
     const target = new Date(yearIdx, monthIdx, d);
     const start = new Date(cycleData.lastPeriodStart + 'T00:00:00');
@@ -252,8 +253,9 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     if (daysSince < 0) return null;
     const cycleDay = (daysSince % totalDays) + 1;
     const range = phases.find((p) => cycleDay >= p.start && cycleDay <= p.end);
-    return range?.key ?? null;
+    return { cycleDay, key: range?.key ?? null };
   };
+  const phaseKeyForCalendarDay = (d: number): string | null => cycleInfoForCalendarDay(d)?.key ?? null;
   const phaseOf = (d: number) => {
     const key = phaseKeyForCalendarDay(d);
     return key ? phaseColorByKey[key] : null;
@@ -364,6 +366,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
 
   // F-004: cycle_symptoms via useCycleSymptoms (real DB / localStorage demo).
   const {
+    days: symptomDayEntries,
     todayMap,
     symptomDates,
     toggleSymptom,
@@ -371,6 +374,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     addCustomSymptom,
     removeCustomSymptom,
   } = useCycleSymptoms();
+  const { isPremium } = useSubscription();
   const [addingSymptom, setAddingSymptom] = useState(false);
   const [newSymptomText, setNewSymptomText] = useState('');
   // Calendar dots — derive day-of-month for current month from symptomDates.
@@ -395,6 +399,97 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     ...customDefs.map((s) => ({ ...s, custom: true as const })),
   ];
   const symptoms = allSymptomDefs.map((s) => ({ l: s.l, k: s.k, on: !!todayMap[s.k], custom: s.custom }));
+
+  // ── Day-detail sheet (tap on a calendar day) ────────────────────────
+  const PHASE_LOCATIVE: Record<string, string> = {
+    menstrual: 'v menštruačnej fáze',
+    follicular: 'vo folikulárnej fáze',
+    ovulation: 'vo fáze ovulácie',
+    luteal: 'v luteálnej fáze',
+  };
+  const selectedInfo = selectedDay !== null ? cycleInfoForCalendarDay(selectedDay) : null;
+  const selectedDateISO = selectedDay !== null
+    ? `${yearIdx}-${String(monthIdx + 1).padStart(2, '0')}-${String(selectedDay).padStart(2, '0')}`
+    : null;
+  const todayISO = `${nowDate.getFullYear()}-${String(nowDate.getMonth() + 1).padStart(2, '0')}-${String(nowDate.getDate()).padStart(2, '0')}`;
+  const selectedIsToday = selectedDateISO === todayISO;
+  const selectedIsPast = !!selectedDateISO && selectedDateISO < todayISO;
+  const selectedSymptomLabels = selectedDateISO
+    ? Object.keys(symptomDayEntries.find((e) => e.date === selectedDateISO)?.symptoms ?? {})
+        .map((k) => allSymptomDefs.find((s) => s.k === k)?.l)
+        .filter((l): l is string => !!l)
+    : [];
+  const phaseSentence = selectedInfo?.key
+    ? `${selectedIsToday ? 'Nachádzaš sa' : selectedIsPast ? 'Bola si' : 'Budeš'} ${PHASE_LOCATIVE[selectedInfo.key]}.`
+    : null;
+
+  const dayDetailSheet = selectedDay !== null && (
+    <div
+      role="dialog"
+      aria-modal="true"
+      onClick={() => setSelectedDay(null)}
+      style={{ position: 'fixed', inset: 0, background: 'rgba(42,26,20,0.55)', backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', zIndex: 100 }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{ width: '100%', maxWidth: 480, background: NM.BG, borderTopLeftRadius: 28, borderTopRightRadius: 28, padding: '24px 24px max(env(safe-area-inset-bottom), 24px)', boxShadow: '0 -10px 40px rgba(0,0,0,0.18)' }}
+      >
+        <div aria-hidden="true" style={{ width: 36, height: 4, borderRadius: 999, background: NM.HAIR_2, margin: '0 auto 16px' }} />
+        <Eye color={NM.TERRA}>{selectedDay}. {monthShort}. {yearIdx}</Eye>
+        {selectedInfo ? (
+          <>
+            <Ser size={24} style={{ marginTop: 10, lineHeight: 1.15 }}>{selectedInfo.cycleDay}. deň tvojho cyklu</Ser>
+            {phaseSentence && (
+              <Body size={13} style={{ marginTop: 8 }}>{phaseSentence}</Body>
+            )}
+          </>
+        ) : (
+          <Ser size={22} style={{ marginTop: 10, lineHeight: 1.2 }}>Mimo zaznamenaného cyklu</Ser>
+        )}
+
+        {selectedSymptomLabels.length > 0 ? (
+          <>
+            <Eye size={10} style={{ marginTop: 18, marginBottom: 10 }}>
+              {selectedIsToday ? 'Ako sa cítiš' : 'Ako si sa cítila'}
+            </Eye>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              {selectedSymptomLabels.map((l) => (
+                <div key={l} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '7px 13px', borderRadius: 999, background: TINT.GOLD_SOFT, color: NM.GOLD, border: `1px solid ${NM.GOLD}`, fontFamily: NM.SANS, fontSize: 12.5, fontWeight: 500 }}>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12l5 5L20 6" /></svg>
+                  {l}
+                </div>
+              ))}
+            </div>
+          </>
+        ) : selectedInfo && (selectedIsPast || selectedIsToday) && isPremium ? (
+          <Body size={12} color={NM.MUTED} style={{ marginTop: 16 }}>
+            Pre tento deň nie sú zaznamenané žiadne príznaky.
+          </Body>
+        ) : null}
+
+        {!isPremium && (
+          <div style={{ marginTop: 18, padding: '12px 14px', borderRadius: 14, background: TINT.GOLD_SOFT, border: `1px solid ${NM.GOLD}55` }}>
+            <div style={{ fontFamily: NM.SANS, fontSize: 12, color: NM.DEEP, lineHeight: 1.5 }}>
+              Chceš, aby sa ti príznaky a poznámky ukladali ku každému dňu a história zostala navždy? S <span style={{ color: NM.GOLD, fontWeight: 500 }}>NeoMe Plus</span> sa nič nestratí.
+            </div>
+            <button
+              onClick={() => navigate('/paywall')}
+              style={{ all: 'unset', cursor: 'pointer', marginTop: 10, fontFamily: NM.SANS, fontSize: 12, fontWeight: 500, color: '#fff', background: NM.GOLD, padding: '8px 16px', borderRadius: 999 }}
+            >
+              Vyskúšať Plus
+            </button>
+          </div>
+        )}
+
+        <button
+          onClick={() => setSelectedDay(null)}
+          style={{ all: 'unset', cursor: 'pointer', display: 'block', width: '100%', textAlign: 'center', marginTop: 18, padding: '12px 20px', borderRadius: 999, color: NM.MUTED, fontFamily: NM.SANS, fontSize: 13, fontWeight: 500 }}
+        >
+          Zavrieť
+        </button>
+      </div>
+    </div>
+  );
 
   // Phase-tailored daily advice — rotates through Gabi's 105-tip library
   // (5 phases × 3 categories × 7 tips/phase) by day-in-phase. Source:
@@ -983,6 +1078,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
           {upcomingBlock}
         </>
       )}
+      {dayDetailSheet}
     </>
   );
 }
