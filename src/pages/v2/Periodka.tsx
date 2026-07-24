@@ -769,8 +769,16 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
                   all: 'unset',
                   cursor: 'pointer',
                   color: 'inherit',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 5,
                 }}
               >
+                {s.on && (
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M4 12l5 5L20 6" />
+                  </svg>
+                )}
                 {s.l}
               </button>
               {s.custom && (
@@ -880,6 +888,9 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
               Pridať vlastný
             </button>
           )}
+        </div>
+        <div style={{ fontFamily: NM.SANS, fontSize: 10.5, color: NM.TERTIARY, fontWeight: 400, marginTop: 12, lineHeight: 1.45 }}>
+          Označenia sa ukladajú automaticky — deň so záznamom dostane v kalendári bodku.
         </div>
       </div>
   );
