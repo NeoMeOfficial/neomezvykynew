@@ -1150,17 +1150,20 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
   return (
     <>
       {headerBlock}
-      {ringBlock}
       {fromHome ? (
+        // From-home flow: hero headline → straight into "zaznač si, ako sa
+        // dnes cítiš"; the cycle ring moves down next to "Čaká ťa".
         <>
-          {periodCtaBlock}
           {wellbeingBlock}
+          {periodCtaBlock}
+          {ringBlock}
           {upcomingBlock}
           {statsBlock}
           {calendarBlock}
         </>
       ) : (
         <>
+          {ringBlock}
           {statsBlock}
           {periodCtaBlock}
           {calendarBlock}
