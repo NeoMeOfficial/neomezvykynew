@@ -5,7 +5,9 @@ import { useUser } from '@/hooks/use-user';
 import { useCycleInfo } from '@/hooks/use-cycle';
 import { useUserProgram } from '@/hooks/useUserProgram';
 import { useMealPlan } from '@/features/nutrition/useMealPlan';
-import { useRecipes } from '@/hooks/useRecipes';
+import { useRecipes, recipeImage } from '@/hooks/useRecipes';
+import { useSupabaseHabits } from '@/hooks/useSupabaseHabits';
+import { useAchievements } from '@/hooks/useAchievements';
 import { useDailyMeditation } from '@/hooks/useDailyContent';
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { useReferral } from '@/hooks/useReferral';
@@ -225,66 +227,175 @@ function WeekCalendar({ onSelectDay }: { onSelectDay: (d: Date) => void }) {
   );
 }
 
-// ─── "Dnes pre teba" — six equal pillars, 2×3 grid ───────────────────────────
-// One simple grid for everything NeoMe stands on: Periodka, Telo, Strava,
-// Myseľ, Moje ciele, Denník. Each card = pillar label + today's featured
-// info. Equal weight, nothing hidden behind a scroll.
+// ─── "Dnes pre teba" — pillar stack ──────────────────────────────────────────
+// Six equal pillars stacked under each other, each with today's featured
+// info. Periodka, Telo, Strava a Myseľ keep their section photos as a
+// full-bleed left panel; Moje ciele and Denník are interactive cards
+// without photos. Deliberately NOT the Kniznica photo-tile grid — same
+// photos and type language, but the home stack is about today, not
+// browsing.
 export interface PillarItem {
   key: string;
   label: string;
   color: string;
+  img: string;
   title: string;
   sub?: string;
-  href?: string;
-  onTap?: () => void;
+  href: string;
 }
 
-function PillarGrid({ items }: { items: PillarItem[] }) {
+function PillarPhotoCard({ p }: { p: PillarItem }) {
   const navigate = useNavigate();
   return (
-    <div style={{ padding: '0 18px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
-      {items.map((p) => (
+    <div
+      onClick={() => navigate(p.href)}
+      style={{
+        background: WHITE,
+        borderRadius: 18,
+        border: `1px solid ${HAIR}`,
+        overflow: 'hidden',
+        cursor: 'pointer',
+        touchAction: 'manipulation',
+        display: 'flex',
+        alignItems: 'stretch',
+        minHeight: 104,
+      }}
+    >
+      <div style={{ flex: '0 0 112px', background: `url(${p.img}) center/cover` }} />
+      <div style={{ flex: 1, minWidth: 0, padding: '13px 14px 12px', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <span aria-hidden style={{ width: 6, height: 6, borderRadius: 999, background: p.color, flexShrink: 0 }} />
+          <span style={{ fontSize: 9.5, letterSpacing: '0.16em', textTransform: 'uppercase' as const, color: p.color, fontWeight: 500 }}>{p.label}</span>
+        </div>
         <div
-          key={p.key}
-          onClick={() => (p.onTap ? p.onTap() : p.href && navigate(p.href))}
           style={{
-            background: WHITE,
-            borderRadius: 18,
-            border: `1px solid ${HAIR}`,
-            padding: '13px 14px 12px',
-            cursor: 'pointer',
-            touchAction: 'manipulation',
-            minHeight: 108,
-            display: 'flex',
-            flexDirection: 'column',
-            boxSizing: 'border-box',
+            fontFamily: SERIF,
+            fontSize: 16.5,
+            color: INK,
+            marginTop: 7,
+            lineHeight: 1.22,
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical' as const,
+            overflow: 'hidden',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span aria-hidden style={{ width: 6, height: 6, borderRadius: 999, background: p.color, flexShrink: 0 }} />
-            <span style={{ fontSize: 9.5, letterSpacing: '0.16em', textTransform: 'uppercase' as const, color: p.color, fontWeight: 500 }}>{p.label}</span>
+          {p.title}
+        </div>
+        <div style={{ marginTop: 'auto', paddingTop: 6, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 6 }}>
+          <div style={{ fontSize: 10.5, color: FG2, fontWeight: 300, whiteSpace: 'nowrap' as const, overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{p.sub ?? ''}</div>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={FG3} strokeWidth="2" strokeLinecap="round" style={{ flexShrink: 0 }}><path d="M9 6l6 6-6 6"/></svg>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PillarStack({ items }: { items: PillarItem[] }) {
+  return (
+    <div style={{ padding: '0 18px', display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 10 }}>
+      {items.map((p) => <PillarPhotoCard key={p.key} p={p} />)}
+    </div>
+  );
+}
+
+// ─── Moje ciele — habits pillar ───────────────────────────────────────────────
+// Full "Pracuj na sebe" functionality inline: real Supabase habits with
+// tap-to-toggle, add-habit and the all-habits link. Same check-in path as
+// NavykyTracker (points awarded only on the un-done → done transition).
+function CardGoals() {
+  const navigate = useNavigate();
+  const { habits, toggleHabitCompletion } = useSupabaseHabits();
+  const { addEntry } = usePointsLedger();
+  const { addActivity } = useAchievements();
+  const today = new Date().toISOString().split('T')[0];
+  const shown = habits.slice(0, 4);
+  const doneCount = habits.filter((h) => (h.completions?.[today] ?? 0) > 0).length;
+
+  const handleToggle = async (habitId: string) => {
+    const habit = habits.find((h) => h.id === habitId);
+    if (!habit) return;
+    const wasUndone = (habit.completions?.[today] ?? 0) === 0;
+    const ok = await toggleHabitCompletion(habitId);
+    if (ok && wasUndone) {
+      addEntry('habit_checkin', 3, `habit_${habitId}_${today}`, 'habit');
+      addActivity('habit_checkin');
+    }
+  };
+
+  return (
+    <div style={{ padding: '0 18px', marginBottom: 10 }}>
+      <div style={{ background: WHITE, borderRadius: 18, border: `1px solid ${HAIR}`, overflow: 'hidden' }}>
+        <div style={{ padding: '13px 16px 0' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span aria-hidden style={{ width: 6, height: 6, borderRadius: 999, background: GOLD, flexShrink: 0 }} />
+              <span style={{ fontSize: 9.5, letterSpacing: '0.16em', textTransform: 'uppercase' as const, color: GOLD, fontWeight: 500 }}>Moje ciele</span>
+            </div>
+            {habits.length > 0 && (
+              <div style={{ fontSize: 10.5, color: FG3, fontWeight: 500 }}>{doneCount}/{habits.length} dnes</div>
+            )}
           </div>
-          <div
-            style={{
-              fontFamily: SERIF,
-              fontSize: 15.5,
-              color: INK,
-              marginTop: 8,
-              lineHeight: 1.22,
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical' as const,
-              overflow: 'hidden',
-            }}
-          >
-            {p.title}
-          </div>
-          <div style={{ marginTop: 'auto', paddingTop: 6, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 6 }}>
-            <div style={{ fontSize: 10.5, color: FG2, fontWeight: 300, whiteSpace: 'nowrap' as const, overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{p.sub ?? ''}</div>
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={FG3} strokeWidth="2" strokeLinecap="round" style={{ flexShrink: 0 }}><path d="M9 6l6 6-6 6"/></svg>
+          <div style={{ fontFamily: SERIF, fontSize: 16.5, color: INK, lineHeight: 1.25, marginTop: 7 }}>Malé kroky, veľký rozdiel</div>
+        </div>
+        <div style={{ padding: '2px 16px 10px' }}>
+          {shown.length === 0 && (
+            <div style={{ fontSize: 12, color: FG2, fontWeight: 300, lineHeight: 1.5, padding: '8px 0 4px' }}>
+              Vytvor si prvý návyk — malý krok, ktorý sa počíta každý deň.
+            </div>
+          )}
+          {shown.map((h) => {
+            const done = (h.completions?.[today] ?? 0) > 0;
+            return (
+              <div key={h.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '9px 0', borderBottom: `1px solid ${HAIR}` }}>
+                <button onClick={() => handleToggle(h.id)} style={{ all: 'unset', cursor: 'pointer', width: 18, height: 18, borderRadius: 9, flexShrink: 0, border: `1.5px solid ${done ? TELO : HAIR2}`, background: done ? TELO : 'transparent', display: 'grid', placeItems: 'center' }}>
+                  {done && <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12l5 5 9-11"/></svg>}
+                </button>
+                <div style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 400, color: done ? FG3 : INK, textDecoration: done ? 'line-through' : 'none', whiteSpace: 'nowrap' as const, overflow: 'hidden', textOverflow: 'ellipsis' }}>{h.name}</div>
+              </div>
+            );
+          })}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0 4px' }}>
+            <button onClick={() => navigate('/navyky/new')} style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'transparent', border: 0, cursor: 'pointer', padding: 0 }}>
+              <div style={{ width: 18, height: 18, borderRadius: 9, flexShrink: 0, border: `1.5px dashed ${HAIR2}`, display: 'grid', placeItems: 'center' }}>
+                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke={FG3} strokeWidth="2.5" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
+              </div>
+              <div style={{ fontSize: 12.5, color: FG2, fontWeight: 400, fontStyle: 'italic', fontFamily: SERIF }}>Pridať návyk</div>
+            </button>
+            <button onClick={() => navigate('/navyky')} style={{ background: 'transparent', border: 0, padding: 0, cursor: 'pointer', fontSize: 11, color: FG3, display: 'flex', alignItems: 'center', gap: 4 }}>
+              Všetky
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={FG3} strokeWidth="2" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
+            </button>
           </div>
         </div>
-      ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── Denník — reflection pillar ───────────────────────────────────────────────
+function CardDiary({ free, prompt, onOpen }: { free: boolean; prompt: string; onOpen: () => void }) {
+  return (
+    <div style={{ padding: '0 18px', marginBottom: 12 }}>
+      <div style={{ background: WHITE, borderRadius: 18, border: `1px solid ${HAIR}`, overflow: 'hidden', cursor: 'pointer' }} onClick={onOpen}>
+        <div style={{ padding: '13px 16px 0' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span aria-hidden style={{ width: 6, height: 6, borderRadius: 999, background: GOLD, flexShrink: 0 }} />
+              <span style={{ fontSize: 9.5, letterSpacing: '0.16em', textTransform: 'uppercase' as const, color: GOLD, fontWeight: 500 }}>Denník</span>
+            </div>
+            {free && (
+              <div style={{ fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase' as const, color: GOLD, fontWeight: 500, fontStyle: 'italic', flexShrink: 0 }}>neukladá sa</div>
+            )}
+          </div>
+          <div style={{ fontFamily: SERIF, fontSize: 16.5, color: INK, lineHeight: 1.25, marginTop: 7 }}>{prompt}</div>
+        </div>
+        <div style={{ padding: '12px 16px 16px' }}>
+          <div style={{ padding: '12px 14px', borderRadius: 12, background: 'rgba(61,41,33,0.04)', border: `1px dashed ${HAIR2}`, fontFamily: SERIF, fontSize: 13, color: FG3, lineHeight: 1.5 }}>
+            Napíš jednu vetu…
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -748,13 +859,14 @@ export default function DomovNew() {
     ? recipes[Math.floor(Date.now() / 86_400_000) % recipes.length]
     : null;
 
-  // Subscriber's first prescribed meal today (if a plan exists).
+  // Subscriber's first prescribed meal today (if a plan exists) — its
+  // recipe photo doubles as the Strava card image.
   const firstMeal = (() => {
     const m = todayPlan?.meals?.[0];
     if (!m) return null;
     const r = recipes.find((x) => x.id === m.options[m.selected]);
     if (!r) return null;
-    return { name: r.name, kcal: Math.round((r.kcal ?? 0) * m.portionMultiplier) };
+    return { recipe: r, name: r.name, kcal: Math.round((r.kcal ?? 0) * m.portionMultiplier) };
   })();
 
   const diaryPrompts = [
@@ -771,6 +883,7 @@ export default function DomovNew() {
           key: 'periodka',
           label: 'Periodka',
           color: CYKLUS,
+          img: '/images/r9/section-period.jpg',
           title: `${cycle.dayOfCycle}. deň z ${cycle.totalDays}`,
           sub: `${cycle.phaseName.toLowerCase()} fáza`,
           href: '/kniznica/periodka?from=home',
@@ -779,6 +892,7 @@ export default function DomovNew() {
           key: 'periodka',
           label: 'Periodka',
           color: CYKLUS,
+          img: '/images/r9/section-period.jpg',
           title: 'Zapni si cyklus',
           sub: 'fázy a predpovede',
           href: '/kniznica/periodka',
@@ -788,6 +902,7 @@ export default function DomovNew() {
           key: 'telo',
           label: 'Telo',
           color: TELO,
+          img: '/images/r9/section-body.jpg',
           title: userProgram.todaysExercise?.title ?? 'Tréning dňa',
           sub: [`týž. ${userProgram.week} · deň ${userProgram.day}`, userProgram.todaysExercise?.duration].filter(Boolean).join(' · '),
           href: `/program/${userProgram.id}`,
@@ -796,6 +911,7 @@ export default function DomovNew() {
           key: 'telo',
           label: 'Telo',
           color: TELO,
+          img: '/images/r9/section-body.jpg',
           title: isPlus ? 'Vyber si program' : 'Ranná energia',
           sub: isPlus ? 'začni trénovať s Gabi' : '12 min · voľný cvik',
           href: isPlus ? '/kniznica/telo/programy' : '/kniznica/telo',
@@ -805,6 +921,7 @@ export default function DomovNew() {
           key: 'strava',
           label: 'Strava',
           color: STRAVA,
+          img: recipeImage(firstMeal.recipe),
           title: firstMeal.name,
           sub: `${firstMeal.kcal} kcal · dnešné menu`,
           href: '/jedalnicek',
@@ -814,6 +931,7 @@ export default function DomovNew() {
           key: 'strava',
           label: 'Strava',
           color: STRAVA,
+          img: '/images/r9/section-nutrition.jpg',
           title: 'Dokonči svoj jedálniček',
           sub: 'dotazník · 2 min',
           href: '/jedalnicek/onboarding',
@@ -822,6 +940,7 @@ export default function DomovNew() {
           key: 'strava',
           label: 'Strava',
           color: STRAVA,
+          img: dailyRecipe ? recipeImage(dailyRecipe) : '/images/r9/section-nutrition.jpg',
           title: dailyRecipe?.name ?? 'Recept dňa',
           sub: dailyRecipe
             ? [
@@ -835,25 +954,10 @@ export default function DomovNew() {
       key: 'mysel',
       label: 'Myseľ',
       color: MYSEL,
+      img: '/images/r9/testimonial-meditation.jpg',
       title: meditationTitle,
       sub: [meditation?.duration, meditation?.category].filter(Boolean).join(' · ').toLowerCase() || 'krátka meditácia',
       href: '/meditacie',
-    },
-    {
-      key: 'ciele',
-      label: 'Moje ciele',
-      color: GOLD,
-      title: 'Malé kroky, veľký rozdiel',
-      sub: 'tvoje návyky na dnes',
-      href: '/navyky',
-    },
-    {
-      key: 'dennik',
-      label: 'Denník',
-      color: GOLD,
-      title: diaryPrompt,
-      sub: 'napíš jednu vetu',
-      onTap: () => setShowDiary(true),
     },
   ];
 
@@ -886,9 +990,11 @@ export default function DomovNew() {
 
       {selectedDay && <DayPlanSheet date={selectedDay} onClose={() => setSelectedDay(null)} />}
 
-      {/* Dnes pre teba — six equal pillars */}
+      {/* Dnes pre teba — six equal pillars, stacked */}
       <SectionEyebrow color={GOLD}>Dnes pre teba</SectionEyebrow>
-      <PillarGrid items={pillars} />
+      <PillarStack items={pillars} />
+      <CardGoals />
+      <CardDiary free={!isPlus} prompt={diaryPrompt} onOpen={() => setShowDiary(true)} />
 
       {promoBanner === 'program' && (
         <UpsellBanner
