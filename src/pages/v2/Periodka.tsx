@@ -919,9 +919,15 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
       </div>
   );
 
-  const symptomsBlock = (
-      <div style={{ padding: '28px 18px 0' }}>
-        <Eye style={{ marginBottom: 14 }}>Ako sa dnes cítiš</Eye>
+  // Symptoms + advice as ONE visually connected card: the question
+  // ("zaznač si, ako sa cítiš") flows into the answer ("čo by ti mohlo
+  // pomôcť") through an arrow divider.
+  const wellbeingBlock = (
+      <div style={{ padding: '24px 18px 0' }}>
+        <div style={{ background: '#fff', border: `1px solid ${NM.HAIR}`, borderRadius: 22, padding: '20px 16px 10px' }}>
+        <Ser size={21} style={{ lineHeight: 1.18, marginBottom: 14 }}>
+          Zaznač si, ako sa <em style={{ color: NM.GOLD, fontStyle: 'italic', fontWeight: 400 }}>dnes cítiš</em>
+        </Ser>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
           {symptoms.map((s) => (
             <div
@@ -1070,17 +1076,19 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
         <div style={{ fontFamily: NM.SANS, fontSize: 10.5, color: NM.TERTIARY, fontWeight: 400, marginTop: 12, lineHeight: 1.45 }}>
           Označenia sa ukladajú automaticky — deň so záznamom dostane v kalendári bodku.
         </div>
-      </div>
-  );
 
-  const adviceBlock = (
-      <div style={{ padding: '32px 22px 0' }}>
-        <Eye color={NM.GOLD}>Pre {currentPhaseName.toLowerCase()} fázu · deň {dayInPhase}</Eye>
-        <Ser size={28} style={{ marginTop: 12, lineHeight: 1.1 }}>
-          Ako sa dnes môžeš cítiť<br />
-          <em style={{ color: NM.GOLD, fontWeight: 400, fontStyle: 'italic' }}>ešte lepšie</em>
+        {/* Connector: question above → answer below */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '20px 0 18px' }}>
+          <div style={{ flex: 1, height: 1, background: NM.HAIR_2 }} />
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={NM.GOLD} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12l7 7 7-7" /></svg>
+          <div style={{ flex: 1, height: 1, background: NM.HAIR_2 }} />
+        </div>
+
+        <Eye size={10} color={NM.GOLD}>Pre {currentPhaseName.toLowerCase()} fázu · deň {dayInPhase}</Eye>
+        <Ser size={21} style={{ marginTop: 8, lineHeight: 1.18 }}>
+          Čo by ti mohlo <em style={{ color: NM.GOLD, fontWeight: 400, fontStyle: 'italic' }}>pomôcť?</em>
         </Ser>
-        <div style={{ marginTop: 18, display: 'flex', flexDirection: 'column' }}>
+        <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column' }}>
           {advice.map((r, i) => (
             <button
               key={r.pillar}
@@ -1104,6 +1112,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={NM.TERTIARY} strokeWidth="1.7" strokeLinecap="round" style={{ flexShrink: 0, marginTop: 6 }}><path d="M9 6l6 6-6 6"/></svg>
             </button>
           ))}
+        </div>
         </div>
       </div>
   );
@@ -1145,8 +1154,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
       {fromHome ? (
         <>
           {periodCtaBlock}
-          {symptomsBlock}
-          {adviceBlock}
+          {wellbeingBlock}
           {upcomingBlock}
           {statsBlock}
           {calendarBlock}
@@ -1156,8 +1164,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
           {statsBlock}
           {periodCtaBlock}
           {calendarBlock}
-          {symptomsBlock}
-          {adviceBlock}
+          {wellbeingBlock}
           {upcomingBlock}
         </>
       )}
