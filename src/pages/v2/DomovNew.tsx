@@ -13,7 +13,6 @@ import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { useReferral } from '@/hooks/useReferral';
 import { usePointsLedger } from '@/hooks/usePointsLedger';
 import SectionEyebrow from '@/components/v2/home/SectionEyebrow';
-import UpsellBanner from '@/components/v2/home/UpsellBanner';
 import { DayPlanSheet } from '@/components/v2/home/DayPlanSheet';
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
@@ -50,29 +49,6 @@ function getTimeGreeting(): string {
 function getDaysSince(iso: string | null | undefined): number {
   if (!iso) return 1;
   return Math.max(1, Math.floor((Date.now() - new Date(iso).getTime()) / 86_400_000));
-}
-
-// ─── Periodic promo gate ─────────────────────────────────────────────────────
-// Upsell banners appear only on every PROMO_INTERVAL-th visit, so the home
-// page isn't selling something on every open. A "visit" is one app session
-// (sessionStorage guard) — moving around the app and coming back to the home
-// page within the same session doesn't advance the counter.
-const PROMO_INTERVAL = 4;
-
-function countHomeVisit(): number {
-  try {
-    const KEY = 'neome_home_visits';
-    const SESSION_KEY = 'neome_home_visit_counted';
-    let n = parseInt(localStorage.getItem(KEY) ?? '0', 10) || 0;
-    if (!sessionStorage.getItem(SESSION_KEY)) {
-      n += 1;
-      localStorage.setItem(KEY, String(n));
-      sessionStorage.setItem(SESSION_KEY, '1');
-    }
-    return n;
-  } catch {
-    return 0;
-  }
 }
 
 // ─── Greeting ─────────────────────────────────────────────────────────────────
@@ -850,7 +826,6 @@ function AddHabitSheet({ onClose }: { onClose: () => void }) {
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function DomovNew() {
-  const navigate = useNavigate();
   const [showDiary,     setShowDiary]     = useState(false);
   const [showPointsInfo, setShowPointsInfo] = useState(false);
   const [selectedDay,   setSelectedDay]   = useState<Date | null>(null);
@@ -906,8 +881,10 @@ export default function DomovNew() {
           label: 'Periodka',
           color: CYKLUS,
           img: '/images/r9/section-period.jpg',
-          title: `${cycle.dayOfCycle}. deň · ${cycle.phaseName.toLowerCase()} fáza`,
-          sub: cycle.note,
+          // The headline leads — "Spomaľ a uzemni sa" tells her what the day
+          // means; the day/phase number is context, not the message.
+          title: cycle.note,
+          sub: `${cycle.dayOfCycle}. deň · ${cycle.phaseName.toLowerCase()} fáza`,
           href: '/kniznica/periodka?from=home',
         }
       : {
@@ -984,19 +961,8 @@ export default function DomovNew() {
     },
   ];
 
-  // ── Periodic upsell banner ─────────────────────────────────────────────
-  // On every 4th visit show ONE banner. Program banner is paused for now
-  // (Gabi 2026-07-24) — only the jedálniček add-on rotates in.
-  const [visitCount] = useState(countHomeVisit);
-  const promoCandidates: Array<'program' | 'jedalnicek'> = [];
-  if (!hasMealPlanAddon) promoCandidates.push('jedalnicek');
-  const promoBanner =
-    visitCount > 0 && visitCount % PROMO_INTERVAL === 0 && promoCandidates.length > 0
-      ? promoCandidates[Math.floor(visitCount / PROMO_INTERVAL) % promoCandidates.length]
-      : null;
-
   return (
-    <div style={{ minHeight: '100vh', background: CREAM, paddingBottom: 90, fontFamily: SANS }}>
+    <div style={{ minHeight: '100vh', background: CREAM, paddingBottom: 'calc(118px + env(safe-area-inset-bottom, 0px))', fontFamily: SANS }}>
       <Greeting
         name={user.name}
         points={points}
@@ -1025,18 +991,6 @@ export default function DomovNew() {
       <PillarStack items={pillars} />
       <CardGoals />
       <CardDiary free={!isPlus} prompt={diaryPrompt} onOpen={() => setShowDiary(true)} />
-
-      {promoBanner === 'jedalnicek' && (
-        <UpsellBanner
-          color={STRAVA}
-          eyebrow="Doplnok · Jedálniček"
-          title="Naplánuj celý týždeň"
-          sub="Jedlá na mieru + nákupný zoznam."
-          cta="Pridať"
-          price="57 €"
-          onClick={() => navigate('/jedalnicek-promo')}
-        />
-      )}
 
       {/* Komunita divider — plain, no bullet (visual separator between personal and community sections) */}
       <div style={{ padding: '0 22px', margin: '32px 0 0', fontSize: 10.5, letterSpacing: '0.24em', textTransform: 'uppercase' as const, fontWeight: 500, color: FG3, fontFamily: SANS }}>Komunita</div>
