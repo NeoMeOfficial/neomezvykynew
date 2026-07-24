@@ -6,7 +6,7 @@ import { useCycleSymptoms } from '../../hooks/useDailyRituals';
 import { Page, Eye, Ser, Body, PlusTag, ConfirmSheet, NM } from '../../components/v2/neome';
 import { getCycleTipByDay } from '../../data/cycleTips';
 import type { DerivedState, CycleData } from '../../features/cycle/types';
-import { PHASE_HEADLINES } from '../../features/cycle/constants';
+import { PHASE_HEADLINES, PHASE_NAMES } from '../../features/cycle/constants';
 import { useConsentGuard } from '../../contexts/ConsentGuardContext';
 import { useSubscription } from '../../contexts/SubscriptionContext';
 import { CONSENT_TYPES } from '../../lib/consents';
@@ -931,6 +931,33 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
       ];
   const hiddenSymptomCount = symptoms.length - visibleSymptoms.length;
 
+  // Two at-a-glance squares under the hero (from-home flow): where am I
+  // today + when is the next period. Same card language as the stats row.
+  const todayStatsBlock = (
+      <div style={{ padding: '18px 18px 0', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+        <div style={{ padding: '14px 12px', background: '#fff', border: `1px solid ${NM.HAIR}`, borderRadius: 18, textAlign: 'center' }}>
+          <Eye size={9} color={NM.TERTIARY}>Dnes</Eye>
+          <div style={{ marginTop: 8, fontFamily: NM.SERIF, fontSize: 21, fontWeight: 400, color: NM.DEEP, letterSpacing: '-0.01em', lineHeight: 1.1 }}>
+            {currentDay}. deň cyklu
+          </div>
+          <div style={{ marginTop: 4, fontFamily: NM.SANS, fontSize: 11, color: NM.MUTED, fontWeight: 400 }}>
+            {isLate ? 'cyklus predĺžený' : ((PHASE_NAMES as Record<string, string>)[currentPhaseKey] ?? currentPhaseName).toLowerCase()}
+          </div>
+        </div>
+        <div style={{ padding: '14px 12px', background: '#fff', border: `1px solid ${NM.HAIR}`, borderRadius: 18, textAlign: 'center' }}>
+          <Eye size={9} color={NM.TERTIARY}>Ďalšia perióda</Eye>
+          <div style={{ marginTop: 8, fontFamily: NM.SERIF, fontSize: 21, fontWeight: 400, color: PHASE.MENSTR, letterSpacing: '-0.01em', lineHeight: 1.1 }}>
+            {isLate ? 'mešká' : nextPeriodLabel.replace(/\.$/, '')}
+          </div>
+          <div style={{ marginTop: 4, fontFamily: NM.SANS, fontSize: 11, color: NM.MUTED, fontWeight: 400 }}>
+            {isLate
+              ? `${daysLate} ${daysLate === 1 ? 'deň' : daysLate < 5 ? 'dni' : 'dní'}`
+              : inDaysLabel(daysToMenstruation).toLowerCase()}
+          </div>
+        </div>
+      </div>
+  );
+
   // Symptoms + advice as ONE visually connected card: the question
   // ("zaznač si, ako sa cítiš") flows into the answer ("čo by ti mohlo
   // pomôcť") through an arrow divider.
@@ -1183,9 +1210,10 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     <>
       {headerBlock}
       {fromHome ? (
-        // From-home flow: hero headline → straight into "zaznač si, ako sa
-        // dnes cítiš"; the cycle ring moves down next to "Čaká ťa".
+        // From-home flow: hero headline → today/next-period squares →
+        // "zaznač si, ako sa dnes cítiš"; the ring moves down to "Čaká ťa".
         <>
+          {todayStatsBlock}
           {wellbeingBlock}
           {periodCtaBlock}
           {ringBlock}
