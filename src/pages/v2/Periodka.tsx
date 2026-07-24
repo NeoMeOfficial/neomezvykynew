@@ -919,6 +919,18 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
       </div>
   );
 
+  // Collapsed chips: first 6 in stable order, plus any selected ones from
+  // the tail so an active selection is never hidden. "+X ďalších" expands.
+  const SYMPTOMS_COLLAPSED_LIMIT = 6;
+  const [symptomsExpanded, setSymptomsExpanded] = useState(false);
+  const visibleSymptoms = symptomsExpanded
+    ? symptoms
+    : [
+        ...symptoms.slice(0, SYMPTOMS_COLLAPSED_LIMIT),
+        ...symptoms.slice(SYMPTOMS_COLLAPSED_LIMIT).filter((s) => s.on),
+      ];
+  const hiddenSymptomCount = symptoms.length - visibleSymptoms.length;
+
   // Symptoms + advice as ONE visually connected card: the question
   // ("zaznač si, ako sa cítiš") flows into the answer ("čo by ti mohlo
   // pomôcť") through an arrow divider.
@@ -929,7 +941,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
           Zaznač si, ako sa <em style={{ color: NM.GOLD, fontStyle: 'italic', fontWeight: 400 }}>dnes cítiš</em>
         </Ser>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
-          {symptoms.map((s) => (
+          {visibleSymptoms.map((s) => (
             <div
               key={s.k}
               style={{
@@ -989,7 +1001,17 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
             </div>
           ))}
 
-          {addingSymptom ? (
+          {!symptomsExpanded && hiddenSymptomCount > 0 && (
+            <button
+              type="button"
+              onClick={() => setSymptomsExpanded(true)}
+              style={{ all: 'unset', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4, padding: '8px 14px', borderRadius: 999, background: 'transparent', color: NM.GOLD, border: `1px dashed ${NM.GOLD}66`, fontFamily: NM.SANS, fontSize: 12.5, fontWeight: 500 }}
+            >
+              +{hiddenSymptomCount} {hiddenSymptomCount < 5 ? 'ďalšie' : 'ďalších'}
+            </button>
+          )}
+
+          {symptomsExpanded && (addingSymptom ? (
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -1070,6 +1092,16 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
                 <path d="M12 5v14M5 12h14" />
               </svg>
               Pridať vlastný
+            </button>
+          ))}
+
+          {symptomsExpanded && (
+            <button
+              type="button"
+              onClick={() => setSymptomsExpanded(false)}
+              style={{ all: 'unset', cursor: 'pointer', padding: '8px 12px', borderRadius: 999, color: NM.MUTED, fontFamily: NM.SANS, fontSize: 12, fontWeight: 500 }}
+            >
+              Menej
             </button>
           )}
         </div>
