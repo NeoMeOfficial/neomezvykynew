@@ -248,11 +248,13 @@ export interface PillarItem {
   href: string;
 }
 
+// Quiet text link, not a pill — the card's content is the point; the CTA
+// is just there for whoever wants more.
 function CtaPill({ label }: { label: string }) {
   return (
-    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: INK, color: '#fff', padding: '8px 15px', borderRadius: 999, fontSize: 11.5, fontWeight: 500 }}>
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: FG2, fontSize: 11, fontWeight: 500, letterSpacing: '0.02em' }}>
       {label}
-      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={FG3} strokeWidth="2" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
     </span>
   );
 }
