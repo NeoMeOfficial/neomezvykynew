@@ -308,37 +308,20 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     && currentDay > periodLength
     && currentDay <= periodLength + 3;
 
-  // When the period is late the cycle-day counter keeps incrementing
-  // past totalDays (29, 30, 31…) on purpose — so we know how late
-  // we are. But "deň 31 z 28" reads as a bug to users, so swap the
-  // eyebrow to a late-period label instead of the of-N pattern.
   const isLate = currentDay > totalDays;
   const daysLate = isLate ? currentDay - totalDays : 0;
-  const dayLabel = isLate
-    ? `menštruácia mešká · ${daysLate} ${daysLate === 1 ? 'deň' : daysLate < 5 ? 'dni' : 'dní'}`
-    : `deň ${currentDay} z ${totalDays}`;
 
   // Headline copy adapts to phase. Text comes from the shared
   // PHASE_HEADLINES so the home Periodka card reads identically; only
-  // the eyebrow and the late-period override are tracker-specific.
-  const EYE_SUFFIX: Record<string, string> = {
-    menstrual: ' · menštruácia',
-    follicular: ' · folikulárna',
-    ovulation: ' · ovulácia',
-    luteal: ' · luteálna',
-  };
+  // the late-period override is tracker-specific.
   const baseHeadline = PHASE_HEADLINES[currentPhaseKey as keyof typeof PHASE_HEADLINES] ?? PHASE_HEADLINES.follicular;
   const head = isLate
     ? {
-        eye: `${monthLabel} · ${dayLabel}`,
         before: 'Cyklus je',
         em: 'predĺžený.',
         body: 'Ak ti menštruácia ešte nezačala, môže to byť normálne. Keď príde, označ jej začiatok v nastaveniach a cyklus sa zarovná.',
       }
-    : {
-        eye: `${monthLabel} · ${dayLabel}${EYE_SUFFIX[currentPhaseKey] ?? ''}`,
-        ...baseHeadline,
-      };
+    : baseHeadline;
 
   // Build calendar grid for the current month, Mon-first
   type Cell = { d: number; mute?: boolean };
@@ -626,8 +609,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
       </div>
 
       <div style={{ padding: '4px 22px 0' }}>
-        <Eye color={NM.GOLD}>{head.eye}</Eye>
-        <Ser size={40} style={{ marginTop: 12, lineHeight: 1.05 }}>
+        <Ser size={40} style={{ lineHeight: 1.05 }}>
           {head.before}
           <br />
           <em style={{ color: NM.GOLD, fontStyle: 'italic', fontWeight: 400 }}>{head.em}</em>
@@ -1143,9 +1125,8 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
           <div style={{ flex: 1, height: 1, background: NM.HAIR_2 }} />
         </div>
 
-        <Eye size={10} color={NM.GOLD}>Pre {currentPhaseName.toLowerCase()} fázu · deň {dayInPhase}</Eye>
-        <Ser size={21} style={{ marginTop: 8, lineHeight: 1.18 }}>
-          Čo by ti mohlo <em style={{ color: NM.GOLD, fontWeight: 400, fontStyle: 'italic' }}>pomôcť?</em>
+        <Ser size={21} style={{ lineHeight: 1.18 }}>
+          Čo by ti mohlo dnes <em style={{ color: NM.GOLD, fontWeight: 400, fontStyle: 'italic' }}>pomôcť?</em>
         </Ser>
         <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column' }}>
           {advice.map((r, i) => (
