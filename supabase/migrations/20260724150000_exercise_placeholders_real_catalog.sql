@@ -15,6 +15,7 @@
 --           core s gumou (diastáza) ×1, celé telo s jednoručkami ×1,
 --           celé telo s gumou ×2, celé telo bez pomôcok ×2
 --   5 min:  core ×3, celé telo ×3, nohy/zadok ×2 (všetko bez pomôcok)
+--           + diastáza-safe: core ×2, nohy/zadok ×2 (bez pomôcok)
 --
 -- Apply via Supabase Dashboard → SQL Editor. Safe to re-run
 -- (ON CONFLICT DO NOTHING; archive UPDATE is idempotent).
@@ -59,7 +60,13 @@ VALUES
 
   -- ── 5 min dopaľovačky · Nohy & zadok ──
   ('cv-legs-bez-5-1', 'exercise', 'Nohy/zadok 5min dopaľovačka #1', '5 min', 'dopalovacka', 'Nohy/Zadok', 'Bez pomôcok', NULL, FALSE, '/images/r9/lifestyle-yoga-pose.jpg', 'Krátka dopaľovačka na nohy a zadok.', NULL, 'published', TRUE, '2026-07-24 12:00:17+00'),
-  ('cv-legs-bez-5-2', 'exercise', 'Nohy/zadok 5min dopaľovačka #2', '5 min', 'dopalovacka', 'Nohy/Zadok', 'Bez pomôcok', NULL, FALSE, '/images/r9/lifestyle-yoga-pose.jpg', 'Krátka dopaľovačka na nohy a zadok.', NULL, 'published', TRUE, '2026-07-24 12:00:18+00')
+  ('cv-legs-bez-5-2', 'exercise', 'Nohy/zadok 5min dopaľovačka #2', '5 min', 'dopalovacka', 'Nohy/Zadok', 'Bez pomôcok', NULL, FALSE, '/images/r9/lifestyle-yoga-pose.jpg', 'Krátka dopaľovačka na nohy a zadok.', NULL, 'published', TRUE, '2026-07-24 12:00:18+00'),
+
+  -- ── 5 min dopaľovačky · diastáza-safe (doplnené Gabi 2026-07-24) ──
+  ('cv-core-bez-5-4', 'exercise', 'Core 5min dopaľovačka #4 (diastáza)',       '5 min', 'dopalovacka', 'Core/Abs',   'Bez pomôcok', NULL, TRUE, '/images/r9/lifestyle-core-workout.jpg', 'Krátka dopaľovačka na stred tela. Bezpečné aj pri diastáze.', NULL, 'published', TRUE, '2026-07-24 12:00:19+00'),
+  ('cv-core-bez-5-5', 'exercise', 'Core 5min dopaľovačka #5 (diastáza)',       '5 min', 'dopalovacka', 'Core/Abs',   'Bez pomôcok', NULL, TRUE, '/images/r9/lifestyle-core-workout.jpg', 'Krátka dopaľovačka na stred tela. Bezpečné aj pri diastáze.', NULL, 'published', TRUE, '2026-07-24 12:00:20+00'),
+  ('cv-legs-bez-5-3', 'exercise', 'Nohy/zadok 5min dopaľovačka #3 (diastáza)', '5 min', 'dopalovacka', 'Nohy/Zadok', 'Bez pomôcok', NULL, TRUE, '/images/r9/lifestyle-yoga-pose.jpg', 'Krátka dopaľovačka na nohy a zadok. Bezpečné aj pri diastáze.', NULL, 'published', TRUE, '2026-07-24 12:00:21+00'),
+  ('cv-legs-bez-5-4', 'exercise', 'Nohy/zadok 5min dopaľovačka #4 (diastáza)', '5 min', 'dopalovacka', 'Nohy/Zadok', 'Bez pomôcok', NULL, TRUE, '/images/r9/lifestyle-yoga-pose.jpg', 'Krátka dopaľovačka na nohy a zadok. Bezpečné aj pri diastáze.', NULL, 'published', TRUE, '2026-07-24 12:00:22+00')
 ON CONFLICT (id) DO NOTHING;
 
 COMMIT;
