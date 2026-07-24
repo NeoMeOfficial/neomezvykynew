@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Play, ChevronRight } from 'lucide-react';
 import FavoriteButton from '../../components/v2/favorites/FavoriteButton';
 import { TopBar } from '@/components/v2/top-bar';
@@ -24,6 +24,8 @@ const CATEGORIES: { label: string; filter: string | null }[] = [
 
 export default function Meditacie() {
   const navigate = useNavigate();
+  // Entered from a home pillar card → back returns home, not to Myseľ.
+  const fromHome = new URLSearchParams(useLocation().search).get('from') === 'home';
   const { meditations, loading } = useMeditations();
   const [activeCat, setActiveCat] = useState<string | null>(null);
 
@@ -35,7 +37,7 @@ export default function Meditacie() {
 
   return (
     <div className="min-h-screen bg-cream pb-12">
-      <TopBar title="Meditácie" backHref="/kniznica/mysel" />
+      <TopBar title="Meditácie" backHref={fromHome ? '/domov-new' : '/kniznica/mysel'} />
 
       {/* Featured */}
       {featured && (

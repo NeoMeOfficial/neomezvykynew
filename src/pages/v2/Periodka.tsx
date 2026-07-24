@@ -597,7 +597,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     <>
       {/* Round 18 top bar — back chevron + centered Gilda title + calendar shortcut */}
       <div style={{ padding: 'calc(env(safe-area-inset-top) + 14px) 20px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <button onClick={() => navigate('/domov-new')} aria-label="Späť" style={{ all: 'unset', width: 36, height: 36, borderRadius: 999, background: '#fff', border: `1px solid ${NM.HAIR_2}`, display: 'grid', placeItems: 'center', cursor: 'pointer' }}>
+        <button onClick={() => navigate(fromHome ? '/domov-new' : '/kniznica')} aria-label="Späť" style={{ all: 'unset', width: 36, height: 36, borderRadius: 999, background: '#fff', border: `1px solid ${NM.HAIR_2}`, display: 'grid', placeItems: 'center', cursor: 'pointer' }}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={NM.DEEP} strokeWidth="1.8" strokeLinecap="round"><path d="M15 6l-6 6 6 6"/></svg>
         </button>
         <div style={{ fontFamily: NM.SERIF, fontSize: 20, fontWeight: 400, color: NM.DEEP, letterSpacing: '-0.005em' }}>Cyklus</div>
@@ -1198,6 +1198,8 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
 }
 
 function FreeView({ navigate }: { navigate: (p: string) => void }) {
+  // Back returns to wherever she came from — home card or Kniznica.
+  const fromHome = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('from') === 'home';
   const phases = [
     { pillar: 'Menštruácia', c: PHASE.MENSTR, d: 'Telo sa resetuje. Doprajte si pokoj, teplo a jemný pohyb.' },
     { pillar: 'Folikulárna', c: PHASE.FOLLIC, d: 'Energia rastie. Skvelý čas na nové výzvy a silový tréning.' },
@@ -1206,7 +1208,7 @@ function FreeView({ navigate }: { navigate: (p: string) => void }) {
   ];
   return (
     <>
-      <TopBar title="Cyklus" onBack={() => navigate('/domov-new')} />
+      <TopBar title="Cyklus" onBack={() => navigate(fromHome ? '/domov-new' : '/kniznica')} />
       <div style={{ padding: '2px 20px 6px' }}>
         <Eye color={NM.TERRA}>Začni so sledovaním</Eye>
         <Ser size={30} style={{ marginTop: 10, lineHeight: 1.02 }}>

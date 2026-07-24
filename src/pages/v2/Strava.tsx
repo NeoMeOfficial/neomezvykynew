@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useRecipes, SLOT_LABEL, type SupabaseRecipe } from '@/hooks/useRecipes';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import { useUniversalFavorites } from '@/hooks/useUniversalFavorites';
@@ -21,6 +21,8 @@ function dayOfYear(d = new Date()): number {
 
 export default function Strava() {
   const navigate = useNavigate();
+  // Entered from a home pillar card → back returns home, not to Kniznica.
+  const fromHome = new URLSearchParams(useLocation().search).get('from') === 'home';
   const { hasMealPlanner } = useSubscription();
   const { recipes, loading } = useRecipes();
   const { isFavorite } = useUniversalFavorites();
@@ -41,7 +43,7 @@ export default function Strava() {
 
   return (
     <div className="min-h-screen bg-cream pb-12">
-      <TopBar title="Strava" backHref="/kniznica" />
+      <TopBar title="Strava" backHref={fromHome ? '/domov-new' : '/kniznica'} />
 
       <div className="px-5 pb-6">
         <SerifHeader as="h1" size="h1">

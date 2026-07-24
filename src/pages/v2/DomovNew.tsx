@@ -894,7 +894,7 @@ export default function DomovNew() {
           img: '/images/r9/section-period.jpg',
           title: 'Zapni si cyklus',
           sub: 'Fázy a predpovede pre tvoje telo.',
-          href: '/kniznica/periodka',
+          href: '/kniznica/periodka?from=home',
           cta: 'Zapnúť',
         },
     isPlus && userProgram
@@ -914,7 +914,7 @@ export default function DomovNew() {
           img: '/images/r9/section-body.jpg',
           title: isPlus ? 'Vyber si program' : 'Ranná energia',
           sub: isPlus ? 'začni trénovať s Gabi' : '12 min · voľný cvik',
-          href: isPlus ? '/kniznica/telo/programy' : '/kniznica/telo',
+          href: isPlus ? '/kniznica/telo/programy' : '/kniznica/telo?from=home',
         },
     hasMealPlan && firstMeal
       ? {
@@ -948,7 +948,7 @@ export default function DomovNew() {
                 dailyRecipe.kcal ? `${dailyRecipe.kcal} kcal` : null,
               ].filter(Boolean).join(' · ') || 'recept dňa'
             : 'Gabine recepty',
-          href: '/kniznica/strava',
+          href: '/kniznica/strava?from=home',
         },
     {
       key: 'mysel',
@@ -957,7 +957,7 @@ export default function DomovNew() {
       img: '/images/r9/testimonial-meditation.jpg',
       title: meditationTitle,
       sub: [meditation?.duration, meditation?.category].filter(Boolean).join(' · ').toLowerCase() || 'krátka meditácia',
-      href: '/meditacie',
+      href: '/meditacie?from=home',
     },
   ];
 

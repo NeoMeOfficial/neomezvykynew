@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import { useUniversalFavorites } from '@/hooks/useUniversalFavorites';
 
@@ -58,6 +58,8 @@ const CARDS: Card[] = [
 
 export default function Telo() {
   const navigate = useNavigate();
+  // Entered from a home pillar card → back returns home, not to Kniznica.
+  const fromHome = new URLSearchParams(useLocation().search).get('from') === 'home';
   const { isPremium } = useSubscription();
   const { getFavoriteCounts } = useUniversalFavorites();
   const favWorkouts = getFavoriteCounts().workout;
@@ -69,7 +71,7 @@ export default function Telo() {
       <div style={{ padding: '56px 20px 18px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <button
-            onClick={() => navigate('/kniznica')}
+            onClick={() => navigate(fromHome ? '/domov-new' : '/kniznica')}
             style={{
               width: 36, height: 36, borderRadius: 999,
               background: '#fff', border: `1px solid ${HAIR}`,
