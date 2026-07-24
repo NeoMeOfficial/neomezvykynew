@@ -169,9 +169,16 @@ export default function ExercisePlayer() {
           <span className="font-sans text-[11px] px-2.5 py-1 rounded-full bg-gold/[0.10] text-gold font-medium">
             {exercise.equip}
           </span>
-          <span className={`font-sans text-[11px] px-2.5 py-1 rounded-full font-medium ${INTENSITY_CLASS[exercise.intensity] || 'bg-ink/[0.06] text-ink/60'}`}>
-            {INTENSITY_LABEL[exercise.intensity] || exercise.intensity}
-          </span>
+          {exercise.intensity && (
+            <span className={`font-sans text-[11px] px-2.5 py-1 rounded-full font-medium ${INTENSITY_CLASS[exercise.intensity] || 'bg-ink/[0.06] text-ink/60'}`}>
+              {INTENSITY_LABEL[exercise.intensity] || exercise.intensity}
+            </span>
+          )}
+          {exercise.diastasisSafe && (
+            <span className="font-sans text-[11px] px-2.5 py-1 rounded-full font-medium bg-pillar-strava/[0.12] text-pillar-strava-700">
+              ✓ Bezpečné pri diastáze
+            </span>
+          )}
         </div>
 
         {/* Description */}

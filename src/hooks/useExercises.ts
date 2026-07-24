@@ -29,6 +29,8 @@ export interface DbExercise {
   video_provider: 'vimeo' | 'youtube' | null;
   free: boolean;
   sort_order: number;
+  diastasis_safe: boolean;
+  description: string | null;
 }
 
 interface RawExercise {
@@ -95,6 +97,8 @@ function adapt(row: RawExercise, index: number): DbExercise {
     video_provider: detectProvider(row.video_url),
     free: (row.level ?? 0) <= 1 || row.id.startsWith('ranne-prebudenie') || row.id.startsWith('jemny-core'),
     sort_order: index + 1,
+    diastasis_safe: row.diastasis_safe ?? true,
+    description: row.description,
   };
 }
 
@@ -116,6 +120,8 @@ function fallback(): DbExercise[] {
         : null,
       free: e.free ?? false,
       sort_order: i + 1,
+      diastasis_safe: true,
+      description: null,
     }));
 }
 
@@ -135,6 +141,9 @@ export function useExercises() {
       .select('id, content_type, name, duration, category, body, equip, level, diastasis_safe, thumb, description, video_url, active')
       .eq('content_type', 'exercise')
       .eq('active', true)
+      // Creation order keeps series numbering (č. 1, č. 2 …) stable as new
+      // videos are appended — see exerciseTaxonomy.ts.
+      .order('created_at', { ascending: true })
       .order('id', { ascending: true })
       .then(({ data, error }) => {
         if (error || !data || data.length === 0) {

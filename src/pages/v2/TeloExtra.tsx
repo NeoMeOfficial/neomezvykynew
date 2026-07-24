@@ -4,62 +4,137 @@ import { useSubscription } from '../../contexts/SubscriptionContext';
 import { useExercises, DbExercise } from '../../hooks/useExercises';
 import { Page, BackHeader, Eye, Ser, Body, PlusTag, NM } from '../../components/v2/neome';
 import PlusUnlockBanner from '../../components/v2/paywall/PlusUnlockBanner';
+import {
+  FocusKey, EquipKey, BandKey,
+  FOCUS_ORDER, EQUIP_ORDER, FOCUS_LABEL, EQUIP_LABEL, EQUIP_SHORT,
+  parseFocus, parseEquip, durationBand, seriesTitle,
+} from '../../features/telo/exerciseTaxonomy';
 
 /**
- * Telo · Cvičenia — R9 sectioned list, now Supabase-backed.
+ * Telo · Cvičenia — taxonomy-driven library (Gabi 2026-07-24).
  *
- * Reads from useExercises (public.exercises table). Filters by body
- * target chips + duration band sub-chips, then groups results into
- * three sections by duration (Krátke ≤10, Stredné 11-20, Dlhé 20+).
+ * No per-video names, no difficulty level. Structure:
+ *   band toggle (15 min tréningy / 5 min dopaľovačky)
+ *   → focus chips (Celé telo / Core & brucho / Nohy & zadok)
+ *   → equipment filter + diastáza-safe toggle.
+ * Titles are generated: "Core & brucho č. 3" — numbered per series
+ * (band × focus × equipment) in creation order.
  *
- * Closes FEATURE-NEEDED-TELO-EXERCISES-CATALOG. Add new rows by
- * inserting directly into public.exercises (or via the admin UI
- * when one ships).
+ * Free tier: the first no-equipment 15-min video of each focus (max 3).
  */
 
-const FILTERS = ['Všetko', 'Celé telo', 'Brucho', 'Panvové dno', 'Chrbát', 'Nohy', 'Ruky'] as const;
-const DURATIONS = ['Krátke', 'Stredné', 'Dlhé'] as const;
-
-interface ExSection {
-  eye: string;
-  items: DbExercise[];
+interface EnrichedExercise {
+  e: DbExercise;
+  focus: FocusKey | null;
+  equip: EquipKey;
+  band: BandKey;
+  seq: number | null;
+  title: string;
+  isFree: boolean;
 }
-
-const SECTION_DEFS: { eye: string; key: typeof DURATIONS[number]; min: number; max: number }[] = [
-  { eye: 'Krátke · do 10 min', key: 'Krátke',  min: 0,  max: 10 },
-  { eye: 'Stredné · 10–20 min', key: 'Stredné', min: 11, max: 20 },
-  { eye: 'Dlhé · 20+ min',     key: 'Dlhé',    min: 21, max: 999 },
-];
 
 export default function TeloExtra() {
   const navigate = useNavigate();
   const { isPremium } = useSubscription();
   const { exercises, loading } = useExercises();
-  const [activeFilter, setActiveFilter] = useState<string>('Všetko');
-  const [activeDuration, setActiveDuration] = useState<string | null>(null);
+  const [band, setBand] = useState<BandKey>('15');
+  const [focus, setFocus] = useState<FocusKey | 'all'>('all');
+  const [equip, setEquip] = useState<EquipKey | null>(null);
+  const [diastOnly, setDiastOnly] = useState(false);
 
-  // Skip the legacy 'strength-N' demo rows on this curated catalog
-  // surface — they're kept in the table for ExercisePlayer fallback but
-  // aren't part of the editorial library.
-  const curated = useMemo(
-    () => exercises.filter((e) => !e.id.startsWith('strength-')),
-    [exercises],
+  // Skip the legacy 'strength-N' demo rows — kept in the table for the
+  // ExercisePlayer fallback but not part of the editorial library.
+  const enriched: EnrichedExercise[] = useMemo(() => {
+    const curated = exercises.filter((e) => !e.id.startsWith('strength-'));
+    const counters = new Map<string, number>();
+    return curated.map((e) => {
+      const f = parseFocus(e.body_target);
+      const q = parseEquip(e.equipment);
+      const b = durationBand(e.duration_min);
+      let seq: number | null = null;
+      if (f) {
+        const key = `${b}|${f}|${q}`;
+        seq = (counters.get(key) ?? 0) + 1;
+        counters.set(key, seq);
+      }
+      return {
+        e,
+        focus: f,
+        equip: q,
+        band: b,
+        seq,
+        title: f && seq ? seriesTitle(f, seq) : e.name,
+        // Free = first no-equipment 15-min video of each focus (max 3).
+        isFree: f ? seq === 1 && q === 'none' && b === '15' : e.free,
+      };
+    });
+  }, [exercises]);
+
+  const list = useMemo(
+    () => enriched.filter((p) =>
+      p.band === band
+      && (focus === 'all' || p.focus === focus)
+      && (equip === null || p.equip === equip)
+      && (!diastOnly || p.e.diastasis_safe)
+    ),
+    [enriched, band, focus, equip, diastOnly],
   );
 
-  const sections: ExSection[] = useMemo(() => {
-    return SECTION_DEFS
-      .filter((s) => activeDuration === null || activeDuration === s.key)
-      .map((s) => ({
-        eye: s.eye,
-        items: curated.filter((e) => {
-          const inBand = e.duration_min >= s.min && e.duration_min <= s.max;
-          if (!inBand) return false;
-          if (activeFilter === 'Všetko') return true;
-          return e.body_target === activeFilter;
-        }),
-      }))
-      .filter((s) => s.items.length > 0);
-  }, [curated, activeFilter, activeDuration]);
+  const openExercise = (p: EnrichedExercise) => {
+    const locked = !p.isFree && !isPremium;
+    if (locked) {
+      navigate('/paywall');
+      return;
+    }
+    // Player renders from location.state — pass the generated title and
+    // taxonomy labels so it never falls back to the static demo data.
+    navigate(`/exercise/extra/${p.e.id}`, {
+      state: {
+        exercise: {
+          id: p.e.id,
+          name: p.title,
+          duration: `${p.e.duration_min} min`,
+          category: p.band === '5' ? 'dopalovacka' : '15min',
+          body: p.focus ? FOCUS_LABEL[p.focus] : p.e.body_target,
+          equip: EQUIP_LABEL[p.equip],
+          videoUrl: p.e.video_id,
+          thumb: p.e.thumb_url,
+          description: p.e.description,
+          diastasisSafe: p.e.diastasis_safe,
+        },
+      },
+    });
+  };
+
+  const chip = (active: boolean): React.CSSProperties => ({
+    all: 'unset',
+    cursor: 'pointer',
+    flexShrink: 0,
+    padding: '8px 14px',
+    borderRadius: 999,
+    background: active ? NM.DEEP : '#fff',
+    color: active ? '#fff' : NM.DEEP,
+    border: active ? '1px solid transparent' : `1px solid ${NM.HAIR_2}`,
+    fontFamily: NM.SANS,
+    fontSize: 12,
+    fontWeight: 400,
+    whiteSpace: 'nowrap',
+  });
+
+  const smallChip = (active: boolean): React.CSSProperties => ({
+    all: 'unset',
+    cursor: 'pointer',
+    flexShrink: 0,
+    padding: '6px 11px',
+    borderRadius: 999,
+    background: active ? NM.DEEP : 'transparent',
+    color: active ? '#fff' : NM.MUTED,
+    border: active ? '1px solid transparent' : `1px solid ${NM.HAIR_2}`,
+    fontFamily: NM.SANS,
+    fontSize: 11,
+    fontWeight: 400,
+    whiteSpace: 'nowrap',
+  });
 
   return (
     <Page>
@@ -70,64 +145,55 @@ export default function TeloExtra() {
           Jednotlivé <em style={{ color: NM.TERRA, fontWeight: 500, fontStyle: 'italic' }}>tréningy</em>.
         </Ser>
         <Body style={{ marginTop: 10, maxWidth: 320 }}>
-          Vyber si podľa času a partie tela. 3 cvičenia dostupné zadarmo — ostatné s Plus.
+          Vyber si dĺžku, zameranie a pomôcku. 3 cvičenia sú zadarmo — ostatné s Plus.
         </Body>
       </div>
 
-      <div style={{ display: 'flex', gap: 8, overflowX: 'auto', padding: '22px 18px 2px' }}>
-        {FILTERS.map((f) => {
-          const active = activeFilter === f;
+      {/* Band toggle — 15 min tréningy / 5 min dopaľovačky */}
+      <div style={{ margin: '20px 18px 0', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4, background: '#fff', borderRadius: 999, border: `1px solid ${NM.HAIR}`, padding: 4 }}>
+        {([['15', '15 min tréningy'], ['5', '5 min dopaľovačky']] as [BandKey, string][]).map(([key, label]) => {
+          const active = band === key;
           return (
             <button
-              key={f}
-              onClick={() => setActiveFilter(f)}
+              key={key}
+              onClick={() => setBand(key)}
               style={{
                 all: 'unset',
                 cursor: 'pointer',
-                flexShrink: 0,
-                padding: '8px 14px',
+                textAlign: 'center',
+                padding: '10px 4px',
                 borderRadius: 999,
-                background: active ? NM.DEEP : '#fff',
-                color: active ? '#fff' : NM.DEEP,
-                border: active ? 'none' : `1px solid ${NM.HAIR_2}`,
+                background: active ? NM.DEEP : 'transparent',
+                color: active ? '#fff' : NM.MUTED,
                 fontFamily: NM.SANS,
                 fontSize: 12,
-                fontWeight: 400,
-                whiteSpace: 'nowrap',
+                fontWeight: active ? 500 : 400,
               }}
             >
-              {f}
+              {label}
             </button>
           );
         })}
       </div>
 
-      <div style={{ display: 'flex', gap: 6, overflowX: 'auto', padding: '12px 18px 2px' }}>
-        {DURATIONS.map((d) => {
-          const active = activeDuration === d;
-          return (
-            <button
-              key={d}
-              onClick={() => setActiveDuration(active ? null : d)}
-              style={{
-                all: 'unset',
-                cursor: 'pointer',
-                flexShrink: 0,
-                padding: '6px 10px',
-                borderRadius: 999,
-                background: active ? NM.DEEP : NM.CREAM_2 ?? '#F1ECE3',
-                color: active ? '#fff' : NM.MUTED,
-                fontFamily: NM.SANS,
-                fontSize: 10.5,
-                fontWeight: 400,
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase',
-              }}
-            >
-              {d}
-            </button>
-          );
-        })}
+      {/* Focus chips */}
+      <div style={{ display: 'flex', gap: 8, overflowX: 'auto', padding: '14px 18px 2px' }}>
+        <button onClick={() => setFocus('all')} style={chip(focus === 'all')}>Všetko</button>
+        {FOCUS_ORDER.map((f) => (
+          <button key={f} onClick={() => setFocus(f)} style={chip(focus === f)}>{FOCUS_LABEL[f]}</button>
+        ))}
+      </div>
+
+      {/* Equipment + diastáza filters */}
+      <div style={{ display: 'flex', gap: 6, overflowX: 'auto', padding: '10px 18px 2px', alignItems: 'center' }}>
+        {EQUIP_ORDER.map((q) => (
+          <button key={q} onClick={() => setEquip(equip === q ? null : q)} style={smallChip(equip === q)}>
+            {EQUIP_LABEL[q]}
+          </button>
+        ))}
+        <button onClick={() => setDiastOnly((v) => !v)} style={{ ...smallChip(diastOnly), color: diastOnly ? '#fff' : NM.SAGE, borderColor: diastOnly ? 'transparent' : `${NM.SAGE}66` }}>
+          ✓ Diastáza
+        </button>
       </div>
 
       {loading && (
@@ -136,29 +202,24 @@ export default function TeloExtra() {
         </div>
       )}
 
-      {!loading && sections.length === 0 && (
+      {!loading && list.length === 0 && (
         <div style={{ margin: '26px 18px', color: NM.MUTED, fontFamily: NM.SANS, fontSize: 13 }}>
           Žiadne cvičenia pre tieto filtre.
         </div>
       )}
 
-      {sections.map((sec) => (
-        <div key={sec.eye} style={{ margin: '26px 18px 0' }}>
-          <Eye size={10} color={NM.TERRA} style={{ marginBottom: 10 }}>{sec.eye}</Eye>
+      {!loading && list.length > 0 && (
+        <div style={{ margin: '22px 18px 0' }}>
+          <Eye size={10} color={NM.TERRA} style={{ marginBottom: 10 }}>
+            {band === '15' ? '15 min tréningy' : '5 min dopaľovačky'} · {list.length}
+          </Eye>
           <div style={{ background: '#fff', borderRadius: 18, border: `1px solid ${NM.HAIR}`, overflow: 'hidden' }}>
-            {sec.items.map((it, i, arr) => {
-              const locked = !it.free;
-              const meta = `${it.duration_min} min · ${it.body_target}`;
+            {list.map((p, i, arr) => {
+              const locked = !p.isFree && !isPremium;
               return (
                 <button
-                  key={it.id}
-                  onClick={() => {
-                    if (locked && !isPremium) {
-                      navigate('/paywall');
-                    } else {
-                      navigate(`/exercise/extra/${it.id}`);
-                    }
-                  }}
+                  key={p.e.id}
+                  onClick={() => openExercise(p)}
                   style={{
                     all: 'unset',
                     cursor: 'pointer',
@@ -177,8 +238,8 @@ export default function TeloExtra() {
                       height: 60,
                       borderRadius: 12,
                       flexShrink: 0,
-                      backgroundImage: it.thumb_url ? `url(${it.thumb_url})` : undefined,
-                      backgroundColor: it.thumb_url ? undefined : NM.HAIR,
+                      backgroundImage: p.e.thumb_url ? `url(${p.e.thumb_url})` : undefined,
+                      backgroundColor: p.e.thumb_url ? undefined : NM.HAIR,
                       backgroundSize: 'cover',
                       backgroundPosition: 'center',
                       position: 'relative',
@@ -193,16 +254,25 @@ export default function TeloExtra() {
                     </div>
                   </div>
                   <div style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
-                    <div style={{ fontFamily: NM.SERIF, fontSize: 15, fontWeight: 500, color: NM.DEEP, letterSpacing: '-0.005em' }}>{it.name}</div>
-                    <div style={{ fontFamily: NM.SANS, fontSize: 10.5, color: NM.EYEBROW, marginTop: 3, fontWeight: 400 }}>{meta}</div>
+                    <div style={{ fontFamily: NM.SERIF, fontSize: 15, fontWeight: 500, color: NM.DEEP, letterSpacing: '-0.005em' }}>{p.title}</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginTop: 3 }}>
+                      <span style={{ fontFamily: NM.SANS, fontSize: 10.5, color: NM.EYEBROW, fontWeight: 400 }}>
+                        {p.e.duration_min} min · {EQUIP_SHORT[p.equip]}
+                      </span>
+                      {p.e.diastasis_safe && (
+                        <span style={{ fontFamily: NM.SANS, fontSize: 9, fontWeight: 500, letterSpacing: '0.08em', textTransform: 'uppercase', color: NM.SAGE, background: `${NM.SAGE}1A`, padding: '2px 7px', borderRadius: 999 }}>
+                          ✓ diastáza
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  {locked && !isPremium ? <PlusTag /> : <div style={{ color: NM.TERTIARY, fontSize: 14 }}>›</div>}
+                  {locked ? <PlusTag /> : <div style={{ color: NM.TERTIARY, fontSize: 14 }}>›</div>}
                 </button>
               );
             })}
           </div>
         </div>
-      ))}
+      )}
 
       <PlusUnlockBanner label="Cvičenia označené + odomkneš s NeoMe Plus" />
     </Page>

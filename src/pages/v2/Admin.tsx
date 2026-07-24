@@ -2595,19 +2595,23 @@ function ExercisesTab() {
   const closeForm = () => { setShowForm(false); setEditId(null); setError(null); };
 
   const save = async () => {
-    if (!form.name) return;
+    const isExercise = (form.content_type ?? 'exercise') === 'exercise';
+    // Exercises don't need a name — the app generates "Core & brucho č. X"
+    // from the taxonomy; the DB name is only an admin-facing fallback.
+    if (!form.name && !isExercise) return;
     setSaving(true); setError(null);
     try {
       const status = form.status ?? 'draft';
       const payload: ExerciseRow = {
         id: editId ?? `${form.content_type}-${Date.now()}`,
         content_type: form.content_type ?? 'exercise',
-        name: form.name!,
+        name: form.name || form.body || 'Cvičenie',
         duration: form.duration ?? '15 min',
-        category: form.category ?? '',
-        body: form.body ?? '',
+        // Category follows the duration band — no separate input needed.
+        category: isExercise ? ((form.duration ?? '15 min') === '5 min' ? 'dopalovacka' : '15min') : (form.category ?? ''),
+        body: form.body ?? (isExercise ? 'Celé telo' : ''),
         equip: form.equip ?? 'Bez pomôcok',
-        level: form.content_type === 'exercise' ? (Number(form.level) || null) : null,
+        level: form.level ?? null,
         diastasis_safe: form.content_type === 'exercise' ? (form.diastasis_safe ?? true) : true,
         thumb: form.thumb ?? '',
         description: form.description ?? '',
@@ -2710,8 +2714,13 @@ function ExercisesTab() {
               </select>
             </div>
             <div>
-              <label style={labelStyle}>Názov *</label>
-              <input value={form.name ?? ''} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} style={inputStyle} />
+              <label style={labelStyle}>{form.content_type === 'exercise' ? 'Interný názov (voliteľné)' : 'Názov *'}</label>
+              <input
+                value={form.name ?? ''}
+                onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                placeholder={form.content_type === 'exercise' ? 'V appke sa zobrazí napr. „Core & brucho č. 3“' : ''}
+                style={inputStyle}
+              />
             </div>
             <div>
               <label style={labelStyle}>Dĺžka</label>
@@ -2721,25 +2730,26 @@ function ExercisesTab() {
               </select>
             </div>
             <div>
-              <label style={labelStyle}>Partie tela</label>
-              <input value={form.body ?? ''} onChange={e => setForm(f => ({ ...f, body: e.target.value }))} placeholder="Celé telo / Core / Nohy..." style={inputStyle} />
+              <label style={labelStyle}>Zameranie</label>
+              {form.content_type === 'exercise' ? (
+                <select value={form.body ?? 'Celé telo'} onChange={e => setForm(f => ({ ...f, body: e.target.value }))} style={inputStyle}>
+                  <option value="Celé telo">Celé telo</option>
+                  <option value="Core/Abs">Core & brucho</option>
+                  <option value="Nohy/Zadok">Nohy & zadok</option>
+                </select>
+              ) : (
+                <input value={form.body ?? ''} onChange={e => setForm(f => ({ ...f, body: e.target.value }))} placeholder="Vršok/Stred tela..." style={inputStyle} />
+              )}
             </div>
             <div>
               <label style={labelStyle}>Pomôcky</label>
               <select value={form.equip ?? 'Bez pomôcok'} onChange={e => setForm(f => ({ ...f, equip: e.target.value }))} style={inputStyle}>
                 <option>Bez pomôcok</option>
-                <option>S gumou</option>
+                <option value="S gumou">S gumami</option>
                 <option>S činkami</option>
+                <option>S pilates loptou</option>
               </select>
             </div>
-            {form.content_type === 'exercise' && (
-              <div>
-                <label style={labelStyle}>Level (1-4)</label>
-                <select value={form.level ?? 1} onChange={e => setForm(f => ({ ...f, level: Number(e.target.value) }))} style={inputStyle}>
-                  {[1,2,3,4].map(l => <option key={l} value={l}>{l}</option>)}
-                </select>
-              </div>
-            )}
             <div style={{ gridColumn: '1 / -1' }}>
               <label style={labelStyle}>Náhľadový obrázok</label>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
