@@ -66,9 +66,19 @@ export function durationBand(minutes: number): BandKey {
   return minutes <= 10 ? '5' : '15';
 }
 
-/** Generated display name: "Core & brucho č. 3". */
+// Action phrasing (Gabi 2026-07-25): a bare "Celé telo č. 3" reads like a
+// label, not an invitation — exercises say "Posilni si…", stretches
+// "Postrečuj si…". Kept separate from FOCUS_LABEL (filters/chips still
+// use the noun form); mind the accusative case ("dolnú časť tela").
+const EXERCISE_ACTION: Record<FocusKey, string> = {
+  full: 'Posilni si celé telo',
+  core: 'Posilni si core & brucho',
+  legs: 'Posilni si nohy & zadok',
+};
+
+/** Generated display name: "Posilni si core & brucho č. 3". */
 export function seriesTitle(focus: FocusKey, seq: number): string {
-  return `${FOCUS_LABEL[focus]} č. ${seq}`;
+  return `${EXERCISE_ACTION[focus]} č. ${seq}`;
 }
 
 // ─── Strečingy ────────────────────────────────────────────────────────────────
@@ -103,7 +113,13 @@ export function parseStretchFocus(body: string | null | undefined): StretchFocus
   return null;
 }
 
-/** Generated display name: "Vršok & stred tela č. 2". */
+const STRETCH_ACTION: Record<StretchFocusKey, string> = {
+  full: 'Postrečuj si celé telo',
+  upper: 'Postrečuj si vršok & stred tela',
+  lower: 'Postrečuj si dolnú časť tela',
+};
+
+/** Generated display name: "Postrečuj si vršok & stred tela č. 2". */
 export function stretchSeriesTitle(focus: StretchFocusKey, seq: number): string {
-  return `${STRETCH_FOCUS_LABEL[focus]} č. ${seq}`;
+  return `${STRETCH_ACTION[focus]} č. ${seq}`;
 }
