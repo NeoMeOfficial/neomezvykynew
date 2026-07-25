@@ -70,3 +70,40 @@ export function durationBand(minutes: number): BandKey {
 export function seriesTitle(focus: FocusKey, seq: number): string {
   return `${FOCUS_LABEL[focus]} č. ${seq}`;
 }
+
+// ─── Strečingy ────────────────────────────────────────────────────────────────
+// Same scheme, different axes (agreed with Gabi 2026-07-25): band
+// (15 min strečingy / 5 min rýchla úľava) × focus (Celé telo /
+// Vršok & stred tela / Dolná časť tela) × equipment (bez pomôcok /
+// s gumou). No diastáza flag — stretches are inherently gentle.
+
+export type StretchFocusKey = 'full' | 'upper' | 'lower';
+
+export const STRETCH_FOCUS_ORDER: StretchFocusKey[] = ['full', 'upper', 'lower'];
+
+export const STRETCH_FOCUS_LABEL: Record<StretchFocusKey, string> = {
+  full: 'Celé telo',
+  upper: 'Vršok & stred tela',
+  lower: 'Dolná časť tela',
+};
+
+export const STRETCH_BAND_LABEL: Record<BandKey, string> = {
+  '15': '15 min strečingy',
+  '5': '5 min rýchla úľava',
+};
+
+/** Stretches use only these two; the shared parseEquip still applies. */
+export const STRETCH_EQUIP_ORDER: EquipKey[] = ['none', 'bands'];
+
+export function parseStretchFocus(body: string | null | undefined): StretchFocusKey | null {
+  const b = (body ?? '').toLowerCase();
+  if (/cel[ée] telo/.test(b)) return 'full';
+  if (/vr[šs]ok|stred/.test(b)) return 'upper';
+  if (/doln/.test(b)) return 'lower';
+  return null;
+}
+
+/** Generated display name: "Vršok & stred tela č. 2". */
+export function stretchSeriesTitle(focus: StretchFocusKey, seq: number): string {
+  return `${STRETCH_FOCUS_LABEL[focus]} č. ${seq}`;
+}

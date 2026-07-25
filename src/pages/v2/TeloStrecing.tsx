@@ -4,67 +4,139 @@ import { useSubscription } from '../../contexts/SubscriptionContext';
 import { useStretches, DbStretch } from '../../hooks/useStretches';
 import { Page, BackHeader, Eye, Ser, Body, PlusTag, NM } from '../../components/v2/neome';
 import PlusUnlockBanner from '../../components/v2/paywall/PlusUnlockBanner';
+import {
+  StretchFocusKey, EquipKey, BandKey,
+  STRETCH_FOCUS_ORDER, STRETCH_EQUIP_ORDER, STRETCH_FOCUS_LABEL, STRETCH_BAND_LABEL,
+  EQUIP_LABEL, EQUIP_SHORT,
+  parseStretchFocus, parseEquip, durationBand, stretchSeriesTitle,
+} from '../../features/telo/exerciseTaxonomy';
 
 /**
- * Telo · Strečing — R9 sectioned list, Supabase-backed.
+ * Telo · Strečing — taxonomy-driven library (Gabi 2026-07-25), mirrors
+ * the Cvičenia structure:
+ *   band toggle (15 min strečingy / 5 min rýchla úľava)
+ *   → focus chips (Celé telo / Vršok & stred tela / Dolná časť tela)
+ *   → equipment filter (bez pomôcok / s gumou).
+ * Titles are generated per series in creation order:
+ * "Vršok & stred tela č. 2". No per-video names, no level.
  *
- * Reads from useStretches (public.stretches table). Filter chip
- * matches against id / name substrings for the theme filters
- * (Ráno / Po tréningu / Pred spaním / Sed / Krk a plecia) since
- * the table doesn't carry an explicit theme/time-of-day tag yet.
- * Items group into three duration bands.
- *
- * Closes FEATURE-NEEDED-TELO-STRECING-CATALOG.
+ * Free tier: the first no-equipment 15-min stretch of each focus (max 3).
  */
 
-const FILTERS = ['Všetko', 'Ráno', 'Po tréningu', 'Pred spaním', 'Sed', 'Krk a plecia'] as const;
-
-interface Section {
-  eye: string;
-  items: DbStretch[];
-}
-
-const SECTION_DEFS: { eye: string; min: number; max: number }[] = [
-  { eye: 'Krátke · do 10 min', min: 0,  max: 10 },
-  { eye: 'Stredné · 10–20 min', min: 11, max: 20 },
-  { eye: 'Dlhé · 20+ min',     min: 21, max: 999 },
-];
-
-// Loose substring/keyword matching against the user's chip choice.
-function matchesFilter(s: DbStretch, filter: string): boolean {
-  if (filter === 'Všetko') return true;
-  const haystack = `${s.id} ${s.name} ${s.body_target}`.toLowerCase();
-  const f = filter.toLowerCase();
-  if (filter === 'Ráno')         return haystack.includes('rann');
-  if (filter === 'Po tréningu')  return haystack.includes('treningu') || haystack.includes('po-treningu');
-  if (filter === 'Pred spaním')  return haystack.includes('spani') || haystack.includes('spanim') || haystack.includes('pred-spanim');
-  if (filter === 'Sed')          return haystack.includes('sedeni') || haystack.includes('sedenie');
-  if (filter === 'Krk a plecia') return haystack.includes('krk');
-  return haystack.includes(f);
+interface EnrichedStretch {
+  s: DbStretch;
+  focus: StretchFocusKey | null;
+  equip: EquipKey;
+  band: BandKey;
+  seq: number | null;
+  title: string;
+  isFree: boolean;
 }
 
 export default function TeloStrecing() {
   const navigate = useNavigate();
   const { isPremium } = useSubscription();
   const { stretches, loading } = useStretches();
-  const [activeFilter, setActiveFilter] = useState<string>('Všetko');
+  const [band, setBand] = useState<BandKey>('15');
+  const [focus, setFocus] = useState<StretchFocusKey | 'all'>('all');
+  const [equip, setEquip] = useState<EquipKey | null>(null);
 
-  // Skip the legacy 'stretch-N' demo rows on this curated catalog surface.
-  const curated = useMemo(
-    () => stretches.filter((s) => !s.id.startsWith('stretch-')),
-    [stretches],
+  // Skip the legacy 'stretch-N' demo rows — kept for the player fallback,
+  // not part of the editorial library.
+  const enriched: EnrichedStretch[] = useMemo(() => {
+    const curated = stretches.filter((s) => !s.id.startsWith('stretch-'));
+    const counters = new Map<string, number>();
+    return curated.map((s) => {
+      const f = parseStretchFocus(s.body_target);
+      const q = parseEquip(s.equipment);
+      const b = durationBand(s.duration_min);
+      let seq: number | null = null;
+      if (f) {
+        const key = `${b}|${f}|${q}`;
+        seq = (counters.get(key) ?? 0) + 1;
+        counters.set(key, seq);
+      }
+      return {
+        s,
+        focus: f,
+        equip: q,
+        band: b,
+        seq,
+        title: f && seq ? stretchSeriesTitle(f, seq) : s.name,
+        // Free = first no-equipment 15-min stretch of each focus (max 3).
+        isFree: f ? seq === 1 && q === 'none' && b === '15' : s.free,
+      };
+    });
+  }, [stretches]);
+
+  const matchesExceptBand = useMemo(
+    () => enriched.filter((p) =>
+      (focus === 'all' || p.focus === focus)
+      && (equip === null || p.equip === equip)
+    ),
+    [enriched, focus, equip],
   );
+  const list = useMemo(
+    () => matchesExceptBand.filter((p) => p.band === band),
+    [matchesExceptBand, band],
+  );
+  const otherBand: BandKey = band === '15' ? '5' : '15';
+  const otherBandCount = matchesExceptBand.length - list.length;
 
-  const sections: Section[] = useMemo(() => {
-    return SECTION_DEFS
-      .map((s) => ({
-        eye: s.eye,
-        items: curated.filter((x) =>
-          x.duration_min >= s.min && x.duration_min <= s.max && matchesFilter(x, activeFilter),
-        ),
-      }))
-      .filter((s) => s.items.length > 0);
-  }, [curated, activeFilter]);
+  const openStretch = (p: EnrichedStretch) => {
+    const locked = !p.isFree && !isPremium;
+    if (locked) {
+      navigate('/paywall');
+      return;
+    }
+    // Player renders from location.state — category 'stretch' routes its
+    // entitlement bucket and back path correctly.
+    navigate(`/stretch/${p.s.id}`, {
+      state: {
+        exercise: {
+          id: p.s.id,
+          name: p.title,
+          duration: `${p.s.duration_min} min`,
+          category: 'stretch',
+          body: p.focus ? STRETCH_FOCUS_LABEL[p.focus] : p.s.body_target,
+          equip: EQUIP_LABEL[p.equip],
+          videoUrl: p.s.video_id,
+          thumb: p.s.thumb_url,
+          description: p.s.description,
+        },
+      },
+    });
+  };
+
+  const chip = (active: boolean): React.CSSProperties => ({
+    all: 'unset',
+    cursor: 'pointer',
+    flexShrink: 0,
+    padding: '8px 14px',
+    borderRadius: 999,
+    background: active ? NM.DEEP : '#fff',
+    color: active ? '#fff' : NM.DEEP,
+    border: active ? '1px solid transparent' : `1px solid ${NM.HAIR_2}`,
+    fontFamily: NM.SANS,
+    fontSize: 12,
+    fontWeight: 400,
+    whiteSpace: 'nowrap',
+  });
+
+  const smallChip = (active: boolean): React.CSSProperties => ({
+    all: 'unset',
+    cursor: 'pointer',
+    flexShrink: 0,
+    padding: '6px 11px',
+    borderRadius: 999,
+    background: active ? NM.DEEP : 'transparent',
+    color: active ? '#fff' : NM.MUTED,
+    border: active ? '1px solid transparent' : `1px solid ${NM.HAIR_2}`,
+    fontFamily: NM.SANS,
+    fontSize: 11,
+    fontWeight: 400,
+    whiteSpace: 'nowrap',
+  });
 
   return (
     <Page>
@@ -74,35 +146,53 @@ export default function TeloStrecing() {
         <Ser size={30}>
           Uvoľnenie a <em style={{ color: NM.TERRA, fontWeight: 500, fontStyle: 'italic' }}>mobilita</em>.
         </Ser>
-        <Body style={{ marginTop: 10, maxWidth: 320 }}>Krátke zostavy na ráno, po tréningu alebo pred spaním.</Body>
+        <Body style={{ marginTop: 10, maxWidth: 320 }}>
+          Vyber si dĺžku, partiu a pomôcku. 3 strečingy sú zadarmo — ostatné s Plus.
+        </Body>
       </div>
 
-      <div style={{ display: 'flex', gap: 8, overflowX: 'auto', padding: '22px 18px 2px' }}>
-        {FILTERS.map((f) => {
-          const active = activeFilter === f;
+      {/* Band toggle — 15 min strečingy / 5 min rýchla úľava */}
+      <div style={{ margin: '20px 18px 0', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4, background: '#fff', borderRadius: 999, border: `1px solid ${NM.HAIR}`, padding: 4 }}>
+        {(['15', '5'] as BandKey[]).map((key) => {
+          const active = band === key;
           return (
             <button
-              key={f}
-              onClick={() => setActiveFilter(f)}
+              key={key}
+              onClick={() => setBand(key)}
               style={{
                 all: 'unset',
                 cursor: 'pointer',
-                flexShrink: 0,
-                padding: '8px 14px',
+                textAlign: 'center',
+                padding: '10px 4px',
                 borderRadius: 999,
-                background: active ? NM.DEEP : '#fff',
-                color: active ? '#fff' : NM.DEEP,
-                border: active ? 'none' : `1px solid ${NM.HAIR_2}`,
+                background: active ? NM.DEEP : 'transparent',
+                color: active ? '#fff' : NM.MUTED,
                 fontFamily: NM.SANS,
                 fontSize: 12,
-                fontWeight: 400,
-                whiteSpace: 'nowrap',
+                fontWeight: active ? 500 : 400,
               }}
             >
-              {f}
+              {STRETCH_BAND_LABEL[key]}
             </button>
           );
         })}
+      </div>
+
+      {/* Focus chips */}
+      <div style={{ display: 'flex', gap: 8, overflowX: 'auto', padding: '14px 18px 2px' }}>
+        <button onClick={() => setFocus('all')} style={chip(focus === 'all')}>Všetko</button>
+        {STRETCH_FOCUS_ORDER.map((f) => (
+          <button key={f} onClick={() => setFocus(f)} style={chip(focus === f)}>{STRETCH_FOCUS_LABEL[f]}</button>
+        ))}
+      </div>
+
+      {/* Equipment filter */}
+      <div style={{ display: 'flex', gap: 6, overflowX: 'auto', padding: '10px 18px 2px', alignItems: 'center' }}>
+        {STRETCH_EQUIP_ORDER.map((q) => (
+          <button key={q} onClick={() => setEquip(equip === q ? null : q)} style={smallChip(equip === q)}>
+            {EQUIP_LABEL[q]}
+          </button>
+        ))}
       </div>
 
       {loading && (
@@ -111,26 +201,37 @@ export default function TeloStrecing() {
         </div>
       )}
 
-      {!loading && sections.length === 0 && (
+      {!loading && list.length === 0 && (
         <div style={{ margin: '26px 18px', color: NM.MUTED, fontFamily: NM.SANS, fontSize: 13 }}>
-          Žiadne strečingy pre tento filter.
+          {otherBandCount > 0 ? (
+            <>
+              <div>V kategórii {STRETCH_BAND_LABEL[band].toLowerCase()} zatiaľ takýto strečing nie je.</div>
+              <button
+                onClick={() => setBand(otherBand)}
+                style={{ all: 'unset', cursor: 'pointer', marginTop: 10, display: 'inline-flex', alignItems: 'center', gap: 6, padding: '9px 16px', borderRadius: 999, background: NM.DEEP, color: '#fff', fontFamily: NM.SANS, fontSize: 12, fontWeight: 500 }}
+              >
+                Pozrieť {STRETCH_BAND_LABEL[otherBand].toLowerCase()} ({otherBandCount})
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
+              </button>
+            </>
+          ) : (
+            'Žiadne strečingy pre tieto filtre.'
+          )}
         </div>
       )}
 
-      {sections.map((sec) => (
-        <div key={sec.eye} style={{ margin: '26px 18px 0' }}>
-          <Eye size={10} color={NM.TERRA} style={{ marginBottom: 10 }}>{sec.eye}</Eye>
+      {!loading && list.length > 0 && (
+        <div style={{ margin: '22px 18px 0' }}>
+          <Eye size={10} color={NM.TERRA} style={{ marginBottom: 10 }}>
+            {STRETCH_BAND_LABEL[band]} · {list.length}
+          </Eye>
           <div style={{ background: '#fff', borderRadius: 18, border: `1px solid ${NM.HAIR}`, overflow: 'hidden' }}>
-            {sec.items.map((it, i, arr) => {
-              const locked = !it.free;
-              const meta = `${it.duration_min} min · ${it.body_target}`;
+            {list.map((p, i, arr) => {
+              const locked = !p.isFree && !isPremium;
               return (
                 <button
-                  key={it.id}
-                  onClick={() => {
-                    if (locked && !isPremium) navigate('/paywall');
-                    else navigate(`/stretch/${it.id}`);
-                  }}
+                  key={p.s.id}
+                  onClick={() => openStretch(p)}
                   style={{
                     all: 'unset',
                     cursor: 'pointer',
@@ -149,8 +250,8 @@ export default function TeloStrecing() {
                       height: 60,
                       borderRadius: 12,
                       flexShrink: 0,
-                      backgroundImage: it.thumb_url ? `url(${it.thumb_url})` : undefined,
-                      backgroundColor: it.thumb_url ? undefined : NM.HAIR,
+                      backgroundImage: p.s.thumb_url ? `url(${p.s.thumb_url})` : undefined,
+                      backgroundColor: p.s.thumb_url ? undefined : NM.HAIR,
                       backgroundSize: 'cover',
                       backgroundPosition: 'center',
                       position: 'relative',
@@ -165,18 +266,20 @@ export default function TeloStrecing() {
                     </div>
                   </div>
                   <div style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
-                    <div style={{ fontFamily: NM.SERIF, fontSize: 15, fontWeight: 500, color: NM.DEEP, letterSpacing: '-0.005em' }}>{it.name}</div>
-                    <div style={{ fontFamily: NM.SANS, fontSize: 10.5, color: NM.EYEBROW, marginTop: 3, fontWeight: 400 }}>{meta}</div>
+                    <div style={{ fontFamily: NM.SERIF, fontSize: 15, fontWeight: 500, color: NM.DEEP, letterSpacing: '-0.005em' }}>{p.title}</div>
+                    <div style={{ fontFamily: NM.SANS, fontSize: 10.5, color: NM.EYEBROW, marginTop: 3, fontWeight: 400 }}>
+                      {p.s.duration_min} min · {EQUIP_SHORT[p.equip]}
+                    </div>
                   </div>
-                  {locked && !isPremium ? <PlusTag /> : <div style={{ color: NM.TERTIARY, fontSize: 14 }}>›</div>}
+                  {locked ? <PlusTag /> : <div style={{ color: NM.TERTIARY, fontSize: 14 }}>›</div>}
                 </button>
               );
             })}
           </div>
         </div>
-      ))}
+      )}
 
-      <PlusUnlockBanner label="Zostavy označené + odomkneš s NeoMe Plus" />
+      <PlusUnlockBanner label="Strečingy označené + odomkneš s NeoMe Plus" />
     </Page>
   );
 }

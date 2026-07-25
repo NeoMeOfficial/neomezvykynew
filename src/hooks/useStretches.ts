@@ -25,6 +25,7 @@ export interface DbStretch {
   video_provider: 'vimeo' | 'youtube' | null;
   free: boolean;
   sort_order: number;
+  description: string | null;
 }
 
 interface RawExercise {
@@ -37,6 +38,7 @@ interface RawExercise {
   equip: string | null;
   level: number | null;
   thumb: string | null;
+  description: string | null;
   video_url: string | null;
   active: boolean | null;
 }
@@ -82,6 +84,7 @@ function adapt(row: RawExercise, index: number): DbStretch {
     video_provider: detectProvider(row.video_url),
     free: dur <= 7 || row.id === 'ranny-prebudzac' || row.id === 'krk-plecia',
     sort_order: index + 1,
+    description: row.description,
   };
 }
 
@@ -103,6 +106,7 @@ function fallback(): DbStretch[] {
         : null,
       free: e.free ?? false,
       sort_order: i + 1,
+      description: null,
     }));
 }
 
@@ -119,9 +123,11 @@ export function useStretches() {
     setLoading(true);
     supabase
       .from('exercises')
-      .select('id, content_type, name, duration, category, body, equip, level, thumb, video_url, active')
+      .select('id, content_type, name, duration, category, body, equip, level, thumb, description, video_url, active')
       .eq('content_type', 'stretch')
       .eq('active', true)
+      // Creation order keeps series numbering stable — see exerciseTaxonomy.ts.
+      .order('created_at', { ascending: true })
       .order('id', { ascending: true })
       .then(({ data, error }) => {
         if (error || !data || data.length === 0) {

@@ -2596,9 +2596,9 @@ function ExercisesTab() {
 
   const save = async () => {
     const isExercise = (form.content_type ?? 'exercise') === 'exercise';
-    // Exercises don't need a name — the app generates "Core & brucho č. X"
-    // from the taxonomy; the DB name is only an admin-facing fallback.
-    if (!form.name && !isExercise) return;
+    // Neither type needs a name — the app generates "Core & brucho č. X" /
+    // "Vršok & stred tela č. X" from the taxonomy; the DB name is only an
+    // admin-facing fallback.
     setSaving(true); setError(null);
     try {
       const status = form.status ?? 'draft';
@@ -2608,8 +2608,10 @@ function ExercisesTab() {
         name: form.name || form.body || 'Cvičenie',
         duration: form.duration ?? '15 min',
         // Category follows the duration band — no separate input needed.
-        category: isExercise ? ((form.duration ?? '15 min') === '5 min' ? 'dopalovacka' : '15min') : (form.category ?? ''),
-        body: form.body ?? (isExercise ? 'Celé telo' : ''),
+        category: (form.duration ?? '15 min') === '5 min'
+          ? (isExercise ? 'dopalovacka' : 'quickstretch')
+          : '15min',
+        body: form.body ?? 'Celé telo',
         equip: form.equip ?? 'Bez pomôcok',
         level: form.level ?? null,
         diastasis_safe: form.content_type === 'exercise' ? (form.diastasis_safe ?? true) : true,
@@ -2729,11 +2731,11 @@ function ExercisesTab() {
               </select>
             </div>
             <div>
-              <label style={labelStyle}>{form.content_type === 'exercise' ? 'Interný názov (voliteľné)' : 'Názov *'}</label>
+              <label style={labelStyle}>Interný názov (voliteľné)</label>
               <input
                 value={form.name ?? ''}
                 onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                placeholder={form.content_type === 'exercise' ? 'V appke sa zobrazí napr. „Core & brucho č. 3“' : ''}
+                placeholder={form.content_type === 'exercise' ? 'V appke sa zobrazí napr. „Core & brucho č. 3“' : 'V appke sa zobrazí napr. „Vršok & stred tela č. 2“'}
                 style={inputStyle}
               />
             </div>
@@ -2753,7 +2755,11 @@ function ExercisesTab() {
                   <option value="Nohy/Zadok">Nohy & zadok</option>
                 </select>
               ) : (
-                <input value={form.body ?? ''} onChange={e => setForm(f => ({ ...f, body: e.target.value }))} placeholder="Vršok/Stred tela..." style={inputStyle} />
+                <select value={form.body ?? 'Celé telo'} onChange={e => setForm(f => ({ ...f, body: e.target.value }))} style={inputStyle}>
+                  <option value="Celé telo">Celé telo</option>
+                  <option value="Vršok/Stred tela">Vršok & stred tela</option>
+                  <option value="Dolná časť tela">Dolná časť tela</option>
+                </select>
               )}
             </div>
             <div>
