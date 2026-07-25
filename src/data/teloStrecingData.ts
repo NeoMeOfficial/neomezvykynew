@@ -1,14 +1,25 @@
-// Static stretch data — mirrors TeloStrecing.tsx inline array
-// Used by ExercisesTab in AdminNew.tsx for seeding Supabase
+// Static stretch data — mirrors Gabi's real recorded stretch catalog
+// (2026-07-25). Used by ExercisesTab in Admin.tsx for (re)seeding
+// Supabase; upserts stable cvs-* ids, so re-importing never duplicates.
+// The admin import archives every non-cv*/cvs* row first, so the old
+// demo stretches (ct-*, vs-*, dc-*) retire automatically.
+//
+// Recorded inventory this mirrors:
+//   15 min: celé telo bez pomôcok ×4, celé telo s gumou ×1
+//   5 min rýchla úľava: celé telo bez pomôcok ×3, vršok/stred ×2
 
 export const TeloStrecingStaticData = [
-  { id: 'ct-1', name: 'Celé telo', duration: '15 min', category: '15min', body: 'Celé telo', equip: 'Bez pomôcok', thumb: 'https://images.unsplash.com/photo-1588286840104-8957b019727f?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Komplexné uvoľnenie celého tela' },
-  { id: 'ct-2', name: 'Celé telo', duration: '15 min', category: '15min', body: 'Celé telo', equip: 'S gumou', thumb: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Večerné uvoľnenie s pomocou gumy' },
-  { id: 'ct-3', name: 'Celé telo', duration: '5 min', category: 'quickstretch', body: 'Celé telo', equip: 'Bez pomôcok', thumb: 'https://images.unsplash.com/photo-1540206395-68808572332f?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Rýchla úľava pre celé telo' },
-  { id: 'vs-1', name: 'Vršok/Stred tela', duration: '15 min', category: '15min', body: 'Vršok/Stred tela', equip: 'Bez pomôcok', thumb: 'https://images.unsplash.com/photo-1591027858406-a9a20dd3c95c?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Uvoľnenie ramien a chrbtice' },
-  { id: 'vs-2', name: 'Vršok/Stred tela', duration: '15 min', category: '15min', body: 'Vršok/Stred tela', equip: 'S gumou', thumb: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Mobilita chrbtice s gumou' },
-  { id: 'vs-3', name: 'Vršok/Stred tela', duration: '5 min', category: 'quickstretch', body: 'Vršok/Stred tela', equip: 'Bez pomôcok', thumb: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Rýchle uvoľnenie ramien' },
-  { id: 'dc-1', name: 'Dolná časť tela', duration: '15 min', category: '15min', body: 'Dolná časť tela', equip: 'Bez pomôcok', thumb: 'https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Strečing nôh a bedier' },
-  { id: 'dc-2', name: 'Dolná časť tela', duration: '15 min', category: '15min', body: 'Dolná časť tela', equip: 'S gumou', thumb: 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Hlboký strečing s gumou' },
-  { id: 'dc-3', name: 'Dolná časť tela', duration: '5 min', category: 'quickstretch', body: 'Dolná časť tela', equip: 'Bez pomôcok', thumb: 'https://images.unsplash.com/photo-1616279969856-759f316a32d4?w=400&h=225&fit=crop&q=80&cs=tinysrgb&mono', description: 'Rýchky strečing nôh' },
+  // 15 min strečingy · Celé telo
+  { id: 'cvs-full-bez-15-1', name: 'Strečing celé telo 15min bez pomôcok #1', duration: '15 min', category: '15min', body: 'Celé telo', equip: 'Bez pomôcok', level: null, diastasis_safe: true, thumb: '/images/r9/hero-yoga.jpg', description: 'Uvoľnenie celého tela bez pomôcok.' },
+  { id: 'cvs-full-bez-15-2', name: 'Strečing celé telo 15min bez pomôcok #2', duration: '15 min', category: '15min', body: 'Celé telo', equip: 'Bez pomôcok', level: null, diastasis_safe: true, thumb: '/images/r9/hero-yoga.jpg', description: 'Uvoľnenie celého tela bez pomôcok.' },
+  { id: 'cvs-full-bez-15-3', name: 'Strečing celé telo 15min bez pomôcok #3', duration: '15 min', category: '15min', body: 'Celé telo', equip: 'Bez pomôcok', level: null, diastasis_safe: true, thumb: '/images/r9/hero-yoga.jpg', description: 'Uvoľnenie celého tela bez pomôcok.' },
+  { id: 'cvs-full-bez-15-4', name: 'Strečing celé telo 15min bez pomôcok #4', duration: '15 min', category: '15min', body: 'Celé telo', equip: 'Bez pomôcok', level: null, diastasis_safe: true, thumb: '/images/r9/hero-yoga.jpg', description: 'Uvoľnenie celého tela bez pomôcok.' },
+  { id: 'cvs-full-guma-15-1', name: 'Strečing celé telo 15min s gumou #1', duration: '15 min', category: '15min', body: 'Celé telo', equip: 'S gumou', level: null, diastasis_safe: true, thumb: '/images/r9/hero-yoga.jpg', description: 'Hlbšie uvoľnenie celého tela s gumou.' },
+  // 5 min rýchla úľava · Celé telo
+  { id: 'cvs-full-bez-5-1', name: 'Rýchla úľava celé telo #1', duration: '5 min', category: 'quickstretch', body: 'Celé telo', equip: 'Bez pomôcok', level: null, diastasis_safe: true, thumb: '/images/r9/hero-yoga.jpg', description: 'Krátka úľava pre celé telo.' },
+  { id: 'cvs-full-bez-5-2', name: 'Rýchla úľava celé telo #2', duration: '5 min', category: 'quickstretch', body: 'Celé telo', equip: 'Bez pomôcok', level: null, diastasis_safe: true, thumb: '/images/r9/hero-yoga.jpg', description: 'Krátka úľava pre celé telo.' },
+  { id: 'cvs-full-bez-5-3', name: 'Rýchla úľava celé telo #3', duration: '5 min', category: 'quickstretch', body: 'Celé telo', equip: 'Bez pomôcok', level: null, diastasis_safe: true, thumb: '/images/r9/hero-yoga.jpg', description: 'Krátka úľava pre celé telo.' },
+  // 5 min rýchla úľava · Vršok & stred tela
+  { id: 'cvs-upper-bez-5-1', name: 'Rýchla úľava vršok/stred tela #1', duration: '5 min', category: 'quickstretch', body: 'Vršok/Stred tela', equip: 'Bez pomôcok', level: null, diastasis_safe: true, thumb: '/images/r9/lifestyle-yoga-pose.jpg', description: 'Krátke uvoľnenie ramien, krku a chrbtice.' },
+  { id: 'cvs-upper-bez-5-2', name: 'Rýchla úľava vršok/stred tela #2', duration: '5 min', category: 'quickstretch', body: 'Vršok/Stred tela', equip: 'Bez pomôcok', level: null, diastasis_safe: true, thumb: '/images/r9/lifestyle-yoga-pose.jpg', description: 'Krátke uvoľnenie ramien, krku a chrbtice.' },
 ];

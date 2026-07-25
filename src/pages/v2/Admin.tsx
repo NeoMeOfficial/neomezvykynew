@@ -2659,13 +2659,13 @@ function ExercisesTab() {
     setSeeding(true); setError(null);
     try {
       // Retire the old demo rows first (everything that isn't the real
-      // cv-* catalog) so fakes don't mix into the library, then upsert
-      // the recorded catalog. Idempotent — safe to re-run.
+      // cv-* exercise / cvs-* stretch catalog) so fakes don't mix into
+      // the library, then upsert the recorded catalog. Idempotent.
       const { error: archErr } = await supabase
         .from('exercises')
         .update({ status: 'archived', active: false })
-        .eq('content_type', 'exercise')
-        .not('id', 'like', 'cv-%');
+        .not('id', 'like', 'cv-%')
+        .not('id', 'like', 'cvs-%');
       if (archErr) throw new Error(archErr.message);
       // NB: PostgREST unifies columns across the whole batch — every row
       // must carry the same keys, or the missing ones are sent as NULL
@@ -2700,7 +2700,7 @@ function ExercisesTab() {
         <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 22, fontWeight: 500, color: _A.DEEP }}>Exercise Library</div>
         <div style={{ display: 'flex', gap: 10 }}>
           <button onClick={seedFromStatic} disabled={seeding} style={btnSecondary}>
-            {seeding ? 'Importujem…' : `Import katalógu (${TeloExtraStaticData.length})`}
+            {seeding ? 'Importujem…' : `Import katalógu (${TeloExtraStaticData.length + TeloStrecingStaticData.length})`}
           </button>
           <button onClick={openAdd} style={{ ...btnPrimary, display: 'flex', alignItems: 'center', gap: 8 }}>
             <Plus style={{ width: 14, height: 14 }} />Nové cvičenie
