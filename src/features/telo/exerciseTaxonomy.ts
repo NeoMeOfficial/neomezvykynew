@@ -42,7 +42,7 @@ export const EQUIP_SHORT: Record<EquipKey, string> = {
 };
 
 export const BAND_LABEL: Record<BandKey, string> = {
-  '15': '15 min tréningy',
+  '15': '15 min cvičenia',
   '5': '5 min dopaľovačky',
 };
 

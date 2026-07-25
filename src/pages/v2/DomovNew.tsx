@@ -927,7 +927,7 @@ export default function DomovNew() {
           label: 'Telo',
           color: TELO,
           img: '/images/r9/section-body.jpg',
-          title: userProgram.todaysExercise?.title ?? 'Tréning dňa',
+          title: userProgram.todaysExercise?.title ?? 'Cvičenie dňa',
           sub: [`týž. ${userProgram.week} · deň ${userProgram.day}`, userProgram.todaysExercise?.duration].filter(Boolean).join(' · '),
           href: `/program/${userProgram.id}`,
         }

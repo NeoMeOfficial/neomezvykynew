@@ -114,7 +114,7 @@ export default function TeloExtra() {
 
       <div style={{ padding: '0 18px' }}>
         <Ser size={30}>
-          Jednotlivé <em style={{ color: NM.TERRA, fontWeight: 500, fontStyle: 'italic' }}>tréningy</em>.
+          Jednotlivé <em style={{ color: NM.TERRA, fontWeight: 500, fontStyle: 'italic' }}>cvičenia</em>.
         </Ser>
         <Body style={{ marginTop: 10, maxWidth: 320 }}>
           Vyber si dĺžku, zameranie a pomôcku. 3 cvičenia sú zadarmo — ostatné s Plus.
@@ -123,7 +123,7 @@ export default function TeloExtra() {
 
       {/* Band toggle — 15 min tréningy / 5 min dopaľovačky */}
       <div style={{ margin: '20px 18px 0', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4, background: '#fff', borderRadius: 999, border: `1px solid ${NM.HAIR}`, padding: 4 }}>
-        {([['15', '15 min tréningy'], ['5', '5 min dopaľovačky']] as [BandKey, string][]).map(([key, label]) => {
+        {([['15', '15 min cvičenia'], ['5', '5 min dopaľovačky']] as [BandKey, string][]).map(([key, label]) => {
           const active = band === key;
           return (
             <button
@@ -196,7 +196,7 @@ export default function TeloExtra() {
       {!loading && list.length > 0 && (
         <div style={{ margin: '22px 18px 0' }}>
           <Eye size={10} color={NM.TERRA} style={{ marginBottom: 10 }}>
-            {band === '15' ? '15 min tréningy' : '5 min dopaľovačky'} · {list.length}
+            {band === '15' ? '15 min cvičenia' : '5 min dopaľovačky'} · {list.length}
           </Eye>
           <div style={{ background: '#fff', borderRadius: 18, border: `1px solid ${NM.HAIR}`, overflow: 'hidden' }}>
             {list.map((p, i, arr) => {
