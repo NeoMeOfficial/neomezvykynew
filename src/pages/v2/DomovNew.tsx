@@ -946,7 +946,7 @@ export default function DomovNew() {
             : `${teloPick.meta} · zapni si cyklus pre výber podľa fázy`,
           href: teloPick.href,
           state: teloPick.playerState,
-          cta: 'Zacvičiť si',
+          cta: 'Zacvič si',
         }
       : {
           key: 'telo',
