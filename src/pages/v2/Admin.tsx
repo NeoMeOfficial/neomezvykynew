@@ -2665,9 +2665,12 @@ function ExercisesTab() {
         .eq('content_type', 'exercise')
         .not('id', 'like', 'cv-%');
       if (archErr) throw new Error(archErr.message);
+      // NB: PostgREST unifies columns across the whole batch — every row
+      // must carry the same keys, or the missing ones are sent as NULL
+      // (which violates the NOT NULL status column).
       const payload = [
         ...TeloExtraStaticData.map((e: any) => ({ ...e, content_type: 'exercise', status: 'published', active: true })),
-        ...TeloStrecingStaticData.map((s: any) => ({ ...s, content_type: 'stretch' })),
+        ...TeloStrecingStaticData.map((s: any) => ({ ...s, content_type: 'stretch', status: 'published', active: true })),
       ];
       const count = await adminSeed('exercises', payload);
       alert(`✅ Importovaných ${count} cvičení — staré demo záznamy zarchivované`);
