@@ -1,15 +1,15 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSubscription } from '../../contexts/SubscriptionContext';
-import { useStretches, DbStretch } from '../../hooks/useStretches';
+import { useStretches } from '../../hooks/useStretches';
 import { Page, BackHeader, Eye, Ser, Body, PlusTag, NM } from '../../components/v2/neome';
 import PlusUnlockBanner from '../../components/v2/paywall/PlusUnlockBanner';
 import {
   StretchFocusKey, EquipKey, BandKey,
   STRETCH_FOCUS_ORDER, STRETCH_EQUIP_ORDER, STRETCH_FOCUS_LABEL, STRETCH_BAND_LABEL,
   EQUIP_LABEL, EQUIP_SHORT,
-  parseStretchFocus, parseEquip, durationBand, stretchSeriesTitle,
 } from '../../features/telo/exerciseTaxonomy';
+import { catalogStretches, CatalogStretch } from '../../features/telo/libraryCatalog';
 
 /**
  * Telo · Strečing — taxonomy-driven library (Gabi 2026-07-25), mirrors
@@ -23,16 +23,6 @@ import {
  * Free tier: the first no-equipment 15-min stretch of each focus (max 3).
  */
 
-interface EnrichedStretch {
-  s: DbStretch;
-  focus: StretchFocusKey | null;
-  equip: EquipKey;
-  band: BandKey;
-  seq: number | null;
-  title: string;
-  isFree: boolean;
-}
-
 export default function TeloStrecing() {
   const navigate = useNavigate();
   const { isPremium } = useSubscription();
@@ -41,33 +31,7 @@ export default function TeloStrecing() {
   const [focus, setFocus] = useState<StretchFocusKey | 'all'>('all');
   const [equip, setEquip] = useState<EquipKey | null>(null);
 
-  // Skip the legacy 'stretch-N' demo rows — kept for the player fallback,
-  // not part of the editorial library.
-  const enriched: EnrichedStretch[] = useMemo(() => {
-    const curated = stretches.filter((s) => !s.id.startsWith('stretch-'));
-    const counters = new Map<string, number>();
-    return curated.map((s) => {
-      const f = parseStretchFocus(s.body_target);
-      const q = parseEquip(s.equipment);
-      const b = durationBand(s.duration_min);
-      let seq: number | null = null;
-      if (f) {
-        const key = `${b}|${f}|${q}`;
-        seq = (counters.get(key) ?? 0) + 1;
-        counters.set(key, seq);
-      }
-      return {
-        s,
-        focus: f,
-        equip: q,
-        band: b,
-        seq,
-        title: f && seq ? stretchSeriesTitle(f, seq) : s.name,
-        // Free = first no-equipment 15-min stretch of each focus (max 3).
-        isFree: f ? seq === 1 && q === 'none' && b === '15' : s.free,
-      };
-    });
-  }, [stretches]);
+  const enriched: CatalogStretch[] = useMemo(() => catalogStretches(stretches), [stretches]);
 
   const matchesExceptBand = useMemo(
     () => enriched.filter((p) =>
@@ -83,7 +47,7 @@ export default function TeloStrecing() {
   const otherBand: BandKey = band === '15' ? '5' : '15';
   const otherBandCount = matchesExceptBand.length - list.length;
 
-  const openStretch = (p: EnrichedStretch) => {
+  const openStretch = (p: CatalogStretch) => {
     const locked = !p.isFree && !isPremium;
     if (locked) {
       navigate('/paywall');

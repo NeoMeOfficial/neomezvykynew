@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useUser } from '@/hooks/use-user';
 import { useCycleInfo } from '@/hooks/use-cycle';
 import { useUserProgram } from '@/hooks/useUserProgram';
+import { useDailyTeloPick } from '@/features/telo/useDailyTeloPick';
 import { useMealPlan } from '@/features/nutrition/useMealPlan';
 import { useRecipes, recipeImage } from '@/hooks/useRecipes';
 import { useSupabaseHabits } from '@/hooks/useSupabaseHabits';
@@ -222,6 +223,8 @@ export interface PillarItem {
   sub?: string;
   cta?: string;
   href: string;
+  /** Optional router state (e.g. the exercise payload for ExercisePlayer). */
+  state?: unknown;
 }
 
 // Quiet text link, not a pill — the card's content is the point; the CTA
@@ -274,7 +277,7 @@ function PillarPhotoCard({ p }: { p: PillarItem }) {
   const navigate = useNavigate();
   return (
     <div
-      onClick={() => navigate(p.href)}
+      onClick={() => navigate(p.href, p.state !== undefined ? { state: p.state } : undefined)}
       style={{
         ...cardTint(p.color),
         position: 'relative',
@@ -852,6 +855,7 @@ export default function DomovNew() {
   const user = useUser();
   const cycle = useCycleInfo();
   const { userProgram } = useUserProgram();
+  const { pick: teloPick } = useDailyTeloPick();
   const { todayPlan } = useMealPlan();
   const { recipes } = useRecipes();
   const { meditation } = useDailyMeditation();
@@ -926,6 +930,19 @@ export default function DomovNew() {
           title: userProgram.todaysExercise?.title ?? 'Tréning dňa',
           sub: [`týž. ${userProgram.week} · deň ${userProgram.day}`, userProgram.todaysExercise?.duration].filter(Boolean).join(' · '),
           href: `/program/${userProgram.id}`,
+        }
+      : teloPick
+      ? {
+          key: 'telo',
+          label: 'Telo',
+          color: TELO,
+          img: teloPick.thumb ?? '/images/r9/section-body.jpg',
+          title: teloPick.title,
+          // Honest phase line — the pick really is filtered by her phase.
+          sub: [teloPick.meta, teloPick.reason ?? (isPlus ? 'zapni si cyklus pre výber podľa fázy' : 'zadarmo')].join(' · '),
+          href: teloPick.href,
+          state: teloPick.playerState,
+          cta: 'Zacvičiť si',
         }
       : {
           key: 'telo',

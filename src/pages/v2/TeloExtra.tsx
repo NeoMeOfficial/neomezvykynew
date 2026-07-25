@@ -1,14 +1,14 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSubscription } from '../../contexts/SubscriptionContext';
-import { useExercises, DbExercise } from '../../hooks/useExercises';
+import { useExercises } from '../../hooks/useExercises';
 import { Page, BackHeader, Eye, Ser, Body, PlusTag, NM } from '../../components/v2/neome';
 import PlusUnlockBanner from '../../components/v2/paywall/PlusUnlockBanner';
 import {
   FocusKey, EquipKey, BandKey,
   FOCUS_ORDER, EQUIP_ORDER, FOCUS_LABEL, EQUIP_LABEL, EQUIP_SHORT, BAND_LABEL,
-  parseFocus, parseEquip, durationBand, seriesTitle,
 } from '../../features/telo/exerciseTaxonomy';
+import { catalogExercises, CatalogExercise } from '../../features/telo/libraryCatalog';
 
 /**
  * Telo · Cvičenia — taxonomy-driven library (Gabi 2026-07-24).
@@ -23,16 +23,6 @@ import {
  * Free tier: the first no-equipment 15-min video of each focus (max 3).
  */
 
-interface EnrichedExercise {
-  e: DbExercise;
-  focus: FocusKey | null;
-  equip: EquipKey;
-  band: BandKey;
-  seq: number | null;
-  title: string;
-  isFree: boolean;
-}
-
 export default function TeloExtra() {
   const navigate = useNavigate();
   const { isPremium } = useSubscription();
@@ -42,33 +32,7 @@ export default function TeloExtra() {
   const [equip, setEquip] = useState<EquipKey | null>(null);
   const [diastOnly, setDiastOnly] = useState(false);
 
-  // Skip the legacy 'strength-N' demo rows — kept in the table for the
-  // ExercisePlayer fallback but not part of the editorial library.
-  const enriched: EnrichedExercise[] = useMemo(() => {
-    const curated = exercises.filter((e) => !e.id.startsWith('strength-'));
-    const counters = new Map<string, number>();
-    return curated.map((e) => {
-      const f = parseFocus(e.body_target);
-      const q = parseEquip(e.equipment);
-      const b = durationBand(e.duration_min);
-      let seq: number | null = null;
-      if (f) {
-        const key = `${b}|${f}|${q}`;
-        seq = (counters.get(key) ?? 0) + 1;
-        counters.set(key, seq);
-      }
-      return {
-        e,
-        focus: f,
-        equip: q,
-        band: b,
-        seq,
-        title: f && seq ? seriesTitle(f, seq) : e.name,
-        // Free = first no-equipment 15-min video of each focus (max 3).
-        isFree: f ? seq === 1 && q === 'none' && b === '15' : e.free,
-      };
-    });
-  }, [exercises]);
+  const enriched: CatalogExercise[] = useMemo(() => catalogExercises(exercises), [exercises]);
 
   const matchesExceptBand = useMemo(
     () => enriched.filter((p) =>
@@ -88,7 +52,7 @@ export default function TeloExtra() {
   const otherBand: BandKey = band === '15' ? '5' : '15';
   const otherBandCount = matchesExceptBand.length - list.length;
 
-  const openExercise = (p: EnrichedExercise) => {
+  const openExercise = (p: CatalogExercise) => {
     const locked = !p.isFree && !isPremium;
     if (locked) {
       navigate('/paywall');
