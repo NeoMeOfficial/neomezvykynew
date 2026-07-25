@@ -35,9 +35,16 @@ export interface CatalogStretch {
   isFree: boolean;
 }
 
-/** Series-number the exercise library (skips legacy 'strength-N' demo rows). */
+/**
+ * Number the exercise library (skips legacy 'strength-N' demo rows).
+ * Numbering is unique per FOCUS across all durations and equipment
+ * ("Posilni si celé telo #1…#8") — a number never repeats within a
+ * focus, so two different videos can't share a title (Gabi 2026-07-25).
+ * Duration + equipment live in the meta line, not the title.
+ */
 export function catalogExercises(exercises: DbExercise[]): CatalogExercise[] {
   const counters = new Map<string, number>();
+  const freeSeen = new Set<string>();
   return exercises
     .filter((e) => !e.id.startsWith('strength-'))
     .map((e) => {
@@ -45,10 +52,14 @@ export function catalogExercises(exercises: DbExercise[]): CatalogExercise[] {
       const equip = parseEquip(e.equipment);
       const band = durationBand(e.duration_min);
       let seq: number | null = null;
+      let isFree = e.free;
       if (focus) {
-        const key = `${band}|${focus}|${equip}`;
-        seq = (counters.get(key) ?? 0) + 1;
-        counters.set(key, seq);
+        seq = (counters.get(focus) ?? 0) + 1;
+        counters.set(focus, seq);
+        // Free = first no-equipment 15-min video of each focus (max 3),
+        // regardless of its number in the focus-wide sequence.
+        isFree = equip === 'none' && band === '15' && !freeSeen.has(focus);
+        if (isFree) freeSeen.add(focus);
       }
       return {
         e,
@@ -57,15 +68,15 @@ export function catalogExercises(exercises: DbExercise[]): CatalogExercise[] {
         band,
         seq,
         title: focus && seq ? seriesTitle(focus, seq) : e.name,
-        // Free = first no-equipment 15-min video of each focus (max 3).
-        isFree: focus ? seq === 1 && equip === 'none' && band === '15' : e.free,
+        isFree,
       };
     });
 }
 
-/** Series-number the stretch library (skips legacy 'stretch-N' demo rows). */
+/** Number the stretch library — same focus-wide scheme as exercises. */
 export function catalogStretches(stretches: DbStretch[]): CatalogStretch[] {
   const counters = new Map<string, number>();
+  const freeSeen = new Set<string>();
   return stretches
     .filter((s) => !s.id.startsWith('stretch-'))
     .map((s) => {
@@ -73,10 +84,12 @@ export function catalogStretches(stretches: DbStretch[]): CatalogStretch[] {
       const equip = parseEquip(s.equipment);
       const band = durationBand(s.duration_min);
       let seq: number | null = null;
+      let isFree = s.free;
       if (focus) {
-        const key = `${band}|${focus}|${equip}`;
-        seq = (counters.get(key) ?? 0) + 1;
-        counters.set(key, seq);
+        seq = (counters.get(focus) ?? 0) + 1;
+        counters.set(focus, seq);
+        isFree = equip === 'none' && band === '15' && !freeSeen.has(focus);
+        if (isFree) freeSeen.add(focus);
       }
       return {
         s,
@@ -85,7 +98,7 @@ export function catalogStretches(stretches: DbStretch[]): CatalogStretch[] {
         band,
         seq,
         title: focus && seq ? stretchSeriesTitle(focus, seq) : s.name,
-        isFree: focus ? seq === 1 && equip === 'none' && band === '15' : s.free,
+        isFree,
       };
     });
 }
