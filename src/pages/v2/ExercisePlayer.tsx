@@ -285,6 +285,12 @@ export default function ExercisePlayer() {
           )}
         </div>
 
+        {/* Per-video description from the admin — differentiates videos even
+            while they all still show the placeholder thumb. */}
+        {exercise.description && (
+          <BodyText size="sm" tone="secondary">{exercise.description}</BodyText>
+        )}
+
         {/* Cycle recommendation */}
         {location.state?.fromRecommendation && (
           <div className="rounded-card bg-mauve/[0.08] border border-mauve/20 p-4">
