@@ -938,8 +938,12 @@ export default function DomovNew() {
           color: TELO,
           img: teloPick.thumb ?? '/images/r9/section-body.jpg',
           title: teloPick.title,
-          // Honest phase line — the pick really is filtered by her phase.
-          sub: [teloPick.meta, teloPick.reason ?? (isPlus ? 'zapni si cyklus pre výber podľa fázy' : 'zadarmo')].join(' · '),
+          // No phase line here — Periodka's card next to it already says the
+          // phase; repeating it reads as noise (Gabi 2026-07-25). The nudge
+          // for Plus users without a cycle stays.
+          sub: teloPick.reason || !isPlus
+            ? teloPick.meta
+            : `${teloPick.meta} · zapni si cyklus pre výber podľa fázy`,
           href: teloPick.href,
           state: teloPick.playerState,
           cta: 'Zacvičiť si',

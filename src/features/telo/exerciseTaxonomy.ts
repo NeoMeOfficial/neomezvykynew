@@ -76,9 +76,9 @@ const EXERCISE_ACTION: Record<FocusKey, string> = {
   legs: 'Posilni si nohy & zadok',
 };
 
-/** Generated display name: "Posilni si core & brucho č. 3". */
+/** Generated display name: "Posilni si core & brucho #3". */
 export function seriesTitle(focus: FocusKey, seq: number): string {
-  return `${EXERCISE_ACTION[focus]} č. ${seq}`;
+  return `${EXERCISE_ACTION[focus]} #${seq}`;
 }
 
 // ─── Strečingy ────────────────────────────────────────────────────────────────
@@ -119,7 +119,7 @@ const STRETCH_ACTION: Record<StretchFocusKey, string> = {
   lower: 'Postrečuj si dolnú časť tela',
 };
 
-/** Generated display name: "Postrečuj si vršok & stred tela č. 2". */
+/** Generated display name: "Postrečuj si vršok & stred tela #2". */
 export function stretchSeriesTitle(focus: StretchFocusKey, seq: number): string {
-  return `${STRETCH_ACTION[focus]} č. ${seq}`;
+  return `${STRETCH_ACTION[focus]} #${seq}`;
 }
