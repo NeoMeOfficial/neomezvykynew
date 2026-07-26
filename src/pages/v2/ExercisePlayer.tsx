@@ -285,8 +285,9 @@ export default function ExercisePlayer() {
           )}
         </div>
 
-        {/* Cycle recommendation */}
-        {location.state?.fromRecommendation && (
+        {/* Cycle recommendation — only when the pick really came from the
+            phase formula (not stretch-day / no-cycle / free rotation) */}
+        {location.state?.phasePick && (
           <div className="rounded-card bg-mauve/[0.08] border border-mauve/20 p-4">
             <BodyText size="sm" className="text-mauve font-medium">
               Toto cvičenie bolo odporúčané na základe aktuálnej fázy tvojho cyklu.

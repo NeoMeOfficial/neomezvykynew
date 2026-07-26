@@ -855,7 +855,7 @@ export default function DomovNew() {
   const user = useUser();
   const cycle = useCycleInfo();
   const { userProgram } = useUserProgram();
-  const { pick: teloPick } = useDailyTeloPick();
+  const { pick: teloPick, hasCycle: teloHasCycle } = useDailyTeloPick();
   const { todayPlan } = useMealPlan();
   const { recipes } = useRecipes();
   const { meditation } = useDailyMeditation();
@@ -941,9 +941,9 @@ export default function DomovNew() {
           // No phase line here — Periodka's card next to it already says the
           // phase; repeating it reads as noise (Gabi 2026-07-25). The nudge
           // for Plus users without a cycle stays.
-          sub: teloPick.reason || !isPlus
-            ? teloPick.meta
-            : `${teloPick.meta} · zapni si cyklus pre výber podľa fázy`,
+          sub: isPlus && !teloHasCycle
+            ? `${teloPick.meta} · zapni si cyklus pre výber podľa fázy`
+            : teloPick.meta,
           href: teloPick.href,
           state: teloPick.playerState,
           cta: 'Zacvič si',

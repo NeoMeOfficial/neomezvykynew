@@ -11,6 +11,8 @@
  *        menstrual (or overdue)  → stretches only
  *   3. Plus without cycle → rotate the whole library, nudge to enable it.
  *   4. Free → rotate the free videos only.
+ *   5. Streda + piatok = strečingové dni (Gabi 2026-07-26) — the pick is
+ *      always a stretch, overriding the phase bucket for every tier.
  *
  * Rotation is deterministic per calendar day (same video for every woman
  * in the same bucket that day; advances daily, no repeats while the pool
@@ -36,8 +38,12 @@ export interface DailyTeloPick {
   reason: string | null;
   thumb: string | null;
   href: string;
-  /** location.state payload for ExercisePlayer. */
-  playerState: { exercise: Record<string, unknown>; fromRecommendation: boolean };
+  /**
+   * location.state payload for ExercisePlayer. `phasePick` gates the
+   * "odporúčané podľa fázy" banner — false for stretch-day / no-cycle /
+   * free picks, where that claim wouldn't be true.
+   */
+  playerState: { exercise: Record<string, unknown>; fromRecommendation: boolean; phasePick: boolean };
 }
 
 function bucketFor(view: {
@@ -85,6 +91,7 @@ function toPick(p: PoolItem, reason: string | null): DailyTeloPick {
       href: `/exercise/extra/${e.id}`,
       playerState: {
         fromRecommendation: true,
+        phasePick: reason !== null,
         exercise: {
           id: e.id,
           name: p.item.title,
@@ -111,6 +118,7 @@ function toPick(p: PoolItem, reason: string | null): DailyTeloPick {
     href: `/stretch/${s.id}`,
     playerState: {
       fromRecommendation: true,
+      phasePick: reason !== null,
       exercise: {
         id: s.id,
         name: p.item.title,
@@ -145,12 +153,24 @@ export function useDailyTeloPick(): { pick: DailyTeloPick | null; loading: boole
     let pool: PoolItem[];
     let reason: string | null = null;
 
+    // Streda + piatok sú strečingové dni (Gabi 2026-07-26): the featured
+    // pick is always a stretch, whatever the phase says.
+    const dow = new Date().getDay();
+    const stretchDay = dow === 3 || dow === 5;
+
     if (!isPremium) {
       // Free tier rotates its free videos.
       pool = [...allExs, ...allSts].filter((p) => p.item.isFree);
+      if (stretchDay) {
+        const freeStretches = pool.filter((p) => p.kind === 'stretch');
+        if (freeStretches.length > 0) pool = freeStretches;
+      }
     } else if (!hasCycle) {
       // Plus without a tracked cycle — whole library, no phase claim.
-      pool = [...allExs, ...allSts];
+      pool = stretchDay && allSts.length > 0 ? allSts : [...allExs, ...allSts];
+    } else if (stretchDay && allSts.length > 0) {
+      // Stretch day overrides the phase bucket — no phase claim either.
+      pool = allSts;
     } else {
       const bucket = bucketFor(cycle);
       reason = BUCKET_REASON[bucket](cycle.phaseKey);
