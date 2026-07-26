@@ -4,42 +4,12 @@ import BottomNav from '../../components/v2/BottomNav';
 import ErrorBoundary from '../../components/v2/ErrorBoundary';
 
 /**
- * Routes where the layout BottomNav should be hidden so the screen
- * gets a distraction-free "focus mode". Any path matching one of
- * these prefixes suppresses the nav.
- *
- * Includes deep screens under the five top-level tabs
- * (/domov-new, /kniznica, /komunita, /spravy, /profil) — those are
- * detail / compose / thread / player pages where a text input or
- * action sheet at the bottom of the viewport would otherwise be
- * covered by the BottomNav. Top-level tab roots themselves are
- * matched by exact-path checks below, not by these prefixes, so the
- * tab still shows the nav.
+ * BottomNav shows ONLY on the five top-level tab roots (Gabi 2026-07-26:
+ * one rule across the whole app). Every screen the user opens from
+ * there — detail, player, compose, settings — is focus mode: no nav,
+ * back arrow top-left (guaranteed by the 2026-07-26 back-arrow audit).
  */
-const FOCUS_ROUTE_PREFIXES = [
-  // Admin panel has its own sidebar — the consumer BottomNav floated over it.
-  '/admin',
-  '/jedalnicek/onboarding',
-  '/onboarding-plus/',
-  // Deep screens under top-level tabs (compose, detail, thread,
-  // player, history, settings)
-  '/komunita/',
-  '/spravy/',
-  '/kniznica/',
-  '/profil/',
-  // Stand-alone deep screens reachable from various tabs
-  '/program/',
-  '/recepty/',
-  '/recept/',
-  '/meditacie/',
-  '/workout/',
-  '/reflection/',
-  '/cyklus/',
-  '/navyky/',
-  '/settings/',
-  '/checkout',
-  '/paywall',
-];
+const TAB_ROOTS = ['/domov-new', '/new-home', '/kniznica', '/komunita', '/spravy', '/profil'];
 
 /**
  * PWA update banner.
@@ -123,7 +93,7 @@ export default function AppLayout() {
   };
 
   const { pathname } = useLocation();
-  const focusMode = FOCUS_ROUTE_PREFIXES.some((p) => pathname.startsWith(p));
+  const focusMode = !TAB_ROOTS.includes(pathname.replace(/\/+$/, '') || '/');
 
   return (
     <div
