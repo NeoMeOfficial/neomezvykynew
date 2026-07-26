@@ -220,6 +220,8 @@ export interface PillarItem {
   color: string;
   img: string;
   title: string;
+  /** Optional split: renders `before` quiet and `em` italic in the pillar color. */
+  titleParts?: { before: string; em: string } | null;
   sub?: string;
   cta?: string;
   href: string;
@@ -304,7 +306,9 @@ function PillarPhotoCard({ p }: { p: PillarItem }) {
             overflow: 'hidden',
           }}
         >
-          {p.title}
+          {p.titleParts
+            ? <>{p.titleParts.before}{' '}<em style={{ fontStyle: 'italic', color: p.color, fontWeight: 500 }}>{p.titleParts.em}</em></>
+            : p.title}
         </div>
         {p.sub && (
           <div style={{ fontSize: 11.5, color: FG2, fontWeight: 300, marginTop: 4, lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }}>{p.sub}</div>
@@ -938,6 +942,7 @@ export default function DomovNew() {
           color: TELO,
           img: teloPick.thumb ?? '/images/r9/section-body.jpg',
           title: teloPick.title,
+          titleParts: teloPick.titleParts,
           // No phase line here — Periodka's card next to it already says the
           // phase; repeating it reads as noise (Gabi 2026-07-25). The nudge
           // for Plus users without a cycle stays.

@@ -70,15 +70,23 @@ export function durationBand(minutes: number): BandKey {
 // label, not an invitation — exercises say "Posilni si…", stretches
 // "Postrečuj si…". Kept separate from FOCUS_LABEL (filters/chips still
 // use the noun form); mind the accusative case ("dolnú časť tela").
-const EXERCISE_ACTION: Record<FocusKey, string> = {
-  full: 'Posilni si celé telo',
-  core: 'Posilni si core & brucho',
-  legs: 'Posilni si nohy & zadok',
+export const EXERCISE_ACTION_VERB = 'Posilni si';
+
+/** Accusative noun part — what gets visually emphasized on the home card. */
+export const EXERCISE_FOCUS_ACC: Record<FocusKey, string> = {
+  full: 'celé telo',
+  core: 'core & brucho',
+  legs: 'nohy & zadok',
 };
 
 /** Generated display name: "Posilni si core & brucho #3". */
 export function seriesTitle(focus: FocusKey, seq: number): string {
-  return `${EXERCISE_ACTION[focus]} #${seq}`;
+  return `${EXERCISE_ACTION_VERB} ${EXERCISE_FOCUS_ACC[focus]} #${seq}`;
+}
+
+/** Same title split for rich rendering: quiet verb + emphasized name. */
+export function seriesTitleParts(focus: FocusKey, seq: number): { before: string; em: string } {
+  return { before: EXERCISE_ACTION_VERB, em: `${EXERCISE_FOCUS_ACC[focus]} #${seq}` };
 }
 
 // ─── Strečingy ────────────────────────────────────────────────────────────────
@@ -113,13 +121,20 @@ export function parseStretchFocus(body: string | null | undefined): StretchFocus
   return null;
 }
 
-const STRETCH_ACTION: Record<StretchFocusKey, string> = {
-  full: 'Postrečuj si celé telo',
-  upper: 'Postrečuj si vršok & stred tela',
-  lower: 'Postrečuj si dolnú časť tela',
+export const STRETCH_ACTION_VERB = 'Postrečuj si';
+
+export const STRETCH_FOCUS_ACC: Record<StretchFocusKey, string> = {
+  full: 'celé telo',
+  upper: 'vršok & stred tela',
+  lower: 'dolnú časť tela',
 };
 
 /** Generated display name: "Postrečuj si vršok & stred tela #2". */
 export function stretchSeriesTitle(focus: StretchFocusKey, seq: number): string {
-  return `${STRETCH_ACTION[focus]} #${seq}`;
+  return `${STRETCH_ACTION_VERB} ${STRETCH_FOCUS_ACC[focus]} #${seq}`;
+}
+
+/** Same title split for rich rendering: quiet verb + emphasized name. */
+export function stretchSeriesTitleParts(focus: StretchFocusKey, seq: number): { before: string; em: string } {
+  return { before: STRETCH_ACTION_VERB, em: `${STRETCH_FOCUS_ACC[focus]} #${seq}` };
 }

@@ -23,7 +23,7 @@ import { useExercises } from '@/hooks/useExercises';
 import { useStretches } from '@/hooks/useStretches';
 import { useCycle } from '@/hooks/use-cycle';
 import { useSubscription } from '@/contexts/SubscriptionContext';
-import { EQUIP_SHORT, EQUIP_LABEL, FOCUS_LABEL, STRETCH_FOCUS_LABEL } from './exerciseTaxonomy';
+import { EQUIP_SHORT, EQUIP_LABEL, FOCUS_LABEL, STRETCH_FOCUS_LABEL, seriesTitleParts, stretchSeriesTitleParts } from './exerciseTaxonomy';
 import { catalogExercises, catalogStretches, CatalogExercise, CatalogStretch } from './libraryCatalog';
 
 export type PhaseBucket = 'power' | 'earlyLuteal' | 'lateLuteal' | 'menstrual';
@@ -32,6 +32,8 @@ export interface DailyTeloPick {
   kind: 'exercise' | 'stretch';
   id: string;
   title: string;
+  /** Title split for rich rendering — quiet verb + emphasized name. */
+  titleParts: { before: string; em: string } | null;
   /** e.g. "15 min · s gumami" */
   meta: string;
   /** Honest phase line, e.g. "pre folikulárnu fázu" — null without a cycle. */
@@ -85,6 +87,7 @@ function toPick(p: PoolItem, reason: string | null): DailyTeloPick {
       kind: 'exercise',
       id: e.id,
       title: p.item.title,
+      titleParts: p.item.focus && p.item.seq ? seriesTitleParts(p.item.focus, p.item.seq) : null,
       meta: `${e.duration_min} min · ${EQUIP_SHORT[p.item.equip]}`,
       reason,
       thumb: e.thumb_url,
@@ -112,6 +115,7 @@ function toPick(p: PoolItem, reason: string | null): DailyTeloPick {
     kind: 'stretch',
     id: s.id,
     title: p.item.title,
+    titleParts: p.item.focus && p.item.seq ? stretchSeriesTitleParts(p.item.focus, p.item.seq) : null,
     meta: `${s.duration_min} min · ${EQUIP_SHORT[p.item.equip]}`,
     reason,
     thumb: s.thumb_url,
