@@ -22,8 +22,8 @@ export interface CatalogExercise {
   band: BandKey;
   seq: number | null;
   title: string;
-  /** Title split for rich rendering — quiet verb + emphasized name. */
-  titleParts: { before: string; em: string } | null;
+  /** Title split for rich rendering — quiet verb + emphasized name + small number. */
+  titleParts: { before: string; em: string; num: string } | null;
   isFree: boolean;
 }
 
@@ -34,8 +34,8 @@ export interface CatalogStretch {
   band: BandKey;
   seq: number | null;
   title: string;
-  /** Title split for rich rendering — quiet verb + emphasized name. */
-  titleParts: { before: string; em: string } | null;
+  /** Title split for rich rendering — quiet verb + emphasized name + small number. */
+  titleParts: { before: string; em: string; num: string } | null;
   isFree: boolean;
 }
 

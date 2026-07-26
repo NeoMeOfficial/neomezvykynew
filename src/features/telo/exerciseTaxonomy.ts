@@ -84,9 +84,9 @@ export function seriesTitle(focus: FocusKey, seq: number): string {
   return `${EXERCISE_ACTION_VERB} ${EXERCISE_FOCUS_ACC[focus]} #${seq}`;
 }
 
-/** Same title split for rich rendering: quiet verb + emphasized name. */
-export function seriesTitleParts(focus: FocusKey, seq: number): { before: string; em: string } {
-  return { before: EXERCISE_ACTION_VERB, em: `${EXERCISE_FOCUS_ACC[focus]} #${seq}` };
+/** Title split for rich rendering: quiet verb + emphasized name + small number. */
+export function seriesTitleParts(focus: FocusKey, seq: number): { before: string; em: string; num: string } {
+  return { before: EXERCISE_ACTION_VERB, em: EXERCISE_FOCUS_ACC[focus], num: `#${seq}` };
 }
 
 // ─── Strečingy ────────────────────────────────────────────────────────────────
@@ -134,7 +134,7 @@ export function stretchSeriesTitle(focus: StretchFocusKey, seq: number): string 
   return `${STRETCH_ACTION_VERB} ${STRETCH_FOCUS_ACC[focus]} #${seq}`;
 }
 
-/** Same title split for rich rendering: quiet verb + emphasized name. */
-export function stretchSeriesTitleParts(focus: StretchFocusKey, seq: number): { before: string; em: string } {
-  return { before: STRETCH_ACTION_VERB, em: `${STRETCH_FOCUS_ACC[focus]} #${seq}` };
+/** Title split for rich rendering: quiet verb + emphasized name + small number. */
+export function stretchSeriesTitleParts(focus: StretchFocusKey, seq: number): { before: string; em: string; num: string } {
+  return { before: STRETCH_ACTION_VERB, em: STRETCH_FOCUS_ACC[focus], num: `#${seq}` };
 }

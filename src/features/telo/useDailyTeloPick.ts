@@ -32,8 +32,8 @@ export interface DailyTeloPick {
   kind: 'exercise' | 'stretch';
   id: string;
   title: string;
-  /** Title split for rich rendering — quiet verb + emphasized name. */
-  titleParts: { before: string; em: string } | null;
+  /** Title split for rich rendering — quiet verb + emphasized name + small number. */
+  titleParts: { before: string; em: string; num: string } | null;
   /** e.g. "15 min · s gumami" */
   meta: string;
   /** Honest phase line, e.g. "pre folikulárnu fázu" — null without a cycle. */

@@ -19,7 +19,7 @@ import { EQUIP_LABEL, EQUIP_SHORT, FOCUS_LABEL, STRETCH_FOCUS_LABEL, parseFocus,
 interface SuggestionRow {
   id: string;
   title: string;
-  titleParts: { before: string; em: string } | null;
+  titleParts: { before: string; em: string; num: string } | null;
   meta: string;
   thumb: string | null;
   focus: string | null;
@@ -351,7 +351,7 @@ export default function ExercisePlayer() {
                 <div className="flex-1 min-w-0">
                   <div className="font-serif text-[14px] text-ink truncate">
                     {row.titleParts
-                      ? <>{row.titleParts.before}{' '}<strong className="font-bold text-[15px]" style={{ color: '#6B4C3B' }}>{row.titleParts.em}</strong></>
+                      ? <>{row.titleParts.before}{' '}<strong className="font-bold text-[15px]" style={{ color: '#6B4C3B' }}>{row.titleParts.em}</strong><span className="font-sans text-[10px] font-semibold text-ink/40 ml-0.5">{row.titleParts.num}</span></>
                       : row.title}
                   </div>
                   <div className="font-sans text-[11px] text-ink/50 mt-0.5">{row.meta}</div>
@@ -382,7 +382,7 @@ export default function ExercisePlayer() {
                 <div className="flex-1 min-w-0">
                   <div className="font-serif text-[14px] text-ink truncate">
                     {row.titleParts
-                      ? <>{row.titleParts.before}{' '}<strong className="font-bold text-[15px]" style={{ color: '#6B4C3B' }}>{row.titleParts.em}</strong></>
+                      ? <>{row.titleParts.before}{' '}<strong className="font-bold text-[15px]" style={{ color: '#6B4C3B' }}>{row.titleParts.em}</strong><span className="font-sans text-[10px] font-semibold text-ink/40 ml-0.5">{row.titleParts.num}</span></>
                       : row.title}
                   </div>
                   <div className="font-sans text-[11px] text-ink/50 mt-0.5">{row.meta}</div>

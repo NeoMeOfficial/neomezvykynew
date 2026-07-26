@@ -220,8 +220,8 @@ export interface PillarItem {
   color: string;
   img: string;
   title: string;
-  /** Optional split: renders `before` quiet and `em` italic in the pillar color. */
-  titleParts?: { before: string; em: string } | null;
+  /** Optional split: `before` quiet, `em` bold in the pillar color, `num` small muted. */
+  titleParts?: { before: string; em: string; num: string } | null;
   sub?: string;
   cta?: string;
   href: string;
@@ -307,7 +307,7 @@ function PillarPhotoCard({ p }: { p: PillarItem }) {
           }}
         >
           {p.titleParts
-            ? <>{p.titleParts.before}{' '}<strong style={{ color: p.color, fontWeight: 700 }}>{p.titleParts.em}</strong></>
+            ? <>{p.titleParts.before}{' '}<strong style={{ color: p.color, fontWeight: 700 }}>{p.titleParts.em}</strong><span style={{ fontFamily: SANS, fontSize: '0.62em', fontWeight: 600, color: FG3, marginLeft: 3 }}>{p.titleParts.num}</span></>
             : p.title}
         </div>
         {p.sub && (
