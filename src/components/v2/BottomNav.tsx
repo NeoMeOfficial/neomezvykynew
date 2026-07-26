@@ -22,15 +22,29 @@ export default function BottomNav() {
   const { unreadCount } = useMessages();
 
   return (
-    <nav
+    // Opaque full-width dock: content visually ENDS at its top edge
+    // instead of sliding behind a floating pill (Gabi 2026-07-26).
+    <div
       style={{
         position: 'fixed',
-        bottom: 'calc(env(safe-area-inset-bottom, 0px) + 10px)',
-        left: '50%',
-        transform: 'translateX(-50%)',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        zIndex: 50,
+        paddingTop: 10,
+        paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 10px)',
+        background: 'rgba(248,245,240,0.92)',
+        backdropFilter: 'blur(14px)',
+        WebkitBackdropFilter: 'blur(14px)',
+        borderTop: '1px solid rgba(61,41,33,0.08)',
+        display: 'flex',
+        justifyContent: 'center',
+      }}
+    >
+    <nav
+      style={{
         width: 'calc(100% - 32px)',
         maxWidth: 420,
-        zIndex: 50,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-around',
@@ -103,5 +117,6 @@ export default function BottomNav() {
         );
       })}
     </nav>
+    </div>
   );
 }
