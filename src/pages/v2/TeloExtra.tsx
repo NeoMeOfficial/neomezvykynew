@@ -241,7 +241,7 @@ export default function TeloExtra() {
                   <div style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
                     <div style={{ fontFamily: NM.SERIF, fontSize: 15, fontWeight: 500, color: NM.DEEP, letterSpacing: '-0.005em' }}>
                       {p.titleParts
-                        ? <>{p.titleParts.before}{' '}<strong style={{ color: '#6B4C3B', fontWeight: 700, fontSize: 16 }}>{p.titleParts.em}</strong><span style={{ fontFamily: NM.SANS, fontSize: 10, fontWeight: 600, color: NM.TERTIARY, marginLeft: 3 }}>{p.titleParts.num}</span></>
+                        ? <>{p.titleParts.before}{' '}<strong style={{ color: '#B8864A', fontWeight: 700, fontSize: 16 }}>{p.titleParts.em}</strong><span style={{ fontFamily: NM.SANS, fontSize: 10, fontWeight: 600, color: NM.TERTIARY, marginLeft: 3 }}>{p.titleParts.num}</span></>
                         : p.title}
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginTop: 3 }}>

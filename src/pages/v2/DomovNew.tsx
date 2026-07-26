@@ -80,7 +80,7 @@ function Greeting({ name, points, streakDays, plus, onPointsClick }: {
       </div>
       <div style={{ fontFamily: SERIF, fontSize: 32, lineHeight: 1.04, letterSpacing: '-0.012em', marginTop: 16, color: INK, fontWeight: 500 }}>
         {getTimeGreeting()},<br/>
-        <em style={{ fontStyle: 'italic', color: TELO, fontWeight: 500 }}>{name}</em>
+        <em style={{ fontStyle: 'italic', color: GOLD, fontWeight: 500 }}>{name}</em>
       </div>
       <div style={{ marginTop: 10, fontSize: 12.5, lineHeight: 1.5, color: FG2, fontWeight: 400, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' as const }}>
         <span>Silné telo vzniká z malých rozhodnutí</span>
@@ -307,7 +307,7 @@ function PillarPhotoCard({ p }: { p: PillarItem }) {
           }}
         >
           {p.titleParts
-            ? <>{p.titleParts.before}{' '}<strong style={{ color: p.color, fontWeight: 700 }}>{p.titleParts.em}</strong><span style={{ fontFamily: SANS, fontSize: '0.62em', fontWeight: 600, color: FG3, marginLeft: 3 }}>{p.titleParts.num}</span></>
+            ? <>{p.titleParts.before}{' '}<strong style={{ color: GOLD, fontWeight: 700 }}>{p.titleParts.em}</strong><span style={{ fontFamily: SANS, fontSize: '0.62em', fontWeight: 600, color: FG3, marginLeft: 3 }}>{p.titleParts.num}</span></>
             : p.title}
         </div>
         {p.sub && (
