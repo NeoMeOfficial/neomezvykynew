@@ -307,7 +307,7 @@ function PillarPhotoCard({ p }: { p: PillarItem }) {
           }}
         >
           {p.titleParts
-            ? <>{p.titleParts.before}{' '}<em style={{ fontStyle: 'italic', color: p.color, fontWeight: 500 }}>{p.titleParts.em}</em></>
+            ? <>{p.titleParts.before}{' '}<strong style={{ color: p.color, fontWeight: 700 }}>{p.titleParts.em}</strong></>
             : p.title}
         </div>
         {p.sub && (
