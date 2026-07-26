@@ -12,7 +12,7 @@ import { DbStretch } from '@/hooks/useStretches';
 import {
   FocusKey, StretchFocusKey, EquipKey, BandKey,
   parseFocus, parseStretchFocus, parseEquip, durationBand,
-  seriesTitle, stretchSeriesTitle,
+  seriesTitle, stretchSeriesTitle, seriesTitleParts, stretchSeriesTitleParts,
 } from './exerciseTaxonomy';
 
 export interface CatalogExercise {
@@ -22,6 +22,8 @@ export interface CatalogExercise {
   band: BandKey;
   seq: number | null;
   title: string;
+  /** Title split for rich rendering — quiet verb + emphasized name. */
+  titleParts: { before: string; em: string } | null;
   isFree: boolean;
 }
 
@@ -32,6 +34,8 @@ export interface CatalogStretch {
   band: BandKey;
   seq: number | null;
   title: string;
+  /** Title split for rich rendering — quiet verb + emphasized name. */
+  titleParts: { before: string; em: string } | null;
   isFree: boolean;
 }
 
@@ -68,6 +72,7 @@ export function catalogExercises(exercises: DbExercise[]): CatalogExercise[] {
         band,
         seq,
         title: focus && seq ? seriesTitle(focus, seq) : e.name,
+        titleParts: focus && seq ? seriesTitleParts(focus, seq) : null,
         isFree,
       };
     });
@@ -98,6 +103,7 @@ export function catalogStretches(stretches: DbStretch[]): CatalogStretch[] {
         band,
         seq,
         title: focus && seq ? stretchSeriesTitle(focus, seq) : s.name,
+        titleParts: focus && seq ? stretchSeriesTitleParts(focus, seq) : null,
         isFree,
       };
     });

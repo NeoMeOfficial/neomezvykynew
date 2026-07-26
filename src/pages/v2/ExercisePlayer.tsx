@@ -19,6 +19,7 @@ import { EQUIP_LABEL, EQUIP_SHORT, FOCUS_LABEL, STRETCH_FOCUS_LABEL, parseFocus,
 interface SuggestionRow {
   id: string;
   title: string;
+  titleParts: { before: string; em: string } | null;
   meta: string;
   thumb: string | null;
   focus: string | null;
@@ -30,6 +31,7 @@ function exerciseRow(c: CatalogExercise): SuggestionRow {
   return {
     id: c.e.id,
     title: c.title,
+    titleParts: c.titleParts,
     meta: `${c.e.duration_min} min · ${EQUIP_SHORT[c.equip]}`,
     thumb: c.e.thumb_url,
     focus: c.focus,
@@ -55,6 +57,7 @@ function stretchRow(c: CatalogStretch): SuggestionRow {
   return {
     id: c.s.id,
     title: c.title,
+    titleParts: c.titleParts,
     meta: `${c.s.duration_min} min · ${EQUIP_SHORT[c.equip]}`,
     thumb: c.s.thumb_url,
     focus: c.focus,
@@ -346,7 +349,11 @@ export default function ExercisePlayer() {
                   style={row.thumb ? { backgroundImage: `url(${row.thumb})` } : undefined}
                 />
                 <div className="flex-1 min-w-0">
-                  <div className="font-serif text-[14px] text-ink truncate">{row.title}</div>
+                  <div className="font-serif text-[14px] text-ink truncate">
+                    {row.titleParts
+                      ? <>{row.titleParts.before}{' '}<strong className="font-bold text-[15px]" style={{ color: '#6B4C3B' }}>{row.titleParts.em}</strong></>
+                      : row.title}
+                  </div>
                   <div className="font-sans text-[11px] text-ink/50 mt-0.5">{row.meta}</div>
                 </div>
                 <span className="text-ink/30 text-sm">›</span>
@@ -373,7 +380,11 @@ export default function ExercisePlayer() {
                   style={row.thumb ? { backgroundImage: `url(${row.thumb})` } : undefined}
                 />
                 <div className="flex-1 min-w-0">
-                  <div className="font-serif text-[14px] text-ink truncate">{row.title}</div>
+                  <div className="font-serif text-[14px] text-ink truncate">
+                    {row.titleParts
+                      ? <>{row.titleParts.before}{' '}<strong className="font-bold text-[15px]" style={{ color: '#6B4C3B' }}>{row.titleParts.em}</strong></>
+                      : row.title}
+                  </div>
                   <div className="font-sans text-[11px] text-ink/50 mt-0.5">{row.meta}</div>
                 </div>
                 <span className="text-ink/30 text-sm">›</span>

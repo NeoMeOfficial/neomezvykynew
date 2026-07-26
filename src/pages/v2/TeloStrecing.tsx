@@ -230,7 +230,11 @@ export default function TeloStrecing() {
                     </div>
                   </div>
                   <div style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
-                    <div style={{ fontFamily: NM.SERIF, fontSize: 15, fontWeight: 500, color: NM.DEEP, letterSpacing: '-0.005em' }}>{p.title}</div>
+                    <div style={{ fontFamily: NM.SERIF, fontSize: 15, fontWeight: 500, color: NM.DEEP, letterSpacing: '-0.005em' }}>
+                      {p.titleParts
+                        ? <>{p.titleParts.before}{' '}<strong style={{ color: '#6B4C3B', fontWeight: 700, fontSize: 16 }}>{p.titleParts.em}</strong></>
+                        : p.title}
+                    </div>
                     <div style={{ fontFamily: NM.SANS, fontSize: 10.5, color: NM.EYEBROW, marginTop: 3, fontWeight: 400 }}>
                       {p.s.duration_min} min · {EQUIP_SHORT[p.equip]}
                     </div>
