@@ -4,6 +4,7 @@ import { Page, Eye, NM } from '../../components/v2/neome';
 import { useMeditations } from '../../hooks/useMeditations';
 import { useReflections } from '../../hooks/useDailyRituals';
 import { useUniversalFavorites } from '../../hooks/useUniversalFavorites';
+import { useSmartBack } from '../../hooks/useSmartBack';
 
 /**
  * Myseľ landing — Round 20.
@@ -34,6 +35,7 @@ const MAUVE_100 = '#EFE4E6';
 
 export default function MyselNew() {
   const navigate = useNavigate();
+  const smartBack = useSmartBack('/kniznica');
   const { meditations } = useMeditations();
   const { entries } = useReflections();
   const { getFavoriteCounts } = useUniversalFavorites();
@@ -65,7 +67,7 @@ export default function MyselNew() {
 
   return (
     <Page paddingBottom={120}>
-      <TopBar title="Myseľ" onBack={() => navigate('/kniznica')} />
+      <TopBar title="Myseľ" onBack={smartBack} />
 
       {/* Hero */}
       <div style={{ padding: '8px 22px 0' }}>

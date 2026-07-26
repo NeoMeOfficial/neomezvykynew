@@ -1,4 +1,5 @@
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { useSmartBack } from '../../hooks/useSmartBack';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import { useUniversalFavorites } from '@/hooks/useUniversalFavorites';
 
@@ -59,7 +60,9 @@ const CARDS: Card[] = [
 export default function Telo() {
   const navigate = useNavigate();
   // Entered from a home pillar card → back returns home, not to Kniznica.
-  const fromHome = new URLSearchParams(useLocation().search).get('from') === 'home';
+  // History-back covers every entry point (home, kniznica, periodka);
+  // fallback only fires on cold deep links.
+  const smartBack = useSmartBack('/kniznica');
   const { isPremium } = useSubscription();
   const { getFavoriteCounts } = useUniversalFavorites();
   const favWorkouts = getFavoriteCounts().workout;
@@ -71,7 +74,7 @@ export default function Telo() {
       <div style={{ padding: '56px 20px 18px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <button
-            onClick={() => navigate(fromHome ? '/domov-new' : '/kniznica')}
+            onClick={smartBack}
             style={{
               width: 36, height: 36, borderRadius: 999,
               background: '#fff', border: `1px solid ${HAIR}`,

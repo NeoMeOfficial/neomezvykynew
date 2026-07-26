@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Page, Eye, NM, ConfirmSheet } from '../../components/v2/neome';
 import { useReflections } from '../../hooks/useDailyRituals';
+import { useSmartBack } from '../../hooks/useSmartBack';
 
 /**
  * Osobný denník — Round 20.
@@ -29,6 +30,7 @@ const MAUVE_300 = '#CBB2B6';
 
 export default function DennikHistory() {
   const navigate = useNavigate();
+  const smartBack = useSmartBack('/kniznica');
   const { entries, loading, deleteReflection, updateReflection } = useReflections();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [actionId, setActionId] = useState<string | null>(null);
@@ -63,7 +65,7 @@ export default function DennikHistory() {
 
   return (
     <Page paddingBottom={120}>
-      <TopBar title="Osobný denník" onBack={() => navigate('/kniznica')} />
+      <TopBar title="Osobný denník" onBack={smartBack} />
 
       {isEmpty ? (
         <EmptyState onWrite={() => navigate('/dennik/new')} />

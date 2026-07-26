@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import WorkoutStatsWidget from '../../components/v2/workouts/WorkoutStatsWidget';
 import WorkoutCalendar from '../../components/v2/workouts/WorkoutCalendar';
 import { useWorkoutHistory } from '../../hooks/useWorkoutHistory';
+import { useSmartBack } from '../../hooks/useSmartBack';
 import { TopBar } from '@/components/v2/top-bar';
 import { Eyebrow } from '@/components/ui/eyebrow';
 import { BodyText } from '@/components/ui/body-text';
@@ -11,12 +12,13 @@ import { SerifHeader } from '@/components/ui/serif-header';
 
 export default function WorkoutHistory() {
   const navigate = useNavigate();
+  const smartBack = useSmartBack('/profil');
   const [activeTab, setActiveTab] = useState<'stats' | 'calendar'>('stats');
   const { stats } = useWorkoutHistory() as { stats: { totalWorkouts: number; currentStreak: number; longestStreak: number; recentSessions: Array<{ id: string; workoutTitle: string; workoutType: string; completedAt: string; duration: number; program?: string }> } };
 
   return (
     <div className="min-h-screen bg-cream pb-12">
-      <TopBar title="Cvičebná história" backHref="/profil" />
+      <TopBar title="Cvičebná história" onBack={smartBack} />
 
       <div className="px-5 pt-2 flex flex-col gap-4">
         {/* Tab toggle */}

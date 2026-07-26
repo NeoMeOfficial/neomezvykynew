@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import { Share2, Copy, Users, Gift, Euro, CheckCircle, Clock } from 'lucide-react';
+import { Share2, Copy, Users, Gift, Euro, CheckCircle, Clock, ChevronLeft } from 'lucide-react';
 import { colors, glassCard } from '../../../theme/warmDusk';
 import { useReferral } from '../../../hooks/useReferral';
+import { useSmartBack } from '../../../hooks/useSmartBack';
 
 export default function ReferralCenter() {
   const { referralCode, credits, stats, getShareUrl, getShareText, loading } = useReferral();
+  const smartBack = useSmartBack('/profil');
   const [copied, setCopied] = useState(false);
 
   const handleCopyCode = () => {
@@ -64,6 +66,13 @@ export default function ReferralCenter() {
     <div className="min-h-screen pb-20" style={{ background: colors.bgGradient }}>
       <div className="p-5 space-y-6 pt-16">
         {/* Header */}
+        <button
+          onClick={smartBack}
+          aria-label="Späť"
+          className="w-9 h-9 rounded-full bg-white/60 border border-black/10 flex items-center justify-center"
+        >
+          <ChevronLeft className="w-4 h-4" style={{ color: colors.textPrimary }} />
+        </button>
         <div className="text-center">
           <h1 className="text-2xl font-bold" style={{ color: colors.textPrimary }}>
             Odporúčaj & získaj

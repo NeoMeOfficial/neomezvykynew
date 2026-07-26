@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useSmartBack } from '../../hooks/useSmartBack';
 import { useSubscription } from '../../contexts/SubscriptionContext';
 
 const R9 = {
@@ -38,6 +39,7 @@ const Ser = ({ children, size = 28, color = R9.DEEP, style }: { children: React.
 
 export default function KniznicaPreview() {
   const navigate = useNavigate();
+  const smartBack = useSmartBack('/kniznica');
   const { isPremium } = useSubscription();
   // ?free=1 forces the free-tier preview regardless of real subscription state
   const forceFree = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('free');
@@ -54,6 +56,15 @@ export default function KniznicaPreview() {
 
       <div style={{ padding: 'calc(env(safe-area-inset-top) + 16px) 18px 14px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <button
+            onClick={smartBack}
+            aria-label="Späť"
+            style={{ all: 'unset', cursor: 'pointer', width: 36, height: 36, borderRadius: 999, background: '#fff', border: `1px solid ${R9.HAIR}`, display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: 10 }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={R9.DEEP} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M15 6l-6 6 6 6" />
+            </svg>
+          </button>
           <Eye>
             Knižnica
             {showPlus && <span style={{ margin: '0 8px', color: R9.TERTIARY }}>·</span>}
