@@ -115,15 +115,41 @@ export default function ExercisePlayer() {
     [dbStretches],
   );
 
-  // 3 more of the same kind — same focus first, current one excluded.
+  // 3 more of the same kind, current one excluded — DIVERSE focuses first
+  // (Gabi 2026-07-26): if today's featured pick doesn't suit her, the
+  // alternatives should cover the other body areas, not more of the same.
+  // Round-robin across focus groups, current focus queued last.
   const suggestions = useMemo(() => {
     const pool = isStretchView ? stRows : exRows;
     const currentFocus = isStretchView ? parseStretchFocus(exercise.body) : parseFocus(exercise.body);
     const rest = pool.filter((r) => r.id !== exercise.id);
-    return [
-      ...rest.filter((r) => r.focus === currentFocus),
-      ...rest.filter((r) => r.focus !== currentFocus),
-    ].slice(0, 3);
+
+    const byFocus = new Map<string, SuggestionRow[]>();
+    for (const r of rest) {
+      const k = r.focus ?? 'other';
+      if (!byFocus.has(k)) byFocus.set(k, []);
+      byFocus.get(k)!.push(r);
+    }
+    const focusOrder = [...byFocus.keys()].sort(
+      (a, b) => Number(a === currentFocus) - Number(b === currentFocus),
+    );
+
+    const result: SuggestionRow[] = [];
+    let round = 0;
+    while (result.length < 3 && result.length < rest.length) {
+      let added = false;
+      for (const k of focusOrder) {
+        const q = byFocus.get(k)!;
+        if (round < q.length) {
+          result.push(q[round]);
+          added = true;
+          if (result.length === 3) break;
+        }
+      }
+      if (!added) break;
+      round += 1;
+    }
+    return result;
   }, [exRows, stRows, isStretchView, exercise.id, exercise.body]);
 
   // Hearted workouts resolved against the library (skips ids that aren't
