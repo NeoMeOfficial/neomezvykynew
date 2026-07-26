@@ -2750,15 +2750,15 @@ function ExercisesTab() {
               <label style={labelStyle}>Zameranie</label>
               {form.content_type === 'exercise' ? (
                 <select value={form.body ?? 'Celé telo'} onChange={e => setForm(f => ({ ...f, body: e.target.value }))} style={inputStyle}>
-                  <option value="Celé telo">Celé telo</option>
-                  <option value="Core/Abs">Core & brucho</option>
-                  <option value="Nohy/Zadok">Nohy & zadok</option>
+                  <option value="Celé telo">Celé Telo</option>
+                  <option value="Core/Abs">Core</option>
+                  <option value="Nohy/Zadok">Nohy & Zadok</option>
                 </select>
               ) : (
                 <select value={form.body ?? 'Celé telo'} onChange={e => setForm(f => ({ ...f, body: e.target.value }))} style={inputStyle}>
-                  <option value="Celé telo">Celé telo</option>
-                  <option value="Vršok/Stred tela">Vršok & stred tela</option>
-                  <option value="Dolná časť tela">Dolná časť tela</option>
+                  <option value="Celé telo">Celé Telo</option>
+                  <option value="Vršok/Stred tela">Vršok & Stred Tela</option>
+                  <option value="Dolná časť tela">Dolná Časť Tela</option>
                 </select>
               )}
             </div>
