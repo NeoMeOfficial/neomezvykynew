@@ -1003,7 +1003,8 @@ export default function DomovNew() {
   ];
 
   return (
-    <div style={{ minHeight: '100vh', background: CREAM, paddingBottom: 'calc(118px + env(safe-area-inset-bottom, 0px))', fontFamily: SANS }}>
+    // Bottom-nav clearance comes from AppLayout's main padding.
+    <div style={{ minHeight: '100vh', background: CREAM, paddingBottom: 24, fontFamily: SANS }}>
       <Greeting
         name={user.name}
         points={points}

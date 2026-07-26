@@ -66,10 +66,10 @@ function UpdateBanner({ onRefresh }: { onRefresh: () => void }) {
   return (
     <div
       style={{
-        position: 'fixed',
+        // Sticky, not fixed: takes up layout space (content is pushed
+        // down instead of being covered) while staying pinned on scroll.
+        position: 'sticky',
         top: 0,
-        left: 0,
-        right: 0,
         zIndex: 9999,
         background: '#3D2921',
         color: '#fff',
@@ -132,7 +132,12 @@ export default function AppLayout() {
     >
       {needRefresh && <UpdateBanner onRefresh={onRefresh} />}
 
-      <main className="relative z-10 w-full max-w-none mx-auto min-h-screen">
+      {/* When the floating BottomNav is visible, reserve space for it here
+          once — pages then never scroll their last content behind it. */}
+      <main
+        className="relative z-10 w-full max-w-none mx-auto min-h-screen"
+        style={!focusMode ? { paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 96px)' } : undefined}
+      >
         <ErrorBoundary>
           <Outlet />
         </ErrorBoundary>
