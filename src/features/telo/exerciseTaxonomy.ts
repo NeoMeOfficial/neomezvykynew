@@ -23,7 +23,7 @@ export const EQUIP_ORDER: EquipKey[] = ['none', 'bands', 'dumbbells', 'ball'];
 export const FOCUS_LABEL: Record<FocusKey, string> = {
   full: 'Celé Telo',
   core: 'Core',
-  legs: 'Nohy & Zadok',
+  legs: 'Nohy·Zadok',
 };
 
 export const EQUIP_LABEL: Record<EquipKey, string> = {
@@ -76,7 +76,7 @@ export const EXERCISE_ACTION_VERB = 'Posilni si';
 export const EXERCISE_FOCUS_ACC: Record<FocusKey, string> = {
   full: 'Celé Telo',
   core: 'Core',
-  legs: 'Nohy & Zadok',
+  legs: 'Nohy·Zadok',
 };
 
 /** Generated display name: "Posilni si core & brucho #3". */
@@ -101,7 +101,7 @@ export const STRETCH_FOCUS_ORDER: StretchFocusKey[] = ['full', 'upper', 'lower']
 
 export const STRETCH_FOCUS_LABEL: Record<StretchFocusKey, string> = {
   full: 'Celé Telo',
-  upper: 'Vršok & Stred Tela',
+  upper: 'Vršok·Stred Tela',
   lower: 'Dolná Časť Tela',
 };
 
@@ -125,7 +125,7 @@ export const STRETCH_ACTION_VERB = 'Postrečuj si';
 
 export const STRETCH_FOCUS_ACC: Record<StretchFocusKey, string> = {
   full: 'Celé Telo',
-  upper: 'Vršok & Stred Tela',
+  upper: 'Vršok·Stred Tela',
   lower: 'Dolnú Časť Tela',
 };
 
