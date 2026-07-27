@@ -45,14 +45,14 @@ const HEADLINES: Record<HeadlineBucket, DailyHeadline[]> = {
   ],
   // ── Menštruácia, deň 3+: krvácanie slabne, estrogén začína stúpať ──
   menstrual_end: [
-    { before: 'Energia sa', em: 'pomaly vracia.', body: 'Krvácanie slabne a estrogén začína stúpať. Jemný pohyb ti dnes môže dobre padnúť.' },
+    { before: 'Energia sa', em: 'pomaly vracia.', body: 'Estrogén začína pomaly stúpať a s ním sa vracia energia. Jemný pohyb ti dnes môže dobre padnúť.' },
     { before: 'Najťažšie je', em: 'za tebou.', body: 'Telo sa uvoľňuje a sily sa postupne vracajú. Nemusíš sa ponáhľať — choď vlastným tempom.' },
     { before: 'Nadýchni sa', em: 'zľahka.', body: 'Telo dokončuje očistu a hladiny hormónov sa pomaly dvíhajú. Krátka prechádzka dnes urobí veľa.' },
     { before: 'Deň za dňom', em: 'ľahšie.', body: 'Estrogén rastie a s ním sa vracia aj chuť hýbať sa. Skús dnes o kúsok viac ako včera.' },
     { before: 'Telo sa', em: 'prebúdza.', body: 'Koniec menštruácie býva zlomový — únava ustupuje a myseľ sa čistí.' },
     { before: 'Pomaly', em: 'vpred.', body: 'Ak ešte cítiš únavu, je to v poriadku. Každá sme iná a telo si svoje tempo určí samo.' },
-    { before: 'Svetlo na', em: 'konci.', body: 'Posledné dni krvácania. Telo má za sebou veľký kus práce — poďakuj mu jemným pohybom.' },
-    { before: 'Nová kapitola', em: 'sa blíži.', body: 'Menštruácia sa končí a pred tebou je najsilnejšia časť cyklu.' },
+    { before: 'Svetlo na', em: 'konci.', body: 'Telo má za sebou veľký kus práce — poďakuj mu jemným pohybom a oddychom.' },
+    { before: 'Nová kapitola', em: 'sa blíži.', body: 'Menštruačná fáza sa chýli ku koncu a pred tebou je najsilnejšia časť cyklu.' },
   ],
   // ── Skorá folikulárna: estrogén stúpa, energia a nálada rastú ──
   follicular_early: [
