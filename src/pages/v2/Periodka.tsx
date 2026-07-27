@@ -6,7 +6,8 @@ import { useCycleSymptoms } from '../../hooks/useDailyRituals';
 import { Page, Eye, Ser, Body, PlusTag, ConfirmSheet, NM } from '../../components/v2/neome';
 import { getCycleTipByDay } from '../../data/cycleTips';
 import type { DerivedState, CycleData } from '../../features/cycle/types';
-import { PHASE_HEADLINES, PHASE_NAMES } from '../../features/cycle/constants';
+import { PHASE_NAMES } from '../../features/cycle/constants';
+import { getDailyHeadline } from '../../features/cycle/dailyHeadlines';
 import { useConsentGuard } from '../../contexts/ConsentGuardContext';
 import { useSubscription } from '../../contexts/SubscriptionContext';
 import { CONSENT_TYPES } from '../../lib/consents';
@@ -311,17 +312,10 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
   const isLate = currentDay > totalDays;
   const daysLate = isLate ? currentDay - totalDays : 0;
 
-  // Headline copy adapts to phase. Text comes from the shared
-  // PHASE_HEADLINES so the home Periodka card reads identically; only
-  // the late-period override is tracker-specific.
-  const baseHeadline = PHASE_HEADLINES[currentPhaseKey as keyof typeof PHASE_HEADLINES] ?? PHASE_HEADLINES.follicular;
-  const head = isLate
-    ? {
-        before: 'Cyklus je',
-        em: 'predĺžený.',
-        body: 'Ak ti menštruácia ešte nezačala, môže to byť normálne. Keď príde, označ jej začiatok v nastaveniach a cyklus sa zarovná.',
-      }
-    : baseHeadline;
+  // Headline copy comes from the shared getDailyHeadline (sub-phase
+  // accurate, rotates daily) so the home Periodka card reads identically;
+  // the 'late' bucket covers the overdue override.
+  const head = getDailyHeadline(currentDay, totalDays, periodLength);
 
   // Build calendar grid for the current month, Mon-first
   type Cell = { d: number; mute?: boolean };
