@@ -912,7 +912,7 @@ export default function DomovNew() {
           // The headline leads — "Spomaľ a uzemni sa" tells her what the day
           // means; the day/phase number is context, not the message.
           title: cycle.note,
-          sub: `${cycle.dayOfCycle}. deň · ${cycle.phaseName.toLowerCase()} fáza`,
+          sub: `${cycle.dayOfCycle}. deň z ${cycle.totalDays} · ${cycle.phaseName.toLowerCase()} fáza`,
           href: '/kniznica/periodka?from=home',
         }
       : {
