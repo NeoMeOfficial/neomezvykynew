@@ -319,7 +319,7 @@ function PillarPhotoCard({ p }: { p: PillarItem }) {
             : p.title}
         </div>
         {p.sub && (
-          <div style={{ fontSize: 11.5, color: FG2, fontWeight: 300, marginTop: 4, lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }}>{p.sub}</div>
+          <div style={{ fontSize: 11.5, color: FG2, fontWeight: 300, marginTop: 4, lineHeight: 1.4, whiteSpace: 'pre-line' as const, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }}>{p.sub}</div>
         )}
         <div style={{ marginTop: 'auto', paddingTop: 10 }}>
           <CtaPill label={p.cta ?? 'Zisti viac'} />
@@ -920,7 +920,7 @@ export default function DomovNew() {
           // The headline leads — "Spomaľ a uzemni sa" tells her what the day
           // means; the day/phase number is context, not the message.
           title: cycle.note,
-          sub: `Nachádzaš sa v ${PHASE_LOCATIVE[cycle.phase] ?? `${cycle.phaseName.toLowerCase()} fáze`} — ${cycle.dayOfCycle}. deň z ${cycle.totalDays}`,
+          sub: `Nachádzaš sa v ${PHASE_LOCATIVE[cycle.phase] ?? `${cycle.phaseName.toLowerCase()} fáze`}\n${cycle.dayOfCycle}. deň z ${cycle.totalDays}`,
           href: '/kniznica/periodka?from=home',
         }
       : {
