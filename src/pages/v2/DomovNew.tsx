@@ -32,6 +32,14 @@ const GOLD   = '#B8864A';
 const SERIF  = "'Gilda Display', Georgia, serif";
 const SANS   = "'DM Sans', sans-serif";
 
+// Locative phase names — "Nachádzaš sa v …" on the Periodka card.
+const PHASE_LOCATIVE: Record<string, string> = {
+  menstrual: 'menštruačnej fáze',
+  folicular: 'folikulárnej fáze',
+  ovulatory: 'ovulačnej fáze',
+  luteal: 'luteálnej fáze',
+};
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function getDateEyebrow(): string {
   const d = new Date();
@@ -912,7 +920,7 @@ export default function DomovNew() {
           // The headline leads — "Spomaľ a uzemni sa" tells her what the day
           // means; the day/phase number is context, not the message.
           title: cycle.note,
-          sub: `${cycle.dayOfCycle}. deň z ${cycle.totalDays} · ${cycle.phaseName.toLowerCase()} fáza`,
+          sub: `Nachádzaš sa v ${PHASE_LOCATIVE[cycle.phase] ?? `${cycle.phaseName.toLowerCase()} fáze`} — ${cycle.dayOfCycle}. deň z ${cycle.totalDays}`,
           href: '/kniznica/periodka?from=home',
         }
       : {
