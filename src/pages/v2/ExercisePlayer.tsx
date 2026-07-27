@@ -8,6 +8,7 @@ import { BodyText } from '@/components/ui/body-text';
 import { exercises } from '../../data/exercises';
 import FavoriteButton from '../../components/v2/favorites/FavoriteButton';
 import { useEntitlement } from '../../hooks/useEntitlement';
+import { useSmartBack } from '../../hooks/useSmartBack';
 import { useExercises } from '../../hooks/useExercises';
 import { useStretches } from '../../hooks/useStretches';
 import { useUniversalFavorites } from '../../hooks/useUniversalFavorites';
@@ -230,11 +231,15 @@ export default function ExercisePlayer() {
     }
   };
 
-  const getBackPath = (): string => {
-    if (location.state?.fromRecommendation) return '/domov';
-    if (exercise.category === 'stretch') return '/kniznica/telo/strecing';
-    return '/kniznica/telo/extra';
-  };
+  // Pops history (returns exactly where she entered the player from —
+  // in-player video switches use replace, so they don't add steps);
+  // the computed path is only the cold-deep-link fallback.
+  const backFallback = location.state?.fromRecommendation
+    ? '/domov'
+    : exercise.category === 'stretch'
+      ? '/kniznica/telo/strecing'
+      : '/kniznica/telo/extra';
+  const smartBack = useSmartBack(backFallback);
 
   // While entitlement resolves, or if quota is exhausted (redirect in
   // flight), render nothing — avoids a flash of paid content.
@@ -244,7 +249,7 @@ export default function ExercisePlayer() {
     <div className="min-h-screen bg-cream pb-12">
       <TopBar
         title={exercise.name}
-        onBack={() => navigate(getBackPath())}
+        onBack={smartBack}
         right={
           <div className="flex items-center gap-1">
             <FavoriteButton
@@ -341,7 +346,7 @@ export default function ExercisePlayer() {
             {suggestions.map((row) => (
               <button
                 key={row.id}
-                onClick={() => navigate(row.route, { state: row.state })}
+                onClick={() => navigate(row.route, { state: row.state, replace: true })}
                 className="w-full flex items-center gap-3 py-2.5 text-left border-b border-ink/[0.06] last:border-0"
               >
                 <div
@@ -372,7 +377,7 @@ export default function ExercisePlayer() {
             {favoriteRows.map((row) => (
               <button
                 key={row.id}
-                onClick={() => navigate(row.route, { state: row.state })}
+                onClick={() => navigate(row.route, { state: row.state, replace: true })}
                 className="w-full flex items-center gap-3 py-2.5 text-left border-b border-ink/[0.06] last:border-0"
               >
                 <div
