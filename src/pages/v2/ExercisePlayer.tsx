@@ -351,7 +351,7 @@ export default function ExercisePlayer() {
                 <div className="flex-1 min-w-0">
                   <div className="font-serif text-[14px] text-ink truncate">
                     {row.titleParts
-                      ? <>{row.titleParts.before}{' '}<strong className="font-bold text-[15px]" style={{ color: '#B8864A' }}>{row.titleParts.em}</strong><span className="font-sans text-[10px] font-semibold ml-0.5" style={{ color: '#B8864A' }}>{row.titleParts.num}</span></>
+                      ? <>{row.titleParts.before}{' '}<strong className="font-bold text-[15px]" style={{ color: '#B8864A' }}>{row.titleParts.em}</strong><span className="font-sans text-[12px] font-semibold ml-0.5" style={{ color: '#B8864A' }}>{row.titleParts.num}</span></>
                       : row.title}
                   </div>
                   <div className="font-sans text-[11px] text-ink/50 mt-0.5">{row.meta}</div>
@@ -382,7 +382,7 @@ export default function ExercisePlayer() {
                 <div className="flex-1 min-w-0">
                   <div className="font-serif text-[14px] text-ink truncate">
                     {row.titleParts
-                      ? <>{row.titleParts.before}{' '}<strong className="font-bold text-[15px]" style={{ color: '#B8864A' }}>{row.titleParts.em}</strong><span className="font-sans text-[10px] font-semibold ml-0.5" style={{ color: '#B8864A' }}>{row.titleParts.num}</span></>
+                      ? <>{row.titleParts.before}{' '}<strong className="font-bold text-[15px]" style={{ color: '#B8864A' }}>{row.titleParts.em}</strong><span className="font-sans text-[12px] font-semibold ml-0.5" style={{ color: '#B8864A' }}>{row.titleParts.num}</span></>
                       : row.title}
                   </div>
                   <div className="font-sans text-[11px] text-ink/50 mt-0.5">{row.meta}</div>
