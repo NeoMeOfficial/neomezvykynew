@@ -100,7 +100,7 @@ const HEADLINES: Record<HeadlineBucket, DailyHeadline[]> = {
   ],
   // ── Neskorá luteálna: hormóny klesajú, PMS okno ──
   luteal_late: [
-    { before: 'Buď k sebe', em: 'jemná.', body: 'Hormóny klesajú a nálada môže kolísať — nie je to slabosť, je to biológia. Spánok a pokoj pomáhajú.' },
+    { before: 'Kolísanie je', em: 'normálne.', body: 'Hormóny klesajú a nálada môže kolísať — nie je to slabosť, je to biológia. Spánok a pokoj pomáhajú.' },
     { before: 'Dni pred', em: 'periódou.', body: 'Podráždenosť či chute k PMS patria. Jemný pohyb, teplo a dostatok spánku ich miernia.' },
     { before: 'Uvoľni', em: 'nároky.', body: 'Telo aj psychika sú pred periódou citlivejšie. Menej povinností dnes nie je prehra.' },
     { before: 'Dovoľ si', em: 'menej.', body: 'PMS dni si pýtajú jemnosť. Strečing a teplý čaj urobia viac než tvrdý tréning.' },
