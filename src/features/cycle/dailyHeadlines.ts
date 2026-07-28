@@ -63,7 +63,7 @@ const HEADLINES: Record<HeadlineBucket, DailyHeadline[]> = {
     { before: 'Stúpaš', em: 'vyššie.', body: 'Estrogén ďalej rastie a nálada s ním. Telo si pýta pohyb — vyhovej mu.' },
     { before: 'Chuť', em: 'tvoriť.', body: 'V tejto časti cyklu sa dobre rodia nápady. Zapíš si tie dnešné.' },
     { before: 'V plnom', em: 'prúde.', body: 'Energia je stabilná a regenerácia rýchla. Ideálne dni na silový tréning.' },
-    { before: 'Teraz sa to', em: 'počíta.', body: 'Telo je vo fáze rastu — každý tréning sa teraz počíta dvojnásobne.' },
+    { before: 'Buduješ', em: 'silu.', body: 'Telo je vo fáze rastu — každý tréning sa teraz počíta dvojnásobne.' },
   ],
   // ── Neskorá folikulárna: estrogén sa blíži k vrcholu ──
   follicular_late: [
