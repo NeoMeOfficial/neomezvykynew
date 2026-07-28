@@ -63,7 +63,7 @@ const HEADLINES: Record<HeadlineBucket, DailyHeadline[]> = {
     { before: 'Stúpaš', em: 'vyššie.', body: 'Estrogén ďalej rastie a nálada s ním. Telo si pýta pohyb — vyhovej mu.' },
     { before: 'Chuť', em: 'tvoriť.', body: 'V tejto časti cyklu sa dobre rodia nápady. Zapíš si tie dnešné.' },
     { before: 'V plnom', em: 'prúde.', body: 'Energia je stabilná a regenerácia rýchla. Ideálne dni na silový tréning.' },
-    { before: 'Buduješ', em: 'silu.', body: 'Telo je vo fáze rastu — každý tréning sa teraz počíta dvojnásobne.' },
+    { before: 'Buduješ', em: 'silu.', body: 'Telo je vo fáze rastu — tréning ti teraz prinesie viac než inokedy.' },
   ],
   // ── Neskorá folikulárna: estrogén sa blíži k vrcholu ──
   follicular_late: [
@@ -250,7 +250,7 @@ const TIPS: Record<HeadlineBucket, DailyTips[]> = {
       mysel: 'Zapíš si nápady, ktoré ti dnes napadnú — hlava teraz dobre tvorí.',
     },
     {
-      pohyb: 'Silový tréning sa teraz počíta dvojnásobne — svaly regenerujú rýchlejšie než inokedy.',
+      pohyb: 'Silovému tréningu sa teraz darí — svaly regenerujú rýchlejšie než inokedy.',
       strava: 'Komplexné sacharidy pred tréningom — ovsená kaša či banán dodajú palivo.',
       mysel: 'Nauč sa dnes niečo nové, hoci len 10 minút — pamäť teraz pracuje výborne.',
     },
