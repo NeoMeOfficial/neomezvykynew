@@ -834,63 +834,6 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
           </div>
         </div>
 
-        {/* Collapsible symptom filter — expands on tap */}
-        {filterableSymptoms.length > 0 && (
-          <div style={{ marginBottom: 12 }}>
-            <button
-              onClick={() => setFilterOpen((v) => !v)}
-              style={{ all: 'unset', cursor: 'pointer', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, padding: '10px 14px', borderRadius: 14, background: '#fff', border: `1px solid ${NM.HAIR}`, boxSizing: 'border-box' }}
-            >
-              <span style={{ fontFamily: NM.SANS, fontSize: 12, color: NM.DEEP, fontWeight: 500 }}>
-                Filtruj podľa symptómov. Ako si sa cítila?
-              </span>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={NM.MUTED} strokeWidth="2" strokeLinecap="round" style={{ flexShrink: 0, transform: filterOpen ? 'rotate(180deg)' : 'none', transition: 'transform 160ms' }}>
-                <path d="M6 9l6 6 6-6"/>
-              </svg>
-            </button>
-            {filterOpen && (
-              <div style={{ marginTop: 10 }}>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                  {filterableSymptoms.map((sd) => {
-                    const active = symptomFilter === sd.k;
-                    return (
-                      <button
-                        key={sd.k}
-                        onClick={() => setSymptomFilter(active ? null : sd.k)}
-                        style={{
-                          all: 'unset',
-                          cursor: 'pointer',
-                          padding: '7px 12px',
-                          borderRadius: 999,
-                          background: active ? NM.GOLD : '#fff',
-                          color: active ? '#fff' : NM.DEEP,
-                          border: active ? '1px solid transparent' : `1px solid ${NM.HAIR_2}`,
-                          fontFamily: NM.SANS,
-                          fontSize: 11.5,
-                          fontWeight: active ? 500 : 400,
-                        }}
-                      >
-                        {sd.l} · {symptomCounts.get(sd.k) ?? 0}×
-                      </button>
-                    );
-                  })}
-                </div>
-                {activeFilterDef && filterPhaseSummary && (
-                  <div style={{ marginTop: 10, padding: '12px 14px', borderRadius: 14, background: 'rgba(184,134,74,0.08)', border: '1px solid rgba(184,134,74,0.28)' }}>
-                    <div style={{ fontFamily: NM.SANS, fontSize: 12, color: NM.DEEP, fontWeight: 500, lineHeight: 1.45 }}>
-                      {activeFilterDef.l} — {filterPhaseSummary.total}× za posledných 12 mesiacov
-                    </div>
-                    {filterPhaseSummary.top && filterPhaseSummary.total >= 2 && (
-                      <div style={{ fontFamily: NM.SANS, fontSize: 11.5, color: 'rgba(61,41,33,0.6)', marginTop: 3, lineHeight: 1.45 }}>
-                        Najčastejšie {PHASE_LOCATIVE[filterPhaseSummary.top.key] ?? ''} ({filterPhaseSummary.top.n}×). Zlaté dni v kalendári sú dni so záznamom — listuj šípkami aj do minulých mesiacov.
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        )}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', marginBottom: 5 }}>
           {['Po', 'Ut', 'St', 'Št', 'Pi', 'So', 'Ne'].map((d) => (
             <div key={d} style={{ fontFamily: NM.SANS, fontSize: 9, letterSpacing: '0.22em', textTransform: 'uppercase', color: NM.EYEBROW, textAlign: 'center', fontWeight: 500 }}>
@@ -958,6 +901,67 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
             );
           })}
         </div>
+
+        {/* Collapsible symptom filter — expands on tap */}
+        {filterableSymptoms.length > 0 && (
+          <div style={{ marginTop: 12 }}>
+            <button
+              onClick={() => setFilterOpen((v) => !v)}
+              style={{ all: 'unset', cursor: 'pointer', width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '11px 14px', borderRadius: 14, background: 'rgba(184,134,74,0.08)', border: '1px solid rgba(184,134,74,0.28)', boxSizing: 'border-box' }}
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={NM.GOLD} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                <path d="M3 5h18l-7 8v5l-4 2v-7L3 5z"/>
+              </svg>
+              <span style={{ flex: 1, fontFamily: NM.SANS, fontSize: 12, color: NM.DEEP, fontWeight: 500 }}>
+                Filtruj podľa symptómov — <em style={{ fontFamily: NM.SERIF, fontStyle: 'italic', color: NM.GOLD, fontSize: 13 }}>ako si sa cítila?</em>
+              </span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={NM.GOLD} strokeWidth="2" strokeLinecap="round" style={{ flexShrink: 0, transform: filterOpen ? 'rotate(180deg)' : 'none', transition: 'transform 160ms' }}>
+                <path d="M6 9l6 6 6-6"/>
+              </svg>
+            </button>
+            {filterOpen && (
+              <div style={{ marginTop: 10 }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                  {filterableSymptoms.map((sd) => {
+                    const active = symptomFilter === sd.k;
+                    return (
+                      <button
+                        key={sd.k}
+                        onClick={() => setSymptomFilter(active ? null : sd.k)}
+                        style={{
+                          all: 'unset',
+                          cursor: 'pointer',
+                          padding: '7px 12px',
+                          borderRadius: 999,
+                          background: active ? NM.GOLD : '#fff',
+                          color: active ? '#fff' : NM.DEEP,
+                          border: active ? '1px solid transparent' : `1px solid ${NM.HAIR_2}`,
+                          fontFamily: NM.SANS,
+                          fontSize: 11.5,
+                          fontWeight: active ? 500 : 400,
+                        }}
+                      >
+                        {sd.l} · {symptomCounts.get(sd.k) ?? 0}×
+                      </button>
+                    );
+                  })}
+                </div>
+                {activeFilterDef && filterPhaseSummary && (
+                  <div style={{ marginTop: 10, padding: '12px 14px', borderRadius: 14, background: 'rgba(184,134,74,0.08)', border: '1px solid rgba(184,134,74,0.28)' }}>
+                    <div style={{ fontFamily: NM.SANS, fontSize: 12, color: NM.DEEP, fontWeight: 500, lineHeight: 1.45 }}>
+                      {activeFilterDef.l} — {filterPhaseSummary.total}× za posledných 12 mesiacov
+                    </div>
+                    {filterPhaseSummary.top && filterPhaseSummary.total >= 2 && (
+                      <div style={{ fontFamily: NM.SANS, fontSize: 11.5, color: 'rgba(61,41,33,0.6)', marginTop: 3, lineHeight: 1.45 }}>
+                        Najčastejšie {PHASE_LOCATIVE[filterPhaseSummary.top.key] ?? ''} ({filterPhaseSummary.top.n}×). Zlaté dni v kalendári sú dni so záznamom — listuj šípkami aj do minulých mesiacov.
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Legend — tap any calendar day to highlight its phase here */}
         <div
