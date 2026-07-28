@@ -171,9 +171,11 @@ export function getDailyHeadline(day: number, cycleLength: number, periodLength:
 }
 
 // ─── "Čo by ti mohlo dnes pomôcť?" ───────────────────────────────────────────
-// One tip per category per state (Gabi 2026-07-28: "menej je viac") —
-// short, concrete, doable on an ordinary day. The tip holds for the
-// whole state while the headline above it changes daily.
+// Tips follow the same position-in-state rule as headlines (Gabi
+// 2026-07-28): 1st day of the state → 1st tip set, 2nd → 2nd, … with
+// enough sets per state that nothing repeats within one cycle. Voice:
+// everyday speech, immediately doable; strava names the nutrient + the
+// exact foods.
 
 export interface DailyTips {
   pohyb: string;
@@ -181,56 +183,270 @@ export interface DailyTips {
   mysel: string;
 }
 
-const TIPS: Record<HeadlineBucket, DailyTips> = {
-  menstrual_start: {
-    pohyb: 'Kŕče? Teplý termofor na brucho a pár hlbokých nádychov — jednoduchá vec, ktorá naozaj funguje.',
-    strava: 'Horčík pomáha pri kŕčoch — daj si banán, hrsť mandlí či kúsok tmavej čokolády.',
-    mysel: 'Zo zoznamu úloh dnes jednu pokojne vyškrtni — svet sa nezrúti.',
-  },
-  menstrual_end: {
-    pohyb: 'Vyjdi na 15 minút von — čerstvý vzduch spraví s náladou divy.',
-    strava: 'Telo teraz potrebuje železo — daj si šošovicu, špenát či mäso a prikvapkni citrón, nech sa lepšie vstrebe.',
-    mysel: 'Skús dnes zaliezť do postele o hodinu skôr — telo ti to vráti.',
-  },
-  follicular_early: {
-    pohyb: 'Máš chuť si zacvičiť? Dnes je na to ideálny deň — telo zvládne aj poriadny tréning.',
-    strava: 'Pridaj si k jedlu bielkoviny — vajíčka na raňajky či jogurt na desiatu urobia veľa.',
-    mysel: 'Tá vec, čo ju stále odkladáš? Dnes je deň na prvý krok.',
-  },
-  follicular_late: {
-    pohyb: 'Cítiš silu? Pokojne pridaj — ťažšie váhy či rýchlejšie tempo telo teraz hravo zvládne.',
-    strava: 'Pridaj zelenú zeleninu — špenát, brokolica či rukola dodajú kyselinu listovú, ktorú telo pred ovuláciou využije.',
-    mysel: 'Čaká ťa ťažký rozhovor či prezentácia? Naplánuj si ich na tieto dni — ide ti to teraz najlepšie.',
-  },
-  ovulation: {
-    pohyb: 'Dnes môžeš ísť naplno — len nezabudni na poriadnu rozcvičku.',
-    strava: 'Siahni po farebnom ovocí — čučoriedky, maliny či pomaranč dodajú vitamín C a antioxidanty.',
-    mysel: 'Zavolaj kamarátke alebo si dohodni kávu — na ľudí máš dnes energie oveľa viac.',
-  },
-  luteal_early: {
-    pohyb: 'Namiesto rekordov skús dnes pokojné tempo — dlhšia prechádzka alebo pohodový tréning sadnú viac.',
-    strava: 'Komplexné sacharidy držia energiu aj náladu stabilnú — ovsené vločky, celozrnný chlieb či sladké zemiaky.',
-    mysel: 'Dnes ti sadne dokončovanie — pozatváraj rozrobené veci, poteší ťa to.',
-  },
-  luteal_mid: {
-    pohyb: 'Ak dnes vládzeš menej, je to normálne — telo míňa viac energie aj bez cvičenia. Stačí prechádzka.',
-    strava: 'Väčší hlad? Úplne normálne — bielkoviny a vláknina zasýtia najdlhšie: vajcia, tvaroh, šošovica.',
-    mysel: 'Spíš horšie? Skús ísť do postele o pol hodinky skôr a odlož mobil.',
-  },
-  luteal_late: {
-    pohyb: 'Stačí 10 minút strečingu či prechádzky — napätie z tela krásne opadne.',
-    strava: 'Chuť na sladké? Tmavá čokoláda či orechy dodajú horčík, ktorý pomáha.',
-    mysel: 'Veľké rozhodnutia radšej odlož o pár dní — uvidíš ich potom úplne inak.',
-  },
-  late: {
-    pohyb: 'Drž sa jemného pohybu — prechádzka či strečing telu teraz prospejú najviac.',
-    strava: 'Jedz pravidelne a dopraj si teplé jedlá — telo má rado istotu.',
-    mysel: 'Stres vie periódu ešte viac oddialiť — dopraj si dnes pokojný večer bez náhlenia.',
-  },
+const TIPS: Record<HeadlineBucket, DailyTips[]> = {
+  menstrual_start: [
+    {
+      pohyb: 'Kŕče? Teplý termofor na brucho a pár hlbokých nádychov — jednoduchá vec, ktorá naozaj funguje.',
+      strava: 'Horčík pomáha pri kŕčoch — daj si banán, hrsť mandlí či kúsok tmavej čokolády.',
+      mysel: 'Zo zoznamu úloh dnes jednu pokojne vyškrtni — svet sa nezrúti.',
+    },
+    {
+      pohyb: 'Teplá sprcha a pomalé pretiahnutie chrbta v ľahu — viac dnes telo nepýta.',
+      strava: 'Zázvorový alebo harmančekový čaj — teplé pitie uvoľňuje kŕče lepšie než studená voda.',
+      mysel: 'Ak sa dá, presuň dnešné náročné stretnutie — o pár dní ho zvládneš ľavou zadnou.',
+    },
+  ],
+  menstrual_end: [
+    {
+      pohyb: 'Vyjdi na 15 minút von — čerstvý vzduch spraví s náladou divy.',
+      strava: 'Telo teraz potrebuje železo — daj si šošovicu, špenát či mäso a prikvapkni citrón, nech sa lepšie vstrebe.',
+      mysel: 'Skús dnes zaliezť do postele o hodinu skôr — telo ti to vráti.',
+    },
+    {
+      pohyb: 'Päť minút strečingu hneď ráno — jemne naštartuje celý deň.',
+      strava: 'Vitamín C pomáha vstrebať železo — pomaranč či paprika k obedu stačia.',
+      mysel: 'Napíš si tri veci, ktoré ťa dnes potešili — aj maličkosti sa počítajú.',
+    },
+    {
+      pohyb: 'Krátka joga alebo pomalý bicykel — pohyb, pri ktorom sa dá rozprávať.',
+      strava: 'Vitamín B12 podporuje tvorbu krvi — vajcia, syr či ryba ho dodajú.',
+      mysel: 'Hodina bez mobilu pred spaním — spánok bude hlbší.',
+    },
+    {
+      pohyb: 'Prechádzka s podcastom či hudbou — telo sa hýbe a hlava oddychuje.',
+      strava: 'Pi viac vody než zvyčajne — únava je často len smäd v prestrojení.',
+      mysel: 'Rozplánuj si týždeň — energia sa vracia a s ňou aj chuť organizovať.',
+    },
+    {
+      pohyb: 'Skús dnes schody namiesto výťahu — malé kroky vracajú kondíciu.',
+      strava: 'Omega-3 tlmia zápal — vlašské orechy, ľanové semienka či losos.',
+      mysel: 'Pusti si obľúbenú hudbu pri rannej rutine — nálada sa zdvihne sama.',
+    },
+    {
+      pohyb: 'Vyskúšaj 10-minútovú rozcvičku doma — telo si už pýta pohyb.',
+      strava: 'Jogurt či kefír podporia trávenie — probiotiká po náročných dňoch sadnú.',
+      mysel: 'Zavolaj niekomu blízkemu — chuť na ľudí sa pomaly vracia.',
+    },
+    {
+      pohyb: 'Dlhšia prechádzka rezkým tempom — otestuj, koľko energie sa už vrátilo.',
+      strava: 'Ovsená kaša či celozrnné pečivo — stabilná energia na celé dopoludnie.',
+      mysel: 'Sprav si malý plán na najbližšie silné dni — čo chceš stihnúť?',
+    },
+    {
+      pohyb: 'Zajtra začína najsilnejšia časť cyklu — dnes pokojne ľahšie, nech máš z čoho brať.',
+      strava: 'Zinok podporuje regeneráciu — tekvicové semienka, syr či hovädzie.',
+      mysel: 'Večer si dopraj kúpeľ alebo teplú sprchu — zajtra štartuješ do novej fázy.',
+    },
+  ],
+  follicular_early: [
+    {
+      pohyb: 'Máš chuť si zacvičiť? Dnes je na to ideálny deň — telo zvládne aj poriadny tréning.',
+      strava: 'Pridaj si k jedlu bielkoviny — vajíčka na raňajky či jogurt na desiatu urobia veľa.',
+      mysel: 'Tá vec, čo ju stále odkladáš? Dnes je deň na prvý krok.',
+    },
+    {
+      pohyb: 'Skús nový typ tréningu — telo je otvorené výzvam a rýchlo sa učí.',
+      strava: 'Zelenina ku každému jedlu — vláknina drží energiu aj trávenie v pohode.',
+      mysel: 'Zapíš si nápady, ktoré ti dnes napadnú — hlava teraz dobre tvorí.',
+    },
+    {
+      pohyb: 'Silový tréning sa teraz počíta dvojnásobne — svaly regenerujú rýchlejšie než inokedy.',
+      strava: 'Komplexné sacharidy pred tréningom — ovsená kaša či banán dodajú palivo.',
+      mysel: 'Nauč sa dnes niečo nové, hoci len 10 minút — pamäť teraz pracuje výborne.',
+    },
+    {
+      pohyb: 'Pridaj k tréningu 10 minút navyše — telo to zvládne ľahko.',
+      strava: 'Bielkoviny po tréningu — tvaroh, skyr či proteínové smoothie pomôžu svalom.',
+      mysel: 'Naplánuj si väčší cieľ na tento mesiac — teraz máš energiu ho rozbehnúť.',
+    },
+    {
+      pohyb: 'Beh, tanec či bicykel — kardio ide teraz ľahšie, vyskúšaj.',
+      strava: 'Fermentované potraviny — kefír, jogurt či kyslá kapusta podporia trávenie aj imunitu.',
+      mysel: 'Uprac jeden kút, čo ťa hnevá — akčná energia sa dnes dobre míňa.',
+    },
+    {
+      pohyb: 'Zober kamarátku na spoločný tréning či prechádzku — spolu to odsýpa.',
+      strava: 'Orechy a semienka ako desiata — zdravé tuky pre hormóny aj mozog.',
+      mysel: 'Povedz nahlas, čo chceš — dnes sa ti dobre formulujú myšlienky.',
+    },
+    {
+      pohyb: 'Vydrž v planku či drepe o kúsok dlhšie než minule — posúvaš sa.',
+      strava: 'Pestrý tanier — čím viac druhov zeleniny za deň, tým lepšie pre trávenie.',
+      mysel: 'Dohodni si stretnutie či telefonát, na ktorý potrebuješ odvahu.',
+    },
+    {
+      pohyb: 'Dnes pokojne dva pohyby — ranná rozcvička a večerná prechádzka.',
+      strava: 'Dopraj si poriadne raňajky — telo v raste potrebuje palivo od rána.',
+      mysel: 'Sprav si zoznam, čo chceš stihnúť v najbližších silných dňoch.',
+    },
+  ],
+  follicular_late: [
+    {
+      pohyb: 'Cítiš silu? Pokojne pridaj — ťažšie váhy či rýchlejšie tempo telo teraz hravo zvládne.',
+      strava: 'Pridaj zelenú zeleninu — špenát, brokolica či rukola dodajú kyselinu listovú, ktorú telo pred ovuláciou využije.',
+      mysel: 'Čaká ťa ťažký rozhovor či prezentácia? Naplánuj si ich na tieto dni — ide ti to teraz najlepšie.',
+    },
+    {
+      pohyb: 'Dnes je deň na osobný rekord — dlhší beh, ťažší drep či rýchlejšie tempo.',
+      strava: 'Ľahší obed — šalát s kuracím či tuniakom — nech ťa popoludní nič nebrzdí.',
+      mysel: 'Vybav dnes ten telefonát či mail, čo odkladáš — sebavedomie je na tvojej strane.',
+    },
+    {
+      pohyb: 'Skupinová hodina alebo tréning vo dvojici — energie máš aj na rozdávanie.',
+      strava: 'Vajcia, ryba či tofu — kvalitné bielkoviny podporia telo na vrchole formy.',
+      mysel: 'Ozvi sa, pýtaj si, čo potrebuješ — teraz to ide samo.',
+    },
+    {
+      pohyb: 'Intervalový tréning — krátke šprinty a pauzy — dnes sadne perfektne.',
+      strava: 'Pri vyššom výkone pi o pohár-dva vody viac než zvyčajne.',
+      mysel: 'Rozhodnutie, ktoré dlho zvažuješ? Dnes máš na hlavu aj odvahu.',
+    },
+    {
+      pohyb: 'Vyskúšaj niečo odvážne — box, lezecká stena či nová trasa.',
+      strava: 'Avokádo či olivový olej — zdravé tuky podporujú tvorbu hormónov.',
+      mysel: 'Poď medzi ľudí — energia z teba dnes prirodzene vyžaruje.',
+    },
+    {
+      pohyb: 'Tréning ráno namiesto večera — naštartuješ deň na plné obrátky.',
+      strava: 'Bobuľové ovocie k raňajkám — antioxidanty pre telo v plnom nasadení.',
+      mysel: 'Napíš si, čo sa ti tento týždeň podarilo — je toho viac, než si myslíš.',
+    },
+    {
+      pohyb: 'Zacvič si vonku, ak sa dá — pohyb aj svetlo zdvihnú náladu ešte vyššie.',
+      strava: 'Celozrnná príloha k obedu — energia vydrží až do večera.',
+      mysel: 'Skvelý deň požiadať o to, čo chceš — v práci aj doma.',
+    },
+    {
+      pohyb: 'Vrchol formy — dopraj si tréning, na ktorý budeš hrdá.',
+      strava: 'Pestré jedlo s bielkovinami aj zeleninou — telo pred ovuláciou ocení všetko.',
+      mysel: 'Poznač si, ako sa tieto dni cítiš — nabudúce ich využiješ ešte lepšie.',
+    },
+  ],
+  ovulation: [
+    {
+      pohyb: 'Dnes môžeš ísť naplno — len nezabudni na poriadnu rozcvičku.',
+      strava: 'Siahni po farebnom ovocí — čučoriedky, maliny či pomaranč dodajú vitamín C a antioxidanty.',
+      mysel: 'Zavolaj kamarátke alebo si dohodni kávu — na ľudí máš dnes energie oveľa viac.',
+    },
+    {
+      pohyb: 'Skvelý deň na výkon — len pri doskokoch a výpadoch buď opatrnejšia, kĺby sú teraz voľnejšie.',
+      strava: 'Vláknina pomáha telu spracovať estrogén — celozrnné obilniny, strukoviny, zelenina.',
+      mysel: 'Naplánuj dôležité veci na dnes — komunikuje sa ti najľahšie z celého cyklu.',
+    },
+    {
+      pohyb: 'Tanec, beh či čokoľvek, čo miluješ — dnes si pohyb užiješ najviac.',
+      strava: 'Ľahké jedlá s bielkovinami — telo je aktívne a ocení kvalitné palivo.',
+      mysel: 'Sprav si dnes poznámku či fotku — na vrchole cyklu sa vidíš najlepšie.',
+    },
+  ],
+  luteal_early: [
+    {
+      pohyb: 'Namiesto rekordov skús dnes pokojné tempo — dlhšia prechádzka alebo pohodový tréning sadnú viac.',
+      strava: 'Komplexné sacharidy držia energiu aj náladu stabilnú — ovsené vločky, celozrnný chlieb či sladké zemiaky.',
+      mysel: 'Dnes ti sadne dokončovanie — pozatváraj rozrobené veci, poteší ťa to.',
+    },
+    {
+      pohyb: 'Vytrvalostný pohyb — svižná chôdza, plávanie či bicykel v stálom tempe.',
+      strava: 'Nevynechávaj jedlá — pravidelnosť teraz drží náladu stabilnú.',
+      mysel: 'Rutina je tvoja kamarátka — rovnaký čas vstávania aj jedla telu sadne.',
+    },
+    {
+      pohyb: 'Pilates alebo silový tréning v pokojnom tempe — kvalita pred rýchlosťou.',
+      strava: 'Vápnik môže zmierniť PMS — jogurt, syr či mak si doraj každý deň.',
+      mysel: 'Urob si poriadok v drobnostiach — hlava sa ti poďakuje.',
+    },
+    {
+      pohyb: 'Dlhšia prechádzka po večeri — pomôže tráveniu aj spánku.',
+      strava: 'Horčík priebežne — orechy, semienka, tmavá čokoláda — telo ho v tejto fáze míňa viac.',
+      mysel: 'Menej multitaskingu — jedna vec poriadne ti dnes urobí lepšie.',
+    },
+    {
+      pohyb: 'Strečing či joga navečer — telo prechádza do pokojnejšieho režimu.',
+      strava: 'Bielkoviny v každom jedle — pomáhajú držať chute na uzde.',
+      mysel: 'Naplánuj si na tento týždeň menej večerných akcií — energia sa začne stišovať.',
+    },
+  ],
+  luteal_mid: [
+    {
+      pohyb: 'Ak dnes vládzeš menej, je to normálne — telo míňa viac energie aj bez cvičenia. Stačí prechádzka.',
+      strava: 'Väčší hlad? Úplne normálne — bielkoviny a vláknina zasýtia najdlhšie: vajcia, tvaroh, šošovica.',
+      mysel: 'Spíš horšie? Skús ísť do postele o pol hodinky skôr a odlož mobil.',
+    },
+    {
+      pohyb: 'Pokojný silový tréning či pilates — bez tlaku na výkon.',
+      strava: 'Dopraj si výdatný obed — telo teraz reálne spáli viac, nie je to výhovorka.',
+      mysel: 'Podvečer si dopraj chvíľu len pre seba — kniha, čaj, ticho.',
+    },
+    {
+      pohyb: 'Plávanie alebo joga — pohyb, ktorý telo zregeneruje, nie vyčerpá.',
+      strava: 'Menšie porcie častejšie — stabilný cukor v krvi drží náladu aj energiu.',
+      mysel: 'Vyvetraj spálňu — pri vyššej telesnej teplote sa lepšie spí v chlade.',
+    },
+    {
+      pohyb: 'Prechádzka na dennom svetle — pomáha spánku aj nálade.',
+      strava: 'Dopraj si teplé jedlo — polievka či dusená zelenina padnú lepšie ako studený šalát.',
+      mysel: 'Ak ti dnes niečo lezie na nervy viac než inokedy, počkaj s reakciou do zajtra.',
+    },
+    {
+      pohyb: 'Krátky pohyb po každom dlhom sedení — telo sa nezasekne.',
+      strava: 'Omega-3 proti zápalu — losos, vlašské orechy či ľanové semienka.',
+      mysel: 'Poďakuj si za to, čo si tento týždeň zvládla — pokojne aj nahlas.',
+    },
+  ],
+  luteal_late: [
+    {
+      pohyb: 'Stačí 10 minút strečingu či prechádzky — napätie z tela krásne opadne.',
+      strava: 'Chuť na sladké? Tmavá čokoláda či orechy dodajú horčík, ktorý pomáha.',
+      mysel: 'Veľké rozhodnutia radšej odlož o pár dní — uvidíš ich potom úplne inak.',
+    },
+    {
+      pohyb: 'Jemná joga pred spaním — uvoľní telo aj hlavu.',
+      strava: 'Menej soli dnes — slané jedlá zhoršujú nafukovanie a zadržiavanie vody.',
+      mysel: 'Nafúknutá či precitlivená? O pár dní to prejde — nie si to ty, sú to hormóny.',
+    },
+    {
+      pohyb: 'Prechádzka namiesto tréningu je dnes úplne v poriadku.',
+      strava: 'Vápnik môže zmierniť PMS náladu — jogurt, tvaroh či syr.',
+      mysel: 'Povedz doma, že máš náročnejšie dni — nemusíš to zvládať sama.',
+    },
+    {
+      pohyb: 'Teplý kúpeľ alebo sprcha namiesto cvičenia — regenerácia je tiež tréning.',
+      strava: 'Obmedz dnes kávu a alkohol — obe vedia PMS zosilniť.',
+      mysel: 'Skorší spánok je teraz najlepší liek — dopraj si ho bez výčitiek.',
+    },
+    {
+      pohyb: 'Pretiahni si chrbát a boky — pár minút na podložke uľaví celému telu.',
+      strava: 'Teplý čaj namiesto ďalšej kávy — nervový systém sa ti poďakuje.',
+      mysel: 'Perióda je za rohom — priprav si veci a choď spať s pokojom.',
+    },
+  ],
+  late: [
+    {
+      pohyb: 'Drž sa jemného pohybu — prechádzka či strečing telu teraz prospejú najviac.',
+      strava: 'Jedz pravidelne a dopraj si teplé jedlá — telo má rado istotu.',
+      mysel: 'Stres vie periódu ešte viac oddialiť — dopraj si dnes pokojný večer bez náhlenia.',
+    },
+    {
+      pohyb: 'Krátka prechádzka každý deň — jemný pohyb cyklu pomáha.',
+      strava: 'Jedz dostatočne — prísne diéty a hladovanie vedia periódu oddialiť.',
+      mysel: 'Meškanie vie potrápiť hlavu — rozptýlenie funguje: film, kniha, kamarátka.',
+    },
+    {
+      pohyb: 'Ostaň pri ľahkom pohybe, kým perióda nepríde — telo si povie samo.',
+      strava: 'Teplé jedlá a dostatok spánku — telo potrebuje pokoj, nie reštrikcie.',
+      mysel: 'Ak mešká dlhšie a nie je to u teba bežné, pokojne sa poraď s lekárkou — istota upokojí.',
+    },
+  ],
 };
 
-/** Today's Pohyb/Strava/Myseľ tips — keyed to the same state as the headline. */
+/**
+ * Today's Pohyb/Strava/Myseľ tips — same state AND same position rule as
+ * the headline, so tips also change every day and never repeat within a
+ * cycle (last set holds on extreme cycle lengths, like headlines).
+ */
 export function getDailyTips(day: number, cycleLength: number, periodLength: number): DailyTips & { bucket: HeadlineBucket } {
-  const { bucket } = bucketInfo(day, cycleLength, periodLength);
-  return { ...TIPS[bucket], bucket };
+  const { bucket, start } = bucketInfo(day, cycleLength, periodLength);
+  const sets = TIPS[bucket];
+  const idx = Math.min(Math.max(0, day - start), sets.length - 1);
+  return { ...sets[idx], bucket };
 }
