@@ -72,7 +72,7 @@ const HEADLINES: Record<HeadlineBucket, DailyHeadline[]> = {
     { before: 'Ideš si', em: 'po svoje.', body: 'Sebavedomie prirodzene rastie. Dobrý deň na rozhovor, ktorý odkladáš.' },
     { before: 'Naber', em: 'rýchlosť.', body: 'Telo je pripravené na výzvy — sila aj koordinácia sú na vysokej úrovni.' },
     { before: 'Tvoje dni', em: 'sily.', body: 'Vrchol folikulárnej fázy. Čokoľvek dnes začneš, pôjde ľahšie.' },
-    { before: 'Vysoká', em: 'vlna.', body: 'Estrogén je takmer na maxime — energia, pleť aj nálada to zvyknú cítiť.' },
+    { before: 'Všetko ide', em: 'hore.', body: 'Estrogén je takmer na maxime — energia, pleť aj nálada to zvyknú cítiť.' },
     { before: 'Využi', em: 'moment.', body: 'Pred ovuláciou býva výkonnosť najvyššia z celého cyklu.' },
     { before: 'Na', em: 'vrchole vlny.', body: 'Ešte deň-dva a estrogén dosiahne maximum. Telo aj myseľ idú naplno.' },
   ],
