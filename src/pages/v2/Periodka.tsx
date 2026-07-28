@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCycleData } from '../../features/cycle/useCycleData';
 import { useCycleSymptoms } from '../../hooks/useDailyRituals';
 import { Page, Eye, Ser, Body, PlusTag, ConfirmSheet, NM } from '../../components/v2/neome';
-import { getCycleTipByDay } from '../../data/cycleTips';
+import { getDailyTips } from '../../features/cycle/dailyHeadlines';
 import type { DerivedState, CycleData } from '../../features/cycle/types';
 import { PHASE_NAMES } from '../../features/cycle/constants';
 import { getDailyHeadline } from '../../features/cycle/dailyHeadlines';
@@ -551,37 +551,25 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     </div>
   );
 
-  // Phase-tailored daily advice — rotates through Gabi's 105-tip library
-  // (5 phases × 3 categories × 7 tips/phase) by day-in-phase. Source:
-  // src/data/cycleTips.ts. Categories map: pohyb=Body, strava=Nutrition,
-  // mysel=Mindset.
+  // Phase-tailored daily advice — one concrete tip per category for the
+  // current sub-phase state, from the same shared source as the daily
+  // headline (features/cycle/dailyHeadlines.ts). "Menej je viac" — the
+  // tip holds for the whole state; the headline above changes daily.
   const PILLAR_META: Record<'telo' | 'strava' | 'mysel', { category: 'pohyb' | 'strava' | 'mysel'; label: string; title: string; color: string; img: string; path: string }> = {
     telo:   { category: 'pohyb',  label: 'Pohyb',  title: 'Tvoj pohyb dnes',  color: NM.TERRA, img: 'lifestyle-core-workout.jpg', path: '/kniznica/telo' },
     strava: { category: 'strava', label: 'Strava', title: 'Tvoja strava dnes', color: NM.SAGE,  img: 'testimonial-recipe.jpg',     path: '/kniznica/strava' },
     mysel:  { category: 'mysel',  label: 'Myseľ',  title: 'Tvoja myseľ dnes', color: NM.MAUVE, img: 'section-mind.jpg',           path: '/kniznica/mysel' },
   };
 
-  // Day-in-phase: 1-indexed within the current phase. e.g. on day 1 of
-  // menstruation = 1, on day 14 of a 14-day follicular phase = 14.
-  const phaseStart = derivedState?.currentPhase?.start ?? 1;
-  const dayInPhase = Math.max(1, currentDay - phaseStart + 1);
-
-  // Subphase: only luteal phase has early/late split. We bisect by halfway
-  // through the phase length — anything past midpoint is "late".
-  const phaseEnd = derivedState?.currentPhase?.end ?? totalDays;
-  const phaseLength = Math.max(1, phaseEnd - phaseStart + 1);
-  const subphase = currentPhaseKey === 'luteal'
-    ? (dayInPhase > phaseLength / 2 ? 'late' : 'early')
-    : null;
+  const dailyTips = getDailyTips(currentDay, totalDays, periodLength);
 
   const advice = (['telo', 'strava', 'mysel'] as const).map((pillarKey) => {
     const meta = PILLAR_META[pillarKey];
-    const tip = getCycleTipByDay(currentPhaseKey, subphase, meta.category, dayInPhase);
     return {
       pillar: meta.label,
       color: meta.color,
       title: meta.title,
-      body: tip,
+      body: dailyTips[meta.category],
       img: meta.img,
       path: meta.path,
     };

@@ -169,3 +169,68 @@ export function getDailyHeadline(day: number, cycleLength: number, periodLength:
   const idx = Math.min(Math.max(0, day - start), variants.length - 1);
   return { ...variants[idx], bucket };
 }
+
+// ─── "Čo by ti mohlo dnes pomôcť?" ───────────────────────────────────────────
+// One tip per category per state (Gabi 2026-07-28: "menej je viac") —
+// short, concrete, doable on an ordinary day. The tip holds for the
+// whole state while the headline above it changes daily.
+
+export interface DailyTips {
+  pohyb: string;
+  strava: string;
+  mysel: string;
+}
+
+const TIPS: Record<HeadlineBucket, DailyTips> = {
+  menstrual_start: {
+    pohyb: 'Termofor na podbrušie a päť minút hlbokého dýchania uľavia kŕčom.',
+    strava: 'Teplé jedlo namiesto studeného — polievka alebo kaša upokoja brucho.',
+    mysel: 'Naplánuj si dnes o jednu povinnosť menej.',
+  },
+  menstrual_end: {
+    pohyb: 'Krátka prechádzka vonku — 15 minút stačí na lepšiu náladu.',
+    strava: 'Dopĺňaj železo: šošovica, špenát či mäso, a k tomu trocha vitamínu C.',
+    mysel: 'Choď dnes spať o hodinu skôr — spánok teraz lieči najviac.',
+  },
+  follicular_early: {
+    pohyb: 'Dobrý deň na silový tréning — telo rýchlo regeneruje.',
+    strava: 'Bielkoviny ku každému jedlu — vajcia, jogurt, strukoviny.',
+    mysel: 'Začni vec, ktorú odkladáš — pôjde to ľahšie než inokedy.',
+  },
+  follicular_late: {
+    pohyb: 'Pokojne pridaj záťaž alebo tempo — telo to teraz unesie.',
+    strava: 'Ľahké a čerstvé jedlá — ťažký obed by ťa dnes zbytočne brzdil.',
+    mysel: 'Náročný rozhovor či prezentáciu naplánuj na tieto dni.',
+  },
+  ovulation: {
+    pohyb: 'Skvelý deň na výkon — len sa poriadne rozcvič.',
+    strava: 'Farebný tanier — zelenina a ovocie v každom jedle.',
+    mysel: 'Stretni sa s ľuďmi — sociálna energia je dnes na vrchole.',
+  },
+  luteal_early: {
+    pohyb: 'Vymeň šprinty za rovnomerné tempo — dlhšia prechádzka alebo pokojný tréning.',
+    strava: 'Pravidelné jedlá bez preskakovania — stabilný cukor znamená stabilnú náladu.',
+    mysel: 'Dokonči rozrobené — sústredená rutina ti teraz sadne.',
+  },
+  luteal_mid: {
+    pohyb: 'Mierny pohyb áno, rekordy nie — telo teraz míňa viac energie samo od seba.',
+    strava: 'Väčší hlad je normálny — pridaj radšej výdatné jedlo než sladkosti.',
+    mysel: 'Choď spať o pol hodiny skôr — spánok býva v tejto fáze plytší.',
+  },
+  luteal_late: {
+    pohyb: 'Jemný strečing alebo prechádzka — aj 10 minút zmierni napätie.',
+    strava: 'Chuť na sladké? Tmavá čokoláda či orechy dodajú horčík, ktorý pomáha.',
+    mysel: 'Veľké rozhodnutia odlož o pár dní — o chvíľu ich uvidíš inak.',
+  },
+  late: {
+    pohyb: 'Ostaň pri jemnom pohybe — prechádzky a strečing telu prospejú.',
+    strava: 'Teplé a pravidelné jedlá — telo má rado predvídateľnosť.',
+    mysel: 'Stres vie cyklus predĺžiť — dopraj si pokojný večer.',
+  },
+};
+
+/** Today's Pohyb/Strava/Myseľ tips — keyed to the same state as the headline. */
+export function getDailyTips(day: number, cycleLength: number, periodLength: number): DailyTips & { bucket: HeadlineBucket } {
+  const { bucket } = bucketInfo(day, cycleLength, periodLength);
+  return { ...TIPS[bucket], bucket };
+}
