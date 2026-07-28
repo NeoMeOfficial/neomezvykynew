@@ -204,8 +204,8 @@ const TIPS: Record<HeadlineBucket, DailyTips> = {
   },
   ovulation: {
     pohyb: 'Dnes môžeš ísť naplno — len nezabudni na poriadnu rozcvičku.',
-    strava: 'Hoď na tanier viac farieb — kúsok zeleniny či ovocia ku každému jedlu stačí.',
-    mysel: 'Zavolaj kamarátke alebo si dohodni kávu — na ľudí máš dnes energiu ako nikdy.',
+    strava: 'Hoď na tanier viac farieb — viac zeleniny či ovocia ku každému jedlu stačí.',
+    mysel: 'Zavolaj kamarátke alebo si dohodni kávu — na ľudí máš dnes energie oveľa viac.',
   },
   luteal_early: {
     pohyb: 'Namiesto rekordov skús dnes pokojné tempo — dlhšia prechádzka alebo pohodový tréning sadnú viac.',
