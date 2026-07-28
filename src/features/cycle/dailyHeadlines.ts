@@ -59,7 +59,7 @@ const HEADLINES: Record<HeadlineBucket, DailyHeadline[]> = {
     { before: 'Nový', em: 'začiatok.', body: 'Estrogén stúpa a s ním energia aj chuť do života. Skvelý čas začať niečo nové.' },
     { before: 'Sila', em: 'rastie.', body: 'Telo teraz dobre zvláda záťaž a rýchlo regeneruje. Dopraj si tréning, na ktorý si trúfaš.' },
     { before: 'Rozbiehaš', em: 'sa.', body: 'Hladina energie deň za dňom rastie. Dobré obdobie na plány, ktoré si odkladala.' },
-    { before: 'Čerstvý', em: 'vietor.', body: 'Folikulárna fáza praje sústredeniu aj učeniu. Myseľ je bystrejšia než inokedy.' },
+    { before: 'Jasná', em: 'myseľ.', body: 'Folikulárna fáza praje sústredeniu aj učeniu. Myseľ je bystrejšia než inokedy.' },
     { before: 'Stúpaš', em: 'vyššie.', body: 'Estrogén ďalej rastie a nálada s ním. Telo si pýta pohyb — vyhovej mu.' },
     { before: 'Chuť', em: 'tvoriť.', body: 'V tejto časti cyklu sa dobre rodia nápady. Zapíš si tie dnešné.' },
     { before: 'V plnom', em: 'prúde.', body: 'Energia je stabilná a regenerácia rýchla. Ideálne dni na silový tréning.' },
