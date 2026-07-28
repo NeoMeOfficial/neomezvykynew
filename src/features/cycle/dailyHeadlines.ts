@@ -352,7 +352,7 @@ const TIPS: Record<HeadlineBucket, DailyTips[]> = {
     },
     {
       pohyb: 'Pilates alebo silový tréning v pokojnom tempe — kvalita pred rýchlosťou.',
-      strava: 'Vápnik môže zmierniť PMS — jogurt, syr či mak si doraj každý deň.',
+      strava: 'Vápnik môže zmierniť PMS — jogurt, syr či mak si dopraj každý deň.',
       mysel: 'Urob si poriadok v drobnostiach — hlava sa ti poďakuje.',
     },
     {

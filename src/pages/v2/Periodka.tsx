@@ -439,7 +439,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
   const selectedDateISO = selectedDay !== null
     ? `${yearIdx}-${String(monthIdx + 1).padStart(2, '0')}-${String(selectedDay).padStart(2, '0')}`
     : null;
-  const todayISO = `${nowDate.getFullYear()}-${String(nowDate.getMonth() + 1).padStart(2, '0')}-${String(nowDate.getDate()).padStart(2, '0')}`;
+  const todayISO = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
   const selectedIsToday = selectedDateISO === todayISO;
   const selectedIsPast = !!selectedDateISO && selectedDateISO < todayISO;
   const selectedSymptomLabels = selectedDateISO
