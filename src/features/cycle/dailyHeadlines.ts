@@ -368,7 +368,7 @@ const TIPS: Record<HeadlineBucket, DailyTips[]> = {
   ],
   luteal_mid: [
     {
-      pohyb: 'Ak dnes vládzeš menej, je to normálne — telo míňa viac energie aj bez cvičenia. Stačí prechádzka.',
+      pohyb: 'Ak dnes vládzeš menej, je to normálne — telo míňa viac energie aj bez cvičenia. Stačí prechádzka, menej intenzívne cvičenie alebo strečing.',
       strava: 'Väčší hlad? Úplne normálne — bielkoviny a vláknina zasýtia najdlhšie: vajcia, tvaroh, šošovica.',
       mysel: 'Spíš horšie? Skús ísť do postele o pol hodinky skôr a odlož mobil.',
     },
@@ -405,12 +405,12 @@ const TIPS: Record<HeadlineBucket, DailyTips[]> = {
       mysel: 'Nafúknutá či precitlivená? O pár dní to prejde — nie si to ty, sú to hormóny.',
     },
     {
-      pohyb: 'Prechádzka namiesto tréningu je dnes úplne v poriadku.',
+      pohyb: 'Prechádzka či jemný strečing namiesto tréningu — dnes úplne v poriadku.',
       strava: 'Vápnik môže zmierniť PMS náladu — jogurt, tvaroh či syr.',
       mysel: 'Povedz doma, že máš náročnejšie dni — nemusíš to zvládať sama.',
     },
     {
-      pohyb: 'Teplý kúpeľ alebo sprcha namiesto cvičenia — regenerácia je tiež tréning.',
+      pohyb: 'Krátky strečing a potom teplý kúpeľ — regenerácia je tiež tréning.',
       strava: 'Obmedz dnes kávu a alkohol — obe vedia PMS zosilniť.',
       mysel: 'Skorší spánok je teraz najlepší liek — dopraj si ho bez výčitiek.',
     },
