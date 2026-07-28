@@ -184,7 +184,7 @@ export interface DailyTips {
 const TIPS: Record<HeadlineBucket, DailyTips> = {
   menstrual_start: {
     pohyb: 'Kŕče? Teplý termofor na brucho a pár hlbokých nádychov — jednoduchá vec, ktorá naozaj funguje.',
-    strava: 'Dopraj si dnes teplé jedlo — polievka či kaša padnú lepšie ako šalát.',
+    strava: 'Horčík pomáha pri kŕčoch — daj si banán, hrsť mandlí či kúsok tmavej čokolády.',
     mysel: 'Zo zoznamu úloh dnes jednu pokojne vyškrtni — svet sa nezrúti.',
   },
   menstrual_end: {
@@ -199,22 +199,22 @@ const TIPS: Record<HeadlineBucket, DailyTips> = {
   },
   follicular_late: {
     pohyb: 'Cítiš silu? Pokojne pridaj — ťažšie váhy či rýchlejšie tempo telo teraz hravo zvládne.',
-    strava: 'Daj si niečo ľahké a čerstvé — po ťažkom obede by si len driemala.',
+    strava: 'Pridaj zelenú zeleninu — špenát, brokolica či rukola dodajú kyselinu listovú, ktorú telo pred ovuláciou využije.',
     mysel: 'Čaká ťa ťažký rozhovor či prezentácia? Naplánuj si ich na tieto dni — ide ti to teraz najlepšie.',
   },
   ovulation: {
     pohyb: 'Dnes môžeš ísť naplno — len nezabudni na poriadnu rozcvičku.',
-    strava: 'Hoď na tanier viac farieb — viac zeleniny či ovocia ku každému jedlu stačí.',
+    strava: 'Siahni po farebnom ovocí — čučoriedky, maliny či pomaranč dodajú vitamín C a antioxidanty.',
     mysel: 'Zavolaj kamarátke alebo si dohodni kávu — na ľudí máš dnes energie oveľa viac.',
   },
   luteal_early: {
     pohyb: 'Namiesto rekordov skús dnes pokojné tempo — dlhšia prechádzka alebo pohodový tréning sadnú viac.',
-    strava: 'Nevynechávaj jedlá — keď vyhladneš, nálada letí dole ako prvá.',
+    strava: 'Komplexné sacharidy držia energiu aj náladu stabilnú — ovsené vločky, celozrnný chlieb či sladké zemiaky.',
     mysel: 'Dnes ti sadne dokončovanie — pozatváraj rozrobené veci, poteší ťa to.',
   },
   luteal_mid: {
     pohyb: 'Ak dnes vládzeš menej, je to normálne — telo míňa viac energie aj bez cvičenia. Stačí prechádzka.',
-    strava: 'Väčší hlad? Úplne normálne — dopraj si poriadnu porciu namiesto maškrtenia.',
+    strava: 'Väčší hlad? Úplne normálne — bielkoviny a vláknina zasýtia najdlhšie: vajcia, tvaroh, šošovica.',
     mysel: 'Spíš horšie? Skús ísť do postele o pol hodinky skôr a odlož mobil.',
   },
   luteal_late: {
