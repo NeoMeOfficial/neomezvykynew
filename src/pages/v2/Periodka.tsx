@@ -378,6 +378,50 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
   ];
   const symptoms = allSymptomDefs.map((s) => ({ l: s.l, k: s.k, on: !!todayMap[s.k], custom: s.custom }));
 
+  // ── Symptom filter on the calendar (Gabi 2026-07-28) ────────────────
+  // Pick a symptom → its logged days highlight in the calendar and a
+  // summary shows how often it lands in which phase, so she can spot
+  // patterns ("hlava ma bolí vždy pred periódou").
+  const [symptomFilter, setSymptomFilter] = useState<string | null>(null);
+  const symptomCounts = (() => {
+    const counts = new Map<string, number>();
+    for (const entry of symptomDayEntries) {
+      for (const k of Object.keys(entry.symptoms)) {
+        if (entry.symptoms[k]) counts.set(k, (counts.get(k) ?? 0) + 1);
+      }
+    }
+    return counts;
+  })();
+  const filterableSymptoms = allSymptomDefs.filter((sd) => (symptomCounts.get(sd.k) ?? 0) > 0);
+  const activeFilterDef = symptomFilter ? allSymptomDefs.find((sd) => sd.k === symptomFilter) ?? null : null;
+  const filteredDates: string[] = symptomFilter
+    ? symptomDayEntries.filter((entry) => !!entry.symptoms[symptomFilter]).map((entry) => entry.date)
+    : [];
+  const filteredMonthDays: number[] = filteredDates
+    .filter((d) => d.startsWith(ym))
+    .map((d) => parseInt(d.slice(8, 10), 10));
+  // Phase for any logged date — past cycles approximated with the current
+  // cycle length (wrap-around modulo), good enough for pattern-spotting.
+  const phaseKeyForDateISO = (iso: string): string | null => {
+    if (!cycleData.lastPeriodStart) return null;
+    const target = new Date(iso + 'T00:00:00');
+    const start = new Date(cycleData.lastPeriodStart + 'T00:00:00');
+    const daysSince = Math.floor((target.getTime() - start.getTime()) / 86400000);
+    const cycleDay = ((daysSince % totalDays) + totalDays) % totalDays + 1;
+    return phases.find((ph) => cycleDay >= ph.start && cycleDay <= ph.end)?.key ?? null;
+  };
+  const filterPhaseSummary = (() => {
+    if (!symptomFilter || filteredDates.length === 0) return null;
+    const perPhase = new Map<string, number>();
+    for (const d of filteredDates) {
+      const key = phaseKeyForDateISO(d);
+      if (key) perPhase.set(key, (perPhase.get(key) ?? 0) + 1);
+    }
+    let top: { key: string; n: number } | null = null;
+    for (const [key, n] of perPhase) if (!top || n > top.n) top = { key, n };
+    return { total: filteredDates.length, top };
+  })();
+
   // ── Day-detail sheet (tap on a calendar day) ────────────────────────
   const PHASE_LOCATIVE: Record<string, string> = {
     menstrual: 'v menštruačnej fáze',
@@ -781,6 +825,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
             const sym = !c.mute && symptomDays.includes(c.d);
             const selected = !c.mute && selectedDay === c.d;
             const cellPhase = !c.mute ? phaseOf(c.d) : null;
+            const filterHit = !c.mute && symptomFilter !== null && filteredMonthDays.includes(c.d);
             return (
               <button
                 key={i}
@@ -796,7 +841,9 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
                   aspectRatio: '1',
                   borderRadius: 9,
                   background: today ? NM.DEEP : tint ?? 'transparent',
-                  boxShadow: selected && !today && cellPhase ? `0 0 0 1.5px ${cellPhase}` : 'none',
+                  boxShadow: filterHit
+                    ? `0 0 0 2px ${NM.GOLD}`
+                    : selected && !today && cellPhase ? `0 0 0 1.5px ${cellPhase}` : 'none',
                   display: 'grid',
                   placeItems: 'center',
                   boxSizing: 'border-box',
@@ -811,7 +858,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
                   opacity: c.mute ? 0.5 : 1,
                 }}>{c.d}</div>
                 {sym && (
-                  <div style={{ position: 'absolute', bottom: 2.5, display: 'flex', gap: 1.5 }}>
+                  <div style={{ position: 'absolute', bottom: 2.5, display: 'flex', gap: 1.5, opacity: symptomFilter !== null && !filterHit ? 0.25 : 1 }}>
                     {[0, 1, 2].map((k) => (
                       <div key={k} style={{ width: 2, height: 2, borderRadius: 999, background: today ? '#fff' : NM.DEEP, opacity: today ? 1 : 0.55 }} />
                     ))}
@@ -861,6 +908,50 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
             );
           })}
         </div>
+
+        {/* Symptom filter — highlight logged days + phase pattern summary */}
+        {filterableSymptoms.length > 0 && (
+          <div style={{ marginTop: 20 }}>
+            <Eye size={10} color={NM.TERTIARY}>Filtruj podľa symptómu</Eye>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 10 }}>
+              {filterableSymptoms.map((sd) => {
+                const active = symptomFilter === sd.k;
+                return (
+                  <button
+                    key={sd.k}
+                    onClick={() => setSymptomFilter(active ? null : sd.k)}
+                    style={{
+                      all: 'unset',
+                      cursor: 'pointer',
+                      padding: '7px 12px',
+                      borderRadius: 999,
+                      background: active ? NM.GOLD : '#fff',
+                      color: active ? '#fff' : NM.DEEP,
+                      border: active ? '1px solid transparent' : `1px solid ${NM.HAIR_2}`,
+                      fontFamily: NM.SANS,
+                      fontSize: 11.5,
+                      fontWeight: active ? 500 : 400,
+                    }}
+                  >
+                    {sd.l} · {symptomCounts.get(sd.k) ?? 0}×
+                  </button>
+                );
+              })}
+            </div>
+            {activeFilterDef && filterPhaseSummary && (
+              <div style={{ marginTop: 12, padding: '12px 14px', borderRadius: 14, background: 'rgba(184,134,74,0.08)', border: '1px solid rgba(184,134,74,0.28)' }}>
+                <div style={{ fontFamily: NM.SANS, fontSize: 12, color: NM.DEEP, fontWeight: 500, lineHeight: 1.45 }}>
+                  {activeFilterDef.l} — {filterPhaseSummary.total}× za posledných 60 dní
+                </div>
+                {filterPhaseSummary.top && filterPhaseSummary.total >= 2 && (
+                  <div style={{ fontFamily: NM.SANS, fontSize: 11.5, color: 'rgba(61,41,33,0.6)', marginTop: 3, lineHeight: 1.45 }}>
+                    Najčastejšie {PHASE_LOCATIVE[filterPhaseSummary.top.key] ?? ''} ({filterPhaseSummary.top.n}×). Zvýraznené dni v kalendári sú dni so záznamom.
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
       </div>
   );
 
