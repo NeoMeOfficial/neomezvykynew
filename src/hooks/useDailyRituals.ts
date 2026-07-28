@@ -382,9 +382,10 @@ export function useCycleSymptoms() {
       setLoading(false);
       return;
     }
-    // Last 60 days is enough for the calendar dots.
+    // A full year of history — the calendar pages back through past
+    // months and the symptom filter looks for cross-cycle patterns.
     const since = new Date();
-    since.setDate(since.getDate() - 60);
+    since.setDate(since.getDate() - 366);
     const { data } = await supabase
       .from('cycle_symptoms')
       .select('date, symptoms')

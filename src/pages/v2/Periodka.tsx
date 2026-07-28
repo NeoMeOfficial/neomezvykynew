@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { useCycleData } from '../../features/cycle/useCycleData';
@@ -238,8 +238,13 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
   // Entered via the home card's 'Zisti viac' → today-first section order.
   const fromHome = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('from') === 'home';
   const todayDate = today.getDate();
-  const monthIdx = today.getMonth();
-  const yearIdx = today.getFullYear();
+  // Calendar month paging (Gabi 2026-07-28): 0 = current month, negative
+  // pages into the past (arrows + swipe). Clamped to a year back.
+  const [monthOffset, setMonthOffset] = useState(0);
+  const swipeStartX = useRef<number | null>(null);
+  const viewedMonth = new Date(today.getFullYear(), today.getMonth() + monthOffset, 1);
+  const monthIdx = viewedMonth.getMonth();
+  const yearIdx = viewedMonth.getFullYear();
   const monthLabel = SK_MONTHS_FULL[monthIdx];
   const monthShort = SK_MONTHS_SHORT_LOWER[monthIdx];
 
@@ -251,8 +256,9 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     const target = new Date(yearIdx, monthIdx, d);
     const start = new Date(cycleData.lastPeriodStart + 'T00:00:00');
     const daysSince = Math.floor((target.getTime() - start.getTime()) / 86400000);
-    if (daysSince < 0) return null;
-    const cycleDay = (daysSince % totalDays) + 1;
+    // Wrap both directions — past months approximate previous cycles with
+    // the current cycle length (same rule as phaseKeyForDateISO).
+    const cycleDay = ((daysSince % totalDays) + totalDays) % totalDays + 1;
     const range = phases.find((p) => cycleDay >= p.start && cycleDay <= p.end);
     return { cycleDay, key: range?.key ?? null };
   };
@@ -355,9 +361,8 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
   const { isPremium } = useSubscription();
   const [addingSymptom, setAddingSymptom] = useState(false);
   const [newSymptomText, setNewSymptomText] = useState('');
-  // Calendar dots — derive day-of-month for current month from symptomDates.
-  const nowDate = new Date();
-  const ym = `${nowDate.getFullYear()}-${String(nowDate.getMonth() + 1).padStart(2, '0')}`;
+  // Calendar dots — derive day-of-month for the VIEWED month (paging).
+  const ym = `${yearIdx}-${String(monthIdx + 1).padStart(2, '0')}`;
   const symptomDays: number[] = symptomDates
     .filter((d) => d.startsWith(ym))
     .map((d) => parseInt(d.slice(8, 10), 10));
@@ -383,6 +388,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
   // summary shows how often it lands in which phase, so she can spot
   // patterns ("hlava ma bolí vždy pred periódou").
   const [symptomFilter, setSymptomFilter] = useState<string | null>(null);
+  const [filterOpen, setFilterOpen] = useState(false);
   const symptomCounts = (() => {
     const counts = new Map<string, number>();
     for (const entry of symptomDayEntries) {
@@ -807,10 +813,84 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
 
   const calendarBlock = (
       <div style={{ padding: '28px 20px 10px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 14 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
           <Eye>Kalendár cyklu</Eye>
-          <div style={{ fontFamily: NM.SERIF, fontSize: 14, color: NM.DEEP, fontWeight: 500, fontStyle: 'italic' }}>{monthLabel} {yearIdx}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <button
+              onClick={() => setMonthOffset((o) => Math.max(o - 1, -12))}
+              aria-label="Predchádzajúci mesiac"
+              style={{ all: 'unset', cursor: 'pointer', width: 28, height: 28, display: 'grid', placeItems: 'center', color: monthOffset <= -12 ? NM.HAIR_2 : NM.MUTED }}
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M15 6l-6 6 6 6"/></svg>
+            </button>
+            <div style={{ fontFamily: NM.SERIF, fontSize: 14, color: NM.DEEP, fontWeight: 500, fontStyle: 'italic', minWidth: 96, textAlign: 'center' }}>{monthLabel} {yearIdx}</div>
+            <button
+              onClick={() => setMonthOffset((o) => Math.min(o + 1, 0))}
+              aria-label="Ďalší mesiac"
+              style={{ all: 'unset', cursor: monthOffset === 0 ? 'default' : 'pointer', width: 28, height: 28, display: 'grid', placeItems: 'center', color: monthOffset === 0 ? NM.HAIR_2 : NM.MUTED }}
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
+            </button>
+          </div>
         </div>
+
+        {/* Collapsible symptom filter — expands on tap */}
+        {filterableSymptoms.length > 0 && (
+          <div style={{ marginBottom: 12 }}>
+            <button
+              onClick={() => setFilterOpen((v) => !v)}
+              style={{ all: 'unset', cursor: 'pointer', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, padding: '10px 14px', borderRadius: 14, background: '#fff', border: `1px solid ${NM.HAIR}`, boxSizing: 'border-box' }}
+            >
+              <span style={{ fontFamily: NM.SANS, fontSize: 12, color: NM.DEEP, fontWeight: 500 }}>
+                Filtruj podľa symptómov. Ako si sa cítila?
+              </span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={NM.MUTED} strokeWidth="2" strokeLinecap="round" style={{ flexShrink: 0, transform: filterOpen ? 'rotate(180deg)' : 'none', transition: 'transform 160ms' }}>
+                <path d="M6 9l6 6 6-6"/>
+              </svg>
+            </button>
+            {filterOpen && (
+              <div style={{ marginTop: 10 }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                  {filterableSymptoms.map((sd) => {
+                    const active = symptomFilter === sd.k;
+                    return (
+                      <button
+                        key={sd.k}
+                        onClick={() => setSymptomFilter(active ? null : sd.k)}
+                        style={{
+                          all: 'unset',
+                          cursor: 'pointer',
+                          padding: '7px 12px',
+                          borderRadius: 999,
+                          background: active ? NM.GOLD : '#fff',
+                          color: active ? '#fff' : NM.DEEP,
+                          border: active ? '1px solid transparent' : `1px solid ${NM.HAIR_2}`,
+                          fontFamily: NM.SANS,
+                          fontSize: 11.5,
+                          fontWeight: active ? 500 : 400,
+                        }}
+                      >
+                        {sd.l} · {symptomCounts.get(sd.k) ?? 0}×
+                      </button>
+                    );
+                  })}
+                </div>
+                {activeFilterDef && filterPhaseSummary && (
+                  <div style={{ marginTop: 10, padding: '12px 14px', borderRadius: 14, background: 'rgba(184,134,74,0.08)', border: '1px solid rgba(184,134,74,0.28)' }}>
+                    <div style={{ fontFamily: NM.SANS, fontSize: 12, color: NM.DEEP, fontWeight: 500, lineHeight: 1.45 }}>
+                      {activeFilterDef.l} — {filterPhaseSummary.total}× za posledných 12 mesiacov
+                    </div>
+                    {filterPhaseSummary.top && filterPhaseSummary.total >= 2 && (
+                      <div style={{ fontFamily: NM.SANS, fontSize: 11.5, color: 'rgba(61,41,33,0.6)', marginTop: 3, lineHeight: 1.45 }}>
+                        Najčastejšie {PHASE_LOCATIVE[filterPhaseSummary.top.key] ?? ''} ({filterPhaseSummary.top.n}×). Zlaté dni v kalendári sú dni so záznamom — listuj šípkami aj do minulých mesiacov.
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', marginBottom: 5 }}>
           {['Po', 'Ut', 'St', 'Št', 'Pi', 'So', 'Ne'].map((d) => (
             <div key={d} style={{ fontFamily: NM.SANS, fontSize: 9, letterSpacing: '0.22em', textTransform: 'uppercase', color: NM.EYEBROW, textAlign: 'center', fontWeight: 500 }}>
@@ -818,10 +898,20 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
             </div>
           ))}
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: 4 }}>
+        <div
+          style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: 4, touchAction: 'pan-y' }}
+          onTouchStart={(e) => { swipeStartX.current = e.touches[0].clientX; }}
+          onTouchEnd={(e) => {
+            if (swipeStartX.current === null) return;
+            const dx = e.changedTouches[0].clientX - swipeStartX.current;
+            swipeStartX.current = null;
+            if (dx > 48) setMonthOffset((o) => Math.max(o - 1, -12));
+            else if (dx < -48) setMonthOffset((o) => Math.min(o + 1, 0));
+          }}
+        >
           {weeks.flat().map((c, i) => {
             const tint = !c.mute ? phaseTintOf(c.d) : null;
-            const today = !c.mute && c.d === todayDate;
+            const today = !c.mute && monthOffset === 0 && c.d === todayDate;
             const sym = !c.mute && symptomDays.includes(c.d);
             const selected = !c.mute && selectedDay === c.d;
             const cellPhase = !c.mute ? phaseOf(c.d) : null;
@@ -840,10 +930,10 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
                   position: 'relative',
                   aspectRatio: '1',
                   borderRadius: 9,
-                  background: today ? NM.DEEP : tint ?? 'transparent',
-                  boxShadow: filterHit
+                  background: today ? NM.DEEP : filterHit ? NM.GOLD : tint ?? 'transparent',
+                  boxShadow: filterHit && today
                     ? `0 0 0 2px ${NM.GOLD}`
-                    : selected && !today && cellPhase ? `0 0 0 1.5px ${cellPhase}` : 'none',
+                    : selected && !today && !filterHit && cellPhase ? `0 0 0 1.5px ${cellPhase}` : 'none',
                   display: 'grid',
                   placeItems: 'center',
                   boxSizing: 'border-box',
@@ -854,13 +944,13 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
                   fontSize: 14,
                   fontWeight: today ? 500 : 400,
                   letterSpacing: '-0.01em',
-                  color: today ? '#fff' : c.mute ? 'rgba(61,41,33,0.40)' : NM.DEEP,
+                  color: today || filterHit ? '#fff' : c.mute ? 'rgba(61,41,33,0.40)' : NM.DEEP,
                   opacity: c.mute ? 0.5 : 1,
                 }}>{c.d}</div>
                 {sym && (
                   <div style={{ position: 'absolute', bottom: 2.5, display: 'flex', gap: 1.5, opacity: symptomFilter !== null && !filterHit ? 0.25 : 1 }}>
                     {[0, 1, 2].map((k) => (
-                      <div key={k} style={{ width: 2, height: 2, borderRadius: 999, background: today ? '#fff' : NM.DEEP, opacity: today ? 1 : 0.55 }} />
+                      <div key={k} style={{ width: 2, height: 2, borderRadius: 999, background: today || filterHit ? '#fff' : NM.DEEP, opacity: today || filterHit ? 1 : 0.55 }} />
                     ))}
                   </div>
                 )}
@@ -909,49 +999,6 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
           })}
         </div>
 
-        {/* Symptom filter — highlight logged days + phase pattern summary */}
-        {filterableSymptoms.length > 0 && (
-          <div style={{ marginTop: 20 }}>
-            <Eye size={10} color={NM.TERTIARY}>Filtruj podľa symptómu</Eye>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 10 }}>
-              {filterableSymptoms.map((sd) => {
-                const active = symptomFilter === sd.k;
-                return (
-                  <button
-                    key={sd.k}
-                    onClick={() => setSymptomFilter(active ? null : sd.k)}
-                    style={{
-                      all: 'unset',
-                      cursor: 'pointer',
-                      padding: '7px 12px',
-                      borderRadius: 999,
-                      background: active ? NM.GOLD : '#fff',
-                      color: active ? '#fff' : NM.DEEP,
-                      border: active ? '1px solid transparent' : `1px solid ${NM.HAIR_2}`,
-                      fontFamily: NM.SANS,
-                      fontSize: 11.5,
-                      fontWeight: active ? 500 : 400,
-                    }}
-                  >
-                    {sd.l} · {symptomCounts.get(sd.k) ?? 0}×
-                  </button>
-                );
-              })}
-            </div>
-            {activeFilterDef && filterPhaseSummary && (
-              <div style={{ marginTop: 12, padding: '12px 14px', borderRadius: 14, background: 'rgba(184,134,74,0.08)', border: '1px solid rgba(184,134,74,0.28)' }}>
-                <div style={{ fontFamily: NM.SANS, fontSize: 12, color: NM.DEEP, fontWeight: 500, lineHeight: 1.45 }}>
-                  {activeFilterDef.l} — {filterPhaseSummary.total}× za posledných 60 dní
-                </div>
-                {filterPhaseSummary.top && filterPhaseSummary.total >= 2 && (
-                  <div style={{ fontFamily: NM.SANS, fontSize: 11.5, color: 'rgba(61,41,33,0.6)', marginTop: 3, lineHeight: 1.45 }}>
-                    Najčastejšie {PHASE_LOCATIVE[filterPhaseSummary.top.key] ?? ''} ({filterPhaseSummary.top.n}×). Zvýraznené dni v kalendári sú dni so záznamom.
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        )}
       </div>
   );
 
