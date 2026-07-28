@@ -902,6 +902,46 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
           })}
         </div>
 
+        {/* Legend — tap any calendar day to highlight its phase here */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+            gap: 8,
+            marginTop: 16,
+          }}
+        >
+          {([
+            { key: 'menstrual', name: 'Menštruácia', color: PHASE.MENSTR },
+            { key: 'follicular', name: 'Folikulárna', color: PHASE.FOLLIC },
+            { key: 'ovulation', name: 'Ovulácia', color: PHASE.OVULAT },
+            { key: 'luteal', name: 'Luteálna', color: PHASE.LUTEAL },
+          ] as const).map((item) => {
+            const active = selectedPhaseKey === null || selectedPhaseKey === item.key;
+            return (
+              <div
+                key={item.key}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  padding: '8px 12px',
+                  borderRadius: 12,
+                  background: '#fff',
+                  border: `1px solid ${NM.HAIR}`,
+                  opacity: active ? 1 : 0.32,
+                  transition: 'opacity 180ms',
+                }}
+              >
+                <span style={{ width: 10, height: 10, borderRadius: 999, background: item.color, flexShrink: 0 }} />
+                <span style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.DEEP, fontWeight: 500, letterSpacing: '0.01em' }}>
+                  {item.name}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+
         {/* Collapsible symptom filter — expands on tap */}
         {filterableSymptoms.length > 0 && (
           <div style={{ marginTop: 12 }}>
@@ -962,46 +1002,6 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
             )}
           </div>
         )}
-
-        {/* Legend — tap any calendar day to highlight its phase here */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-            gap: 8,
-            marginTop: 16,
-          }}
-        >
-          {([
-            { key: 'menstrual', name: 'Menštruácia', color: PHASE.MENSTR },
-            { key: 'follicular', name: 'Folikulárna', color: PHASE.FOLLIC },
-            { key: 'ovulation', name: 'Ovulácia', color: PHASE.OVULAT },
-            { key: 'luteal', name: 'Luteálna', color: PHASE.LUTEAL },
-          ] as const).map((item) => {
-            const active = selectedPhaseKey === null || selectedPhaseKey === item.key;
-            return (
-              <div
-                key={item.key}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  padding: '8px 12px',
-                  borderRadius: 12,
-                  background: '#fff',
-                  border: `1px solid ${NM.HAIR}`,
-                  opacity: active ? 1 : 0.32,
-                  transition: 'opacity 180ms',
-                }}
-              >
-                <span style={{ width: 10, height: 10, borderRadius: 999, background: item.color, flexShrink: 0 }} />
-                <span style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.DEEP, fontWeight: 500, letterSpacing: '0.01em' }}>
-                  {item.name}
-                </span>
-              </div>
-            );
-          })}
-        </div>
 
       </div>
   );
