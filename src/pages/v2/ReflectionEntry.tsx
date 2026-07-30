@@ -214,8 +214,8 @@ export default function ReflectionEntry() {
       <div style={{ margin: '30px 22px 0', paddingTop: 20, borderTop: `1px solid ${NM.HAIR}` }}>
         <div style={{ fontFamily: NM.SERIF, fontSize: 18, color: NM.DEEP, fontWeight: 600, lineHeight: 1.3, letterSpacing: '-0.005em' }}>
           {patterns.structuredCount >= 5
-            ? 'V minulých dňoch ti energiu…'
-            : 'Po piatich dňoch zapisovania sa ti ukáže…'}
+            ? 'V minulých dňoch ti energiu najčastejšie…'
+            : 'Po piatich dňoch zapisovania sa ti ukáže, čo ti energiu najčastejšie…'}
         </div>
         <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 9, fontFamily: NM.SANS, fontSize: 13, color: NM.MUTED, lineHeight: 1.5 }}>
@@ -224,7 +224,7 @@ export default function ReflectionEntry() {
               <strong style={{ color: '#7A9E78', fontWeight: 600 }}>dávalo</strong>
               {patterns.structuredCount >= 5 && patterns.gave.length > 0
                 ? `: ${patterns.gave.map(([l, n]) => `${l} (${n}×)`).join(', ')}`
-                : ' — čo ti ju najčastejšie prinášalo'}
+                : ': …'}
             </span>
           </div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 9, fontFamily: NM.SANS, fontSize: 13, color: NM.MUTED, lineHeight: 1.5 }}>
@@ -233,12 +233,12 @@ export default function ReflectionEntry() {
               <strong style={{ color: '#C27A6E', fontWeight: 600 }}>bralo</strong>
               {patterns.structuredCount >= 5 && patterns.took.length > 0
                 ? `: ${patterns.took.map(([l, n]) => `${l} (${n}×)`).join(', ')}`
-                : ' — čo ti ju najčastejšie uberalo'}
+                : ': …'}
             </span>
           </div>
         </div>
         <div style={{ marginTop: 12, fontFamily: NM.SANS, fontSize: 12.5, color: NM.TERTIARY, lineHeight: 1.5, fontStyle: 'italic' }}>
-          Aby si vedela, čomu venovať viac času — a čomu menej.
+          Prehľad sa každým zápisom aktualizuje — aby si vedela, čomu venovať viac času a čomu menej.
         </div>
       </div>
 
