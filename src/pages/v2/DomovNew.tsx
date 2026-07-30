@@ -1011,12 +1011,10 @@ export default function DomovNew() {
       img: '/images/r9/testimonial-meditation.jpg',
       title: meditationTitle,
       sub: [meditation?.duration, meditation?.category].filter(Boolean).join(' · ').toLowerCase() || 'krátka meditácia',
-      // Straight into the player; its back arrow then lands on the full
-      // Myseľ section (fromHome state), where the whole catalog lives.
-      href: meditation && (meditation as { id?: string }).id && !(meditation as { id: string }).id.startsWith('fallback')
-        ? `/meditacia/${(meditation as { id: string }).id}`
-        : '/kniznica/mysel?from=home',
-      state: { fromHome: true },
+      // Opens the Myseľ section — the same view as from Knižnica, with
+      // today's meditation featured on top (Gabi 2026-07-30); back pops
+      // to home via the section's smartBack.
+      href: '/kniznica/mysel',
       cta: 'Vypočuj si',
     },
   ];
