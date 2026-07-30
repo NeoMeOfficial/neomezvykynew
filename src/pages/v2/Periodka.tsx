@@ -1296,26 +1296,15 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
   return (
     <>
       {headerBlock}
-      {fromHome ? (
-        // From-home flow: hero headline → today/next-period squares →
-        // "zaznač si, ako sa dnes cítiš"; the ring moves down to "Čaká ťa".
-        <>
-          {todayStatsBlock}
-          {wellbeingBlock}
-          {periodCtaBlock}
-          {ringBlock}
-          {upcomingBlock}
-          {calendarBlock}
-        </>
-      ) : (
-        <>
-          {ringBlock}
-          {periodCtaBlock}
-          {calendarBlock}
-          {wellbeingBlock}
-          {upcomingBlock}
-        </>
-      )}
+      {/* One order for every entry point (Gabi 2026-07-30) — the
+          today-first flow she tuned for the home card applies always;
+          fromHome now only steers the back arrow. */}
+      {todayStatsBlock}
+      {wellbeingBlock}
+      {periodCtaBlock}
+      {ringBlock}
+      {upcomingBlock}
+      {calendarBlock}
       {dayDetailSheet}
     </>
   );
