@@ -9,17 +9,12 @@ import { BodyText } from '@/components/ui/body-text';
 import { SectionHeader } from '@/components/ui/section-header';
 import { useMeditations, DbMeditation } from '../../hooks/useMeditations';
 
-// Categories match the prod meditations.category values (free-form Slovak
-// labels set by Gabi in the admin / SQL editor): 'Mindfulness', 'Spánok',
-// 'Stres', 'Materstvo', 'Emócie', 'Ja'. Filter list is hand-picked from
-// what's currently in the table.
+// Two canonical groups (Gabi 2026-07-30): every meditation is either
+// 'Pre mamičky' or 'Pre ženy'; seeded via Admin → Meditations → Import.
 const CATEGORIES: { label: string; filter: string | null }[] = [
-  { label: 'Všetko',      filter: null },
-  { label: 'Mindfulness', filter: 'Mindfulness' },
-  { label: 'Spánok',      filter: 'Spánok' },
-  { label: 'Stres',       filter: 'Stres' },
-  { label: 'Materstvo',   filter: 'Materstvo' },
-  { label: 'Emócie',      filter: 'Emócie' },
+  { label: 'Všetko',       filter: null },
+  { label: 'Pre mamičky',  filter: 'Pre mamičky' },
+  { label: 'Pre ženy',     filter: 'Pre ženy' },
 ];
 
 export default function Meditacie() {
