@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Page, Eye, NM } from '../../components/v2/neome';
 import { useMeditations } from '../../hooks/useMeditations';
@@ -42,16 +42,18 @@ export default function MyselNew() {
   const favMeditations = getFavoriteCounts().meditation;
 
   const today = new Date();
-  const dateLabel = `${SK_DAYS[today.getDay()]} · ${today.getDate()}. ${today.getMonth() + 1}.`;
-  const prompt = PROMPTS[dayPromptIndex(today)];
 
-  const featured = meditations[0];
+  // Featured rotates daily — deterministic, same for every woman that day.
+  const featured = meditations.length > 0
+    ? meditations[Math.floor(Date.now() / 86_400_000) % meditations.length]
+    : undefined;
+  const [medCat, setMedCat] = useState<string | null>(null);
+  const filteredMeds = meditations.filter((m) => medCat === null || m.category === medCat);
   const featuredTitle = featured?.title ?? 'Ticho pred dňom';
   const featuredDur = featured ? Math.round(featured.duration_sec / 60) : 10;
   const featuredEyebrow = `${featured?.eyebrow ?? 'Ranná meditácia'} · ${featuredDur} min`;
   const featuredImg = featured?.thumb_url || '/images/r9/testimonial-meditation.jpg';
 
-  const list = meditations.slice(1, 4);
 
   const reflections = useMemo(() => {
     return entries.slice(0, 3).map((e) => {
@@ -94,57 +96,7 @@ export default function MyselNew() {
             lineHeight: 1.55,
           }}
         >
-          Meditácie pre ranné stíšenie aj večerný oddych. Reflexie, keď potrebuješ niekoho vypočuť.
-        </div>
-      </div>
-
-      {/* Daily reflection prompt */}
-      <div style={{ padding: '24px 18px 0' }}>
-        <div
-          style={{
-            background: '#FFFFFF',
-            borderRadius: 20,
-            padding: '18px 20px',
-            border: `1px solid ${NM.HAIR}`,
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Eye color={NM.GOLD} size={10}>Dnešné zamyslenie</Eye>
-            <Eye size={10}>{dateLabel}</Eye>
-          </div>
-          <div
-            style={{
-              marginTop: 12,
-              fontFamily: NM.SERIF,
-              fontSize: 20,
-              color: NM.DEEP,
-              lineHeight: 1.2,
-              letterSpacing: '-0.01em',
-            }}
-          >
-            {prompt}
-          </div>
-          <div style={{ marginTop: 14, display: 'flex', alignItems: 'center', gap: 14 }}>
-            <button
-              onClick={() => navigate('/dennik/new')}
-              style={{
-                background: NM.DEEP,
-                color: '#fff',
-                border: 0,
-                padding: '11px 20px',
-                borderRadius: 999,
-                fontFamily: NM.SANS,
-                fontSize: 12.5,
-                fontWeight: 500,
-                cursor: 'pointer',
-              }}
-            >
-              Napísať záznam
-            </button>
-            <span style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.MUTED, fontWeight: 300 }}>
-              ~3 minúty
-            </span>
-          </div>
+          Meditácie pre ranné nastavenie dňa aj večerné stíšenie a oddych. Sprítomni sa a skľudni svoju myseľ.
         </div>
       </div>
 
@@ -217,21 +169,49 @@ export default function MyselNew() {
         </button>
       </div>
 
-      <SectionHeader right="Knižnica meditácií" onRightClick={() => navigate('/meditacie')}>
-        Ďalej skús
-      </SectionHeader>
+      {/* Category tabs + full list right under the featured pick */}
+      <div style={{ display: 'flex', gap: 8, overflowX: 'auto', padding: '22px 18px 2px' }}>
+        {([
+          { label: 'Všetko', filter: null },
+          { label: 'Pre mamičky', filter: 'Pre mamičky' },
+          { label: 'Pre ženy', filter: 'Pre ženy' },
+        ] as const).map((c) => {
+          const active = medCat === c.filter;
+          return (
+            <button
+              key={c.label}
+              onClick={() => setMedCat(c.filter)}
+              style={{
+                all: 'unset',
+                cursor: 'pointer',
+                flexShrink: 0,
+                padding: '8px 14px',
+                borderRadius: 999,
+                background: active ? NM.DEEP : '#fff',
+                color: active ? '#fff' : NM.DEEP,
+                border: active ? '1px solid transparent' : `1px solid ${NM.HAIR_2}`,
+                fontFamily: NM.SANS,
+                fontSize: 12,
+                fontWeight: active ? 500 : 400,
+              }}
+            >
+              {c.label}
+            </button>
+          );
+        })}
+      </div>
 
-      <div style={{ padding: '0 18px' }}>
-        {list.length === 0 ? (
+      <div style={{ padding: '12px 18px 0' }}>
+        {filteredMeds.length === 0 ? (
           <FallbackRows />
         ) : (
-          list.map((m, i) => (
+          filteredMeds.map((m, i) => (
             <MedRow
               key={m.id}
-              eye={`${m.eyebrow ?? m.category} · ${Math.round(m.duration_sec / 60)} min`}
+              eye={`${m.category} · ${Math.round(m.duration_sec / 60)} min`}
               title={m.title}
               done={false}
-              last={i === list.length - 1}
+              last={i === filteredMeds.length - 1}
               onClick={() => navigate(`/meditacia/${m.id}`)}
             />
           ))
@@ -240,36 +220,6 @@ export default function MyselNew() {
 
       {/* Library CTA pill */}
       <div style={{ padding: '16px 18px 0' }}>
-        <button
-          onClick={() => navigate('/meditacie')}
-          style={{
-            width: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '16px 20px',
-            borderRadius: 18,
-            background: '#FFFFFF',
-            border: `1px solid ${NM.HAIR_2}`,
-            cursor: 'pointer',
-            fontFamily: NM.SANS,
-            fontSize: 13,
-            color: NM.DEEP,
-            fontWeight: 500,
-          }}
-        >
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10 }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={NM.MAUVE} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M4 4h16v16H4z" />
-              <path d="M12 4v16" />
-            </svg>
-            Všetky meditácie{meditations.length ? ` · ${meditations.length}` : ''}
-          </span>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={NM.MAUVE} strokeWidth="2" strokeLinecap="round">
-            <path d="M9 6l6 6-6 6" />
-          </svg>
-        </button>
-
         <button
           onClick={() => navigate('/oblubene?tab=meditation')}
           style={{
