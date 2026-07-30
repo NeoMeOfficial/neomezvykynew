@@ -102,6 +102,25 @@ export default function AppLayout() {
     >
       {needRefresh && <UpdateBanner onRefresh={onRefresh} />}
 
+      {/* Opaque status-bar dock — the top mirror of the BottomNav zone:
+          scrolling content visually ends under the clock/battery strip
+          instead of colliding with it. Height comes from the device's
+          safe-area inset, so on phones without a notch it's invisible. */}
+      <div
+        aria-hidden
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 'env(safe-area-inset-top, 0px)',
+          zIndex: 60,
+          background: 'rgba(248,245,240,0.92)',
+          backdropFilter: 'blur(14px)',
+          WebkitBackdropFilter: 'blur(14px)',
+        }}
+      />
+
       {/* When the floating BottomNav is visible, reserve space for it here
           once — pages then never scroll their last content behind it. */}
       <main
