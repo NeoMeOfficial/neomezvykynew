@@ -6,6 +6,7 @@ import { useReflections } from '../../hooks/useDailyRituals';
 import { useUniversalFavorites } from '../../hooks/useUniversalFavorites';
 import { useSmartBack } from '../../hooks/useSmartBack';
 import FavoriteButton from '../../components/v2/favorites/FavoriteButton';
+import { useDailyMeditation } from '../../hooks/useDailyContent';
 
 /**
  * Myseľ landing — Round 20.
@@ -44,10 +45,12 @@ export default function MyselNew() {
 
   const today = new Date();
 
-  // Featured rotates daily — deterministic, same for every woman that day.
-  const featured = meditations.length > 0
-    ? meditations[Math.floor(Date.now() / 86_400_000) % meditations.length]
-    : undefined;
+  // Featured = the SAME daily pick the home Myseľ card shows
+  // (useDailyMeditation: featured_on override, else day-of-year rotation);
+  // resolved against the full catalog row for thumb/duration.
+  const { meditation: dailyPick } = useDailyMeditation();
+  const featured = meditations.find((m) => m.id === (dailyPick as { id?: string }).id)
+    ?? (meditations.length > 0 ? meditations[0] : undefined);
   const [medCat, setMedCat] = useState<string | null>(null);
   const filteredMeds = meditations.filter((m) => medCat === null || m.category === medCat);
   const featuredTitle = featured?.title ?? 'Ticho pred dňom';
