@@ -24,7 +24,7 @@ function useStatusBarInset(): string {
     if (!standalone) { setPx(0); return; }
     const h = Math.max(window.screen.height, window.screen.width);
     // Tight estimates — just enough to clear the clock, no wasted screen.
-    setPx(h >= 852 ? 50 : h >= 812 ? 44 : 20);
+    setPx(h >= 852 ? 25 : h >= 812 ? 22 : 10);
   }, []);
   return px === null ? 'env(safe-area-inset-top, 0px)' : `${px}px`;
 }
