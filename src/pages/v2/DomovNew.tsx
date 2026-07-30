@@ -1078,8 +1078,8 @@ export default function DomovNew() {
         </div>
       </div>
       <PillarStack items={pillars} />
-      <CardGoals />
       <CardDiary free={!isPlus} prompt={diaryPrompt} sub={diarySub} savedToday={diarySavedToday} onOpen={() => navigate('/dennik/new')} />
+      <CardGoals />
 
       {/* Komunita divider — plain, no bullet (visual separator between personal and community sections) */}
       <div style={{ padding: '0 22px', margin: '32px 0 0', fontSize: 10.5, letterSpacing: '0.24em', textTransform: 'uppercase' as const, fontWeight: 500, color: FG3, fontFamily: SANS }}>Komunita</div>
