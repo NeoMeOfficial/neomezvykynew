@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Page, Eye, NM, ConfirmSheet } from '../../components/v2/neome';
 import { useReflections } from '../../hooks/useDailyRituals';
 import { useSmartBack } from '../../hooks/useSmartBack';
+import { parseStructured, serializeStructured, computeEnergyPatterns } from '../../features/dennik/structuredEntry';
 
 /**
  * Osobný denník — Round 20.
@@ -45,16 +46,38 @@ export default function DennikHistory() {
       .map((e) => {
         const raw = e.created_at || e.date || '';
         const d = raw ? new Date(raw) : new Date();
+        const structured = parseStructured(e.text || '');
+        // Human preview for structured entries; plain entries unchanged.
+        const body = structured
+          ? [
+              structured.win && `✓ ${structured.win}`,
+              structured.reflection,
+              structured.gave.length > 0 && `⚡ Dalo: ${structured.gave.join(', ')}`,
+              structured.took.length > 0 && `− Bralo: ${structured.took.join(', ')}`,
+            ].filter(Boolean).join('\n')
+          : (e.text || '');
         return {
           id: e.id,
           d: `${d.getDate()}. ${d.getMonth() + 1}.`,
           t: SK_DAYS[d.getDay()],
-          body: e.text || '',
+          body,
+          structured,
+          // Editing a structured entry edits its reflection; chips stay.
+          editBody: structured ? structured.reflection : (e.text || ''),
           ts: d.getTime(),
         };
       })
       .sort((a, b) => b.ts - a.ts);
   }, [entries]);
+
+  // Energy patterns — counted from her own chip taps (facts, not guesses).
+  const patterns = useMemo(
+    () => computeEnergyPatterns(entries.map((e) => ({
+      text: e.text || '',
+      date: (e.date || e.created_at || '').slice(0, 10),
+    }))),
+    [entries],
+  );
 
   const isEmpty = !loading && rows.length === 0;
   const selectedRow = rows.find((r) => r.id === selectedId) || null;
@@ -72,6 +95,38 @@ export default function DennikHistory() {
       ) : (
         <>
           <TodayPrompt label={todayLabel} prompt={prompt} onWrite={() => navigate('/dennik/new')} />
+
+          {/* Tvoje vzorce — appears from 5 structured entries in 7 days */}
+          {patterns.structuredCount >= 5 ? (
+            <div style={{ padding: '18px 18px 0' }}>
+              <div style={{ background: '#fff', borderRadius: 20, border: `1px solid ${NM.HAIR}`, padding: '16px 18px' }}>
+                <Eye color={NM.GOLD} size={10}>Tvoje vzorce · posledných {patterns.windowDays} dní</Eye>
+                {patterns.gave.length > 0 && (
+                  <div style={{ marginTop: 12, fontFamily: NM.SANS, fontSize: 13, color: NM.DEEP, lineHeight: 1.5 }}>
+                    Energiu ti najčastejšie <strong style={{ color: '#7A9E78', fontWeight: 700 }}>dávalo</strong>:{' '}
+                    {patterns.gave.map(([l, n]) => `${l} (${n}×)`).join(', ')}
+                  </div>
+                )}
+                {patterns.took.length > 0 && (
+                  <div style={{ marginTop: 8, fontFamily: NM.SANS, fontSize: 13, color: NM.DEEP, lineHeight: 1.5 }}>
+                    Energiu ti najčastejšie <strong style={{ color: '#C27A6E', fontWeight: 700 }}>bralo</strong>:{' '}
+                    {patterns.took.map(([l, n]) => `${l} (${n}×)`).join(', ')}
+                  </div>
+                )}
+                {patterns.gave.length === 0 && patterns.took.length === 0 && (
+                  <div style={{ marginTop: 10, fontFamily: NM.SANS, fontSize: 12.5, color: NM.MUTED, fontWeight: 300 }}>
+                    Označuj pri zápise, čo ti energiu dáva a berie — vzorce sa objavia tu.
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : patterns.structuredCount > 0 ? (
+            <div style={{ padding: '18px 18px 0' }}>
+              <div style={{ background: 'rgba(184,134,74,0.08)', border: '1px solid rgba(184,134,74,0.28)', borderRadius: 16, padding: '12px 16px', fontFamily: NM.SANS, fontSize: 12.5, color: NM.DEEP, lineHeight: 1.5 }}>
+                Ešte {5 - patterns.structuredCount} {5 - patterns.structuredCount === 1 ? 'zápis' : 'zápisy'} a ukážem ti, čo ťa v posledných dňoch nabíja a čo vybíja.
+              </div>
+            </div>
+          ) : null}
 
           {rows.length > 0 && (
             <div style={{ padding: '24px 18px 0' }}>
@@ -127,10 +182,16 @@ export default function DennikHistory() {
 
       {editRow && (
         <EditEntrySheet
-          row={editRow}
+          row={{ ...editRow, body: editRow.editBody }}
           onClose={() => setEditId(null)}
           onSave={async (text) => {
-            if (editId) await updateReflection(editId, text);
+            if (editId) {
+              const r = rows.find((x) => x.id === editId);
+              const next = r?.structured
+                ? serializeStructured({ ...r.structured, reflection: text })
+                : text;
+              await updateReflection(editId, next);
+            }
             setEditId(null);
           }}
         />

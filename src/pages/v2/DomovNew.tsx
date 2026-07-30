@@ -423,9 +423,9 @@ function CardDiary({ free, prompt, onOpen }: { free: boolean; prompt: string; on
             right={free ? <div style={{ fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase' as const, color: GOLD, fontWeight: 500, fontStyle: 'italic', flexShrink: 0 }}>neukladá sa</div> : undefined}
           />
           <div style={{ fontFamily: SERIF, fontSize: 17.5, color: INK, lineHeight: 1.22, marginTop: 7 }}>{prompt}</div>
-          <div style={{ fontSize: 11.5, color: FG2, fontWeight: 300, marginTop: 4, lineHeight: 1.4 }}>Krátka reflexia — stačí jedna veta.</div>
+          <div style={{ fontSize: 11.5, color: FG2, fontWeight: 300, marginTop: 4, lineHeight: 1.4 }}>Podarené · energia · reflexia — za minútku.</div>
           <div style={{ marginTop: 'auto', paddingTop: 10 }}>
-            <CtaPill label="Napísať" />
+            <CtaPill label="Zapíš si" />
           </div>
         </div>
       </div>
@@ -861,6 +861,7 @@ function AddHabitSheet({ onClose }: { onClose: () => void }) {
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function DomovNew() {
+  const navigate = useNavigate();
   const [showDiary,     setShowDiary]     = useState(false);
   const [showPointsInfo, setShowPointsInfo] = useState(false);
   const [selectedDay,   setSelectedDay]   = useState<Date | null>(null);
@@ -1049,7 +1050,7 @@ export default function DomovNew() {
       </div>
       <PillarStack items={pillars} />
       <CardGoals />
-      <CardDiary free={!isPlus} prompt={diaryPrompt} onOpen={() => setShowDiary(true)} />
+      <CardDiary free={!isPlus} prompt={diaryPrompt} onOpen={() => navigate('/dennik/new')} />
 
       {/* Komunita divider — plain, no bullet (visual separator between personal and community sections) */}
       <div style={{ padding: '0 22px', margin: '32px 0 0', fontSize: 10.5, letterSpacing: '0.24em', textTransform: 'uppercase' as const, fontWeight: 500, color: FG3, fontFamily: SANS }}>Komunita</div>
