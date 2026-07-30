@@ -208,10 +208,11 @@ export default function ReflectionEntry() {
         />
       </>)}
 
-      {/* Pattern teaser → live pattern once 5 entries exist.
-          Styled as a serif subheading + two dávalo/bralo lines, not a box
-          (Gabi 2026-07-30: "vizualne krajsie, mozno ako podnadpis"). */}
-      <div style={{ margin: '30px 22px 0', paddingTop: 20, borderTop: `1px solid ${NM.HAIR}` }}>
+      {/* Pattern teaser → live pattern once 5 entries exist. Same white
+          card as the four blocks above so the series reads as one whole
+          (Gabi 2026-07-30); the dark serif head — not a coloured question,
+          no input — marks it as the app giving back, not asking. */}
+      {card(<>
         <div style={{ fontFamily: NM.SERIF, fontSize: 18, color: NM.DEEP, fontWeight: 600, lineHeight: 1.3, letterSpacing: '-0.005em' }}>
           {patterns.structuredCount >= 5
             ? 'V minulých dňoch ti energiu najčastejšie…'
@@ -240,7 +241,7 @@ export default function ReflectionEntry() {
         <div style={{ marginTop: 12, fontFamily: NM.SANS, fontSize: 12.5, color: NM.TERTIARY, lineHeight: 1.5, fontStyle: 'italic' }}>
           Prehľad sa každým zápisom aktualizuje — aby si vedela, čomu venovať viac času a čomu menej.
         </div>
-      </div>
+      </>)}
 
       {error && (
         <div style={{ margin: '14px 20px 0', padding: '10px 14px', borderRadius: 12, background: 'rgba(194,122,110,0.10)', border: '1px solid rgba(194,122,110,0.30)', fontFamily: NM.SANS, fontSize: 12, color: '#C27A6E' }}>
