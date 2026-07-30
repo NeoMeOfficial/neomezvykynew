@@ -427,11 +427,7 @@ function CardDiary({ free, prompt, sub, savedToday, onOpen }: { free: boolean; p
           <div style={{ fontFamily: SERIF, fontSize: 17.5, color: INK, lineHeight: 1.22, marginTop: 7 }}>{prompt}</div>
           <div style={{ fontSize: 11.5, color: FG2, fontWeight: 300, marginTop: 4, lineHeight: 1.4 }}>{sub}</div>
           <div style={{ marginTop: 'auto', paddingTop: 10 }}>
-            {savedToday ? (
-              <span style={{ fontFamily: SANS, fontSize: 11.5, color: '#5F8A5D', fontWeight: 500 }}>Zapísané ✓</span>
-            ) : (
-              <CtaPill label="Zapíš si" />
-            )}
+            <CtaPill label={savedToday ? 'Dopíš si' : 'Zapíš si'} />
           </div>
         </div>
       </div>
@@ -938,7 +934,7 @@ export default function DomovNew() {
   const yestGave = yestEntry ? (parseStructured(yestEntry.text || '')?.gave ?? []) : [];
 
   let diaryPrompt = diaryPrompts[new Date().getDay() % diaryPrompts.length];
-  let diarySub = 'Podarené · energia · reflexia — za minútku.';
+  let diarySub = 'Zapíš si deň v štyroch krokoch — stačí minútka.';
   if (diaryPatterns.structuredCount >= 5 && diaryPatterns.gave.length > 0) {
     diaryPrompt = `Dopraj si dnes: ${diaryPatterns.gave[0][0].toLocaleLowerCase('sk')}`;
     diarySub = 'Práve to ti posledné dni najčastejšie dávalo energiu.';
