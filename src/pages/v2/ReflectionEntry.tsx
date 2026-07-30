@@ -4,6 +4,7 @@ import { NM } from '../../components/v2/neome';
 import { useAchievements } from '../../hooks/useAchievements';
 import { usePointsLedger } from '../../hooks/usePointsLedger';
 import { useReflections } from '../../hooks/useDailyRituals';
+import { computeEnergyPatterns } from '../../features/dennik/structuredEntry';
 import {
   ENERGY_CHIPS,
   readCustomChips,
@@ -98,7 +99,11 @@ export default function ReflectionEntry() {
   const [error, setError] = useState<string | null>(null);
   const { addActivity } = useAchievements();
   const { addEntry } = usePointsLedger();
-  const { addReflection } = useReflections();
+  const { addReflection, entries } = useReflections();
+  const patterns = computeEnergyPatterns(entries.map((e) => ({
+    text: e.text || '',
+    date: (e.date || e.created_at || '').slice(0, 10),
+  })));
   const today = new Date();
   const dateLabel = `${SK_DAYS[today.getDay()]} · ${today.getDate()}. ${today.getMonth() + 1}.`;
 
@@ -133,9 +138,9 @@ export default function ReflectionEntry() {
   // Each block = its own white card with a serif question whose key words
   // carry the accent colour — the four sections read as four steps, not
   // one wall of text (Gabi 2026-07-30).
-  const questionHead = (before: string, em: string, after: string, color: string) => (
-    <div style={{ fontFamily: NM.SERIF, fontSize: 17, color: NM.DEEP, lineHeight: 1.25, letterSpacing: '-0.005em' }}>
-      {before}<strong style={{ color, fontWeight: 700 }}>{em}</strong>{after}
+  const questionHead = (text: string, color: string) => (
+    <div style={{ fontFamily: NM.SERIF, fontSize: 19, color, fontWeight: 600, lineHeight: 1.25, letterSpacing: '-0.005em' }}>
+      {text}
     </div>
   );
 
@@ -173,27 +178,27 @@ export default function ReflectionEntry() {
 
       <div style={{ padding: '10px 20px 0' }}>
         <div style={{ fontFamily: NM.SERIF, fontSize: 26, color: NM.DEEP, lineHeight: 1.1, letterSpacing: '-0.01em' }}>
-          Ako bol tvoj <em style={{ fontStyle: 'italic', color: NM.GOLD }}>dnešný deň?</em>
+          Aký bol tvoj <em style={{ fontStyle: 'italic', color: NM.GOLD }}>dnešný deň?</em>
         </div>
       </div>
 
       {card(<>
-        {questionHead('Čo sa ti dnes ', 'podarilo', '?', NM.GOLD)}
+        {questionHead('Čo sa ti dnes podarilo?', NM.GOLD)}
         {lineInput(win, setWin, 'Aj maličkosť sa počíta…')}
       </>)}
 
       {card(<>
-        {questionHead('Čo ti dnes ', 'dalo energiu', '?', '#7A9E78')}
+        {questionHead('Čo ti dnes dalo energiu?', '#7A9E78')}
         <ChipRow selected={gave} onToggle={toggle(setGave)} extra={customChips} onAddCustom={handleAddCustom} />
       </>)}
 
       {card(<>
-        {questionHead('Čo ti dnes ', 'zobralo energiu', '?', '#C27A6E')}
+        {questionHead('Čo ti dnes zobralo energiu?', '#C27A6E')}
         <ChipRow selected={took} onToggle={toggle(setTook)} extra={customChips} onAddCustom={handleAddCustom} />
       </>)}
 
       {card(<>
-        {questionHead('Tvoja ', 'reflexia', ' dňa', NM.MAUVE ?? '#A8848B')}
+        {questionHead('Tvoja reflexia dňa', NM.MAUVE ?? '#A8848B')}
         <textarea
           value={reflection}
           onChange={(e) => setReflection(e.target.value)}
@@ -202,6 +207,22 @@ export default function ReflectionEntry() {
           style={{ width: '100%', marginTop: 12, padding: '14px 15px', borderRadius: 14, border: `1px solid ${NM.HAIR}`, fontFamily: NM.SERIF, fontSize: 15, color: NM.DEEP, background: NM.BG, outline: 'none', resize: 'none', lineHeight: 1.55, boxSizing: 'border-box' }}
         />
       </>)}
+
+      {/* Pattern teaser → live pattern once 5 entries exist */}
+      <div style={{ margin: '18px 18px 0', background: 'rgba(184,134,74,0.08)', border: '1px solid rgba(184,134,74,0.28)', borderRadius: 16, padding: '14px 16px', fontFamily: NM.SANS, fontSize: 12.5, color: NM.DEEP, lineHeight: 1.55 }}>
+        {patterns.structuredCount >= 5 ? (
+          <>
+            {patterns.gave.length > 0 && (
+              <div>V minulých dňoch ti energiu <strong style={{ color: '#7A9E78', fontWeight: 700 }}>dávalo</strong>: {patterns.gave.map(([l, n]) => `${l} (${n}×)`).join(', ')}</div>
+            )}
+            {patterns.took.length > 0 && (
+              <div style={{ marginTop: 6 }}>…a naopak energiu <strong style={{ color: '#C27A6E', fontWeight: 700 }}>bralo</strong>: {patterns.took.map(([l, n]) => `${l} (${n}×)`).join(', ')}</div>
+            )}
+          </>
+        ) : (
+          <>Po piatich dňoch zapisovania ti ukážem, čo ti v minulých dňoch energiu <strong style={{ color: '#7A9E78', fontWeight: 700 }}>dávalo</strong> a čo ju <strong style={{ color: '#C27A6E', fontWeight: 700 }}>bralo</strong>.</>
+        )}
+      </div>
 
       {error && (
         <div style={{ margin: '14px 20px 0', padding: '10px 14px', borderRadius: 12, background: 'rgba(194,122,110,0.10)', border: '1px solid rgba(194,122,110,0.30)', fontFamily: NM.SANS, fontSize: 12, color: '#C27A6E' }}>
