@@ -4,6 +4,7 @@ import { useAchievements } from '../../hooks/useAchievements';
 import { usePointsLedger } from '../../hooks/usePointsLedger';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseHabits } from '../../hooks/useSupabaseHabits';
+import { useSmartBack } from '../../hooks/useSmartBack';
 import { useSubscription } from '../../contexts/SubscriptionContext';
 import { TopBar } from '@/components/v2/top-bar';
 import { Eyebrow } from '@/components/ui/eyebrow';
@@ -27,6 +28,7 @@ export default function NavykyTracker() {
   const { isPremium } = useSubscription();
   const navigate = useNavigate();
   const { habits, loading, toggleHabitCompletion, removeHabit } = useSupabaseHabits();
+  const smartBack = useSmartBack('/domov-new');
   const { addActivity } = useAchievements();
   const { addEntry } = usePointsLedger();
   const [editMode, setEditMode] = useState(false);
@@ -68,7 +70,7 @@ export default function NavykyTracker() {
 
   return (
     <div className="min-h-screen bg-cream pb-12">
-      <TopBar title="Návyky" backHref="/domov-new" right={
+      <TopBar title="Návyky" onBack={smartBack} right={
         <div className="flex items-center gap-2">
           {habits.length > 0 && (
             <button

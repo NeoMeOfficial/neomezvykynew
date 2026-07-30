@@ -240,19 +240,18 @@ function SearchSheet({ onClose }: { onClose: () => void }) {
 
 interface Pillar { id: string; name: string; sub: string; img: string; path: string; }
 
+// Order fixed by Gabi 2026-07-30; blog joins the grid so 8 tiles make
+// four clean rows (no lone wide tile).
 const PILLARS: Pillar[] = [
-  { id: 'telo',     name: 'Telo',     sub: 'Pohyb a sila',          img: 'section-body.jpg',      path: '/kniznica/telo'      },
-  { id: 'strava',   name: 'Strava',   sub: 'Jedálniček a recepty',  img: 'section-nutrition.jpg', path: '/kniznica/strava'    },
-  { id: 'mysel',    name: 'Myseľ',    sub: 'Meditácie a dýchanie',  img: 'section-mind.jpg',      path: '/kniznica/mysel'     },
-  { id: 'periodka', name: 'Periodka', sub: 'Periodka a fázy',       img: 'section-period.jpg',    path: '/kniznica/periodka'  },
-  { id: 'dennik',   name: 'Denník',   sub: 'Reflexia a nálady',     img: 'section-diary.jpg',     path: '/kniznica/dennik'    },
-  { id: 'komunita', name: 'Komunita', sub: 'Ženy v pohybe',         img: 'section-community.jpg', path: '/komunita'           },
+  { id: 'telo',     name: 'Telo',           sub: 'Pohyb a sila',          img: 'section-body.jpg',        path: '/kniznica/telo'      },
+  { id: 'strava',   name: 'Strava',         sub: 'Jedálniček a recepty',  img: 'section-nutrition.jpg',   path: '/kniznica/strava'    },
+  { id: 'mysel',    name: 'Myseľ',          sub: 'Meditácie a dýchanie',  img: 'section-mind.jpg',        path: '/kniznica/mysel'     },
+  { id: 'periodka', name: 'Periodka',       sub: 'Periodka a fázy',       img: 'section-period.jpg',      path: '/kniznica/periodka'  },
+  { id: 'dennik',   name: 'Denník',         sub: 'Reflexia a nálady',     img: 'section-diary.jpg',       path: '/kniznica/dennik'    },
+  { id: 'navyky',   name: 'Návyky a ciele', sub: 'Malé kroky každý deň',  img: 'lifestyle-yoga-pose.jpg', path: '/navyky'             },
+  { id: 'komunita', name: 'Komunita',       sub: 'Ženy v pohybe',         img: 'section-community.jpg',   path: '/komunita'           },
+  { id: 'blog',     name: 'Blog',           sub: 'Články od Gabi',        img: 'blog-cycle-training.jpg', path: '/kniznica/blog'      },
 ];
-
-const BLOG: Pillar = {
-  id: 'blog', name: 'Blog', sub: 'Články od Gabi',
-  img: 'blog-cycle-training.jpg', path: '/kniznica/blog',
-};
 
 const GRADIENT = 'linear-gradient(180deg, rgba(42,26,20,0) 35%, rgba(42,26,20,0.82) 100%)';
 
@@ -306,7 +305,7 @@ export default function Kniznica() {
       {/* Oblasti label */}
       <div style={{ margin: '34px 20px 14px', display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
         <div style={{ fontFamily: 'DM Sans', fontSize: 10, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(61,41,33,0.55)', fontWeight: 500 }}>Oblasti</div>
-        <div style={{ fontFamily: 'DM Sans', fontSize: 10, letterSpacing: '0.24em', textTransform: 'uppercase', color: TERTIARY, fontWeight: 500 }}>7 celkom</div>
+        <div style={{ fontFamily: 'DM Sans', fontSize: 10, letterSpacing: '0.24em', textTransform: 'uppercase', color: TERTIARY, fontWeight: 500 }}>{PILLARS.length} celkom</div>
       </div>
 
       {/* 2-col photo grid */}
@@ -335,28 +334,7 @@ export default function Kniznica() {
         ))}
       </div>
 
-      {/* Blog — full-width wide tile */}
-      <div style={{ margin: '10px 20px 0' }}>
-        <button
-          onClick={() => navigate(BLOG.path)}
-          style={{
-            borderRadius: 18, overflow: 'hidden', position: 'relative',
-            aspectRatio: '2.1 / 1', width: '100%',
-            backgroundImage: `url(${IMG(BLOG.img)})`,
-            backgroundSize: 'cover', backgroundPosition: 'center',
-            border: 'none', cursor: 'pointer', display: 'block',
-          }}
-        >
-          <div style={{ position: 'absolute', inset: 0, background: GRADIENT }} />
-          <div style={{ position: 'absolute', bottom: 16, left: 18, right: 18, color: '#fff', textAlign: 'left' }}>
-            <div style={{ fontFamily: 'DM Sans', fontSize: 9, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.72)', fontWeight: 500, marginBottom: 4 }}>
-              Oblasť · 07
-            </div>
-            <div style={{ fontFamily: 'Gilda Display, serif', fontSize: 22, fontWeight: 500, letterSpacing: '-0.005em' }}>{BLOG.name}</div>
-            <div style={{ fontFamily: 'DM Sans', fontSize: 10.5, color: 'rgba(255,255,255,0.7)', marginTop: 3, fontWeight: 400 }}>{BLOG.sub}</div>
-          </div>
-        </button>
-      </div>
+
 
       {/* Upgrade banner — free only */}
       {!isPremium && (
