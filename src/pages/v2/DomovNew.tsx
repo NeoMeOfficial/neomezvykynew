@@ -905,17 +905,11 @@ export default function DomovNew() {
     return { recipe: r, name: r.name, kcal: Math.round((r.kcal ?? 0) * m.portionMultiplier) };
   })();
 
-  const diaryPrompts = [
-    'Čo ti dnes dalo najviac energie?',
-    'Na čo si dnes hrdá?',
-    'Čo by si zajtra urobila inak?',
-    'Čo ti dnes prinieslo radosť?',
-  ];
-
   // Home diary card gives back what she logged (Gabi 2026-07-30):
-  // 5+ entries → her top energy-giver, else yesterday's pick, else the
-  // rotating prompt. "Dopraj si dnes: X" keeps the chip label uninflected
-  // — Slovak case/number agreement can't be automated for custom chips.
+  // 5+ entries → her top energy-giver, else yesterday's pick, else an
+  // invitation that sells the payoff. "Dopraj si dnes: X" keeps the chip
+  // label uninflected — Slovak case/number agreement can't be automated
+  // for custom chips.
   const { entries: diaryEntries } = useReflections();
   const diaryTodayISO = new Date().toISOString().slice(0, 10);
   const diaryYest = new Date();
@@ -933,8 +927,8 @@ export default function DomovNew() {
   );
   const yestGave = yestEntry ? (parseStructured(yestEntry.text || '')?.gave ?? []) : [];
 
-  let diaryPrompt = diaryPrompts[new Date().getDay() % diaryPrompts.length];
-  let diarySub = 'Zapíš si deň v štyroch krokoch — stačí minútka.';
+  let diaryPrompt = 'Zapíš si, aký bol tvoj dnešný deň';
+  let diarySub = 'Stačí minútka denne — po piatich dňoch ti ukážem, čo ti energiu dáva a čo ju berie.';
   if (diaryPatterns.structuredCount >= 5 && diaryPatterns.gave.length > 0) {
     diaryPrompt = `Dopraj si dnes: ${diaryPatterns.gave[0][0].toLocaleLowerCase('sk')}`;
     diarySub = 'Práve to ti posledné dni najčastejšie dávalo energiu.';
