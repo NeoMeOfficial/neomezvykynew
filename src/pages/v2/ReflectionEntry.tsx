@@ -1,10 +1,10 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
 import { NM } from '../../components/v2/neome';
 import { useAchievements } from '../../hooks/useAchievements';
 import { usePointsLedger } from '../../hooks/usePointsLedger';
 import { useReflections } from '../../hooks/useDailyRituals';
-import { computeEnergyPatterns } from '../../features/dennik/structuredEntry';
+import { useSmartBack } from '../../hooks/useSmartBack';
+import { computeEnergyPatterns, parseStructured } from '../../features/dennik/structuredEntry';
 import {
   ENERGY_CHIPS,
   readCustomChips,
@@ -89,17 +89,18 @@ function ChipRow({ selected, onToggle, extra, onAddCustom }: {
 }
 
 export default function ReflectionEntry() {
-  const navigate = useNavigate();
+  const smartBack = useSmartBack('/kniznica/dennik');
   const [win, setWin] = useState('');
   const [gave, setGave] = useState<string[]>([]);
   const [took, setTook] = useState<string[]>([]);
   const [reflection, setReflection] = useState('');
   const [customChips, setCustomChips] = useState<string[]>(() => readCustomChips());
   const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { addActivity } = useAchievements();
   const { addEntry } = usePointsLedger();
-  const { addReflection, entries } = useReflections();
+  const { addReflection, updateReflection, entries } = useReflections();
   const patterns = computeEnergyPatterns(entries.map((e) => ({
     text: e.text || '',
     date: (e.date || e.created_at || '').slice(0, 10),
@@ -107,30 +108,64 @@ export default function ReflectionEntry() {
   const today = new Date();
   const dateLabel = `${SK_DAYS[today.getDay()]} · ${today.getDate()}. ${today.getMonth() + 1}.`;
 
-  const toggle = (setter: React.Dispatch<React.SetStateAction<string[]>>) => (label: string) =>
+  // Saving keeps her on this screen with her picks highlighted (Gabi
+  // 2026-07-30); reopening the same day re-loads today's entry into the
+  // form, and a second save UPDATES it instead of adding a duplicate.
+  const todayISO = today.toISOString().slice(0, 10);
+  const todayEntry = entries.find(
+    (e) => (e.date || e.created_at || '').slice(0, 10) === todayISO && parseStructured(e.text || ''),
+  );
+  const touchedRef = useRef(false);
+  const hydratedRef = useRef(false);
+  useEffect(() => {
+    if (hydratedRef.current || touchedRef.current || !todayEntry) return;
+    const s = parseStructured(todayEntry.text || '');
+    if (!s) return;
+    hydratedRef.current = true;
+    setWin(s.win);
+    setGave(s.gave);
+    setTook(s.took);
+    setReflection(s.reflection);
+    setSaved(true);
+  }, [todayEntry]);
+
+  const markDirty = () => {
+    touchedRef.current = true;
+    setSaved(false);
+  };
+
+  const toggle = (setter: React.Dispatch<React.SetStateAction<string[]>>) => (label: string) => {
+    markDirty();
     setter((prev) => (prev.includes(label) ? prev.filter((x) => x !== label) : [...prev, label]));
+  };
 
   const handleAddCustom = (label: string) => setCustomChips(addCustomChip(label));
 
   const hasContent = win.trim() || gave.length > 0 || took.length > 0 || reflection.trim();
 
   const onSave = async () => {
-    if (!hasContent || saving) return;
+    if (!hasContent || saving || saved) return;
     setSaving(true);
     setError(null);
     try {
-      await addReflection(serializeStructured({
+      const payload = serializeStructured({
         win: win.trim(),
         gave,
         took,
         reflection: reflection.trim(),
-      }));
-      addEntry('reflection_write', 6, `reflection_${today.toISOString().slice(0, 10)}`, 'reflection');
-      addActivity('reflection_write');
-      navigate('/kniznica/dennik');
+      });
+      if (todayEntry) {
+        await updateReflection(todayEntry.id, payload);
+      } else {
+        await addReflection(payload);
+        addEntry('reflection_write', 6, `reflection_${todayISO}`, 'reflection');
+        addActivity('reflection_write');
+      }
+      setSaved(true);
     } catch (err) {
       console.error('Reflection save failed:', err);
       setError('Nepodarilo sa uložiť. Skús to ešte raz.');
+    } finally {
       setSaving(false);
     }
   };
@@ -153,7 +188,7 @@ export default function ReflectionEntry() {
   const lineInput = (value: string, set: (v: string) => void, placeholder: string) => (
     <input
       value={value}
-      onChange={(e) => set(e.target.value)}
+      onChange={(e) => { markDirty(); set(e.target.value); }}
       placeholder={placeholder}
       style={{ width: '100%', marginTop: 12, padding: '13px 15px', borderRadius: 14, border: `1px solid ${NM.HAIR}`, fontFamily: NM.SERIF, fontSize: 15, color: NM.DEEP, background: NM.BG, outline: 'none', boxSizing: 'border-box' }}
     />
@@ -161,18 +196,24 @@ export default function ReflectionEntry() {
 
   return (
     <div style={{ minHeight: '100vh', background: NM.BG, fontFamily: NM.SANS, paddingBottom: 48 }}>
-      {/* Top bar: Zatvoriť · date · Uložiť */}
+      {/* Top bar: back arrow · date · Uložiť */}
       <div style={{ padding: 'calc(env(safe-area-inset-top) + 14px) 18px 10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <button onClick={() => navigate(-1)} style={{ all: 'unset', cursor: 'pointer', fontFamily: NM.SANS, fontSize: 13, color: NM.MUTED }}>
-          Zatvoriť
+        <button
+          onClick={smartBack}
+          aria-label="Späť"
+          style={{ width: 36, height: 36, borderRadius: 999, background: '#FFFFFF', border: `1px solid ${NM.HAIR_2}`, display: 'grid', placeItems: 'center', cursor: 'pointer', padding: 0 }}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={NM.DEEP} strokeWidth="1.8" strokeLinecap="round">
+            <path d="M15 6l-6 6 6 6" />
+          </svg>
         </button>
         <div style={{ fontFamily: NM.SANS, fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: NM.TERTIARY, fontWeight: 500 }}>{dateLabel}</div>
         <button
           onClick={onSave}
-          disabled={!hasContent || saving}
-          style={{ all: 'unset', cursor: hasContent && !saving ? 'pointer' : 'default', padding: '9px 16px', borderRadius: 999, background: hasContent ? NM.DEEP : NM.HAIR_2, color: hasContent ? '#fff' : NM.TERTIARY, fontFamily: NM.SANS, fontSize: 12.5, fontWeight: 500, opacity: saving ? 0.7 : 1 }}
+          disabled={!hasContent || saving || saved}
+          style={{ all: 'unset', cursor: hasContent && !saving && !saved ? 'pointer' : 'default', padding: '9px 16px', borderRadius: 999, background: saved ? 'rgba(122,158,120,0.14)' : hasContent ? NM.DEEP : NM.HAIR_2, color: saved ? '#5F8A5D' : hasContent ? '#fff' : NM.TERTIARY, fontFamily: NM.SANS, fontSize: 12.5, fontWeight: 500, opacity: saving ? 0.7 : 1 }}
         >
-          {saving ? 'Ukladám…' : 'Uložiť'}
+          {saving ? 'Ukladám…' : saved ? 'Uložené ✓' : 'Uložiť'}
         </button>
       </div>
 
@@ -201,7 +242,7 @@ export default function ReflectionEntry() {
         {questionHead('Tvoja reflexia dňa', NM.MAUVE ?? '#A8848B')}
         <textarea
           value={reflection}
-          onChange={(e) => setReflection(e.target.value)}
+          onChange={(e) => { markDirty(); setReflection(e.target.value); }}
           placeholder="Píš čokoľvek — dobré aj ťažké. Tento priestor je len tvoj."
           rows={5}
           style={{ width: '100%', marginTop: 12, padding: '14px 15px', borderRadius: 14, border: `1px solid ${NM.HAIR}`, fontFamily: NM.SERIF, fontSize: 15, color: NM.DEEP, background: NM.BG, outline: 'none', resize: 'none', lineHeight: 1.55, boxSizing: 'border-box' }}
