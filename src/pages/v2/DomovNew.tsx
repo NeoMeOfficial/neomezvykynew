@@ -1011,7 +1011,13 @@ export default function DomovNew() {
       img: '/images/r9/testimonial-meditation.jpg',
       title: meditationTitle,
       sub: [meditation?.duration, meditation?.category].filter(Boolean).join(' · ').toLowerCase() || 'krátka meditácia',
-      href: '/meditacie?from=home',
+      // Straight into the player; its back arrow then lands on the full
+      // Myseľ section (fromHome state), where the whole catalog lives.
+      href: meditation && (meditation as { id?: string }).id && !(meditation as { id: string }).id.startsWith('fallback')
+        ? `/meditacia/${(meditation as { id: string }).id}`
+        : '/kniznica/mysel?from=home',
+      state: { fromHome: true },
+      cta: 'Vypočuť si',
     },
   ];
 

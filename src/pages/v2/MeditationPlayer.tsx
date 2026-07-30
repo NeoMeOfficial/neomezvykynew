@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { NM } from '../../components/v2/neome';
 import { useAchievements } from '../../hooks/useAchievements';
 import { useMeditation } from '../../hooks/useMeditations';
@@ -37,6 +37,13 @@ export default function MeditationPlayer() {
   const navigate = useNavigate();
   const { meditationId } = useParams<{ meditationId: string }>();
   const { meditation, loading } = useMeditation(meditationId);
+  const location = useLocation();
+  // From the home card, back should reveal the full Myseľ catalog rather
+  // than bouncing straight home (Gabi 2026-07-30).
+  const goBack = () => {
+    if ((location.state as { fromHome?: boolean } | null)?.fromHome) navigate('/kniznica/mysel');
+    else navigate(-1);
+  };
   const { addActivity } = useAchievements();
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -127,7 +134,7 @@ export default function MeditationPlayer() {
       completedRef.current = true;
       addActivity('meditation_complete', { ref_id: meditationId, ref_type: 'meditation' });
     }
-    navigate(-1);
+    goBack();
   }
 
   if (loading) {
@@ -143,7 +150,7 @@ export default function MeditationPlayer() {
       <div style={{ minHeight: '100vh', background: NM.DEEP_2, color: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14, fontFamily: NM.SANS, padding: '0 32px', textAlign: 'center' }}>
         <div>Meditácia sa nenašla.</div>
         <button
-          onClick={() => navigate(-1)}
+          onClick={goBack}
           style={{ all: 'unset', cursor: 'pointer', padding: '10px 18px', borderRadius: 999, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.20)' }}
         >
           Späť
@@ -201,7 +208,7 @@ export default function MeditationPlayer() {
 
       <div style={{ position: 'relative', padding: 'calc(env(safe-area-inset-top) + 14px) 18px 16px', display: 'flex', alignItems: 'center', zIndex: 10 }}>
         <button
-          onClick={() => navigate(-1)}
+          onClick={goBack}
           aria-label="Zavrieť"
           style={{
             all: 'unset',
