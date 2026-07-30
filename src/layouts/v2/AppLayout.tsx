@@ -23,7 +23,8 @@ function useStatusBarInset(): string {
     const standalone = (navigator as unknown as { standalone?: boolean }).standalone === true;
     if (!standalone) { setPx(0); return; }
     const h = Math.max(window.screen.height, window.screen.width);
-    setPx(h >= 852 ? 59 : h >= 812 ? 48 : 20);
+    // Tight estimates — just enough to clear the clock, no wasted screen.
+    setPx(h >= 852 ? 50 : h >= 812 ? 44 : 20);
   }, []);
   return px === null ? 'env(safe-area-inset-top, 0px)' : `${px}px`;
 }
@@ -144,6 +145,9 @@ export default function AppLayout() {
           background: 'rgba(248,245,240,0.92)',
           backdropFilter: 'blur(14px)',
           WebkitBackdropFilter: 'blur(14px)',
+          // Soft bottom edge — reads as air, not as a bar.
+          WebkitMaskImage: 'linear-gradient(to bottom, #000 72%, transparent)',
+          maskImage: 'linear-gradient(to bottom, #000 72%, transparent)',
         }}
       />
 
