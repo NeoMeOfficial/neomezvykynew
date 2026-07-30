@@ -74,9 +74,21 @@ const DEMO_FALLBACK: DbMeditation[] = [
   { id: 'fokus',            title: 'Fokus a koncentrácia', subtitle: '12 minút na zostrenie pozornosti.',                     eyebrow: 'Mindfulness', category: 'Mindfulness', duration_sec: 720,  instructor: 'Gabi', thumb_url: null, audio_url: null, free: true, sort_order: 4 },
 ];
 
+// Warm cache — the Myseľ section's featured card renders the correct
+// daily meditation instantly; the fetch reconciles in the background
+// (same pattern as useExercises/useStretches).
+const MED_LIST_CACHE_KEY = 'neome_meditations_cache_v1';
+function readMedListCache(): DbMeditation[] | null {
+  try {
+    const raw = localStorage.getItem(MED_LIST_CACHE_KEY);
+    const parsed = raw ? JSON.parse(raw) : null;
+    return Array.isArray(parsed) && parsed.length > 0 ? parsed : null;
+  } catch { return null; }
+}
+
 export function useMeditations() {
-  const [meditations, setMeditations] = useState<DbMeditation[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [meditations, setMeditations] = useState<DbMeditation[]>(() => readMedListCache() ?? []);
+  const [loading, setLoading] = useState(() => readMedListCache() === null);
 
   useEffect(() => {
     if (!isSupabaseConfigured()) {
@@ -84,7 +96,6 @@ export function useMeditations() {
       setLoading(false);
       return;
     }
-    setLoading(true);
     supabase
       .from('meditations')
       .select('id, title, duration, description, audio_url, image, category, status, featured_on, active')
@@ -92,9 +103,11 @@ export function useMeditations() {
       .order('id', { ascending: true })
       .then(({ data, error }) => {
         if (error || !data || data.length === 0) {
-          setMeditations(DEMO_FALLBACK);
+          if (readMedListCache() === null) setMeditations(DEMO_FALLBACK);
         } else {
-          setMeditations(data.map((r, i) => adapt(r as RawMeditation, i)));
+          const adapted = data.map((r, i) => adapt(r as RawMeditation, i));
+          setMeditations(adapted);
+          try { localStorage.setItem(MED_LIST_CACHE_KEY, JSON.stringify(adapted)); } catch { /* full */ }
         }
         setLoading(false);
       });
