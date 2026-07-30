@@ -224,7 +224,7 @@ export default function ReflectionEntry() {
               <strong style={{ color: '#7A9E78', fontWeight: 600 }}>dávalo</strong>
               {patterns.structuredCount >= 5 && patterns.gave.length > 0
                 ? `: ${patterns.gave.map(([l, n]) => `${l} (${n}×)`).join(', ')}`
-                : ' — čo ti energiu prinášalo'}
+                : ' — čo ti ju najčastejšie prinášalo'}
             </span>
           </div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 9, fontFamily: NM.SANS, fontSize: 13, color: NM.MUTED, lineHeight: 1.5 }}>
@@ -233,9 +233,12 @@ export default function ReflectionEntry() {
               <strong style={{ color: '#C27A6E', fontWeight: 600 }}>bralo</strong>
               {patterns.structuredCount >= 5 && patterns.took.length > 0
                 ? `: ${patterns.took.map(([l, n]) => `${l} (${n}×)`).join(', ')}`
-                : ' — čo ti energiu uberalo'}
+                : ' — čo ti ju najčastejšie uberalo'}
             </span>
           </div>
+        </div>
+        <div style={{ marginTop: 12, fontFamily: NM.SANS, fontSize: 12.5, color: NM.TERTIARY, lineHeight: 1.5, fontStyle: 'italic' }}>
+          Aby si vedela, čomu venovať viac času — a čomu menej.
         </div>
       </div>
 
