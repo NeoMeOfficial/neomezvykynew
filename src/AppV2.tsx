@@ -85,7 +85,6 @@ const AdminLogin = lazy(() => import('./pages/v2/AdminLogin'));
 const AdminReferrals = lazy(() => import('./pages/v2/AdminReferrals'));
 const TeloExtra = lazy(() => import('./pages/v2/TeloExtra'));
 const TeloStrecing = lazy(() => import('./pages/v2/TeloStrecing'));
-const DennikHistory = lazy(() => import('./pages/v2/DennikHistory'));
 const NavykyHistory = lazy(() => import('./pages/v2/NavykyHistory'));
 const SymptomCalendar = lazy(() => import('./pages/v2/SymptomCalendar'));
 const Oblubene = lazy(() => import('./pages/v2/Oblubene'));
@@ -354,7 +353,7 @@ export default function AppV2() {
               {import.meta.env.DEV && (
                 <Route path="/kniznica/periodka/testing" element={<PeriodkaTestingConsole />} />
               )}
-              <Route path="/kniznica/dennik" element={<DennikHistory />} />
+              <Route path="/kniznica/dennik" element={<ReflectionEntry />} />
               <Route path="/kniznica/navyky" element={<NavykyHistory />} />
               <Route path="/kniznica/symptomy" element={<SymptomCalendar />} />
               <Route path="/program/:programId/info" element={<PostpartumInfo />} />

@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
-import { NM } from '../../components/v2/neome';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { NM, ConfirmSheet } from '../../components/v2/neome';
 import { useAchievements } from '../../hooks/useAchievements';
 import { usePointsLedger } from '../../hooks/usePointsLedger';
 import { useReflections } from '../../hooks/useDailyRituals';
@@ -26,11 +26,17 @@ import {
 
 const SK_DAYS = ['Nedeľa', 'Pondelok', 'Utorok', 'Streda', 'Štvrtok', 'Piatok', 'Sobota'] as const;
 
-function ChipRow({ selected, onToggle, extra, onAddCustom }: {
+// Saved-state colour language (Gabi 2026-07-30): while she's picking,
+// selection is brown; the moment the day is saved, everything selected
+// flips to green — one glance says "hotovo".
+const SAVED_GREEN = '#7A9E78';
+
+function ChipRow({ selected, onToggle, extra, onAddCustom, saved }: {
   selected: string[];
   onToggle: (label: string) => void;
   extra: string[];
   onAddCustom: (label: string) => void;
+  saved: boolean;
 }) {
   const [adding, setAdding] = useState(false);
   const [draft, setDraft] = useState('');
@@ -54,7 +60,7 @@ function ChipRow({ selected, onToggle, extra, onAddCustom }: {
               cursor: 'pointer',
               padding: '8px 13px',
               borderRadius: 999,
-              background: on ? NM.DEEP : '#fff',
+              background: on ? (saved ? SAVED_GREEN : NM.DEEP) : '#fff',
               color: on ? '#fff' : NM.DEEP,
               border: on ? '1px solid transparent' : `1px solid ${NM.HAIR_2}`,
               fontFamily: NM.SANS,
@@ -89,7 +95,7 @@ function ChipRow({ selected, onToggle, extra, onAddCustom }: {
 }
 
 export default function ReflectionEntry() {
-  const smartBack = useSmartBack('/kniznica/dennik');
+  const smartBack = useSmartBack('/kniznica');
   const [win, setWin] = useState('');
   const [gave, setGave] = useState<string[]>([]);
   const [took, setTook] = useState<string[]>([]);
@@ -100,7 +106,11 @@ export default function ReflectionEntry() {
   const [error, setError] = useState<string | null>(null);
   const { addActivity } = useAchievements();
   const { addEntry } = usePointsLedger();
-  const { addReflection, updateReflection, entries } = useReflections();
+  const { addReflection, updateReflection, deleteReflection, entries } = useReflections();
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [histEditId, setHistEditId] = useState<string | null>(null);
+  const [histDraft, setHistDraft] = useState('');
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const patterns = computeEnergyPatterns(entries.map((e) => ({
     text: e.text || '',
     date: (e.date || e.created_at || '').slice(0, 10),
@@ -128,6 +138,26 @@ export default function ReflectionEntry() {
     setReflection(s.reflection);
     setSaved(true);
   }, [todayEntry]);
+
+  // One diary page (Gabi 2026-07-30): today's entry on top, patterns in
+  // the middle, previous days at the bottom — /kniznica/dennik and
+  // /dennik/new both land here.
+  const historyRows = useMemo(() => entries
+    .filter((e) => e.id !== todayEntry?.id)
+    .map((e) => {
+      const raw = e.created_at || e.date || '';
+      const d = raw ? new Date(raw) : new Date();
+      const s = parseStructured(e.text || '');
+      return {
+        id: e.id,
+        label: `${SK_DAYS[d.getDay()]} · ${d.getDate()}. ${d.getMonth() + 1}.`,
+        preview: s ? (s.win || s.reflection || [...s.gave, ...s.took].join(', ')) : (e.text || ''),
+        structured: s,
+        plain: e.text || '',
+        ts: d.getTime(),
+      };
+    })
+    .sort((a, b) => b.ts - a.ts), [entries, todayEntry?.id]);
 
   const markDirty = () => {
     touchedRef.current = true;
@@ -185,13 +215,29 @@ export default function ReflectionEntry() {
     </div>
   );
 
+  // A saved, filled field shows a green ✓ and a soft green wash — "toto
+  // mám dopísané a uložené". Tapping in and typing removes the ✓ and the
+  // colours revert (that IS the edit mode; a second Uložiť updates).
+  const savedField = (filled: boolean) => saved && filled;
+
+  const checkBadge = (
+    <span style={{ position: 'absolute', right: 13, top: '50%', transform: 'translateY(-50%)', width: 20, height: 20, borderRadius: 999, background: SAVED_GREEN, display: 'grid', placeItems: 'center', pointerEvents: 'none' }}>
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M20 6L9 17l-5-5" />
+      </svg>
+    </span>
+  );
+
   const lineInput = (value: string, set: (v: string) => void, placeholder: string) => (
-    <input
-      value={value}
-      onChange={(e) => { markDirty(); set(e.target.value); }}
-      placeholder={placeholder}
-      style={{ width: '100%', marginTop: 12, padding: '13px 15px', borderRadius: 14, border: `1px solid ${NM.HAIR}`, fontFamily: NM.SERIF, fontSize: 15, color: NM.DEEP, background: NM.BG, outline: 'none', boxSizing: 'border-box' }}
-    />
+    <div style={{ position: 'relative', marginTop: 12 }}>
+      <input
+        value={value}
+        onChange={(e) => { markDirty(); set(e.target.value); }}
+        placeholder={placeholder}
+        style={{ width: '100%', padding: savedField(!!value.trim()) ? '13px 42px 13px 15px' : '13px 15px', borderRadius: 14, border: savedField(!!value.trim()) ? '1px solid rgba(122,158,120,0.40)' : `1px solid ${NM.HAIR}`, fontFamily: NM.SERIF, fontSize: 15, color: NM.DEEP, background: savedField(!!value.trim()) ? 'rgba(122,158,120,0.08)' : NM.BG, outline: 'none', boxSizing: 'border-box' }}
+      />
+      {savedField(!!value.trim()) && checkBadge}
+    </div>
   );
 
   return (
@@ -211,7 +257,7 @@ export default function ReflectionEntry() {
         <button
           onClick={onSave}
           disabled={!hasContent || saving || saved}
-          style={{ all: 'unset', cursor: hasContent && !saving && !saved ? 'pointer' : 'default', padding: '9px 16px', borderRadius: 999, background: saved ? 'rgba(122,158,120,0.14)' : hasContent ? NM.DEEP : NM.HAIR_2, color: saved ? '#5F8A5D' : hasContent ? '#fff' : NM.TERTIARY, fontFamily: NM.SANS, fontSize: 12.5, fontWeight: 500, opacity: saving ? 0.7 : 1 }}
+          style={{ all: 'unset', cursor: hasContent && !saving && !saved ? 'pointer' : 'default', padding: '9px 16px', borderRadius: 999, background: saved ? SAVED_GREEN : hasContent ? NM.DEEP : NM.HAIR_2, color: saved || hasContent ? '#fff' : NM.TERTIARY, fontFamily: NM.SANS, fontSize: 12.5, fontWeight: 500, opacity: saving ? 0.7 : 1 }}
         >
           {saving ? 'Ukladám…' : saved ? 'Uložené ✓' : 'Uložiť'}
         </button>
@@ -230,23 +276,32 @@ export default function ReflectionEntry() {
 
       {card(<>
         {questionHead('Čo ti dnes dalo energiu?', '#7A9E78')}
-        <ChipRow selected={gave} onToggle={toggle(setGave)} extra={customChips} onAddCustom={handleAddCustom} />
+        <ChipRow selected={gave} onToggle={toggle(setGave)} extra={customChips} onAddCustom={handleAddCustom} saved={saved} />
       </>)}
 
       {card(<>
         {questionHead('Čo ti dnes zobralo energiu?', '#C27A6E')}
-        <ChipRow selected={took} onToggle={toggle(setTook)} extra={customChips} onAddCustom={handleAddCustom} />
+        <ChipRow selected={took} onToggle={toggle(setTook)} extra={customChips} onAddCustom={handleAddCustom} saved={saved} />
       </>)}
 
       {card(<>
         {questionHead('Tvoja reflexia dňa', NM.MAUVE ?? '#A8848B')}
-        <textarea
-          value={reflection}
-          onChange={(e) => { markDirty(); setReflection(e.target.value); }}
-          placeholder="Píš čokoľvek — dobré aj ťažké. Tento priestor je len tvoj."
-          rows={5}
-          style={{ width: '100%', marginTop: 12, padding: '14px 15px', borderRadius: 14, border: `1px solid ${NM.HAIR}`, fontFamily: NM.SERIF, fontSize: 15, color: NM.DEEP, background: NM.BG, outline: 'none', resize: 'none', lineHeight: 1.55, boxSizing: 'border-box' }}
-        />
+        <div style={{ position: 'relative', marginTop: 12 }}>
+          <textarea
+            value={reflection}
+            onChange={(e) => { markDirty(); setReflection(e.target.value); }}
+            placeholder="Píš čokoľvek — dobré aj ťažké. Tento priestor je len tvoj."
+            rows={5}
+            style={{ width: '100%', padding: '14px 15px', borderRadius: 14, border: savedField(!!reflection.trim()) ? '1px solid rgba(122,158,120,0.40)' : `1px solid ${NM.HAIR}`, fontFamily: NM.SERIF, fontSize: 15, color: NM.DEEP, background: savedField(!!reflection.trim()) ? 'rgba(122,158,120,0.08)' : NM.BG, outline: 'none', resize: 'none', lineHeight: 1.55, boxSizing: 'border-box' }}
+          />
+          {savedField(!!reflection.trim()) && (
+            <span style={{ position: 'absolute', right: 13, top: 14, width: 20, height: 20, borderRadius: 999, background: SAVED_GREEN, display: 'grid', placeItems: 'center', pointerEvents: 'none' }}>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 6L9 17l-5-5" />
+              </svg>
+            </span>
+          )}
+        </div>
       </>)}
 
       {/* Pattern teaser → live pattern once 5 entries exist. Same white
@@ -289,6 +344,124 @@ export default function ReflectionEntry() {
           {error}
         </div>
       )}
+
+      {/* Tvoje predošlé dni — tap a day to expand, edit or delete it */}
+      {historyRows.length > 0 && (
+        <div style={{ margin: '30px 18px 0' }}>
+          <div style={{ fontFamily: NM.SERIF, fontSize: 18, color: NM.DEEP, fontWeight: 600, lineHeight: 1.3, letterSpacing: '-0.005em', paddingLeft: 4 }}>
+            Tvoje predošlé dni
+          </div>
+          <div style={{ marginTop: 12, background: '#fff', borderRadius: 20, border: `1px solid ${NM.HAIR}`, overflow: 'hidden' }}>
+            {historyRows.map((r, i) => {
+              const open = expandedId === r.id;
+              const editing = histEditId === r.id;
+              return (
+                <div key={r.id} style={{ borderTop: i === 0 ? 'none' : `1px solid ${NM.HAIR}` }}>
+                  <div
+                    role="button"
+                    onClick={() => { setExpandedId(open ? null : r.id); setHistEditId(null); }}
+                    style={{ padding: '13px 16px', cursor: 'pointer' }}
+                  >
+                    <div style={{ fontFamily: NM.SANS, fontSize: 10.5, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#A8848B', fontWeight: 600 }}>{r.label}</div>
+                    {!open && r.preview && (
+                      <div style={{ marginTop: 4, fontFamily: NM.SERIF, fontSize: 14, color: NM.DEEP, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{r.preview}</div>
+                    )}
+                  </div>
+                  {open && (
+                    <div style={{ padding: '0 16px 14px' }}>
+                      {r.structured ? (
+                        <>
+                          {r.structured.win && (
+                            <div style={{ fontFamily: NM.SERIF, fontSize: 14.5, color: NM.DEEP, lineHeight: 1.45 }}>✓ {r.structured.win}</div>
+                          )}
+                          {r.structured.gave.length > 0 && (
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginTop: 8 }}>
+                              {r.structured.gave.map((l) => (
+                                <span key={l} style={{ padding: '4px 10px', borderRadius: 999, background: 'rgba(122,158,120,0.14)', color: '#5F8A5D', fontSize: 11, fontFamily: NM.SANS, fontWeight: 500 }}>{l}</span>
+                              ))}
+                            </div>
+                          )}
+                          {r.structured.took.length > 0 && (
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginTop: 6 }}>
+                              {r.structured.took.map((l) => (
+                                <span key={l} style={{ padding: '4px 10px', borderRadius: 999, background: 'rgba(194,122,110,0.13)', color: '#B06A5E', fontSize: 11, fontFamily: NM.SANS, fontWeight: 500 }}>{l}</span>
+                              ))}
+                            </div>
+                          )}
+                          {!editing && r.structured.reflection && (
+                            <div style={{ marginTop: 10, fontFamily: NM.SERIF, fontSize: 14, color: NM.MUTED, lineHeight: 1.55, whiteSpace: 'pre-wrap' }}>{r.structured.reflection}</div>
+                          )}
+                        </>
+                      ) : (
+                        !editing && <div style={{ fontFamily: NM.SERIF, fontSize: 14, color: NM.MUTED, lineHeight: 1.55, whiteSpace: 'pre-wrap' }}>{r.plain}</div>
+                      )}
+                      {editing ? (
+                        <>
+                          <textarea
+                            value={histDraft}
+                            onChange={(e) => setHistDraft(e.target.value)}
+                            rows={4}
+                            autoFocus
+                            style={{ width: '100%', marginTop: 10, padding: '12px 14px', borderRadius: 14, border: `1px solid ${NM.HAIR}`, fontFamily: NM.SERIF, fontSize: 14, color: NM.DEEP, background: NM.BG, outline: 'none', resize: 'none', lineHeight: 1.5, boxSizing: 'border-box' }}
+                          />
+                          <div style={{ display: 'flex', gap: 14, marginTop: 10 }}>
+                            <button
+                              onClick={async () => {
+                                const next = r.structured
+                                  ? serializeStructured({ ...r.structured, reflection: histDraft.trim() })
+                                  : histDraft.trim();
+                                if (next) await updateReflection(r.id, next);
+                                setHistEditId(null);
+                              }}
+                              style={{ all: 'unset', cursor: 'pointer', padding: '8px 15px', borderRadius: 999, background: NM.DEEP, color: '#fff', fontFamily: NM.SANS, fontSize: 12, fontWeight: 500 }}
+                            >
+                              Uložiť
+                            </button>
+                            <button onClick={() => setHistEditId(null)} style={{ all: 'unset', cursor: 'pointer', fontFamily: NM.SANS, fontSize: 12, color: NM.MUTED, alignSelf: 'center' }}>
+                              Zrušiť
+                            </button>
+                          </div>
+                        </>
+                      ) : (
+                        <div style={{ display: 'flex', gap: 18, marginTop: 12 }}>
+                          <button
+                            onClick={() => { setHistEditId(r.id); setHistDraft(r.structured ? r.structured.reflection : r.plain); }}
+                            style={{ all: 'unset', cursor: 'pointer', fontFamily: NM.SANS, fontSize: 12, color: NM.GOLD, fontWeight: 500 }}
+                          >
+                            Upraviť
+                          </button>
+                          <button
+                            onClick={() => setConfirmDeleteId(r.id)}
+                            style={{ all: 'unset', cursor: 'pointer', fontFamily: NM.SANS, fontSize: 12, color: '#C27A6E', fontWeight: 500 }}
+                          >
+                            Vymazať
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      <ConfirmSheet
+        open={!!confirmDeleteId}
+        eyebrow="Denník"
+        title="Vymazať tento záznam?"
+        message="Záznam bude trvalo odstránený. Túto akciu nemožno vrátiť."
+        confirmLabel="Áno, vymazať"
+        cancelLabel="Späť"
+        tone="danger"
+        onConfirm={async () => {
+          if (confirmDeleteId) await deleteReflection(confirmDeleteId);
+          setConfirmDeleteId(null);
+          setExpandedId(null);
+        }}
+        onCancel={() => setConfirmDeleteId(null)}
+      />
     </div>
   );
 }
