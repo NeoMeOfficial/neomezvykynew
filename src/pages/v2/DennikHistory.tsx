@@ -100,22 +100,21 @@ export default function DennikHistory() {
           {patterns.structuredCount >= 5 ? (
             <div style={{ padding: '18px 18px 0' }}>
               <div style={{ background: '#fff', borderRadius: 20, border: `1px solid ${NM.HAIR}`, padding: '16px 18px' }}>
-                <Eye color={NM.GOLD} size={10}>Tvoje vzorce · posledných {patterns.windowDays} dní</Eye>
                 {patterns.gave.length > 0 && (
-                  <div style={{ marginTop: 12, fontFamily: NM.SANS, fontSize: 13, color: NM.DEEP, lineHeight: 1.5 }}>
-                    Energiu ti najčastejšie <strong style={{ color: '#7A9E78', fontWeight: 700 }}>dávalo</strong>:{' '}
+                  <div style={{ fontFamily: NM.SANS, fontSize: 13.5, color: NM.DEEP, lineHeight: 1.55 }}>
+                    V minulých dňoch ti energiu <strong style={{ color: '#7A9E78', fontWeight: 700 }}>dávalo</strong>:{' '}
                     {patterns.gave.map(([l, n]) => `${l} (${n}×)`).join(', ')}
                   </div>
                 )}
                 {patterns.took.length > 0 && (
-                  <div style={{ marginTop: 8, fontFamily: NM.SANS, fontSize: 13, color: NM.DEEP, lineHeight: 1.5 }}>
-                    Energiu ti najčastejšie <strong style={{ color: '#C27A6E', fontWeight: 700 }}>bralo</strong>:{' '}
+                  <div style={{ marginTop: patterns.gave.length > 0 ? 10 : 0, fontFamily: NM.SANS, fontSize: 13.5, color: NM.DEEP, lineHeight: 1.55 }}>
+                    …a naopak energiu <strong style={{ color: '#C27A6E', fontWeight: 700 }}>bralo</strong>:{' '}
                     {patterns.took.map(([l, n]) => `${l} (${n}×)`).join(', ')}
                   </div>
                 )}
                 {patterns.gave.length === 0 && patterns.took.length === 0 && (
-                  <div style={{ marginTop: 10, fontFamily: NM.SANS, fontSize: 12.5, color: NM.MUTED, fontWeight: 300 }}>
-                    Označuj pri zápise, čo ti energiu dáva a berie — vzorce sa objavia tu.
+                  <div style={{ fontFamily: NM.SANS, fontSize: 12.5, color: NM.MUTED, fontWeight: 300 }}>
+                    Označuj pri zápise, čo ti energiu dáva a berie — a tu uvidíš, čo ťa nabíja.
                   </div>
                 )}
               </div>

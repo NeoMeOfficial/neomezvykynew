@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Eye, NM } from '../../components/v2/neome';
+import { NM } from '../../components/v2/neome';
 import { useAchievements } from '../../hooks/useAchievements';
 import { usePointsLedger } from '../../hooks/usePointsLedger';
 import { useReflections } from '../../hooks/useDailyRituals';
@@ -130,8 +130,19 @@ export default function ReflectionEntry() {
     }
   };
 
-  const blockLabel = (text: string, color: string) => (
-    <Eye size={10} color={color}>{text}</Eye>
+  // Each block = its own white card with a serif question whose key words
+  // carry the accent colour — the four sections read as four steps, not
+  // one wall of text (Gabi 2026-07-30).
+  const questionHead = (before: string, em: string, after: string, color: string) => (
+    <div style={{ fontFamily: NM.SERIF, fontSize: 17, color: NM.DEEP, lineHeight: 1.25, letterSpacing: '-0.005em' }}>
+      {before}<strong style={{ color, fontWeight: 700 }}>{em}</strong>{after}
+    </div>
+  );
+
+  const card = (children: React.ReactNode) => (
+    <div style={{ margin: '14px 18px 0', background: '#fff', borderRadius: 20, border: `1px solid ${NM.HAIR}`, padding: '16px 18px' }}>
+      {children}
+    </div>
   );
 
   const lineInput = (value: string, set: (v: string) => void, placeholder: string) => (
@@ -139,7 +150,7 @@ export default function ReflectionEntry() {
       value={value}
       onChange={(e) => set(e.target.value)}
       placeholder={placeholder}
-      style={{ width: '100%', marginTop: 10, padding: '13px 15px', borderRadius: 14, border: `1px solid ${NM.HAIR_2}`, fontFamily: NM.SERIF, fontSize: 15, color: NM.DEEP, background: '#fff', outline: 'none', boxSizing: 'border-box' }}
+      style={{ width: '100%', marginTop: 12, padding: '13px 15px', borderRadius: 14, border: `1px solid ${NM.HAIR}`, fontFamily: NM.SERIF, fontSize: 15, color: NM.DEEP, background: NM.BG, outline: 'none', boxSizing: 'border-box' }}
     />
   );
 
@@ -166,35 +177,31 @@ export default function ReflectionEntry() {
         </div>
       </div>
 
-      {/* 1 · Čo sa ti dnes podarilo */}
-      <div style={{ padding: '24px 20px 0' }}>
-        {blockLabel('Čo sa ti dnes podarilo?', NM.GOLD)}
+      {card(<>
+        {questionHead('Čo sa ti dnes ', 'podarilo', '?', NM.GOLD)}
         {lineInput(win, setWin, 'Aj maličkosť sa počíta…')}
-      </div>
+      </>)}
 
-      {/* 2 · Energiu dalo */}
-      <div style={{ padding: '24px 20px 0' }}>
-        {blockLabel('Čo ti dnes dalo energiu?', '#7A9E78')}
+      {card(<>
+        {questionHead('Čo ti dnes ', 'dalo energiu', '?', '#7A9E78')}
         <ChipRow selected={gave} onToggle={toggle(setGave)} extra={customChips} onAddCustom={handleAddCustom} />
-      </div>
+      </>)}
 
-      {/* 3 · Energiu zobralo */}
-      <div style={{ padding: '24px 20px 0' }}>
-        {blockLabel('Čo ti dnes zobralo energiu?', '#C27A6E')}
+      {card(<>
+        {questionHead('Čo ti dnes ', 'zobralo energiu', '?', '#C27A6E')}
         <ChipRow selected={took} onToggle={toggle(setTook)} extra={customChips} onAddCustom={handleAddCustom} />
-      </div>
+      </>)}
 
-      {/* 4 · Reflexia — neutral prompt, hard days welcome */}
-      <div style={{ padding: '24px 20px 0' }}>
-        {blockLabel('Tvoja reflexia dňa', NM.MAUVE ?? '#A8848B')}
+      {card(<>
+        {questionHead('Tvoja ', 'reflexia', ' dňa', NM.MAUVE ?? '#A8848B')}
         <textarea
           value={reflection}
           onChange={(e) => setReflection(e.target.value)}
           placeholder="Píš čokoľvek — dobré aj ťažké. Tento priestor je len tvoj."
           rows={5}
-          style={{ width: '100%', marginTop: 10, padding: '14px 15px', borderRadius: 14, border: `1px solid ${NM.HAIR_2}`, fontFamily: NM.SERIF, fontSize: 15, color: NM.DEEP, background: '#fff', outline: 'none', resize: 'none', lineHeight: 1.55, boxSizing: 'border-box' }}
+          style={{ width: '100%', marginTop: 12, padding: '14px 15px', borderRadius: 14, border: `1px solid ${NM.HAIR}`, fontFamily: NM.SERIF, fontSize: 15, color: NM.DEEP, background: NM.BG, outline: 'none', resize: 'none', lineHeight: 1.55, boxSizing: 'border-box' }}
         />
-      </div>
+      </>)}
 
       {error && (
         <div style={{ margin: '14px 20px 0', padding: '10px 14px', borderRadius: 12, background: 'rgba(194,122,110,0.10)', border: '1px solid rgba(194,122,110,0.30)', fontFamily: NM.SANS, fontSize: 12, color: '#C27A6E' }}>
