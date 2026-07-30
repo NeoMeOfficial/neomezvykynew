@@ -416,7 +416,7 @@ function MedRow({
           <FavoriteButton itemId={id} type="meditation" title={title} duration={duration} category={category} size="sm" />
         </span>
       )}
-      {done ? (
+      {done && (
         <div
           style={{
             width: 26,
@@ -432,10 +432,6 @@ function MedRow({
             <path d="M5 12l5 5L20 7" />
           </svg>
         </div>
-      ) : (
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={NM.TERTIARY} strokeWidth="2" strokeLinecap="round" style={{ flexShrink: 0 }}>
-          <path d="M9 6l6 6-6 6" />
-        </svg>
       )}
     </div>
   );
