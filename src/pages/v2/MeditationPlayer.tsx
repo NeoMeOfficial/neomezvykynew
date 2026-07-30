@@ -41,7 +41,9 @@ export default function MeditationPlayer() {
   // From the home card, back should reveal the full Myseľ catalog rather
   // than bouncing straight home (Gabi 2026-07-30).
   const goBack = () => {
-    if ((location.state as { fromHome?: boolean } | null)?.fromHome) navigate('/kniznica/mysel');
+    // replace, not push — otherwise back from the catalog pops right
+    // back into this player (ping-pong).
+    if ((location.state as { fromHome?: boolean } | null)?.fromHome) navigate('/kniznica/mysel', { replace: true });
     else navigate(-1);
   };
   const { addActivity } = useAchievements();

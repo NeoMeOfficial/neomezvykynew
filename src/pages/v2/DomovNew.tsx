@@ -1017,7 +1017,7 @@ export default function DomovNew() {
         ? `/meditacia/${(meditation as { id: string }).id}`
         : '/kniznica/mysel?from=home',
       state: { fromHome: true },
-      cta: 'Vypočuť si',
+      cta: 'Vypočuj si',
     },
   ];
 
