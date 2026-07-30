@@ -13,6 +13,8 @@ import { useDailyMeditation } from '@/hooks/useDailyContent';
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { useReferral } from '@/hooks/useReferral';
 import { usePointsLedger } from '@/hooks/usePointsLedger';
+import { useReflections } from '@/hooks/useDailyRituals';
+import { computeEnergyPatterns, parseStructured } from '@/features/dennik/structuredEntry';
 import SectionEyebrow from '@/components/v2/home/SectionEyebrow';
 import { DayPlanSheet } from '@/components/v2/home/DayPlanSheet';
 
@@ -408,7 +410,7 @@ function CardGoals() {
 }
 
 // ─── Denník — reflection pillar ───────────────────────────────────────────────
-function CardDiary({ free, prompt, onOpen }: { free: boolean; prompt: string; onOpen: () => void }) {
+function CardDiary({ free, prompt, sub, savedToday, onOpen }: { free: boolean; prompt: string; sub: string; savedToday: boolean; onOpen: () => void }) {
   return (
     <div style={{ padding: '0 18px', marginBottom: 12 }}>
       <div
@@ -423,9 +425,13 @@ function CardDiary({ free, prompt, onOpen }: { free: boolean; prompt: string; on
             right={free ? <div style={{ fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase' as const, color: GOLD, fontWeight: 500, fontStyle: 'italic', flexShrink: 0 }}>neukladá sa</div> : undefined}
           />
           <div style={{ fontFamily: SERIF, fontSize: 17.5, color: INK, lineHeight: 1.22, marginTop: 7 }}>{prompt}</div>
-          <div style={{ fontSize: 11.5, color: FG2, fontWeight: 300, marginTop: 4, lineHeight: 1.4 }}>Podarené · energia · reflexia — za minútku.</div>
+          <div style={{ fontSize: 11.5, color: FG2, fontWeight: 300, marginTop: 4, lineHeight: 1.4 }}>{sub}</div>
           <div style={{ marginTop: 'auto', paddingTop: 10 }}>
-            <CtaPill label="Zapíš si" />
+            {savedToday ? (
+              <span style={{ fontFamily: SANS, fontSize: 11.5, color: '#5F8A5D', fontWeight: 500 }}>Zapísané ✓</span>
+            ) : (
+              <CtaPill label="Zapíš si" />
+            )}
           </div>
         </div>
       </div>
@@ -909,7 +915,37 @@ export default function DomovNew() {
     'Čo by si zajtra urobila inak?',
     'Čo ti dnes prinieslo radosť?',
   ];
-  const diaryPrompt = diaryPrompts[new Date().getDay() % diaryPrompts.length];
+
+  // Home diary card gives back what she logged (Gabi 2026-07-30):
+  // 5+ entries → her top energy-giver, else yesterday's pick, else the
+  // rotating prompt. "Dopraj si dnes: X" keeps the chip label uninflected
+  // — Slovak case/number agreement can't be automated for custom chips.
+  const { entries: diaryEntries } = useReflections();
+  const diaryTodayISO = new Date().toISOString().slice(0, 10);
+  const diaryYest = new Date();
+  diaryYest.setDate(diaryYest.getDate() - 1);
+  const diaryYestISO = diaryYest.toISOString().slice(0, 10);
+  const diarySavedToday = diaryEntries.some(
+    (e) => (e.date || e.created_at || '').slice(0, 10) === diaryTodayISO && parseStructured(e.text || ''),
+  );
+  const diaryPatterns = computeEnergyPatterns(diaryEntries.map((e) => ({
+    text: e.text || '',
+    date: (e.date || e.created_at || '').slice(0, 10),
+  })));
+  const yestEntry = diaryEntries.find(
+    (e) => (e.date || e.created_at || '').slice(0, 10) === diaryYestISO && parseStructured(e.text || ''),
+  );
+  const yestGave = yestEntry ? (parseStructured(yestEntry.text || '')?.gave ?? []) : [];
+
+  let diaryPrompt = diaryPrompts[new Date().getDay() % diaryPrompts.length];
+  let diarySub = 'Podarené · energia · reflexia — za minútku.';
+  if (diaryPatterns.structuredCount >= 5 && diaryPatterns.gave.length > 0) {
+    diaryPrompt = `Dopraj si dnes: ${diaryPatterns.gave[0][0].toLocaleLowerCase('sk')}`;
+    diarySub = 'Práve to ti posledné dni najčastejšie dávalo energiu.';
+  } else if (yestGave.length > 0) {
+    diaryPrompt = `Dopraj si dnes: ${yestGave[0].toLocaleLowerCase('sk')}`;
+    diarySub = 'Včera ti to dalo energiu.';
+  }
 
   const pillars: PillarItem[] = [
     cycle
@@ -1050,7 +1086,7 @@ export default function DomovNew() {
       </div>
       <PillarStack items={pillars} />
       <CardGoals />
-      <CardDiary free={!isPlus} prompt={diaryPrompt} onOpen={() => navigate('/dennik/new')} />
+      <CardDiary free={!isPlus} prompt={diaryPrompt} sub={diarySub} savedToday={diarySavedToday} onOpen={() => navigate('/dennik/new')} />
 
       {/* Komunita divider — plain, no bullet (visual separator between personal and community sections) */}
       <div style={{ padding: '0 22px', margin: '32px 0 0', fontSize: 10.5, letterSpacing: '0.24em', textTransform: 'uppercase' as const, fontWeight: 500, color: FG3, fontFamily: SANS }}>Komunita</div>
