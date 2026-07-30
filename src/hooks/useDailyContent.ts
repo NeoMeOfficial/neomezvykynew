@@ -74,10 +74,27 @@ async function fetchDailyMeditation(): Promise<DailyMeditation> {
   return MEDITATION_FALLBACK;
 }
 
+const MED_CACHE_KEY = 'neome_daily_meditation_v1';
+function readMedCache(): DailyMeditation | null {
+  try {
+    const raw = localStorage.getItem(MED_CACHE_KEY);
+    const parsed = raw ? JSON.parse(raw) : null;
+    return parsed && parsed.date === todayISODate() ? parsed.med : null;
+  } catch { return null; }
+}
+
 export function useDailyMeditation() {
   const { data, isLoading } = useQuery({
     queryKey: ['daily-meditation', todayISODate()],
-    queryFn: fetchDailyMeditation,
+    queryFn: async () => {
+      const med = await fetchDailyMeditation();
+      try { localStorage.setItem(MED_CACHE_KEY, JSON.stringify({ date: todayISODate(), med })); } catch { /* full */ }
+      return med;
+    },
+    // Same-day cache renders the correct title instantly on app open;
+    // the fetch reconciles in the background.
+    initialData: () => readMedCache() ?? undefined,
+    initialDataUpdatedAt: 0,
   });
   return {
     meditation: data ?? MEDITATION_FALLBACK,

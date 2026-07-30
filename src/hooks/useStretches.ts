@@ -110,9 +110,19 @@ function fallback(): DbStretch[] {
     }));
 }
 
+// Warm cache — see useExercises; keeps the home card instant.
+const ST_CACHE_KEY = 'neome_stretches_cache_v1';
+function readStCache(): DbStretch[] | null {
+  try {
+    const raw = localStorage.getItem(ST_CACHE_KEY);
+    const parsed = raw ? JSON.parse(raw) : null;
+    return Array.isArray(parsed) && parsed.length > 0 ? parsed : null;
+  } catch { return null; }
+}
+
 export function useStretches() {
-  const [stretches, setStretches] = useState<DbStretch[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [stretches, setStretches] = useState<DbStretch[]>(() => readStCache() ?? []);
+  const [loading, setLoading] = useState(() => readStCache() === null);
 
   useEffect(() => {
     if (!isSupabaseConfigured()) {
@@ -120,7 +130,6 @@ export function useStretches() {
       setLoading(false);
       return;
     }
-    setLoading(true);
     supabase
       .from('exercises')
       .select('id, content_type, name, duration, category, body, equip, level, thumb, description, video_url, active')
@@ -131,9 +140,11 @@ export function useStretches() {
       .order('id', { ascending: true })
       .then(({ data, error }) => {
         if (error || !data || data.length === 0) {
-          setStretches(fallback());
+          if (readStCache() === null) setStretches(fallback());
         } else {
-          setStretches(data.map((r, i) => adapt(r as RawExercise, i)));
+          const adapted = data.map((r, i) => adapt(r as RawExercise, i));
+          setStretches(adapted);
+          try { localStorage.setItem(ST_CACHE_KEY, JSON.stringify(adapted)); } catch { /* full */ }
         }
         setLoading(false);
       });

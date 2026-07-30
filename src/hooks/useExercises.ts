@@ -125,9 +125,20 @@ function fallback(): DbExercise[] {
     }));
 }
 
+// Warm cache — the home Telo card renders the correct daily pick
+// instantly on app open; the network fetch then quietly reconciles.
+const EX_CACHE_KEY = 'neome_exercises_cache_v1';
+function readExCache(): DbExercise[] | null {
+  try {
+    const raw = localStorage.getItem(EX_CACHE_KEY);
+    const parsed = raw ? JSON.parse(raw) : null;
+    return Array.isArray(parsed) && parsed.length > 0 ? parsed : null;
+  } catch { return null; }
+}
+
 export function useExercises() {
-  const [exercises, setExercises] = useState<DbExercise[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [exercises, setExercises] = useState<DbExercise[]>(() => readExCache() ?? []);
+  const [loading, setLoading] = useState(() => readExCache() === null);
 
   useEffect(() => {
     if (!isSupabaseConfigured()) {
@@ -135,7 +146,6 @@ export function useExercises() {
       setLoading(false);
       return;
     }
-    setLoading(true);
     supabase
       .from('exercises')
       .select('id, content_type, name, duration, category, body, equip, level, diastasis_safe, thumb, description, video_url, active')
@@ -147,9 +157,11 @@ export function useExercises() {
       .order('id', { ascending: true })
       .then(({ data, error }) => {
         if (error || !data || data.length === 0) {
-          setExercises(fallback());
+          if (readExCache() === null) setExercises(fallback());
         } else {
-          setExercises(data.map((r, i) => adapt(r as RawExercise, i)));
+          const adapted = data.map((r, i) => adapt(r as RawExercise, i));
+          setExercises(adapted);
+          try { localStorage.setItem(EX_CACHE_KEY, JSON.stringify(adapted)); } catch { /* full */ }
         }
         setLoading(false);
       });
