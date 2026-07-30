@@ -208,20 +208,35 @@ export default function ReflectionEntry() {
         />
       </>)}
 
-      {/* Pattern teaser → live pattern once 5 entries exist */}
-      <div style={{ margin: '18px 18px 0', background: 'rgba(184,134,74,0.08)', border: '1px solid rgba(184,134,74,0.28)', borderRadius: 16, padding: '14px 16px', fontFamily: NM.SANS, fontSize: 12.5, color: NM.DEEP, lineHeight: 1.55 }}>
-        {patterns.structuredCount >= 5 ? (
-          <>
-            {patterns.gave.length > 0 && (
-              <div>V minulých dňoch ti energiu <strong style={{ color: '#7A9E78', fontWeight: 700 }}>dávalo</strong>: {patterns.gave.map(([l, n]) => `${l} (${n}×)`).join(', ')}</div>
-            )}
-            {patterns.took.length > 0 && (
-              <div style={{ marginTop: 6 }}>…a naopak energiu <strong style={{ color: '#C27A6E', fontWeight: 700 }}>bralo</strong>: {patterns.took.map(([l, n]) => `${l} (${n}×)`).join(', ')}</div>
-            )}
-          </>
-        ) : (
-          <>Po piatich dňoch zapisovania ti ukážem, čo ti v minulých dňoch energiu <strong style={{ color: '#7A9E78', fontWeight: 700 }}>dávalo</strong> a čo ju <strong style={{ color: '#C27A6E', fontWeight: 700 }}>bralo</strong>.</>
-        )}
+      {/* Pattern teaser → live pattern once 5 entries exist.
+          Styled as a serif subheading + two dávalo/bralo lines, not a box
+          (Gabi 2026-07-30: "vizualne krajsie, mozno ako podnadpis"). */}
+      <div style={{ margin: '30px 22px 0', paddingTop: 20, borderTop: `1px solid ${NM.HAIR}` }}>
+        <div style={{ fontFamily: NM.SERIF, fontSize: 18, color: NM.DEEP, fontWeight: 600, lineHeight: 1.3, letterSpacing: '-0.005em' }}>
+          {patterns.structuredCount >= 5
+            ? 'V minulých dňoch ti energiu…'
+            : 'Po piatich dňoch zapisovania sa ti ukáže…'}
+        </div>
+        <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 9, fontFamily: NM.SANS, fontSize: 13, color: NM.MUTED, lineHeight: 1.5 }}>
+            <span style={{ width: 7, height: 7, borderRadius: 999, background: '#7A9E78', flexShrink: 0, alignSelf: 'center' }} />
+            <span>
+              <strong style={{ color: '#7A9E78', fontWeight: 600 }}>dávalo</strong>
+              {patterns.structuredCount >= 5 && patterns.gave.length > 0
+                ? `: ${patterns.gave.map(([l, n]) => `${l} (${n}×)`).join(', ')}`
+                : ' — čo ti energiu prinášalo'}
+            </span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 9, fontFamily: NM.SANS, fontSize: 13, color: NM.MUTED, lineHeight: 1.5 }}>
+            <span style={{ width: 7, height: 7, borderRadius: 999, background: '#C27A6E', flexShrink: 0, alignSelf: 'center' }} />
+            <span>
+              <strong style={{ color: '#C27A6E', fontWeight: 600 }}>bralo</strong>
+              {patterns.structuredCount >= 5 && patterns.took.length > 0
+                ? `: ${patterns.took.map(([l, n]) => `${l} (${n}×)`).join(', ')}`
+                : ' — čo ti energiu uberalo'}
+            </span>
+          </div>
+        </div>
       </div>
 
       {error && (
