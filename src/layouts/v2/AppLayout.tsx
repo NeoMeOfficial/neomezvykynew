@@ -2,6 +2,31 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 import BottomNav from '../../components/v2/BottomNav';
 import ErrorBoundary from '../../components/v2/ErrorBoundary';
+import { useEffect, useState } from 'react';
+
+/**
+ * Real status-bar inset. iOS standalone PWAs with status-bar-style
+ * "default" let content scroll under the clock yet report
+ * env(safe-area-inset-top) as 0 — so we measure env() with a probe and,
+ * when it lies (0 in standalone), estimate from the device's logical
+ * screen height (Dynamic Island ≈59pt, notch ≈48pt, classic ≈20pt).
+ */
+function useStatusBarInset(): string {
+  const [px, setPx] = useState<number | null>(null);
+  useEffect(() => {
+    const probe = document.createElement('div');
+    probe.style.cssText = 'position:fixed;top:0;height:env(safe-area-inset-top,0px);width:1px;pointer-events:none;visibility:hidden;';
+    document.body.appendChild(probe);
+    const envH = probe.getBoundingClientRect().height;
+    document.body.removeChild(probe);
+    if (envH > 0) { setPx(envH); return; }
+    const standalone = (navigator as unknown as { standalone?: boolean }).standalone === true;
+    if (!standalone) { setPx(0); return; }
+    const h = Math.max(window.screen.height, window.screen.width);
+    setPx(h >= 852 ? 59 : h >= 812 ? 48 : 20);
+  }, []);
+  return px === null ? 'env(safe-area-inset-top, 0px)' : `${px}px`;
+}
 
 /**
  * BottomNav shows ONLY on the five top-level tab roots (Gabi 2026-07-26:
@@ -32,7 +57,7 @@ const TAB_ROOTS = ['/domov-new', '/new-home', '/kniznica', '/komunita', '/spravy
  *      standalone mode, leaving the user with a button that did
  *      nothing.
  */
-function UpdateBanner({ onRefresh }: { onRefresh: () => void }) {
+function UpdateBanner({ onRefresh, topInset }: { onRefresh: () => void; topInset: string }) {
   return (
     <div
       style={{
@@ -47,7 +72,7 @@ function UpdateBanner({ onRefresh }: { onRefresh: () => void }) {
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '10px 18px',
-        paddingTop: 'calc(env(safe-area-inset-top) + 10px)',
+        paddingTop: `calc(${topInset} + 10px)`,
         fontFamily: 'system-ui, sans-serif',
         fontSize: 13,
       }}
@@ -93,6 +118,7 @@ export default function AppLayout() {
   };
 
   const { pathname } = useLocation();
+  const topInset = useStatusBarInset();
   const focusMode = !TAB_ROOTS.includes(pathname.replace(/\/+$/, '') || '/');
 
   return (
@@ -100,7 +126,7 @@ export default function AppLayout() {
       className="min-h-screen font-sans relative w-full overflow-x-hidden"
       style={{ background: 'linear-gradient(to bottom, #FAF7F2, #F5F1E8)' }}
     >
-      {needRefresh && <UpdateBanner onRefresh={onRefresh} />}
+      {needRefresh && <UpdateBanner onRefresh={onRefresh} topInset={topInset} />}
 
       {/* Opaque status-bar dock — the top mirror of the BottomNav zone:
           scrolling content visually ends under the clock/battery strip
@@ -113,7 +139,7 @@ export default function AppLayout() {
           top: 0,
           left: 0,
           right: 0,
-          height: 'env(safe-area-inset-top, 0px)',
+          height: topInset,
           zIndex: 60,
           background: 'rgba(248,245,240,0.92)',
           backdropFilter: 'blur(14px)',
