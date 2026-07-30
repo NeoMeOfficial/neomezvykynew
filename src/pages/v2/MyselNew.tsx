@@ -5,6 +5,7 @@ import { useMeditations } from '../../hooks/useMeditations';
 import { useReflections } from '../../hooks/useDailyRituals';
 import { useUniversalFavorites } from '../../hooks/useUniversalFavorites';
 import { useSmartBack } from '../../hooks/useSmartBack';
+import FavoriteButton from '../../components/v2/favorites/FavoriteButton';
 
 /**
  * Myseľ landing — Round 20.
@@ -96,7 +97,7 @@ export default function MyselNew() {
             lineHeight: 1.55,
           }}
         >
-          Meditácie pre ranné nastavenie dňa aj večerné stíšenie a oddych. Sprítomni sa a skľudni svoju myseľ.
+          Meditácie, ktoré ťa ráno naladia do dňa a večer stíšia k oddychu. Spomaľ a upokoj svoju myseľ.
         </div>
       </div>
 
@@ -208,8 +209,11 @@ export default function MyselNew() {
           filteredMeds.map((m, i) => (
             <MedRow
               key={m.id}
+              id={m.id}
               eye={`${m.category} · ${Math.round(m.duration_sec / 60)} min`}
               title={m.title}
+              duration={`${Math.round(m.duration_sec / 60)} min`}
+              category={m.category}
               done={false}
               last={i === filteredMeds.length - 1}
               onClick={() => navigate(`/meditacia/${m.id}`)}
@@ -251,68 +255,6 @@ export default function MyselNew() {
         </button>
       </div>
 
-      <SectionHeader right="História" onRightClick={() => navigate('/kniznica/dennik')}>
-        Tvoje reflexie
-      </SectionHeader>
-
-      {/* Reflection previews */}
-      <div style={{ padding: '0 18px' }}>
-        {reflections.length === 0 ? (
-          <div
-            style={{
-              background: '#FFFFFF',
-              borderRadius: 18,
-              border: `1px solid ${NM.HAIR}`,
-              padding: '18px 20px',
-              fontFamily: NM.SANS,
-              fontSize: 12.5,
-              color: NM.MUTED,
-              fontWeight: 300,
-              lineHeight: 1.55,
-            }}
-          >
-            Tvoje reflexie sa objavia tu, keď napíšeš prvý záznam.
-          </div>
-        ) : (
-          <div
-            style={{
-              background: '#FFFFFF',
-              borderRadius: 18,
-              border: `1px solid ${NM.HAIR}`,
-              overflow: 'hidden',
-            }}
-          >
-            {reflections.map((r, i) => (
-              <div
-                key={r.id}
-                style={{
-                  padding: '14px 18px',
-                  borderBottom: i < reflections.length - 1 ? `1px solid ${NM.HAIR}` : 'none',
-                }}
-              >
-                <Eye color={NM.MAUVE} size={9.5}>{r.d}</Eye>
-                <div
-                  style={{
-                    marginTop: 6,
-                    fontFamily: NM.SANS,
-                    fontSize: 12.5,
-                    color: NM.MUTED,
-                    fontWeight: 300,
-                    lineHeight: 1.55,
-                    display: '-webkit-box',
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: 'vertical',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                  }}
-                >
-                  {r.body}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
     </Page>
   );
 }
@@ -407,21 +349,30 @@ function SectionHeader({
 }
 
 function MedRow({
+  id,
   eye,
   title,
+  duration,
+  category,
   done,
   last,
   onClick,
 }: {
+  id?: string;
   eye: string;
   title: string;
+  duration?: string;
+  category?: string;
   done?: boolean;
   last?: boolean;
   onClick?: () => void;
 }) {
   return (
-    <button
+    <div
+      role="button"
+      tabIndex={0}
       onClick={onClick}
+      onKeyDown={(e) => { if (e.key === 'Enter') onClick?.(); }}
       style={{
         display: 'flex',
         alignItems: 'center',
@@ -434,6 +385,7 @@ function MedRow({
         width: '100%',
         cursor: 'pointer',
         textAlign: 'left',
+        boxSizing: 'border-box',
       }}
     >
       <div
@@ -466,6 +418,11 @@ function MedRow({
           {title}
         </div>
       </div>
+      {id && (
+        <span onClick={(e) => e.stopPropagation()} style={{ flexShrink: 0, display: 'inline-flex' }}>
+          <FavoriteButton itemId={id} type="meditation" title={title} duration={duration} category={category} size="sm" />
+        </span>
+      )}
       {done ? (
         <div
           style={{
@@ -487,7 +444,7 @@ function MedRow({
           <path d="M9 6l6 6-6 6" />
         </svg>
       )}
-    </button>
+    </div>
   );
 }
 
