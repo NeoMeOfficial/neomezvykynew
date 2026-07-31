@@ -24,24 +24,17 @@ const CORAL = '#C27A6E';
 // same language as the diary's coloured question heads.
 // Ordered in colour pairs (Gabi 2026-07-31): strava green, telo brown,
 // myseľ mauve — custom habit closes the list in gold.
+// No category tags on habit cards — auto-classifying user-written
+// habits can't be guaranteed correct, so nothing is classified
+// (Gabi 2026-07-31). Cards anchor on the dark serif name alone.
 const PRESETS = [
-  { name: '2l vody', unit: 'krát', target: 1, color: '#7A9E78', pillar: 'Hydratácia' },
-  { name: 'Po večeri už nezobkám', unit: 'krát', target: 1, color: '#7A9E78', pillar: 'Večerný rituál' },
-  { name: '30-min prechádzka', unit: 'krát', target: 1, color: '#6B4C3B', pillar: 'Pohyb' },
-  { name: 'Cvičenie / strečing', unit: 'krát', target: 1, color: '#6B4C3B', pillar: 'Pohyb' },
-  { name: '5-min meditácia / stíšenie', unit: 'krát', target: 1, color: '#A8848B', pillar: 'Pokoj' },
-  { name: 'Sebareflexia a zápis do denníka', unit: 'krát', target: 1, color: '#A8848B', pillar: 'Reflexia' },
+  { name: '2l vody', unit: 'krát', target: 1 },
+  { name: 'Po večeri už nezobkám', unit: 'krát', target: 1 },
+  { name: '30-min prechádzka', unit: 'krát', target: 1 },
+  { name: 'Cvičenie / strečing', unit: 'krát', target: 1 },
+  { name: '5-min meditácia / stíšenie', unit: 'krát', target: 1 },
+  { name: 'Sebareflexia a zápis do denníka', unit: 'krát', target: 1 },
 ] as const;
-
-// Small coloured uppercase tag — the anchor above each card's dark
-// serif name. Wording = what the habit BUILDS (hydratácia, pokoj…),
-// not which app section it belongs to (Gabi 2026-07-31: '2l vody' is
-// not 'strava').
-const Eyebrow = ({ label, color }: { label: string; color: string }) => (
-  <div style={{ fontFamily: NM.SANS, fontSize: 10, letterSpacing: '0.16em', textTransform: 'uppercase', color, fontWeight: 600 }}>
-    {label}
-  </div>
-);
 
 // duration_days ≥ UNLIMITED is displayed as "bez limitu".
 const UNLIMITED = 365;
@@ -170,11 +163,8 @@ function PresetCard({ preset, saving, onStart }: {
         />
       ) : (
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10 }}>
-          <div style={{ minWidth: 0 }}>
-            <Eyebrow label={preset.pillar} color={preset.color} />
-            <div style={{ marginTop: 5, fontFamily: NM.SERIF, fontSize: 19, color: NM.DEEP, fontWeight: 600, lineHeight: 1.25, letterSpacing: '-0.005em' }}>
-              {name}
-            </div>
+          <div style={{ minWidth: 0, fontFamily: NM.SERIF, fontSize: 19, color: NM.DEEP, fontWeight: 600, lineHeight: 1.25, letterSpacing: '-0.005em' }}>
+            {name}
           </div>
           <button
             onClick={() => setEditing(true)}
@@ -220,7 +210,9 @@ function CustomCard({ saving, onStart }: { saving: boolean; onStart: (name: stri
 
   return (
     <div style={{ marginTop: 12, background: '#fff', borderRadius: 20, border: `1px dashed ${NM.HAIR_2}`, padding: '16px 18px' }}>
-      <Eyebrow label="Vlastný návyk" color={NM.GOLD} />
+      <div style={{ fontFamily: NM.SERIF, fontSize: 19, color: NM.DEEP, fontWeight: 600, lineHeight: 1.25 }}>
+        Vlastný návyk
+      </div>
       <input
         value={name}
         onChange={(e) => setName(e.target.value)}
@@ -365,7 +357,6 @@ export default function NavykyTracker() {
               const dayN = Math.min(daysIn(h), h.durationDays);
               const goalReached = goalWindowOver;
               const open = expandedId === h.id;
-              const pset = PRESETS.find((p) => p.name === h.name);
 
               // One measure only (Gabi 2026-07-31): completed days out of
               // the goal — grows only when she ticks.
@@ -441,8 +432,7 @@ export default function NavykyTracker() {
                   </button>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '15px 58px 15px 16px' }}>
                     <div role="button" onClick={() => { setExpandedId(open ? null : h.id); setBackfillId(null); }} style={{ flex: 1, minWidth: 0, cursor: 'pointer' }}>
-                      <Eyebrow label={pset?.pillar ?? 'Vlastný návyk'} color={pset?.color ?? NM.GOLD} />
-                      <div style={{ marginTop: 4, fontFamily: NM.SERIF, fontSize: 17, color: NM.DEEP, fontWeight: 600, lineHeight: 1.3 }}>{h.name}</div>
+                      <div style={{ fontFamily: NM.SERIF, fontSize: 17, color: NM.DEEP, fontWeight: 600, lineHeight: 1.3 }}>{h.name}</div>
                       {subParts.map((part) => (
                         <div key={part} style={{ marginTop: 3, fontFamily: NM.SANS, fontSize: 11.5, color: goalReached ? NM.GOLD : NM.MUTED, fontWeight: goalReached ? 500 : 400, lineHeight: 1.4 }}>
                           {part}
