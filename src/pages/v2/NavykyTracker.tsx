@@ -360,6 +360,7 @@ export default function NavykyTracker() {
               const unlimited = h.durationDays >= UNLIMITED;
               const goalWindowOver = !unlimited && daysIn(h) > h.durationDays;
               const doneDays = unlimited ? 0 : doneDaysOf(h);
+              const dayN = Math.min(daysIn(h), h.durationDays);
               const goalReached = goalWindowOver;
               const open = expandedId === h.id;
               const pset = PRESETS.find((p) => p.name === h.name);
@@ -376,6 +377,9 @@ export default function NavykyTracker() {
                   ? `cieľ zvládnutý ✓ · splnených ${doneDays} z ${h.durationDays} dní`
                   : `cieľ ukončený · splnených ${doneDays} z ${h.durationDays} dní`);
               } else if (!unlimited) {
+                // Position first ("kde na ceste som"), achievement second
+                // ("čo mám splnené") — two numbers, two meanings.
+                subParts.push(`${dayN}. deň tvojej cesty`);
                 subParts.push(`splnených ${doneDays} z ${h.durationDays} dní`);
               }
 
@@ -487,6 +491,7 @@ export default function NavykyTracker() {
                                 const c = h.completions?.[iso] ?? 0;
                                 const full = c >= h.targetPerDay;
                                 const future = iso > todayISO;
+                                const isToday = iso === todayISO;
                                 const tappable = backfilling && !future;
                                 return (
                                   <div
@@ -497,7 +502,7 @@ export default function NavykyTracker() {
                                       borderRadius: 5,
                                       cursor: tappable ? 'pointer' : 'default',
                                       background: full ? SAVED_GREEN : c > 0 ? 'rgba(122,158,120,0.35)' : future ? 'transparent' : NM.HAIR,
-                                      border: future ? `1px solid ${NM.HAIR}` : '1px solid transparent',
+                                      border: isToday ? `1.5px solid ${NM.GOLD}` : future ? `1px solid ${NM.HAIR}` : '1px solid transparent',
                                       boxSizing: 'border-box',
                                     }}
                                   />
