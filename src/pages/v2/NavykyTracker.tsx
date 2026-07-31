@@ -25,16 +25,18 @@ const CORAL = '#C27A6E';
 // Ordered in colour pairs (Gabi 2026-07-31): strava green, telo brown,
 // myseľ mauve — custom habit closes the list in gold.
 const PRESETS = [
-  { name: '2l vody', unit: 'krát', target: 1, color: '#7A9E78', pillar: 'Strava' },
-  { name: 'Po večeri už nezobkám', unit: 'krát', target: 1, color: '#7A9E78', pillar: 'Strava' },
+  { name: '2l vody', unit: 'krát', target: 1, color: '#7A9E78', pillar: 'Hydratácia' },
+  { name: 'Po večeri už nezobkám', unit: 'krát', target: 1, color: '#7A9E78', pillar: 'Večerný rituál' },
   { name: '30-min prechádzka', unit: 'krát', target: 1, color: '#6B4C3B', pillar: 'Pohyb' },
   { name: 'Cvičenie / strečing', unit: 'krát', target: 1, color: '#6B4C3B', pillar: 'Pohyb' },
-  { name: '5-min meditácia / stíšenie', unit: 'krát', target: 1, color: '#A8848B', pillar: 'Myseľ' },
-  { name: 'Sebareflexia a zápis do denníka', unit: 'krát', target: 1, color: '#A8848B', pillar: 'Myseľ' },
+  { name: '5-min meditácia / stíšenie', unit: 'krát', target: 1, color: '#A8848B', pillar: 'Pokoj' },
+  { name: 'Sebareflexia a zápis do denníka', unit: 'krát', target: 1, color: '#A8848B', pillar: 'Reflexia' },
 ] as const;
 
-// Small coloured uppercase pillar label — the anchor above each card's
-// dark serif name (Periodka's POHYB/STRAVA/MYSEĽ pattern).
+// Small coloured uppercase tag — the anchor above each card's dark
+// serif name. Wording = what the habit BUILDS (hydratácia, pokoj…),
+// not which app section it belongs to (Gabi 2026-07-31: '2l vody' is
+// not 'strava').
 const Eyebrow = ({ label, color }: { label: string; color: string }) => (
   <div style={{ fontFamily: NM.SANS, fontSize: 10, letterSpacing: '0.16em', textTransform: 'uppercase', color, fontWeight: 600 }}>
     {label}
