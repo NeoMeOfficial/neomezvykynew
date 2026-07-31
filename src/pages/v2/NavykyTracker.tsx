@@ -380,7 +380,7 @@ export default function NavykyTracker() {
                 // Position first ("kde na ceste som"), achievement second
                 // ("čo mám splnené") — two numbers, two meanings.
                 subParts.push(`${dayN}. deň tvojej cesty`);
-                subParts.push(`splnených ${doneDays} z ${h.durationDays} dní`);
+                subParts.push(`${doneDays} z ${h.durationDays} dní splnených`);
               }
 
               return (
@@ -441,11 +441,11 @@ export default function NavykyTracker() {
                     <div role="button" onClick={() => { setExpandedId(open ? null : h.id); setBackfillId(null); }} style={{ flex: 1, minWidth: 0, cursor: 'pointer' }}>
                       <Eyebrow label={pset?.pillar ?? 'Môj návyk'} color={pset?.color ?? NM.GOLD} />
                       <div style={{ marginTop: 4, fontFamily: NM.SERIF, fontSize: 17, color: NM.DEEP, fontWeight: 600, lineHeight: 1.3 }}>{h.name}</div>
-                      {subParts.length > 0 && (
-                        <div style={{ marginTop: 3, fontFamily: NM.SANS, fontSize: 11.5, color: goalReached ? NM.GOLD : NM.MUTED, fontWeight: goalReached ? 500 : 400 }}>
-                          {subParts.join(' · ')}
+                      {subParts.map((part) => (
+                        <div key={part} style={{ marginTop: 3, fontFamily: NM.SANS, fontSize: 11.5, color: goalReached ? NM.GOLD : NM.MUTED, fontWeight: goalReached ? 500 : 400, lineHeight: 1.4 }}>
+                          {part}
                         </div>
-                      )}
+                      ))}
 
                     </div>
                   </div>
