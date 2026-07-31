@@ -112,7 +112,7 @@ function TickHint() {
           <path d="M20 6L9 17l-5-5" />
         </svg>
       </span>
-      <span style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.MUTED }}>Ak máš hotovo, nezabudni si odtiknúť.</span>
+      <span style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.MUTED }}>Ak máš hotovo, nezabudni si návyk odtiknúť.</span>
     </div>
   );
 }
