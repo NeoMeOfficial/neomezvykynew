@@ -94,8 +94,9 @@ function DurationPicker({ value, custom, onPick, onCustom }: {
   );
 }
 
-// Grey circle → green check: shows the daily-tick mechanic on offer
-// cards before she starts (Gabi 2026-07-31).
+// Grey circle → green check: reminds her of the daily tick under the
+// active-habits heading (Gabi 2026-07-31 — offer cards must NOT carry
+// this; those habits aren't active yet).
 function TickHint() {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginTop: 10 }}>
@@ -106,7 +107,7 @@ function TickHint() {
           <path d="M20 6L9 17l-5-5" />
         </svg>
       </span>
-      <span style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.MUTED }}>Každý deň si ho odtikneš</span>
+      <span style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.MUTED }}>Máš hotovo? Nezabudni si to odtiknúť.</span>
     </div>
   );
 }
@@ -154,8 +155,6 @@ function PresetCard({ preset, saving, onStart }: {
         </div>
       )}
 
-      <TickHint />
-
       <DurationPicker value={dur} custom={custom} onPick={setDur} onCustom={setCustom} />
 
       <button
@@ -200,7 +199,6 @@ function CustomCard({ saving, onStart }: { saving: boolean; onStart: (name: stri
         placeholder="Napíš si ho vlastnými slovami…"
         style={{ width: '100%', marginTop: 12, padding: '12px 14px', borderRadius: 14, border: `1px solid ${NM.HAIR}`, fontFamily: NM.SERIF, fontSize: 14.5, color: NM.DEEP, background: NM.BG, outline: 'none', boxSizing: 'border-box' }}
       />
-      <TickHint />
       <DurationPicker value={dur} custom={custom} onPick={setDur} onCustom={setCustom} />
       <button
         onClick={() => { if (days && name.trim()) onStart(name.trim(), days); }}
@@ -320,7 +318,10 @@ export default function NavykyTracker() {
         {/* Active habits */}
         {!loading && habits.length > 0 && (
           <>
-            {sectionHead('Tvoje návyky')}
+            {sectionHead('Budujem si tieto návyky')}
+            <div style={{ paddingLeft: 4 }}>
+              <TickHint />
+            </div>
             {habits.map((h) => {
               const count = h.completions?.[todayISO] ?? 0;
               const done = count >= h.targetPerDay;
