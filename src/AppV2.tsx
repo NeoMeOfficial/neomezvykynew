@@ -43,7 +43,6 @@ const CompletionWorkout = lazy(() => import('./pages/v2/CompletionWorkout'));
 const CompletionProgram = lazy(() => import('./pages/v2/CompletionProgram'));
 const ReflectionEntry = lazy(() => import('./pages/v2/ReflectionEntry'));
 const CyklusLog = lazy(() => import('./pages/v2/CyklusLog'));
-const HabitCompose = lazy(() => import('./pages/v2/HabitCompose'));
 const KomunitaPostDetail = lazy(() => import('./pages/v2/KomunitaPostDetail'));
 const KomunitaCompose = lazy(() => import('./pages/v2/KomunitaCompose'));
 const SpravyThread = lazy(() => import('./pages/v2/SpravyThread'));
@@ -85,7 +84,6 @@ const AdminLogin = lazy(() => import('./pages/v2/AdminLogin'));
 const AdminReferrals = lazy(() => import('./pages/v2/AdminReferrals'));
 const TeloExtra = lazy(() => import('./pages/v2/TeloExtra'));
 const TeloStrecing = lazy(() => import('./pages/v2/TeloStrecing'));
-const NavykyHistory = lazy(() => import('./pages/v2/NavykyHistory'));
 const SymptomCalendar = lazy(() => import('./pages/v2/SymptomCalendar'));
 const Oblubene = lazy(() => import('./pages/v2/Oblubene'));
 const WorkoutHistory = lazy(() => import('./pages/v2/WorkoutHistory'));
@@ -324,7 +322,6 @@ export default function AppV2() {
               <Route path="/completion/program" element={<CompletionProgram />} />
               <Route path="/dennik/new" element={<ReflectionEntry />} />
               <Route path="/kniznica/periodka/log" element={<CyklusLog />} />
-              <Route path="/navyky/new" element={<HabitCompose />} />
               <Route path="/komunita/new" element={<KomunitaCompose />} />
               <Route path="/komunita/:id" element={<KomunitaPostDetail />} />
               <Route path="/spravy/:threadId" element={<SpravyThread />} />
@@ -354,7 +351,7 @@ export default function AppV2() {
                 <Route path="/kniznica/periodka/testing" element={<PeriodkaTestingConsole />} />
               )}
               <Route path="/kniznica/dennik" element={<ReflectionEntry />} />
-              <Route path="/kniznica/navyky" element={<NavykyHistory />} />
+              <Route path="/kniznica/navyky" element={<NavykyTracker />} />
               <Route path="/kniznica/symptomy" element={<SymptomCalendar />} />
               <Route path="/program/:programId/info" element={<PostpartumInfo />} />
               {/* Per-program purchase removed — single NeoMe Plus

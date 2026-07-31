@@ -369,7 +369,7 @@ function CardGoals() {
   return (
     <div style={{ padding: '0 18px', marginBottom: 10 }}>
       <div
-        onClick={() => navigate(hasHabits ? '/navyky' : '/navyky/new')}
+        onClick={() => navigate('/navyky')}
         style={{ ...cardTint(GOLD), position: 'relative', borderRadius: 18, border: `1px solid ${HAIR}`, overflow: 'hidden', cursor: 'pointer', touchAction: 'manipulation' }}
       >
         <CardPhoto img="/images/r9/lifestyle-yoga-pose.jpg" />
