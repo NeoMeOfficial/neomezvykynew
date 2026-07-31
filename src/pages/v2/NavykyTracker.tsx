@@ -290,10 +290,10 @@ export default function NavykyTracker() {
   const availablePresets = PRESETS.filter((p) => !habits.some((h) => h.name === p.name));
   const canAdd = !loading && habits.length < MAX_HABITS;
 
-  // Small uppercase eyebrow — the serif voice belongs to the habit names,
-  // so section labels step back into the label register.
+  // Section titles sit clearly ABOVE the habit names in the hierarchy:
+  // bigger dark serif vs. the smaller coloured serif card names.
   const sectionHead = (text: string) => (
-    <div style={{ marginTop: 30, fontFamily: NM.SANS, fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase', color: NM.GOLD, fontWeight: 600, paddingLeft: 4 }}>
+    <div style={{ marginTop: 32, fontFamily: NM.SERIF, fontSize: 23, color: NM.DEEP, fontWeight: 600, lineHeight: 1.15, letterSpacing: '-0.01em', paddingLeft: 4 }}>
       {text}
     </div>
   );
