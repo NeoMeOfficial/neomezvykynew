@@ -368,8 +368,12 @@ export default function NavykyTracker() {
               // the goal — grows only when she ticks.
               const subParts: string[] = [];
               if (goalReached) {
+                // Lally 2009: a few missed days don't derail habit formation
+                // — ≥80% of the window still counts as building the habit.
                 subParts.push(doneDays >= h.durationDays
                   ? 'cieľ splnený ✓'
+                  : doneDays / h.durationDays >= 0.8
+                  ? `cieľ zvládnutý ✓ · splnených ${doneDays} z ${h.durationDays} dní`
                   : `cieľ ukončený · splnených ${doneDays} z ${h.durationDays} dní`);
               } else if (!unlimited) {
                 subParts.push(`splnených ${doneDays} z ${h.durationDays} dní`);
