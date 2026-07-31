@@ -44,6 +44,12 @@ const isoDaysAgo = (n: number) => {
   d.setDate(d.getDate() - n);
   return isoOf(d);
 };
+// i-th day of a goal (0-based) counted from its start date.
+const isoFromStart = (startISO: string, i: number) => {
+  const d = new Date(`${startISO}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + i);
+  return isoOf(d);
+};
 
 const skDays = (n: number) => (n === 1 ? 'deň' : n >= 2 && n <= 4 ? 'dni' : 'dní');
 
@@ -227,13 +233,12 @@ function CustomCard({ saving, onStart }: { saving: boolean; onStart: (name: stri
 // ─── Screen ──────────────────────────────────────────────────────────────────
 export default function NavykyTracker() {
   const smartBack = useSmartBack('/kniznica');
-  const { habits, loading, addHabit, editHabit, toggleHabitCompletion, removeHabit } = useSupabaseHabits();
+  const { habits, loading, addHabit, editHabit, toggleHabitCompletion, setCompletionForDate, removeHabit } = useSupabaseHabits();
   const { addActivity } = useAchievements();
   const { addEntry } = usePointsLedger();
 
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [editId, setEditId] = useState<string | null>(null);
-  const [editDraft, setEditDraft] = useState('');
+  const [backfillId, setBackfillId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -331,7 +336,6 @@ export default function NavykyTracker() {
               const goalReached = !unlimited && daysIn(h) > h.durationDays;
               const open = expandedId === h.id;
               const streak = habitStreak(h);
-              const editing = editId === h.id;
               const color = PRESETS.find((p) => p.name === h.name)?.color ?? NM.DEEP;
 
               const subParts: string[] = [];
@@ -343,7 +347,7 @@ export default function NavykyTracker() {
               return (
                 <div key={h.id} style={{ marginTop: 12, background: '#fff', borderRadius: 20, border: `1px solid ${NM.HAIR}`, overflow: 'hidden' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '15px 16px' }}>
-                    <div role="button" onClick={() => { setExpandedId(open ? null : h.id); setEditId(null); }} style={{ flex: 1, minWidth: 0, cursor: 'pointer' }}>
+                    <div role="button" onClick={() => { setExpandedId(open ? null : h.id); setBackfillId(null); }} style={{ flex: 1, minWidth: 0, cursor: 'pointer' }}>
                       <div style={{ fontFamily: NM.SERIF, fontSize: 17, color, fontWeight: 600, lineHeight: 1.3 }}>{h.name}</div>
                       {subParts.length > 0 && (
                         <div style={{ marginTop: 3, fontFamily: NM.SANS, fontSize: 11.5, color: goalReached ? NM.GOLD : NM.MUTED, fontWeight: goalReached ? 500 : 400 }}>
@@ -386,20 +390,51 @@ export default function NavykyTracker() {
 
                   {open && (
                     <div style={{ padding: '2px 16px 14px' }}>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: 4 }}>
-                        {Array.from({ length: 30 }, (_, i) => {
-                          const iso = isoDaysAgo(29 - i);
-                          const c = h.completions?.[iso] ?? 0;
-                          const full = c >= h.targetPerDay;
-                          return (
-                            <div
-                              key={iso}
-                              style={{ aspectRatio: '1', borderRadius: 5, background: full ? SAVED_GREEN : c > 0 ? 'rgba(122,158,120,0.35)' : NM.HAIR }}
-                            />
-                          );
-                        })}
-                      </div>
-                      <div style={{ marginTop: 6, fontFamily: NM.SANS, fontSize: 10.5, color: NM.TERTIARY }}>Posledných 30 dní</div>
+                      {/* Goal habits: one square per goal day from day 1 —
+                          missed days stay empty forever. Unlimited: rolling
+                          last 30 days. Backfill mode makes past squares
+                          tappable so she can add forgotten days. */}
+                      {(() => {
+                        const backfilling = backfillId === h.id;
+                        const gridDays = unlimited
+                          ? Array.from({ length: 30 }, (_, i) => isoDaysAgo(29 - i))
+                          : Array.from({ length: h.durationDays }, (_, i) => isoFromStart(h.startDate, i));
+                        const cols = unlimited ? 10 : h.durationDays <= 35 ? 7 : 11;
+                        return (
+                          <>
+                            {backfilling && (
+                              <div style={{ marginBottom: 8, fontFamily: NM.SANS, fontSize: 11.5, color: NM.MUTED, lineHeight: 1.5 }}>
+                                Ťukni na dni, ktoré si splnila, ale zabudla odtiknúť.
+                              </div>
+                            )}
+                            <div style={{ display: 'grid', gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: 4 }}>
+                              {gridDays.map((iso) => {
+                                const c = h.completions?.[iso] ?? 0;
+                                const full = c >= h.targetPerDay;
+                                const future = iso > todayISO;
+                                const tappable = backfilling && !future;
+                                return (
+                                  <div
+                                    key={iso}
+                                    onClick={tappable ? () => setCompletionForDate(h.id, iso, full ? 0 : h.targetPerDay) : undefined}
+                                    style={{
+                                      aspectRatio: '1',
+                                      borderRadius: 5,
+                                      cursor: tappable ? 'pointer' : 'default',
+                                      background: full ? SAVED_GREEN : c > 0 ? 'rgba(122,158,120,0.35)' : future ? 'transparent' : NM.HAIR,
+                                      border: future ? `1px solid ${NM.HAIR}` : '1px solid transparent',
+                                      boxSizing: 'border-box',
+                                    }}
+                                  />
+                                );
+                              })}
+                            </div>
+                            <div style={{ marginTop: 6, fontFamily: NM.SANS, fontSize: 10.5, color: NM.TERTIARY }}>
+                              {unlimited ? 'Posledných 30 dní' : `Tvoj cieľ deň po dni — od 1 do ${h.durationDays}`}
+                            </div>
+                          </>
+                        );
+                      })()}
 
                       {goalReached && (
                         <button
@@ -412,39 +447,22 @@ export default function NavykyTracker() {
                         </button>
                       )}
 
-                      {editing ? (
+                      {backfillId === h.id ? (
                         <div style={{ marginTop: 12 }}>
-                          <input
-                            value={editDraft}
-                            onChange={(e) => setEditDraft(e.target.value)}
-                            autoFocus
-                            style={{ width: '100%', padding: '11px 13px', borderRadius: 12, border: `1px solid ${NM.HAIR}`, fontFamily: NM.SERIF, fontSize: 15, color: NM.DEEP, background: NM.BG, outline: 'none', boxSizing: 'border-box' }}
-                          />
-                          <div style={{ display: 'flex', gap: 14, marginTop: 10, alignItems: 'center' }}>
-                            <button
-                              onClick={async () => {
-                                const clean = editDraft.trim();
-                                if (clean && clean !== h.name) {
-                                  await editHabit(h.id, { name: clean, durationDays: h.durationDays, unit: h.unit, targetPerDay: h.targetPerDay });
-                                }
-                                setEditId(null);
-                              }}
-                              style={{ all: 'unset', cursor: 'pointer', padding: '8px 15px', borderRadius: 999, background: NM.DEEP, color: '#fff', fontFamily: NM.SANS, fontSize: 12, fontWeight: 500 }}
-                            >
-                              Uložiť
-                            </button>
-                            <button onClick={() => setEditId(null)} style={{ all: 'unset', cursor: 'pointer', fontFamily: NM.SANS, fontSize: 12, color: NM.MUTED }}>
-                              Zrušiť
-                            </button>
-                          </div>
+                          <button
+                            onClick={() => setBackfillId(null)}
+                            style={{ all: 'unset', cursor: 'pointer', padding: '8px 15px', borderRadius: 999, background: NM.DEEP, color: '#fff', fontFamily: NM.SANS, fontSize: 12, fontWeight: 500 }}
+                          >
+                            Hotovo
+                          </button>
                         </div>
                       ) : (
                         <div style={{ display: 'flex', gap: 18, marginTop: 12 }}>
                           <button
-                            onClick={() => { setEditId(h.id); setEditDraft(h.name); }}
+                            onClick={() => setBackfillId(h.id)}
                             style={{ all: 'unset', cursor: 'pointer', fontFamily: NM.SANS, fontSize: 12, color: NM.GOLD, fontWeight: 500 }}
                           >
-                            Upraviť
+                            Doplň si dni
                           </button>
                           <button
                             onClick={() => setConfirmDeleteId(h.id)}

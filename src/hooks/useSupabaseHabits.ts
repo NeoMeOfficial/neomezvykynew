@@ -211,6 +211,41 @@ export function useSupabaseHabits() {
     }
   };
 
+  // Backfill: set a specific past day's completion (no points awarded —
+  // points stay reserved for the day-of check-in).
+  const setCompletionForDate = async (habitId: string, date: string, count: number): Promise<boolean> => {
+    if (!user) return false;
+
+    try {
+      const { error } = await supabase
+        .from('habit_completions')
+        .upsert({
+          habit_id: habitId,
+          user_id: user.id,
+          completion_date: date,
+          count,
+          updated_at: new Date().toISOString(),
+        }, {
+          onConflict: 'habit_id,completion_date'
+        });
+
+      if (error) throw error;
+
+      setHabits(prev =>
+        prev.map(h =>
+          h.id === habitId
+            ? { ...h, completions: { ...h.completions, [date]: count } }
+            : h
+        )
+      );
+
+      return true;
+    } catch (error) {
+      console.error('Error setting habit completion:', error);
+      return false;
+    }
+  };
+
   const removeHabit = async (id: string): Promise<boolean> => {
     if (!user) return false;
 
@@ -238,6 +273,7 @@ export function useSupabaseHabits() {
     addHabit,
     editHabit,
     toggleHabitCompletion,
+    setCompletionForDate,
     removeHabit,
     refreshHabits: fetchHabits,
   };
