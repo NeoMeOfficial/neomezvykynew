@@ -509,9 +509,9 @@ export default function NavykyTracker() {
       <ConfirmSheet
         open={!!confirmDeleteId}
         eyebrow="Návyky a ciele"
-        title="Vymazať tento návyk?"
+        title="Ukončiť budovanie návyku?"
         message="Návyk zmizne zo zoznamu. Jeho doterajšie odfajknutia sa nestratia."
-        confirmLabel="Áno, vymazať"
+        confirmLabel="Áno, ukončiť"
         cancelLabel="Späť"
         tone="danger"
         onConfirm={async () => {
