@@ -351,11 +351,11 @@ function CardGoals() {
   const today = new Date().toISOString().split('T')[0];
   const doneCount = habits.filter((h) => (h.completions?.[today] ?? 0) > 0).length;
   const allDone = habits.length > 0 && doneCount === habits.length;
-  // Max 2 rows so the card keeps the same height as the other pillars —
-  // unfinished habits first, so the card reads as "what's left today".
-  const shown = [...habits]
-    .sort((a, b) => ((a.completions?.[today] ?? 0) > 0 ? 1 : 0) - ((b.completions?.[today] ?? 0) > 0 ? 1 : 0))
-    .slice(0, 2);
+  // "Nezabudni na …" — only today's unfinished habits, max 2 rows so the
+  // card keeps the same height as the other pillars.
+  const shown = habits.filter((h) => (h.completions?.[today] ?? 0) === 0).slice(0, 2);
+  const nHabits = habits.length;
+  const habitWord = nHabits === 1 ? 'návyk' : nHabits >= 2 && nHabits <= 4 ? 'návyky' : 'návykov';
 
   const handleToggle = async (habitId: string) => {
     const habit = habits.find((h) => h.id === habitId);
@@ -378,18 +378,17 @@ function CardGoals() {
       >
         <CardPhoto img="/images/r9/lifestyle-yoga-pose.jpg" />
         <div style={{ position: 'relative', minHeight: PILLAR_CARD_MIN_H, minWidth: 0, padding: '14px 15px 14px 126px', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
-          <PillarEyebrow
-            color={GOLD}
-            label="Moje návyky a ciele"
-            right={hasHabits ? <div style={{ fontSize: 10.5, color: FG3, fontWeight: 500, flexShrink: 0 }}>{doneCount}/{habits.length} dnes</div> : undefined}
-          />
+          <PillarEyebrow color={GOLD} label="Moje návyky a ciele" />
           {allDone ? (
             <>
               <div style={{ fontFamily: SERIF, fontSize: 17.5, color: INK, lineHeight: 1.22, marginTop: 7 }}>Všetky návyky máš dnes hotové ✓</div>
               <div style={{ fontSize: 11.5, color: FG2, fontWeight: 300, marginTop: 4, lineHeight: 1.4 }}>Skvelé — vidíme sa pri nich zajtra.</div>
             </>
           ) : hasHabits ? (
-            <div style={{ marginTop: 6 }}>
+            <>
+              <div style={{ fontFamily: SERIF, fontSize: 17.5, color: INK, lineHeight: 1.22, marginTop: 7 }}>Buduješ si {nHabits} {habitWord}</div>
+              <div style={{ fontSize: 11.5, color: FG2, fontWeight: 300, marginTop: 4, lineHeight: 1.4 }}>{doneCount} z {nHabits} na dnes hotové · nezabudni na:</div>
+            <div style={{ marginTop: 2 }}>
               {shown.map((h, i) => {
                 const done = (h.completions?.[today] ?? 0) > 0;
                 return (
@@ -403,10 +402,11 @@ function CardGoals() {
                 );
               })}
             </div>
+            </>
           ) : (
             <>
               <div style={{ fontFamily: SERIF, fontSize: 17.5, color: INK, lineHeight: 1.22, marginTop: 7 }}>Malé kroky, veľký rozdiel</div>
-              <div style={{ fontSize: 11.5, color: FG2, fontWeight: 300, marginTop: 4, lineHeight: 1.4 }}>Vyber si prvý návyk — stačí minútka denne.</div>
+              <div style={{ fontSize: 11.5, color: FG2, fontWeight: 300, marginTop: 4, lineHeight: 1.4 }}>Začni si budovať zdravý návyk — stačí minútka denne.</div>
             </>
           )}
           <div style={{ marginTop: 'auto', paddingTop: 10 }}>
