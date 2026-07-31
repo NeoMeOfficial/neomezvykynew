@@ -441,7 +441,7 @@ export default function NavykyTracker() {
                   </button>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '15px 58px 15px 16px' }}>
                     <div role="button" onClick={() => { setExpandedId(open ? null : h.id); setBackfillId(null); }} style={{ flex: 1, minWidth: 0, cursor: 'pointer' }}>
-                      <Eyebrow label={pset?.pillar ?? 'Môj návyk'} color={pset?.color ?? NM.GOLD} />
+                      <Eyebrow label={pset?.pillar ?? 'Vlastný návyk'} color={pset?.color ?? NM.GOLD} />
                       <div style={{ marginTop: 4, fontFamily: NM.SERIF, fontSize: 17, color: NM.DEEP, fontWeight: 600, lineHeight: 1.3 }}>{h.name}</div>
                       {subParts.map((part) => (
                         <div key={part} style={{ marginTop: 3, fontFamily: NM.SANS, fontSize: 11.5, color: goalReached ? NM.GOLD : NM.MUTED, fontWeight: goalReached ? 500 : 400, lineHeight: 1.4 }}>
