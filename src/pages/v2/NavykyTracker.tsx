@@ -22,13 +22,15 @@ const CORAL = '#C27A6E';
 
 // Preset titles carry the colour of the pillar they nudge toward —
 // same language as the diary's coloured question heads.
+// Ordered in colour pairs (Gabi 2026-07-31): strava green, telo brown,
+// myseľ mauve — custom habit closes the list in gold.
 const PRESETS = [
   { name: '2l vody', unit: 'pohárov', target: 8, color: '#7A9E78' },
-  { name: '30-min prechádzka', unit: 'krát', target: 1, color: '#6B4C3B' },
-  { name: '5-min meditácia / stíšenie', unit: 'krát', target: 1, color: '#A8848B' },
-  { name: 'Sebareflexia a zápis do denníka', unit: 'krát', target: 1, color: '#B8864A' },
-  { name: 'Cvičenie / strečing', unit: 'krát', target: 1, color: '#6B4C3B' },
   { name: 'Po večeri už nezobkám', unit: 'krát', target: 1, color: '#7A9E78' },
+  { name: '30-min prechádzka', unit: 'krát', target: 1, color: '#6B4C3B' },
+  { name: 'Cvičenie / strečing', unit: 'krát', target: 1, color: '#6B4C3B' },
+  { name: '5-min meditácia / stíšenie', unit: 'krát', target: 1, color: '#A8848B' },
+  { name: 'Sebareflexia a zápis do denníka', unit: 'krát', target: 1, color: '#A8848B' },
 ] as const;
 
 // duration_days ≥ UNLIMITED is displayed as "bez limitu".
@@ -168,7 +170,7 @@ function CustomCard({ saving, onStart }: { saving: boolean; onStart: (name: stri
 
   return (
     <div style={{ marginTop: 12, background: '#fff', borderRadius: 20, border: `1px dashed ${NM.HAIR_2}`, padding: '16px 18px' }}>
-      <div style={{ fontFamily: NM.SERIF, fontSize: 19, color: NM.DEEP, fontWeight: 600, lineHeight: 1.25 }}>
+      <div style={{ fontFamily: NM.SERIF, fontSize: 19, color: NM.GOLD, fontWeight: 600, lineHeight: 1.25 }}>
         Vlastný návyk
       </div>
       <input
