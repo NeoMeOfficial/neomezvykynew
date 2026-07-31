@@ -127,7 +127,7 @@ function EndHint() {
           <path d="M6 6l12 12M18 6L6 18" />
         </svg>
       </span>
-      <span style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.MUTED }}>Ak chceš návyk predčasne ukončiť.</span>
+      <span style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.MUTED }}>Ak chceš návyk predčasne ukončiť, klikni krížik.</span>
     </div>
   );
 }
