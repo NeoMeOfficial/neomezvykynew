@@ -53,24 +53,26 @@ function DurationPicker({ value, custom, onPick, onCustom }: {
   onPick: (v: number | 'custom') => void;
   onCustom: (v: string) => void;
 }) {
+  // Quiet secondary controls — the card's visual order is title →
+  // CTA → duration → edit link, so the chips stay small and muted.
   const chip = (on: boolean): React.CSSProperties => ({
     all: 'unset',
     cursor: 'pointer',
-    padding: '8px 13px',
+    padding: '6px 11px',
     borderRadius: 999,
-    background: on ? NM.GOLD : '#fff',
-    color: on ? '#fff' : NM.DEEP,
+    background: on ? NM.GOLD : 'transparent',
+    color: on ? '#fff' : NM.MUTED,
     border: on ? '1px solid transparent' : `1px solid ${NM.HAIR_2}`,
     fontFamily: NM.SANS,
-    fontSize: 12,
+    fontSize: 11.5,
     fontWeight: on ? 500 : 400,
   });
   return (
     <>
-      <div style={{ marginTop: 12, fontFamily: NM.SANS, fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: NM.TERTIARY, fontWeight: 500 }}>
+      <div style={{ marginTop: 14, fontFamily: NM.SANS, fontSize: 10.5, letterSpacing: '0.12em', textTransform: 'uppercase', color: NM.TERTIARY, fontWeight: 500 }}>
         Ako dlho?
       </div>
-      <div style={{ display: 'flex', gap: 7, marginTop: 9, alignItems: 'center', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: 6, marginTop: 8, alignItems: 'center', flexWrap: 'wrap' }}>
         <button onClick={() => onPick(21)} style={chip(value === 21)}>21 dní</button>
         <button onClick={() => onPick(66)} style={chip(value === 66)}>66 dní</button>
         <button onClick={() => onPick('custom')} style={chip(value === 'custom')}>Vlastná</button>
@@ -82,9 +84,9 @@ function DurationPicker({ value, custom, onPick, onCustom }: {
               inputMode="numeric"
               autoFocus
               placeholder="30"
-              style={{ width: 52, padding: '8px 10px', borderRadius: 999, border: `1px solid ${NM.HAIR_2}`, fontFamily: NM.SANS, fontSize: 12, color: NM.DEEP, background: '#fff', outline: 'none', textAlign: 'center', boxSizing: 'border-box' }}
+              style={{ width: 48, padding: '6px 9px', borderRadius: 999, border: `1px solid ${NM.HAIR_2}`, fontFamily: NM.SANS, fontSize: 11.5, color: NM.DEEP, background: '#fff', outline: 'none', textAlign: 'center', boxSizing: 'border-box' }}
             />
-            <span style={{ fontFamily: NM.SANS, fontSize: 12, color: NM.MUTED }}>dní</span>
+            <span style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.MUTED }}>dní</span>
           </span>
         )}
       </div>
@@ -128,7 +130,7 @@ function PresetCard({ preset, saving, onStart }: {
           </div>
           <button
             onClick={() => setEditing(true)}
-            style={{ all: 'unset', cursor: 'pointer', fontFamily: NM.SANS, fontSize: 11.5, color: NM.MUTED, flexShrink: 0 }}
+            style={{ all: 'unset', cursor: 'pointer', fontFamily: NM.SANS, fontSize: 11, color: NM.TERTIARY, flexShrink: 0, textDecoration: 'underline', textDecorationColor: NM.HAIR_2, textUnderlineOffset: 3 }}
           >
             Uprav si ho
           </button>
@@ -143,7 +145,7 @@ function PresetCard({ preset, saving, onStart }: {
         style={{
           all: 'unset',
           cursor: !saving && days && name.trim() ? 'pointer' : 'default',
-          marginTop: 14,
+          marginTop: 16,
           padding: '10px 18px',
           borderRadius: 999,
           background: days && name.trim() ? NM.DEEP : NM.HAIR_2,
@@ -186,7 +188,7 @@ function CustomCard({ saving, onStart }: { saving: boolean; onStart: (name: stri
         style={{
           all: 'unset',
           cursor: !saving && days && name.trim() ? 'pointer' : 'default',
-          marginTop: 14,
+          marginTop: 16,
           padding: '10px 18px',
           borderRadius: 999,
           background: days && name.trim() ? NM.DEEP : NM.HAIR_2,
@@ -279,7 +281,8 @@ export default function NavykyTracker() {
       {/* Hero — same format as Myseľ ("Priestor pre seba.") */}
       <div style={{ padding: '8px 22px 0' }}>
         <div style={{ fontFamily: NM.SERIF, fontSize: 40, color: NM.DEEP, lineHeight: 1.04, letterSpacing: '-0.01em' }}>
-          Malé kroky,{' '}
+          Malé kroky,
+          <br />
           <em style={{ color: NM.GOLD, fontWeight: 400 }}>veľký rozdiel.</em>
         </div>
         <div style={{ marginTop: 14, maxWidth: 320, fontFamily: NM.SANS, fontSize: 14, color: NM.MUTED, fontWeight: 300, lineHeight: 1.55 }}>
