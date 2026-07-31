@@ -363,6 +363,7 @@ export default function NavykyTracker() {
               const count = h.completions?.[todayISO] ?? 0;
               const done = count >= h.targetPerDay;
               const unlimited = h.durationDays >= UNLIMITED;
+              const neverTicked = !Object.values(h.completions ?? {}).some((c) => c > 0);
               const goalWindowOver = !unlimited && daysIn(h) > h.durationDays;
               const doneDays = unlimited ? 0 : doneDaysOf(h);
               const dayN = Math.min(daysIn(h), h.durationDays);
@@ -418,6 +419,16 @@ export default function NavykyTracker() {
                       </svg>
                     )}
                   </button>
+                  {/* First-run teaching: until this habit is ticked for the
+                      very first time, point at the circle. Disappears
+                      forever after the first tick. */}
+                  {neverTicked && (
+                    <div style={{ position: 'absolute', top: 50, right: 10, width: 64, textAlign: 'center', fontFamily: NM.SANS, fontSize: 9.5, lineHeight: 1.35, color: NM.GOLD, fontWeight: 600, zIndex: 1, pointerEvents: 'none' }}>
+                      Splnené?
+                      <br />
+                      Ťukni ↑
+                    </div>
+                  )}
                   <button
                     onClick={() => setConfirmDeleteId(h.id)}
                     aria-label="Ukončiť budovanie návyku"
