@@ -355,9 +355,17 @@ export default function NavykyTracker() {
                         </div>
                       )}
                       {!open && (
-                        <div style={{ marginTop: 5, fontFamily: NM.SANS, fontSize: 11, color: NM.GOLD, fontWeight: 500 }}>
-                          Pozri si svoje dni ›
-                        </div>
+                        <>
+                          <div style={{ marginTop: 5, fontFamily: NM.SANS, fontSize: 11, color: NM.GOLD, fontWeight: 500 }}>
+                            Pozri si svoje dni ›
+                          </div>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(h.id); }}
+                            style={{ all: 'unset', cursor: 'pointer', marginTop: 4, fontFamily: NM.SANS, fontSize: 11, color: CORAL, fontWeight: 400 }}
+                          >
+                            Chcem ukončiť budovanie návyku predčasne
+                          </button>
+                        </>
                       )}
                     </div>
                     <button
@@ -468,12 +476,6 @@ export default function NavykyTracker() {
                             style={{ all: 'unset', cursor: 'pointer', fontFamily: NM.SANS, fontSize: 12, color: NM.GOLD, fontWeight: 500 }}
                           >
                             Zabudla si si zaznačiť?
-                          </button>
-                          <button
-                            onClick={() => setConfirmDeleteId(h.id)}
-                            style={{ all: 'unset', cursor: 'pointer', fontFamily: NM.SANS, fontSize: 12, color: CORAL, fontWeight: 500 }}
-                          >
-                            Vymazať návyk
                           </button>
                         </div>
                       )}
