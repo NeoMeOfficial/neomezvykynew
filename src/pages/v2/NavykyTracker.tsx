@@ -28,6 +28,7 @@ const PRESETS = [
   { name: '5-min meditácia / stíšenie', unit: 'krát', target: 1, color: '#A8848B' },
   { name: 'Sebareflexia a zápis do denníka', unit: 'krát', target: 1, color: '#B8864A' },
   { name: 'Cvičenie / strečing', unit: 'krát', target: 1, color: '#6B4C3B' },
+  { name: 'Po večeri už nezobkám', unit: 'krát', target: 1, color: '#7A9E78' },
 ] as const;
 
 // duration_days ≥ UNLIMITED is displayed as "bez limitu".
