@@ -25,7 +25,7 @@ const CORAL = '#C27A6E';
 // Ordered in colour pairs (Gabi 2026-07-31): strava green, telo brown,
 // myseľ mauve — custom habit closes the list in gold.
 const PRESETS = [
-  { name: '2l vody', unit: 'pohárov', target: 8, color: '#7A9E78', pillar: 'Strava' },
+  { name: '2l vody', unit: 'krát', target: 1, color: '#7A9E78', pillar: 'Strava' },
   { name: 'Po večeri už nezobkám', unit: 'krát', target: 1, color: '#7A9E78', pillar: 'Strava' },
   { name: '30-min prechádzka', unit: 'krát', target: 1, color: '#6B4C3B', pillar: 'Pohyb' },
   { name: 'Cvičenie / strečing', unit: 'krát', target: 1, color: '#6B4C3B', pillar: 'Pohyb' },
@@ -58,8 +58,6 @@ const isoFromStart = (startISO: string, i: number) => {
   d.setUTCDate(d.getUTCDate() + i);
   return isoOf(d);
 };
-
-const skDays = (n: number) => (n === 1 ? 'deň' : n >= 2 && n <= 4 ? 'dni' : 'dní');
 
 function DurationPicker({ value, custom, onPick, onCustom }: {
   value: number | 'custom';
@@ -266,14 +264,6 @@ export default function NavykyTracker() {
 
   const todayISO = isoOf(new Date());
 
-  // Per-habit consecutive streak; an untouched today doesn't break it.
-  const habitStreak = (h: { completions: Record<string, number> }) => {
-    let n = 0;
-    const offset = (h.completions?.[todayISO] ?? 0) > 0 ? 0 : 1;
-    while ((h.completions?.[isoDaysAgo(offset + n)] ?? 0) > 0) n += 1;
-    return n;
-  };
-
   const daysIn = (h: { startDate: string }) =>
     Math.max(0, Math.floor((Date.parse(todayISO) - Date.parse(h.startDate)) / 86400000)) + 1;
 
@@ -355,19 +345,17 @@ export default function NavykyTracker() {
             {habits.map((h) => {
               const count = h.completions?.[todayISO] ?? 0;
               const done = count >= h.targetPerDay;
-              const multi = h.targetPerDay > 1;
               const unlimited = h.durationDays >= UNLIMITED;
               const dayN = Math.min(daysIn(h), h.durationDays);
               const goalReached = !unlimited && daysIn(h) > h.durationDays;
               const open = expandedId === h.id;
-              const streak = habitStreak(h);
               const pset = PRESETS.find((p) => p.name === h.name);
 
+              // One measure only (Gabi 2026-07-31): "deň X z Y" says it all —
+              // no per-day counts, no streak.
               const subParts: string[] = [];
-              if (multi) subParts.push(`${count}/${h.targetPerDay} ${h.unit}`);
               if (goalReached) subParts.push('cieľ splnený ✓');
               else if (!unlimited) subParts.push(`deň ${dayN} z ${h.durationDays}`);
-              if (streak > 0) subParts.push(`${streak} ${skDays(streak)} v rade`);
 
               return (
                 <div key={h.id} style={{ marginTop: 12, position: 'relative', background: '#fff', borderRadius: 20, border: `1px solid ${NM.HAIR}`, overflow: 'hidden' }}>
