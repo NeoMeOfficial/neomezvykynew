@@ -23,10 +23,10 @@ const CORAL = '#C27A6E';
 // Preset titles carry the colour of the pillar they nudge toward —
 // same language as the diary's coloured question heads.
 const PRESETS = [
-  { name: '2l vody denne', unit: 'pohárov', target: 8, color: '#7A9E78' },
+  { name: '2l vody', unit: 'pohárov', target: 8, color: '#7A9E78' },
   { name: '30-min prechádzka', unit: 'krát', target: 1, color: '#6B4C3B' },
-  { name: '5-min meditácia', unit: 'krát', target: 1, color: '#A8848B' },
-  { name: 'Večerný zápis do denníka', unit: 'krát', target: 1, color: '#B8864A' },
+  { name: '5-min meditácia / stíšenie', unit: 'krát', target: 1, color: '#A8848B' },
+  { name: 'Sebareflexia a zápis do denníka', unit: 'krát', target: 1, color: '#B8864A' },
   { name: 'Cvičenie / strečing', unit: 'krát', target: 1, color: '#6B4C3B' },
 ] as const;
 
@@ -67,10 +67,7 @@ function DurationPicker({ value, custom, onPick, onCustom }: {
       <div style={{ marginTop: 12, fontFamily: NM.SANS, fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: NM.TERTIARY, fontWeight: 500 }}>
         Ako dlho?
       </div>
-      <div style={{ marginTop: 5, fontFamily: NM.SANS, fontSize: 12, color: NM.MUTED, lineHeight: 1.5 }}>
-        Odporúčaná dĺžka je 66 dní — priemer, za ktorý sa návyk stane automatickým. Na začiatok ti odporúčam kratší cieľ, 21 dní.
-      </div>
-      <div style={{ display: 'flex', gap: 7, marginTop: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: 7, marginTop: 9, alignItems: 'center', flexWrap: 'wrap' }}>
         <button onClick={() => onPick(21)} style={chip(value === 21)}>21 dní</button>
         <button onClick={() => onPick(66)} style={chip(value === 66)}>66 dní</button>
         <button onClick={() => onPick('custom')} style={chip(value === 'custom')}>Vlastná</button>
@@ -277,7 +274,7 @@ export default function NavykyTracker() {
       </div>
 
       <div style={{ padding: '6px 22px 0', fontFamily: NM.SANS, fontSize: 12.5, color: NM.MUTED, lineHeight: 1.55 }}>
-        Malé kroky, ktoré sa každodenným opakovaním stanú prirodzenou súčasťou tvojich dní.
+        Malé kroky, ktoré opakovaním <strong style={{ color: NM.DEEP, fontWeight: 600 }}>každý deň</strong> prirodzene zapadnú do tvojho života. Návykom sa stanú v priemere za 66 dní — na začiatok ti odporúčam kratší cieľ, 21 dní.
       </div>
 
       <div style={{ padding: '0 18px' }}>
