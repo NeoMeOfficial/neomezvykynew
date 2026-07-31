@@ -248,7 +248,7 @@ export default function ExercisePlayer() {
   return (
     <div className="min-h-screen bg-cream pb-12">
       <TopBar
-        title={exercise.name}
+        title="Telo"
         onBack={smartBack}
         right={
           <div className="flex items-center gap-1">
@@ -298,6 +298,9 @@ export default function ExercisePlayer() {
             )}
           </div>
         </div>
+
+        {/* Exercise name — the top bar now carries the section label */}
+        <h1 className="font-serif text-[21px] text-ink leading-snug">{exercise.name}</h1>
 
         {/* Tags */}
         <div className="flex items-center gap-2 flex-wrap">

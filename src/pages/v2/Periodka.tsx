@@ -629,10 +629,12 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     <>
       {/* Round 18 top bar — back chevron + centered Gilda title + calendar shortcut */}
       <div style={{ padding: 'calc(env(safe-area-inset-top) + 14px) 20px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <button onClick={() => navigate(fromHome ? '/domov-new' : '/kniznica')} aria-label="Späť" style={{ all: 'unset', width: 36, height: 36, borderRadius: 999, background: '#fff', border: `1px solid ${NM.HAIR_2}`, display: 'grid', placeItems: 'center', cursor: 'pointer' }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={NM.DEEP} strokeWidth="1.8" strokeLinecap="round"><path d="M15 6l-6 6 6 6"/></svg>
-        </button>
-        <div style={{ fontFamily: NM.SERIF, fontSize: 20, fontWeight: 400, color: NM.DEEP, letterSpacing: '-0.005em' }}>Cyklus</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <button onClick={() => navigate(fromHome ? '/domov-new' : '/kniznica')} aria-label="Späť" style={{ all: 'unset', width: 36, height: 36, borderRadius: 999, background: '#fff', border: `1px solid ${NM.HAIR_2}`, display: 'grid', placeItems: 'center', cursor: 'pointer', flexShrink: 0 }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={NM.DEEP} strokeWidth="1.8" strokeLinecap="round"><path d="M15 6l-6 6 6 6"/></svg>
+          </button>
+          <div style={{ fontFamily: NM.SERIF, fontSize: 20, fontWeight: 400, color: NM.DEEP, letterSpacing: '-0.005em' }}>Periodka</div>
+        </div>
         <button onClick={() => navigate('/kniznica/periodka/nastavenia')} aria-label="Nastavenia cyklu" style={{ all: 'unset', width: 36, height: 36, borderRadius: 999, background: '#fff', border: `1px solid ${NM.HAIR_2}`, display: 'grid', placeItems: 'center', cursor: 'pointer' }}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={NM.DEEP} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
             <rect x="4" y="5" width="16" height="16" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>
@@ -1321,7 +1323,7 @@ function FreeView({ navigate }: { navigate: (p: string) => void }) {
   ];
   return (
     <>
-      <TopBar title="Cyklus" onBack={() => navigate(fromHome ? '/domov-new' : '/kniznica')} />
+      <TopBar title="Periodka" onBack={() => navigate(fromHome ? '/domov-new' : '/kniznica')} />
       <div style={{ padding: '2px 20px 6px' }}>
         <Eye color={NM.TERRA}>Začni so sledovaním</Eye>
         <Ser size={30} style={{ marginTop: 10, lineHeight: 1.02 }}>
