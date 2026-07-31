@@ -354,6 +354,11 @@ export default function NavykyTracker() {
                           {subParts.join(' · ')}
                         </div>
                       )}
+                      {!open && (
+                        <div style={{ marginTop: 5, fontFamily: NM.SANS, fontSize: 11, color: NM.GOLD, fontWeight: 500 }}>
+                          Pozri si svoje dni ›
+                        </div>
+                      )}
                     </div>
                     <button
                       onClick={() => handleToggle(h.id)}
@@ -462,7 +467,7 @@ export default function NavykyTracker() {
                             onClick={() => setBackfillId(h.id)}
                             style={{ all: 'unset', cursor: 'pointer', fontFamily: NM.SANS, fontSize: 12, color: NM.GOLD, fontWeight: 500 }}
                           >
-                            Doplň si dni
+                            Zabudla si si zaznačiť?
                           </button>
                           <button
                             onClick={() => setConfirmDeleteId(h.id)}
