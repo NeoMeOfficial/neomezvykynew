@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { NM, ConfirmSheet } from '../../components/v2/neome';
 import { useSupabaseHabits } from '../../hooks/useSupabaseHabits';
 import { useSmartBack } from '../../hooks/useSmartBack';
@@ -252,6 +252,8 @@ export default function NavykyTracker() {
   const { addEntry } = usePointsLedger();
 
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [justAdded, setJustAdded] = useState<string | null>(null);
+  const activeSectionRef = useRef<HTMLDivElement | null>(null);
   const [backfillId, setBackfillId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -288,8 +290,15 @@ export default function NavykyTracker() {
   const startHabit = (unit: string, target: number) => async (name: string, days: number) => {
     if (saving) return;
     setSaving(true);
-    await addHabit({ name, durationDays: days, unit, targetPerDay: target });
+    const ok = await addHabit({ name, durationDays: days, unit, targetPerDay: target });
     setSaving(false);
+    if (!ok) return;
+    // The new habit lands in the top section — scroll her there and
+    // flash it green so the move is visible (otherwise the card just
+    // vanishes from the offer and she taps again).
+    setJustAdded(name);
+    setTimeout(() => activeSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 120);
+    setTimeout(() => setJustAdded(null), 3000);
   };
 
   const availablePresets = PRESETS.filter((p) => !habits.some((h) => h.name === p.name));
@@ -343,7 +352,9 @@ export default function NavykyTracker() {
         {/* Active habits */}
         {!loading && habits.length > 0 && (
           <>
-            {sectionHead('Budujem si', 'tieto návyky')}
+            <div ref={activeSectionRef} style={{ scrollMarginTop: 'calc(env(safe-area-inset-top) + 16px)' }}>
+              {sectionHead('Budujem si', 'tieto návyky')}
+            </div>
             <div style={{ paddingLeft: 4 }}>
               <TickHint />
               <EndHint />
@@ -377,7 +388,7 @@ export default function NavykyTracker() {
               }
 
               return (
-                <div key={h.id} style={{ marginTop: 12, position: 'relative', background: '#fff', borderRadius: 20, border: `1px solid ${NM.HAIR}`, overflow: 'hidden' }}>
+                <div key={h.id} style={{ marginTop: 12, position: 'relative', background: justAdded === h.name ? 'rgba(122,158,120,0.07)' : '#fff', borderRadius: 20, border: `1px solid ${justAdded === h.name ? SAVED_GREEN : NM.HAIR}`, overflow: 'hidden', transition: 'background 0.6s ease, border-color 0.6s ease' }}>
                   {/* Corner controls: tick top-right, X bottom-right — both
                       pre-drawn grey, colouring on tap (Gabi 2026-07-31). */}
                   <button
