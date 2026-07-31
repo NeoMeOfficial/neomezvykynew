@@ -106,8 +106,6 @@ function DurationPicker({ value, custom, onPick, onCustom }: {
 function TickHint() {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginTop: 10 }}>
-      <span style={{ width: 18, height: 18, borderRadius: 999, border: `1px solid ${NM.HAIR_2}`, flexShrink: 0, boxSizing: 'border-box' }} />
-      <span style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.TERTIARY }}>→</span>
       <span style={{ width: 18, height: 18, borderRadius: 999, background: SAVED_GREEN, display: 'grid', placeItems: 'center', flexShrink: 0 }}>
         <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M20 6L9 17l-5-5" />
@@ -128,7 +126,7 @@ function EndHint() {
           <path d="M6 6l12 12M18 6L6 18" />
         </svg>
       </span>
-      <span style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.MUTED }}>Chceš predčasne ukončiť budovanie návyku?</span>
+      <span style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.MUTED }}>Chcem predčasne ukončiť budovanie tohto návyku</span>
     </div>
   );
 }
@@ -361,8 +359,60 @@ export default function NavykyTracker() {
               if (streak > 0) subParts.push(`${streak} ${skDays(streak)} v rade`);
 
               return (
-                <div key={h.id} style={{ marginTop: 12, background: '#fff', borderRadius: 20, border: `1px solid ${NM.HAIR}`, overflow: 'hidden' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '15px 16px' }}>
+                <div key={h.id} style={{ marginTop: 12, position: 'relative', background: '#fff', borderRadius: 20, border: `1px solid ${NM.HAIR}`, overflow: 'hidden' }}>
+                  {/* Corner controls: tick top-right, X bottom-right — both
+                      pre-drawn grey, colouring on tap (Gabi 2026-07-31). */}
+                  <button
+                    onClick={() => handleToggle(h.id)}
+                    aria-label={done ? 'Hotovo' : 'Odfajkni'}
+                    style={{
+                      position: 'absolute',
+                      top: 13,
+                      right: 14,
+                      width: 34,
+                      height: 34,
+                      borderRadius: 999,
+                      cursor: 'pointer',
+                      background: done ? SAVED_GREEN : count > 0 ? 'rgba(122,158,120,0.12)' : 'rgba(61,41,33,0.06)',
+                      border: done ? '1px solid transparent' : `1px solid ${count > 0 ? SAVED_GREEN : NM.HAIR_2}`,
+                      display: 'grid',
+                      placeItems: 'center',
+                      padding: 0,
+                      zIndex: 1,
+                    }}
+                  >
+                    {count > 0 && !done ? (
+                      <span style={{ fontFamily: NM.SANS, fontSize: 12, fontWeight: 600, color: SAVED_GREEN }}>{count}</span>
+                    ) : (
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={done ? '#fff' : 'rgba(61,41,33,0.30)'} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M20 6L9 17l-5-5" />
+                      </svg>
+                    )}
+                  </button>
+                  <button
+                    onClick={() => setConfirmDeleteId(h.id)}
+                    aria-label="Ukončiť budovanie návyku"
+                    style={{
+                      position: 'absolute',
+                      bottom: 11,
+                      right: 14,
+                      width: 24,
+                      height: 24,
+                      borderRadius: 999,
+                      cursor: 'pointer',
+                      background: confirmDeleteId === h.id ? CORAL : 'rgba(61,41,33,0.06)',
+                      border: confirmDeleteId === h.id ? '1px solid transparent' : `1px solid ${NM.HAIR_2}`,
+                      display: 'grid',
+                      placeItems: 'center',
+                      padding: 0,
+                      zIndex: 1,
+                    }}
+                  >
+                    <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke={confirmDeleteId === h.id ? '#fff' : 'rgba(61,41,33,0.30)'} strokeWidth="2.6" strokeLinecap="round">
+                      <path d="M6 6l12 12M18 6L6 18" />
+                    </svg>
+                  </button>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '15px 58px 15px 16px' }}>
                     <div role="button" onClick={() => { setExpandedId(open ? null : h.id); setBackfillId(null); }} style={{ flex: 1, minWidth: 0, cursor: 'pointer' }}>
                       <div style={{ fontFamily: NM.SERIF, fontSize: 17, color, fontWeight: 600, lineHeight: 1.3 }}>{h.name}</div>
                       {subParts.length > 0 && (
@@ -371,40 +421,6 @@ export default function NavykyTracker() {
                         </div>
                       )}
 
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-                      <button
-                        onClick={() => handleToggle(h.id)}
-                        aria-label={done ? 'Hotovo' : 'Odfajkni'}
-                        style={{
-                          width: 34,
-                          height: 34,
-                          borderRadius: 999,
-                          cursor: 'pointer',
-                          background: done ? SAVED_GREEN : count > 0 ? 'rgba(122,158,120,0.12)' : 'transparent',
-                          border: done ? '1px solid transparent' : `1px solid ${count > 0 ? SAVED_GREEN : NM.HAIR_2}`,
-                          display: 'grid',
-                          placeItems: 'center',
-                          padding: 0,
-                        }}
-                      >
-                        {done ? (
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M20 6L9 17l-5-5" />
-                          </svg>
-                        ) : count > 0 ? (
-                          <span style={{ fontFamily: NM.SANS, fontSize: 12, fontWeight: 600, color: SAVED_GREEN }}>{count}</span>
-                        ) : null}
-                      </button>
-                      <button
-                        onClick={() => setConfirmDeleteId(h.id)}
-                        aria-label="Ukončiť budovanie návyku"
-                        style={{ width: 20, height: 20, borderRadius: 999, cursor: 'pointer', background: 'transparent', border: `1px solid ${CORAL}66`, display: 'grid', placeItems: 'center', padding: 0 }}
-                      >
-                        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke={CORAL} strokeWidth="2.6" strokeLinecap="round">
-                          <path d="M6 6l12 12M18 6L6 18" />
-                        </svg>
-                      </button>
                     </div>
                   </div>
 
@@ -419,7 +435,7 @@ export default function NavykyTracker() {
                     <div
                       role="button"
                       onClick={() => { setExpandedId(h.id); setBackfillId(null); }}
-                      style={{ padding: '0 16px 13px', fontFamily: NM.SANS, fontSize: 11, color: NM.GOLD, fontWeight: 500, cursor: 'pointer' }}
+                      style={{ padding: '0 48px 13px 16px', fontFamily: NM.SANS, fontSize: 11, color: NM.GOLD, fontWeight: 500, cursor: 'pointer' }}
                     >
                       Pozri si svoje dni ›
                     </div>
