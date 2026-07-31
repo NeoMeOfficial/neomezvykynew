@@ -112,7 +112,7 @@ function TickHint() {
           <path d="M20 6L9 17l-5-5" />
         </svg>
       </span>
-      <span style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.MUTED }}>Máš hotovo? Nezabudni si to odtiknúť.</span>
+      <span style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.MUTED }}>Ak máš hotovo, nezabudni si odtiknúť.</span>
     </div>
   );
 }
@@ -127,7 +127,7 @@ function EndHint() {
           <path d="M6 6l12 12M18 6L6 18" />
         </svg>
       </span>
-      <span style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.MUTED }}>Chcem predčasne ukončiť budovanie tohto návyku</span>
+      <span style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.MUTED }}>Ak chceš návyk predčasne ukončiť.</span>
     </div>
   );
 }
