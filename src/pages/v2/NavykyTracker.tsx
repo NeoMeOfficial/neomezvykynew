@@ -118,6 +118,21 @@ function TickHint() {
   );
 }
 
+// Coral X circle: explains the early-end control shown under each
+// habit's check circle.
+function EndHint() {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginTop: 6 }}>
+      <span style={{ width: 18, height: 18, borderRadius: 999, border: `1px solid ${CORAL}66`, display: 'grid', placeItems: 'center', flexShrink: 0, boxSizing: 'border-box' }}>
+        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke={CORAL} strokeWidth="2.6" strokeLinecap="round">
+          <path d="M6 6l12 12M18 6L6 18" />
+        </svg>
+      </span>
+      <span style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.MUTED }}>Chceš predčasne ukončiť budovanie návyku?</span>
+    </div>
+  );
+}
+
 function resolveDays(value: number | 'custom', custom: string): number | null {
   if (value !== 'custom') return value;
   const n = parseInt(custom, 10);
@@ -326,6 +341,7 @@ export default function NavykyTracker() {
             {sectionHead('Budujem si tieto návyky')}
             <div style={{ paddingLeft: 4 }}>
               <TickHint />
+              <EndHint />
             </div>
             {habits.map((h) => {
               const count = h.completions?.[todayISO] ?? 0;
@@ -354,50 +370,58 @@ export default function NavykyTracker() {
                           {subParts.join(' · ')}
                         </div>
                       )}
-                      {!open && (
-                        <>
-                          <div style={{ marginTop: 5, fontFamily: NM.SANS, fontSize: 11, color: NM.GOLD, fontWeight: 500 }}>
-                            Pozri si svoje dni ›
-                          </div>
-                          <button
-                            onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(h.id); }}
-                            style={{ all: 'unset', cursor: 'pointer', marginTop: 4, fontFamily: NM.SANS, fontSize: 11, color: CORAL, fontWeight: 400 }}
-                          >
-                            Chcem ukončiť budovanie návyku predčasne
-                          </button>
-                        </>
-                      )}
+
                     </div>
-                    <button
-                      onClick={() => handleToggle(h.id)}
-                      aria-label={done ? 'Hotovo' : 'Odfajkni'}
-                      style={{
-                        width: 34,
-                        height: 34,
-                        borderRadius: 999,
-                        flexShrink: 0,
-                        cursor: 'pointer',
-                        background: done ? SAVED_GREEN : count > 0 ? 'rgba(122,158,120,0.12)' : 'transparent',
-                        border: done ? '1px solid transparent' : `1px solid ${count > 0 ? SAVED_GREEN : NM.HAIR_2}`,
-                        display: 'grid',
-                        placeItems: 'center',
-                        padding: 0,
-                      }}
-                    >
-                      {done ? (
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M20 6L9 17l-5-5" />
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+                      <button
+                        onClick={() => handleToggle(h.id)}
+                        aria-label={done ? 'Hotovo' : 'Odfajkni'}
+                        style={{
+                          width: 34,
+                          height: 34,
+                          borderRadius: 999,
+                          cursor: 'pointer',
+                          background: done ? SAVED_GREEN : count > 0 ? 'rgba(122,158,120,0.12)' : 'transparent',
+                          border: done ? '1px solid transparent' : `1px solid ${count > 0 ? SAVED_GREEN : NM.HAIR_2}`,
+                          display: 'grid',
+                          placeItems: 'center',
+                          padding: 0,
+                        }}
+                      >
+                        {done ? (
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M20 6L9 17l-5-5" />
+                          </svg>
+                        ) : count > 0 ? (
+                          <span style={{ fontFamily: NM.SANS, fontSize: 12, fontWeight: 600, color: SAVED_GREEN }}>{count}</span>
+                        ) : null}
+                      </button>
+                      <button
+                        onClick={() => setConfirmDeleteId(h.id)}
+                        aria-label="Ukončiť budovanie návyku"
+                        style={{ width: 20, height: 20, borderRadius: 999, cursor: 'pointer', background: 'transparent', border: `1px solid ${CORAL}66`, display: 'grid', placeItems: 'center', padding: 0 }}
+                      >
+                        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke={CORAL} strokeWidth="2.6" strokeLinecap="round">
+                          <path d="M6 6l12 12M18 6L6 18" />
                         </svg>
-                      ) : count > 0 ? (
-                        <span style={{ fontFamily: NM.SANS, fontSize: 12, fontWeight: 600, color: SAVED_GREEN }}>{count}</span>
-                      ) : null}
-                    </button>
+                      </button>
+                    </div>
                   </div>
 
                   {/* Goal progress — gold = time elapsed, green = done today */}
                   {!unlimited && !goalReached && (
                     <div style={{ height: 3, background: NM.HAIR, margin: '0 16px 13px', borderRadius: 999, overflow: 'hidden' }}>
                       <div style={{ height: '100%', width: `${Math.min(100, Math.round((dayN / h.durationDays) * 100))}%`, background: NM.GOLD, borderRadius: 999 }} />
+                    </div>
+                  )}
+
+                  {!open && (
+                    <div
+                      role="button"
+                      onClick={() => { setExpandedId(h.id); setBackfillId(null); }}
+                      style={{ padding: '0 16px 13px', fontFamily: NM.SANS, fontSize: 11, color: NM.GOLD, fontWeight: 500, cursor: 'pointer' }}
+                    >
+                      Pozri si svoje dni ›
                     </div>
                   )}
 
