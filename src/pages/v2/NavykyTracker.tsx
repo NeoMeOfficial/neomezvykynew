@@ -274,7 +274,7 @@ export default function NavykyTracker() {
       </div>
 
       <div style={{ padding: '6px 22px 0', fontFamily: NM.SANS, fontSize: 12.5, color: NM.MUTED, lineHeight: 1.55 }}>
-        Malé kroky, ktoré opakovaním <strong style={{ color: NM.DEEP, fontWeight: 600 }}>každý deň</strong> prirodzene zapadnú do tvojho života. Návykom sa stanú v priemere za 66 dní — na začiatok ti odporúčam kratší cieľ, 21 dní.
+        Stačí málo, ale <strong style={{ color: NM.DEEP, fontWeight: 600 }}>každý deň</strong>. Približne za 66 dní sa z malého kroku stane samozrejmosť — na začiatok si pokojne daj kratší cieľ, 21 dní.
       </div>
 
       <div style={{ padding: '0 18px' }}>
