@@ -276,8 +276,15 @@ export default function NavykyTracker() {
         </div>
       </div>
 
-      <div style={{ padding: '6px 22px 0', fontFamily: NM.SANS, fontSize: 12.5, color: NM.MUTED, lineHeight: 1.55 }}>
-        Stačí málo, ale <strong style={{ color: NM.DEEP, fontWeight: 600 }}>každý deň</strong>. Približne za 66 dní sa z malého kroku stane samozrejmosť — na začiatok si pokojne daj kratší cieľ, 21 dní.
+      {/* Hero — same format as Myseľ ("Priestor pre seba.") */}
+      <div style={{ padding: '8px 22px 0' }}>
+        <div style={{ fontFamily: NM.SERIF, fontSize: 40, color: NM.DEEP, lineHeight: 1.04, letterSpacing: '-0.01em' }}>
+          Malé kroky,{' '}
+          <em style={{ color: NM.GOLD, fontWeight: 400 }}>veľký rozdiel.</em>
+        </div>
+        <div style={{ marginTop: 14, maxWidth: 320, fontFamily: NM.SANS, fontSize: 14, color: NM.MUTED, fontWeight: 300, lineHeight: 1.55 }}>
+          Stačí málo, ale <strong style={{ color: NM.DEEP, fontWeight: 500 }}>každý deň</strong>. Približne za 66 dní sa z malého kroku stane samozrejmosť — na začiatok si pokojne daj kratší cieľ, 21 dní.
+        </div>
       </div>
 
       <div style={{ padding: '0 18px' }}>
