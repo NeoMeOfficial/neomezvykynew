@@ -94,6 +94,23 @@ function DurationPicker({ value, custom, onPick, onCustom }: {
   );
 }
 
+// Grey circle → green check: shows the daily-tick mechanic on offer
+// cards before she starts (Gabi 2026-07-31).
+function TickHint() {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginTop: 10 }}>
+      <span style={{ width: 18, height: 18, borderRadius: 999, border: `1px solid ${NM.HAIR_2}`, flexShrink: 0, boxSizing: 'border-box' }} />
+      <span style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.TERTIARY }}>→</span>
+      <span style={{ width: 18, height: 18, borderRadius: 999, background: SAVED_GREEN, display: 'grid', placeItems: 'center', flexShrink: 0 }}>
+        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M20 6L9 17l-5-5" />
+        </svg>
+      </span>
+      <span style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.MUTED }}>Každý deň si ho odtikneš</span>
+    </div>
+  );
+}
+
 function resolveDays(value: number | 'custom', custom: string): number | null {
   if (value !== 'custom') return value;
   const n = parseInt(custom, 10);
@@ -136,6 +153,8 @@ function PresetCard({ preset, saving, onStart }: {
           </button>
         </div>
       )}
+
+      <TickHint />
 
       <DurationPicker value={dur} custom={custom} onPick={setDur} onCustom={setCustom} />
 
@@ -181,6 +200,7 @@ function CustomCard({ saving, onStart }: { saving: boolean; onStart: (name: stri
         placeholder="Napíš si ho vlastnými slovami…"
         style={{ width: '100%', marginTop: 12, padding: '12px 14px', borderRadius: 14, border: `1px solid ${NM.HAIR}`, fontFamily: NM.SERIF, fontSize: 14.5, color: NM.DEEP, background: NM.BG, outline: 'none', boxSizing: 'border-box' }}
       />
+      <TickHint />
       <DurationPicker value={dur} custom={custom} onPick={setDur} onCustom={setCustom} />
       <button
         onClick={() => { if (days && name.trim()) onStart(name.trim(), days); }}
