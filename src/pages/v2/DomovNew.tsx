@@ -349,9 +349,13 @@ function CardGoals() {
   const { addEntry } = usePointsLedger();
   const { addActivity } = useAchievements();
   const today = new Date().toISOString().split('T')[0];
-  // Max 2 rows so the card keeps the same height as the other pillars.
-  const shown = habits.slice(0, 2);
   const doneCount = habits.filter((h) => (h.completions?.[today] ?? 0) > 0).length;
+  const allDone = habits.length > 0 && doneCount === habits.length;
+  // Max 2 rows so the card keeps the same height as the other pillars —
+  // unfinished habits first, so the card reads as "what's left today".
+  const shown = [...habits]
+    .sort((a, b) => ((a.completions?.[today] ?? 0) > 0 ? 1 : 0) - ((b.completions?.[today] ?? 0) > 0 ? 1 : 0))
+    .slice(0, 2);
 
   const handleToggle = async (habitId: string) => {
     const habit = habits.find((h) => h.id === habitId);
@@ -379,7 +383,12 @@ function CardGoals() {
             label="Moje návyky a ciele"
             right={hasHabits ? <div style={{ fontSize: 10.5, color: FG3, fontWeight: 500, flexShrink: 0 }}>{doneCount}/{habits.length} dnes</div> : undefined}
           />
-          {hasHabits ? (
+          {allDone ? (
+            <>
+              <div style={{ fontFamily: SERIF, fontSize: 17.5, color: INK, lineHeight: 1.22, marginTop: 7 }}>Všetky návyky máš dnes hotové ✓</div>
+              <div style={{ fontSize: 11.5, color: FG2, fontWeight: 300, marginTop: 4, lineHeight: 1.4 }}>Skvelé — vidíme sa pri nich zajtra.</div>
+            </>
+          ) : hasHabits ? (
             <div style={{ marginTop: 6 }}>
               {shown.map((h, i) => {
                 const done = (h.completions?.[today] ?? 0) > 0;
@@ -397,11 +406,11 @@ function CardGoals() {
           ) : (
             <>
               <div style={{ fontFamily: SERIF, fontSize: 17.5, color: INK, lineHeight: 1.22, marginTop: 7 }}>Malé kroky, veľký rozdiel</div>
-              <div style={{ fontSize: 11.5, color: FG2, fontWeight: 300, marginTop: 4, lineHeight: 1.4 }}>Vytvor si prvý návyk, ktorý sa počíta každý deň.</div>
+              <div style={{ fontSize: 11.5, color: FG2, fontWeight: 300, marginTop: 4, lineHeight: 1.4 }}>Vyber si prvý návyk — stačí minútka denne.</div>
             </>
           )}
           <div style={{ marginTop: 'auto', paddingTop: 10 }}>
-            <CtaPill label={hasHabits ? 'Zisti viac' : 'Pridať návyk'} />
+            <CtaPill label={allDone ? 'Pozri si' : hasHabits ? 'Odfajkni si' : 'Vyber si'} />
           </div>
         </div>
       </div>
