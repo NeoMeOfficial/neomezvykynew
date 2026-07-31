@@ -473,7 +473,7 @@ export default function NavykyTracker() {
                             onClick={() => setConfirmDeleteId(h.id)}
                             style={{ all: 'unset', cursor: 'pointer', fontFamily: NM.SANS, fontSize: 12, color: CORAL, fontWeight: 500 }}
                           >
-                            Vymazať
+                            Vymazať návyk
                           </button>
                         </div>
                       )}
