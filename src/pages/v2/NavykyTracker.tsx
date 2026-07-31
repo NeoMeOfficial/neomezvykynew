@@ -267,6 +267,18 @@ export default function NavykyTracker() {
   const daysIn = (h: { startDate: string }) =>
     Math.max(0, Math.floor((Date.parse(todayISO) - Date.parse(h.startDate)) / 86400000)) + 1;
 
+  // Days actually completed inside the goal window — the measure and the
+  // progress bar mirror the green squares, not elapsed time (a fresh
+  // morning shows 0 z 21, not deň 1 z 21).
+  const doneDaysOf = (h: { startDate: string; durationDays: number; targetPerDay: number; completions: Record<string, number> }) => {
+    let n = 0;
+    const span = Math.min(h.durationDays, daysIn(h));
+    for (let i = 0; i < span; i++) {
+      if ((h.completions?.[isoFromStart(h.startDate, i)] ?? 0) >= h.targetPerDay) n += 1;
+    }
+    return n;
+  };
+
   const handleToggle = async (habitId: string) => {
     const habit = habits.find((h) => h.id === habitId);
     if (!habit) return;
@@ -346,16 +358,22 @@ export default function NavykyTracker() {
               const count = h.completions?.[todayISO] ?? 0;
               const done = count >= h.targetPerDay;
               const unlimited = h.durationDays >= UNLIMITED;
-              const dayN = Math.min(daysIn(h), h.durationDays);
-              const goalReached = !unlimited && daysIn(h) > h.durationDays;
+              const goalWindowOver = !unlimited && daysIn(h) > h.durationDays;
+              const doneDays = unlimited ? 0 : doneDaysOf(h);
+              const goalReached = goalWindowOver;
               const open = expandedId === h.id;
               const pset = PRESETS.find((p) => p.name === h.name);
 
-              // One measure only (Gabi 2026-07-31): "deň X z Y" says it all —
-              // no per-day counts, no streak.
+              // One measure only (Gabi 2026-07-31): completed days out of
+              // the goal — grows only when she ticks.
               const subParts: string[] = [];
-              if (goalReached) subParts.push('cieľ splnený ✓');
-              else if (!unlimited) subParts.push(`deň ${dayN} z ${h.durationDays}`);
+              if (goalReached) {
+                subParts.push(doneDays >= h.durationDays
+                  ? 'cieľ splnený ✓'
+                  : `cieľ ukončený · splnených ${doneDays} z ${h.durationDays} dní`);
+              } else if (!unlimited) {
+                subParts.push(`splnených ${doneDays} z ${h.durationDays} dní`);
+              }
 
               return (
                 <div key={h.id} style={{ marginTop: 12, position: 'relative', background: '#fff', borderRadius: 20, border: `1px solid ${NM.HAIR}`, overflow: 'hidden' }}>
@@ -424,10 +442,10 @@ export default function NavykyTracker() {
                     </div>
                   </div>
 
-                  {/* Goal progress — gold = time elapsed, green = done today */}
+                  {/* Goal progress — green like the ticks: completed days */}
                   {!unlimited && !goalReached && (
                     <div style={{ height: 3, background: NM.HAIR, margin: '0 16px 13px', borderRadius: 999, overflow: 'hidden' }}>
-                      <div style={{ height: '100%', width: `${Math.min(100, Math.round((dayN / h.durationDays) * 100))}%`, background: NM.GOLD, borderRadius: 999 }} />
+                      <div style={{ height: '100%', width: `${Math.min(100, Math.round((doneDays / h.durationDays) * 100))}%`, background: SAVED_GREEN, borderRadius: 999 }} />
                     </div>
                   )}
 
