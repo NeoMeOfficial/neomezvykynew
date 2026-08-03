@@ -458,9 +458,8 @@ export default function NavykyTracker() {
                   ? `cieľ zvládnutý ✓ · splnených ${doneDays} z ${h.durationDays} dní`
                   : `cieľ ukončený · splnených ${doneDays} z ${h.durationDays} dní`);
               } else if (!unlimited) {
-                // Position first ("kde na ceste som"), achievement second
-                // ("čo mám splnené") — two numbers, two meanings.
-                subParts.push(`${dayN}. deň tvojej cesty`);
+                // Achievement in words; the day position lives on the
+                // timeline bar as a gold marker (Gabi 2026-08-03).
                 subParts.push(`${doneDays} z ${h.durationDays} dní splnených`);
               }
 
@@ -543,10 +542,15 @@ export default function NavykyTracker() {
                     </div>
                   </div>
 
-                  {/* Goal progress — green like the ticks: completed days */}
+                  {/* Timeline: green fill = completed days, gold notch =
+                      where today sits on the journey. */}
                   {!unlimited && !goalReached && (
-                    <div style={{ height: 3, background: NM.HAIR, margin: '0 16px 13px', borderRadius: 999, overflow: 'hidden' }}>
-                      <div style={{ height: '100%', width: `${Math.min(100, Math.round((doneDays / h.durationDays) * 100))}%`, background: SAVED_GREEN, borderRadius: 999 }} />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, margin: '0 16px 13px' }}>
+                      <div style={{ flex: 1, position: 'relative', height: 3, background: NM.HAIR, borderRadius: 999 }}>
+                        <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${Math.min(100, Math.round((doneDays / h.durationDays) * 100))}%`, background: SAVED_GREEN, borderRadius: 999 }} />
+                        <div style={{ position: 'absolute', left: `calc(${Math.min(100, Math.round((dayN / h.durationDays) * 100))}% - 2px)`, top: -3, width: 4, height: 9, borderRadius: 2, background: NM.GOLD }} />
+                      </div>
+                      <span style={{ fontFamily: NM.SANS, fontSize: 10, color: NM.TERTIARY, whiteSpace: 'nowrap', flexShrink: 0 }}>{dayN}. deň</span>
                     </div>
                   )}
 
