@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
+import { useSupabaseAuth } from '../contexts/SupabaseAuthContext';
 
 // Day keys use LOCAL midnight — the habit day must flip at 00:00 for the
 // user, not at UTC midnight (02:00 in Slovak summer).
 export const localDayISO = (d = new Date()) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-import { supabase } from '../lib/supabase';
-import { useSupabaseAuth } from '../contexts/SupabaseAuthContext';
 
 interface Habit {
   id: string;
