@@ -529,8 +529,12 @@ export default function NavykyTracker() {
                           {part}
                         </div>
                       ))}
-
                     </div>
+                    {!done && (
+                      <div style={{ flexShrink: 0, whiteSpace: 'nowrap', fontFamily: NM.SANS, fontSize: 10.5, color: NM.GOLD, fontWeight: 600 }}>
+                        Splnené? Ťukni →
+                      </div>
+                    )}
                   </div>
 
                   {/* Timeline: green fill = completed days, gold notch =
