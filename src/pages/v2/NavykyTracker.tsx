@@ -340,6 +340,16 @@ export default function NavykyTracker() {
     }
   };
 
+  const setSkipDay = (habitId: string, iso: string, on: boolean) => {
+    setSkips((prev) => {
+      const cur = prev[habitId] ?? [];
+      if (on === cur.includes(iso)) return prev;
+      const next = { ...prev, [habitId]: on ? [...cur, iso] : cur.filter((d) => d !== iso) };
+      writeSkips(next);
+      return next;
+    });
+  };
+
   const toggleSkip = (habitId: string) => {
     setSkips((prev) => {
       const cur = prev[habitId] ?? [];
@@ -582,7 +592,7 @@ export default function NavykyTracker() {
                           <>
                             {backfilling && (
                               <div style={{ marginBottom: 8, fontFamily: NM.SANS, fontSize: 11.5, color: NM.MUTED, lineHeight: 1.5 }}>
-                                Ťukni na dni, ktoré si splnila, ale zabudla odtiknúť.
+                                Ťukni na deň: raz ✓ splnené, druhý raz ✕ nevyšlo, tretí raz prázdne.
                               </div>
                             )}
                             <div style={{ display: 'grid', gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: 4 }}>
@@ -593,19 +603,44 @@ export default function NavykyTracker() {
                                 const isToday = iso === todayISO;
                                 const skippedDay = !full && !future && (skips[h.id] ?? []).includes(iso);
                                 const tappable = backfilling && !future;
+                                const iconSize = cols === 7 ? 13 : 9;
+                                // Backfill cycles the day: empty → ✓ → ✕ → empty.
+                                const cycle = () => {
+                                  if (full) {
+                                    setCompletionForDate(h.id, iso, 0);
+                                    setSkipDay(h.id, iso, true);
+                                  } else if (skippedDay) {
+                                    setSkipDay(h.id, iso, false);
+                                  } else {
+                                    setCompletionForDate(h.id, iso, h.targetPerDay);
+                                  }
+                                };
                                 return (
                                   <div
                                     key={iso}
-                                    onClick={tappable ? () => setCompletionForDate(h.id, iso, full ? 0 : h.targetPerDay) : undefined}
+                                    onClick={tappable ? cycle : undefined}
                                     style={{
                                       aspectRatio: '1',
                                       borderRadius: 5,
                                       cursor: tappable ? 'pointer' : 'default',
-                                      background: full ? SAVED_GREEN : c > 0 ? 'rgba(122,158,120,0.35)' : skippedDay ? 'rgba(194,122,110,0.45)' : future ? 'transparent' : NM.HAIR,
-                                      border: isToday ? `1.5px solid ${NM.GOLD}` : future ? `1px solid ${NM.HAIR}` : '1px solid transparent',
+                                      background: full ? SAVED_GREEN : c > 0 ? 'rgba(122,158,120,0.35)' : skippedDay ? CORAL : 'transparent',
+                                      border: isToday ? `1.5px solid ${NM.GOLD}` : full || skippedDay || c > 0 ? '1px solid transparent' : future ? `1px solid ${NM.HAIR}` : `1px solid ${NM.HAIR_2}`,
                                       boxSizing: 'border-box',
+                                      display: 'grid',
+                                      placeItems: 'center',
                                     }}
-                                  />
+                                  >
+                                    {full && (
+                                      <svg width={iconSize} height={iconSize} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M20 6L9 17l-5-5" />
+                                      </svg>
+                                    )}
+                                    {skippedDay && (
+                                      <svg width={iconSize - 2} height={iconSize - 2} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round">
+                                        <path d="M6 6l12 12M18 6L6 18" />
+                                      </svg>
+                                    )}
+                                  </div>
                                 );
                               })}
                             </div>
@@ -613,16 +648,22 @@ export default function NavykyTracker() {
                               {unlimited ? 'Posledných 30 dní' : `Tvoj cieľ deň po dni — od 1 do ${h.durationDays}`}
                             </div>
                             <div style={{ marginTop: 7, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-                              {[
-                                [SAVED_GREEN, 'splnené'],
-                                ['rgba(194,122,110,0.45)', 'nevyšlo'],
-                                [NM.HAIR, 'nezaznačené'],
-                              ].map(([clr, lbl]) => (
-                                <span key={lbl} style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
-                                  <span style={{ width: 10, height: 10, borderRadius: 3, background: clr, flexShrink: 0 }} />
-                                  <span style={{ fontFamily: NM.SANS, fontSize: 10, color: NM.TERTIARY }}>{lbl}</span>
+                              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                                <span style={{ width: 12, height: 12, borderRadius: 3, background: SAVED_GREEN, display: 'grid', placeItems: 'center' }}>
+                                  <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
                                 </span>
-                              ))}
+                                <span style={{ fontFamily: NM.SANS, fontSize: 10, color: NM.TERTIARY }}>splnené</span>
+                              </span>
+                              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                                <span style={{ width: 12, height: 12, borderRadius: 3, background: CORAL, display: 'grid', placeItems: 'center' }}>
+                                  <svg width="6" height="6" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.5" strokeLinecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
+                                </span>
+                                <span style={{ fontFamily: NM.SANS, fontSize: 10, color: NM.TERTIARY }}>nevyšlo</span>
+                              </span>
+                              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                                <span style={{ width: 12, height: 12, borderRadius: 3, border: `1px solid ${NM.HAIR_2}`, boxSizing: 'border-box' }} />
+                                <span style={{ fontFamily: NM.SANS, fontSize: 10, color: NM.TERTIARY }}>nezaznačené</span>
+                              </span>
                             </div>
                           </>
                         );
