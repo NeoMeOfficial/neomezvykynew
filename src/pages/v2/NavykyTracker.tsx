@@ -545,9 +545,15 @@ export default function NavykyTracker() {
                           <path d="M6 6l12 12M18 6L6 18" />
                         </svg>
                       </button>
-                      <div style={{ position: 'absolute', bottom: 16, right: 46, whiteSpace: 'nowrap', fontFamily: NM.SANS, fontSize: 9.5, color: skippedToday ? NM.MUTED : CORAL, fontWeight: 600, zIndex: 1, pointerEvents: 'none' }}>
-                        {skippedToday ? 'Zajtra to skúsim zas ✓' : 'Dnes nevyšlo? Ťukni →'}
-                      </div>
+                      {!open && (
+                        <div style={{ position: 'absolute', bottom: 40, right: 3, width: 78, textAlign: 'center', fontFamily: NM.SANS, fontSize: 9.5, lineHeight: 1.35, color: skippedToday ? NM.MUTED : CORAL, fontWeight: 600, zIndex: 1, pointerEvents: 'none' }}>
+                          {skippedToday ? (
+                            <>Zajtra to<br />skúsiš zas ✓</>
+                          ) : (
+                            <>Dnes to nevyšlo?<br />Skúsiš zajtra.<br />Ťukni ↓</>
+                          )}
+                        </div>
+                      )}
                     </>
                   )}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '15px 58px 15px 16px' }}>
@@ -573,7 +579,7 @@ export default function NavykyTracker() {
                     <div
                       role="button"
                       onClick={() => { setExpandedId(h.id); setBackfillId(null); }}
-                      style={{ padding: '0 48px 13px 16px', fontFamily: NM.SANS, fontSize: 11, color: NM.GOLD, fontWeight: 500, cursor: 'pointer' }}
+                      style={{ padding: done ? '0 48px 13px 16px' : '0 88px 46px 16px', fontFamily: NM.SANS, fontSize: 11, color: NM.GOLD, fontWeight: 500, cursor: 'pointer' }}
                     >
                       Pozri si svoje dni ›
                     </div>
