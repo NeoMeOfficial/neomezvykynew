@@ -58,6 +58,32 @@ export function addCustomChip(label: string): string[] {
   return next;
 }
 
+export function removeCustomChip(label: string): string[] {
+  const next = readCustomChips().filter((c) => c !== label);
+  try { localStorage.setItem(CUSTOM_CHIPS_KEY, JSON.stringify(next)); } catch { /* full */ }
+  return next;
+}
+
+// Long-press deletion works for preset chips too — they aren't removed
+// from code, just hidden per device.
+const HIDDEN_CHIPS_KEY = 'neome_dennik_hidden_chips_v1';
+
+export function readHiddenChips(): string[] {
+  try {
+    const raw = localStorage.getItem(HIDDEN_CHIPS_KEY);
+    const parsed = raw ? JSON.parse(raw) : null;
+    return Array.isArray(parsed) ? parsed.filter((x) => typeof x === 'string') : [];
+  } catch { return []; }
+}
+
+export function hideDefaultChip(label: string): string[] {
+  const cur = readHiddenChips();
+  if (cur.includes(label)) return cur;
+  const next = [...cur, label];
+  try { localStorage.setItem(HIDDEN_CHIPS_KEY, JSON.stringify(next)); } catch { /* full */ }
+  return next;
+}
+
 export function serializeStructured(e: Omit<StructuredDiaryEntry, 'v'>): string {
   return JSON.stringify({ v: 1, ...e });
 }

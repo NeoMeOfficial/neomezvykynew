@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { useCycleData } from '../../features/cycle/useCycleData';
@@ -361,6 +361,41 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
   const { isPremium } = useSubscription();
   const [addingSymptom, setAddingSymptom] = useState(false);
   const [newSymptomText, setNewSymptomText] = useState('');
+  // Long-press any symptom chip → ✕ to remove it (custom chips are
+  // deleted, preset chips hidden per device; history and the calendar
+  // filter keep working — Gabi 2026-08-03).
+  const [hiddenSymptomKeys, setHiddenSymptomKeys] = useState<string[]>(() => {
+    try {
+      const raw = localStorage.getItem('neome_cycle_hidden_symptoms_v1');
+      const parsed = raw ? JSON.parse(raw) : null;
+      return Array.isArray(parsed) ? parsed.filter((x) => typeof x === 'string') : [];
+    } catch { return []; }
+  });
+  const hideSymptomChip = (k: string) => {
+    setHiddenSymptomKeys((prev) => {
+      const next = prev.includes(k) ? prev : [...prev, k];
+      try { localStorage.setItem('neome_cycle_hidden_symptoms_v1', JSON.stringify(next)); } catch { /* full */ }
+      return next;
+    });
+  };
+  const [symptomDeleteFor, setSymptomDeleteFor] = useState<string | null>(null);
+  const symptomLpTimer = useRef<number | null>(null);
+  const symptomLpFired = useRef(false);
+  useEffect(() => {
+    if (!symptomDeleteFor) return;
+    const t = window.setTimeout(() => setSymptomDeleteFor(null), 4000);
+    return () => window.clearTimeout(t);
+  }, [symptomDeleteFor]);
+  const symptomLpStart = (k: string) => {
+    symptomLpFired.current = false;
+    symptomLpTimer.current = window.setTimeout(() => {
+      symptomLpFired.current = true;
+      setSymptomDeleteFor(k);
+    }, 550);
+  };
+  const symptomLpCancel = () => {
+    if (symptomLpTimer.current !== null) { window.clearTimeout(symptomLpTimer.current); symptomLpTimer.current = null; }
+  };
   // Calendar dots — derive day-of-month for the VIEWED month (paging).
   const ym = `${yearIdx}-${String(monthIdx + 1).padStart(2, '0')}`;
   const symptomDays: number[] = symptomDates
@@ -381,7 +416,9 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     ...SYMPTOM_DEFS.map((s) => ({ ...s, custom: false as const })),
     ...customDefs.map((s) => ({ ...s, custom: true as const })),
   ];
-  const symptoms = allSymptomDefs.map((s) => ({ l: s.l, k: s.k, on: !!todayMap[s.k], custom: s.custom }));
+  const symptoms = allSymptomDefs
+    .filter((s) => !hiddenSymptomKeys.includes(s.k))
+    .map((s) => ({ l: s.l, k: s.k, on: !!todayMap[s.k], custom: s.custom }));
 
   // ── Symptom filter on the calendar (Gabi 2026-07-28) ────────────────
   // Pick a symptom → its logged days highlight in the calendar and a
@@ -1058,32 +1095,38 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
         </Ser>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
           {visibleSymptoms.map((s) => (
-            <div
-              key={s.k}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
-                padding: s.custom ? '6px 6px 6px 14px' : '8px 14px',
-                borderRadius: 999,
-                background: s.on ? TINT.GOLD_SOFT : '#fff',
-                color: s.on ? NM.GOLD : NM.DEEP,
-                border: `1px solid ${s.on ? NM.GOLD : NM.HAIR_2}`,
-                fontFamily: NM.SANS,
-                fontSize: 12.5,
-                fontWeight: s.on ? 500 : 400,
-              }}
-            >
+            <span key={s.k} style={{ position: 'relative', display: 'inline-flex' }}>
               <button
                 type="button"
-                onClick={() => toggleSymptom(s.k)}
+                onClick={() => {
+                  if (symptomLpFired.current) { symptomLpFired.current = false; return; }
+                  if (symptomDeleteFor === s.k) { setSymptomDeleteFor(null); return; }
+                  toggleSymptom(s.k);
+                }}
+                onTouchStart={() => symptomLpStart(s.k)}
+                onTouchEnd={symptomLpCancel}
+                onTouchMove={symptomLpCancel}
+                onMouseDown={() => symptomLpStart(s.k)}
+                onMouseUp={symptomLpCancel}
+                onMouseLeave={symptomLpCancel}
+                onContextMenu={(e) => e.preventDefault()}
                 style={{
                   all: 'unset',
                   cursor: 'pointer',
-                  color: 'inherit',
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: 5,
+                  padding: '8px 14px',
+                  borderRadius: 999,
+                  background: s.on ? TINT.GOLD_SOFT : '#fff',
+                  color: s.on ? NM.GOLD : NM.DEEP,
+                  border: `1px solid ${s.on ? NM.GOLD : NM.HAIR_2}`,
+                  fontFamily: NM.SANS,
+                  fontSize: 12.5,
+                  fontWeight: s.on ? 500 : 400,
+                  WebkitTouchCallout: 'none',
+                  WebkitUserSelect: 'none',
+                  userSelect: 'none',
                 }}
               >
                 {s.on && (
@@ -1093,28 +1136,23 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
                 )}
                 {s.l}
               </button>
-              {s.custom && (
+              {symptomDeleteFor === s.k && (
                 <button
                   type="button"
                   aria-label={`Vymazať ${s.l}`}
-                  onClick={() => removeCustomSymptom(s.k)}
-                  style={{
-                    all: 'unset',
-                    cursor: 'pointer',
-                    width: 18,
-                    height: 18,
-                    borderRadius: 999,
-                    display: 'grid',
-                    placeItems: 'center',
-                    color: NM.TERTIARY,
+                  onClick={() => {
+                    if (s.custom) removeCustomSymptom(s.k);
+                    else hideSymptomChip(s.k);
+                    setSymptomDeleteFor(null);
                   }}
+                  style={{ position: 'absolute', top: -7, right: -7, width: 20, height: 20, borderRadius: 999, background: '#C27A6E', border: '2px solid #fff', display: 'grid', placeItems: 'center', cursor: 'pointer', padding: 0, boxSizing: 'border-box', zIndex: 1 }}
                 >
-                  <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
+                  <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round">
                     <path d="M6 6l12 12M18 6L6 18" />
                   </svg>
                 </button>
               )}
-            </div>
+            </span>
           ))}
 
           {!symptomsExpanded && hiddenSymptomCount > 0 && (

@@ -9,6 +9,9 @@ import {
   ENERGY_CHIPS,
   readCustomChips,
   addCustomChip,
+  removeCustomChip,
+  readHiddenChips,
+  hideDefaultChip,
   serializeStructured,
 } from '../../features/dennik/structuredEntry';
 
@@ -31,16 +34,38 @@ const SK_DAYS = ['Nedeľa', 'Pondelok', 'Utorok', 'Streda', 'Štvrtok', 'Piatok'
 // flips to green — one glance says "hotovo".
 const SAVED_GREEN = '#7A9E78';
 
-function ChipRow({ selected, onToggle, extra, onAddCustom, saved }: {
+function ChipRow({ selected, onToggle, extra, hidden, onAddCustom, onRemove, saved }: {
   selected: string[];
   onToggle: (label: string) => void;
   extra: string[];
+  hidden: string[];
   onAddCustom: (label: string) => void;
+  onRemove: (label: string) => void;
   saved: boolean;
 }) {
   const [adding, setAdding] = useState(false);
   const [draft, setDraft] = useState('');
-  const all = [...ENERGY_CHIPS, ...extra];
+  // Long-press any chip (preset or custom) → a small ✕ appears to
+  // remove it (Gabi 2026-08-03). Auto-hides after a moment.
+  const [deleteFor, setDeleteFor] = useState<string | null>(null);
+  const lpTimer = useRef<number | null>(null);
+  const lpFired = useRef(false);
+  useEffect(() => {
+    if (!deleteFor) return;
+    const t = window.setTimeout(() => setDeleteFor(null), 4000);
+    return () => window.clearTimeout(t);
+  }, [deleteFor]);
+  const lpStart = (label: string) => {
+    lpFired.current = false;
+    lpTimer.current = window.setTimeout(() => {
+      lpFired.current = true;
+      setDeleteFor(label);
+    }, 550);
+  };
+  const lpCancel = () => {
+    if (lpTimer.current !== null) { window.clearTimeout(lpTimer.current); lpTimer.current = null; }
+  };
+  const all = [...ENERGY_CHIPS.filter((c) => !hidden.includes(c)), ...extra];
   const commit = () => {
     const clean = draft.trim();
     if (clean) { onAddCustom(clean); onToggle(clean); }
@@ -52,24 +77,50 @@ function ChipRow({ selected, onToggle, extra, onAddCustom, saved }: {
       {all.map((label) => {
         const on = selected.includes(label);
         return (
-          <button
-            key={label}
-            onClick={() => onToggle(label)}
-            style={{
-              all: 'unset',
-              cursor: 'pointer',
-              padding: '8px 13px',
-              borderRadius: 999,
-              background: on ? (saved ? SAVED_GREEN : NM.DEEP) : '#fff',
-              color: on ? '#fff' : NM.DEEP,
-              border: on ? '1px solid transparent' : `1px solid ${NM.HAIR_2}`,
-              fontFamily: NM.SANS,
-              fontSize: 12,
-              fontWeight: on ? 500 : 400,
-            }}
-          >
-            {on ? '✓ ' : ''}{label}
-          </button>
+          <span key={label} style={{ position: 'relative', display: 'inline-flex' }}>
+            <button
+              onClick={() => {
+                if (lpFired.current) { lpFired.current = false; return; }
+                if (deleteFor === label) { setDeleteFor(null); return; }
+                onToggle(label);
+              }}
+              onTouchStart={() => lpStart(label)}
+              onTouchEnd={lpCancel}
+              onTouchMove={lpCancel}
+              onMouseDown={() => lpStart(label)}
+              onMouseUp={lpCancel}
+              onMouseLeave={lpCancel}
+              onContextMenu={(e) => e.preventDefault()}
+              style={{
+                all: 'unset',
+                cursor: 'pointer',
+                padding: '8px 13px',
+                borderRadius: 999,
+                background: on ? (saved ? SAVED_GREEN : NM.DEEP) : '#fff',
+                color: on ? '#fff' : NM.DEEP,
+                border: on ? '1px solid transparent' : `1px solid ${NM.HAIR_2}`,
+                fontFamily: NM.SANS,
+                fontSize: 12,
+                fontWeight: on ? 500 : 400,
+                WebkitTouchCallout: 'none',
+                WebkitUserSelect: 'none',
+                userSelect: 'none',
+              }}
+            >
+              {on ? '✓ ' : ''}{label}
+            </button>
+            {deleteFor === label && (
+              <button
+                onClick={() => { onRemove(label); setDeleteFor(null); }}
+                aria-label={`Vymazať ${label}`}
+                style={{ position: 'absolute', top: -7, right: -7, width: 20, height: 20, borderRadius: 999, background: '#C27A6E', border: '2px solid #fff', display: 'grid', placeItems: 'center', cursor: 'pointer', padding: 0, boxSizing: 'border-box' }}
+              >
+                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round">
+                  <path d="M6 6l12 12M18 6L6 18" />
+                </svg>
+              </button>
+            )}
+          </span>
         );
       })}
       {adding ? (
@@ -101,6 +152,7 @@ export default function ReflectionEntry() {
   const [took, setTook] = useState<string[]>([]);
   const [reflection, setReflection] = useState('');
   const [customChips, setCustomChips] = useState<string[]>(() => readCustomChips());
+  const [hiddenChips, setHiddenChips] = useState<string[]>(() => readHiddenChips());
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -170,6 +222,15 @@ export default function ReflectionEntry() {
   };
 
   const handleAddCustom = (label: string) => setCustomChips(addCustomChip(label));
+
+  // Long-press deletion: custom chips are removed, preset chips hidden
+  // per device; either way it leaves today's selections.
+  const handleRemoveChip = (label: string) => {
+    if (customChips.includes(label)) setCustomChips(removeCustomChip(label));
+    else setHiddenChips(hideDefaultChip(label));
+    setGave((prev) => prev.filter((x) => x !== label));
+    setTook((prev) => prev.filter((x) => x !== label));
+  };
 
   const hasContent = win.trim() || gave.length > 0 || took.length > 0 || reflection.trim();
 
@@ -279,12 +340,12 @@ export default function ReflectionEntry() {
 
       {card(<>
         {questionHead('Čo ti dnes dalo energiu?', '#7A9E78')}
-        <ChipRow selected={gave} onToggle={toggle(setGave)} extra={customChips} onAddCustom={handleAddCustom} saved={saved} />
+        <ChipRow selected={gave} onToggle={toggle(setGave)} extra={customChips} hidden={hiddenChips} onAddCustom={handleAddCustom} onRemove={handleRemoveChip} saved={saved} />
       </>)}
 
       {card(<>
         {questionHead('Čo ti dnes zobralo energiu?', '#C27A6E')}
-        <ChipRow selected={took} onToggle={toggle(setTook)} extra={customChips} onAddCustom={handleAddCustom} saved={saved} />
+        <ChipRow selected={took} onToggle={toggle(setTook)} extra={customChips} hidden={hiddenChips} onAddCustom={handleAddCustom} onRemove={handleRemoveChip} saved={saved} />
       </>)}
 
       {card(<>
