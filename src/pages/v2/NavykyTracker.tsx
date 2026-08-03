@@ -521,12 +521,7 @@ export default function NavykyTracker() {
                   </button>
                   {/* Daily nudge (Gabi 2026-07-31): every day the circle is
                       unticked, point at it; gone once today is green. */}
-                  {!done && (
-                    <div style={{ position: 'absolute', top: 23, right: 56, whiteSpace: 'nowrap', fontFamily: NM.SANS, fontSize: 10.5, color: NM.GOLD, fontWeight: 600, zIndex: 1, pointerEvents: 'none' }}>
-                      Splnené? Ťukni →
-                    </div>
-                  )}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '15px 58px 15px 16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '15px 58px 15px 16px' }}>
                     <div role="button" onClick={() => { setExpandedId(open ? null : h.id); setBackfillId(null); }} style={{ flex: 1, minWidth: 0, cursor: 'pointer' }}>
                       <div style={{ fontFamily: NM.SERIF, fontSize: 17, color: NM.DEEP, fontWeight: 600, lineHeight: 1.3 }}>{h.name}</div>
                       {subParts.map((part) => (
