@@ -457,11 +457,9 @@ export default function NavykyTracker() {
                   : doneDays / h.durationDays >= 0.8
                   ? `cieľ zvládnutý ✓ · splnených ${doneDays} z ${h.durationDays} dní`
                   : `cieľ ukončený · splnených ${doneDays} z ${h.durationDays} dní`);
-              } else if (!unlimited) {
-                // Achievement in words; the day position lives on the
-                // timeline bar as a gold marker (Gabi 2026-08-03).
-                subParts.push(`${doneDays} z ${h.durationDays} dní splnených`);
               }
+              // Active goals carry no text line — the timeline says it;
+              // the count waits inside "Pozri si svoje dni" (Gabi 2026-08-03).
 
               const skippedToday = !done && (skips[h.id] ?? []).includes(todayISO);
               const dragX = drag?.id === h.id ? drag.x : 0;
@@ -524,10 +522,8 @@ export default function NavykyTracker() {
                   {/* Daily nudge (Gabi 2026-07-31): every day the circle is
                       unticked, point at it; gone once today is green. */}
                   {!done && (
-                    <div style={{ position: 'absolute', top: 50, right: 10, width: 64, textAlign: 'center', fontFamily: NM.SANS, fontSize: 9.5, lineHeight: 1.35, color: NM.GOLD, fontWeight: 600, zIndex: 1, pointerEvents: 'none' }}>
-                      Splnené?
-                      <br />
-                      Ťukni ↑
+                    <div style={{ position: 'absolute', top: 23, right: 56, whiteSpace: 'nowrap', fontFamily: NM.SANS, fontSize: 10.5, color: NM.GOLD, fontWeight: 600, zIndex: 1, pointerEvents: 'none' }}>
+                      Splnené? Ťukni →
                     </div>
                   )}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '15px 58px 15px 16px' }}>
@@ -590,6 +586,11 @@ export default function NavykyTracker() {
                           missed days stay empty forever. Unlimited: rolling
                           last 30 days. Backfill mode makes past squares
                           tappable so she can add forgotten days. */}
+                      {!unlimited && !goalReached && (
+                        <div style={{ marginBottom: 8, fontFamily: NM.SANS, fontSize: 11.5, color: NM.MUTED }}>
+                          {doneDays} z {h.durationDays} dní splnených
+                        </div>
+                      )}
                       {(() => {
                         const backfilling = backfillId === h.id;
                         const gridDays = unlimited
