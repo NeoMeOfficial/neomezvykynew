@@ -95,6 +95,18 @@ export function loadRecipes(): Promise<SupabaseRecipe[]> {
   return loadPromise;
 }
 
+/**
+ * The one shared "recept dňa": same recipe on the home card and in the
+ * Strava section, rotating at LOCAL midnight, different every day and
+ * across year boundaries.
+ */
+export function dailyRecipeOf(recipes: SupabaseRecipe[]): SupabaseRecipe | null {
+  if (recipes.length === 0) return null;
+  const now = new Date();
+  const doy = Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000);
+  return recipes[(now.getFullYear() * 366 + doy) % recipes.length];
+}
+
 /** Slot-based cover image (full path) for recipes without own photos. */
 export function recipeImage(r: Pick<SupabaseRecipe, 'slot'> | null | undefined): string {
   if (r?.slot === 'hlavne') return '/images/r9/section-nutrition.jpg';

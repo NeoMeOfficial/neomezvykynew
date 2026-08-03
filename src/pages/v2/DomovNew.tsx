@@ -6,7 +6,7 @@ import { useCycleInfo } from '@/hooks/use-cycle';
 import { useUserProgram } from '@/hooks/useUserProgram';
 import { useDailyTeloPick } from '@/features/telo/useDailyTeloPick';
 import { useMealPlan } from '@/features/nutrition/useMealPlan';
-import { useRecipes, recipeImage } from '@/hooks/useRecipes';
+import { useRecipes, recipeImage, dailyRecipeOf } from '@/hooks/useRecipes';
 import { useSupabaseHabits } from '@/hooks/useSupabaseHabits';
 import { useAchievements } from '@/hooks/useAchievements';
 import { useDailyMeditation } from '@/hooks/useDailyContent';
@@ -900,10 +900,9 @@ export default function DomovNew() {
   const meditationTitle = meditation?.title ?? 'Ranný pokoj';
 
   // ── "Dnes pre teba" — six pillars, each with today's featured info ──
-  // Deterministic "recipe of the day" — same recipe for everyone all day.
-  const dailyRecipe = recipes.length > 0
-    ? recipes[Math.floor(Date.now() / 86_400_000) % recipes.length]
-    : null;
+  // One shared "recept dňa" with the Strava section (local-midnight
+  // rotation) — two formulas showed two different recipes before.
+  const dailyRecipe = dailyRecipeOf(recipes);
 
   // Subscriber's first prescribed meal today (if a plan exists) — its
   // recipe photo doubles as the Strava card image.
@@ -1016,7 +1015,9 @@ export default function DomovNew() {
           img: recipeImage(firstMeal.recipe),
           title: firstMeal.name,
           sub: `${firstMeal.kcal} kcal · dnešné menu`,
-          href: '/jedalnicek',
+          // Tapping the meal opens THE recipe (Gabi 2026-08-03); the full
+          // plan stays reachable via the Strava section shortcut.
+          href: `/recept/${firstMeal.recipe.id}`,
         }
       : mealPlanNeedsSetup
       ? {
@@ -1040,7 +1041,7 @@ export default function DomovNew() {
                 dailyRecipe.kcal ? `${dailyRecipe.kcal} kcal` : null,
               ].filter(Boolean).join(' · ') || 'recept dňa'
             : 'Gabine recepty',
-          href: '/kniznica/strava?from=home',
+          href: dailyRecipe ? `/recept/${dailyRecipe.id}` : '/kniznica/strava?from=home',
         },
     {
       key: 'mysel',

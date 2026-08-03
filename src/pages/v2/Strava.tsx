@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useRecipes, SLOT_LABEL, type SupabaseRecipe } from '@/hooks/useRecipes';
+import { useRecipes, SLOT_LABEL, dailyRecipeOf, type SupabaseRecipe } from '@/hooks/useRecipes';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import { useUniversalFavorites } from '@/hooks/useUniversalFavorites';
 import { TopBar } from '@/components/v2/top-bar';
@@ -14,10 +14,6 @@ const CATEGORIES: { slot: SupabaseRecipe['slot']; label: string; img: string }[]
   { slot: 'hlavne',  label: 'Hlavné jedlá', img: 'section-nutrition.jpg' },
   { slot: 'snack',   label: 'Snacky',       img: 'hero-yoga.jpg' },
 ];
-
-function dayOfYear(d = new Date()): number {
-  return Math.floor((d.getTime() - new Date(d.getFullYear(), 0, 0).getTime()) / 86400000);
-}
 
 export default function Strava() {
   const navigate = useNavigate();
@@ -35,11 +31,8 @@ export default function Strava() {
     CATEGORIES.map(c => ({ ...c, count: recipes.filter(r => r.slot === c.slot).length })),
   [recipes]);
 
-  // Deterministic recipe-of-the-day: stable per calendar day.
-  const featured = useMemo(() => {
-    if (!recipes.length) return null;
-    return recipes[dayOfYear() % recipes.length];
-  }, [recipes]);
+  // Deterministic recipe-of-the-day — shared with the home card.
+  const featured = useMemo(() => dailyRecipeOf(recipes), [recipes]);
 
   return (
     <div className="min-h-screen bg-cream pb-12">
