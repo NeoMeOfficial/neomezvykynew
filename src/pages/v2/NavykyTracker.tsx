@@ -546,11 +546,14 @@ export default function NavykyTracker() {
                       where today sits on the journey. */}
                   {!unlimited && !goalReached && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, margin: '0 16px 13px' }}>
+                      {/* Day label sits LEFT of the bar — the right edge
+                          belongs to the tick/skip prompts on unticked days
+                          and got too busy (Gabi 2026-08-03 screenshot). */}
+                      <span style={{ fontFamily: NM.SANS, fontSize: 10, color: NM.TERTIARY, whiteSpace: 'nowrap', flexShrink: 0 }}>{dayN}. deň</span>
                       <div style={{ flex: 1, position: 'relative', height: 3, background: NM.HAIR, borderRadius: 999 }}>
                         <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${Math.min(100, Math.round((doneDays / h.durationDays) * 100))}%`, background: SAVED_GREEN, borderRadius: 999 }} />
                         <div style={{ position: 'absolute', left: `calc(${Math.min(100, Math.round((dayN / h.durationDays) * 100))}% - 2px)`, top: -3, width: 4, height: 9, borderRadius: 2, background: NM.GOLD }} />
                       </div>
-                      <span style={{ fontFamily: NM.SANS, fontSize: 10, color: NM.TERTIARY, whiteSpace: 'nowrap', flexShrink: 0 }}>{dayN}. deň</span>
                     </div>
                   )}
 
