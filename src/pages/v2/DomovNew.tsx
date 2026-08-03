@@ -348,7 +348,8 @@ function CardGoals() {
   const { habits, toggleHabitCompletion } = useSupabaseHabits();
   const { addEntry } = usePointsLedger();
   const { addActivity } = useAchievements();
-  const today = new Date().toISOString().split('T')[0];
+  const now = new Date();
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   const doneCount = habits.filter((h) => (h.completions?.[today] ?? 0) > 0).length;
   const allDone = habits.length > 0 && doneCount === habits.length;
   // "Nezabudni na …" — only today's unfinished habits, max 2 rows so the

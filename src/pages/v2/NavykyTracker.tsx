@@ -40,8 +40,9 @@ const PRESETS = [
 const UNLIMITED = 365;
 const MAX_HABITS = 5;
 
-// The habits hook keys completions by UTC ISO dates — stay consistent.
-const isoOf = (d: Date) => d.toISOString().split('T')[0];
+// Day keys flip at LOCAL midnight (same rule as useSupabaseHabits).
+const isoOf = (d: Date) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 const isoDaysAgo = (n: number) => {
   const d = new Date();
   d.setDate(d.getDate() - n);

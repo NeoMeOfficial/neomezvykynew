@@ -1,4 +1,9 @@
 import { useState, useEffect } from 'react';
+
+// Day keys use LOCAL midnight — the habit day must flip at 00:00 for the
+// user, not at UTC midnight (02:00 in Slovak summer).
+export const localDayISO = (d = new Date()) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 import { supabase } from '../lib/supabase';
 import { useSupabaseAuth } from '../contexts/SupabaseAuthContext';
 
@@ -115,7 +120,7 @@ export function useSupabaseHabits() {
           duration_days: data.durationDays,
           unit: data.unit,
           target_per_day: data.targetPerDay,
-          start_date: new Date().toISOString().split('T')[0], // today
+          start_date: localDayISO(), // today (local midnight boundary)
         }]);
 
       if (error) throw error;
@@ -160,7 +165,7 @@ export function useSupabaseHabits() {
   const toggleHabitCompletion = async (habitId: string): Promise<boolean> => {
     if (!user) return false;
 
-    const today = new Date().toISOString().split('T')[0];
+    const today = localDayISO();
     const habit = habits.find(h => h.id === habitId);
     if (!habit) return false;
 
