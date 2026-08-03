@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { NM, ConfirmSheet } from '../../components/v2/neome';
 import { useSupabaseHabits } from '../../hooks/useSupabaseHabits';
 import { useSmartBack } from '../../hooks/useSmartBack';
@@ -259,6 +259,21 @@ export default function NavykyTracker() {
   const [saving, setSaving] = useState(false);
 
   const todayISO = isoOf(new Date());
+
+  // One-time heal: habits created before 2026-07-31 with a multi-tap
+  // target (the old 8-glass water) become single-tick like everything
+  // else — no need to delete and re-add (Gabi 2026-08-03).
+  const healedRef = useRef(false);
+  useEffect(() => {
+    if (healedRef.current || loading) return;
+    const legacy = habits.filter((h) => h.targetPerDay > 1);
+    if (legacy.length === 0) return;
+    healedRef.current = true;
+    legacy.forEach((h) => {
+      editHabit(h.id, { name: h.name, durationDays: h.durationDays, unit: 'krát', targetPerDay: 1 });
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [habits, loading]);
 
   const daysIn = (h: { startDate: string }) =>
     Math.max(0, Math.floor((Date.parse(todayISO) - Date.parse(h.startDate)) / 86400000)) + 1;
