@@ -591,6 +591,7 @@ export default function NavykyTracker() {
                                 const full = c >= h.targetPerDay;
                                 const future = iso > todayISO;
                                 const isToday = iso === todayISO;
+                                const skippedDay = !full && !future && (skips[h.id] ?? []).includes(iso);
                                 const tappable = backfilling && !future;
                                 return (
                                   <div
@@ -600,7 +601,7 @@ export default function NavykyTracker() {
                                       aspectRatio: '1',
                                       borderRadius: 5,
                                       cursor: tappable ? 'pointer' : 'default',
-                                      background: full ? SAVED_GREEN : c > 0 ? 'rgba(122,158,120,0.35)' : future ? 'transparent' : NM.HAIR,
+                                      background: full ? SAVED_GREEN : c > 0 ? 'rgba(122,158,120,0.35)' : skippedDay ? 'rgba(194,122,110,0.45)' : future ? 'transparent' : NM.HAIR,
                                       border: isToday ? `1.5px solid ${NM.GOLD}` : future ? `1px solid ${NM.HAIR}` : '1px solid transparent',
                                       boxSizing: 'border-box',
                                     }}
@@ -610,6 +611,18 @@ export default function NavykyTracker() {
                             </div>
                             <div style={{ marginTop: 6, fontFamily: NM.SANS, fontSize: 10.5, color: NM.TERTIARY }}>
                               {unlimited ? 'Posledných 30 dní' : `Tvoj cieľ deň po dni — od 1 do ${h.durationDays}`}
+                            </div>
+                            <div style={{ marginTop: 7, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+                              {[
+                                [SAVED_GREEN, 'splnené'],
+                                ['rgba(194,122,110,0.45)', 'nevyšlo'],
+                                [NM.HAIR, 'nezaznačené'],
+                              ].map(([clr, lbl]) => (
+                                <span key={lbl} style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                                  <span style={{ width: 10, height: 10, borderRadius: 3, background: clr, flexShrink: 0 }} />
+                                  <span style={{ fontFamily: NM.SANS, fontSize: 10, color: NM.TERTIARY }}>{lbl}</span>
+                                </span>
+                              ))}
                             </div>
                           </>
                         );
