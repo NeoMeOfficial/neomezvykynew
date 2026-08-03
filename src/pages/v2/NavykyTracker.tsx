@@ -47,6 +47,19 @@ const isoDaysAgo = (n: number) => {
   d.setDate(d.getDate() - n);
   return isoOf(d);
 };
+// "Dnes to nevyšlo" marks — a gentle acknowledgment, stored locally
+// per habit per day (no schema; it changes nothing in the data model).
+const SKIPS_KEY = 'neome_habit_skips_v1';
+function readSkips(): Record<string, string[]> {
+  try {
+    const v = JSON.parse(localStorage.getItem(SKIPS_KEY) || '{}');
+    return v && typeof v === 'object' ? v : {};
+  } catch { return {}; }
+}
+function writeSkips(v: Record<string, string[]>) {
+  try { localStorage.setItem(SKIPS_KEY, JSON.stringify(v)); } catch { /* full */ }
+}
+
 // i-th day of a goal (0-based) counted from its start date.
 const isoFromStart = (startISO: string, i: number) => {
   const d = new Date(`${startISO}T00:00:00Z`);
@@ -127,7 +140,22 @@ function EndHint() {
           <path d="M6 6l12 12M18 6L6 18" />
         </svg>
       </span>
-      <span style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.MUTED }}>Ak chceš návyk predčasne ukončiť, klikni krížik.</span>
+      <span style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.MUTED }}>Ak dnes nevyšlo, klikni krížik — zajtra to skúsiš zas.</span>
+    </div>
+  );
+}
+
+// Swipe left = end the habit early (the only destructive action, so it
+// hides behind a gesture + confirm instead of a visible button).
+function SwipeHint() {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginTop: 6 }}>
+      <span style={{ width: 18, height: 18, borderRadius: 999, border: `1px solid ${NM.HAIR_2}`, display: 'grid', placeItems: 'center', flexShrink: 0, boxSizing: 'border-box' }}>
+        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="rgba(61,41,33,0.45)" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M19 12H5M11 6l-6 6 6 6" />
+        </svg>
+      </span>
+      <span style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.MUTED }}>Ak chceš návyk úplne ukončiť, potiahni jeho kartu doľava.</span>
     </div>
   );
 }
@@ -257,6 +285,9 @@ export default function NavykyTracker() {
   const [backfillId, setBackfillId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [skips, setSkips] = useState<Record<string, string[]>>(() => readSkips());
+  const [drag, setDrag] = useState<{ id: string; x: number } | null>(null);
+  const touchRef = useRef<{ id: string; x: number; y: number; horiz: boolean | null } | null>(null);
 
   const todayISO = isoOf(new Date());
 
@@ -299,7 +330,26 @@ export default function NavykyTracker() {
     if (ok && wasZero) {
       addEntry('habit_checkin', 3, `habit_${habitId}_${todayISO}`, 'habit');
       addActivity('habit_checkin');
+      // A tick beats an earlier "nevyšlo" — clear today's skip mark.
+      setSkips((prev) => {
+        if (!prev[habitId]?.includes(todayISO)) return prev;
+        const next = { ...prev, [habitId]: prev[habitId].filter((d) => d !== todayISO) };
+        writeSkips(next);
+        return next;
+      });
     }
+  };
+
+  const toggleSkip = (habitId: string) => {
+    setSkips((prev) => {
+      const cur = prev[habitId] ?? [];
+      const next = {
+        ...prev,
+        [habitId]: cur.includes(todayISO) ? cur.filter((d) => d !== todayISO) : [...cur, todayISO],
+      };
+      writeSkips(next);
+      return next;
+    });
   };
 
   const startHabit = (unit: string, target: number) => async (name: string, days: number) => {
@@ -373,6 +423,7 @@ export default function NavykyTracker() {
             <div style={{ paddingLeft: 4 }}>
               <TickHint />
               <EndHint />
+              <SwipeHint />
             </div>
             {habits.map((h) => {
               const count = h.completions?.[todayISO] ?? 0;
@@ -402,8 +453,35 @@ export default function NavykyTracker() {
                 subParts.push(`${doneDays} z ${h.durationDays} dní splnených`);
               }
 
+              const skippedToday = !done && (skips[h.id] ?? []).includes(todayISO);
+              const dragX = drag?.id === h.id ? drag.x : 0;
               return (
-                <div key={h.id} style={{ marginTop: 12, position: 'relative', background: justAdded === h.name ? 'rgba(122,158,120,0.07)' : '#fff', borderRadius: 20, border: `1px solid ${justAdded === h.name ? SAVED_GREEN : NM.HAIR}`, overflow: 'hidden', transition: 'background 0.6s ease, border-color 0.6s ease' }}>
+                <div key={h.id} style={{ marginTop: 12, position: 'relative' }}>
+                  {/* Revealed by the left-swipe — ending a habit lives
+                      behind a gesture + confirm, not a button. */}
+                  <div style={{ position: 'absolute', inset: 0, borderRadius: 20, background: 'rgba(194,122,110,0.13)', border: '1px solid rgba(194,122,110,0.30)', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 20, boxSizing: 'border-box' }}>
+                    <span style={{ fontFamily: NM.SANS, fontSize: 12, color: CORAL, fontWeight: 600 }}>Ukončiť návyk</span>
+                  </div>
+                  <div
+                    onTouchStart={(e) => {
+                      touchRef.current = { id: h.id, x: e.touches[0].clientX, y: e.touches[0].clientY, horiz: null };
+                    }}
+                    onTouchMove={(e) => {
+                      const t = touchRef.current;
+                      if (!t || t.id !== h.id) return;
+                      const dx = e.touches[0].clientX - t.x;
+                      const dy = e.touches[0].clientY - t.y;
+                      if (t.horiz === null && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) t.horiz = Math.abs(dx) > Math.abs(dy);
+                      if (t.horiz) setDrag({ id: h.id, x: Math.min(0, dx) });
+                    }}
+                    onTouchEnd={() => {
+                      const wasOpen = drag?.id === h.id && drag.x < -70;
+                      touchRef.current = null;
+                      setDrag(null);
+                      if (wasOpen) setConfirmDeleteId(h.id);
+                    }}
+                    onTouchCancel={() => { touchRef.current = null; setDrag(null); }}
+                    style={{ position: 'relative', background: justAdded === h.name ? 'rgba(122,158,120,0.07)' : '#fff', borderRadius: 20, border: `1px solid ${justAdded === h.name ? SAVED_GREEN : NM.HAIR}`, overflow: 'hidden', transform: `translateX(${dragX}px)`, transition: dragX === 0 ? 'transform 0.25s ease, background 0.6s ease, border-color 0.6s ease' : 'background 0.6s ease, border-color 0.6s ease', touchAction: 'pan-y' }}>
                   {/* Corner controls: tick top-right, X bottom-right — both
                       pre-drawn grey, colouring on tap (Gabi 2026-07-31). */}
                   <button
@@ -442,29 +520,36 @@ export default function NavykyTracker() {
                       Ťukni ↑
                     </div>
                   )}
-                  <button
-                    onClick={() => setConfirmDeleteId(h.id)}
-                    aria-label="Ukončiť budovanie návyku"
-                    style={{
-                      position: 'absolute',
-                      bottom: 11,
-                      right: 14,
-                      width: 24,
-                      height: 24,
-                      borderRadius: 999,
-                      cursor: 'pointer',
-                      background: confirmDeleteId === h.id ? CORAL : 'rgba(61,41,33,0.06)',
-                      border: confirmDeleteId === h.id ? '1px solid transparent' : `1px solid ${NM.HAIR_2}`,
-                      display: 'grid',
-                      placeItems: 'center',
-                      padding: 0,
-                      zIndex: 1,
-                    }}
-                  >
-                    <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke={confirmDeleteId === h.id ? '#fff' : 'rgba(61,41,33,0.30)'} strokeWidth="2.6" strokeLinecap="round">
-                      <path d="M6 6l12 12M18 6L6 18" />
-                    </svg>
-                  </button>
+                  {!done && (
+                    <>
+                      <button
+                        onClick={() => toggleSkip(h.id)}
+                        aria-label={skippedToday ? 'Zajtra to skúsim zas' : 'Dnes to nevyšlo'}
+                        style={{
+                          position: 'absolute',
+                          bottom: 11,
+                          right: 14,
+                          width: 24,
+                          height: 24,
+                          borderRadius: 999,
+                          cursor: 'pointer',
+                          background: skippedToday ? CORAL : 'rgba(61,41,33,0.06)',
+                          border: skippedToday ? '1px solid transparent' : `1px solid ${NM.HAIR_2}`,
+                          display: 'grid',
+                          placeItems: 'center',
+                          padding: 0,
+                          zIndex: 1,
+                        }}
+                      >
+                        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke={skippedToday ? '#fff' : 'rgba(61,41,33,0.30)'} strokeWidth="2.6" strokeLinecap="round">
+                          <path d="M6 6l12 12M18 6L6 18" />
+                        </svg>
+                      </button>
+                      <div style={{ position: 'absolute', bottom: 16, right: 46, whiteSpace: 'nowrap', fontFamily: NM.SANS, fontSize: 9.5, color: skippedToday ? NM.MUTED : CORAL, fontWeight: 600, zIndex: 1, pointerEvents: 'none' }}>
+                        {skippedToday ? 'Zajtra to skúsim zas ✓' : 'Dnes nevyšlo? Ťukni →'}
+                      </div>
+                    </>
+                  )}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '15px 58px 15px 16px' }}>
                     <div role="button" onClick={() => { setExpandedId(open ? null : h.id); setBackfillId(null); }} style={{ flex: 1, minWidth: 0, cursor: 'pointer' }}>
                       <div style={{ fontFamily: NM.SERIF, fontSize: 17, color: NM.DEEP, fontWeight: 600, lineHeight: 1.3 }}>{h.name}</div>
@@ -575,6 +660,7 @@ export default function NavykyTracker() {
                       )}
                     </div>
                   )}
+                  </div>
                 </div>
               );
             })}
