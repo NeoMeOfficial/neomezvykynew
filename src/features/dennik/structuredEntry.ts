@@ -97,7 +97,7 @@ export function computeEnergyPatterns(
 ): EnergyPatterns {
   const since = new Date();
   since.setDate(since.getDate() - windowDays);
-  const sinceISO = since.toISOString().slice(0, 10);
+  const sinceISO = `${since.getFullYear()}-${String(since.getMonth() + 1).padStart(2, '0')}-${String(since.getDate()).padStart(2, '0')}`;
   const gave = new Map<string, number>();
   const took = new Map<string, number>();
   let structuredCount = 0;

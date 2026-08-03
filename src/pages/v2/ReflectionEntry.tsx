@@ -121,7 +121,7 @@ export default function ReflectionEntry() {
   // Saving keeps her on this screen with her picks highlighted (Gabi
   // 2026-07-30); reopening the same day re-loads today's entry into the
   // form, and a second save UPDATES it instead of adding a duplicate.
-  const todayISO = today.toISOString().slice(0, 10);
+  const todayISO = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
   const todayEntry = entries.find(
     (e) => (e.date || e.created_at || '').slice(0, 10) === todayISO && parseStructured(e.text || ''),
   );

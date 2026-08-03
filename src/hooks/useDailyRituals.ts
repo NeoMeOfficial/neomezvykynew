@@ -25,7 +25,9 @@ function isRealUser(userId: string | undefined | null): boolean {
 }
 
 function todayISODate(): string {
-  return new Date().toISOString().slice(0, 10);
+  // Local midnight, not UTC — the diary day follows the phone's clock.
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
 // ─── Reflections ────────────────────────────────────────────

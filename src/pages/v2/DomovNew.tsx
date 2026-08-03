@@ -921,10 +921,11 @@ export default function DomovNew() {
   // label uninflected — Slovak case/number agreement can't be automated
   // for custom chips.
   const { entries: diaryEntries } = useReflections();
-  const diaryTodayISO = new Date().toISOString().slice(0, 10);
+  const localISO = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const diaryTodayISO = localISO(new Date());
   const diaryYest = new Date();
   diaryYest.setDate(diaryYest.getDate() - 1);
-  const diaryYestISO = diaryYest.toISOString().slice(0, 10);
+  const diaryYestISO = localISO(diaryYest);
   const diarySavedToday = diaryEntries.some(
     (e) => (e.date || e.created_at || '').slice(0, 10) === diaryTodayISO && parseStructured(e.text || ''),
   );
