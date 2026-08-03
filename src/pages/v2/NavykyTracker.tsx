@@ -135,8 +135,8 @@ function TickHint() {
 function EndHint() {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginTop: 6 }}>
-      <span style={{ width: 18, height: 18, borderRadius: 999, border: `1px solid ${CORAL}66`, display: 'grid', placeItems: 'center', flexShrink: 0, boxSizing: 'border-box' }}>
-        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke={CORAL} strokeWidth="2.6" strokeLinecap="round">
+      <span style={{ width: 18, height: 18, borderRadius: 999, background: CORAL, display: 'grid', placeItems: 'center', flexShrink: 0 }}>
+        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round">
           <path d="M6 6l12 12M18 6L6 18" />
         </svg>
       </span>
