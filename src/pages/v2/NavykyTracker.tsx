@@ -520,42 +520,6 @@ export default function NavykyTracker() {
                       Ťukni ↑
                     </div>
                   )}
-                  {!done && (
-                    <>
-                      <button
-                        onClick={() => toggleSkip(h.id)}
-                        aria-label={skippedToday ? 'Zajtra to skúsim zas' : 'Dnes to nevyšlo'}
-                        style={{
-                          position: 'absolute',
-                          bottom: 11,
-                          right: 14,
-                          width: 24,
-                          height: 24,
-                          borderRadius: 999,
-                          cursor: 'pointer',
-                          background: skippedToday ? CORAL : 'rgba(61,41,33,0.06)',
-                          border: skippedToday ? '1px solid transparent' : `1px solid ${NM.HAIR_2}`,
-                          display: 'grid',
-                          placeItems: 'center',
-                          padding: 0,
-                          zIndex: 1,
-                        }}
-                      >
-                        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke={skippedToday ? '#fff' : 'rgba(61,41,33,0.30)'} strokeWidth="2.6" strokeLinecap="round">
-                          <path d="M6 6l12 12M18 6L6 18" />
-                        </svg>
-                      </button>
-                      {!open && (
-                        <div style={{ position: 'absolute', bottom: 40, right: 3, width: 78, textAlign: 'center', fontFamily: NM.SANS, fontSize: 9.5, lineHeight: 1.35, color: skippedToday ? NM.MUTED : CORAL, fontWeight: 600, zIndex: 1, pointerEvents: 'none' }}>
-                          {skippedToday ? (
-                            <>Zajtra to<br />skúsiš zas ✓</>
-                          ) : (
-                            <>Dnes to nevyšlo?<br />Skúsiš zajtra.<br />Ťukni ↓</>
-                          )}
-                        </div>
-                      )}
-                    </>
-                  )}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '15px 58px 15px 16px' }}>
                     <div role="button" onClick={() => { setExpandedId(open ? null : h.id); setBackfillId(null); }} style={{ flex: 1, minWidth: 0, cursor: 'pointer' }}>
                       <div style={{ fontFamily: NM.SERIF, fontSize: 17, color: NM.DEEP, fontWeight: 600, lineHeight: 1.3 }}>{h.name}</div>
@@ -576,12 +540,29 @@ export default function NavykyTracker() {
                   )}
 
                   {!open && (
-                    <div
-                      role="button"
-                      onClick={() => { setExpandedId(h.id); setBackfillId(null); }}
-                      style={{ padding: done ? '0 48px 13px 16px' : '0 88px 46px 16px', fontFamily: NM.SANS, fontSize: 11, color: NM.GOLD, fontWeight: 500, cursor: 'pointer' }}
-                    >
-                      Pozri si svoje dni ›
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '0 16px 13px' }}>
+                      <div
+                        role="button"
+                        onClick={() => { setExpandedId(h.id); setBackfillId(null); }}
+                        style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.GOLD, fontWeight: 500, cursor: 'pointer' }}
+                      >
+                        Pozri si svoje dni ›
+                      </div>
+                      {!done && (
+                        <button
+                          onClick={() => toggleSkip(h.id)}
+                          style={{ all: 'unset', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
+                        >
+                          <span style={{ fontFamily: NM.SANS, fontSize: 10.5, color: skippedToday ? NM.MUTED : CORAL, fontWeight: 600 }}>
+                            {skippedToday ? 'Zajtra to skúsiš zas ✓' : 'Dnes nevyšlo? Ťukni →'}
+                          </span>
+                          <span style={{ width: 20, height: 20, borderRadius: 999, background: skippedToday ? CORAL : 'rgba(61,41,33,0.06)', border: skippedToday ? '1px solid transparent' : `1px solid ${NM.HAIR_2}`, display: 'grid', placeItems: 'center', flexShrink: 0, boxSizing: 'border-box' }}>
+                            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke={skippedToday ? '#fff' : 'rgba(61,41,33,0.30)'} strokeWidth="2.6" strokeLinecap="round">
+                              <path d="M6 6l12 12M18 6L6 18" />
+                            </svg>
+                          </span>
+                        </button>
+                      )}
                     </div>
                   )}
 
@@ -655,13 +636,28 @@ export default function NavykyTracker() {
                           </button>
                         </div>
                       ) : (
-                        <div style={{ display: 'flex', gap: 18, marginTop: 12 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginTop: 12 }}>
                           <button
                             onClick={() => setBackfillId(h.id)}
                             style={{ all: 'unset', cursor: 'pointer', fontFamily: NM.SANS, fontSize: 12, color: NM.GOLD, fontWeight: 500 }}
                           >
                             Zabudla si si zaznačiť?
                           </button>
+                          {!done && (
+                            <button
+                              onClick={() => toggleSkip(h.id)}
+                              style={{ all: 'unset', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
+                            >
+                              <span style={{ fontFamily: NM.SANS, fontSize: 10.5, color: skippedToday ? NM.MUTED : CORAL, fontWeight: 600 }}>
+                                {skippedToday ? 'Zajtra zas ✓' : 'Dnes nevyšlo?'}
+                              </span>
+                              <span style={{ width: 20, height: 20, borderRadius: 999, background: skippedToday ? CORAL : 'rgba(61,41,33,0.06)', border: skippedToday ? '1px solid transparent' : `1px solid ${NM.HAIR_2}`, display: 'grid', placeItems: 'center', flexShrink: 0, boxSizing: 'border-box' }}>
+                                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke={skippedToday ? '#fff' : 'rgba(61,41,33,0.30)'} strokeWidth="2.6" strokeLinecap="round">
+                                  <path d="M6 6l12 12M18 6L6 18" />
+                                </svg>
+                              </span>
+                            </button>
+                          )}
                         </div>
                       )}
                     </div>
