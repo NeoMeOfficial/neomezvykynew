@@ -1141,7 +1141,11 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
                   type="button"
                   aria-label={`Vymazať ${s.l}`}
                   onClick={() => {
-                    if (s.custom) removeCustomSymptom(s.k);
+                    // History is untouchable: a custom symptom with logged
+                    // days is only HIDDEN (its definition must survive so
+                    // past months keep rendering it); truly deleted only
+                    // when it was never used.
+                    if (s.custom && (symptomCounts.get(s.k) ?? 0) === 0) removeCustomSymptom(s.k);
                     else hideSymptomChip(s.k);
                     setSymptomDeleteFor(null);
                   }}
