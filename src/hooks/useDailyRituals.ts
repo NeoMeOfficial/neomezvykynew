@@ -322,6 +322,8 @@ export type SymptomMap = Record<string, number>;
 export interface SymptomDay {
   date: string;
   symptoms: SymptomMap;
+  /** Free-text day note (Gabi 2026-08-13) — shown as a pen in the calendar. */
+  note?: string | null;
 }
 
 const SYMPTOMS_DEMO_KEY = 'neome_cycle_symptoms_demo';
@@ -388,12 +390,22 @@ export function useCycleSymptoms() {
     // months and the symptom filter looks for cross-cycle patterns.
     const since = new Date();
     since.setDate(since.getDate() - 366);
-    const { data } = await supabase
+    let { data, error } = await supabase
       .from('cycle_symptoms')
-      .select('date, symptoms')
+      .select('date, symptoms, note')
       .eq('user_id', user!.id)
       .gte('date', since.toISOString().slice(0, 10))
       .order('date', { ascending: false });
+    if (error) {
+      // The note column ships via migration — fall back gracefully until
+      // it's applied so the whole cycle screen never breaks.
+      ({ data } = await supabase
+        .from('cycle_symptoms')
+        .select('date, symptoms')
+        .eq('user_id', user!.id)
+        .gte('date', since.toISOString().slice(0, 10))
+        .order('date', { ascending: false }));
+    }
     setDays((data as SymptomDay[] | null) ?? []);
     setLoading(false);
   }, [real, user?.id]);
@@ -408,18 +420,22 @@ export function useCycleSymptoms() {
   // from the calendar day-detail sheet share this path.
   const toggleSymptomForDate = useCallback(
     async (date: string, key: string) => {
-      const entry = days.find((d) => d.date === date)?.symptoms ?? {};
+      const existing = days.find((d) => d.date === date);
+      const entry = existing?.symptoms ?? {};
+      const note = existing?.note ?? null;
       const current = entry[key] ?? 0;
       const next = current > 0 ? 0 : 1;
       const nextMap = { ...entry };
       if (next > 0) nextMap[key] = next;
       else delete nextMap[key];
 
-      // Optimistic local update
+      // Optimistic local update — a day with a note survives losing its
+      // last symptom.
+      const rowEmpty = Object.keys(nextMap).length === 0 && !note;
       const otherDays = days.filter((d) => d.date !== date);
-      const updatedDays = Object.keys(nextMap).length === 0
+      const updatedDays = rowEmpty
         ? otherDays
-        : [{ date, symptoms: nextMap }, ...otherDays];
+        : [{ date, symptoms: nextMap, note }, ...otherDays];
       setDays(updatedDays);
 
       // Free tier: toggles stay on-screen for the session only —
@@ -431,7 +447,7 @@ export function useCycleSymptoms() {
         return;
       }
       // Upsert by (user_id, date)
-      if (Object.keys(nextMap).length === 0) {
+      if (rowEmpty) {
         const { error } = await supabase
           .from('cycle_symptoms')
           .delete()
@@ -454,6 +470,43 @@ export function useCycleSymptoms() {
   const toggleSymptom = useCallback(
     (key: string) => toggleSymptomForDate(todayISODate(), key),
     [toggleSymptomForDate],
+  );
+
+  // Set/clear the free-text note for any date. Same persistence rules as
+  // symptoms (Plus persists, free is session-only, demo → localStorage).
+  const setNoteForDate = useCallback(
+    async (date: string, noteRaw: string) => {
+      const trimmed = noteRaw.trim();
+      const note = trimmed || null;
+      const symptoms = days.find((d) => d.date === date)?.symptoms ?? {};
+      const rowEmpty = Object.keys(symptoms).length === 0 && !note;
+      const otherDays = days.filter((d) => d.date !== date);
+      const updatedDays = rowEmpty ? otherDays : [{ date, symptoms, note }, ...otherDays];
+      setDays(updatedDays);
+
+      if (!isPremium) return;
+      if (!real) {
+        saveDemoSymptoms(updatedDays);
+        return;
+      }
+      if (rowEmpty) {
+        const { error } = await supabase
+          .from('cycle_symptoms')
+          .delete()
+          .eq('user_id', user!.id)
+          .eq('date', date);
+        if (error) console.warn('[symptoms] note delete failed', error.message);
+      } else {
+        const { error } = await supabase
+          .from('cycle_symptoms')
+          .upsert(
+            { user_id: user!.id, date, symptoms, note },
+            { onConflict: 'user_id,date' },
+          );
+        if (error) console.warn('[symptoms] note upsert failed', error.message);
+      }
+    },
+    [days, real, user?.id, isPremium],
   );
 
   // Helper: list of dates (YYYY-MM-DD) in the last 60 days that have any symptom logged.
@@ -499,6 +552,7 @@ export function useCycleSymptoms() {
     loading,
     toggleSymptom,
     toggleSymptomForDate,
+    setNoteForDate,
     refresh,
     customDefs,
     addCustomSymptom,

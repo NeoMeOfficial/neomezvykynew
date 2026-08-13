@@ -354,6 +354,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     symptomDates,
     toggleSymptom,
     toggleSymptomForDate,
+    setNoteForDate,
     customDefs,
     addCustomSymptom,
     removeCustomSymptom,
@@ -361,6 +362,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
   const { isPremium } = useSubscription();
   const [addingSymptom, setAddingSymptom] = useState(false);
   const [newSymptomText, setNewSymptomText] = useState('');
+  const [noteEditing, setNoteEditing] = useState(false);
   // Long-press any symptom chip → ✕ to remove it (custom chips are
   // deleted, preset chips hidden per device; history and the calendar
   // filter keep working — Gabi 2026-08-03).
@@ -401,6 +403,9 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
   const symptomDays: number[] = symptomDates
     .filter((d) => d.startsWith(ym))
     .map((d) => parseInt(d.slice(8, 10), 10));
+  const noteDays: number[] = symptomDayEntries
+    .filter((d) => (d.note ?? '').trim() && d.date.startsWith(ym))
+    .map((d) => parseInt(d.date.slice(8, 10), 10));
 
   const SYMPTOM_DEFS = [
     { l: 'Energická',     k: 'energetic' },
@@ -613,6 +618,23 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
             </div>
           </>
         ) : null}
+
+        {/* Poznámka dňa — editable for today and past days; future days
+            have nothing to note yet. */}
+        {selectedDateISO && (selectedIsPast || selectedIsToday) && (
+          <>
+            <Eye size={10} style={{ marginTop: 18, marginBottom: 8 }}>Poznámka</Eye>
+            <textarea
+              key={selectedDateISO}
+              defaultValue={symptomDayEntries.find((e) => e.date === selectedDateISO)?.note ?? ''}
+              rows={3}
+              maxLength={500}
+              placeholder="Napíš si čokoľvek k tomuto dňu…"
+              onBlur={(e) => setNoteForDate(selectedDateISO, e.target.value)}
+              style={{ width: '100%', padding: '12px 14px', borderRadius: 14, border: `1px solid ${NM.HAIR_2}`, fontFamily: NM.SERIF, fontSize: 14, color: NM.DEEP, background: '#fff', outline: 'none', resize: 'none', lineHeight: 1.5, boxSizing: 'border-box' }}
+            />
+          </>
+        )}
 
         {!isPremium && (
           <div style={{ marginTop: 18, padding: '12px 14px', borderRadius: 14, background: TINT.GOLD_SOFT, border: `1px solid ${NM.GOLD}55` }}>
@@ -929,6 +951,15 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
                   color: today || filterHit ? '#fff' : c.mute ? 'rgba(61,41,33,0.40)' : NM.DEEP,
                   opacity: c.mute ? 0.5 : 1,
                 }}>{c.d}</div>
+                {!c.mute && noteDays.includes(c.d) && (
+                  <svg
+                    width="8" height="8" viewBox="0 0 24 24" fill="none"
+                    stroke={today || filterHit ? '#fff' : NM.GOLD} strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"
+                    style={{ position: 'absolute', top: 2.5, right: 3, opacity: symptomFilter !== null && !filterHit ? 0.25 : 1 }}
+                  >
+                    <path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4L16.5 3.5z" />
+                  </svg>
+                )}
                 {sym && (
                   <div style={{ position: 'absolute', bottom: 2.5, display: 'flex', gap: 1.5, opacity: symptomFilter !== null && !filterHit ? 0.25 : 1 }}>
                     {[0, 1, 2].map((k) => (
@@ -1263,8 +1294,51 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
             </button>
           )}
         </div>
+        {/* Poznámka k dnešku (Gabi 2026-08-13) — pen in the calendar */}
+        {(() => {
+          const todayNote = (symptomDayEntries.find((e) => e.date === todayISO)?.note ?? '').trim();
+          if (noteEditing) {
+            return (
+              <textarea
+                autoFocus
+                defaultValue={todayNote}
+                rows={3}
+                maxLength={500}
+                placeholder="Napíš si čokoľvek k dnešnému dňu…"
+                onBlur={(e) => { setNoteForDate(todayISO, e.target.value); setNoteEditing(false); }}
+                style={{ width: '100%', marginTop: 12, padding: '12px 14px', borderRadius: 14, border: `1px solid ${NM.GOLD}66`, fontFamily: NM.SERIF, fontSize: 14, color: NM.DEEP, background: NM.BG, outline: 'none', resize: 'none', lineHeight: 1.5, boxSizing: 'border-box' }}
+              />
+            );
+          }
+          if (todayNote) {
+            return (
+              <div
+                role="button"
+                onClick={() => setNoteEditing(true)}
+                style={{ marginTop: 12, padding: '11px 14px', borderRadius: 14, background: NM.BG, border: `1px solid ${NM.HAIR}`, cursor: 'pointer', display: 'flex', gap: 8, alignItems: 'flex-start' }}
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={NM.GOLD} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 2 }}>
+                  <path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4L16.5 3.5z" />
+                </svg>
+                <div style={{ fontFamily: NM.SERIF, fontSize: 13.5, color: NM.DEEP, lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>{todayNote}</div>
+              </div>
+            );
+          }
+          return (
+            <button
+              type="button"
+              onClick={() => setNoteEditing(true)}
+              style={{ all: 'unset', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 12, padding: '7px 13px', borderRadius: 999, color: NM.GOLD, border: `1px dashed ${NM.GOLD}66`, fontFamily: NM.SANS, fontSize: 12.5, fontWeight: 500 }}
+            >
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4L16.5 3.5z" />
+              </svg>
+              Pridaj si poznámku
+            </button>
+          );
+        })()}
         <div style={{ fontFamily: NM.SANS, fontSize: 10.5, color: NM.TERTIARY, fontWeight: 400, marginTop: 12, lineHeight: 1.45 }}>
-          Označenia sa ukladajú automaticky — deň so záznamom dostane v kalendári bodku.
+          Označenia sa ukladajú automaticky — deň so záznamom dostane v kalendári bodku, deň s poznámkou pero.
         </div>
 
         {/* Connector: question above → answer below */}
