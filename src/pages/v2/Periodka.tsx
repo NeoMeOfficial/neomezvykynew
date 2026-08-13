@@ -458,6 +458,14 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     const cycleDay = ((daysSince % totalDays) + totalDays) % totalDays + 1;
     return phases.find((ph) => cycleDay >= ph.start && cycleDay <= ph.end)?.key ?? null;
   };
+  const cycleDayForDateISO = (iso: string): number | null => {
+    if (!cycleData.lastPeriodStart) return null;
+    const target = new Date(iso + 'T00:00:00');
+    const start = new Date(cycleData.lastPeriodStart + 'T00:00:00');
+    const daysSince = Math.floor((target.getTime() - start.getTime()) / 86400000);
+    return ((daysSince % totalDays) + totalDays) % totalDays + 1;
+  };
+
   const filterPhaseSummary = (() => {
     if (!symptomFilter || filteredDates.length === 0) return null;
     const perPhase = new Map<string, number>();
@@ -467,7 +475,15 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     }
     let top: { key: string; n: number } | null = null;
     for (const [key, n] of perPhase) if (!top || n > top.n) top = { key, n };
-    return { total: filteredDates.length, top };
+    // Which CYCLE DAYS it last happened on — the number she can apply to
+    // her next cycle ("okolo 10. dňa to príde zas") (Gabi 2026-08-13).
+    const recentDays: number[] = [];
+    for (const iso of [...filteredDates].sort().slice(-3)) {
+      const cd = cycleDayForDateISO(iso);
+      if (cd !== null && !recentDays.includes(cd)) recentDays.push(cd);
+    }
+    recentDays.sort((a, b) => a - b);
+    return { total: filteredDates.length, top, recentDays };
   })();
 
   // ── Day-detail sheet (tap on a calendar day) ────────────────────────
@@ -1112,6 +1128,15 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
                     <div style={{ fontFamily: NM.SANS, fontSize: 12, color: NM.DEEP, fontWeight: 500, lineHeight: 1.45 }}>
                       {activeFilterDef.l} — {filterPhaseSummary.total}× za posledných 12 mesiacov
                     </div>
+                    {filterPhaseSummary.recentDays.length > 0 && (
+                      <div style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.DEEP, marginTop: 3, lineHeight: 1.45 }}>
+                        Naposledy si sa tak cítila na{' '}
+                        <strong style={{ fontWeight: 600 }}>
+                          {filterPhaseSummary.recentDays.map((d) => `${d}.`).join(' a ').replace(/ a (?=.* a )/g, ', ')}
+                        </strong>{' '}
+                        deň tvojho cyklu.
+                      </div>
+                    )}
                     {filterPhaseSummary.top && filterPhaseSummary.total >= 2 && (
                       <div style={{ fontFamily: NM.SANS, fontSize: 11.5, color: 'rgba(61,41,33,0.6)', marginTop: 3, lineHeight: 1.45 }}>
                         Najčastejšie {PHASE_LOCATIVE[filterPhaseSummary.top.key] ?? ''} ({filterPhaseSummary.top.n}×). Zlaté dni v kalendári sú dni so záznamom — listuj šípkami aj do minulých mesiacov.
