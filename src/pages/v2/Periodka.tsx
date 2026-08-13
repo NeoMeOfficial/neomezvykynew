@@ -1125,10 +1125,10 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
       <div style={{ padding: '14px 18px 0' }}>
         <div style={{ background: '#fff', border: `1px solid ${NM.HAIR}`, borderRadius: 22, padding: '20px 16px 16px' }}>
           <Ser size={21} style={{ lineHeight: 1.18 }}>
-            Tvoja poznámka <em style={{ color: NM.GOLD, fontStyle: 'italic', fontWeight: 400 }}>k dnešku</em>
+            Poznámka <em style={{ color: NM.GOLD, fontStyle: 'italic', fontWeight: 400 }}>k tvojmu telu</em>
           </Ser>
           <div style={{ fontFamily: NM.SANS, fontSize: 12, color: NM.MUTED, marginTop: 6, lineHeight: 1.5 }}>
-            Čokoľvek vlastnými slovami — deň s poznámkou dostane v kalendári pero ✎.
+            Špinenie, bolesť, lieky či ovulačný test — čokoľvek, čo chceš pri tomto dni v kalendári nájsť aj o pár mesiacov (pod perom ✎).
           </div>
           {noteEditing ? (
             <textarea
@@ -1164,6 +1164,10 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
               Pridaj si poznámku
             </button>
           )}
+          <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.TERTIARY, marginTop: 12, lineHeight: 1.5 }}>
+            Aký bol tvoj deň a ako si sa cítila v duši, patrí do{' '}
+            <span role="button" onClick={() => navigate('/kniznica/dennik')} style={{ color: NM.GOLD, fontWeight: 500, cursor: 'pointer' }}>Denníka ›</span>
+          </div>
         </div>
       </div>
   );
