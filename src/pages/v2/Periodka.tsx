@@ -1125,10 +1125,10 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
       <div style={{ padding: '14px 18px 0' }}>
         <div style={{ background: '#fff', border: `1px solid ${NM.HAIR}`, borderRadius: 22, padding: '20px 16px 16px' }}>
           <Ser size={21} style={{ lineHeight: 1.18 }}>
-            Poznámka <em style={{ color: NM.GOLD, fontStyle: 'italic', fontWeight: 400 }}>k tvojmu telu</em>
+            Poznámka <em style={{ color: NM.GOLD, fontStyle: 'italic', fontWeight: 400 }}>k dnešku</em>
           </Ser>
           <div style={{ fontFamily: NM.SANS, fontSize: 12, color: NM.MUTED, marginTop: 6, lineHeight: 1.5 }}>
-            Špinenie, bolesť, lieky či ovulačný test — čokoľvek, čo chceš pri tomto dni v kalendári nájsť aj o pár mesiacov (pod perom ✎).
+            Čo sa nedá odtiknúť hore: detaily a výnimky — „zabudla som tabletku", „bolesť silnejšia než inokedy", „stresový týždeň". V kalendári ju nájdeš pod perom ✎.
           </div>
           {noteEditing ? (
             <textarea
