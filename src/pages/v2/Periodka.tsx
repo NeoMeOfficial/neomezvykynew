@@ -483,6 +483,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     : null;
   const todayISO = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
   const selectedIsToday = selectedDateISO === todayISO;
+  const todayNoteText = (symptomDayEntries.find((e) => e.date === todayISO)?.note ?? '').trim();
   const selectedIsPast = !!selectedDateISO && selectedDateISO < todayISO;
   const selectedSymptomLabels = selectedDateISO
     ? Object.keys(symptomDayEntries.find((e) => e.date === selectedDateISO)?.symptoms ?? {})
@@ -1012,6 +1013,56 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
           })}
         </div>
 
+        {/* Poznámka k dnešku — lives WITH the calendar it marks (Gabi
+            2026-08-13): write here, find it later under the pen ✎. */}
+        <div style={{ marginTop: 12, background: '#fff', border: `1px solid ${NM.HAIR}`, borderRadius: 14, padding: '12px 14px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+            <div style={{ fontFamily: NM.SANS, fontSize: 13, color: NM.DEEP, fontWeight: 500 }}>
+              Poznámka <em style={{ fontFamily: NM.SERIF, fontStyle: 'italic', color: NM.GOLD }}>k dnešku</em>
+            </div>
+            {!noteEditing && !todayNoteText && (
+              <button
+                type="button"
+                onClick={() => setNoteEditing(true)}
+                aria-label="Pridaj si poznámku"
+                style={{ all: 'unset', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 5, padding: '5px 11px', borderRadius: 999, color: NM.GOLD, border: `1px dashed ${NM.GOLD}66`, fontFamily: NM.SANS, fontSize: 11.5, fontWeight: 500 }}
+              >
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4L16.5 3.5z" />
+                </svg>
+                Pridať
+              </button>
+            )}
+          </div>
+          {noteEditing ? (
+            <textarea
+              autoFocus
+              defaultValue={todayNoteText}
+              rows={3}
+              maxLength={500}
+              placeholder={'Detaily a výnimky dňa — „zabudla som tabletku", „bolesť silnejšia než inokedy"…'}
+              onBlur={(e) => { setNoteForDate(todayISO, e.target.value); setNoteEditing(false); }}
+              style={{ width: '100%', marginTop: 10, padding: '11px 13px', borderRadius: 12, border: `1px solid ${NM.GOLD}66`, fontFamily: NM.SERIF, fontSize: 14, color: NM.DEEP, background: NM.BG, outline: 'none', resize: 'none', lineHeight: 1.5, boxSizing: 'border-box' }}
+            />
+          ) : todayNoteText ? (
+            <div
+              role="button"
+              onClick={() => setNoteEditing(true)}
+              style={{ marginTop: 10, padding: '10px 12px', borderRadius: 12, background: NM.BG, border: `1px solid ${NM.HAIR}`, cursor: 'pointer', display: 'flex', gap: 8, alignItems: 'flex-start' }}
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={NM.GOLD} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 2 }}>
+                <path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4L16.5 3.5z" />
+              </svg>
+              <div style={{ fontFamily: NM.SERIF, fontSize: 13.5, color: NM.DEEP, lineHeight: 1.5, whiteSpace: 'pre-wrap', flex: 1 }}>{todayNoteText}</div>
+              <span style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.TERTIARY, flexShrink: 0 }}>Uprav</span>
+            </div>
+          ) : (
+            <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.TERTIARY, marginTop: 6, lineHeight: 1.5 }}>
+              Deň s poznámkou dostane pero ✎ — ťuknutím na deň si ju prečítaš aj doplníš spätne.
+            </div>
+          )}
+        </div>
+
         {/* Collapsible symptom filter — expands on tap */}
         {filterableSymptoms.length > 0 && (
           <div style={{ marginTop: 12 }}>
@@ -1118,60 +1169,6 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
   // Symptoms + advice as ONE visually connected card: the question
   // ("zaznač si, ako sa cítiš") flows into the answer ("čo by ti mohlo
   // pomôcť") through an arrow divider.
-  // Own card, clearly separate from the symptom chips: chips = tap what
-  // you feel, note = write anything in your own words (Gabi 2026-08-13).
-  const todayNoteText = (symptomDayEntries.find((e) => e.date === todayISO)?.note ?? '').trim();
-  const noteBlock = (
-      <div style={{ padding: '14px 18px 0' }}>
-        <div style={{ background: '#fff', border: `1px solid ${NM.HAIR}`, borderRadius: 22, padding: '20px 16px 16px' }}>
-          <Ser size={21} style={{ lineHeight: 1.18 }}>
-            Poznámka <em style={{ color: NM.GOLD, fontStyle: 'italic', fontWeight: 400 }}>k dnešku</em>
-          </Ser>
-          <div style={{ fontFamily: NM.SANS, fontSize: 12, color: NM.MUTED, marginTop: 6, lineHeight: 1.5 }}>
-            Čo sa nedá odtiknúť hore: detaily a výnimky — „zabudla som tabletku", „bolesť silnejšia než inokedy", „stresový týždeň". V kalendári ju nájdeš pod perom ✎.
-          </div>
-          {noteEditing ? (
-            <textarea
-              autoFocus
-              defaultValue={todayNoteText}
-              rows={3}
-              maxLength={500}
-              placeholder="Napíš si čokoľvek k dnešnému dňu…"
-              onBlur={(e) => { setNoteForDate(todayISO, e.target.value); setNoteEditing(false); }}
-              style={{ width: '100%', marginTop: 12, padding: '12px 14px', borderRadius: 14, border: `1px solid ${NM.GOLD}66`, fontFamily: NM.SERIF, fontSize: 14, color: NM.DEEP, background: NM.BG, outline: 'none', resize: 'none', lineHeight: 1.5, boxSizing: 'border-box' }}
-            />
-          ) : todayNoteText ? (
-            <div
-              role="button"
-              onClick={() => setNoteEditing(true)}
-              style={{ marginTop: 12, padding: '11px 14px', borderRadius: 14, background: NM.BG, border: `1px solid ${NM.HAIR}`, cursor: 'pointer', display: 'flex', gap: 8, alignItems: 'flex-start' }}
-            >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={NM.GOLD} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 2 }}>
-                <path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4L16.5 3.5z" />
-              </svg>
-              <div style={{ fontFamily: NM.SERIF, fontSize: 13.5, color: NM.DEEP, lineHeight: 1.5, whiteSpace: 'pre-wrap', flex: 1 }}>{todayNoteText}</div>
-              <span style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.TERTIARY, flexShrink: 0 }}>Uprav</span>
-            </div>
-          ) : (
-            <button
-              type="button"
-              onClick={() => setNoteEditing(true)}
-              style={{ all: 'unset', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 12, padding: '8px 14px', borderRadius: 999, color: NM.GOLD, border: `1px dashed ${NM.GOLD}66`, fontFamily: NM.SANS, fontSize: 12.5, fontWeight: 500 }}
-            >
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4L16.5 3.5z" />
-              </svg>
-              Pridaj si poznámku
-            </button>
-          )}
-          <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.TERTIARY, marginTop: 12, lineHeight: 1.5 }}>
-            Aký bol tvoj deň a ako si sa cítila v duši, patrí do{' '}
-            <span role="button" onClick={() => navigate('/kniznica/dennik')} style={{ color: NM.GOLD, fontWeight: 500, cursor: 'pointer' }}>Denníka ›</span>
-          </div>
-        </div>
-      </div>
-  );
-
   const wellbeingBlock = (
       <div style={{ padding: '24px 18px 0' }}>
         <div style={{ background: '#fff', border: `1px solid ${NM.HAIR}`, borderRadius: 22, padding: '20px 16px 10px' }}>
@@ -1430,7 +1427,6 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
           fromHome now only steers the back arrow. */}
       {todayStatsBlock}
       {wellbeingBlock}
-      {noteBlock}
       {periodCtaBlock}
       {ringBlock}
       {upcomingBlock}
