@@ -1058,7 +1058,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
             </div>
           ) : (
             <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.TERTIARY, marginTop: 6, lineHeight: 1.5 }}>
-              Deň s poznámkou dostane pero ✎ — ťuknutím na deň si ju prečítaš aj doplníš spätne.
+              Ak si potrebuješ niečo špecifické k dnešku zaznačiť, zapíš si to tu — taký deň dostane v kalendári pero ✎.
             </div>
           )}
         </div>
