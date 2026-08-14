@@ -461,10 +461,14 @@ export function useCycleSymptoms() {
             { user_id: user!.id, date, symptoms: nextMap },
             { onConflict: 'user_id,date' },
           );
-        if (error) console.warn('[symptoms] upsert failed', error.message);
+        if (error) {
+          console.warn('[symptoms] upsert failed', error.message);
+          // Resync so the UI never keeps showing state that didn't save.
+          refresh();
+        }
       }
     },
-    [days, real, user?.id, isPremium],
+    [days, real, user?.id, isPremium, refresh],
   );
 
   const toggleSymptom = useCallback(
@@ -495,7 +499,10 @@ export function useCycleSymptoms() {
           .delete()
           .eq('user_id', user!.id)
           .eq('date', date);
-        if (error) console.warn('[symptoms] note delete failed', error.message);
+        if (error) {
+          console.warn('[symptoms] note delete failed', error.message);
+          refresh();
+        }
       } else {
         const { error } = await supabase
           .from('cycle_symptoms')
@@ -503,10 +510,15 @@ export function useCycleSymptoms() {
             { user_id: user!.id, date, symptoms, note },
             { onConflict: 'user_id,date' },
           );
-        if (error) console.warn('[symptoms] note upsert failed', error.message);
+        if (error) {
+          console.warn('[symptoms] note upsert failed', error.message);
+          // A note that didn't reach the DB must not keep its pen —
+          // resyncing drops it immediately instead of overnight.
+          refresh();
+        }
       }
     },
-    [days, real, user?.id, isPremium],
+    [days, real, user?.id, isPremium, refresh],
   );
 
   // Helper: list of dates (YYYY-MM-DD) in the last 60 days that have any symptom logged.
