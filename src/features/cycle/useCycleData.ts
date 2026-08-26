@@ -244,6 +244,37 @@ export function useCycleData(accessCode?: string) {
     });
   }, [saveCycleData]);
 
+  // Correct the recorded end of the CURRENT period after the fact
+  // (Gabi 2026-08-17: ended it a day late and had nowhere to fix it).
+  // Unlike markPeriodEnded, a re-correction REPLACES the bleed length
+  // learned for this period instead of appending a second one.
+  const correctPeriodEnd = useCallback((date: Date) => {
+    setCycleData(current => {
+      if (!current.lastPeriodStart) return current;
+      const start = new Date(current.lastPeriodStart + 'T00:00:00');
+      const actualLength = differenceInDays(date, start) + 1;
+      if (actualLength < 1) return current;
+
+      const hadEnd = !!current.currentPeriodEnd && current.currentPeriodEnd >= current.lastPeriodStart;
+      const base = current.bleedLengths ?? [];
+      const bleedLengths = [...(hadEnd ? base.slice(0, -1) : base), Math.min(actualLength, 14)].slice(-6);
+      let learnedPeriodLength = current.periodLength;
+      if (bleedLengths.length >= 3) {
+        const avg = Math.round(bleedLengths.reduce((s, n) => s + n, 0) / bleedLengths.length);
+        learnedPeriodLength = Math.max(2, Math.min(10, avg));
+      }
+
+      const updated = {
+        ...current,
+        currentPeriodEnd: format(date, 'yyyy-MM-dd'),
+        bleedLengths,
+        periodLength: learnedPeriodLength,
+      };
+      saveCycleData(updated);
+      return updated;
+    });
+  }, [saveCycleData]);
+
   // Set cycle length
   const setCycleLength = useCallback((length: number) => {
     updateCycleData({ cycleLength: Math.max(21, Math.min(45, length)) });
@@ -379,6 +410,7 @@ export function useCycleData(accessCode?: string) {
     setCycleLength,
     setPeriodLength,
     markPeriodEnded,
+    correctPeriodEnd,
     addPeriodToHistory,
     updateCustomSettings,
     updateCycleData,

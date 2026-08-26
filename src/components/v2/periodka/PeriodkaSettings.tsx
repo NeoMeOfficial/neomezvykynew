@@ -137,7 +137,7 @@ function Numeral({ children, color = T.MAUVE, size = 30 }: { children: React.Rea
 }
 
 // ─── Date picker (sheet) ────────────────────────────────────────────
-function DatePickerSheet({ open, value, onClose, onChange }: { open: boolean; value: Date | null; onClose: () => void; onChange: (d: Date) => void }) {
+function DatePickerSheet({ open, value, onClose, onChange, label = 'Začiatok poslednej menštruácie', min }: { open: boolean; value: Date | null; onClose: () => void; onChange: (d: Date) => void; label?: string; min?: string }) {
   const [draft, setDraft] = useState<Date>(value ?? new Date());
   useEffect(() => {
     if (open) setDraft(value ?? new Date());
@@ -157,11 +157,12 @@ function DatePickerSheet({ open, value, onClose, onChange }: { open: boolean; va
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 14 }}>
           <div style={{ width: 38, height: 4, borderRadius: 999, background: T.HAIR_2 }} />
         </div>
-        <Eyebrow color={T.MAUVE}>Začiatok poslednej menštruácie</Eyebrow>
+        <Eyebrow color={T.MAUVE}>{label}</Eyebrow>
         <div style={{ marginTop: 14, marginBottom: 18 }}>
           <input
             type="date"
             value={iso}
+            min={min}
             max={format(new Date(), 'yyyy-MM-dd')}
             onChange={(e) => setDraft(new Date(e.target.value + 'T00:00:00'))}
             style={{
@@ -377,8 +378,20 @@ function HistoryEmpty() {
 export default function PeriodkaSettings() {
   const navigate = useNavigate();
   const requireConsent = useConsentGuard();
-  const { cycleData, setLastPeriodStart, setCycleLength, setPeriodLength, updateCycleData } = useCycleData();
+  const { cycleData, setLastPeriodStart, setCycleLength, setPeriodLength, updateCycleData, correctPeriodEnd } = useCycleData();
   const { lastPeriodStart, cycleLength, periodLength, currentPeriodEnd } = cycleData;
+  const [showEndPicker, setShowEndPicker] = useState(false);
+
+  // Actual end of the CURRENT period + bleed length computed from the
+  // two dates (Gabi 2026-08-17) — editable, so a day-late "Skončila
+  // dnes" tap can be corrected.
+  const endValid = !!currentPeriodEnd && !!lastPeriodStart && currentPeriodEnd >= lastPeriodStart;
+  const actualBleedDays = endValid
+    ? differenceInDays(
+        startOfDay(new Date(currentPeriodEnd! + 'T00:00:00')),
+        startOfDay(new Date(lastPeriodStart! + 'T00:00:00')),
+      ) + 1
+    : null;
 
   // ?pick=1 (from the tracker's "Začala skôr — vybrať dátum") opens the
   // date picker immediately so backdating a period start is one tap.
@@ -518,6 +531,18 @@ export default function PeriodkaSettings() {
         onAction={() => setShowPicker(true)}
       />
 
+      {lastPeriodStart && (
+        <DateCard
+          label="Koniec poslednej menštruácie"
+          date={endValid ? fmtFullDate(new Date(currentPeriodEnd! + 'T00:00:00')) : 'Ešte nezaznačený'}
+          action="Zmeniť"
+          onAction={() => setShowEndPicker(true)}
+          note={actualBleedDays
+            ? `Krvácanie trvalo ${actualBleedDays} ${actualBleedDays === 1 ? 'deň' : actualBleedDays <= 4 ? 'dni' : 'dní'} — prepočítava sa automaticky z dátumov.`
+            : 'Zaznač koniec a dĺžka krvácania sa prepočíta automaticky.'}
+        />
+      )}
+
       <NumPicker
         label="Dĺžka cyklu"
         hint="Priemerná dĺžka medzi prvými dňami dvoch menštruácií."
@@ -583,6 +608,19 @@ export default function PeriodkaSettings() {
         onChange={(d) => {
           handlePeriodStarted(d);
           setShowPicker(false);
+        }}
+      />
+
+      <DatePickerSheet
+        open={showEndPicker}
+        label="Koniec poslednej menštruácie"
+        min={lastPeriodStart ?? undefined}
+        value={endValid ? new Date(currentPeriodEnd! + 'T00:00:00') : new Date()}
+        onClose={() => setShowEndPicker(false)}
+        onChange={(d) => {
+          correctPeriodEnd(d);
+          setShowEndPicker(false);
+          toast.success('Koniec menštruácie upravený');
         }}
       />
     </div>
