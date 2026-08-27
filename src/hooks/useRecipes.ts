@@ -4,7 +4,9 @@ import { supabase } from '@/lib/supabase';
 export interface SupabaseIngredient {
   raw: string;
   name: string;
-  grams: number;
+  grams: number | null;
+  /** Section label inside the list ("OMÁČKA", "NA PLACKY") — not a food. */
+  header?: boolean;
 }
 
 export interface SupabaseRecipe {
@@ -22,6 +24,55 @@ export interface SupabaseRecipe {
   coverage_pct: number | null;
   usage_count: number;
   active: boolean;
+  /** Browsing categories (2026-08-28 library) — a recipe may sit in several. */
+  categories?: string[] | null;
+  /** Ingredient amounts are for this many portions; kcal is per portion. */
+  servings?: number | null;
+  vegetarian?: boolean | null;
+  image_url?: string | null;
+}
+
+// Six browsing categories (Gabi 2026-08-28). `slot` stays the 3-valued
+// meal-planner slot; these drive the Strava section and the browser.
+export type RecipeCategory = 'ranajky' | 'hlavne' | 'salaty' | 'natierky' | 'snacky' | 'napoje';
+export const CATEGORY_KEYS: RecipeCategory[] = ['ranajky', 'hlavne', 'salaty', 'natierky', 'snacky', 'napoje'];
+export const CATEGORY_LABEL: Record<RecipeCategory, string> = {
+  ranajky: 'Raňajky',
+  hlavne: 'Hlavné jedlá a polievky',
+  salaty: 'Šaláty',
+  natierky: 'Nátierky',
+  snacky: 'Snacky a dezerty',
+  napoje: 'Nápoje a smoothie',
+};
+const SLOT_TO_CATEGORY: Record<SupabaseRecipe['slot'], RecipeCategory> = { ranajky: 'ranajky', hlavne: 'hlavne', snack: 'snacky' };
+
+/** Categories of a recipe — falls back to its planner slot for rows
+ *  imported before the categories column existed. */
+export function recipeCategories(r: Pick<SupabaseRecipe, 'slot' | 'categories'>): RecipeCategory[] {
+  const cats = (r.categories ?? []).filter((c): c is RecipeCategory => (CATEGORY_KEYS as string[]).includes(c));
+  return cats.length > 0 ? cats : [SLOT_TO_CATEGORY[r.slot]];
+}
+
+export function recipeCategoryLabel(r: Pick<SupabaseRecipe, 'slot' | 'categories'>): string {
+  return recipeCategories(r).map((c) => CATEGORY_LABEL[c]).join(' · ');
+}
+
+export function servingsLabel(n: number | null | undefined): string | null {
+  if (!n || n < 1) return null;
+  return `Recept na ${n} ${n === 1 ? 'porciu' : n <= 4 ? 'porcie' : 'porcií'}`;
+}
+
+// Stock cover per category until real photos land (Gabi: later).
+const CATEGORY_IMG: Record<RecipeCategory, string> = {
+  ranajky: '/images/r9/testimonial-recipe.jpg',
+  hlavne: '/images/r9/section-nutrition.jpg',
+  salaty: '/images/r9/blog-iron-rich-foods.jpg',
+  natierky: '/images/r9/blog-luteal-nutrition.jpg',
+  snacky: '/images/r9/hero-yoga.jpg',
+  napoje: '/images/r9/testimonial-recipe.jpg',
+};
+export function categoryImage(c: RecipeCategory): string {
+  return CATEGORY_IMG[c];
 }
 
 export const SLOT_LABEL: Record<SupabaseRecipe['slot'], string> = {
@@ -33,7 +84,7 @@ export const SLOT_LABEL: Record<SupabaseRecipe['slot'], string> = {
 // First FREE_PER_SLOT recipes per slot (sorted by name) are accessible on free tier.
 export const FREE_PER_SLOT = 10;
 
-const CACHE_KEY = 'neome_recipes_v2';
+const CACHE_KEY = 'neome_recipes_v3';
 // Recipe fixes must reach users promptly — iOS standalone PWAs keep a
 // session alive for days, so an unversioned sessionStorage entry served
 // stale data indefinitely. Entries older than this refetch.
@@ -107,10 +158,12 @@ export function dailyRecipeOf(recipes: SupabaseRecipe[]): SupabaseRecipe | null 
   return recipes[(now.getFullYear() * 366 + doy) % recipes.length];
 }
 
-/** Slot-based cover image (full path) for recipes without own photos. */
-export function recipeImage(r: Pick<SupabaseRecipe, 'slot'> | null | undefined): string {
-  if (r?.slot === 'hlavne') return '/images/r9/section-nutrition.jpg';
-  return '/images/r9/testimonial-recipe.jpg';
+/** Cover image (full path): the recipe's own photo when it has one,
+ *  else the stock image of its first category. */
+export function recipeImage(r: Pick<SupabaseRecipe, 'slot' | 'categories' | 'image_url'> | null | undefined): string {
+  if (!r) return '/images/r9/testimonial-recipe.jpg';
+  if (r.image_url) return r.image_url;
+  return CATEGORY_IMG[recipeCategories(r)[0]];
 }
 
 export function useRecipes() {

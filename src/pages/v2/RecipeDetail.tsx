@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useUniversalFavorites } from '../../hooks/useUniversalFavorites';
-import { useRecipe, SLOT_LABEL } from '@/hooks/useRecipes';
+import { useRecipe, recipeCategoryLabel, recipeImage, servingsLabel } from '@/hooks/useRecipes';
 import { useMealPlan } from '../../features/nutrition/useMealPlan';
 import { useSubscription } from '../../contexts/SubscriptionContext';
 import { useEntitlement } from '../../hooks/useEntitlement';
@@ -16,11 +16,6 @@ import { BackHeader, Eye, Ser, Body, NM } from '../../components/v2/neome';
  * days + slots; tapping a slot inserts the recipe via
  * useMealPlan.setRecipeForSlot and closes the sheet.
  */
-
-function recipeHeroImg(slot: string): string {
-  if (slot === 'hlavne') return 'section-nutrition.jpg';
-  return 'testimonial-recipe.jpg';
-}
 
 function instructionSteps(text: string | null): string[] {
   if (!text) return [];
@@ -119,7 +114,7 @@ export default function RecipeDetail() {
         style={{
           height: 340,
           position: 'relative',
-          backgroundImage: `url(/images/r9/${recipeHeroImg(recipe.slot)})`,
+          backgroundImage: `url(${recipeImage(recipe)})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -147,9 +142,15 @@ export default function RecipeDetail() {
         {/* Title section */}
         <div style={{ padding: '0 18px 22px' }}>
           <Eye color={NM.GOLD} style={{ marginBottom: 12 }}>
-            {SLOT_LABEL[recipe.slot]}{recipe.prep_minutes ? ` · ${recipe.prep_minutes} min` : ''}
+            {recipeCategoryLabel(recipe)}{recipe.prep_minutes ? ` · ${recipe.prep_minutes} min` : ''}
           </Eye>
           <Ser size={32} style={{ lineHeight: 1.02, marginBottom: 14 }}>{recipe.name}</Ser>
+          {/* Amounts below are for the whole batch; kcal is per portion (Gabi 2026-08-28) */}
+          {servingsLabel(recipe.servings) && (
+            <div style={{ fontFamily: NM.SANS, fontSize: 12.5, color: NM.MUTED, marginTop: -4 }}>
+              {servingsLabel(recipe.servings)}{recipe.vegetarian ? ' · bezmäsité' : ''}
+            </div>
+          )}
         </div>
 
         {/* Macros strip */}
@@ -172,11 +173,18 @@ export default function RecipeDetail() {
         {/* Ingredients */}
         {recipe.ingredients.length > 0 && (
           <div style={{ padding: '22px 18px 22px', borderBottom: `1px solid ${NM.HAIR}` }}>
-            <Eye style={{ marginBottom: 16 }}>Suroviny · {recipe.ingredients.length}</Eye>
+            <Eye style={{ marginBottom: 16 }}>Suroviny · {recipe.ingredients.filter((ing) => !ing.header).length}</Eye>
             <div>
               {recipe.ingredients.map((ing, i) => {
                 const checked = checkedIngredients.has(i);
                 const label = ing.raw || (ing.grams ? `${ing.grams}g ${ing.name}` : ing.name);
+                if (ing.header) {
+                  return (
+                    <div key={i} style={{ padding: '14px 0 4px', fontFamily: NM.SANS, fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: NM.GOLD, fontWeight: 600 }}>
+                      {label}
+                    </div>
+                  );
+                }
                 return (
                   <button
                     key={i}

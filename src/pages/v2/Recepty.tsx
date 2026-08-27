@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useRecipes, SLOT_LABEL, type SupabaseRecipe } from '@/hooks/useRecipes';
+import { useRecipes, recipeCategories, recipeCategoryLabel, recipeImage, CATEGORY_KEYS, CATEGORY_LABEL, type SupabaseRecipe, type RecipeCategory } from '@/hooks/useRecipes';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import { useUniversalFavorites } from '@/hooks/useUniversalFavorites';
 import { Page, BackHeader, Eye, NM } from '../../components/v2/neome';
@@ -15,27 +15,16 @@ import PlusUnlockBanner from '../../components/v2/paywall/PlusUnlockBanner';
  * useEntitlement and routes to /paywall when the quota is exhausted.
  */
 
-const CATEGORY_QUERY_MAP: Record<string, SupabaseRecipe['slot']> = {
-  ranajky:  'ranajky',
-  obedy:    'hlavne',
-  vecera:   'hlavne',
-  snacky:   'snack',
-  napoje:   'snack',
-  hlavne:   'hlavne',
-  snack:    'snack',
+// ?cat= accepts the six category keys plus legacy aliases.
+const CATEGORY_QUERY_MAP: Record<string, RecipeCategory> = {
+  ranajky: 'ranajky', hlavne: 'hlavne', salaty: 'salaty', natierky: 'natierky', snacky: 'snacky', napoje: 'napoje',
+  obedy: 'hlavne', vecera: 'hlavne', snack: 'snacky',
 };
 
-const SLOT_CHIPS: { id: SupabaseRecipe['slot'] | 'all'; label: string }[] = [
-  { id: 'all',     label: 'Všetko' },
-  { id: 'ranajky', label: 'Raňajky' },
-  { id: 'hlavne',  label: 'Hlavné' },
-  { id: 'snack',   label: 'Snacky' },
+const CATEGORY_CHIPS: { id: RecipeCategory | 'all'; label: string }[] = [
+  { id: 'all', label: 'Všetko' },
+  ...CATEGORY_KEYS.map((id) => ({ id, label: CATEGORY_LABEL[id] })),
 ];
-
-function recipeImg(r: SupabaseRecipe): string {
-  if (r.slot === 'ranajky' || r.slot === 'snack') return 'testimonial-recipe.jpg';
-  return 'section-nutrition.jpg';
-}
 
 export default function Recepty() {
   const navigate = useNavigate();
@@ -46,14 +35,14 @@ export default function Recepty() {
   const [query, setQuery] = useState(params.get('q') ?? '');
   const [activeFast, setActiveFast] = useState(false);
   const [favOnly, setFavOnly] = useState(params.get('fav') === '1');
-  const [slotFilter, setSlotFilter] = useState<SupabaseRecipe['slot'] | 'all'>(() => {
+  const [slotFilter, setSlotFilter] = useState<RecipeCategory | 'all'>(() => {
     const cat = params.get('cat');
     return cat ? CATEGORY_QUERY_MAP[cat] ?? 'all' : 'all';
   });
 
   const filtered = useMemo(() => {
     let list = recipes;
-    if (slotFilter !== 'all') list = list.filter((r) => r.slot === slotFilter);
+    if (slotFilter !== 'all') list = list.filter((r) => recipeCategories(r).includes(slotFilter));
     if (activeFast) list = list.filter((r) => (r.prep_minutes ?? 99) <= 20);
     if (favOnly) list = list.filter((r) => isFavorite(r.id, 'recipe'));
     if (query.trim().length > 0) {
@@ -91,12 +80,12 @@ export default function Recepty() {
 
       {/* Slot chips */}
       <div style={{ padding: '0 18px 6px', display: 'flex', gap: 8, overflowX: 'auto' }}>
-        {SLOT_CHIPS.map((c) => {
+        {CATEGORY_CHIPS.map((c) => {
           const active = slotFilter === c.id;
           return (
             <button
               key={c.id}
-              onClick={() => setSlotFilter(c.id as SupabaseRecipe['slot'] | 'all')}
+              onClick={() => setSlotFilter(c.id)}
               style={{
                 all: 'unset', cursor: 'pointer', padding: '8px 14px', borderRadius: 999,
                 background: active ? NM.DEEP : 'transparent',
@@ -194,7 +183,7 @@ export default function Recepty() {
                   <div
                     style={{
                       width: '100%', height: '100%', borderRadius: 14,
-                      backgroundImage: `url(/images/r9/${recipeImg(r)})`,
+                      backgroundImage: `url(${recipeImage(r)})`,
                       backgroundSize: 'cover', backgroundPosition: 'center',
                     }}
                   />
@@ -203,7 +192,7 @@ export default function Recepty() {
                 {/* Text */}
                 <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', textAlign: 'left' }}>
                   <Eye size={9} style={{ marginBottom: 5 }}>
-                    {SLOT_LABEL[r.slot]}{r.prep_minutes ? ` · ${r.prep_minutes} min` : ''}
+                    {recipeCategoryLabel(r)}{r.prep_minutes ? ` · ${r.prep_minutes} min` : ''}
                     {r.kcal ? ` · ${r.kcal} kcal` : ''}
                   </Eye>
                   <div style={{
