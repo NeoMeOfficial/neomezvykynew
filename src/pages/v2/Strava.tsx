@@ -177,16 +177,8 @@ export default function Strava() {
               <div style={{ fontFamily: 'Gilda Display, serif', fontSize: 22, lineHeight: 1.2, color: '#F5EFE5', marginBottom: 6 }}>
                 6-týždňový plán <em style={{ color: '#F5EFE5', fontStyle: 'italic', opacity: 0.92 }}>na mieru</em>
               </div>
-              <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: 'rgba(245,239,229,0.85)', lineHeight: 1.5, fontWeight: 300, marginBottom: 16, maxWidth: 280 }}>
-                Personalizovaný jedálniček s nákupným zoznamom a Gabinými receptami — na celých 6 týždňov.
-              </div>
-              <div style={{ display: 'flex', flexWrap: 'wrap' as const, gap: '6px 14px', marginBottom: 18 }}>
-                {['Nákupný zoznam', 'Makrá + kalórie', 'Gabine recepty', 'Cyklus-vedomé'].map(p => (
-                  <div key={p} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#F5EFE5" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12l5 5 9-11"/></svg>
-                    <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11.5, color: 'rgba(245,239,229,0.95)' }}>{p}</span>
-                  </div>
-                ))}
+              <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: 'rgba(245,239,229,0.85)', lineHeight: 1.5, fontWeight: 300, marginBottom: 18, maxWidth: 280 }}>
+                Personalizovaný jedálniček, ktorý zohľadňuje tvoje preferencie — naplnený Gabikinými receptami tak, aby ti pomohol dosiahnuť tvoje ciele.
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <div style={{ background: 'rgba(245,239,229,0.16)', border: '1px solid rgba(245,239,229,0.45)', color: '#F5EFE5', padding: '11px 20px', borderRadius: 999, fontFamily: 'DM Sans, system-ui', fontSize: 13, fontWeight: 600, display: 'inline-flex', alignItems: 'center' }}>
