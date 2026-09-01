@@ -6,7 +6,7 @@
 begin;
 
 alter table public.recipes
-  add column if not exists temperature text check (temperature in ('warm','cold','room')),
+  add column if not exists temperature text check (temperature in ('warm','cold')),
   add column if not exists is_iron_rich boolean not null default false,
   add column if not exists is_magnesium_rich boolean not null default false,
   add column if not exists is_complex_carbs boolean not null default false,
@@ -16,11 +16,11 @@ alter table public.recipes
 
 update public.recipes set temperature = 'cold', is_iron_rich = false, is_magnesium_rich = true, is_complex_carbs = false, is_high_protein = false where source_id = 'ananasovy-kokteil-z-mandloveho-mlieka';
 update public.recipes set temperature = 'warm', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = false, is_high_protein = false where source_id = 'baklazanove-lasagne';
-update public.recipes set temperature = 'room', is_iron_rich = false, is_magnesium_rich = true, is_complex_carbs = false, is_high_protein = false where source_id = 'bananove-muffiny-mugcake';
+update public.recipes set temperature = 'cold', is_iron_rich = false, is_magnesium_rich = true, is_complex_carbs = false, is_high_protein = false where source_id = 'bananove-muffiny-mugcake';
 update public.recipes set temperature = 'warm', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = false, is_high_protein = true where source_id = 'brokolicova-pizza-so-syrom';
 update public.recipes set temperature = 'warm', is_iron_rich = false, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = true where source_id = 'parmezanove-vafle';
 update public.recipes set temperature = 'warm', is_iron_rich = true, is_magnesium_rich = false, is_complex_carbs = false, is_high_protein = true where source_id = 'biftek-so-zeleninovymi-hranolkami-a-domacim-dresingom';
-update public.recipes set temperature = 'room', is_iron_rich = false, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = false where source_id = 'jednohubky-s-brusnicami-a-kozim-syrom';
+update public.recipes set temperature = 'cold', is_iron_rich = false, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = false where source_id = 'jednohubky-s-brusnicami-a-kozim-syrom';
 update public.recipes set temperature = 'warm', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = true, is_high_protein = true where source_id = 'bulgur-s-tempehom-a-shitake';
 update public.recipes set temperature = 'cold', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = true, is_high_protein = true where source_id = 'cesnakova-pomazanka-s-tvarohom';
 update public.recipes set temperature = 'cold', is_iron_rich = true, is_magnesium_rich = true, is_complex_carbs = false, is_high_protein = false where source_id = 'chia-puding-nielen-na-ranajky';
@@ -33,43 +33,43 @@ update public.recipes set temperature = 'cold', is_iron_rich = true, is_magnesiu
 update public.recipes set temperature = 'cold', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = false, is_high_protein = false where source_id = 'bazova-limonada';
 update public.recipes set temperature = 'cold', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = false, is_high_protein = false where source_id = 'cucoriedkova-zmrzlina';
 update public.recipes set temperature = 'warm', is_iron_rich = true, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = false where source_id = 'fantasticka-pizza-alla-dorka';
-update public.recipes set temperature = 'room', is_iron_rich = true, is_magnesium_rich = false, is_complex_carbs = true, is_high_protein = true where source_id = 'burger-s-volskym-okom-a-omackou-zo-stopkoveho-zeleru';
+update public.recipes set temperature = 'cold', is_iron_rich = true, is_magnesium_rich = false, is_complex_carbs = true, is_high_protein = true where source_id = 'burger-s-volskym-okom-a-omackou-zo-stopkoveho-zeleru';
 update public.recipes set temperature = 'warm', is_iron_rich = true, is_magnesium_rich = false, is_complex_carbs = true, is_high_protein = true where source_id = 'burger-s-volskym-okom-a-omackou-zo-stonkoveho-zeleru';
 update public.recipes set temperature = 'cold', is_iron_rich = true, is_magnesium_rich = false, is_complex_carbs = true, is_high_protein = false where source_id = 'indicky-salat-s-falafelom';
-update public.recipes set temperature = 'room', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = false, is_high_protein = false where source_id = 'bruscetta-s-kozim-syrom-a-figami';
-update public.recipes set temperature = 'room', is_iron_rich = false, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = false where source_id = 'fit-makovnik';
+update public.recipes set temperature = 'cold', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = false, is_high_protein = false where source_id = 'bruscetta-s-kozim-syrom-a-figami';
+update public.recipes set temperature = 'cold', is_iron_rich = false, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = false where source_id = 'fit-makovnik';
 update public.recipes set temperature = 'warm', is_iron_rich = false, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = true where source_id = 'brokolicove-placky-so-salatom-2';
 update public.recipes set temperature = 'warm', is_iron_rich = true, is_magnesium_rich = false, is_complex_carbs = false, is_high_protein = true where source_id = 'grilovany-biftek-so-zeleninovymi-hranolkami-a-dipom';
-update public.recipes set temperature = 'room', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = true, is_high_protein = false where source_id = 'vianocna-jablkova-babovka-so-steviou';
-update public.recipes set temperature = 'room', is_iron_rich = false, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = true where source_id = 'fitness-toricka-s-ovocim';
-update public.recipes set temperature = 'room', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = true, is_high_protein = true where source_id = 'brokolica-s-morcacim-masom-a-ryzou';
+update public.recipes set temperature = 'cold', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = true, is_high_protein = false where source_id = 'vianocna-jablkova-babovka-so-steviou';
+update public.recipes set temperature = 'cold', is_iron_rich = false, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = true where source_id = 'fitness-toricka-s-ovocim';
+update public.recipes set temperature = 'cold', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = true, is_high_protein = true where source_id = 'brokolica-s-morcacim-masom-a-ryzou';
 update public.recipes set temperature = 'warm', is_iron_rich = true, is_magnesium_rich = false, is_complex_carbs = true, is_high_protein = true where source_id = 'grilovane-maso-s-omackou-z-korenovel-zeleniny-a-pohankou';
 update public.recipes set temperature = 'warm', is_iron_rich = true, is_magnesium_rich = false, is_complex_carbs = true, is_high_protein = true where source_id = 'biftek-s-grilovanou-zeleninou-a-kuskusom';
 update public.recipes set temperature = 'warm', is_iron_rich = true, is_magnesium_rich = true, is_complex_carbs = false, is_high_protein = false where source_id = 'grilovany-kozi-syr-s-orechovou-korkou-a-glazovanou-cibulkou';
 update public.recipes set temperature = 'warm', is_iron_rich = false, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = true where source_id = 'halusky-ako-ich-nepoznate';
 update public.recipes set temperature = 'warm', is_iron_rich = true, is_magnesium_rich = false, is_complex_carbs = true, is_high_protein = true where source_id = 'hovadzie-karbonatky-so-zemiakmi-horcicou-a-cibulou';
-update public.recipes set temperature = 'room', is_iron_rich = true, is_magnesium_rich = false, is_complex_carbs = true, is_high_protein = true where source_id = 'hovadzie-maso-na-ciernych-olivach-so-zemiakmi-varenymi-v-supke';
+update public.recipes set temperature = 'cold', is_iron_rich = true, is_magnesium_rich = false, is_complex_carbs = true, is_high_protein = true where source_id = 'hovadzie-maso-na-ciernych-olivach-so-zemiakmi-varenymi-v-supke';
 update public.recipes set temperature = 'warm', is_iron_rich = true, is_magnesium_rich = false, is_complex_carbs = false, is_high_protein = true where source_id = 'hovadzie-kocky-s-tekvicou';
 update public.recipes set temperature = 'warm', is_iron_rich = true, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = false where source_id = 'arasidova-kasa-s-lesnym-ovocim';
 update public.recipes set temperature = 'warm', is_iron_rich = false, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = false where source_id = 'ranajkova-kasa-so-susenym-ovocim';
 update public.recipes set temperature = 'cold', is_iron_rich = false, is_magnesium_rich = true, is_complex_carbs = false, is_high_protein = false where source_id = 'smoothie-proti-nachladnutiu';
-update public.recipes set temperature = 'room', is_iron_rich = false, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = false where source_id = 'zdravy-jablkovy-dezert';
+update public.recipes set temperature = 'cold', is_iron_rich = false, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = false where source_id = 'zdravy-jablkovy-dezert';
 update public.recipes set temperature = 'warm', is_iron_rich = true, is_magnesium_rich = true, is_complex_carbs = false, is_high_protein = false where source_id = 'quinoova-kasa-s-tvarohom';
-update public.recipes set temperature = 'room', is_iron_rich = false, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = false where source_id = 'celozrnna-jablkova-strudla';
-update public.recipes set temperature = 'room', is_iron_rich = false, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = false where source_id = 'jablkove-mafiny-bez-muky';
+update public.recipes set temperature = 'cold', is_iron_rich = false, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = false where source_id = 'celozrnna-jablkova-strudla';
+update public.recipes set temperature = 'cold', is_iron_rich = false, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = false where source_id = 'jablkove-mafiny-bez-muky';
 update public.recipes set temperature = 'cold', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = false, is_high_protein = false where source_id = 'matova-limonada-s-jahodami';
 update public.recipes set temperature = 'cold', is_iron_rich = true, is_magnesium_rich = true, is_complex_carbs = false, is_high_protein = false where source_id = 'jahodove-smoothie-s-chia-semienkami';
 update public.recipes set temperature = 'cold', is_iron_rich = false, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = false where source_id = 'fitness-cheescake-s-jahodami';
 update public.recipes set temperature = 'cold', is_iron_rich = false, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = false where source_id = 'jahodovy-mug-cake';
-update public.recipes set temperature = 'room', is_iron_rich = false, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = false where source_id = 'tekvicov0-mrkvova-babovka-s-orechmi';
+update public.recipes set temperature = 'cold', is_iron_rich = false, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = false where source_id = 'tekvicov0-mrkvova-babovka-s-orechmi';
 update public.recipes set temperature = 'cold', is_iron_rich = false, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = false where source_id = 'jogurtove-muffiny-s-cucoriedkami-ceresnami';
-update public.recipes set temperature = 'room', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = true, is_high_protein = false where source_id = 'kapustova-polievka-so-sunkou-a-hubami';
+update public.recipes set temperature = 'cold', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = true, is_high_protein = false where source_id = 'kapustova-polievka-so-sunkou-a-hubami';
 update public.recipes set temperature = 'warm', is_iron_rich = false, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = false where source_id = 'kapustove-karbonatky';
 update public.recipes set temperature = 'warm', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = false, is_high_protein = true where source_id = 'kacacie-prsia-pecene-so-zeleninou';
-update public.recipes set temperature = 'room', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = true, is_high_protein = true where source_id = 'lievance-z-pohankovej-muky-a-kefiru';
+update public.recipes set temperature = 'cold', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = true, is_high_protein = true where source_id = 'lievance-z-pohankovej-muky-a-kefiru';
 update public.recipes set temperature = 'cold', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = false, is_high_protein = false where source_id = 'biely-jogurt-s-tvarohom-kivi-a-skoricou';
 update public.recipes set temperature = 'warm', is_iron_rich = false, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = false where source_id = 'celozrnne-cestoviny-s-krevetami';
-update public.recipes set temperature = 'room', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = false, is_high_protein = true where source_id = 'bravcova-krkovicka-v-rajcinovej-omacke-so-zeleninovymi-rezancami';
+update public.recipes set temperature = 'cold', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = false, is_high_protein = true where source_id = 'bravcova-krkovicka-v-rajcinovej-omacke-so-zeleninovymi-rezancami';
 update public.recipes set temperature = 'warm', is_iron_rich = false, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = true where source_id = 'kralik-na-vine-s-karfiolovymi-plackami';
 update public.recipes set temperature = 'warm', is_iron_rich = true, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = true where source_id = 'batatovy-krem-s-marinovanym-tempehom';
 update public.recipes set temperature = 'warm', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = false, is_high_protein = false where source_id = 'hubovy-krem-s-krupami';
@@ -82,7 +82,7 @@ update public.recipes set temperature = 'cold', is_iron_rich = true, is_magnesiu
 update public.recipes set temperature = 'warm', is_iron_rich = false, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = false where source_id = 'celozrnne-cestoviny-s-cuketou';
 update public.recipes set temperature = 'warm', is_iron_rich = false, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = false where source_id = 'grilovana-zelenina-s-cestovinami';
 update public.recipes set temperature = 'warm', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = true, is_high_protein = true where source_id = 'grilovane-rybacie-spizy-v-citrusovej-marinade';
-update public.recipes set temperature = 'room', is_iron_rich = true, is_magnesium_rich = true, is_complex_carbs = false, is_high_protein = false where source_id = 'datlove-kosicky-s-kokosovym-kremom';
+update public.recipes set temperature = 'cold', is_iron_rich = true, is_magnesium_rich = true, is_complex_carbs = false, is_high_protein = false where source_id = 'datlove-kosicky-s-kokosovym-kremom';
 update public.recipes set temperature = 'warm', is_iron_rich = true, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = true where source_id = 'grilovany-tempeh-v-marinade-s-batatmi-a-koprovou-omackou';
 update public.recipes set temperature = 'warm', is_iron_rich = false, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = false where source_id = 'chilli-kuskus-ako-priloha';
 update public.recipes set temperature = 'cold', is_iron_rich = true, is_magnesium_rich = true, is_complex_carbs = false, is_high_protein = false where source_id = 'cucoriedkovy-smoothie';
@@ -92,33 +92,33 @@ update public.recipes set temperature = 'warm', is_iron_rich = true, is_magnesiu
 update public.recipes set temperature = 'cold', is_iron_rich = false, is_magnesium_rich = true, is_complex_carbs = false, is_high_protein = false where source_id = 'fazulova-pomazanka-s-celozrnnym-chlebom';
 update public.recipes set temperature = 'warm', is_iron_rich = true, is_magnesium_rich = true, is_complex_carbs = false, is_high_protein = true where source_id = 'frittata-talianska-omeleta';
 update public.recipes set temperature = 'cold', is_iron_rich = true, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = false where source_id = 'ranajkova-kasa-na-cesty';
-update public.recipes set temperature = 'room', is_iron_rich = false, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = false where source_id = 'domace-ovsene-susienky';
+update public.recipes set temperature = 'cold', is_iron_rich = false, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = false where source_id = 'domace-ovsene-susienky';
 update public.recipes set temperature = 'warm', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = false, is_high_protein = false where source_id = 'cervena-repa-podla-jamieho-olivera';
 update public.recipes set temperature = 'warm', is_iron_rich = true, is_magnesium_rich = false, is_complex_carbs = true, is_high_protein = true where source_id = 'batatovy-krem-so-smakounom-tekvicovymi-semienkami-a-chilli';
 update public.recipes set temperature = 'warm', is_iron_rich = true, is_magnesium_rich = false, is_complex_carbs = true, is_high_protein = false where source_id = 'batatove-chilli-gulicky';
 update public.recipes set temperature = 'warm', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = false, is_high_protein = true where source_id = 'krevety-na-cesnaku';
 update public.recipes set temperature = 'warm', is_iron_rich = true, is_magnesium_rich = false, is_complex_carbs = true, is_high_protein = false where source_id = 'batatovy-krem-s-chilli';
-update public.recipes set temperature = 'room', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = false, is_high_protein = false where source_id = 'ananasove-ravioly-plnene-lahkym-pistaciovym-kremom';
+update public.recipes set temperature = 'cold', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = false, is_high_protein = false where source_id = 'ananasove-ravioly-plnene-lahkym-pistaciovym-kremom';
 update public.recipes set temperature = 'warm', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = false, is_high_protein = false where source_id = 'brokolicova-pizza-bez-muky';
 update public.recipes set temperature = 'warm', is_iron_rich = true, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = false where source_id = 'jablkove-placky';
 update public.recipes set temperature = 'warm', is_iron_rich = true, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = true where source_id = 'karbonatky-z-cervenej-sosovice';
 update public.recipes set temperature = 'warm', is_iron_rich = true, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = true where source_id = 'kuracia-kapsa-so-spenatom-bataty-a-salat';
-update public.recipes set temperature = 'room', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = false, is_high_protein = false where source_id = 'jahodovo-malinove-trifle';
+update public.recipes set temperature = 'cold', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = false, is_high_protein = false where source_id = 'jahodovo-malinove-trifle';
 update public.recipes set temperature = 'warm', is_iron_rich = true, is_magnesium_rich = false, is_complex_carbs = true, is_high_protein = false where source_id = 'cicerova-polievka';
 update public.recipes set temperature = 'cold', is_iron_rich = true, is_magnesium_rich = true, is_complex_carbs = false, is_high_protein = false where source_id = 'zlate-mlieko';
-update public.recipes set temperature = 'room', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = true, is_high_protein = true where source_id = 'filet-zo-pstruha-na-citronovej-omacke-so-zeleninou-a-pecenym-zemiakom';
+update public.recipes set temperature = 'cold', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = true, is_high_protein = true where source_id = 'filet-zo-pstruha-na-citronovej-omacke-so-zeleninou-a-pecenym-zemiakom';
 update public.recipes set temperature = 'warm', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = false, is_high_protein = false where source_id = 'slane-muffiny-s-quinoa';
 update public.recipes set temperature = 'cold', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = false, is_high_protein = false where source_id = 'napoj-na-chudnutie-pre-tych-co-potrebuju-zhodit';
 update public.recipes set temperature = 'cold', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = false, is_high_protein = false where source_id = 'cheesecake-s-rebarborovym-prelivom';
 update public.recipes set temperature = 'cold', is_iron_rich = true, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = true where source_id = 'fazulova-natierka-s-cviklou';
-update public.recipes set temperature = 'room', is_iron_rich = true, is_magnesium_rich = false, is_complex_carbs = true, is_high_protein = true where source_id = 'cervena-sosovica-s-repou-a-feta-syrom';
-update public.recipes set temperature = 'room', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = true, is_high_protein = true where source_id = 'duseny-kapor-so-zemiakmi';
-update public.recipes set temperature = 'room', is_iron_rich = true, is_magnesium_rich = false, is_complex_carbs = true, is_high_protein = false where source_id = 'filet-z-prazmy-so-salatom-z-cervenej-sosovice';
+update public.recipes set temperature = 'cold', is_iron_rich = true, is_magnesium_rich = false, is_complex_carbs = true, is_high_protein = true where source_id = 'cervena-sosovica-s-repou-a-feta-syrom';
+update public.recipes set temperature = 'cold', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = true, is_high_protein = true where source_id = 'duseny-kapor-so-zemiakmi';
+update public.recipes set temperature = 'cold', is_iron_rich = true, is_magnesium_rich = false, is_complex_carbs = true, is_high_protein = false where source_id = 'filet-z-prazmy-so-salatom-z-cervenej-sosovice';
 update public.recipes set temperature = 'warm', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = true, is_high_protein = true where source_id = 'arasidova-zmes-s-ryzou';
-update public.recipes set temperature = 'room', is_iron_rich = false, is_magnesium_rich = true, is_complex_carbs = false, is_high_protein = false where source_id = 'bananove-lievance';
+update public.recipes set temperature = 'cold', is_iron_rich = false, is_magnesium_rich = true, is_complex_carbs = false, is_high_protein = false where source_id = 'bananove-lievance';
 update public.recipes set temperature = 'warm', is_iron_rich = false, is_magnesium_rich = true, is_complex_carbs = false, is_high_protein = true where source_id = 'americky-brunch';
 update public.recipes set temperature = 'warm', is_iron_rich = true, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = false where source_id = 'cicerova-sekana';
-update public.recipes set temperature = 'room', is_iron_rich = false, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = false where source_id = 'chlebik-mez-muky';
+update public.recipes set temperature = 'cold', is_iron_rich = false, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = false where source_id = 'chlebik-mez-muky';
 update public.recipes set temperature = 'warm', is_iron_rich = true, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = false where source_id = 'cicerove-placky-s-natierkou-z-avokada';
 update public.recipes set temperature = 'warm', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = false, is_high_protein = false where source_id = 'jemny-hraskovy-krem';
 update public.recipes set temperature = 'warm', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = false, is_high_protein = true where source_id = 'slim-ranajkova-omeleta-z-juhu-europy';
@@ -130,19 +130,19 @@ update public.recipes set temperature = 'warm', is_iron_rich = false, is_magnesi
 update public.recipes set temperature = 'warm', is_iron_rich = true, is_magnesium_rich = true, is_complex_carbs = false, is_high_protein = false where source_id = 'avokadova-nepecena-torta';
 update public.recipes set temperature = 'cold', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = false, is_high_protein = false where source_id = 'pazitkova-natierka-so-susienkami-smart-break';
 update public.recipes set temperature = 'cold', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = false, is_high_protein = false where source_id = 'hroznove-trifle-s-plodmi-goji';
-update public.recipes set temperature = 'room', is_iron_rich = false, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = false where source_id = 'domace-mussli-tycinky';
+update public.recipes set temperature = 'cold', is_iron_rich = false, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = false where source_id = 'domace-mussli-tycinky';
 update public.recipes set temperature = 'warm', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = true, is_high_protein = true where source_id = 'miesane-vajicka-na-cibulke-so-syrom-chlebom-a-zeleninou';
 update public.recipes set temperature = 'cold', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = true, is_high_protein = true where source_id = 'natierka-z-korenovej-zeleniny-a-vajicka';
 update public.recipes set temperature = 'cold', is_iron_rich = true, is_magnesium_rich = true, is_complex_carbs = false, is_high_protein = false where source_id = 'smoothie-s-goji-a-chia';
 update public.recipes set temperature = 'warm', is_iron_rich = true, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = false where source_id = 'cuketovy-pernik';
-update public.recipes set temperature = 'room', is_iron_rich = true, is_magnesium_rich = true, is_complex_carbs = false, is_high_protein = false where source_id = 'bezlepkova-torta-s-mangom-a-skyrom';
-update public.recipes set temperature = 'room', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = false, is_high_protein = false where source_id = 'gratinovana-spargla-so-syrom';
+update public.recipes set temperature = 'cold', is_iron_rich = true, is_magnesium_rich = true, is_complex_carbs = false, is_high_protein = false where source_id = 'bezlepkova-torta-s-mangom-a-skyrom';
+update public.recipes set temperature = 'cold', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = false, is_high_protein = false where source_id = 'gratinovana-spargla-so-syrom';
 update public.recipes set temperature = 'warm', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = false, is_high_protein = true where source_id = 'kremovy-zapeceny-karfiol';
 update public.recipes set temperature = 'cold', is_iron_rich = true, is_magnesium_rich = false, is_complex_carbs = false, is_high_protein = true where source_id = 'brokolicova-pomazanka';
 update public.recipes set temperature = 'warm', is_iron_rich = false, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = false where source_id = 'batatove-lievance';
-update public.recipes set temperature = 'room', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = false, is_high_protein = false where source_id = 'domace-zeleninove-chipsy';
-update public.recipes set temperature = 'room', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = true, is_high_protein = false where source_id = 'irsky-chlieb-zo-spaldovej-muky-nemieseny-nekysnuty-a-rychly';
-update public.recipes set temperature = 'room', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = false, is_high_protein = false where source_id = 'slany-cuketovy-kolac-bez-muky';
+update public.recipes set temperature = 'cold', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = false, is_high_protein = false where source_id = 'domace-zeleninove-chipsy';
+update public.recipes set temperature = 'cold', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = true, is_high_protein = false where source_id = 'irsky-chlieb-zo-spaldovej-muky-nemieseny-nekysnuty-a-rychly';
+update public.recipes set temperature = 'cold', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = false, is_high_protein = false where source_id = 'slany-cuketovy-kolac-bez-muky';
 update public.recipes set temperature = 'warm', is_iron_rich = true, is_magnesium_rich = false, is_complex_carbs = true, is_high_protein = true where source_id = 'husta-zeleninova-polievka-s-fazulou';
 update public.recipes set temperature = 'warm', is_iron_rich = true, is_magnesium_rich = true, is_complex_carbs = false, is_high_protein = false where source_id = 'bylinkova-polievka-plna-antioxidantov';
 update public.recipes set temperature = 'cold', is_iron_rich = true, is_magnesium_rich = true, is_complex_carbs = false, is_high_protein = false where source_id = 'carpaccio-bez-masa';
@@ -154,7 +154,7 @@ update public.recipes set temperature = 'warm', is_iron_rich = false, is_magnesi
 update public.recipes set temperature = 'warm', is_iron_rich = false, is_magnesium_rich = false, is_complex_carbs = false, is_high_protein = false where source_id = 'grilovane-sampinony-s-paprikou-a-cherry-paradajkami';
 update public.recipes set temperature = 'warm', is_iron_rich = false, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = true where source_id = 'spladove-lievanceky';
 update public.recipes set temperature = 'warm', is_iron_rich = true, is_magnesium_rich = false, is_complex_carbs = true, is_high_protein = false where source_id = 'indicka-sosovica-dhal';
-update public.recipes set temperature = 'room', is_iron_rich = true, is_magnesium_rich = false, is_complex_carbs = true, is_high_protein = false where source_id = 'bylinkova-sosovica';
+update public.recipes set temperature = 'cold', is_iron_rich = true, is_magnesium_rich = false, is_complex_carbs = true, is_high_protein = false where source_id = 'bylinkova-sosovica';
 update public.recipes set temperature = 'warm', is_iron_rich = true, is_magnesium_rich = true, is_complex_carbs = true, is_high_protein = true where source_id = 'celozrnne-spagety-s-cervenou-sosovicou-na-vine';
 
 commit;
