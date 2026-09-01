@@ -902,7 +902,7 @@ export default function DomovNew() {
   // ── "Dnes pre teba" — six pillars, each with today's featured info ──
   // One shared "recept dňa" with the Strava section (local-midnight
   // rotation) — two formulas showed two different recipes before.
-  const dailyRecipe = dailyRecipeOf(recipes);
+  const dailyRecipe = dailyRecipeOf(recipes, cycle?.phaseKey ?? null);
 
   // Subscriber's first prescribed meal today (if a plan exists) — its
   // recipe photo doubles as the Strava card image.

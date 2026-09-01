@@ -30,6 +30,12 @@ export interface SupabaseRecipe {
   servings?: number | null;
   vegetarian?: boolean | null;
   image_url?: string | null;
+  /** Phase-alignment tags (heuristic; no UI copy claims phase fit). */
+  temperature?: 'warm' | 'cold' | null;
+  is_iron_rich?: boolean | null;
+  is_magnesium_rich?: boolean | null;
+  is_complex_carbs?: boolean | null;
+  is_high_protein?: boolean | null;
 }
 
 // Six browsing categories (Gabi 2026-08-28). `slot` stays the 3-valued
@@ -84,7 +90,7 @@ export const SLOT_LABEL: Record<SupabaseRecipe['slot'], string> = {
 // First FREE_PER_SLOT recipes per slot (sorted by name) are accessible on free tier.
 export const FREE_PER_SLOT = 10;
 
-const CACHE_KEY = 'neome_recipes_v3';
+const CACHE_KEY = 'neome_recipes_v4';
 // Recipe fixes must reach users promptly — iOS standalone PWAs keep a
 // session alive for days, so an unversioned sessionStorage entry served
 // stale data indefinitely. Entries older than this refetch.
@@ -146,16 +152,39 @@ export function loadRecipes(): Promise<SupabaseRecipe[]> {
   return loadPromise;
 }
 
+// What each cycle phase loosely prefers (Gabi 2026-07-12 plan): the pick
+// quietly leans this way, the UI never claims "vhodné pre tvoju fázu".
+type PhaseFlag = 'is_iron_rich' | 'is_magnesium_rich' | 'is_complex_carbs' | 'is_high_protein';
+const PHASE_RECIPE_PREFS: Record<string, { temp?: 'warm' | 'cold'; flags: PhaseFlag[] }> = {
+  menstrual:  { temp: 'warm', flags: ['is_iron_rich'] },
+  follicular: { flags: ['is_high_protein'] },
+  ovulation:  { temp: 'cold', flags: ['is_high_protein'] },
+  luteal:     { flags: ['is_magnesium_rich', 'is_complex_carbs'] },
+};
+
 /**
  * The one shared "recept dňa": same recipe on the home card and in the
- * Strava section, rotating at LOCAL midnight, different every day and
- * across year boundaries.
+ * Strava section, rotating at LOCAL midnight. With a known cycle phase
+ * it rotates among the recipes that best match the phase's preferences;
+ * without one (cycle off) it rotates over the whole library.
  */
-export function dailyRecipeOf(recipes: SupabaseRecipe[]): SupabaseRecipe | null {
+export function dailyRecipeOf(recipes: SupabaseRecipe[], phaseKey?: string | null): SupabaseRecipe | null {
   if (recipes.length === 0) return null;
   const now = new Date();
   const doy = Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000);
-  return recipes[(now.getFullYear() * 366 + doy) % recipes.length];
+  const seed = now.getFullYear() * 366 + doy;
+  const prefs = phaseKey ? PHASE_RECIPE_PREFS[phaseKey] : undefined;
+  if (!prefs) return recipes[seed % recipes.length];
+  let best = -1;
+  let pool: SupabaseRecipe[] = [];
+  for (const r of recipes) {
+    let s = 0;
+    if (prefs.temp && r.temperature === prefs.temp) s += 1;
+    for (const f of prefs.flags) if (r[f]) s += 1;
+    if (s > best) { best = s; pool = [r]; }
+    else if (s === best) pool.push(r);
+  }
+  return pool[seed % pool.length];
 }
 
 /** Cover image (full path): the recipe's own photo when it has one,

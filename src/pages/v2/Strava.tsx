@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useRecipes, dailyRecipeOf, recipeCategories, recipeCategoryLabel, CATEGORY_KEYS, CATEGORY_LABEL, categoryImage } from '@/hooks/useRecipes';
+import { useCycleInfo } from '@/hooks/use-cycle';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import { useUniversalFavorites } from '@/hooks/useUniversalFavorites';
 import { TopBar } from '@/components/v2/top-bar';
@@ -16,6 +17,7 @@ export default function Strava() {
   const fromHome = new URLSearchParams(useLocation().search).get('from') === 'home';
   const { hasMealPlanner } = useSubscription();
   const { recipes, loading } = useRecipes();
+  const cycle = useCycleInfo();
   const { isFavorite } = useUniversalFavorites();
   const favCount = useMemo(
     () => recipes.filter(r => isFavorite(r.id, 'recipe')).length,
@@ -31,8 +33,9 @@ export default function Strava() {
     })),
   [recipes]);
 
-  // Deterministic recipe-of-the-day — shared with the home card.
-  const featured = useMemo(() => dailyRecipeOf(recipes), [recipes]);
+  // Deterministic recipe-of-the-day — shared with the home card,
+  // quietly phase-aligned when the cycle is on.
+  const featured = useMemo(() => dailyRecipeOf(recipes, cycle?.phaseKey ?? null), [recipes, cycle?.phaseKey]);
 
   return (
     <div className="min-h-screen bg-cream pb-12">

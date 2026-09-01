@@ -33,7 +33,9 @@ export default function Recepty() {
   const { isPremium } = useSubscription();
   const { isFavorite, toggleFavorite } = useUniversalFavorites();
   const [query, setQuery] = useState(params.get('q') ?? '');
-  const [activeFast, setActiveFast] = useState(false);
+  // Fáza B filters: prep-time bucket + meatless (both combine with category)
+  const [timeFilter, setTimeFilter] = useState<'all' | 10 | 20 | 30 | 99>('all');
+  const [meatless, setMeatless] = useState(false);
   const [favOnly, setFavOnly] = useState(params.get('fav') === '1');
   const [slotFilter, setSlotFilter] = useState<RecipeCategory | 'all'>(() => {
     const cat = params.get('cat');
@@ -43,14 +45,19 @@ export default function Recepty() {
   const filtered = useMemo(() => {
     let list = recipes;
     if (slotFilter !== 'all') list = list.filter((r) => recipeCategories(r).includes(slotFilter));
-    if (activeFast) list = list.filter((r) => (r.prep_minutes ?? 99) <= 20);
+    if (timeFilter !== 'all') {
+      list = timeFilter === 99
+        ? list.filter((r) => (r.prep_minutes ?? 0) > 30)
+        : list.filter((r) => r.prep_minutes != null && r.prep_minutes <= timeFilter);
+    }
+    if (meatless) list = list.filter((r) => r.vegetarian === true);
     if (favOnly) list = list.filter((r) => isFavorite(r.id, 'recipe'));
     if (query.trim().length > 0) {
       const q = query.toLowerCase();
       list = list.filter((r) => r.name.toLowerCase().includes(q));
     }
     return list;
-  }, [recipes, slotFilter, activeFast, favOnly, query, isFavorite]);
+  }, [recipes, slotFilter, timeFilter, meatless, favOnly, query, isFavorite]);
 
   const handleClick = (r: SupabaseRecipe) => {
     // Detail page enforces the per-user quota; listing taps are always permitted.
@@ -99,18 +106,6 @@ export default function Recepty() {
           );
         })}
         <button
-          onClick={() => setActiveFast((v) => !v)}
-          style={{
-            all: 'unset', cursor: 'pointer', padding: '8px 14px', borderRadius: 999,
-            background: activeFast ? NM.DEEP : 'transparent',
-            color: activeFast ? '#fff' : NM.DEEP,
-            border: activeFast ? 'none' : `1px solid ${NM.HAIR_2}`,
-            fontFamily: NM.SANS, fontSize: 12, whiteSpace: 'nowrap', flexShrink: 0,
-          }}
-        >
-          Do 20 min
-        </button>
-        <button
           onClick={() => setFavOnly((v) => !v)}
           style={{
             all: 'unset', cursor: 'pointer', padding: '8px 14px', borderRadius: 999,
@@ -125,6 +120,46 @@ export default function Recepty() {
             <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" />
           </svg>
           Obľúbené
+        </button>
+      </div>
+
+      {/* Fáza B: prep-time buckets + meatless — combine with category */}
+      <div style={{ padding: '8px 18px 6px', display: 'flex', gap: 8, overflowX: 'auto' }}>
+        {([
+          { id: 'all' as const, label: 'Ľubovoľný čas' },
+          { id: 10 as const, label: 'Do 10 min' },
+          { id: 20 as const, label: 'Do 20 min' },
+          { id: 30 as const, label: 'Do 30 min' },
+          { id: 99 as const, label: 'Nad 30 min' },
+        ]).map((c) => {
+          const active = timeFilter === c.id;
+          return (
+            <button
+              key={c.id}
+              onClick={() => setTimeFilter(c.id)}
+              style={{
+                all: 'unset', cursor: 'pointer', padding: '8px 14px', borderRadius: 999,
+                background: active ? NM.DEEP : 'transparent',
+                color: active ? '#fff' : NM.DEEP,
+                border: active ? 'none' : `1px solid ${NM.HAIR_2}`,
+                fontFamily: NM.SANS, fontSize: 12, whiteSpace: 'nowrap', flexShrink: 0,
+              }}
+            >
+              {c.label}
+            </button>
+          );
+        })}
+        <button
+          onClick={() => setMeatless((v) => !v)}
+          style={{
+            all: 'unset', cursor: 'pointer', padding: '8px 14px', borderRadius: 999,
+            background: meatless ? NM.SAGE : 'transparent',
+            color: meatless ? '#fff' : NM.DEEP,
+            border: meatless ? 'none' : `1px solid ${NM.HAIR_2}`,
+            fontFamily: NM.SANS, fontSize: 12, whiteSpace: 'nowrap', flexShrink: 0,
+          }}
+        >
+          Bez mäsa
         </button>
       </div>
 
@@ -164,7 +199,9 @@ export default function Recepty() {
           <div style={{ textAlign: 'center', padding: '40px 20px', color: NM.MUTED, fontSize: 13 }}>
             {favOnly
               ? 'Zatiaľ nemáš žiadne obľúbené recepty. Ulož si recept srdiečkom a nájdeš ho tu.'
-              : 'Nič sa nenašlo. Skús inú frázu alebo zruš filter.'}
+              : timeFilter !== 'all' || meatless || slotFilter !== 'all'
+              ? 'Nič sa nenašlo. Skús menej filtrov.'
+              : 'Nič sa nenašlo. Skús inú frázu.'}
           </div>
         ) : (
           filtered.map((r) => {
