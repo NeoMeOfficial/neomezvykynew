@@ -241,20 +241,41 @@ export function dailyRecipeOf(recipes: SupabaseRecipe[], phaseKey?: string | nul
     }
   }
 
+  // Temperature is a HARD rule (Gabi 2026-09-02): a phase that calls for warm
+  // food never features a cold recipe, and vice versa. Nutrient flags stay
+  // soft — missing iron is not a contradiction, a salad during menstruation is.
+  const allowed = prefs?.temp
+    ? ordered.filter((r) => r.temperature === prefs.temp)
+    : ordered;
+  const candidates = allowed.length > 0 ? allowed : ordered;
+
+  const cutoff = new Date(now);
+  cutoff.setDate(cutoff.getDate() - NO_REPEAT_DAYS);
+  const cutoffKey = localDayKey(cutoff);
+
   // Skip everything already featured this lap (today's stale entry included).
   const past = history.filter((h) => h.d !== today);
   const lapIds = new Set(past.map((h) => h.id));
-  let pick = ordered.find((r) => !lapIds.has(r.id));
+  let pick = candidates.find((r) => !lapIds.has(r.id));
   let kept = past;
+  if (!pick) {
+    // No unfeatured recipe satisfies the temperature rule. Prefer repeating
+    // the temperature-correct recipe featured longest ago (outside the week
+    // window) over contradicting the phase; the lap keeps running so the
+    // remaining recipes still surface in unconstrained phases.
+    const lastShown = new Map<string, string>();
+    for (const h of past) lastShown.set(h.id, h.d);
+    const repeatable = candidates
+      .filter((r) => (lastShown.get(r.id) ?? '') < cutoffKey)
+      .sort((a, b) => (lastShown.get(a.id) ?? '').localeCompare(lastShown.get(b.id) ?? ''));
+    pick = repeatable[0];
+  }
   if (!pick) {
     // Lap complete — every recipe has been featured. Restart, but keep the
     // last NO_REPEAT_DAYS days excluded so the week rule still holds.
-    const cutoff = new Date(now);
-    cutoff.setDate(cutoff.getDate() - NO_REPEAT_DAYS);
-    const cutoffKey = localDayKey(cutoff);
     kept = past.filter((h) => h.d >= cutoffKey);
     const recentIds = new Set(kept.map((h) => h.id));
-    pick = ordered.find((r) => !recentIds.has(r.id)) ?? ordered[0];
+    pick = candidates.find((r) => !recentIds.has(r.id)) ?? candidates[0];
   }
 
   writeDailyHistory([...kept, { d: today, id: pick.id, p: phase }]);
