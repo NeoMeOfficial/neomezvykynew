@@ -160,11 +160,12 @@ export default function Strava() {
             </div>
           </button>
         ) : (
-          <button
-            onClick={() => navigate('/jedalnicek-promo')}
-            className="w-full text-left transition-all active:scale-[0.99]"
+          /* Not purchasable at first launch (Gabi 2026-09-02) — the card stays
+             as an announcement, so no tap-through to the sales page. */
+          <div
+            className="w-full text-left"
             style={{
-              borderRadius: 20, overflow: 'hidden', border: 'none', cursor: 'pointer', padding: 0,
+              borderRadius: 20, overflow: 'hidden', border: 'none', padding: 0,
               background: 'linear-gradient(135deg, #7A9E78 0%, #5F7E5D 100%)',
             }}
           >
@@ -188,14 +189,12 @@ export default function Strava() {
                 ))}
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div style={{ background: '#F5EFE5', color: '#4E6B4C', padding: '11px 20px', borderRadius: 999, fontFamily: 'DM Sans, system-ui', fontSize: 13, fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                  Zistiť viac
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#4E6B4C" strokeWidth="2.5" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
+                <div style={{ background: 'rgba(245,239,229,0.16)', border: '1px solid rgba(245,239,229,0.45)', color: '#F5EFE5', padding: '11px 20px', borderRadius: 999, fontFamily: 'DM Sans, system-ui', fontSize: 13, fontWeight: 600, display: 'inline-flex', alignItems: 'center' }}>
+                  V ponuke čoskoro
                 </div>
-                <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: 'rgba(245,239,229,0.8)', fontWeight: 300 }}>od 57 €</div>
               </div>
             </div>
-          </button>
+          </div>
         )}
       </div>
     </div>
