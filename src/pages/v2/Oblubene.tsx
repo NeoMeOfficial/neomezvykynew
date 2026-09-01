@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useUniversalFavorites, ContentType } from '../../hooks/useUniversalFavorites';
+import { useRecipes, type SupabaseRecipe } from '@/hooks/useRecipes';
+import { RecipeListCard } from '../../components/v2/RecipeListCard';
 import FavoriteButton from '../../components/v2/favorites/FavoriteButton';
 import { Heart, ChefHat, Dumbbell, Brain, FileText, Target } from 'lucide-react';
 import { TopBar } from '@/components/v2/top-bar';
@@ -46,17 +48,43 @@ function itemPath(item: { id: string | number; type: ContentType; category?: str
 export default function Oblubene() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
-  const { favorites, getFavoritesByType, getFavoriteCounts } = useUniversalFavorites();
+  const { favorites, supabaseFavorites, isFavorite, toggleFavorite } = useUniversalFavorites();
+  const { recipes, loading: recipesLoading } = useRecipes();
   const [activeTab, setActiveTab] = useState<ContentType | 'all'>(() => {
     const tab = params.get('tab');
     return tab && tab in TYPE_LABEL ? (tab as ContentType) : 'all';
   });
 
-  const counts = getFavoriteCounts();
+  // Recipes resolve against the live library via the Supabase favourites list
+  // (source of truth across devices) plus any local-only metadata (anon/demo).
+  // Local metadata alone missed favourites saved on another device or before
+  // metadata existed. Old favourites pointing at retired recipes are dropped.
+  const recipeById = new Map(recipes.map((r) => [String(r.id), r]));
+  const favRecipeIds: string[] = [];
+  supabaseFavorites.forEach((f) => { if (f.item_type === 'recipe') favRecipeIds.push(f.item_id); });
+  favorites.forEach((f) => {
+    if (f.type === 'recipe' && !favRecipeIds.includes(String(f.id))) favRecipeIds.push(String(f.id));
+  });
+  const favRecipes = favRecipeIds
+    .map((id) => recipeById.get(id))
+    .filter((r): r is SupabaseRecipe => Boolean(r));
+  const otherFavs = favorites.filter((f) => f.type !== 'recipe');
 
-  const filteredFavorites = activeTab === 'all'
-    ? favorites
-    : getFavoritesByType(activeTab);
+  const counts = {
+    total: favRecipes.length + otherFavs.length,
+    recipe: favRecipes.length,
+    workout: otherFavs.filter((f) => f.type === 'workout').length,
+    meditation: otherFavs.filter((f) => f.type === 'meditation').length,
+    article: otherFavs.filter((f) => f.type === 'article').length,
+    program: otherFavs.filter((f) => f.type === 'program').length,
+  };
+
+  const showRecipes = activeTab === 'all' || activeTab === 'recipe';
+  const filteredOther = activeTab === 'all'
+    ? otherFavs
+    : activeTab === 'recipe'
+    ? []
+    : otherFavs.filter((f) => f.type === activeTab);
 
   const tabs = [
     { key: 'all' as const, label: 'Všetky', count: counts.total },
@@ -71,7 +99,11 @@ export default function Oblubene() {
     <div className="min-h-screen bg-cream pb-12">
       <TopBar title="Obľúbené" onBack={() => navigate(-1)} />
 
-      {favorites.length === 0 ? (
+      {counts.total === 0 && recipesLoading ? (
+        <div className="px-5 mt-12 text-center">
+          <BodyText tone="secondary">Načítavam…</BodyText>
+        </div>
+      ) : counts.total === 0 ? (
         <div className="px-5 mt-12 text-center">
           <div className="h-16 w-16 rounded-full bg-rose/10 flex items-center justify-center mx-auto mb-4">
             <Heart className="size-7 text-rose" />
@@ -108,15 +140,37 @@ export default function Oblubene() {
           )}
 
           {/* Content list */}
-          {filteredFavorites.length === 0 ? (
+          {(showRecipes ? favRecipes.length : 0) + filteredOther.length === 0 ? (
             <div className="rounded-card bg-white border border-ink/[0.08] shadow-nm-sm p-8 text-center">
               <BodyText tone="secondary">
                 Žiadne obľúbené v tejto kategórii.
               </BodyText>
             </div>
           ) : (
+            <>
+            {/* Recipes — same card as in Recepty */}
+            {showRecipes && favRecipes.length > 0 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 18, marginBottom: filteredOther.length > 0 ? 18 : 0 }}>
+                {favRecipes.map((r) => (
+                  <RecipeListCard
+                    key={r.id}
+                    recipe={r}
+                    fav={isFavorite(r.id, 'recipe')}
+                    onOpen={() => navigate(`/recept/${r.id}`)}
+                    onToggleFav={() => toggleFavorite({
+                      id: r.id,
+                      type: 'recipe',
+                      title: r.name,
+                      duration: `${r.prep_minutes ?? 0} min`,
+                      kcal: r.kcal ?? 0,
+                      category: r.slot,
+                    })}
+                  />
+                ))}
+              </div>
+            )}
             <div className="flex flex-col gap-2">
-              {filteredFavorites.map(item => {
+              {filteredOther.map(item => {
                 const Icon = TYPE_ICON[item.type];
                 const colorClass = TYPE_COLOR[item.type];
                 return (
@@ -163,6 +217,7 @@ export default function Oblubene() {
                 );
               })}
             </div>
+            </>
           )}
         </div>
       )}

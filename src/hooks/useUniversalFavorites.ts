@@ -34,7 +34,7 @@ function saveAnonFavorites(items: FavoriteItem[]) {
 
 export function useUniversalFavorites() {
   const { user } = useSupabaseAuth();
-  const { toggleFavorite: toggleSupabaseFavorite, isFavorite: isSupabaseFavorite, loading } = useFavorites();
+  const { favorites: supabaseFavorites, toggleFavorite: toggleSupabaseFavorite, isFavorite: isSupabaseFavorite, loading } = useFavorites();
   const [localFavorites, setLocalFavorites] = useState<FavoriteItem[]>([]);
 
   // Load metadata from localStorage
@@ -83,15 +83,17 @@ export function useUniversalFavorites() {
     });
   };
 
+  // Note: no `loading` guard here — it silently swallowed taps made while a
+  // previous toggle was still reloading, losing favourites liked in quick succession.
   const addToFavorites = async (item: Omit<FavoriteItem, 'addedAt'>) => {
-    if (!user?.id || loading) return;
+    if (!user?.id) return;
     const favoriteItem: FavoriteItem = { ...item, addedAt: new Date().toISOString() };
     const success = await toggleSupabaseFavorite(item.type as any, String(item.id));
     if (success) saveMetadataToLocal(favoriteItem);
   };
 
   const removeFromFavorites = async (itemId: string | number, type: ContentType) => {
-    if (!user?.id || loading) return;
+    if (!user?.id) return;
     const success = await toggleSupabaseFavorite(type as any, String(itemId));
     if (success) removeMetadataFromLocal(itemId, type);
   };
@@ -150,6 +152,8 @@ export function useUniversalFavorites() {
 
   return {
     favorites: getAllFavorites(),
+    /** Raw Supabase rows (authenticated) — source of truth across devices. */
+    supabaseFavorites,
     addToFavorites,
     removeFromFavorites,
     toggleFavorite,
