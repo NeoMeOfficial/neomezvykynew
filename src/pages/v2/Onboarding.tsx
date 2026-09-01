@@ -424,91 +424,58 @@ function StepPrograms({ state, setState, onContinue, onBack, onSkip }: { state: 
   );
 }
 
-// ─── Step 3 · Nutrition upsell ─────────────────────────────────
-function StepNutritionUpsell({ state, setState, onContinue, onBack }: { state: FlowState; setState: (s: FlowState) => void; onContinue: () => void; onBack: () => void }) {
+// ─── Step 3 · Nutrition announcement ───────────────────────────
+// Not purchasable at first launch (Gabi 2026-09-02): no €57 upsell, no
+// add/skip choice — the step only announces the plan ("V ponuke čoskoro").
+// nutrition stays null, so the flow routing treats it as 'skip'.
+function StepNutritionUpsell({ onContinue, onBack }: { state: FlowState; setState: (s: FlowState) => void; onContinue: () => void; onBack: () => void }) {
   return (
     <Shell step={3} totalSteps={6} onBack={onBack}>
       <div style={{ padding: '0 22px' }}>
-        <Eye>Výživa (voliteľné)</Eye>
+        <Eye>Výživa</Eye>
         <Ser size={30} style={{ marginTop: 10 }}>
-          Chceš aj <em style={{ color: NM.GOLD, fontStyle: 'italic', fontWeight: 500 }}>Jedálniček?</em>
+          Chystáme pre teba <em style={{ color: NM.GOLD, fontStyle: 'italic', fontWeight: 500 }}>Jedálniček</em>
         </Ser>
         <Body style={{ marginTop: 10 }}>
-          Plán jedál na týždeň s receptami, makrami a nákupným zoznamom — zladený s tvojou fázou cyklu a potrebami.
+          Personalizovaný jedálniček, ktorý zohľadňuje tvoje preferencie — naplnený Gabikinými receptami tak, aby ti pomohol dosiahnuť tvoje ciele.
         </Body>
       </div>
       <div style={{ margin: '28px 22px 0' }}>
         <div
-          onClick={() => setState({ ...state, nutrition: 'add' })}
           style={{
             padding: '22px 20px',
             background: '#fff',
             borderRadius: 22,
-            border: state.nutrition === 'add' ? `2px solid ${NM.GOLD}` : `1px solid ${NM.HAIR}`,
-            boxShadow: state.nutrition === 'add' ? `0 14px 34px rgba(184,134,74,0.18)` : '0 8px 22px rgba(61,41,33,0.06)',
+            border: `1px solid ${NM.HAIR}`,
+            boxShadow: '0 8px 22px rgba(61,41,33,0.06)',
             position: 'relative',
             overflow: 'hidden',
-            cursor: 'pointer',
           }}
         >
           <div style={{ position: 'absolute', top: -30, right: -30, width: 120, height: 120, borderRadius: 999, background: `${NM.GOLD}14` }} />
           <div style={{ position: 'relative' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-              <Eye color={NM.GOLD} size={10}>Odporúčané</Eye>
-              <div style={{ padding: '3px 8px', background: `${NM.GOLD}20`, borderRadius: 999, fontFamily: NM.SANS, fontSize: 9, color: NM.GOLD, letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 500 }}>+57 €</div>
+            <Eye color={NM.GOLD} size={10}>Jedálniček</Eye>
+            <Ser size={22} style={{ marginTop: 8, marginBottom: 14 }}>6-týždňový plán na mieru</Ser>
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                padding: '9px 16px',
+                borderRadius: 999,
+                background: `${NM.GOLD}18`,
+                border: `1px solid ${NM.GOLD}`,
+                fontFamily: NM.SANS,
+                fontSize: 12,
+                fontWeight: 600,
+                color: NM.GOLD,
+              }}
+            >
+              V ponuke čoskoro
             </div>
-            <Ser size={22} style={{ marginBottom: 6 }}>Pridať Jedálniček</Ser>
-            <Body size={12.5} style={{ marginBottom: 14 }}>Jednorazový poplatok · navždy tvoj</Body>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {[
-                'Týždenné plány s receptami (cca 4–6 jedál denne)',
-                'Makrá, nákupný zoznam, rešpekt k alergénom',
-                'Plán podľa cyklu a postpartum fázy',
-                'Kojaciemu režimu prispôsobené porcie',
-              ].map((li) => (
-                <div key={li} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                  <div style={{ width: 16, height: 16, borderRadius: 999, background: `${NM.GOLD}22`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
-                    <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke={NM.GOLD} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M20 6L9 17l-5-5" />
-                    </svg>
-                  </div>
-                  <Body size={12} color={NM.DEEP} weight={400} style={{ lineHeight: 1.5 }}>{li}</Body>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-        <div
-          onClick={() => setState({ ...state, nutrition: 'skip' })}
-          style={{
-            marginTop: 12,
-            padding: '16px 18px',
-            background: state.nutrition === 'skip' ? '#fff' : 'transparent',
-            border: state.nutrition === 'skip' ? `1.5px solid ${NM.DEEP}` : `1px solid ${NM.HAIR_2}`,
-            borderRadius: 16,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 12,
-            cursor: 'pointer',
-          }}
-        >
-          <div
-            style={{
-              width: 22,
-              height: 22,
-              borderRadius: 999,
-              border: state.nutrition === 'skip' ? `6px solid ${NM.DEEP}` : `1.5px solid ${NM.HAIR_2}`,
-              background: '#fff',
-              flexShrink: 0,
-            }}
-          />
-          <div style={{ flex: 1 }}>
-            <div style={{ fontFamily: NM.SANS, fontSize: 14, fontWeight: 500, color: NM.DEEP }}>Zatiaľ nie</div>
-            <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.EYEBROW, marginTop: 1, fontWeight: 400 }}>Môžeš pridať kedykoľvek z Profilu</div>
           </div>
         </div>
       </div>
-      <CTA label={state.nutrition === 'add' ? 'Pridať a pokračovať' : 'Pokračovať'} onClick={onContinue} />
+      <CTA label="Pokračovať" onClick={onContinue} />
     </Shell>
   );
 }

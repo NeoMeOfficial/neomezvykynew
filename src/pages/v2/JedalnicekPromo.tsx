@@ -63,11 +63,17 @@ export default function JedalnicekPromo() {
   const { hasMealPlanner, purchaseMealPlanner } = useSubscription();
   const [buying, setBuying] = useState(false);
 
+  // Not purchasable at first launch (Gabi 2026-09-02): checkout disabled,
+  // the page only announces the plan. purchaseMealPlanner/buying stay wired
+  // for when the plan launches.
+  const PURCHASABLE = false;
+
   const onPrimary = async () => {
     if (hasMealPlanner) {
       navigate('/jedalnicek');
       return;
     }
+    if (!PURCHASABLE) return;
     setBuying(true);
     try {
       await purchaseMealPlanner();
@@ -283,12 +289,12 @@ export default function JedalnicekPromo() {
             ? 'Vytvoriť môj jedálniček'
             : buying
               ? 'Otváram platbu…'
-              : 'Pridať Jedálniček · 57 €'}
+              : 'V ponuke čoskoro'}
         </button>
         <BodyText size="sm" tone="muted" className="text-center mt-2">
           {hasMealPlanner
             ? 'Jedálniček máš odomknutý'
-            : 'Jednorazový poplatok · navždy tvoj'}
+            : 'Pripravujeme — dáme ti vedieť, keď bude dostupný.'}
         </BodyText>
       </div>
     </div>
