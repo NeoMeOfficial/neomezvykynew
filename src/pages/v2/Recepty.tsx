@@ -65,6 +65,9 @@ export default function Recepty() {
   const inCategory = slotFilter !== 'all';
 
   // Deep links (?cat= from Strava tiles) must apply even when the page is already mounted.
+  // The param is stripped right away (replace) so this history entry is the plain
+  // category landing — back from a recipe detail then lands on the 6 categories,
+  // not on the category listing.
   useEffect(() => {
     const cat = params.get('cat');
     const mapped = cat ? CATEGORY_QUERY_MAP[cat] : undefined;
@@ -73,8 +76,11 @@ export default function Recepty() {
       setTimeFilter('all');
       setMeatless(false);
       setFavOnly(false);
+      const next = new URLSearchParams(params);
+      next.delete('cat');
+      setParams(next, { replace: true });
     }
-  }, [params]);
+  }, [params, setParams]);
 
   // Back from a category view returns to the category list with clean filters.
   const leaveCategory = () => {
