@@ -68,17 +68,11 @@ export function servingsLabel(n: number | null | undefined): string | null {
   return `Recept na ${n} ${n === 1 ? 'porciu' : n <= 4 ? 'porcie' : 'porcií'}`;
 }
 
-// Stock cover per category until real photos land (Gabi: later).
-const CATEGORY_IMG: Record<RecipeCategory, string> = {
-  ranajky: '/images/r9/testimonial-recipe.jpg',
-  hlavne: '/images/r9/section-nutrition.jpg',
-  salaty: '/images/r9/blog-iron-rich-foods.jpg',
-  natierky: '/images/r9/blog-luteal-nutrition.jpg',
-  snacky: '/images/r9/hero-yoga.jpg',
-  napoje: '/images/r9/testimonial-recipe.jpg',
-};
-export function categoryImage(c: RecipeCategory): string {
-  return CATEGORY_IMG[c];
+// One shared stock cover everywhere until real photos land (Gabi 2026-09-02:
+// no mixed placeholders — every category and recipe uses the same photo).
+const STOCK_IMG = '/images/r9/testimonial-recipe.jpg';
+export function categoryImage(_c: RecipeCategory): string {
+  return STOCK_IMG;
 }
 
 export const SLOT_LABEL: Record<SupabaseRecipe['slot'], string> = {
@@ -190,9 +184,8 @@ export function dailyRecipeOf(recipes: SupabaseRecipe[], phaseKey?: string | nul
 /** Cover image (full path): the recipe's own photo when it has one,
  *  else the stock image of its first category. */
 export function recipeImage(r: Pick<SupabaseRecipe, 'slot' | 'categories' | 'image_url'> | null | undefined): string {
-  if (!r) return '/images/r9/testimonial-recipe.jpg';
-  if (r.image_url) return r.image_url;
-  return CATEGORY_IMG[recipeCategories(r)[0]];
+  if (r?.image_url) return r.image_url;
+  return STOCK_IMG;
 }
 
 export function useRecipes() {
