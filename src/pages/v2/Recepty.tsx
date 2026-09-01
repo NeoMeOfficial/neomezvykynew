@@ -59,7 +59,9 @@ export default function Recepty() {
 
   const handleClick = (r: SupabaseRecipe) => {
     // Detail page enforces the per-user quota; listing taps are always permitted.
-    navigate(`/recept/${r.id}`);
+    // replace: the listing is a transient picker — back from the recipe detail
+    // returns to wherever the user entered recipes from (Strava hub), per Gabi.
+    navigate(`/recept/${r.id}`, { replace: true });
   };
 
   const inCategory = slotFilter !== 'all';
