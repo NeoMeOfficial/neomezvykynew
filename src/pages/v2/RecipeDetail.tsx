@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useUniversalFavorites } from '../../hooks/useUniversalFavorites';
-import { useRecipe, recipeCategoryLabel, recipeImage, servingsLabel } from '@/hooks/useRecipes';
+import { useRecipe, useRecipes, recipeCategories, recipeCategoryLabel, recipeImage, servingsLabel, CATEGORY_LABEL } from '@/hooks/useRecipes';
 import { useMealPlan } from '../../features/nutrition/useMealPlan';
 import { useSubscription } from '../../contexts/SubscriptionContext';
 import { useEntitlement } from '../../hooks/useEntitlement';
@@ -49,6 +49,13 @@ export default function RecipeDetail() {
   const [checkedIngredients, setCheckedIngredients] = useState<Set<number>>(new Set());
   const [showPicker, setShowPicker] = useState(false);
   const [picked, setPicked] = useState<{ dayIndex: number; slotIndex: number } | null>(null);
+
+  // "Ďalšie recepty" rows replace this entry, so reset state for the new recipe.
+  const { recipes: allRecipes } = useRecipes();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    setCheckedIngredients(new Set());
+  }, [id]);
 
   const toggleIngredient = (i: number) => {
     setCheckedIngredients((prev) => {
@@ -106,6 +113,13 @@ export default function RecipeDetail() {
 
   const isFav = isFavorite(recipe.id, 'recipe');
   const steps = instructionSteps(recipe.instructions);
+
+  // "Ďalšie recepty" — three more from the same category, start rotated by
+  // day of month so the trio varies; heading links into the full category.
+  const primaryCat = recipeCategories(recipe)[0];
+  const sameCat = allRecipes.filter((r) => r.id !== recipe.id && recipeCategories(r).includes(primaryCat));
+  const relStart = sameCat.length > 0 ? new Date().getDate() % sameCat.length : 0;
+  const related = [...sameCat.slice(relStart), ...sameCat.slice(0, relStart)].slice(0, 3);
 
   return (
     <div style={{ background: NM.BG, minHeight: '100vh', position: 'relative', fontFamily: NM.SANS, color: NM.DEEP, paddingBottom: 'calc(env(safe-area-inset-bottom) + 100px)' }}>
@@ -252,6 +266,44 @@ export default function RecipeDetail() {
         {steps.length === 0 && recipe.instructions === null && (
           <div style={{ padding: '22px 18px', color: NM.MUTED, fontSize: 13, fontFamily: NM.SANS }}>
             Postup prípravy nie je k dispozícii.
+          </div>
+        )}
+
+        {/* Ďalšie recepty — mirrors the "Ďalšie cvičenia" card on the exercise player */}
+        {related.length > 0 && (
+          <div style={{ margin: '4px 18px 10px', padding: '16px 16px 8px', background: '#fff', borderRadius: 18, border: `1px solid ${NM.HAIR}` }}>
+            <button
+              onClick={() => navigate(`/recepty?cat=${primaryCat}`)}
+              style={{ all: 'unset', cursor: 'pointer', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6, boxSizing: 'border-box' }}
+            >
+              <Eye>Ďalšie recepty · {CATEGORY_LABEL[primaryCat]}</Eye>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontFamily: NM.SANS, fontSize: 11, fontWeight: 500, color: NM.MUTED }}>
+                Všetky
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
+              </span>
+            </button>
+            {related.map((r, i) => (
+              <button
+                key={r.id}
+                onClick={() => navigate(`/recept/${r.id}`, { replace: true })}
+                style={{
+                  all: 'unset', cursor: 'pointer', width: '100%', display: 'flex', alignItems: 'center', gap: 12,
+                  padding: '10px 0', boxSizing: 'border-box',
+                  borderBottom: i < related.length - 1 ? `1px solid ${NM.HAIR}` : 'none',
+                }}
+              >
+                <div style={{ width: 48, height: 48, borderRadius: 12, flexShrink: 0, backgroundImage: `url(${recipeImage(r)})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontFamily: NM.SERIF, fontSize: 14, color: NM.DEEP, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {r.name}
+                  </div>
+                  <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.MUTED, marginTop: 2 }}>
+                    {r.prep_minutes ? `${r.prep_minutes} min` : ''}{r.prep_minutes && r.kcal ? ' · ' : ''}{r.kcal ? `${r.kcal} kcal` : ''}
+                  </div>
+                </div>
+                <span style={{ color: NM.TERTIARY, fontSize: 14 }}>›</span>
+              </button>
+            ))}
           </div>
         )}
       </div>
