@@ -169,7 +169,9 @@ export default function RecipeDetail() {
                 </div>
               ))}
             </div>
-            <div style={{ marginTop: 10, textAlign: 'center', fontFamily: NM.SANS, fontSize: 11, color: NM.MUTED }}>
+            {/* Left-aligned: sits under the Kcal column, which every recipe has
+                (macros are often missing and show as em-dashes). */}
+            <div style={{ marginTop: 10, textAlign: 'left', fontFamily: NM.SANS, fontSize: 11, color: NM.MUTED }}>
               Hodnoty na 1 porciu
             </div>
           </div>
