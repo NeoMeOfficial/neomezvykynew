@@ -141,10 +141,20 @@ export function useCycleData(accessCode?: string) {
         const remoteHistoryLen = merged.history?.length ?? 0;
         const localHistoryLen = current.history?.length ?? 0;
         if (merged.lastPeriodStart && remoteHistoryLen >= localHistoryLen) {
+          // Same cycle, remote missing the recorded period end (older schema
+          // or a failed remote write) — keep the local record instead of
+          // silently reverting the correction.
+          const final = (
+            !merged.currentPeriodEnd
+            && current.currentPeriodEnd
+            && current.lastPeriodStart === merged.lastPeriodStart
+          )
+            ? { ...merged, currentPeriodEnd: current.currentPeriodEnd, bleedLengths: current.bleedLengths ?? merged.bleedLengths }
+            : merged;
           try {
-            localStorage.setItem(getStorageKey(), JSON.stringify(merged));
+            localStorage.setItem(getStorageKey(), JSON.stringify(final));
           } catch (_) { /* ignore */ }
-          return merged;
+          return final;
         }
         return current;
       });
@@ -405,6 +415,20 @@ export function useCycleData(accessCode?: string) {
   useEffect(() => {
     loadCycleData();
   }, [loadCycleData]);
+
+  // A PWA gets killed without unmounting — flush the debounced write the
+  // moment the app goes to background so closing it can't lose the change.
+  useEffect(() => {
+    const onHide = () => {
+      if (document.visibilityState === 'hidden') flushSave();
+    };
+    window.addEventListener('pagehide', flushSave);
+    document.addEventListener('visibilitychange', onHide);
+    return () => {
+      window.removeEventListener('pagehide', flushSave);
+      document.removeEventListener('visibilitychange', onHide);
+    };
+  }, [flushSave]);
 
   // Listen for cross-tab changes
   useEffect(() => {

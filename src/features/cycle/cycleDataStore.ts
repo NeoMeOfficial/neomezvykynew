@@ -22,6 +22,9 @@ interface CycleDataRow {
   daily_period_data: DailyPeriodData[] | null;
   custom_settings: Partial<CustomSettings> | null;
   updated_at: string;
+  // Added by migration 20260902100000 — absent (undefined) on older schemas.
+  current_period_end?: string | null;
+  bleed_lengths?: number[] | null;
 }
 
 const defaultCustomSettings: CustomSettings = {
@@ -39,6 +42,8 @@ function rowToCycleData(row: CycleDataRow): CycleData {
     history: row.history ?? [],
     dailyPeriodData: row.daily_period_data ?? [],
     customSettings: { ...defaultCustomSettings, ...(row.custom_settings ?? {}) },
+    currentPeriodEnd: row.current_period_end ?? null,
+    bleedLengths: row.bleed_lengths ?? undefined,
   };
 }
 
@@ -90,21 +95,35 @@ export async function saveCycleData(data: CycleData): Promise<void> {
   const userId = await currentUserId();
   if (!userId) return;
 
+  const basePayload = {
+    user_id: userId,
+    last_period_start: data.lastPeriodStart,
+    cycle_length: data.cycleLength,
+    period_length: data.periodLength,
+    history: data.history ?? [],
+    daily_period_data: data.dailyPeriodData ?? [],
+    custom_settings: data.customSettings,
+    updated_at: new Date().toISOString(),
+  };
+
   const { error } = await supabase
     .from('cycle_data')
     .upsert(
       {
-        user_id: userId,
-        last_period_start: data.lastPeriodStart,
-        cycle_length: data.cycleLength,
-        period_length: data.periodLength,
-        history: data.history ?? [],
-        daily_period_data: data.dailyPeriodData ?? [],
-        custom_settings: data.customSettings,
-        updated_at: new Date().toISOString(),
+        ...basePayload,
+        current_period_end: data.currentPeriodEnd ?? null,
+        bleed_lengths: data.bleedLengths ?? null,
       },
       { onConflict: 'user_id' },
     );
 
-  if (error) console.warn('[cycleDataStore] table save failed:', error.message);
+  if (!error) return;
+
+  // Schema not migrated yet (migration 20260902100000) — save what the
+  // table can hold rather than losing the whole write.
+  const { error: retryError } = await supabase
+    .from('cycle_data')
+    .upsert(basePayload, { onConflict: 'user_id' });
+  if (retryError) console.warn('[cycleDataStore] table save failed:', retryError.message);
+  else console.warn('[cycleDataStore] saved without period-end fields (run migration 20260902100000):', error.message);
 }
