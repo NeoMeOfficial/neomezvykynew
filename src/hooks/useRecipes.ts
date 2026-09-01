@@ -156,11 +156,12 @@ const PHASE_RECIPE_PREFS: Record<string, { temp?: 'warm' | 'cold'; flags: PhaseF
   luteal:     { flags: ['is_magnesium_rich', 'is_complex_carbs'] },
 };
 
-// Featured-recipe history: the ids shown on the last few days, so the
-// "recept dňa" never repeats within a week even across phase changes or
-// cycle on/off. Per device; entries older than the window are pruned.
+// Featured-recipe history: every id already featured this lap, so the
+// "recept dňa" cycles through the whole library before anything repeats
+// (phase preference decides the order within the lap). Per device; once
+// all recipes have been featured the lap restarts.
 const DAILY_HISTORY_KEY = 'neome_daily_recipe_history_v1';
-const NO_REPEAT_DAYS = 6; // today + previous 6 = a repeat-free week
+const NO_REPEAT_DAYS = 6; // hard floor at a lap restart: today + previous 6 stay excluded
 
 type DailyHistoryEntry = { d: string; id: string; p: string | null };
 
@@ -190,9 +191,11 @@ function writeDailyHistory(list: DailyHistoryEntry[]) {
  * Strava section, rotating at LOCAL midnight. With a known cycle phase
  * it prefers the recipes that best match the phase (candidates ordered
  * best-match first); without one (cycle off) it rotates over the whole
- * library. Recipes shown in the previous NO_REPEAT_DAYS days are skipped,
- * so a week never shows the same recipe twice. Today's pick is stored and
- * stays stable for the day unless the phase changes.
+ * library. Every recipe already featured this lap is skipped, so all
+ * recipes get their turn before any repeats; at a lap restart the last
+ * NO_REPEAT_DAYS days stay excluded so a week never shows a recipe twice.
+ * Today's pick is stored and stays stable for the day unless the phase
+ * changes.
  */
 export function dailyRecipeOf(recipes: SupabaseRecipe[], phaseKey?: string | null): SupabaseRecipe | null {
   if (recipes.length === 0) return null;
@@ -238,17 +241,23 @@ export function dailyRecipeOf(recipes: SupabaseRecipe[], phaseKey?: string | nul
     }
   }
 
-  // Skip anything featured in the recent window (today's stale entry included).
-  const cutoff = new Date(now);
-  cutoff.setDate(cutoff.getDate() - NO_REPEAT_DAYS);
-  const cutoffKey = localDayKey(cutoff);
-  const recentIds = new Set(history.filter((h) => h.d >= cutoffKey && h.d !== today).map((h) => h.id));
-  const pick = ordered.find((r) => !recentIds.has(r.id)) ?? ordered[0];
+  // Skip everything already featured this lap (today's stale entry included).
+  const past = history.filter((h) => h.d !== today);
+  const lapIds = new Set(past.map((h) => h.id));
+  let pick = ordered.find((r) => !lapIds.has(r.id));
+  let kept = past;
+  if (!pick) {
+    // Lap complete — every recipe has been featured. Restart, but keep the
+    // last NO_REPEAT_DAYS days excluded so the week rule still holds.
+    const cutoff = new Date(now);
+    cutoff.setDate(cutoff.getDate() - NO_REPEAT_DAYS);
+    const cutoffKey = localDayKey(cutoff);
+    kept = past.filter((h) => h.d >= cutoffKey);
+    const recentIds = new Set(kept.map((h) => h.id));
+    pick = ordered.find((r) => !recentIds.has(r.id)) ?? ordered[0];
+  }
 
-  writeDailyHistory([
-    ...history.filter((h) => h.d >= cutoffKey && h.d !== today),
-    { d: today, id: pick.id, p: phase },
-  ]);
+  writeDailyHistory([...kept, { d: today, id: pick.id, p: phase }]);
   return pick;
 }
 
