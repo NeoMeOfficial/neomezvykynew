@@ -155,18 +155,23 @@ export default function RecipeDetail() {
 
         {/* Macros strip */}
         {(recipe.kcal || recipe.protein || recipe.carbs || recipe.fat) && (
-          <div style={{ padding: '18px 18px', display: 'flex', justifyContent: 'space-between', borderTop: `1px solid ${NM.HAIR}`, borderBottom: `1px solid ${NM.HAIR}` }}>
-            {([
-              ['Kcal', recipe.kcal],
-              ['Proteín', recipe.protein != null ? `${recipe.protein} g` : '—'],
-              ['Sach.', recipe.carbs != null ? `${recipe.carbs} g` : '—'],
-              ['Tuky', recipe.fat != null ? `${recipe.fat} g` : '—'],
-            ] as [string, string | number | null][]).map(([k, v]) => (
-              <div key={k} style={{ textAlign: 'center' }}>
-                <div style={{ fontFamily: NM.SANS, fontSize: 10, letterSpacing: '0.24em', textTransform: 'uppercase', color: NM.TERTIARY, marginBottom: 6 }}>{k}</div>
-                <div style={{ fontFamily: NM.SERIF, fontSize: 20, fontWeight: 500, color: NM.DEEP, letterSpacing: '-0.005em' }}>{v ?? '—'}</div>
-              </div>
-            ))}
+          <div style={{ padding: '18px 18px 14px', borderTop: `1px solid ${NM.HAIR}`, borderBottom: `1px solid ${NM.HAIR}` }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              {([
+                ['Kcal', recipe.kcal],
+                ['Proteín', recipe.protein != null ? `${recipe.protein} g` : '—'],
+                ['Sach.', recipe.carbs != null ? `${recipe.carbs} g` : '—'],
+                ['Tuky', recipe.fat != null ? `${recipe.fat} g` : '—'],
+              ] as [string, string | number | null][]).map(([k, v]) => (
+                <div key={k} style={{ textAlign: 'center' }}>
+                  <div style={{ fontFamily: NM.SANS, fontSize: 10, letterSpacing: '0.24em', textTransform: 'uppercase', color: NM.TERTIARY, marginBottom: 6 }}>{k}</div>
+                  <div style={{ fontFamily: NM.SERIF, fontSize: 20, fontWeight: 500, color: NM.DEEP, letterSpacing: '-0.005em' }}>{v ?? '—'}</div>
+                </div>
+              ))}
+            </div>
+            <div style={{ marginTop: 10, textAlign: 'center', fontFamily: NM.SANS, fontSize: 11, color: NM.MUTED }}>
+              Hodnoty na 1 porciu
+            </div>
           </div>
         )}
 
