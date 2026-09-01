@@ -4,6 +4,8 @@ import { useUniversalFavorites, ContentType } from '../../hooks/useUniversalFavo
 import { useRecipes, type SupabaseRecipe } from '@/hooks/useRecipes';
 import { RecipeListCard } from '../../components/v2/RecipeListCard';
 import { ExerciseListRow } from '../../components/v2/ExerciseListRow';
+import { MeditationListRow } from '../../components/v2/MeditationListRow';
+import { useMeditations } from '../../hooks/useMeditations';
 import { useExercises } from '../../hooks/useExercises';
 import { useStretches } from '../../hooks/useStretches';
 import { catalogExercises, catalogStretches, CatalogExercise, CatalogStretch } from '../../features/telo/libraryCatalog';
@@ -100,8 +102,24 @@ export default function Oblubene() {
     .filter((w): w is NonNullable<typeof w> => w !== null);
   const resolvedWorkoutIds = new Set(favWorkouts.map((w) => String(w.kind === 'extra' ? w.extra!.e.id : w.stretch!.s.id)));
 
+  // Meditations resolve against the live library and render with the same
+  // row card as in Myseľ. Unmatched ones fall back to the generic row.
+  const { meditations } = useMeditations();
+  const meditationById = new Map(meditations.map((m) => [String(m.id), m]));
+  const meditationFavIds: string[] = [];
+  supabaseFavorites.forEach((f) => { if (f.item_type === 'meditation') meditationFavIds.push(f.item_id); });
+  favorites.forEach((f) => {
+    if (f.type === 'meditation' && !meditationFavIds.includes(String(f.id))) meditationFavIds.push(String(f.id));
+  });
+  const favMeditations = meditationFavIds
+    .map((id) => meditationById.get(id))
+    .filter((m): m is NonNullable<typeof m> => Boolean(m));
+  const resolvedMeditationIds = new Set(favMeditations.map((m) => String(m.id)));
+
   const otherFavs = favorites.filter((f) =>
-    f.type !== 'recipe' && !(f.type === 'workout' && resolvedWorkoutIds.has(String(f.id)))
+    f.type !== 'recipe'
+    && !(f.type === 'workout' && resolvedWorkoutIds.has(String(f.id)))
+    && !(f.type === 'meditation' && resolvedMeditationIds.has(String(f.id)))
   );
 
   const openFavExercise = (p: CatalogExercise) => {
@@ -144,16 +162,17 @@ export default function Oblubene() {
   };
 
   const counts = {
-    total: favRecipes.length + favWorkouts.length + otherFavs.length,
+    total: favRecipes.length + favWorkouts.length + favMeditations.length + otherFavs.length,
     recipe: favRecipes.length,
     workout: favWorkouts.length + otherFavs.filter((f) => f.type === 'workout').length,
-    meditation: otherFavs.filter((f) => f.type === 'meditation').length,
+    meditation: favMeditations.length + otherFavs.filter((f) => f.type === 'meditation').length,
     article: otherFavs.filter((f) => f.type === 'article').length,
     program: otherFavs.filter((f) => f.type === 'program').length,
   };
 
   const showRecipes = activeTab === 'all' || activeTab === 'recipe';
   const showWorkouts = activeTab === 'all' || activeTab === 'workout';
+  const showMeditations = activeTab === 'all' || activeTab === 'meditation';
   const filteredOther = activeTab === 'all'
     ? otherFavs
     : activeTab === 'recipe'
@@ -214,7 +233,7 @@ export default function Oblubene() {
           )}
 
           {/* Content list */}
-          {(showRecipes ? favRecipes.length : 0) + (showWorkouts ? favWorkouts.length : 0) + filteredOther.length === 0 ? (
+          {(showRecipes ? favRecipes.length : 0) + (showWorkouts ? favWorkouts.length : 0) + (showMeditations ? favMeditations.length : 0) + filteredOther.length === 0 ? (
             <div className="rounded-card bg-white border border-ink/[0.08] shadow-nm-sm p-8 text-center">
               <BodyText tone="secondary">
                 Žiadne obľúbené v tejto kategórii.
@@ -272,6 +291,23 @@ export default function Oblubene() {
                     />
                   )
                 )}
+              </div>
+            )}
+            {/* Meditations — same row card as in Myseľ */}
+            {showMeditations && favMeditations.length > 0 && (
+              <div style={{ marginBottom: filteredOther.length > 0 ? 18 : 0 }}>
+                {favMeditations.map((m, i) => (
+                  <MeditationListRow
+                    key={m.id}
+                    id={m.id}
+                    eye={`${m.category} · ${Math.round(m.duration_sec / 60)} min`}
+                    title={m.title}
+                    duration={`${Math.round(m.duration_sec / 60)} min`}
+                    category={m.category}
+                    last={i === favMeditations.length - 1}
+                    onClick={() => navigate(`/meditacia/${m.id}`)}
+                  />
+                ))}
               </div>
             )}
             <div className="flex flex-col gap-2">

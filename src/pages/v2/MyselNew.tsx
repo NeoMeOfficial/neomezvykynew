@@ -2,10 +2,10 @@ import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Page, Eye, NM } from '../../components/v2/neome';
 import { useMeditations } from '../../hooks/useMeditations';
+import { MeditationListRow } from '../../components/v2/MeditationListRow';
 import { useReflections } from '../../hooks/useDailyRituals';
 import { useUniversalFavorites } from '../../hooks/useUniversalFavorites';
 import { useSmartBack } from '../../hooks/useSmartBack';
-import FavoriteButton from '../../components/v2/favorites/FavoriteButton';
 import { useDailyMeditation } from '../../hooks/useDailyContent';
 
 /**
@@ -33,7 +33,6 @@ function dayPromptIndex(d = new Date()): number {
   return Math.floor((d.getTime() - new Date(d.getFullYear(), 0, 0).getTime()) / 86400000) % PROMPTS.length;
 }
 
-const MAUVE_100 = '#EFE4E6';
 
 export default function MyselNew() {
   const navigate = useNavigate();
@@ -232,7 +231,7 @@ export default function MyselNew() {
           <FallbackRows />
         ) : (
           filteredMeds.map((m, i) => (
-            <MedRow
+            <MeditationListRow
               key={m.id}
               id={m.id}
               eye={`${m.category} · ${Math.round(m.duration_sec / 60)} min`}
@@ -341,108 +340,12 @@ function SectionHeader({
   );
 }
 
-function MedRow({
-  id,
-  eye,
-  title,
-  duration,
-  category,
-  done,
-  last,
-  onClick,
-}: {
-  id?: string;
-  eye: string;
-  title: string;
-  duration?: string;
-  category?: string;
-  done?: boolean;
-  last?: boolean;
-  onClick?: () => void;
-}) {
-  return (
-    <div
-      role="button"
-      tabIndex={0}
-      onClick={onClick}
-      onKeyDown={(e) => { if (e.key === 'Enter') onClick?.(); }}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 14,
-        padding: '14px 18px',
-        background: '#FFFFFF',
-        borderRadius: 18,
-        border: `1px solid ${NM.HAIR}`,
-        marginBottom: last ? 0 : 10,
-        width: '100%',
-        cursor: 'pointer',
-        textAlign: 'left',
-        boxSizing: 'border-box',
-      }}
-    >
-      <div
-        style={{
-          width: 42,
-          height: 42,
-          borderRadius: 999,
-          background: MAUVE_100,
-          display: 'grid',
-          placeItems: 'center',
-          flexShrink: 0,
-        }}
-      >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill={NM.MAUVE}>
-          <path d="M8 5v14l11-7z" />
-        </svg>
-      </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <Eye size={9.5}>{eye}</Eye>
-        <div
-          style={{
-            marginTop: 4,
-            fontFamily: NM.SERIF,
-            fontSize: 16,
-            color: NM.DEEP,
-            lineHeight: 1.15,
-            letterSpacing: '-0.01em',
-          }}
-        >
-          {title}
-        </div>
-      </div>
-      {id && (
-        <span onClick={(e) => e.stopPropagation()} style={{ flexShrink: 0, display: 'inline-flex' }}>
-          <FavoriteButton itemId={id} type="meditation" title={title} duration={duration} category={category} size="sm" />
-        </span>
-      )}
-      {done && (
-        <div
-          style={{
-            width: 26,
-            height: 26,
-            borderRadius: 999,
-            background: NM.SAGE,
-            display: 'grid',
-            placeItems: 'center',
-            flexShrink: 0,
-          }}
-        >
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M5 12l5 5L20 7" />
-          </svg>
-        </div>
-      )}
-    </div>
-  );
-}
-
 function FallbackRows() {
   return (
     <>
-      <MedRow eye="Emócie · 12 min" title="Upokojenie úzkosti" done />
-      <MedRow eye="Večer · 15 min" title="Dych pre spánok" />
-      <MedRow eye="Telo · 8 min" title="Prijatie tela" last />
+      <MeditationListRow eye="Emócie · 12 min" title="Upokojenie úzkosti" done />
+      <MeditationListRow eye="Večer · 15 min" title="Dych pre spánok" />
+      <MeditationListRow eye="Telo · 8 min" title="Prijatie tela" last />
     </>
   );
 }
