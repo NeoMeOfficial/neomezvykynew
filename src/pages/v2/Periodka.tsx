@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { useCycleData } from '../../features/cycle/useCycleData';
@@ -204,12 +205,13 @@ interface PaidViewProps {
   derivedState: DerivedState | null;
   onMarkPeriodStart: () => void;
   onMarkPeriodEnd: (date: Date) => void;
+  onCorrectPeriod: (start: Date, end: Date | null) => void;
 }
 
 const SK_MONTHS_FULL = ['január', 'február', 'marec', 'apríl', 'máj', 'jún', 'júl', 'august', 'september', 'október', 'november', 'december'];
 const SK_MONTHS_SHORT_LOWER = ['jan', 'feb', 'mar', 'apr', 'máj', 'jún', 'júl', 'aug', 'sep', 'okt', 'nov', 'dec'];
 
-function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMarkPeriodEnd }: PaidViewProps) {
+function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMarkPeriodEnd, onCorrectPeriod }: PaidViewProps) {
   const totalDays = cycleData.cycleLength ?? 28;
   const periodLength = cycleData.periodLength ?? 5;
   const currentDay = derivedState?.currentDay ?? 1;
@@ -248,6 +250,15 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
   const monthLabel = SK_MONTHS_FULL[monthIdx];
   const monthShort = SK_MONTHS_SHORT_LOWER[monthIdx];
 
+  // Actual bleed length of THIS cycle when its end was recorded — overrides
+  // the assumed periodLength in the calendar so a corrected end date
+  // recolours the days immediately (parked bug, fixed 2026-09-02).
+  const actualBleedLen = (cycleData.currentPeriodEnd && cycleData.lastPeriodStart
+    && cycleData.currentPeriodEnd >= cycleData.lastPeriodStart)
+    ? Math.floor((new Date(cycleData.currentPeriodEnd + 'T00:00:00').getTime()
+        - new Date(cycleData.lastPeriodStart + 'T00:00:00').getTime()) / 86400000) + 1
+    : null;
+
   // Day-of-month → cycle-day → phase key. Maps a calendar date in the
   // visible month back to a phase. Both the cell tint AND the legend
   // highlight derive from this so they're guaranteed to agree.
@@ -260,7 +271,15 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     // the current cycle length (same rule as phaseKeyForDateISO).
     const cycleDay = ((daysSince % totalDays) + totalDays) % totalDays + 1;
     const range = phases.find((p) => cycleDay >= p.start && cycleDay <= p.end);
-    return { cycleDay, key: range?.key ?? null };
+    let key = range?.key ?? null;
+    // Current cycle with a recorded end: menstrual days follow the ACTUAL
+    // bleed, not the assumed average.
+    const inCurrentCycle = daysSince >= 0 && daysSince < totalDays;
+    if (inCurrentCycle && actualBleedLen !== null) {
+      if (cycleDay <= actualBleedLen) key = 'menstrual';
+      else if (key === 'menstrual') key = 'follicular';
+    }
+    return { cycleDay, key };
   };
   const phaseKeyForCalendarDay = (d: number): string | null => cycleInfoForCalendarDay(d)?.key ?? null;
   const phaseOf = (d: number) => {
@@ -298,6 +317,27 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     && !!cycleData.lastPeriodStart
     && cycleData.currentPeriodEnd >= cycleData.lastPeriodStart;
   const bleedingOngoing = !periodEnded && currentDay <= periodLength;
+
+  // ✎ editor for the last period's dates ("Tvoj cyklus" section).
+  const [periodEditOpen, setPeriodEditOpen] = useState(false);
+  const [draftStart, setDraftStart] = useState('');
+  const [draftEnd, setDraftEnd] = useState('');
+  const openPeriodEditor = () => {
+    setDraftStart(cycleData.lastPeriodStart ?? '');
+    setDraftEnd(periodEnded ? cycleData.currentPeriodEnd! : '');
+    setPeriodEditOpen(true);
+  };
+  const editTodayISO = format(today, 'yyyy-MM-dd');
+  const draftValid = !!draftStart && draftStart <= editTodayISO
+    && (!draftEnd || (draftEnd >= draftStart && draftEnd <= editTodayISO));
+  const savePeriodEdit = () => {
+    if (!draftValid) return;
+    onCorrectPeriod(
+      new Date(draftStart + 'T00:00:00'),
+      draftEnd ? new Date(draftEnd + 'T00:00:00') : null,
+    );
+    setPeriodEditOpen(false);
+  };
   // Just past the assumed length with no recorded end — ask instead of
   // silently assuming. Dismissable for the rest of the day.
   const [bleedPromptDismissed, setBleedPromptDismissed] = useState(() => {
@@ -1413,36 +1453,137 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
       </div>
   );
 
+  // "Tvoj cyklus" (Gabi 2026-09-02, replaces "Čaká ťa"): two columns —
+  // Posledná (recorded past, editable via ✎ on the period row) and
+  // Nasledujúca (computed predictions, deliberately NOT editable).
+  const fmtNumDate = (d: Date) => `${d.getDate()}.${d.getMonth() + 1}.`;
+  const lastStartDate = cycleData.lastPeriodStart ? new Date(cycleData.lastPeriodStart + 'T00:00:00') : null;
+  const lastEndDate = periodEnded ? new Date(cycleData.currentPeriodEnd! + 'T00:00:00') : null;
+  const assumedEndDate = lastStartDate ? new Date(lastStartDate.getTime() + (periodLength - 1) * 86400000) : null;
+  const lastPeriodLabel = !lastStartDate
+    ? '—'
+    : lastEndDate
+      ? `${fmtNumDate(lastStartDate)} – ${fmtNumDate(lastEndDate)}`
+      : bleedingOngoing
+        ? `od ${fmtNumDate(lastStartDate)}`
+        : `${fmtNumDate(lastStartDate)} – ${fmtNumDate(assumedEndDate!)}`;
+  const lastOvulationDate = lastStartDate
+    ? new Date(lastStartDate.getTime() + (ovulationStart - 1 - (currentDay >= ovulationStart ? 0 : totalDays)) * 86400000)
+    : null;
+
+  const cyclusRows: { t: string; c: string; last: string; next: string; nextSub?: string; edit?: boolean }[] = [
+    { t: 'Perióda', c: PHASE.MENSTR, last: lastPeriodLabel, next: fmtNumDate(nextPeriodDate), nextSub: inDaysLabel(daysToMenstruation).toLowerCase(), edit: true },
+    { t: 'Ovulácia', c: PHASE.OVULAT, last: lastOvulationDate ? fmtNumDate(lastOvulationDate) : '—', next: fmtNumDate(ovulationDate), nextSub: inDaysLabel(daysToOvulation).toLowerCase() },
+    { t: 'Dĺžka cyklu', c: NM.GOLD, last: `${totalDays} dní`, next: `~${totalDays} dní`, nextSub: 'podľa posledných cyklov' },
+  ];
+
   const upcomingBlock = (
       <div style={{ padding: '28px 22px 8px' }}>
-        <Eye>Čaká ťa</Eye>
+        <Eye>Tvoj cyklus</Eye>
         <div style={{ marginTop: 16 }}>
-          {[
-            { w: inDaysLabel(daysToMenstruation), d: fmtShortDate(nextPeriodDate), t: 'Nasledujúca perióda', c: PHASE.MENSTR },
-            { w: inDaysLabel(daysToOvulation), d: fmtShortDate(ovulationDate), t: 'Nasledujúca ovulácia', c: PHASE.OVULAT },
-            { w: 'priemer', d: `${totalDays} dní`, t: 'Dĺžka cyklu', c: NM.GOLD },
-          ].map((u, i, arr) => (
+          {/* Column headers */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, paddingBottom: 6 }}>
+            <div style={{ width: 8, flexShrink: 0 }} />
+            <div style={{ flex: 1 }} />
+            <div style={{ width: 104, fontFamily: NM.SANS, fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: NM.TERTIARY, fontWeight: 500 }}>Posledná</div>
+            <div style={{ width: 88, fontFamily: NM.SANS, fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: NM.TERTIARY, fontWeight: 500, textAlign: 'right' }}>Nasledujúca</div>
+          </div>
+          {cyclusRows.map((u, i, arr) => (
             <div
               key={u.t}
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: 12,
-                padding: '14px 0',
+                padding: '13px 0',
                 borderBottom: i < arr.length - 1 ? `1px solid ${NM.HAIR}` : 'none',
               }}
             >
               <div style={{ width: 8, height: 8, borderRadius: 999, background: u.c, flexShrink: 0 }} />
               <div style={{ flex: 1, fontFamily: NM.SANS, fontSize: 13, color: NM.DEEP, fontWeight: 400 }}>{u.t}</div>
-              <div style={{ textAlign: 'right' }}>
-                <div style={{ fontFamily: NM.SERIF, fontSize: 15, color: NM.DEEP, letterSpacing: '-0.005em' }}>{u.d}</div>
-                <div style={{ fontFamily: NM.SANS, fontSize: 10.5, color: NM.TERTIARY, fontWeight: 400, marginTop: 2 }}>{u.w.toLowerCase()}</div>
+              <div style={{ width: 104, display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span style={{ fontFamily: NM.SERIF, fontSize: 13.5, color: NM.DEEP, letterSpacing: '-0.005em', whiteSpace: 'nowrap' }}>{u.last}</span>
+                {u.edit && (
+                  <button
+                    onClick={openPeriodEditor}
+                    aria-label="Upraviť dátumy poslednej periódy"
+                    style={{ all: 'unset', cursor: 'pointer', display: 'inline-flex', padding: 4, margin: -4, marginLeft: -2 }}
+                  >
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={PHASE.MENSTR} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M17 3a2.828 2.828 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+                    </svg>
+                  </button>
+                )}
+              </div>
+              <div style={{ width: 88, textAlign: 'right' }}>
+                <div style={{ fontFamily: NM.SERIF, fontSize: 13.5, color: NM.DEEP, letterSpacing: '-0.005em', whiteSpace: 'nowrap' }}>{u.next}</div>
+                {u.nextSub && (
+                  <div style={{ fontFamily: NM.SANS, fontSize: 9.5, color: NM.TERTIARY, fontWeight: 400, marginTop: 2 }}>{u.nextSub}</div>
+                )}
               </div>
             </div>
           ))}
         </div>
       </div>
   );
+
+  // Bottom sheet for correcting the last period's dates. Portal to body —
+  // PWA rule: overlays must escape the layout or BottomNav covers them.
+  const dateInputStyle: React.CSSProperties = {
+    width: '100%', padding: '13px 14px', boxSizing: 'border-box',
+    background: '#fff', border: `1px solid ${NM.HAIR_2}`, borderRadius: 14,
+    fontFamily: NM.SANS, fontSize: 14, color: NM.DEEP, outline: 'none',
+  };
+  const periodEditSheet = periodEditOpen ? createPortal(
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(42,26,20,0.55)', backdropFilter: 'blur(6px)', zIndex: 9999, display: 'flex', alignItems: 'flex-end' }}>
+      <div onClick={() => setPeriodEditOpen(false)} style={{ position: 'absolute', inset: 0 }} />
+      <div style={{ position: 'relative', width: '100%', background: NM.BG, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: '22px 22px calc(env(safe-area-inset-bottom) + 22px)', boxShadow: '0 -10px 32px rgba(61,41,33,0.18)' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 14 }}>
+          <div style={{ width: 38, height: 4, borderRadius: 999, background: NM.HAIR_2 }} />
+        </div>
+        <Eye color={PHASE.MENSTR}>Posledná perióda</Eye>
+        <div style={{ marginTop: 14 }}>
+          <div style={{ fontFamily: NM.SANS, fontSize: 12, color: NM.MUTED, marginBottom: 6 }}>Začiatok</div>
+          <input
+            type="date"
+            value={draftStart}
+            max={todayISO}
+            onChange={(e) => setDraftStart(e.target.value)}
+            style={dateInputStyle}
+          />
+        </div>
+        <div style={{ marginTop: 14 }}>
+          <div style={{ fontFamily: NM.SANS, fontSize: 12, color: NM.MUTED, marginBottom: 6 }}>Koniec</div>
+          <input
+            type="date"
+            value={draftEnd}
+            min={draftStart || undefined}
+            max={todayISO}
+            onChange={(e) => setDraftEnd(e.target.value)}
+            style={dateInputStyle}
+          />
+          <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.TERTIARY, marginTop: 6 }}>
+            {draftEnd ? 'Dĺžka krvácania sa prepočíta automaticky.' : 'Nechaj prázdne, ak perióda ešte trvá.'}
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
+          <button
+            onClick={() => setPeriodEditOpen(false)}
+            style={{ all: 'unset', cursor: 'pointer', flex: 1, textAlign: 'center', padding: '14px 0', borderRadius: 999, border: `1px solid ${NM.HAIR_2}`, fontFamily: NM.SANS, fontSize: 13, color: NM.DEEP, fontWeight: 500 }}
+          >
+            Zrušiť
+          </button>
+          <button
+            onClick={savePeriodEdit}
+            style={{ all: 'unset', cursor: draftValid ? 'pointer' : 'default', flex: 1, textAlign: 'center', padding: '14px 0', borderRadius: 999, background: draftValid ? PHASE.MENSTR : NM.HAIR_2, color: '#fff', fontFamily: NM.SANS, fontSize: 13, fontWeight: 500, opacity: draftValid ? 1 : 0.7 }}
+          >
+            Uložiť
+          </button>
+        </div>
+      </div>
+    </div>,
+    document.body,
+  ) : null;
 
   return (
     <>
@@ -1457,6 +1598,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
       {upcomingBlock}
       {calendarBlock}
       {dayDetailSheet}
+      {periodEditSheet}
     </>
   );
 }
@@ -1574,7 +1716,7 @@ function FreeView({ navigate }: { navigate: (p: string) => void }) {
 
 export default function Periodka() {
   const navigate = useNavigate();
-  const { cycleData, derivedState, setLastPeriodStart, markPeriodEnded } = useCycleData();
+  const { cycleData, derivedState, setLastPeriodStart, markPeriodEnded, correctPeriod } = useCycleData();
   const [confirmStartOpen, setConfirmStartOpen] = useState(false);
   const requireConsent = useConsentGuard();
 
@@ -1613,6 +1755,7 @@ export default function Periodka() {
           derivedState={derivedState}
           onMarkPeriodStart={() => setConfirmStartOpen(true)}
           onMarkPeriodEnd={handleMarkPeriodEnded}
+          onCorrectPeriod={correctPeriod}
         />
       ) : (
         <FreeView navigate={navigate} />

@@ -275,6 +275,43 @@ export function useCycleData(accessCode?: string) {
     });
   }, [saveCycleData]);
 
+  // Correct BOTH dates of the last period at once (the ✎ editor in the
+  // "Tvoj cyklus" section). Atomic — a start-then-end pair of updates would
+  // race the debounced save and clear currentPeriodEnd in between.
+  // end === null means "ešte trvá": the end marker is cleared.
+  const correctPeriod = useCallback((start: Date, end: Date | null) => {
+    setCycleData(current => {
+      const startStr = format(start, 'yyyy-MM-dd');
+      if (!end) {
+        const updated = { ...current, lastPeriodStart: startStr, currentPeriodEnd: null };
+        saveCycleData(updated);
+        return updated;
+      }
+      const actualLength = differenceInDays(end, start) + 1;
+      if (actualLength < 1) return current;
+
+      const hadEnd = !!current.currentPeriodEnd && !!current.lastPeriodStart
+        && current.currentPeriodEnd >= current.lastPeriodStart;
+      const base = current.bleedLengths ?? [];
+      const bleedLengths = [...(hadEnd ? base.slice(0, -1) : base), Math.min(actualLength, 14)].slice(-6);
+      let learnedPeriodLength = current.periodLength;
+      if (bleedLengths.length >= 3) {
+        const avg = Math.round(bleedLengths.reduce((s, n) => s + n, 0) / bleedLengths.length);
+        learnedPeriodLength = Math.max(2, Math.min(10, avg));
+      }
+
+      const updated = {
+        ...current,
+        lastPeriodStart: startStr,
+        currentPeriodEnd: format(end, 'yyyy-MM-dd'),
+        bleedLengths,
+        periodLength: learnedPeriodLength,
+      };
+      saveCycleData(updated);
+      return updated;
+    });
+  }, [saveCycleData]);
+
   // Set cycle length
   const setCycleLength = useCallback((length: number) => {
     updateCycleData({ cycleLength: Math.max(21, Math.min(45, length)) });
@@ -411,6 +448,7 @@ export function useCycleData(accessCode?: string) {
     setPeriodLength,
     markPeriodEnded,
     correctPeriodEnd,
+    correctPeriod,
     addPeriodToHistory,
     updateCustomSettings,
     updateCycleData,
