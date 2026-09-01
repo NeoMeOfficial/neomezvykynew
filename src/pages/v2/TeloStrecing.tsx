@@ -4,6 +4,7 @@ import { useSubscription } from '../../contexts/SubscriptionContext';
 import { useStretches } from '../../hooks/useStretches';
 import { Page, BackHeader, Eye, Ser, Body, PlusTag, NM } from '../../components/v2/neome';
 import PlusUnlockBanner from '../../components/v2/paywall/PlusUnlockBanner';
+import { ExerciseListRow } from '../../components/v2/ExerciseListRow';
 import {
   StretchFocusKey, EquipKey, BandKey,
   STRETCH_FOCUS_ORDER, STRETCH_EQUIP_ORDER, STRETCH_FOCUS_LABEL, STRETCH_BAND_LABEL,
@@ -190,59 +191,18 @@ export default function TeloStrecing() {
             {STRETCH_BAND_LABEL[band]} · {list.length}
           </Eye>
           <div style={{ background: '#fff', borderRadius: 18, border: `1px solid ${NM.HAIR}`, overflow: 'hidden' }}>
-            {list.map((p, i, arr) => {
-              const locked = !p.isFree && !isPremium;
-              return (
-                <button
-                  key={p.s.id}
-                  onClick={() => openStretch(p)}
-                  style={{
-                    all: 'unset',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    width: '100%',
-                    gap: 14,
-                    padding: '12px 14px',
-                    alignItems: 'center',
-                    borderBottom: i < arr.length - 1 ? `1px solid ${NM.HAIR}` : 'none',
-                    boxSizing: 'border-box',
-                  }}
-                >
-                  <div
-                    style={{
-                      width: 60,
-                      height: 60,
-                      borderRadius: 12,
-                      flexShrink: 0,
-                      backgroundImage: p.s.thumb_url ? `url(${p.s.thumb_url})` : undefined,
-                      backgroundColor: p.s.thumb_url ? undefined : NM.HAIR,
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center',
-                      position: 'relative',
-                    }}
-                  >
-                    <div style={{ position: 'absolute', inset: 0, borderRadius: 12, background: 'rgba(42,26,20,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <div style={{ width: 24, height: 24, borderRadius: 999, background: 'rgba(255,255,255,0.92)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <svg width="8" height="9" viewBox="0 0 8 9" fill="none">
-                          <path d="M1 1v7l6-3.5L1 1z" fill={NM.DEEP} />
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
-                    <div style={{ fontFamily: NM.SERIF, fontSize: 15, fontWeight: 500, color: NM.DEEP, letterSpacing: '-0.005em' }}>
-                      {p.titleParts
-                        ? <>{p.titleParts.before}{' '}<strong style={{ color: '#B8864A', fontWeight: 700, fontSize: 16 }}>{p.titleParts.em}</strong><span style={{ fontFamily: NM.SANS, fontSize: 12, fontWeight: 600, color: '#B8864A', marginLeft: 3 }}>{p.titleParts.num}</span></>
-                        : p.title}
-                    </div>
-                    <div style={{ fontFamily: NM.SANS, fontSize: 10.5, color: NM.EYEBROW, marginTop: 3, fontWeight: 400 }}>
-                      {p.s.duration_min} min · {EQUIP_SHORT[p.equip]}
-                    </div>
-                  </div>
-                  {locked ? <PlusTag /> : <div style={{ color: NM.TERTIARY, fontSize: 14 }}>›</div>}
-                </button>
-              );
-            })}
+            {list.map((p, i, arr) => (
+              <ExerciseListRow
+                key={p.s.id}
+                thumbUrl={p.s.thumb_url}
+                title={p.title}
+                titleParts={p.titleParts}
+                meta={`${p.s.duration_min} min · ${EQUIP_SHORT[p.equip]}`}
+                locked={!p.isFree && !isPremium}
+                onOpen={() => openStretch(p)}
+                divider={i < arr.length - 1}
+              />
+            ))}
           </div>
         </div>
       )}

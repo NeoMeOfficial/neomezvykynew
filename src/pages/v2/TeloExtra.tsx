@@ -4,6 +4,7 @@ import { useSubscription } from '../../contexts/SubscriptionContext';
 import { useExercises } from '../../hooks/useExercises';
 import { Page, BackHeader, Eye, Ser, Body, PlusTag, NM } from '../../components/v2/neome';
 import PlusUnlockBanner from '../../components/v2/paywall/PlusUnlockBanner';
+import { ExerciseListRow } from '../../components/v2/ExerciseListRow';
 import {
   FocusKey, EquipKey, BandKey,
   FOCUS_ORDER, EQUIP_ORDER, FOCUS_LABEL, EQUIP_LABEL, EQUIP_SHORT, BAND_LABEL,
@@ -199,66 +200,19 @@ export default function TeloExtra() {
             {band === '15' ? '15 min cvičenia' : '5 min dopaľovačky'} · {list.length}
           </Eye>
           <div style={{ background: '#fff', borderRadius: 18, border: `1px solid ${NM.HAIR}`, overflow: 'hidden' }}>
-            {list.map((p, i, arr) => {
-              const locked = !p.isFree && !isPremium;
-              return (
-                <button
-                  key={p.e.id}
-                  onClick={() => openExercise(p)}
-                  style={{
-                    all: 'unset',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    width: '100%',
-                    gap: 14,
-                    padding: '12px 14px',
-                    alignItems: 'center',
-                    borderBottom: i < arr.length - 1 ? `1px solid ${NM.HAIR}` : 'none',
-                    boxSizing: 'border-box',
-                  }}
-                >
-                  <div
-                    style={{
-                      width: 60,
-                      height: 60,
-                      borderRadius: 12,
-                      flexShrink: 0,
-                      backgroundImage: p.e.thumb_url ? `url(${p.e.thumb_url})` : undefined,
-                      backgroundColor: p.e.thumb_url ? undefined : NM.HAIR,
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center',
-                      position: 'relative',
-                    }}
-                  >
-                    <div style={{ position: 'absolute', inset: 0, borderRadius: 12, background: 'rgba(42,26,20,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <div style={{ width: 24, height: 24, borderRadius: 999, background: 'rgba(255,255,255,0.92)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <svg width="8" height="9" viewBox="0 0 8 9" fill="none">
-                          <path d="M1 1v7l6-3.5L1 1z" fill={NM.DEEP} />
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
-                    <div style={{ fontFamily: NM.SERIF, fontSize: 15, fontWeight: 500, color: NM.DEEP, letterSpacing: '-0.005em' }}>
-                      {p.titleParts
-                        ? <>{p.titleParts.before}{' '}<strong style={{ color: '#B8864A', fontWeight: 700, fontSize: 16 }}>{p.titleParts.em}</strong><span style={{ fontFamily: NM.SANS, fontSize: 12, fontWeight: 600, color: '#B8864A', marginLeft: 3 }}>{p.titleParts.num}</span></>
-                        : p.title}
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginTop: 3 }}>
-                      <span style={{ fontFamily: NM.SANS, fontSize: 10.5, color: NM.EYEBROW, fontWeight: 400 }}>
-                        {p.e.duration_min} min · {EQUIP_SHORT[p.equip]}
-                      </span>
-                      {p.e.diastasis_safe && (
-                        <span style={{ fontFamily: NM.SANS, fontSize: 9, fontWeight: 500, letterSpacing: '0.08em', textTransform: 'uppercase', color: NM.SAGE, background: `${NM.SAGE}1A`, padding: '2px 7px', borderRadius: 999 }}>
-                          ✓ diastáza
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  {locked ? <PlusTag /> : <div style={{ color: NM.TERTIARY, fontSize: 14 }}>›</div>}
-                </button>
-              );
-            })}
+            {list.map((p, i, arr) => (
+              <ExerciseListRow
+                key={p.e.id}
+                thumbUrl={p.e.thumb_url}
+                title={p.title}
+                titleParts={p.titleParts}
+                meta={`${p.e.duration_min} min · ${EQUIP_SHORT[p.equip]}`}
+                diastasisSafe={p.e.diastasis_safe}
+                locked={!p.isFree && !isPremium}
+                onOpen={() => openExercise(p)}
+                divider={i < arr.length - 1}
+              />
+            ))}
           </div>
         </div>
       )}

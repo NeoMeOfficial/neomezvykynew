@@ -3,6 +3,13 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useUniversalFavorites, ContentType } from '../../hooks/useUniversalFavorites';
 import { useRecipes, type SupabaseRecipe } from '@/hooks/useRecipes';
 import { RecipeListCard } from '../../components/v2/RecipeListCard';
+import { ExerciseListRow } from '../../components/v2/ExerciseListRow';
+import { useExercises } from '../../hooks/useExercises';
+import { useStretches } from '../../hooks/useStretches';
+import { catalogExercises, catalogStretches, CatalogExercise, CatalogStretch } from '../../features/telo/libraryCatalog';
+import { FOCUS_LABEL, STRETCH_FOCUS_LABEL, EQUIP_LABEL, EQUIP_SHORT } from '../../features/telo/exerciseTaxonomy';
+import { useSubscription } from '../../contexts/SubscriptionContext';
+import { NM } from '../../components/v2/neome';
 import FavoriteButton from '../../components/v2/favorites/FavoriteButton';
 import { Heart, ChefHat, Dumbbell, Brain, FileText, Target } from 'lucide-react';
 import { TopBar } from '@/components/v2/top-bar';
@@ -68,18 +75,85 @@ export default function Oblubene() {
   const favRecipes = favRecipeIds
     .map((id) => recipeById.get(id))
     .filter((r): r is SupabaseRecipe => Boolean(r));
-  const otherFavs = favorites.filter((f) => f.type !== 'recipe');
+
+  // Workouts resolve the same way against the Telo catalogs (cvičenia + strečing)
+  // and render with the same row card as the Telo listings. Workout favourites
+  // that no longer match a catalog item fall back to the generic row below.
+  const { exercises } = useExercises();
+  const { stretches } = useStretches();
+  const { isPremium } = useSubscription();
+  const extraById = new Map(catalogExercises(exercises).map((p) => [String(p.e.id), p]));
+  const stretchById = new Map(catalogStretches(stretches).map((p) => [String(p.s.id), p]));
+  const workoutFavIds: string[] = [];
+  supabaseFavorites.forEach((f) => { if (f.item_type === 'workout') workoutFavIds.push(f.item_id); });
+  favorites.forEach((f) => {
+    if (f.type === 'workout' && !workoutFavIds.includes(String(f.id))) workoutFavIds.push(String(f.id));
+  });
+  const favWorkouts = workoutFavIds
+    .map((id) => {
+      const extra = extraById.get(id);
+      if (extra) return { kind: 'extra' as const, extra, stretch: undefined };
+      const stretch = stretchById.get(id);
+      if (stretch) return { kind: 'stretch' as const, extra: undefined, stretch };
+      return null;
+    })
+    .filter((w): w is NonNullable<typeof w> => w !== null);
+  const resolvedWorkoutIds = new Set(favWorkouts.map((w) => String(w.kind === 'extra' ? w.extra!.e.id : w.stretch!.s.id)));
+
+  const otherFavs = favorites.filter((f) =>
+    f.type !== 'recipe' && !(f.type === 'workout' && resolvedWorkoutIds.has(String(f.id)))
+  );
+
+  const openFavExercise = (p: CatalogExercise) => {
+    if (!p.isFree && !isPremium) { navigate('/paywall'); return; }
+    navigate(`/exercise/extra/${p.e.id}`, {
+      state: {
+        exercise: {
+          id: p.e.id,
+          name: p.title,
+          duration: `${p.e.duration_min} min`,
+          category: p.band === '5' ? 'dopalovacka' : '15min',
+          body: p.focus ? FOCUS_LABEL[p.focus] : p.e.body_target,
+          equip: EQUIP_LABEL[p.equip],
+          videoUrl: p.e.video_id,
+          thumb: p.e.thumb_url,
+          description: p.e.description,
+          diastasisSafe: p.e.diastasis_safe,
+        },
+      },
+    });
+  };
+
+  const openFavStretch = (p: CatalogStretch) => {
+    if (!p.isFree && !isPremium) { navigate('/paywall'); return; }
+    navigate(`/stretch/${p.s.id}`, {
+      state: {
+        exercise: {
+          id: p.s.id,
+          name: p.title,
+          duration: `${p.s.duration_min} min`,
+          category: 'stretch',
+          body: p.focus ? STRETCH_FOCUS_LABEL[p.focus] : p.s.body_target,
+          equip: EQUIP_LABEL[p.equip],
+          videoUrl: p.s.video_id,
+          thumb: p.s.thumb_url,
+          description: p.s.description,
+        },
+      },
+    });
+  };
 
   const counts = {
-    total: favRecipes.length + otherFavs.length,
+    total: favRecipes.length + favWorkouts.length + otherFavs.length,
     recipe: favRecipes.length,
-    workout: otherFavs.filter((f) => f.type === 'workout').length,
+    workout: favWorkouts.length + otherFavs.filter((f) => f.type === 'workout').length,
     meditation: otherFavs.filter((f) => f.type === 'meditation').length,
     article: otherFavs.filter((f) => f.type === 'article').length,
     program: otherFavs.filter((f) => f.type === 'program').length,
   };
 
   const showRecipes = activeTab === 'all' || activeTab === 'recipe';
+  const showWorkouts = activeTab === 'all' || activeTab === 'workout';
   const filteredOther = activeTab === 'all'
     ? otherFavs
     : activeTab === 'recipe'
@@ -140,7 +214,7 @@ export default function Oblubene() {
           )}
 
           {/* Content list */}
-          {(showRecipes ? favRecipes.length : 0) + filteredOther.length === 0 ? (
+          {(showRecipes ? favRecipes.length : 0) + (showWorkouts ? favWorkouts.length : 0) + filteredOther.length === 0 ? (
             <div className="rounded-card bg-white border border-ink/[0.08] shadow-nm-sm p-8 text-center">
               <BodyText tone="secondary">
                 Žiadne obľúbené v tejto kategórii.
@@ -167,6 +241,37 @@ export default function Oblubene() {
                     })}
                   />
                 ))}
+              </div>
+            )}
+            {/* Workouts — same row card as the Telo listings */}
+            {showWorkouts && favWorkouts.length > 0 && (
+              <div style={{ background: '#fff', borderRadius: 18, border: `1px solid ${NM.HAIR}`, overflow: 'hidden', marginBottom: filteredOther.length > 0 ? 18 : 0 }}>
+                {favWorkouts.map((w, i) => w.kind === 'extra'
+                  ? (
+                    <ExerciseListRow
+                      key={w.extra!.e.id}
+                      thumbUrl={w.extra!.e.thumb_url}
+                      title={w.extra!.title}
+                      titleParts={w.extra!.titleParts}
+                      meta={`${w.extra!.e.duration_min} min · ${EQUIP_SHORT[w.extra!.equip]}`}
+                      diastasisSafe={w.extra!.e.diastasis_safe}
+                      locked={!w.extra!.isFree && !isPremium}
+                      onOpen={() => openFavExercise(w.extra!)}
+                      divider={i < favWorkouts.length - 1}
+                    />
+                  ) : (
+                    <ExerciseListRow
+                      key={w.stretch!.s.id}
+                      thumbUrl={w.stretch!.s.thumb_url}
+                      title={w.stretch!.title}
+                      titleParts={w.stretch!.titleParts}
+                      meta={`${w.stretch!.s.duration_min} min · ${EQUIP_SHORT[w.stretch!.equip]}`}
+                      locked={!w.stretch!.isFree && !isPremium}
+                      onOpen={() => openFavStretch(w.stretch!)}
+                      divider={i < favWorkouts.length - 1}
+                    />
+                  )
+                )}
               </div>
             )}
             <div className="flex flex-col gap-2">
