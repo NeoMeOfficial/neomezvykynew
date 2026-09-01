@@ -272,8 +272,10 @@ export default function RecipeDetail() {
         {/* Ďalšie recepty — mirrors the "Ďalšie cvičenia" card on the exercise player */}
         {related.length > 0 && (
           <div style={{ margin: '4px 18px 10px', padding: '16px 16px 8px', background: '#fff', borderRadius: 18, border: `1px solid ${NM.HAIR}` }}>
+            {/* "Všetky" opens the Strava hub with all 6 categories, so any recipe
+                is reachable from here (Gabi 2026-09-02). */}
             <button
-              onClick={() => navigate(`/recepty?cat=${primaryCat}`)}
+              onClick={() => navigate('/kniznica/strava')}
               style={{ all: 'unset', cursor: 'pointer', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6, boxSizing: 'border-box' }}
             >
               <Eye>Ďalšie recepty · {CATEGORY_LABEL[primaryCat]}</Eye>
