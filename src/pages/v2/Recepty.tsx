@@ -85,18 +85,6 @@ export default function Recepty() {
     }
   }, [params, setParams]);
 
-  // Back from a category view returns to the category list with clean filters.
-  const leaveCategory = () => {
-    setSlotFilter('all');
-    setTimeFilter('all');
-    setMeatless(false);
-    if (params.has('cat')) {
-      const next = new URLSearchParams(params);
-      next.delete('cat');
-      setParams(next, { replace: true });
-    }
-  };
-
   const openCategory = (id: RecipeCategory) => {
     setSlotFilter(id);
     setTimeFilter('all');
@@ -106,9 +94,10 @@ export default function Recepty() {
 
   return (
     <Page>
+      {/* Back always steps out of recipes entirely (to the Strava hub) —
+          the category view is not its own history step, per Gabi. */}
       <BackHeader
         title={slotFilter !== 'all' ? `Recepty — ${CATEGORY_LABEL[slotFilter]}` : 'Recepty'}
-        onBack={inCategory ? leaveCategory : undefined}
         showSearch={false}
       />
 
