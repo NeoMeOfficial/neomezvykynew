@@ -156,29 +156,100 @@ const PHASE_RECIPE_PREFS: Record<string, { temp?: 'warm' | 'cold'; flags: PhaseF
   luteal:     { flags: ['is_magnesium_rich', 'is_complex_carbs'] },
 };
 
+// Featured-recipe history: the ids shown on the last few days, so the
+// "recept dňa" never repeats within a week even across phase changes or
+// cycle on/off. Per device; entries older than the window are pruned.
+const DAILY_HISTORY_KEY = 'neome_daily_recipe_history_v1';
+const NO_REPEAT_DAYS = 6; // today + previous 6 = a repeat-free week
+
+type DailyHistoryEntry = { d: string; id: string; p: string | null };
+
+function localDayKey(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+function readDailyHistory(): DailyHistoryEntry[] {
+  try {
+    const raw = localStorage.getItem(DAILY_HISTORY_KEY);
+    const list = raw ? JSON.parse(raw) : [];
+    return Array.isArray(list) ? list : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeDailyHistory(list: DailyHistoryEntry[]) {
+  try { localStorage.setItem(DAILY_HISTORY_KEY, JSON.stringify(list)); } catch { /* private mode */ }
+}
+
 /**
  * The one shared "recept dňa": same recipe on the home card and in the
  * Strava section, rotating at LOCAL midnight. With a known cycle phase
- * it rotates among the recipes that best match the phase's preferences;
- * without one (cycle off) it rotates over the whole library.
+ * it prefers the recipes that best match the phase (candidates ordered
+ * best-match first); without one (cycle off) it rotates over the whole
+ * library. Recipes shown in the previous NO_REPEAT_DAYS days are skipped,
+ * so a week never shows the same recipe twice. Today's pick is stored and
+ * stays stable for the day unless the phase changes.
  */
 export function dailyRecipeOf(recipes: SupabaseRecipe[], phaseKey?: string | null): SupabaseRecipe | null {
   if (recipes.length === 0) return null;
   const now = new Date();
+  const today = localDayKey(now);
+  const phase = phaseKey ?? null;
+
+  const history = readDailyHistory();
+  const stored = history.find((h) => h.d === today);
+  if (stored && stored.p === phase) {
+    const r = recipes.find((x) => x.id === stored.id);
+    if (r) return r;
+  }
+
   const doy = Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000);
   const seed = now.getFullYear() * 366 + doy;
-  const prefs = phaseKey ? PHASE_RECIPE_PREFS[phaseKey] : undefined;
-  if (!prefs) return recipes[seed % recipes.length];
-  let best = -1;
-  let pool: SupabaseRecipe[] = [];
-  for (const r of recipes) {
-    let s = 0;
-    if (prefs.temp && r.temperature === prefs.temp) s += 1;
-    for (const f of prefs.flags) if (r[f]) s += 1;
-    if (s > best) { best = s; pool = [r]; }
-    else if (s === best) pool.push(r);
+
+  // Candidates ordered by phase match (best score first); within each score
+  // tier the start index rotates daily. No phase → the whole library, rotated.
+  const prefs = phase ? PHASE_RECIPE_PREFS[phase] : undefined;
+  let ordered: SupabaseRecipe[];
+  if (!prefs) {
+    const start = seed % recipes.length;
+    ordered = [...recipes.slice(start), ...recipes.slice(0, start)];
+  } else {
+    const score = (r: SupabaseRecipe) => {
+      let s = 0;
+      if (prefs.temp && r.temperature === prefs.temp) s += 1;
+      for (const f of prefs.flags) if (r[f]) s += 1;
+      return s;
+    };
+    const byTier = new Map<number, SupabaseRecipe[]>();
+    for (const r of recipes) {
+      const s = score(r);
+      const tier = byTier.get(s);
+      if (tier) tier.push(r); else byTier.set(s, [r]);
+    }
+    ordered = [];
+    for (const s of [...byTier.keys()].sort((a, b) => b - a)) {
+      const tier = byTier.get(s)!;
+      const start = seed % tier.length;
+      ordered.push(...tier.slice(start), ...tier.slice(0, start));
+    }
   }
-  return pool[seed % pool.length];
+
+  // Skip anything featured in the recent window (today's stale entry included).
+  const cutoff = new Date(now);
+  cutoff.setDate(cutoff.getDate() - NO_REPEAT_DAYS);
+  const cutoffKey = localDayKey(cutoff);
+  const recentIds = new Set(history.filter((h) => h.d >= cutoffKey && h.d !== today).map((h) => h.id));
+  const pick = ordered.find((r) => !recentIds.has(r.id)) ?? ordered[0];
+
+  writeDailyHistory([
+    ...history.filter((h) => h.d >= cutoffKey && h.d !== today),
+    { d: today, id: pick.id, p: phase },
+  ]);
+  return pick;
 }
 
 /** Cover image (full path): the recipe's own photo when it has one,
