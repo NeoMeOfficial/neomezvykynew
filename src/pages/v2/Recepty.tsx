@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useRecipes, recipeCategories, recipeCategoryLabel, recipeImage, CATEGORY_KEYS, CATEGORY_LABEL, type SupabaseRecipe, type RecipeCategory } from '@/hooks/useRecipes';
 import { useSubscription } from '@/contexts/SubscriptionContext';
@@ -21,14 +21,12 @@ const CATEGORY_QUERY_MAP: Record<string, RecipeCategory> = {
   obedy: 'hlavne', vecera: 'hlavne', snack: 'snacky',
 };
 
-const CATEGORY_CHIPS: { id: RecipeCategory | 'all'; label: string }[] = [
-  { id: 'all', label: 'Všetko' },
-  ...CATEGORY_KEYS.map((id) => ({ id, label: CATEGORY_LABEL[id] })),
-];
+const CATEGORY_CHIPS: { id: RecipeCategory; label: string }[] =
+  CATEGORY_KEYS.map((id) => ({ id, label: CATEGORY_LABEL[id] }));
 
 export default function Recepty() {
   const navigate = useNavigate();
-  const [params] = useSearchParams();
+  const [params, setParams] = useSearchParams();
   const { recipes, loading, error } = useRecipes();
   const { isPremium } = useSubscription();
   const { isFavorite, toggleFavorite } = useUniversalFavorites();
@@ -64,9 +62,46 @@ export default function Recepty() {
     navigate(`/recept/${r.id}`);
   };
 
+  const inCategory = slotFilter !== 'all';
+
+  // Deep links (?cat= from Strava tiles) must apply even when the page is already mounted.
+  useEffect(() => {
+    const cat = params.get('cat');
+    const mapped = cat ? CATEGORY_QUERY_MAP[cat] : undefined;
+    if (mapped) {
+      setSlotFilter(mapped);
+      setTimeFilter('all');
+      setMeatless(false);
+      setFavOnly(false);
+    }
+  }, [params]);
+
+  // Back from a category view returns to the category list with clean filters.
+  const leaveCategory = () => {
+    setSlotFilter('all');
+    setTimeFilter('all');
+    setMeatless(false);
+    if (params.has('cat')) {
+      const next = new URLSearchParams(params);
+      next.delete('cat');
+      setParams(next, { replace: true });
+    }
+  };
+
+  const openCategory = (id: RecipeCategory) => {
+    setSlotFilter(id);
+    setTimeFilter('all');
+    setMeatless(false);
+    setFavOnly(false);
+  };
+
   return (
     <Page>
-      <BackHeader title="Recepty" showSearch={false} />
+      <BackHeader
+        title={slotFilter !== 'all' ? `Recepty — ${CATEGORY_LABEL[slotFilter]}` : 'Recepty'}
+        onBack={inCategory ? leaveCategory : undefined}
+        showSearch={false}
+      />
 
       {/* Search bar */}
       <div style={{ padding: '4px 18px 14px' }}>
@@ -85,83 +120,80 @@ export default function Recepty() {
         </div>
       </div>
 
-      {/* Slot chips */}
-      <div style={{ padding: '0 18px 6px', display: 'flex', gap: 8, overflowX: 'auto' }}>
-        {CATEGORY_CHIPS.map((c) => {
-          const active = slotFilter === c.id;
-          return (
+      {!inCategory ? (
+        /* Landing: category chips + favourites */
+        <div style={{ padding: '0 18px 6px', display: 'flex', gap: 8, overflowX: 'auto' }}>
+          {CATEGORY_CHIPS.map((c) => (
             <button
               key={c.id}
-              onClick={() => setSlotFilter(c.id)}
+              onClick={() => openCategory(c.id)}
               style={{
                 all: 'unset', cursor: 'pointer', padding: '8px 14px', borderRadius: 999,
-                background: active ? NM.DEEP : 'transparent',
-                color: active ? '#fff' : NM.DEEP,
-                border: active ? 'none' : `1px solid ${NM.HAIR_2}`,
+                background: 'transparent', color: NM.DEEP,
+                border: `1px solid ${NM.HAIR_2}`,
                 fontFamily: NM.SANS, fontSize: 12, whiteSpace: 'nowrap', flexShrink: 0,
               }}
             >
               {c.label}
             </button>
-          );
-        })}
-        <button
-          onClick={() => setFavOnly((v) => !v)}
-          style={{
-            all: 'unset', cursor: 'pointer', padding: '8px 14px', borderRadius: 999,
-            background: favOnly ? NM.TERRA : 'transparent',
-            color: favOnly ? '#fff' : NM.DEEP,
-            border: favOnly ? 'none' : `1px solid ${NM.HAIR_2}`,
-            fontFamily: NM.SANS, fontSize: 12, whiteSpace: 'nowrap', flexShrink: 0,
-            display: 'inline-flex', alignItems: 'center', gap: 5,
-          }}
-        >
-          <svg width="11" height="11" viewBox="0 0 24 24" fill={favOnly ? '#fff' : 'none'} stroke={favOnly ? '#fff' : NM.DEEP} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" />
-          </svg>
-          Obľúbené
-        </button>
-      </div>
-
-      {/* Fáza B: prep-time buckets + meatless — combine with category */}
-      <div style={{ padding: '8px 18px 6px', display: 'flex', gap: 8, overflowX: 'auto' }}>
-        {([
-          { id: 'all' as const, label: 'Ľubovoľný čas' },
-          { id: 10 as const, label: 'Do 10 min' },
-          { id: 20 as const, label: 'Do 20 min' },
-          { id: 30 as const, label: 'Do 30 min' },
-          { id: 99 as const, label: 'Nad 30 min' },
-        ]).map((c) => {
-          const active = timeFilter === c.id;
-          return (
-            <button
-              key={c.id}
-              onClick={() => setTimeFilter(c.id)}
-              style={{
-                all: 'unset', cursor: 'pointer', padding: '8px 14px', borderRadius: 999,
-                background: active ? NM.DEEP : 'transparent',
-                color: active ? '#fff' : NM.DEEP,
-                border: active ? 'none' : `1px solid ${NM.HAIR_2}`,
-                fontFamily: NM.SANS, fontSize: 12, whiteSpace: 'nowrap', flexShrink: 0,
-              }}
-            >
-              {c.label}
-            </button>
-          );
-        })}
-        <button
-          onClick={() => setMeatless((v) => !v)}
-          style={{
-            all: 'unset', cursor: 'pointer', padding: '8px 14px', borderRadius: 999,
-            background: meatless ? NM.SAGE : 'transparent',
-            color: meatless ? '#fff' : NM.DEEP,
-            border: meatless ? 'none' : `1px solid ${NM.HAIR_2}`,
-            fontFamily: NM.SANS, fontSize: 12, whiteSpace: 'nowrap', flexShrink: 0,
-          }}
-        >
-          Bez mäsa
-        </button>
-      </div>
+          ))}
+          <button
+            onClick={() => setFavOnly((v) => !v)}
+            style={{
+              all: 'unset', cursor: 'pointer', padding: '8px 14px', borderRadius: 999,
+              background: favOnly ? NM.TERRA : 'transparent',
+              color: favOnly ? '#fff' : NM.DEEP,
+              border: favOnly ? 'none' : `1px solid ${NM.HAIR_2}`,
+              fontFamily: NM.SANS, fontSize: 12, whiteSpace: 'nowrap', flexShrink: 0,
+              display: 'inline-flex', alignItems: 'center', gap: 5,
+            }}
+          >
+            <svg width="11" height="11" viewBox="0 0 24 24" fill={favOnly ? '#fff' : 'none'} stroke={favOnly ? '#fff' : NM.DEEP} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" />
+            </svg>
+            Obľúbené
+          </button>
+        </div>
+      ) : (
+        /* Category view: straight to filters — tap an active time chip again to clear it */
+        <div style={{ padding: '0 18px 6px', display: 'flex', gap: 8, overflowX: 'auto' }}>
+          {([
+            { id: 10 as const, label: 'Do 10 min' },
+            { id: 20 as const, label: 'Do 20 min' },
+            { id: 30 as const, label: 'Do 30 min' },
+            { id: 99 as const, label: 'Viac ako 30 min' },
+          ]).map((c) => {
+            const active = timeFilter === c.id;
+            return (
+              <button
+                key={c.id}
+                onClick={() => setTimeFilter(active ? 'all' : c.id)}
+                style={{
+                  all: 'unset', cursor: 'pointer', padding: '8px 14px', borderRadius: 999,
+                  background: active ? NM.DEEP : 'transparent',
+                  color: active ? '#fff' : NM.DEEP,
+                  border: active ? 'none' : `1px solid ${NM.HAIR_2}`,
+                  fontFamily: NM.SANS, fontSize: 12, whiteSpace: 'nowrap', flexShrink: 0,
+                }}
+              >
+                {c.label}
+              </button>
+            );
+          })}
+          <button
+            onClick={() => setMeatless((v) => !v)}
+            style={{
+              all: 'unset', cursor: 'pointer', padding: '8px 14px', borderRadius: 999,
+              background: meatless ? NM.SAGE : 'transparent',
+              color: meatless ? '#fff' : NM.DEEP,
+              border: meatless ? 'none' : `1px solid ${NM.HAIR_2}`,
+              fontFamily: NM.SANS, fontSize: 12, whiteSpace: 'nowrap', flexShrink: 0,
+            }}
+          >
+            Bez mäsa
+          </button>
+        </div>
+      )}
 
       <div style={{ padding: '18px 18px 8px' }}>
         <Eye>{loading ? 'Načítavam…' : `Výsledky · ${filtered.length}`}</Eye>
