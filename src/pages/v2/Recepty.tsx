@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useRecipes, recipeCategories, CATEGORY_KEYS, CATEGORY_LABEL, type SupabaseRecipe, type RecipeCategory } from '@/hooks/useRecipes';
 import { RecipeListCard } from '../../components/v2/RecipeListCard';
@@ -36,10 +36,11 @@ export default function Recepty() {
   const [timeFilter, setTimeFilter] = useState<'all' | 10 | 20 | 30 | 99>('all');
   const [meatless, setMeatless] = useState(false);
   const [favOnly, setFavOnly] = useState(params.get('fav') === '1');
-  const [slotFilter, setSlotFilter] = useState<RecipeCategory | 'all'>(() => {
-    const cat = params.get('cat');
-    return cat ? CATEGORY_QUERY_MAP[cat] ?? 'all' : 'all';
-  });
+  // The category lives in the URL (?cat=), so the history keeps the flow
+  // Strava → category listing → recipe detail: back from a recipe returns to
+  // the clearly-titled category, and back from the category returns to Strava.
+  const catParam = params.get('cat');
+  const slotFilter: RecipeCategory | 'all' = catParam ? CATEGORY_QUERY_MAP[catParam] ?? 'all' : 'all';
 
   const filtered = useMemo(() => {
     let list = recipes;
@@ -60,42 +61,26 @@ export default function Recepty() {
 
   const handleClick = (r: SupabaseRecipe) => {
     // Detail page enforces the per-user quota; listing taps are always permitted.
-    // replace: the listing is a transient picker — back from the recipe detail
-    // returns to wherever the user entered recipes from (Strava hub), per Gabi.
-    navigate(`/recept/${r.id}`, { replace: true });
+    // Plain push: back from the recipe returns to this category listing.
+    navigate(`/recept/${r.id}`);
   };
 
   const inCategory = slotFilter !== 'all';
 
-  // Deep links (?cat= from Strava tiles) must apply even when the page is already mounted.
-  // The param is stripped right away (replace) so this history entry is the plain
-  // category landing — back from a recipe detail then lands on the 6 categories,
-  // not on the category listing.
-  useEffect(() => {
-    const cat = params.get('cat');
-    const mapped = cat ? CATEGORY_QUERY_MAP[cat] : undefined;
-    if (mapped) {
-      setSlotFilter(mapped);
-      setTimeFilter('all');
-      setMeatless(false);
-      setFavOnly(false);
-      const next = new URLSearchParams(params);
-      next.delete('cat');
-      setParams(next, { replace: true });
-    }
-  }, [params, setParams]);
-
+  // Opening a category replaces the current entry, so back from the category
+  // view exits recipes entirely (to the Strava hub) instead of re-showing the
+  // all-recipes landing.
   const openCategory = (id: RecipeCategory) => {
-    setSlotFilter(id);
     setTimeFilter('all');
     setMeatless(false);
     setFavOnly(false);
+    const next = new URLSearchParams(params);
+    next.set('cat', id);
+    setParams(next, { replace: true });
   };
 
   return (
     <Page>
-      {/* Back always steps out of recipes entirely (to the Strava hub) —
-          the category view is not its own history step, per Gabi. */}
       <BackHeader
         title={slotFilter !== 'all' ? `Recepty — ${CATEGORY_LABEL[slotFilter]}` : 'Recepty'}
         showSearch={false}
