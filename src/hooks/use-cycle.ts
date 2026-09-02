@@ -105,6 +105,10 @@ export function useCycle() {
 export type CyclePhase = 'menstrual' | 'folicular' | 'ovulatory' | 'luteal';
 export interface CycleInfo {
   phase: CyclePhase;
+  /** Canonical phase key ('follicular'/'ovulation' spellings) — what
+   *  dailyRecipeOf and the other phase-aware pickers expect. The legacy
+   *  `phase` field uses old spellings and MUST NOT be fed to them. */
+  phaseKey: PhaseKey;
   dayOfCycle: number;
   totalDays: number;
   phaseName: string;
@@ -123,6 +127,7 @@ export function useCycleInfo(): CycleInfo | null {
   if (!hasData) return null;
   return {
     phase: LEGACY_PHASE_MAP[phaseKey],
+    phaseKey,
     dayOfCycle: currentDay,
     totalDays: cycleData.cycleLength,
     phaseName,
