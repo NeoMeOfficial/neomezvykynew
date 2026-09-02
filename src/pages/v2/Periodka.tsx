@@ -3,6 +3,8 @@ import { createPortal } from 'react-dom';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { useCycleData } from '../../features/cycle/useCycleData';
+import { useDailyTeloPick } from '../../features/telo/useDailyTeloPick';
+import { useRecipes, dailyRecipeOf } from '@/hooks/useRecipes';
 import { useCycleSymptoms } from '../../hooks/useDailyRituals';
 import { Page, Eye, Ser, Body, PlusTag, ConfirmSheet, NM } from '../../components/v2/neome';
 import { getDailyTips } from '../../features/cycle/dailyHeadlines';
@@ -200,7 +202,7 @@ function PhaseLegend({ activeKey }: { activeKey?: string }) {
 }
 
 interface PaidViewProps {
-  navigate: (p: string) => void;
+  navigate: (p: string, opts?: { state?: unknown }) => void;
   cycleData: CycleData;
   derivedState: DerivedState | null;
   onMarkPeriodStart: () => void;
@@ -212,6 +214,11 @@ const SK_MONTHS_FULL = ['január', 'február', 'marec', 'apríl', 'máj', 'jún'
 const SK_MONTHS_SHORT_LOWER = ['jan', 'feb', 'mar', 'apr', 'máj', 'jún', 'júl', 'aug', 'sep', 'okt', 'nov', 'dec'];
 
 function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMarkPeriodEnd, onCorrectPeriod }: PaidViewProps) {
+  // Same featured picks as the home cards (Gabi 2026-09-02): the advice
+  // rows below deep-link to the identical phase-aligned exercise/recipe/
+  // meditation views instead of the bare section hubs.
+  const { pick: teloPick } = useDailyTeloPick();
+  const { recipes } = useRecipes();
   const totalDays = cycleData.cycleLength ?? 28;
   const periodLength = cycleData.periodLength ?? 5;
   const currentDay = derivedState?.currentDay ?? 1;
@@ -729,15 +736,28 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
 
   const dailyTips = getDailyTips(currentDay, totalDays, periodLength);
 
+  // Arrow targets mirror the home cards exactly: telo → today's phase pick
+  // in the player (with "Ďalšie" + favourites below), strava → recept dňa
+  // detail, myseľ → the Myseľ section with today's meditation featured.
+  const dailyRecipe = dailyRecipeOf(recipes, currentPhaseKey);
   const advice = (['telo', 'strava', 'mysel'] as const).map((pillarKey) => {
     const meta = PILLAR_META[pillarKey];
+    let path = meta.path;
+    let state: unknown;
+    if (pillarKey === 'telo' && teloPick) {
+      path = teloPick.href;
+      state = teloPick.playerState;
+    } else if (pillarKey === 'strava' && dailyRecipe) {
+      path = `/recept/${dailyRecipe.id}`;
+    }
     return {
       pillar: meta.label,
       color: meta.color,
       title: meta.title,
       body: dailyTips[meta.category],
       img: meta.img,
-      path: meta.path,
+      path,
+      state,
     };
   });
 
@@ -1428,7 +1448,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
           {advice.map((r, i) => (
             <button
               key={r.pillar}
-              onClick={() => navigate(r.path)}
+              onClick={() => navigate(r.path, r.state ? { state: r.state } : undefined)}
               style={{
                 all: 'unset',
                 cursor: 'pointer',
