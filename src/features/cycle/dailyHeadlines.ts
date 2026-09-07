@@ -450,3 +450,76 @@ export function getDailyTips(day: number, cycleLength: number, periodLength: num
   const idx = Math.min(Math.max(0, day - start), sets.length - 1);
   return { ...sets[idx], bucket };
 }
+
+// ─── Recept dňa ↔ denný tip alignment (Gabi 2026-09-07) ─────────────────────
+// The featured recipe should try to CONTAIN what today's strava tip
+// recommends ("vitamín C pomáha vstrebať železo — pomaranč či paprika…" →
+// prefer recipes with oranges/peppers/iron). The wants are extracted from
+// the exact tip text shown to the user, so the two can never drift apart.
+
+export interface StravaWants {
+  flags: ('iron' | 'magnesium' | 'protein' | 'complex')[];
+  ingredients: string[];
+}
+
+const normSk = (t: string) => t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+// tip-text stem → ingredient-search stems (all diacritic-stripped).
+// Distinctive stems only — short/ambiguous words are deliberately left out.
+const FOOD_STEMS: [string, string[]][] = [
+  ['banan', ['banan']],
+  ['mandl', ['mandl']],
+  ['cokolad', ['cokolad', 'kakao']],
+  ['zazvor', ['zazvor']],
+  ['sosovic', ['sosovic']],
+  ['spenat', ['spenat']],
+  ['citron', ['citron']],
+  ['pomaranc', ['pomaranc']],
+  ['paprik', ['paprik']],
+  ['vajc', ['vajc', 'vajic']],
+  ['vajic', ['vajc', 'vajic']],
+  ['orech', ['orech']],
+  ['lanov', ['lanov']],
+  ['losos', ['losos']],
+  ['ryb', ['losos', 'tuniak', 'treska', 'pstruh', 'makrel']],
+  ['jogurt', ['jogurt']],
+  ['kefir', ['kefir']],
+  ['ovsen', ['ovsen', 'vlock']],
+  ['vlock', ['ovsen', 'vlock']],
+  ['celozrn', ['celozrn']],
+  ['tekvicov', ['tekvicov']],
+  ['hovadz', ['hovadz']],
+  ['tvaroh', ['tvaroh']],
+  ['skyr', ['skyr']],
+  ['brokolic', ['brokolic']],
+  ['rukol', ['rukol']],
+  ['avokad', ['avokad']],
+  ['olivov', ['olivov']],
+  ['cucoried', ['cucoried']],
+  ['malin', ['malin']],
+  ['tuniak', ['tuniak']],
+  ['kurac', ['kurac']],
+  ['tofu', ['tofu']],
+  ['strukovin', ['sosovic', 'cicer', 'fazul']],
+  ['zemiak', ['zemiak', 'batat']],
+  ['polievk', ['polievk']],
+  ['syr', ['syr']],
+];
+
+const NUTRIENT_FLAGS: [string, StravaWants['flags'][number]][] = [
+  ['zelez', 'iron'],
+  ['horcik', 'magnesium'],
+  ['bielkovin', 'protein'],
+  ['protein', 'protein'],
+  ['komplexne sacharid', 'complex'],
+  ['vlaknin', 'complex'],
+  ['celozrn', 'complex'],
+];
+
+/** Structured wants extracted from the strava tip shown for this cycle day. */
+export function getStravaWants(day: number, cycleLength: number, periodLength: number): StravaWants {
+  const tip = normSk(getDailyTips(day, cycleLength, periodLength).strava);
+  const flags = [...new Set(NUTRIENT_FLAGS.filter(([stem]) => tip.includes(stem)).map(([, f]) => f))];
+  const ingredients = [...new Set(FOOD_STEMS.filter(([stem]) => tip.includes(stem)).flatMap(([, out]) => out))];
+  return { flags, ingredients };
+}

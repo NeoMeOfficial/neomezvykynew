@@ -7,7 +7,7 @@ import { useDailyTeloPick } from '../../features/telo/useDailyTeloPick';
 import { useRecipes, dailyRecipeOf } from '@/hooks/useRecipes';
 import { useCycleSymptoms } from '../../hooks/useDailyRituals';
 import { Page, Eye, Ser, Body, PlusTag, ConfirmSheet, NM } from '../../components/v2/neome';
-import { getDailyTips } from '../../features/cycle/dailyHeadlines';
+import { getDailyTips, getStravaWants } from '../../features/cycle/dailyHeadlines';
 import type { DerivedState, CycleData } from '../../features/cycle/types';
 import { PHASE_NAMES } from '../../features/cycle/constants';
 import { getDailyHeadline } from '../../features/cycle/dailyHeadlines';
@@ -739,7 +739,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
   // Arrow targets mirror the home cards exactly: telo → today's phase pick
   // in the player (with "Ďalšie" + favourites below), strava → recept dňa
   // detail, myseľ → the Myseľ section with today's meditation featured.
-  const dailyRecipe = dailyRecipeOf(recipes, currentPhaseKey);
+  const dailyRecipe = dailyRecipeOf(recipes, currentPhaseKey, getStravaWants(currentDay, totalDays, periodLength));
   const advice = (['telo', 'strava', 'mysel'] as const).map((pillarKey) => {
     const meta = PILLAR_META[pillarKey];
     let path = meta.path;

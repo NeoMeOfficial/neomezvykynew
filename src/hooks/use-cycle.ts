@@ -19,7 +19,7 @@ import {
   getFertilityWindow,
   getSubphase,
 } from '@/features/cycle/utils';
-import { getDailyHeadline } from '@/features/cycle/dailyHeadlines';
+import { getStravaWants, getDailyHeadline, type StravaWants } from '@/features/cycle/dailyHeadlines';
 import type { PhaseKey, PhaseRange } from '@/features/cycle/types';
 
 const PHASE_NAME: Record<PhaseKey, string> = {
@@ -113,6 +113,8 @@ export interface CycleInfo {
   totalDays: number;
   phaseName: string;
   note: string;
+  /** Foods/nutrients named by today's strava tip — feed into dailyRecipeOf. */
+  stravaWants: StravaWants;
 }
 
 const LEGACY_PHASE_MAP: Record<PhaseKey, CyclePhase> = {
@@ -132,5 +134,6 @@ export function useCycleInfo(): CycleInfo | null {
     totalDays: cycleData.cycleLength,
     phaseName,
     note: phaseNote,
+    stravaWants: getStravaWants(currentDay, cycleData.cycleLength, cycleData.periodLength),
   };
 }

@@ -35,7 +35,7 @@ export default function Strava() {
 
   // Deterministic recipe-of-the-day — shared with the home card,
   // quietly phase-aligned when the cycle is on.
-  const featured = useMemo(() => dailyRecipeOf(recipes, cycle?.phaseKey ?? null), [recipes, cycle?.phaseKey]);
+  const featured = useMemo(() => dailyRecipeOf(recipes, cycle?.phaseKey ?? null, cycle?.stravaWants ?? null), [recipes, cycle]);
 
   return (
     <div className="min-h-screen bg-cream pb-12">

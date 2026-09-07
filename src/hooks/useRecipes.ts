@@ -197,7 +197,22 @@ function writeDailyHistory(list: DailyHistoryEntry[]) {
  * Today's pick is stored and stays stable for the day unless the phase
  * changes.
  */
-export function dailyRecipeOf(recipes: SupabaseRecipe[], phaseKey?: string | null): SupabaseRecipe | null {
+/** Structured wants from the day's strava tip — see getStravaWants(). */
+export interface RecipeWants {
+  flags: ('iron' | 'magnesium' | 'protein' | 'complex')[];
+  ingredients: string[];
+}
+
+const WANT_FLAG_COL: Record<RecipeWants['flags'][number], PhaseFlag> = {
+  iron: 'is_iron_rich',
+  magnesium: 'is_magnesium_rich',
+  protein: 'is_high_protein',
+  complex: 'is_complex_carbs',
+};
+
+const normIngredient = (t: string) => t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+export function dailyRecipeOf(recipes: SupabaseRecipe[], phaseKey?: string | null, wants?: RecipeWants | null): SupabaseRecipe | null {
   if (recipes.length === 0) return null;
   const now = new Date();
   const today = localDayKey(now);
@@ -216,15 +231,28 @@ export function dailyRecipeOf(recipes: SupabaseRecipe[], phaseKey?: string | nul
   // Candidates ordered by phase match (best score first); within each score
   // tier the start index rotates daily. No phase → the whole library, rotated.
   const prefs = phase ? PHASE_RECIPE_PREFS[phase] : undefined;
+  const hasWants = !!wants && (wants.flags.length > 0 || wants.ingredients.length > 0);
   let ordered: SupabaseRecipe[];
-  if (!prefs) {
+  if (!prefs && !hasWants) {
     const start = seed % recipes.length;
     ordered = [...recipes.slice(start), ...recipes.slice(0, start)];
   } else {
+    // Today's tip outranks the generic phase flags: a recipe that actually
+    // contains the recommended food (+3/stem) or nutrient (+2/flag) redeems
+    // the tip the user just read. Temperature stays the hard rule below.
     const score = (r: SupabaseRecipe) => {
       let s = 0;
-      if (prefs.temp && r.temperature === prefs.temp) s += 1;
-      for (const f of prefs.flags) if (r[f]) s += 1;
+      if (prefs?.temp && r.temperature === prefs.temp) s += 1;
+      if (prefs) for (const f of prefs.flags) if (r[f]) s += 1;
+      if (hasWants) {
+        for (const f of wants!.flags) if (r[WANT_FLAG_COL[f]]) s += 2;
+        if (wants!.ingredients.length > 0) {
+          const ing = normIngredient(r.ingredients.map((i) => `${i.name} ${i.raw ?? ''}`).join(' '));
+          let hits = 0;
+          for (const stem of wants!.ingredients) if (ing.includes(stem)) hits += 1;
+          s += Math.min(hits, 2) * 3;
+        }
+      }
       return s;
     };
     const byTier = new Map<number, SupabaseRecipe[]>();
@@ -245,7 +273,7 @@ export function dailyRecipeOf(recipes: SupabaseRecipe[], phaseKey?: string | nul
   // food never features a cold recipe, and vice versa. Nutrient flags stay
   // soft — missing iron is not a contradiction, a salad during menstruation is.
   const allowed = prefs?.temp
-    ? ordered.filter((r) => r.temperature === prefs.temp)
+    ? ordered.filter((r) => r.temperature === prefs!.temp)
     : ordered;
   const candidates = allowed.length > 0 ? allowed : ordered;
 

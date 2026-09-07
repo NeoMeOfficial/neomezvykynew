@@ -81,7 +81,7 @@ export type PeriodTracking = {
 export type UserFavorites = {
   id: string
   user_id: string
-  item_type: 'recipe' | 'exercise' | 'meditation' | 'program'
+  item_type: 'recipe' | 'exercise' | 'workout' | 'meditation' | 'program'
   item_id: string
   created_at: string
 }
