@@ -1132,6 +1132,41 @@ function UsersTab() {
   const [programsOpenFor, setProgramsOpenFor] = useState<string | null>(null);
   const [userGrants, setUserGrants] = useState<Record<string, string[]>>({});
   const [togglingProgram, setTogglingProgram] = useState<string | null>(null);
+
+  // "Pridať používateľku" — invite (create + set-password email) with an
+  // optional single-program grant in one step.
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [inviteForm, setInviteForm] = useState({ email: '', name: '', programId: '' });
+  const [inviting, setInviting] = useState(false);
+  const submitInvite = async () => {
+    if (inviting) return;
+    setInviting(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch('/.netlify/functions/admin-create-user', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+        },
+        body: JSON.stringify({
+          email: inviteForm.email,
+          name: inviteForm.name || undefined,
+          programId: inviteForm.programId || undefined,
+        }),
+      });
+      const body = await res.json();
+      if (!res.ok) throw new Error(body.error ?? 'Zlyhalo');
+      alert(`✅ Pozvánka odoslaná na ${inviteForm.email}${inviteForm.programId ? ` + prístup k programu` : ''}. Používateľka si nastaví heslo cez odkaz v e-maile.`);
+      setInviteOpen(false);
+      setInviteForm({ email: '', name: '', programId: '' });
+      fetchUsers();
+    } catch (err: any) {
+      alert('Pozvánka zlyhala: ' + err.message);
+    } finally {
+      setInviting(false);
+    }
+  };
   const PROGRAM_OPTIONS: [string, string][] = [
     ['postpartum', 'Postpartum'], ['bodyforming', 'BodyForming'],
     ['elastic-bands', 'El. gumy'], ['strong-sexy', 'Strong&Sexy'],
@@ -1343,10 +1378,52 @@ function UsersTab() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }} onClick={() => setTierMenuOpen(null)}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 22, fontWeight: 500, color: _A.DEEP }}>User Management</div>
-        <button onClick={fetchUsers} style={{ ...btnSecondary, display: 'flex', alignItems: 'center', gap: 8 }}>
-          <RefreshCw style={{ width: 13, height: 13 }} /> Obnoviť
-        </button>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button onClick={() => setInviteOpen(v => !v)} style={{ ...btnPrimary, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Plus style={{ width: 13, height: 13 }} /> Pridať používateľku
+          </button>
+          <button onClick={fetchUsers} style={{ ...btnSecondary, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <RefreshCw style={{ width: 13, height: 13 }} /> Obnoviť
+          </button>
+        </div>
       </div>
+
+      {inviteOpen && (
+        <Card>
+          <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 17, fontWeight: 500, color: _A.DEEP, marginBottom: 14 }}>
+            Nová používateľka — pozvánka e-mailom
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: 10, alignItems: 'end' }}>
+            <div>
+              <label style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED, display: 'block', marginBottom: 5 }}>E-mail *</label>
+              <input value={inviteForm.email} onChange={e => setInviteForm(fm => ({ ...fm, email: e.target.value }))} placeholder="meno@email.sk"
+                style={{ width: '100%', boxSizing: 'border-box', padding: '9px 12px', borderRadius: 10, border: `1px solid ${_A.HAIR2}`, fontFamily: 'DM Sans, system-ui', fontSize: 13 }} />
+            </div>
+            <div>
+              <label style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED, display: 'block', marginBottom: 5 }}>Meno (voliteľné)</label>
+              <input value={inviteForm.name} onChange={e => setInviteForm(fm => ({ ...fm, name: e.target.value }))} placeholder="Katka"
+                style={{ width: '100%', boxSizing: 'border-box', padding: '9px 12px', borderRadius: 10, border: `1px solid ${_A.HAIR2}`, fontFamily: 'DM Sans, system-ui', fontSize: 13 }} />
+            </div>
+            <div>
+              <label style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED, display: 'block', marginBottom: 5 }}>Prístup k programu (voliteľné)</label>
+              <select value={inviteForm.programId} onChange={e => setInviteForm(fm => ({ ...fm, programId: e.target.value }))}
+                style={{ width: '100%', boxSizing: 'border-box', padding: '9px 12px', borderRadius: 10, border: `1px solid ${_A.HAIR2}`, fontFamily: 'DM Sans, system-ui', fontSize: 13, background: '#fff' }}>
+                <option value="">— žiadny (len účet) —</option>
+                <option value="postpartum">Postpartum</option>
+                <option value="bodyforming">BodyForming</option>
+                <option value="elastic-bands">Elastické gumy</option>
+                <option value="strong-sexy">Strong & Sexy</option>
+              </select>
+            </div>
+            <button onClick={submitInvite} disabled={inviting || !inviteForm.email} style={{ ...btnPrimary, opacity: inviting || !inviteForm.email ? 0.6 : 1, whiteSpace: 'nowrap' }}>
+              {inviting ? 'Posielam…' : 'Poslať pozvánku'}
+            </button>
+          </div>
+          <div style={{ marginTop: 10, fontFamily: 'DM Sans, system-ui', fontSize: 11.5, color: _A.MUTED }}>
+            Používateľka dostane e-mail s odkazom, cez ktorý si nastaví heslo. Bez predplatného má prístup len k zvolenému programu.
+          </div>
+        </Card>
+      )}
 
       {/* Stats */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14 }}>
