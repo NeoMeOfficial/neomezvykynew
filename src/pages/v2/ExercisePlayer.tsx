@@ -12,6 +12,8 @@ import { useSmartBack } from '../../hooks/useSmartBack';
 import { useExercises } from '../../hooks/useExercises';
 import { useStretches } from '../../hooks/useStretches';
 import { useUniversalFavorites } from '../../hooks/useUniversalFavorites';
+import { useProgramAccess } from '../../hooks/useProgramAccess';
+import { useActiveProgram } from '../../hooks/useDailyRituals';
 import { catalogExercises, catalogStretches, CatalogExercise, CatalogStretch } from '../../features/telo/libraryCatalog';
 import { EQUIP_LABEL, EQUIP_SHORT, FOCUS_LABEL, STRETCH_FOCUS_LABEL, parseFocus, parseStretchFocus } from '../../features/telo/exerciseTaxonomy';
 
@@ -174,6 +176,14 @@ export default function ExercisePlayer() {
   const contentType = exercise.category === 'stretch' ? 'stretch' : 'exercise';
   const entitlement = useEntitlement(contentType, exercise.id);
 
+  // A scheduled program exercise plays for anyone with access to the
+  // active program — subscribers AND single-program grantees, who are
+  // otherwise free-tier and would hit the library quota.
+  const { program: activeProg } = useActiveProgram();
+  const { hasProgram: hasProgAccess } = useProgramAccess();
+  const programAllowed = !!location.state?.fromProgram && !!activeProg && hasProgAccess(activeProg.program_id);
+  const allowed = entitlement.allowed || programAllowed;
+
   const vimeoMountRef = useRef<HTMLDivElement | null>(null);
   const playedSecRef = useRef(0);
   const lastTimeRef = useRef(0);
@@ -182,16 +192,16 @@ export default function ExercisePlayer() {
   // Quota exhausted → redirect before render.
   useEffect(() => {
     if (entitlement.loading) return;
-    if (!entitlement.allowed) {
+    if (!allowed) {
       navigate('/paywall', { replace: true });
     }
-  }, [entitlement.loading, entitlement.allowed, navigate]);
+  }, [entitlement.loading, allowed, navigate]);
 
   // Vimeo SDK player — gives real playback + the timeupdate events we
   // need to measure 10s of accumulated play for the entitlement log.
   useEffect(() => {
     if (!isVimeo || !vimeoMountRef.current) return;
-    if (entitlement.loading || !entitlement.allowed) return;
+    if (entitlement.loading || !allowed) return;
 
     const player = new Player(vimeoMountRef.current, {
       id: Number(exercise.videoUrl),
@@ -243,7 +253,7 @@ export default function ExercisePlayer() {
 
   // While entitlement resolves, or if quota is exhausted (redirect in
   // flight), render nothing — avoids a flash of paid content.
-  if (entitlement.loading || !entitlement.allowed) return null;
+  if (entitlement.loading || !allowed) return null;
 
   return (
     <div className="min-h-screen bg-cream pb-12">

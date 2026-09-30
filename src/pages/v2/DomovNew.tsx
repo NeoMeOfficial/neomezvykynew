@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '@/hooks/use-user';
 import { useCycleInfo } from '@/hooks/use-cycle';
+import { useProgramAccess } from '@/hooks/useProgramAccess';
 import { useUserProgram } from '@/hooks/useUserProgram';
 import { useDailyTeloPick } from '@/features/telo/useDailyTeloPick';
 import { useMealPlan } from '@/features/nutrition/useMealPlan';
@@ -880,6 +881,9 @@ export default function DomovNew() {
   const user = useUser();
   const cycle = useCycleInfo();
   const { userProgram } = useUserProgram();
+  // Program-only users (program_purchases grant, no subscription) still get
+  // their program card — hasProgram covers both subscribers and grantees.
+  const { hasProgram: hasProgramAccess } = useProgramAccess();
   const { pick: teloPick, hasCycle: teloHasCycle } = useDailyTeloPick();
   const { todayPlan } = useMealPlan();
   const { recipes } = useRecipes();
@@ -973,7 +977,7 @@ export default function DomovNew() {
     // Active program owns the Telo card: today's SCHEDULED content (from the
     // admin programme builder) opens straight in the player. Upcoming →
     // start-Monday teaser; rest day / unscheduled → program overview.
-    isPlus && userProgram
+    userProgram && hasProgramAccess(userProgram.id)
       ? (() => {
           const base = { key: 'telo' as const, label: 'Telo', color: TELO };
           const progSub = `${userProgram.name} · týž. ${userProgram.week} · deň ${userProgram.day}`;
@@ -1028,6 +1032,7 @@ export default function DomovNew() {
               },
               fromRecommendation: true,
               phasePick: false,
+              fromProgram: true,
             },
             cta: 'Zacvič si',
           };

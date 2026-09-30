@@ -1127,6 +1127,55 @@ function UsersTab() {
   const [togglingMeal, setTogglingMeal] = useState<string | null>(null);
   const [togglingRole, setTogglingRole] = useState<string | null>(null);
 
+  // Single-program access grants (program_purchases) — "selected basis"
+  // access for legacy programme buyers without a subscription.
+  const [programsOpenFor, setProgramsOpenFor] = useState<string | null>(null);
+  const [userGrants, setUserGrants] = useState<Record<string, string[]>>({});
+  const [togglingProgram, setTogglingProgram] = useState<string | null>(null);
+  const PROGRAM_OPTIONS: [string, string][] = [
+    ['postpartum', 'Postpartum'], ['bodyforming', 'BodyForming'],
+    ['elastic-bands', 'El. gumy'], ['strong-sexy', 'Strong&Sexy'],
+  ];
+  const openProgramGrants = async (userId: string) => {
+    if (programsOpenFor === userId) { setProgramsOpenFor(null); return; }
+    setProgramsOpenFor(userId);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch(`/.netlify/functions/admin-set-program-access?userId=${encodeURIComponent(userId)}`, {
+        headers: { ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}) },
+      });
+      const body = await res.json();
+      if (res.ok) setUserGrants(prev => ({ ...prev, [userId]: (body.grants ?? []).map((g: { program_id: string }) => g.program_id) }));
+    } catch { /* chips just show unknown state */ }
+  };
+  const toggleProgramGrant = async (userId: string, programId: string) => {
+    const grant = !(userGrants[userId] ?? []).includes(programId);
+    setTogglingProgram(`${userId}:${programId}`);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch('/.netlify/functions/admin-set-program-access', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+        },
+        body: JSON.stringify({ userId, programId, grant }),
+      });
+      const body = await res.json();
+      if (!res.ok) throw new Error(body.error);
+      setUserGrants(prev => ({
+        ...prev,
+        [userId]: grant
+          ? [...(prev[userId] ?? []), programId]
+          : (prev[userId] ?? []).filter(p => p !== programId),
+      }));
+    } catch (err: any) {
+      alert('Chyba pri zmene prístupu k programu: ' + err.message);
+    } finally {
+      setTogglingProgram(null);
+    }
+  };
+
   const handleToggleAdmin = async (user: AdminUser) => {
     const next: 'admin' | 'user' = user.role === 'admin' ? 'user' : 'admin';
     const msg = next === 'admin'
@@ -1407,6 +1456,37 @@ function UsersTab() {
                     >
                       {togglingMeal === user.id ? '…' : (user.nutrition_plan_purchased ? 'Jedálniček ✓' : '+ Jedálniček')}
                     </button>
+
+                    {/* Single-program access (program_purchases) */}
+                    <button
+                      onClick={() => openProgramGrants(user.id)}
+                      title="Prístup len k vybraným programom (bez predplatného)"
+                      style={{ ...btnSecondary, padding: '6px 10px', fontSize: 11 }}
+                    >
+                      Programy{(userGrants[user.id]?.length ?? 0) > 0 ? ` ✓${userGrants[user.id].length}` : ''}
+                    </button>
+                    {programsOpenFor === user.id && PROGRAM_OPTIONS.map(([pid, plabel]) => {
+                      const has = (userGrants[user.id] ?? []).includes(pid);
+                      const busy = togglingProgram === `${user.id}:${pid}`;
+                      return (
+                        <button
+                          key={pid}
+                          onClick={() => toggleProgramGrant(user.id, pid)}
+                          disabled={busy}
+                          style={{
+                            all: 'unset', cursor: 'pointer', padding: '4px 8px', borderRadius: 999,
+                            fontFamily: 'DM Sans, system-ui', fontSize: 10, fontWeight: 500,
+                            letterSpacing: '0.04em',
+                            background: has ? _A.TERRA : 'transparent',
+                            color: has ? '#fff' : _A.MUTED,
+                            border: has ? `1px solid ${_A.TERRA}` : `1px solid ${_A.HAIR2}`,
+                            opacity: busy ? 0.5 : 1,
+                          }}
+                        >
+                          {busy ? '…' : `${has ? '✓ ' : ''}${plabel}`}
+                        </button>
+                      );
+                    })}
 
                     {/* Auth helpers — generate magic link or password
                         reset link the admin can copy and forward. */}

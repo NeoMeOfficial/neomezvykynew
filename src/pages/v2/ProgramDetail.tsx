@@ -1,11 +1,25 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSubscription } from '../../contexts/SubscriptionContext';
+import { useProgramAccess } from '../../hooks/useProgramAccess';
 import { useActiveProgram } from '../../hooks/useDailyRituals';
 import { useToast } from '@/hooks/use-toast';
 import { Eye, Ser, Body, PlusTag, FaqAccordion, NM } from '../../components/v2/neome';
 import { getProgramBySlug, type Program, type ProgramSlug } from '../../data/programs';
 import { supabase } from '../../lib/supabase';
+
+// Program lifecycle → netlify program-event (ActiveCampaign tags + emails).
+// Fire-and-forget: the app's own DB already holds the truth.
+function sendProgramEvent(payload: { action: 'activated' | 'ended'; programId: string; startDate?: string; reason?: string }) {
+  supabase.auth.getSession().then(({ data: { session } }) => {
+    if (!session?.access_token) return;
+    fetch('/.netlify/functions/program-event', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+      body: JSON.stringify(payload),
+    }).catch(() => {});
+  });
+}
 
 /**
  * Program detail — R9 + Gabi's full content (postpartum, bodyforming,
@@ -102,6 +116,8 @@ export default function ProgramDetail() {
   const { programId: rawSlug } = useParams<{ programId: string }>();
   const navigate = useNavigate();
   const { isPremium } = useSubscription();
+  // Access = subscription OR a single-program grant (program_purchases).
+  const { hasProgram } = useProgramAccess();
   const { program: activeProgram, activateProgram, deactivateProgram } = useActiveProgram();
   const { toast } = useToast();
 
@@ -144,6 +160,7 @@ export default function ProgramDetail() {
     );
   }
 
+  const hasAccess = hasProgram(program.slug);
   const heroImg = HERO_IMAGES[program.slug] ?? HERO_IMAGES.postpartum;
   const exercises = exercisesCountFor(program);
   const minPerDay = minutesPerDayFor(program);
@@ -161,20 +178,8 @@ export default function ProgramDetail() {
       });
       return;
     }
-    // Fire-and-forget: activation confirmation email (+ the email-sequence
-    // registration hook lives server-side in program-activated).
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session?.access_token) return;
-      const iso = mondays[selectedIdx].toISOString().slice(0, 10);
-      fetch('/.netlify/functions/program-activated', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${session.access_token}`,
-        },
-        body: JSON.stringify({ programId: program.slug, startDate: iso }),
-      }).catch(() => {});
-    });
+    // Fire-and-forget: AC automation tag + confirmation email.
+    sendProgramEvent({ action: 'activated', programId: program.slug, startDate: mondays[selectedIdx].toISOString().slice(0, 10) });
     setConfirmOpen(true);
   };
 
@@ -199,6 +204,8 @@ export default function ProgramDetail() {
       });
       return;
     }
+    // Fire-and-forget: AC exits the email automation / gets the status tag.
+    sendProgramEvent({ action: 'ended', programId: program.slug, reason: endReason });
     const labels = { canceled: 'Program zrušený', paused: 'Program pozastavený', completed: 'Program dokončený' };
     toast({ title: labels[endReason], description: 'Vrátili sme ti odporúčané cvičenia na Domov.' });
     setEnding(false);
@@ -485,7 +492,7 @@ export default function ProgramDetail() {
       <div style={{ margin: '28px 20px 0' }}>
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 12 }}>
           <Eye size={10}>Začni v pondelok</Eye>
-          {!isPremium && <PlusTag />}
+          {!hasAccess && <PlusTag />}
         </div>
         <div
           style={{
@@ -494,11 +501,11 @@ export default function ProgramDetail() {
             background: '#fff',
             border: `1px solid ${NM.HAIR}`,
             boxShadow: '0 10px 28px rgba(61,41,33,0.06)',
-            opacity: isPremium ? 1 : 0.6,
+            opacity: hasAccess ? 1 : 0.6,
             position: 'relative',
           }}
         >
-          {!isPremium && (
+          {!hasAccess && (
             <div style={{ position: 'absolute', inset: 0, borderRadius: 20, background: 'rgba(248,245,240,0.25)', pointerEvents: 'none' }} />
           )}
           <div style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.EYEBROW, fontWeight: 400, marginBottom: 14 }}>
@@ -510,10 +517,10 @@ export default function ProgramDetail() {
               return (
                 <button
                   key={i}
-                  onClick={() => isPremium && setSelectedIdx(i)}
+                  onClick={() => hasAccess && setSelectedIdx(i)}
                   style={{
                     all: 'unset',
-                    cursor: isPremium ? 'pointer' : 'not-allowed',
+                    cursor: hasAccess ? 'pointer' : 'not-allowed',
                     flexShrink: 0,
                     width: 76,
                     padding: '13px 0',
@@ -542,7 +549,7 @@ export default function ProgramDetail() {
               <rect x="3" y="5" width="18" height="16" rx="2" />
               <path d="M3 10h18M8 3v4M16 3v4" />
             </svg>
-            {isPremium ? (
+            {hasAccess ? (
               <>
                 Skončíš v pondelok <strong style={{ color: NM.DEEP, fontWeight: 500 }}>{finalDate}</strong>.
               </>
@@ -555,7 +562,26 @@ export default function ProgramDetail() {
 
       {/* Primary CTA */}
       <div style={{ margin: '24px 20px 0' }}>
-        {isPremium ? (
+        {hasAccess && activeProgram && !isActive ? (
+          /* One program at a time (Sam 2026-09-30): another program is
+             running — block activation and point to it instead of
+             silently replacing it. */
+          <div style={{ padding: '18px 20px', borderRadius: 20, background: '#fff', border: `1px solid ${NM.HAIR}` }}>
+            <Eye size={10} color={NM.TERRA}>Naraz môže bežať len jeden program</Eye>
+            <div style={{ fontFamily: NM.SERIF, fontSize: 17, color: NM.DEEP, marginTop: 8, lineHeight: 1.25 }}>
+              Máš aktívny program {getProgramBySlug(activeProgram.program_id)?.name ?? activeProgram.program_id}.
+            </div>
+            <div style={{ fontFamily: NM.SANS, fontSize: 12.5, color: NM.MUTED, marginTop: 6, lineHeight: 1.5 }}>
+              Ak chceš začať tento, najprv ho v jeho detaile pozastav alebo ukonči.
+            </div>
+            <button
+              onClick={() => navigate(`/program/${activeProgram.program_id}`)}
+              style={{ marginTop: 14, width: '100%', padding: '13px 20px', background: NM.DEEP, color: '#fff', border: 'none', borderRadius: 999, fontFamily: NM.SANS, fontSize: 13, fontWeight: 500, cursor: 'pointer' }}
+            >
+              Otvoriť môj aktívny program
+            </button>
+          </div>
+        ) : hasAccess ? (
           <>
             <button
               onClick={onActivate}
