@@ -449,8 +449,15 @@ export default function PeriodkaSettings() {
   const headlineCopy = useMemo(() => {
     if (!lastPeriodStart) return 'Zaznač prvý deň menštruácie a nastavíme ti odporúčania na mieru.';
     if (currentDay > cycleLength) return 'Podľa plánu by ti menštruácia mala už začať.';
-    const phaseLabel = (PHASE_NAMES as Record<string, string>)[phase.key] ?? phase.name ?? '';
-    return `Si v ${phaseLabel.toLowerCase()}. Tu si zaznačíš ďalšiu menštruáciu a upravíš dĺžku cyklu.`;
+    // Locative case per phase — "Si v folikulárna fáza" was broken Slovak.
+    const PHASE_LOCATIVE: Record<string, string> = {
+      menstrual: 'v menštruačnej fáze',
+      follicular: 'vo folikulárnej fáze',
+      ovulation: 'v ovulačnej fáze',
+      luteal: 'v luteálnej fáze',
+    };
+    const inPhase = PHASE_LOCATIVE[phase.key] ?? `vo fáze ${(phase.name ?? '').toLowerCase()}`;
+    return `Si ${inPhase}. Tu si zaznačíš ďalšiu menštruáciu a upravíš dĺžku cyklu.`;
   }, [lastPeriodStart, currentDay, cycleLength, phase]);
 
   // Actions
