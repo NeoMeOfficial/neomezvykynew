@@ -11,7 +11,6 @@ import { colors } from '../../theme/warmDusk';
 import { supabase } from '../../lib/supabase';
 import { uploadContentImage } from '../../lib/storage';
 import BlogEditor from '../../components/admin/BlogEditor';
-import ContentManager from '../../components/admin/ContentManager';
 import { useAdminMessages, useUnreviewedPostsCount, useUnreadAdminMessagesCount } from '../../hooks/useMessages';
 import { TeloExtraStaticData } from '../../data/teloExtraData';
 import { TeloStrecingStaticData } from '../../data/teloStrecingData';
@@ -43,7 +42,6 @@ const Card = ({ children, className = '' }: { children: React.ReactNode; classNa
 const navigationItems = [
   { id: 'overview', label: 'Dashboard', icon: BarChart3, description: 'Overview & Analytics' },
   { id: 'users', label: 'Users', icon: Users, description: 'Account Management' },
-  { id: 'content', label: 'Content Manager', icon: FolderOpen, description: 'Videos, Photos & Media' },
   { id: 'blog', label: 'Blog', icon: BookOpen, description: 'Blog Posts' },
   { id: 'programs', label: 'Programs', icon: Calendar, description: 'Fitness Programs' },
   { id: 'exercises', label: 'Exercises', icon: Dumbbell, description: 'Exercise Library' },
@@ -2789,8 +2787,32 @@ function ExercisesTab() {
               <input ref={thumbInputRef} type="file" accept="image/jpeg,image/png,image/webp" style={{ display: 'none' }} onChange={handleThumbUpload} />
             </div>
             <div style={{ gridColumn: '1 / -1' }}>
-              <label style={labelStyle}>Video URL</label>
-              <input value={form.video_url ?? ''} onChange={e => setForm(f => ({ ...f, video_url: e.target.value }))} placeholder="Doplníš neskôr…" style={inputStyle} />
+              <label style={labelStyle}>Video URL (Vimeo alebo YouTube)</label>
+              <input value={form.video_url ?? ''} onChange={e => setForm(f => ({ ...f, video_url: e.target.value }))} placeholder="https://vimeo.com/123456789 — dá sa doplniť aj neskôr" style={inputStyle} />
+              {(() => {
+                // Same detection the app player uses — instant feedback that
+                // the pasted link will actually play.
+                const v = (form.video_url ?? '').trim();
+                if (!v) return null;
+                const vimeo = v.match(/vimeo\.com\/(\d+)/)?.[1] ?? (/^\d+$/.test(v) ? v : null);
+                const yt = v.match(/(?:youtube\.com\/.*[?&]v=|youtu\.be\/|youtube\.com\/embed\/)([\w-]{11})/)?.[1]
+                  ?? (/^[\w-]{11}$/.test(v) && !/^\d+$/.test(v) ? v : null);
+                if (vimeo) return (
+                  <div style={{ marginTop: 6, fontFamily: 'DM Sans, system-ui', fontSize: 11.5, color: _A.SAGE }}>
+                    ✓ Vimeo · ID {vimeo} · <a href={`https://vimeo.com/${vimeo}`} target="_blank" rel="noreferrer" style={{ color: _A.SAGE }}>otvoriť video</a>
+                  </div>
+                );
+                if (yt) return (
+                  <div style={{ marginTop: 6, fontFamily: 'DM Sans, system-ui', fontSize: 11.5, color: _A.SAGE }}>
+                    ✓ YouTube · ID {yt} · <a href={`https://youtu.be/${yt}`} target="_blank" rel="noreferrer" style={{ color: _A.SAGE }}>otvoriť video</a>
+                  </div>
+                );
+                return (
+                  <div style={{ marginTop: 6, fontFamily: 'DM Sans, system-ui', fontSize: 11.5, color: _A.TERRA }}>
+                    ⚠ Toto nevyzerá ako Vimeo ani YouTube link — appka ho neprehrá.
+                  </div>
+                );
+              })()}
             </div>
             <div style={{ gridColumn: '1 / -1' }}>
               <label style={labelStyle}>Popis</label>
@@ -2841,6 +2863,9 @@ function ExercisesTab() {
                       </span>
                       <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED }}>{r.duration}</span>
                       {r.body && <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED }}>{r.body}</span>}
+                      {r.video_url
+                        ? <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '2px 7px', borderRadius: 999, background: 'rgba(139,158,136,0.15)', color: _A.SAGE }}>▶ video</span>
+                        : <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '2px 7px', borderRadius: 999, background: 'rgba(184,134,74,0.15)', color: _A.GOLD }}>bez videa</span>}
                     </div>
                   </div>
                 </div>
@@ -3206,7 +3231,7 @@ function ProgramsTab() {
     if (!file || !editing) return;
     setUploadingCover(true); setCoverError(null);
     try {
-      const result = await uploadContentImage(file, 'programmes');
+      const result = await uploadContentImage(file, 'programs');
       setEditing(p => p && ({ ...p, image: result.url }));
     } catch (err: any) { setCoverError(err.message ?? 'Nahrávanie zlyhalo'); }
     setUploadingCover(false);
@@ -3647,7 +3672,6 @@ export default function AdminNew() {
                 { label: 'Blog',           desc: 'Nový príspevok',          icon: BookOpen, tab: 'blog' },
                 { label: 'Komunita',       desc: 'Moderovať príspevky',     icon: Flag,     tab: 'community' },
                 { label: 'Promo kódy',     desc: 'Stripe zľavové kódy',     icon: Percent,  tab: 'promo-codes' },
-                { label: 'Content Manager',desc: 'Videá, fotky, médiá',    icon: FolderOpen, tab: 'content' },
               ].map((item) => (
                 <button
                   key={item.tab}
@@ -3795,8 +3819,6 @@ export default function AdminNew() {
     switch (activeTab) {
       case 'overview':
         return renderOverview();
-      case 'content':
-        return <ContentManager />;
       case 'programs':
         return <ProgramsTab />;
       case 'exercises':
