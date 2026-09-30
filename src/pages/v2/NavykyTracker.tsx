@@ -286,6 +286,7 @@ export default function NavykyTracker() {
   const [backfillId, setBackfillId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [startError, setStartError] = useState<string | null>(null);
   const [skips, setSkips] = useState<Record<string, string[]>>(() => readSkips());
   const [drag, setDrag] = useState<{ id: string; x: number } | null>(null);
   const touchRef = useRef<{ id: string; x: number; y: number; horiz: boolean | null } | null>(null);
@@ -368,7 +369,14 @@ export default function NavykyTracker() {
     setSaving(true);
     const ok = await addHabit({ name, durationDays: days, unit, targetPerDay: target });
     setSaving(false);
-    if (!ok) return;
+    if (!ok) {
+      // Behavioural audit 2026-10-01: a failed insert (RLS, offline, demo
+      // env) used to die silently — the button just did nothing.
+      setStartError('Návyk sa nepodarilo uložiť. Skontroluj pripojenie a skús to znova.');
+      setTimeout(() => setStartError(null), 5000);
+      return;
+    }
+    setStartError(null);
     // The new habit lands in the top section — scroll her there and
     // flash it green so the move is visible (otherwise the card just
     // vanishes from the offer and she taps again).
@@ -735,6 +743,11 @@ export default function NavykyTracker() {
         {canAdd && availablePresets.length > 0 && (
           <>
             {sectionHead('Vyber si', habits.length === 0 ? 'svoj prvý návyk' : 'ďalší návyk')}
+            {startError && (
+              <div style={{ margin: '0 0 10px', padding: '10px 14px', borderRadius: 12, background: 'rgba(194,122,110,0.12)', border: '1px solid rgba(194,122,110,0.4)', fontFamily: NM.SANS, fontSize: 12.5, color: '#B4614F' }}>
+                {startError}
+              </div>
+            )}
             {availablePresets.map((p) => (
               <PresetCard key={p.name} preset={p} saving={saving} onStart={startHabit(p.unit, p.target)} />
             ))}
