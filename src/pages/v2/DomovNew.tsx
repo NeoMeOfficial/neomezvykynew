@@ -970,16 +970,68 @@ export default function DomovNew() {
           href: '/kniznica/periodka?from=home',
           cta: 'Zapnúť',
         },
+    // Active program owns the Telo card: today's SCHEDULED content (from the
+    // admin programme builder) opens straight in the player. Upcoming →
+    // start-Monday teaser; rest day / unscheduled → program overview.
     isPlus && userProgram
-      ? {
-          key: 'telo',
-          label: 'Telo',
-          color: TELO,
-          img: '/images/r9/section-body.jpg',
-          title: userProgram.todaysExercise?.title ?? 'Cvičenie dňa',
-          sub: [`týž. ${userProgram.week} · deň ${userProgram.day}`, userProgram.todaysExercise?.duration].filter(Boolean).join(' · '),
-          href: `/program/${userProgram.id}`,
-        }
+      ? (() => {
+          const base = { key: 'telo' as const, label: 'Telo', color: TELO };
+          const progSub = `${userProgram.name} · týž. ${userProgram.week} · deň ${userProgram.day}`;
+          if (userProgram.state === 'upcoming') {
+            const d = new Date(userProgram.startDate + 'T00:00:00');
+            return {
+              ...base,
+              img: '/images/r9/section-body.jpg',
+              title: `${userProgram.name} štartuje v pondelok`,
+              sub: `${d.getDate()}. ${d.getMonth() + 1}. — dovtedy pokračuj voľnými cvičeniami`,
+              href: `/program/${userProgram.id}`,
+            };
+          }
+          const ex = userProgram.todaysExercise;
+          if (userProgram.todayType === 'rest' || !ex) {
+            return {
+              ...base,
+              img: '/images/r9/section-body.jpg',
+              title: userProgram.todayType === 'rest' ? 'Dnes máš oddychový deň' : 'Program pokračuje',
+              sub: `${userProgram.name} · týž. ${userProgram.week} z ${userProgram.totalWeeks}`,
+              href: `/program/${userProgram.id}`,
+            };
+          }
+          if (ex.kind === 'meditation') {
+            return {
+              ...base,
+              img: ex.thumb ?? '/images/r9/section-mind.jpg',
+              title: ex.title,
+              sub: [progSub, ex.duration].filter(Boolean).join(' · '),
+              href: `/meditacia/${ex.id}`,
+              cta: 'Pusti si',
+            };
+          }
+          return {
+            ...base,
+            img: ex.thumb ?? '/images/r9/section-body.jpg',
+            title: ex.title,
+            sub: [progSub, ex.duration].filter(Boolean).join(' · '),
+            href: `/exercise/extra/${ex.id}`,
+            state: {
+              exercise: {
+                id: ex.id,
+                name: ex.title,
+                duration: ex.duration,
+                category: ex.category ?? '15min',
+                body: ex.body ?? '',
+                equip: ex.equip ?? '',
+                videoUrl: ex.videoUrl,
+                thumb: ex.thumb,
+                description: ex.description ?? '',
+                diastasisSafe: ex.diastasisSafe,
+              },
+              fromRecommendation: true,
+              phasePick: false,
+            },
+            cta: 'Zacvič si',
+          };
+        })()
       : teloPick
       ? {
           key: 'telo',

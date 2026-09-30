@@ -144,14 +144,76 @@ async function sendOne(sub: Sub, payload: PushPayload, kind: string, sentForDate
 }
 
 export async function handler() {
-  if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY) {
-    return { statusCode: 500, body: 'VAPID env missing' };
-  }
-
   const today = todayLocal();
   let sentPeriod = 0;
   let sentProgram = 0;
   let skipped = 0;
+
+  // ── Program day message → in-app inbox ───────────────────────
+  // Gabi's per-day motivation message from the admin programme builder
+  // lands in the user's /spravy inbox on that program day (Mon–Fri).
+  // Runs for EVERY program user — push subscription not required.
+  // Dedupe via push_notification_log kind='program_msg'.
+  let inboxDelivered = 0;
+  let inboxSkipped = 0;
+  if (today.dow >= 1 && today.dow <= 5) {
+    const { data: progRows } = await supabase
+      .from('user_active_programs')
+      .select('user_id,program_id,start_date');
+    const rows = (progRows ?? []) as ProgramRow[];
+    const progIds = [...new Set(rows.map((r) => r.program_id))];
+    const { data: progDefs } = progIds.length
+      ? await supabase.from('programmes').select('id,weeks,schedule').in('id', progIds)
+      : { data: [] as unknown[] };
+    const defById = new Map(
+      ((progDefs ?? []) as { id: string; weeks: number | null; schedule: unknown }[]).map((p) => [p.id, p]),
+    );
+    for (const row of rows) {
+      const def = defById.get(row.program_id);
+      const totalWeeks = def?.weeks ?? PROGRAMS[row.program_id]?.weeks;
+      if (!def || !totalWeeks) continue;
+      const daysSince = daysBetween(row.start_date, today.iso);
+      if (daysSince < 0) continue;
+      const week = Math.floor(daysSince / 7) + 1;
+      if (week > totalWeeks) continue;
+      const weekday = today.dow - 1; // Mon=0 .. Fri=4
+      const schedule = Array.isArray(def.schedule)
+        ? (def.schedule as { weekNumber?: number; days?: { message?: string }[] }[])
+        : [];
+      const w = schedule.find((x) => x?.weekNumber === week) ?? schedule[week - 1];
+      const message = (w?.days?.[weekday]?.message ?? '').trim();
+      if (!message) continue;
+
+      const { data: logRow } = await supabase
+        .from('push_notification_log')
+        .select('id')
+        .eq('user_id', row.user_id)
+        .eq('kind', 'program_msg')
+        .eq('sent_for_date', today.iso)
+        .maybeSingle();
+      if (logRow) { inboxSkipped++; continue; }
+
+      const { error: insErr } = await supabase.from('messages').insert({
+        user_id: row.user_id,
+        body: message,
+        is_from_admin: true,
+        sender_name: 'Gabi',
+      });
+      if (!insErr) {
+        inboxDelivered++;
+        await supabase.from('push_notification_log').insert({
+          user_id: row.user_id,
+          kind: 'program_msg',
+          sent_for_date: today.iso,
+          outcome: 'inbox',
+        }).then(() => {}, () => {});
+      }
+    }
+  }
+
+  if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY) {
+    return { statusCode: 500, body: JSON.stringify({ error: 'VAPID env missing', inboxDelivered, inboxSkipped }) };
+  }
 
   // Pull every enabled subscription. Small table — fine to scan.
   const { data: allSubs } = await supabase
@@ -159,7 +221,7 @@ export async function handler() {
     .select('id,user_id,endpoint,p256dh,auth_secret')
     .eq('enabled', true);
   if (!allSubs?.length) {
-    return { statusCode: 200, body: JSON.stringify({ ok: true, note: 'no subscriptions' }) };
+    return { statusCode: 200, body: JSON.stringify({ ok: true, note: 'no subscriptions', inboxDelivered, inboxSkipped }) };
   }
 
   // Group subscriptions by user.
@@ -261,6 +323,8 @@ export async function handler() {
       sentPeriod,
       sentProgram,
       skipped,
+      inboxDelivered,
+      inboxSkipped,
     }),
   };
 }

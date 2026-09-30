@@ -161,6 +161,20 @@ export default function ProgramDetail() {
       });
       return;
     }
+    // Fire-and-forget: activation confirmation email (+ the email-sequence
+    // registration hook lives server-side in program-activated).
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session?.access_token) return;
+      const iso = mondays[selectedIdx].toISOString().slice(0, 10);
+      fetch('/.netlify/functions/program-activated', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ programId: program.slug, startDate: iso }),
+      }).catch(() => {});
+    });
     setConfirmOpen(true);
   };
 
