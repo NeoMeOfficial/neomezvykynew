@@ -171,7 +171,7 @@ export default function AffiliateDashboard() {
     return (
       <div style={{ minHeight: '100vh', background: NM.BG, padding: '0 18px', fontFamily: NM.SANS }}>
         <div style={{ padding: 'calc(env(safe-area-inset-top) + 18px) 0 14px' }}>
-          <button onClick={() => navigate(-1)} style={{ all: 'unset', cursor: 'pointer', fontSize: 14, color: NM.DEEP, padding: 6 }}>← Späť</button>
+          <button onClick={() => navigate('/profil')} style={{ all: 'unset', cursor: 'pointer', fontSize: 14, color: NM.DEEP, padding: 6 }}>← Späť</button>
         </div>
         <div style={card}>
           <div style={{ fontFamily: NM.SERIF, fontSize: 20, color: NM.DEEP, marginBottom: 8 }}>Partnerský program</div>
@@ -188,7 +188,7 @@ export default function AffiliateDashboard() {
   return (
     <div style={{ minHeight: '100vh', background: NM.BG, padding: '0 18px 60px', fontFamily: NM.SANS }}>
       <div style={{ padding: 'calc(env(safe-area-inset-top) + 18px) 0 6px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <button onClick={() => navigate(-1)} style={{ all: 'unset', cursor: 'pointer', fontSize: 14, color: NM.DEEP, padding: 6 }}>← Späť</button>
+        <button onClick={() => navigate('/profil')} style={{ all: 'unset', cursor: 'pointer', fontSize: 14, color: NM.DEEP, padding: 6 }}>← Späť</button>
       </div>
 
       <h1 style={{ fontFamily: NM.SERIF, fontSize: 26, fontWeight: 500, color: NM.DEEP, margin: '6px 0 2px' }}>Partnerský program</h1>
