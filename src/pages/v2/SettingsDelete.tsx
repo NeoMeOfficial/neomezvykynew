@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useWorkoutHistory } from '../../hooks/useWorkoutHistory';
-import { useFavorites } from '../../hooks/useFavorites';
+import { useUniversalFavorites } from '../../hooks/useUniversalFavorites';
 import { usePointsLedger } from '../../hooks/usePointsLedger';
 import { useSupabaseAuth } from '../../contexts/SupabaseAuthContext';
 import { supabase } from '../../lib/supabase';
@@ -35,7 +35,8 @@ import { Page, BackHeader, Eye, Ser, Body, NM } from '../../components/v2/neome'
 export default function SettingsDelete() {
   const navigate = useNavigate();
   const { stats } = useWorkoutHistory() as { stats: { currentStreak: number } };
-  const { favoritesCount } = useFavorites();
+  const { favorites: favItems } = useUniversalFavorites();
+  const favoritesCount = favItems.length;
   const { balance: pointsBalance } = usePointsLedger();
   const { signOut } = useSupabaseAuth();
   const { toast } = useToast();
@@ -84,7 +85,7 @@ export default function SettingsDelete() {
     { n: '—', l: 'zápisov v denníku', c: NM.MAUVE },
     { n: streak.toString(), l: 'dní v rade', c: NM.TERRA },
     { n: credits.toString(), l: 'získaných bodov', c: NM.GOLD },
-    { n: favoritesCount.toString(), l: 'uložených receptov', c: NM.SAGE },
+    { n: favoritesCount.toString(), l: 'uložených obľúbených', c: NM.SAGE },
   ];
 
   const alternatives = [

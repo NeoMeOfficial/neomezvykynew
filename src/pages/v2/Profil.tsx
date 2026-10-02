@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import { useWorkoutHistory } from '@/hooks/useWorkoutHistory';
-import { useFavorites } from '@/hooks/useFavorites';
+import { useUniversalFavorites } from '@/hooks/useUniversalFavorites';
 import { useReflections } from '@/hooks/useDailyRituals';
 import { useIsAffiliate } from '@/hooks/useIsAffiliate';
 import { Eyebrow } from '@/components/ui/eyebrow';
@@ -19,7 +19,8 @@ export default function Profil() {
   const { user, profile, signOut } = useSupabaseAuth();
   const { isPremium } = useSubscription();
   const { stats } = useWorkoutHistory() as { stats: { totalWorkouts: number; currentStreak: number; longestStreak: number } };
-  const { favoritesCount } = useFavorites();
+  const { favorites } = useUniversalFavorites();
+  const favoritesCount = favorites.length;
   const { count: reflectionCount } = useReflections();
 
   const meta = (user?.user_metadata ?? {}) as { full_name?: string; name?: string };
