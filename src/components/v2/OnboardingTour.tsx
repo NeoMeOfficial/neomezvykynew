@@ -41,10 +41,16 @@ const STEPS: Step[] = [
     text: 'Každý deň ti vyberieme recept, ktorý sadne fáze tvojho cyklu. V sekcii Strava je celá knižnica receptov — podľa kategórií, času aj chuti.',
   },
   {
-    eyebrow: 'Myseľ & Periodka',
+    eyebrow: 'Myseľ',
+    accent: NM.DUSTY,
+    title: 'Pokoj pre hlavu.',
+    text: 'Meditácie a denník ti pomôžu spomaliť a všimnúť si, ako sa máš. Stačí pár minút — aj jedna odpoveď v denníku sa počíta.',
+  },
+  {
+    eyebrow: 'Periodka',
     accent: NM.MAUVE,
-    title: 'Pokoj pre hlavu, prehľad o cykle.',
-    text: 'Meditácie a denník ti pomôžu spomaliť. Periodka sleduje tvoj cyklus a appka podľa neho ladí odporúčania — cvičenie, stravu aj starostlivosť o seba.',
+    title: 'Tvoj cyklus, tvoj kompas.',
+    text: 'Zaznač si periódu a symptómy — Periodka sa naučí tvoj rytmus, predpovie ďalšie dni a celá appka podľa tvojej fázy ladí cvičenie, recepty aj starostlivosť o seba.',
   },
   {
     eyebrow: 'Domov',
