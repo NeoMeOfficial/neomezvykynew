@@ -47,9 +47,11 @@ export async function handler(event: any) {
       case 'customer.subscription.created':
       case 'customer.subscription.updated': {
         const sub = stripeEvent.data.object as Stripe.Subscription;
-        const active = sub.status === 'active' || sub.status === 'trialing';
+        // Paused collection keeps Stripe status 'active' but the user
+        // isn't paying — access stops too (Sam: cancel OR pause must
+        // restrict access). Audit C2.
+        const active = (sub.status === 'active' || sub.status === 'trialing') && !sub.pause_collection;
         await upsertSubscription(sub, active);
-        if (active) await handleReferralConversion(sub);
         break;
       }
       case 'customer.subscription.deleted': {
@@ -334,52 +336,6 @@ async function handleAffiliateCommission(invoice: Stripe.Invoice) {
   }
   if (!userId) return;
   await accrueAffiliateCommission(userId, invoice.amount_paid, 'subscription', invoice.id);
-}
-
-// When a new subscription goes active, check if the user was referred and award
-// points to the referrer (300 pts) if not already issued.
-async function handleReferralConversion(sub: Stripe.Subscription) {
-  const userId = sub.metadata?.userId;
-  if (!userId) return;
-
-  // Only fire once per subscription (guard via sub_reward_issued)
-  // Column names audited against prod 2026-10-02: referrer_user_id /
-  // referred_user_id (referrer_id never existed — this select used to
-  // error silently and no referrer was ever paid).
-  const { data: referral, error: refErr } = await supabase
-    .from('referrals')
-    .select('id, referrer_user_id, sub_reward_issued')
-    .eq('referred_user_id', userId)
-    .maybeSingle();
-  if (refErr) {
-    console.error('Referral lookup failed:', refErr);
-    return;
-  }
-
-  if (!referral || referral.sub_reward_issued) return;
-
-  const now = new Date().toISOString();
-
-  // Mark conversion timestamps + issued flags
-  await supabase
-    .from('referrals')
-    .update({ subscribed_at: now, sub_reward_issued: true })
-    .eq('id', referral.id);
-
-  // Award 300 points to the referrer
-  const { error } = await supabase.from('points_ledger').insert({
-    user_id: referral.referrer_user_id,
-    event_type: 'referral_sub',
-    points: 300,
-    ref_id: referral.id,
-    ref_type: 'referral',
-  });
-
-  if (error) {
-    console.error('Failed to award referral sub points:', error);
-  } else {
-    console.log(`Referral sub reward (300 pts) awarded to ${referral.referrer_user_id} for converting ${userId}`);
-  }
 }
 
 async function upsertSubscription(sub: Stripe.Subscription, active: boolean) {

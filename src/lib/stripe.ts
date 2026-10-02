@@ -276,13 +276,27 @@ export function formatPrice(price: number, currency: string = 'EUR'): string {
   }).format(price);
 }
 
+const EXPIRY_GRACE_SECONDS = 3 * 24 * 3600;
+
 export function isSubscriptionActive(subscription: SubscriptionData | null): boolean {
   if (!subscription) return false;
-  
+
   const now = Date.now() / 1000;
-  
+
+  // Audit C2: a stale 'active' row must not grant access forever. When
+  // the paid period ended more than the grace window ago, treat it as
+  // expired client-side; the nightly reconcile job syncs the row from
+  // Stripe. period_end of 0 means legacy/unknown — leave it to the
+  // reconciler rather than lock a paying user out.
+  if (
+    subscription.current_period_end > 0 &&
+    now > subscription.current_period_end + EXPIRY_GRACE_SECONDS
+  ) {
+    return false;
+  }
+
   return (
-    subscription.status === 'active' || 
+    subscription.status === 'active' ||
     subscription.status === 'trialing' ||
     (subscription.status === 'past_due' && subscription.current_period_end > now)
   );
