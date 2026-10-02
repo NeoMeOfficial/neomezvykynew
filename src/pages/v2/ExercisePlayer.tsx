@@ -221,9 +221,28 @@ export default function ExercisePlayer() {
       lastTimeRef.current = data.seconds;
     };
 
+    // Finishing the video is the workout completion — the celebration
+    // screen logs history and asks the server for the +10 award. Only
+    // Vimeo gets this (the YouTube iframe exposes no ended event);
+    // replace:true so Späť from the celebration skips the dead player.
+    const onEnded = () => {
+      navigate('/completion/workout', {
+        replace: true,
+        state: {
+          exerciseId: exercise.id,
+          title: exercise.name,
+          type: contentType,
+          duration: Math.round(playedSecRef.current / 60) || undefined,
+          program: location.state?.fromProgram ? activeProg?.program_id : undefined,
+        },
+      });
+    };
+
     player.on('timeupdate', onTimeUpdate);
+    player.on('ended', onEnded);
     return () => {
       player.off('timeupdate', onTimeUpdate);
+      player.off('ended', onEnded);
       player.destroy().catch(() => { /* element already gone */ });
     };
   }, [isVimeo, exercise.videoUrl, entitlement.loading, entitlement.allowed]);
