@@ -110,3 +110,38 @@ function escape(s: string): string {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
 }
+
+/**
+ * DB-editable templates (email_templates table, Sam 2026-10-02): lets
+ * the team restyle transactional mails in the Supabase dashboard
+ * (Table Editor) without a deploy. {{name}} placeholders are replaced
+ * with vars; a missing table/row falls back to the caller's built-in
+ * subject/html so sends never break on a missing migration.
+ */
+import { serviceClient } from './_userAuth';
+
+export async function sendTemplatedEmail(opts: {
+  slug: string;
+  to: string;
+  vars?: Record<string, string>;
+  fallback: { subject: string; html: string };
+}): Promise<{ id?: string }> {
+  let subject = opts.fallback.subject;
+  let html = opts.fallback.html;
+  try {
+    const { data } = await serviceClient()
+      .from('email_templates')
+      .select('subject, html')
+      .eq('slug', opts.slug)
+      .maybeSingle();
+    if (data?.subject && data?.html) {
+      subject = data.subject;
+      html = data.html;
+    }
+  } catch { /* table not migrated yet — built-in template */ }
+  for (const [k, v] of Object.entries(opts.vars ?? {})) {
+    subject = subject.split(`{{${k}}}`).join(v);
+    html = html.split(`{{${k}}}`).join(v);
+  }
+  return sendTransactionalEmail({ to: opts.to, subject, html });
+}
