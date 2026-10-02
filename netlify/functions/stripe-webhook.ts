@@ -273,11 +273,18 @@ async function handleReferralConversion(sub: Stripe.Subscription) {
   if (!userId) return;
 
   // Only fire once per subscription (guard via sub_reward_issued)
-  const { data: referral } = await supabase
+  // Column names audited against prod 2026-10-02: referrer_user_id /
+  // referred_user_id (referrer_id never existed — this select used to
+  // error silently and no referrer was ever paid).
+  const { data: referral, error: refErr } = await supabase
     .from('referrals')
-    .select('id, referrer_id, sub_reward_issued')
-    .eq('referred_id', userId)
+    .select('id, referrer_user_id, sub_reward_issued')
+    .eq('referred_user_id', userId)
     .maybeSingle();
+  if (refErr) {
+    console.error('Referral lookup failed:', refErr);
+    return;
+  }
 
   if (!referral || referral.sub_reward_issued) return;
 
@@ -291,7 +298,7 @@ async function handleReferralConversion(sub: Stripe.Subscription) {
 
   // Award 300 points to the referrer
   const { error } = await supabase.from('points_ledger').insert({
-    user_id: referral.referrer_id,
+    user_id: referral.referrer_user_id,
     event_type: 'referral_sub',
     points: 300,
     ref_id: referral.id,
@@ -301,7 +308,7 @@ async function handleReferralConversion(sub: Stripe.Subscription) {
   if (error) {
     console.error('Failed to award referral sub points:', error);
   } else {
-    console.log(`Referral sub reward (300 pts) awarded to ${referral.referrer_id} for converting ${userId}`);
+    console.log(`Referral sub reward (300 pts) awarded to ${referral.referrer_user_id} for converting ${userId}`);
   }
 }
 

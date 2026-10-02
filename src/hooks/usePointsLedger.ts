@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { awardPoints, AwardEvent, POINTS_AWARDED_EVENT } from '../lib/points';
 import { useSupabaseAuth } from '../contexts/SupabaseAuthContext';
 
 /**
@@ -9,19 +10,13 @@ import { useSupabaseAuth } from '../contexts/SupabaseAuthContext';
  * PointsRewards and Profil. Distinct from useReferral.credits which
  * tracks EUR-cents monetary credit.
  *
- * Demo fallback: localStorage-backed mock when no auth user, mirroring
- * useReferral's pattern.
+ * Earning goes through the award-points Netlify function — the server
+ * owns values, dedupe and caps (points buy real Stripe coupons, so the
+ * client is never trusted with an amount). points_ledger has no INSERT
+ * policy for end users; direct inserts bounce off RLS by design.
  */
 
-export type PointsEvent =
-  | 'workout_completed'
-  | 'program_completed'
-  | 'post_published'
-  | 'comment_published'
-  | 'heart_received'
-  | 'journal_entry'
-  | 'referral_approved'
-  | 'reward_redeemed';
+export type PointsEvent = AwardEvent | 'referral_sub' | 'referral_approved' | 'reward_redeemed' | string;
 
 export interface LedgerEntry {
   id: string;
@@ -55,23 +50,14 @@ export interface UserBadgeRow extends BadgeRow {
   earned: boolean;
 }
 
-const DEMO_LEDGER_KEY = 'neome_points_ledger';
+const DEMO_LEDGER_KEY = 'neome_points_ledger_v2';
 
 function loadDemoLedger(): LedgerEntry[] {
-  const raw = localStorage.getItem(DEMO_LEDGER_KEY);
-  if (raw) return JSON.parse(raw);
-  const seed: LedgerEntry[] = [
-    { id: 'd1', user_id: 'demo', event_type: 'post_published',     points: 10,  ref_id: null, ref_type: 'post',    created_at: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString() },
-    { id: 'd2', user_id: 'demo', event_type: 'comment_published',  points: 5,   ref_id: null, ref_type: 'comment', created_at: new Date(Date.now() - 1000 * 60 * 60 * 26).toISOString() },
-    { id: 'd3', user_id: 'demo', event_type: 'program_completed',  points: 50,  ref_id: null, ref_type: 'program', created_at: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString() },
-    { id: 'd4', user_id: 'demo', event_type: 'reward_redeemed',    points: -100, ref_id: 'partner-yoga', ref_type: 'reward', created_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 8).toISOString() },
-  ];
-  localStorage.setItem(DEMO_LEDGER_KEY, JSON.stringify(seed));
-  return seed;
-}
-
-function saveDemoLedger(rows: LedgerEntry[]) {
-  localStorage.setItem(DEMO_LEDGER_KEY, JSON.stringify(rows));
+  try {
+    const raw = localStorage.getItem(DEMO_LEDGER_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch { /* ignore */ }
+  return [];
 }
 
 export function usePointsLedger() {
@@ -96,9 +82,11 @@ export function usePointsLedger() {
       .eq('user_id', user!.id)
       .order('created_at', { ascending: false });
     if (error || !data) {
-      // Fall back to demo so UI never blanks
-      setEntries(loadDemoLedger());
-      setIsDemo(true);
+      // Show an honest empty state — the demo ledger must never leak
+      // into a real account's balance.
+      console.warn('points_ledger fetch failed:', error?.message);
+      setEntries([]);
+      setIsDemo(false);
     } else {
       setEntries(data as LedgerEntry[]);
       setIsDemo(false);
@@ -110,50 +98,29 @@ export function usePointsLedger() {
     refresh();
   }, [refresh]);
 
-  const addEntry = useCallback(
-    async (eventType: PointsEvent, points: number, refId?: string, refType?: string) => {
-      if (isDemo || !isRealUser) {
-        const next: LedgerEntry = {
-          id: crypto.randomUUID(),
-          user_id: user?.id ?? 'demo',
-          event_type: eventType,
-          points,
-          ref_id: refId ?? null,
-          ref_type: refType ?? null,
-          created_at: new Date().toISOString(),
-        };
-        const updated = [next, ...entries];
-        setEntries(updated);
-        saveDemoLedger(updated);
-        return;
-      }
-      // Idempotency: if ref_id+ref_type already exists for this user+event, skip
-      if (refId && refType) {
-        const { data: existing } = await supabase
-          .from('points_ledger')
-          .select('id')
-          .eq('user_id', user!.id)
-          .eq('event_type', eventType)
-          .eq('ref_id', refId)
-          .eq('ref_type', refType)
-          .limit(1);
-        if (existing && existing.length > 0) return;
-      }
-      const { error } = await supabase.from('points_ledger').insert({
-        user_id: user!.id,
-        event_type: eventType,
-        points,
-        ref_id: refId ?? null,
-        ref_type: refType ?? null,
-      });
-      if (!error) refresh();
+  // Ask the server to award points for an event it recognises. Returns
+  // the points actually granted (0 = deduped / capped / demo session).
+  const award = useCallback(
+    async (eventType: AwardEvent, refId?: string): Promise<number> => {
+      if (!isRealUser) return 0;
+      const got = await awardPoints(eventType, refId);
+      if (got > 0) refresh();
+      return got;
     },
-    [entries, isDemo, isRealUser, refresh, user],
+    [isRealUser, refresh],
   );
+
+  // Awards fired outside this hook instance (lib/points dispatches on
+  // every success) refresh the balance everywhere it is displayed.
+  useEffect(() => {
+    const onAward = () => refresh();
+    window.addEventListener(POINTS_AWARDED_EVENT, onAward);
+    return () => window.removeEventListener(POINTS_AWARDED_EVENT, onAward);
+  }, [refresh]);
 
   const balance = entries.reduce((sum, e) => sum + (e.points || 0), 0);
 
-  return { entries, balance, loading, isDemo, addEntry, refresh };
+  return { entries, balance, loading, isDemo, award, refresh };
 }
 
 /**

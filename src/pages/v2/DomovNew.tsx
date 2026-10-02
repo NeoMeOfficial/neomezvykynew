@@ -347,7 +347,7 @@ function PillarStack({ items }: { items: PillarItem[] }) {
 function CardGoals() {
   const navigate = useNavigate();
   const { habits, toggleHabitCompletion } = useSupabaseHabits();
-  const { addEntry } = usePointsLedger();
+  const { award } = usePointsLedger();
   const { addActivity } = useAchievements();
   const now = new Date();
   const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
@@ -365,7 +365,7 @@ function CardGoals() {
     const wasUndone = (habit.completions?.[today] ?? 0) === 0;
     const ok = await toggleHabitCompletion(habitId);
     if (ok && wasUndone) {
-      addEntry('habit_checkin', 3, `habit_${habitId}_${today}`, 'habit');
+      award('habit_checkin', habitId);
       addActivity('habit_checkin');
     }
   };

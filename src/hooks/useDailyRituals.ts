@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useSupabaseAuth } from '../contexts/SupabaseAuthContext';
 import { useSubscription } from '../contexts/SubscriptionContext';
+import { awardPoints } from '../lib/points';
 
 /**
  * Daily-ritual hooks — F-003 / F-004 / F-006
@@ -465,6 +466,10 @@ export function useCycleSymptoms() {
           console.warn('[symptoms] upsert failed', error.message);
           // Resync so the UI never keeps showing state that didn't save.
           refresh();
+        } else if (next > 0) {
+          // Logging a symptom counts as the day's cycle log — the server
+          // pays it once per day no matter how many chips are toggled.
+          awardPoints('cycle_log');
         }
       }
     },

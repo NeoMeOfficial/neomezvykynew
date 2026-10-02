@@ -5,7 +5,7 @@ import { useCommunityPosts } from '../../hooks/useCommunityPosts';
 import { useAuthContext } from '../../contexts/AuthContext';
 import { usePointsLedger } from '../../hooks/usePointsLedger';
 import { Page, Eye, Ser, Body, NM } from '../../components/v2/neome';
-import { getShieldTier, getShieldInfo, SHIELD_TIERS, DAILY_COMMUNITY_LIKE_CAP } from '../../data/achievements';
+import { getShieldTier, getShieldInfo, SHIELD_TIERS } from '../../data/achievements';
 
 /**
  * Komunita — R2 feed
@@ -203,21 +203,12 @@ function loadFollowed(): Set<string> {
   catch { return new Set(); }
 }
 
-function communityLikePtsToday(userId: string): number {
-  const key = `community_like_pts_${userId}_${new Date().toISOString().slice(0, 10)}`;
-  return parseInt(localStorage.getItem(key) ?? '0', 10);
-}
-
-function incrementCommunityLikePts(userId: string): void {
-  const key = `community_like_pts_${userId}_${new Date().toISOString().slice(0, 10)}`;
-  const current = parseInt(localStorage.getItem(key) ?? '0', 10);
-  localStorage.setItem(key, String(current + 1));
-}
+// Like earns 1 pt — once per post ever, max 5/day, enforced server-side.
 
 export default function Komunita() {
   const navigate = useNavigate();
   const { user } = useAuthContext();
-  const { addEntry } = usePointsLedger();
+  const { award } = usePointsLedger();
   const { posts, likedIds, toggleLike } = useCommunityPosts();
   const [followedIds, setFollowedIds] = useState<Set<string>>(loadFollowed);
   const [activeTab, setActiveTab] = useState<'posts' | 'following' | 'disc'>('posts');
@@ -228,15 +219,8 @@ export default function Komunita() {
   const handleToggleLike = (postId: string) => {
     const wasLiked = likedIds.has(postId);
     toggleLike(postId, user?.id);
-    // Award 1 pt only when liking (not unliking), subject to 5pt daily sub-cap
-    if (!wasLiked && user?.id) {
-      const todayPts = communityLikePtsToday(user.id);
-      if (todayPts < DAILY_COMMUNITY_LIKE_CAP) {
-        const today = new Date().toISOString().slice(0, 10);
-        addEntry('community_like', 1, `like_${postId}_${today}`, 'community');
-        incrementCommunityLikePts(user.id);
-      }
-    }
+    // Award only when liking (not unliking); dedupe + caps are server-side.
+    if (!wasLiked && user?.id) award('community_like', postId);
   };
 
   const toggleFollow = (id: string) => {

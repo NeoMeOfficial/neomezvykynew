@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { NM } from '../../components/v2/neome';
 import { useAchievements } from '../../hooks/useAchievements';
+import { awardPoints } from '../../lib/points';
 import { useMeditation } from '../../hooks/useMeditations';
 import { useEntitlement } from '../../hooks/useEntitlement';
 
@@ -18,8 +19,8 @@ import { useEntitlement } from '../../hooks/useEntitlement';
  * still renders gracefully.
  *
  * Completion (via the Dokončiť meditáciu button) records an achievement
- * but no longer awards points — per product decision; points were
- * removable via free-tier replay farming.
+ * and awards 8 pts server-side — replay farming is dead because the
+ * server dedupes per meditation per day and caps the daily total.
  *
  * Mounted at /meditacia/:meditationId.
  */
@@ -134,6 +135,7 @@ export default function MeditationPlayer() {
   function handleComplete() {
     if (!completedRef.current) {
       completedRef.current = true;
+      awardPoints('meditation_completed', meditationId);
       addActivity('meditation_complete', { ref_id: meditationId, ref_type: 'meditation' });
     }
     goBack();

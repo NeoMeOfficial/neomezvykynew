@@ -278,7 +278,7 @@ export default function NavykyTracker() {
   const smartBack = useSmartBack('/kniznica');
   const { habits, loading, addHabit, editHabit, toggleHabitCompletion, setCompletionForDate, removeHabit } = useSupabaseHabits();
   const { addActivity } = useAchievements();
-  const { addEntry } = usePointsLedger();
+  const { award } = usePointsLedger();
 
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [justAdded, setJustAdded] = useState<string | null>(null);
@@ -330,7 +330,7 @@ export default function NavykyTracker() {
     const ok = await toggleHabitCompletion(habitId);
     // Points only on the first tick of the day, never on re-taps.
     if (ok && wasZero) {
-      addEntry('habit_checkin', 3, `habit_${habitId}_${todayISO}`, 'habit');
+      award('habit_checkin', habitId);
       addActivity('habit_checkin');
       // A tick beats an earlier "nevyšlo" — clear today's skip mark.
       setSkips((prev) => {

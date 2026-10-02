@@ -37,13 +37,13 @@ export default function CompletionProgram() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useSupabaseAuth();
-  const { addEntry } = usePointsLedger();
+  const { award } = usePointsLedger();
   const firstName = deriveFirstName(user as never);
   const programSlug = (location.state as { programSlug?: string } | null)?.programSlug ?? 'postpartum';
 
   useEffect(() => {
-    addEntry('program_completed', PROGRAM_POINTS, programSlug, 'program');
-  }, [addEntry, programSlug]);
+    award('program_completed', programSlug);
+  }, [award, programSlug]);
 
   return (
     <Page paddingBottom={40}>

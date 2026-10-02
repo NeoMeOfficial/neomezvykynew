@@ -157,7 +157,7 @@ export default function ReflectionEntry() {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { addActivity } = useAchievements();
-  const { addEntry } = usePointsLedger();
+  const { award } = usePointsLedger();
   const { addReflection, updateReflection, deleteReflection, entries } = useReflections();
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [histEditId, setHistEditId] = useState<string | null>(null);
@@ -249,7 +249,7 @@ export default function ReflectionEntry() {
         await updateReflection(todayEntry.id, payload);
       } else {
         await addReflection(payload);
-        addEntry('reflection_write', 6, `reflection_${todayISO}`, 'reflection');
+        award('reflection_write');
         addActivity('reflection_write');
       }
       setSaved(true);

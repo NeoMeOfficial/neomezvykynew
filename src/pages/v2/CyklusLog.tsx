@@ -62,7 +62,7 @@ export default function CyklusLog() {
   const { logs, saveLog } = useCycleLogs();
   const { isPremium } = useSubscription();
   const { addActivity } = useAchievements();
-  const { addEntry } = usePointsLedger();
+  const { award } = usePointsLedger();
   const today = derivedState?.today ?? new Date();
   const dateLabel = `${SK_DAYS[today.getDay()]} · ${today.getDate()}. ${SK_MONTHS[today.getMonth()]}`;
   const phaseLabel = derivedState?.currentPhase ? PHASE_LABEL[derivedState.currentPhase.key] : null;
@@ -122,7 +122,7 @@ export default function CyklusLog() {
     if (isPremium) {
       // Points reward persistence — free-tier entries are session-only
       // previews, so they don't earn (and can't be re-farmed on reload).
-      addEntry('cycle_log', 4, `cycle_${toDateKey(now)}`, 'cycle');
+      award('cycle_log');
       addActivity('cycle_log');
     }
     navigate('/kniznica/periodka');

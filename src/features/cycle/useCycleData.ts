@@ -59,6 +59,7 @@ export function calculateAverageCycleLength(history: PeriodLog[]): { average: nu
 }
 import { getDerivedState } from './utils';
 import { loadCycleData as loadFromStore, saveCycleData as saveToStore } from './cycleDataStore';
+import { awardPoints } from '@/lib/points';
 
 const STORAGE_KEY = 'cycle_data';
 
@@ -224,12 +225,14 @@ export function useCycleData(accessCode?: string) {
   const setLastPeriodStart = useCallback((date: Date) => {
     const dateString = format(date, 'yyyy-MM-dd');
     updateCycleData({ lastPeriodStart: dateString, currentPeriodEnd: null });
+    awardPoints('cycle_log');
   }, [updateCycleData]);
 
   // Mark the current period as ended ("Skončila dnes"). Records the actual
   // bleed length and — after 3 recorded periods — auto-calibrates
   // periodLength the same way cycle length learns from history.
   const markPeriodEnded = useCallback((date: Date) => {
+    awardPoints('cycle_log');
     setCycleData(current => {
       if (!current.lastPeriodStart) return current;
       const start = new Date(current.lastPeriodStart + 'T00:00:00');
