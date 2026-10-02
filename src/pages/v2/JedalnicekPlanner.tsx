@@ -137,7 +137,7 @@ export default function JedalnicekPlanner() {
             Vygeneruj si týždenný plán z aktuálnych preferencií.
           </div>
           <button
-            onClick={() => navigate('/onboarding')}
+            onClick={() => navigate('/jedalnicek/onboarding')}
             style={{
               background: NM.DEEP,
               color: '#fff',

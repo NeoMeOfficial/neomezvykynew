@@ -30,7 +30,7 @@ const PERMS = [
 ];
 
 const DATA_ACTIONS = [
-  { id: 'export', t: 'Stiahnuť moje dáta', d: 'PDF export všetkých zápisov a štatistík' },
+  { id: 'export', t: 'Stiahnuť moje dáta', d: 'Export všetkých tvojich dát (súbor JSON)' },
   { id: 'rules', t: 'Zásady ochrany osobných údajov', d: 'Ako spracúvame tvoje údaje (GDPR)' },
   { id: 'thirdparty', t: 'Tretie strany', d: 'Stripe, Supabase, Google, Netlify' },
 ];

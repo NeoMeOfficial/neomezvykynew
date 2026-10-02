@@ -232,6 +232,21 @@ export function useAdminMessages() {
       .order('created_at', { ascending: true });
 
     if (data) setThread(data as Message[]);
+
+    // Opening the thread = reading it (audit M4: read_at was never set
+    // on the admin side, so the unread badge only ever grew). The
+    // "Admin full access" RLS policy allows this update.
+    const { error: readErr } = await supabase
+      .from('messages')
+      .update({ read_at: new Date().toISOString() })
+      .eq('user_id', userId)
+      .eq('is_from_admin', false)
+      .is('read_at', null);
+    if (readErr) {
+      console.warn('admin mark-read failed:', readErr.message);
+    } else {
+      setConversations(prev => prev.map(c => (c.user_id === userId ? { ...c, unread: 0 } : c)));
+    }
   }, []);
 
   // Send a reply as Gabi
