@@ -13,15 +13,20 @@ const stripe = new Stripe(stripeEnv('STRIPE_SECRET_KEY')!, {
  * Without this, any recurring price in the Stripe account could be
  * checked out and would flip `subscriptions.active` via the webhook.
  */
+// Audit C3 fix (2026-10-02): the allowlist must accept BOTH the live and
+// the _TEST price ids — the client resolves prices test-first, so a
+// test-mode checkout used to be rejected here with "Unknown priceId".
+// The hardcoded live-price fallbacks are gone too: a missing env var now
+// fails the checkout loudly instead of silently charging real money.
 function allowedPriceIds(): Set<string> {
-  return new Set(
-    [
-      process.env.VITE_STRIPE_SUBSCRIPTION_PRICE_ID || 'price_1TM4KREpPqBqxo4m0Swf5F88',
-      process.env.VITE_STRIPE_SUBSCRIPTION_QUARTERLY_PRICE_ID || 'price_1TY3sXEpPqBqxo4mJ6EhEPM3',
-      process.env.VITE_STRIPE_SUBSCRIPTION_YEARLY_PRICE_ID || 'price_1TY3d6EpPqBqxo4mtqFHOXOz',
-      process.env.VITE_STRIPE_MEAL_PRICE_ID || 'price_1TW8SeEpPqBqxo4mOwzTetog',
-    ].filter(Boolean),
-  );
+  const names = [
+    'VITE_STRIPE_SUBSCRIPTION_PRICE_ID',
+    'VITE_STRIPE_SUBSCRIPTION_QUARTERLY_PRICE_ID',
+    'VITE_STRIPE_SUBSCRIPTION_YEARLY_PRICE_ID',
+    'VITE_STRIPE_MEAL_PRICE_ID',
+  ];
+  const ids = names.flatMap((n) => [process.env[n], process.env[`${n}_TEST`]]);
+  return new Set(ids.filter((v): v is string => !!v));
 }
 
 export async function handler(event: any) {

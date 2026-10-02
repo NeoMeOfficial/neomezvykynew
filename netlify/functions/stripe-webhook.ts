@@ -11,8 +11,16 @@ const stripe = new Stripe(stripeEnv('STRIPE_SECRET_KEY')!, {
 // uses this to identify which checkout.session.completed events should set
 // `profiles.nutrition_plan_purchased = true`. Env-overridable so test mode
 // can match against the test-mode meal plan price ID.
-const MEAL_PLAN_PRICE_ID =
-  stripeEnv('STRIPE_MEAL_PRICE_ID') || 'price_1TW8SeEpPqBqxo4mOwzTetog';
+// Audit C3 (2026-10-02): accept live AND test meal-price ids, no
+// hardcoded fallback — an unmatched payment logs instead of guessing.
+const MEAL_PLAN_PRICE_IDS = new Set(
+  [
+    process.env.STRIPE_MEAL_PRICE_ID,
+    process.env.STRIPE_MEAL_PRICE_ID_TEST,
+    process.env.VITE_STRIPE_MEAL_PRICE_ID,
+    process.env.VITE_STRIPE_MEAL_PRICE_ID_TEST,
+  ].filter((v): v is string => !!v),
+);
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
@@ -240,7 +248,7 @@ async function handleOneTimePayment(session: Stripe.Checkout.Session) {
   }
 
   const lineItems = await stripe.checkout.sessions.listLineItems(session.id, { limit: 5 });
-  const boughtMealPlan = lineItems.data.some((item) => item.price?.id === MEAL_PLAN_PRICE_ID);
+  const boughtMealPlan = lineItems.data.some((item) => !!item.price?.id && MEAL_PLAN_PRICE_IDS.has(item.price.id));
   if (!boughtMealPlan) {
     console.log('One-time payment for unknown price — no action:', session.id);
     return;
