@@ -3,7 +3,6 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CreditCard, Calendar, AlertCircle, Check, X, Gift, Settings, ExternalLink, ChevronRight } from 'lucide-react';
 import { useSubscription } from '../../contexts/SubscriptionContext';
 import { SUBSCRIPTION_PLANS, formatPrice } from '../../lib/stripe';
-import DemoBanner from '../../components/v2/DemoBanner';
 import { TopBar } from '@/components/v2/top-bar';
 import { Eyebrow } from '@/components/ui/eyebrow';
 import { BodyText } from '@/components/ui/body-text';
@@ -22,6 +21,9 @@ export default function SubscriptionManagement() {
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [cancelReason, setCancelReason] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
+  // Stripe calls can fail (no billing profile on the account, network…)
+  // — swallowing that made buttons look dead. Surface it instead.
+  const [actionError, setActionError] = useState<string | null>(null);
 
   const subData = subscription ? {
     plan: isTrialing ? 'Skúšobné obdobie' : 'NeoMe Plus',
@@ -29,8 +31,9 @@ export default function SubscriptionManagement() {
             subscription.status === 'trialing' ? 'Skúšobné' :
             subscription.status === 'past_due' ? 'Neuhradené' : 'Neaktívne',
     price: formatPrice(SUBSCRIPTION_PLANS.premium.price),
-    nextBilling: new Date(subscription.current_period_end * 1000).toLocaleDateString('sk-SK'),
-    startDate: new Date(subscription.current_period_start * 1000).toLocaleDateString('sk-SK'),
+    nextBilling: subscription.current_period_end > 0
+      ? new Date(subscription.current_period_end * 1000).toLocaleDateString('sk-SK')
+      : null,
     willCancelAtPeriodEnd: subscription.cancel_at_period_end,
     trialEndsAt: subscription.trial_end
       ? new Date(subscription.trial_end * 1000).toLocaleDateString('sk-SK')
@@ -39,30 +42,46 @@ export default function SubscriptionManagement() {
 
   const handleCancel = async () => {
     setActionLoading(true);
+    setActionError(null);
     try {
       await cancelSubscription();
       setShowCancelDialog(false);
-    } catch { /* handled by context */ }
+    } catch {
+      setActionError('Zrušenie sa nepodarilo. Skús to o chvíľu, alebo nám napíš.');
+    }
     finally { setActionLoading(false); }
   };
 
   const handleBilling = async () => {
     setActionLoading(true);
+    setActionError(null);
     try { await manageBilling(); }
-    catch { /* handled by context */ }
+    catch {
+      setActionError('Platobný profil sa nepodarilo otvoriť — účet zatiaľ nemá platbu v Stripe.');
+    }
     finally { setActionLoading(false); }
   };
 
   const handleStart = async () => {
     setActionLoading(true);
+    setActionError(null);
     try {
       await startCheckout(SUBSCRIPTION_PLANS.premium.priceId);
-      // In demo mode startCheckout stays in-app; redirect back to the originating page if provided
       if (returnTo) navigate(returnTo, { replace: true });
     }
-    catch { /* handled by context */ }
+    catch {
+      setActionError('Platbu sa nepodarilo spustiť. Skús to o chvíľu.');
+    }
     finally { setActionLoading(false); }
   };
+
+  const errorBanner = actionError && (
+    <div className="rounded-card border p-4 flex items-start gap-3"
+      style={{ background: 'rgba(194,122,110,0.10)', borderColor: 'rgba(194,122,110,0.35)' }}>
+      <AlertCircle className="size-5 mt-0.5 flex-shrink-0" style={{ color: '#C27A6E' }} />
+      <BodyText size="sm" style={{ color: '#8A4F43' }}>{actionError}</BodyText>
+    </div>
+  );
 
   // Cancel confirmation screen
   if (showCancelDialog && subData) {
@@ -125,10 +144,7 @@ export default function SubscriptionManagement() {
         <TopBar title="Predplatné" backHref="/profil" />
 
         <div className="px-5 pt-2 flex flex-col gap-4">
-          <DemoBanner
-            message="Demo Mode: Môžete bezpečne testovať všetky funkcie predplatného."
-            type="demo"
-          />
+          {errorBanner}
 
           {/* Plan card */}
           <div className="rounded-card bg-white border border-ink/[0.08] shadow-nm-sm p-6 text-center">
@@ -156,7 +172,7 @@ export default function SubscriptionManagement() {
               disabled={actionLoading}
               className="w-full py-4 rounded-full bg-ink text-cream font-sans font-semibold transition-all active:scale-[0.98] disabled:opacity-50"
             >
-              {actionLoading ? 'Spracováva sa…' : 'Začať skúšku zadarmo'}
+              {actionLoading ? 'Spracováva sa…' : 'Aktivovať Plus'}
             </button>
             <BodyText size="sm" tone="muted" className="mt-3">
               Môžete kedykoľvek zrušiť.
@@ -173,10 +189,7 @@ export default function SubscriptionManagement() {
       <TopBar title="Predplatné" backHref="/profil" />
 
       <div className="px-5 pt-2 flex flex-col gap-4">
-        <DemoBanner
-          message="Demo Mode: V produkčnej verzii by tu boli skutočné platby cez Stripe."
-          type="demo"
-        />
+        {errorBanner}
 
         {/* Return to program banner — shown when navigated here from a program page */}
         {returnTo && (
@@ -242,33 +255,34 @@ export default function SubscriptionManagement() {
           </div>
 
           <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-2">
-              <Calendar className="size-4 text-ink/40 flex-shrink-0" />
-              <BodyText size="sm" tone="secondary">Predplatné od {subData!.startDate}</BodyText>
-            </div>
-            <div className="flex items-center gap-2">
-              <Calendar className="size-4 text-ink/40 flex-shrink-0" />
-              <BodyText size="sm" tone="secondary">Ďalšie účtovanie {subData!.nextBilling}</BodyText>
-            </div>
+            {subData!.nextBilling && (
+              <div className="flex items-center gap-2">
+                <Calendar className="size-4 text-ink/40 flex-shrink-0" />
+                <BodyText size="sm" tone="secondary">Ďalšie účtovanie {subData!.nextBilling}</BodyText>
+              </div>
+            )}
             <div className="flex items-center gap-2">
               <CreditCard className="size-4 text-ink/40 flex-shrink-0" />
-              <BodyText size="sm" tone="secondary" className="flex-1">Visa •••• 4242</BodyText>
+              <BodyText size="sm" tone="secondary" className="flex-1">Platobná karta a faktúry</BodyText>
               <button onClick={handleBilling} disabled={actionLoading}
                 className="font-sans text-xs font-medium text-terra disabled:opacity-50">
-                {actionLoading ? '…' : 'Zmeniť'}
+                {actionLoading ? '…' : 'Spravovať'}
               </button>
             </div>
           </div>
         </div>
 
-        {/* Quick actions */}
-        <SettingsGroup label="Možnosti">
+      </div>
+
+      {/* Quick actions — outside the px-5 wrapper: SettingsGroup brings
+          its own mx-5, stacking them offset these cards to the right. */}
+      <div className="mt-4">
+        <SettingsGroup label="Možnosti" className="mb-4">
           <SettingsRow label="Odporučiť kamarátke" value="Mesiac zadarmo" onClick={() => navigate('/referral')} />
           <SettingsRow label="Notifikácie" onClick={() => navigate('/settings/notifications')} />
           <SettingsRow label="História platieb" onClick={handleBilling} />
         </SettingsGroup>
 
-        {/* Help + cancel */}
         <SettingsGroup>
           <SettingsRow label="Zrušiť predplatné" tone="danger" onClick={() => setShowCancelDialog(true)} />
         </SettingsGroup>
