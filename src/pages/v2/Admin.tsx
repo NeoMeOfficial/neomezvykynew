@@ -1131,6 +1131,7 @@ function UsersTab() {
   // access for legacy programme buyers without a subscription.
   const [programsOpenFor, setProgramsOpenFor] = useState<string | null>(null);
   const [userGrants, setUserGrants] = useState<Record<string, string[]>>({});
+  const [userActiveProgram, setUserActiveProgram] = useState<Record<string, { program_id: string; start_date: string } | null>>({});
   const [togglingProgram, setTogglingProgram] = useState<string | null>(null);
 
   // "Pridať používateľku" — invite (create + set-password email) with an
@@ -1180,7 +1181,10 @@ function UsersTab() {
         headers: { ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}) },
       });
       const body = await res.json();
-      if (res.ok) setUserGrants(prev => ({ ...prev, [userId]: (body.grants ?? []).map((g: { program_id: string }) => g.program_id) }));
+      if (res.ok) {
+        setUserGrants(prev => ({ ...prev, [userId]: (body.grants ?? []).map((g: { program_id: string }) => g.program_id) }));
+        setUserActiveProgram(prev => ({ ...prev, [userId]: body.active ?? null }));
+      }
     } catch { /* chips just show unknown state */ }
   };
   const toggleProgramGrant = async (userId: string, programId: string) => {
@@ -1466,10 +1470,10 @@ function UsersTab() {
               <div key={user.id} style={{ borderRadius: 12, border: `1px solid ${isExpanded ? _A.HAIR2 : _A.HAIR}`, background: isExpanded ? _A.CARD : _A.BG, overflow: 'hidden' }}>
                 {/* Row header — click to expand */}
                 <div
-                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px', cursor: 'pointer' }}
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px', cursor: 'pointer', flexWrap: 'wrap', rowGap: 10 }}
                   onClick={() => toggleExpand(user.id)}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1, minWidth: 260 }}>
                     <div style={{ width: 36, height: 36, borderRadius: 999, background: _A.CREAM2, color: _A.DEEP, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Gilda Display, Georgia, serif', fontSize: 15, fontWeight: 500, flexShrink: 0 }}>
                       {(user.full_name || user.email || '?').charAt(0).toUpperCase()}
                     </div>
@@ -1483,7 +1487,7 @@ function UsersTab() {
                       </div>
                     </div>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }} onClick={e => e.stopPropagation()}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', rowGap: 6, justifyContent: 'flex-end', maxWidth: '100%' }} onClick={e => e.stopPropagation()}>
                     <span style={tierBadgeStyle(tier)}>{tierLabel(tier)}</span>
 
                     {/* Admin role chip — click to promote / demote */}
@@ -1564,6 +1568,36 @@ function UsersTab() {
                         </button>
                       );
                     })}
+                    {programsOpenFor === user.id && (() => {
+                      const act = userActiveProgram[user.id];
+                      const WEEKS: Record<string, number> = { postpartum: 8, bodyforming: 6, 'elastic-bands': 6, 'strong-sexy': 6 };
+                      const NAMES: Record<string, string> = { postpartum: 'Postpartum', bodyforming: 'BodyForming', 'elastic-bands': 'Elastické gumy', 'strong-sexy': 'Strong & Sexy' };
+                      let line: string;
+                      if (!act) {
+                        line = (userGrants[user.id]?.length ?? 0) > 0
+                          ? 'Žiadny program zatiaľ nespustila — vyberie si štartový pondelok v appke.'
+                          : 'Žiadny aktívny program.';
+                      } else {
+                        const total = WEEKS[act.program_id] ?? 8;
+                        const start = new Date(act.start_date + 'T00:00:00');
+                        const today = new Date(); today.setHours(0, 0, 0, 0);
+                        const daysSince = Math.round((today.getTime() - start.getTime()) / 86400000);
+                        const name = NAMES[act.program_id] ?? act.program_id;
+                        const startLabel = start.toLocaleDateString('sk-SK');
+                        if (daysSince < 0) {
+                          line = `${name}: štartuje v pondelok ${startLabel}.`;
+                        } else {
+                          const week = Math.floor(daysSince / 7) + 1;
+                          if (week > total) line = `${name}: po termíne — štart ${startLabel}, ${total} týž. uplynulo (dokončenie si zatiaľ neevidujeme).`;
+                          else line = `${name}: beží — štart ${startLabel} · týž. ${week} z ${total} · deň ${daysSince + 1}.`;
+                        }
+                      }
+                      return (
+                        <span style={{ flexBasis: '100%', fontFamily: 'DM Sans, system-ui', fontSize: 11.5, color: _A.MUTED, paddingTop: 2 }}>
+                          {line}
+                        </span>
+                      );
+                    })()}
 
                     {/* Auth helpers — generate magic link or password
                         reset link the admin can copy and forward. */}
@@ -3652,7 +3686,13 @@ const cardStyle: React.CSSProperties = {
 
 export default function AdminNew() {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<string>('overview');
+  const [activeTab, setActiveTabState] = useState<string>(() => {
+    try { return sessionStorage.getItem('neome_admin_tab') || 'overview'; } catch { return 'overview'; }
+  });
+  const setActiveTab = (t: string) => {
+    setActiveTabState(t);
+    try { sessionStorage.setItem('neome_admin_tab', t); } catch { /* ignore */ }
+  };
   const [analytics, setAnalytics] = useState<AdminAnalytics | null>(null);
   const [analyticsLoading, setAnalyticsLoading] = useState(true);
   const unreadMessagesCount = useUnreadAdminMessagesCount();

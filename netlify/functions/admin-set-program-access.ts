@@ -39,7 +39,14 @@ export async function handler(event: any) {
       .select('program_id, granted_at, note')
       .eq('user_id', userId);
     if (error) return { statusCode: 500, headers: CORS, body: JSON.stringify({ error: error.message }) };
-    return { statusCode: 200, headers: CORS, body: JSON.stringify({ grants: data ?? [] }) };
+    // Program status for the admin summary: the user's active enrollment
+    // (one at a time; history of finished runs is not retained by design).
+    const { data: active } = await supabase
+      .from('user_active_programs')
+      .select('program_id, start_date, activated_at')
+      .eq('user_id', userId)
+      .maybeSingle();
+    return { statusCode: 200, headers: CORS, body: JSON.stringify({ grants: data ?? [], active: active ?? null }) };
   }
 
   if (event.httpMethod !== 'POST') {
