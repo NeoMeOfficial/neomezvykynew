@@ -1132,6 +1132,7 @@ function UsersTab() {
   const [programsOpenFor, setProgramsOpenFor] = useState<string | null>(null);
   const [userGrants, setUserGrants] = useState<Record<string, string[]>>({});
   const [userActiveProgram, setUserActiveProgram] = useState<Record<string, { program_id: string; start_date: string } | null>>({});
+  const [userProgramHistory, setUserProgramHistory] = useState<Record<string, { program_id: string; start_date: string; ended_at: string; status: string; weeks_reached: number | null }[]>>({});
   const [togglingProgram, setTogglingProgram] = useState<string | null>(null);
 
   // "Pridať používateľku" — invite (create + set-password email) with an
@@ -1184,6 +1185,7 @@ function UsersTab() {
       if (res.ok) {
         setUserGrants(prev => ({ ...prev, [userId]: (body.grants ?? []).map((g: { program_id: string }) => g.program_id) }));
         setUserActiveProgram(prev => ({ ...prev, [userId]: body.active ?? null }));
+        setUserProgramHistory(prev => ({ ...prev, [userId]: body.history ?? [] }));
       }
     } catch { /* chips just show unknown state */ }
   };
@@ -1592,9 +1594,18 @@ function UsersTab() {
                           else line = `${name}: beží — štart ${startLabel} · týž. ${week} z ${total} · deň ${daysSince + 1}.`;
                         }
                       }
+                      const hist = userProgramHistory[user.id] ?? [];
+                      const STATUS_SK: Record<string, string> = { completed: 'dokončený', paused: 'pozastavený', canceled: 'zrušený', replaced: 'nahradený iným' };
                       return (
-                        <span style={{ flexBasis: '100%', fontFamily: 'DM Sans, system-ui', fontSize: 11.5, color: _A.MUTED, paddingTop: 2 }}>
+                        <span style={{ flexBasis: '100%', fontFamily: 'DM Sans, system-ui', fontSize: 11.5, color: _A.MUTED, paddingTop: 2, display: 'block' }}>
                           {line}
+                          {hist.length > 0 && (
+                            <span style={{ display: 'block', marginTop: 4 }}>
+                              História: {hist.map(h =>
+                                `${NAMES[h.program_id] ?? h.program_id} ${STATUS_SK[h.status] ?? h.status} ${new Date(h.ended_at).toLocaleDateString('sk-SK')}${h.weeks_reached ? ` (týž. ${h.weeks_reached})` : ''}`
+                              ).join(' · ')}
+                            </span>
+                          )}
                         </span>
                       );
                     })()}

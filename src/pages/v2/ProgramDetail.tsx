@@ -194,7 +194,7 @@ export default function ProgramDetail() {
   const onConfirmEnd = async () => {
     if (!endReason || ending) return;
     setEnding(true);
-    const { error } = await deactivateProgram();
+    const { error } = await deactivateProgram(endReason);
     if (error) {
       setEnding(false);
       toast({

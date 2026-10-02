@@ -608,6 +608,31 @@ export function useActiveProgram() {
     refresh();
   }, [refresh]);
 
+  // Archive an enrollment into user_program_history before it is removed
+  // (Sam 2026-10-02: ending used to delete the row, so completion history
+  // didn't exist). weeks_reached = how far she got, floor 1.
+  const archiveProgram = useCallback(async (
+    row: ActiveProgram,
+    status: 'paused' | 'canceled' | 'completed' | 'replaced',
+  ) => {
+    if (!real) return;
+    const start = new Date(row.start_date + 'T00:00:00');
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const daysSince = Math.round((today.getTime() - start.getTime()) / 86400000);
+    const weeksReached = daysSince < 0 ? 0 : Math.floor(daysSince / 7) + 1;
+    const { error } = await supabase.from('user_program_history').insert({
+      user_id: user!.id,
+      program_id: row.program_id,
+      start_date: row.start_date,
+      activated_at: row.activated_at ?? null,
+      status,
+      weeks_reached: weeksReached,
+    });
+    // Pre-migration schema or RLS failure must not block the end flow.
+    if (error) console.warn('[programs] history archive failed:', error.message);
+  }, [real, user?.id]);
+
+
   /**
    * Activate a program with a chosen start Monday. Replaces any
    * existing active program for the user (one active at a time).
@@ -623,11 +648,13 @@ export function useActiveProgram() {
         start_date: iso,
         activated_at: new Date().toISOString(),
       };
+      const displaced = program && program.program_id !== programId ? program : null;
       setProgram(next);
       if (!real) {
         localStorage.setItem(ACTIVE_PROGRAM_DEMO_KEY, JSON.stringify(next));
         return { error: null };
       }
+      if (displaced) await archiveProgram(displaced, 'replaced');
       const { error } = await supabase
         .from('user_active_programs')
         .upsert(
@@ -636,26 +663,31 @@ export function useActiveProgram() {
         );
       return { error };
     },
-    [real, user?.id],
+    [real, user?.id, program, archiveProgram],
   );
 
   /**
    * Remove the user's active program. Used when they cancel, pause, or
    * mark it complete from the program detail page. After this, the
-   * home tile reverts to suggested exercises.
+   * home tile reverts to suggested exercises. The enrollment is archived
+   * into user_program_history first (reason defaults to 'canceled').
    */
-  const deactivateProgram = useCallback(async () => {
+  const deactivateProgram = useCallback(async (
+    reason: 'paused' | 'canceled' | 'completed' = 'canceled',
+  ) => {
+    const ending = program;
     setProgram(null);
     if (!real) {
       localStorage.removeItem(ACTIVE_PROGRAM_DEMO_KEY);
       return { error: null };
     }
+    if (ending) await archiveProgram(ending, reason);
     const { error } = await supabase
       .from('user_active_programs')
       .delete()
       .eq('user_id', user!.id);
     return { error };
-  }, [real, user?.id]);
+  }, [real, user?.id, program, archiveProgram]);
 
   return { program, loading, activateProgram, deactivateProgram, refresh };
 }

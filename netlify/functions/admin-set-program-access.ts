@@ -46,7 +46,13 @@ export async function handler(event: any) {
       .select('program_id, start_date, activated_at')
       .eq('user_id', userId)
       .maybeSingle();
-    return { statusCode: 200, headers: CORS, body: JSON.stringify({ grants: data ?? [], active: active ?? null }) };
+    const { data: history } = await supabase
+      .from('user_program_history')
+      .select('program_id, start_date, ended_at, status, weeks_reached')
+      .eq('user_id', userId)
+      .order('ended_at', { ascending: false })
+      .limit(10);
+    return { statusCode: 200, headers: CORS, body: JSON.stringify({ grants: data ?? [], active: active ?? null, history: history ?? [] }) };
   }
 
   if (event.httpMethod !== 'POST') {
