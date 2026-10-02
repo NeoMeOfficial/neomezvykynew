@@ -147,66 +147,8 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
       }
 
       setProfile(data);
-
-      // Process pending referral code (set during landing page visit)
-      const pendingReferralCode = localStorage.getItem('referralCode');
-      if (pendingReferralCode) {
-        processReferralOnSignup(pendingReferralCode, userId);
-      }
-
     } catch (error) {
       console.error('Error loading user profile:', error);
-    }
-  };
-
-  const processReferralOnSignup = async (code: string, newUserId: string) => {
-    try {
-      // Look up the referral code
-      const { data: codeData, error: codeErr } = await supabase
-        .from('referral_codes')
-        .select('*')
-        .eq('code', code.toUpperCase())
-        .eq('is_active', true)
-        .maybeSingle();
-
-      if (codeErr || !codeData) {
-        console.warn('[referral] Invalid or inactive code:', code);
-        localStorage.removeItem('referralCode');
-        return;
-      }
-
-      // Don't self-refer
-      if (codeData.user_id === newUserId) {
-        localStorage.removeItem('referralCode');
-        return;
-      }
-
-      // Check not already referred
-      const { data: existing } = await supabase
-        .from('referrals')
-        .select('id')
-        .eq('referred_user_id', newUserId)
-        .maybeSingle();
-
-      if (existing) {
-        localStorage.removeItem('referralCode');
-        return;
-      }
-
-      // Create referral record (pending — admin approves to release credits)
-      await supabase.from('referrals').insert({
-        referrer_user_id: codeData.user_id,
-        referred_user_id: newUserId,
-        referral_code: code.toUpperCase(),
-        credit_amount: 1400, // €14 credit
-        status: 'pending',
-      });
-
-      localStorage.removeItem('referralCode');
-      console.log('[referral] Referral recorded for code:', code);
-    } catch (err) {
-      console.warn('[referral] Failed to process referral:', err);
-      localStorage.removeItem('referralCode');
     }
   };
 

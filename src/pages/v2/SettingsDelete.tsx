@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useWorkoutHistory } from '../../hooks/useWorkoutHistory';
 import { useFavorites } from '../../hooks/useFavorites';
-import { useReferral } from '../../hooks/useReferral';
+import { usePointsLedger } from '../../hooks/usePointsLedger';
 import { useSupabaseAuth } from '../../contexts/SupabaseAuthContext';
 import { supabase } from '../../lib/supabase';
 import { useToast } from '@/hooks/use-toast';
@@ -18,7 +18,7 @@ import { Page, BackHeader, Eye, Ser, Body, NM } from '../../components/v2/neome'
  *
  * Wired:
  * - 'dní v rade' from useWorkoutHistory.stats.currentStreak
- * - 'získaných bodov' from useReferral.stats.totalCreditsEarned
+ * - 'získaných bodov' from the points ledger balance
  * - 'zápisov v denníku' — FEATURE-NEEDED-PROFIL-REFLECTION-COUNT
  *   (no account-scoped reflection count yet); placeholder dash
  * - 'priateľstiev v komunite' — FEATURE-NEEDED-KOMUNITA-FOLLOW
@@ -36,7 +36,7 @@ export default function SettingsDelete() {
   const navigate = useNavigate();
   const { stats } = useWorkoutHistory() as { stats: { currentStreak: number } };
   const { favoritesCount } = useFavorites();
-  const { stats: refStats } = useReferral();
+  const { balance: pointsBalance } = usePointsLedger();
   const { signOut } = useSupabaseAuth();
   const { toast } = useToast();
   const [deleting, setDeleting] = useState(false);
@@ -78,7 +78,7 @@ export default function SettingsDelete() {
   };
 
   const streak = stats?.currentStreak ?? 0;
-  const credits = refStats?.totalCreditsEarned ?? 0;
+  const credits = pointsBalance;
 
   const losses = [
     { n: '—', l: 'zápisov v denníku', c: NM.MAUVE },
@@ -208,7 +208,7 @@ export default function SettingsDelete() {
                 'Návyky, streak a pokrok v programe',
                 'Príspevky, komentáre a srdcia v komunite',
                 'Uložené recepty, jedálničky a obľúbené',
-                'Body, odznaky a referal kredity',
+                'Body a odznaky',
                 'Aktívne predplatné (zrušíme aj v Stripe)',
               ].map((item) => (
                 <li key={item} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', fontFamily: NM.SANS, fontSize: 13, color: NM.DEEP, lineHeight: 1.45 }}>

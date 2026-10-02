@@ -12,7 +12,6 @@ import { useSupabaseHabits } from '@/hooks/useSupabaseHabits';
 import { useAchievements } from '@/hooks/useAchievements';
 import { useDailyMeditation } from '@/hooks/useDailyContent';
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
-import { useReferral } from '@/hooks/useReferral';
 import { usePointsLedger } from '@/hooks/usePointsLedger';
 import { useReflections } from '@/hooks/useDailyRituals';
 import { computeEnergyPatterns, parseStructured } from '@/features/dennik/structuredEntry';
@@ -489,41 +488,6 @@ function CardCommunity() {
   );
 }
 
-// ─── GOLD referral card ───────────────────────────────────────────────────────
-function CardReferral({ code }: { code: string }) {
-  const handleShare = () => {
-    const url = `${window.location.origin}/ref/${code}`;
-    if (navigator.share) {
-      navigator.share({ title: 'NeoMe', text: `Pridaj sa k NeoMe — použi môj kód ${code} a dostaneme obe mesiac zadarmo.`, url });
-    } else {
-      navigator.clipboard?.writeText(url);
-    }
-  };
-  return (
-    <div style={{ padding: '4px 18px 14px' }}>
-      <div style={{ background: '#3D2921', borderRadius: 20, overflow: 'hidden', position: 'relative' }}>
-        <div style={{ position: 'absolute', top: -22, right: 14, fontFamily: SERIF, fontSize: 150, fontStyle: 'italic', lineHeight: 0.9, color: GOLD, opacity: 0.16, letterSpacing: '-0.04em', userSelect: 'none', pointerEvents: 'none' }}>+1</div>
-        <div style={{ padding: '20px 20px 18px', position: 'relative' }}>
-          <div style={{ fontSize: 9.5, letterSpacing: '0.24em', textTransform: 'uppercase' as const, fontWeight: 500, color: GOLD, marginBottom: 12 }}>Pozvi kamarátku</div>
-          <div style={{ fontFamily: SERIF, fontSize: 22, lineHeight: 1.18, color: '#F5EFE5', letterSpacing: '-0.005em', marginBottom: 8, maxWidth: 230 }}>
-            Získajte <em style={{ color: GOLD, fontWeight: 500 }}>mesiac zadarmo</em> — obe.
-          </div>
-          <div style={{ fontSize: 12, color: 'rgba(245,239,229,0.7)', lineHeight: 1.5, fontWeight: 300, maxWidth: 280, marginBottom: 16 }}>
-            Pošli kamarátke svoj kód. Keď si predplatí, mesiac NeoMe je darček pre teba aj pre ňu.
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <button onClick={handleShare} style={{ background: GOLD, color: INK, border: 0, padding: '11px 18px', borderRadius: 999, fontSize: 12, fontWeight: 500, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-              Zdieľať môj kód
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={INK} strokeWidth="2" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
-            </button>
-            <div style={{ fontSize: 10.5, color: 'rgba(245,239,229,0.55)', letterSpacing: '0.12em', textTransform: 'uppercase' as const, fontWeight: 500 }}>{code}</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // ─── Sheet backdrop wrapper ───────────────────────────────────────────────────
 // Portal → sits above BottomNav (z-index:50) at z-index:200 in root stacking context.
 function SheetBackdrop({ onClose, title, children }: { onClose: () => void; title: string; children: React.ReactNode }) {
@@ -890,7 +854,6 @@ export default function DomovNew() {
   const { recipes } = useRecipes();
   const { meditation } = useDailyMeditation();
   const { profile } = useSupabaseAuth();
-  const { referralCode } = useReferral();
   const { balance: points } = usePointsLedger();
 
   const isPlus    = user.tier === 'plus';
@@ -899,7 +862,6 @@ export default function DomovNew() {
   // Purchased the add-on but hasn't filled the questionnaire yet —
   // we prompt for setup instead of showing the upsell again.
   const mealPlanNeedsSetup = hasMealPlanAddon && !user.hasMealPlan;
-  const code = referralCode?.code ?? 'NEOME';
   const streakDays = getDaysSince((profile as any)?.created_at);
 
   const meditationTitle = meditation?.title ?? 'Ranný pokoj';
@@ -1196,7 +1158,7 @@ export default function DomovNew() {
       <CardCommunity />
 
       {/* Subscription upsell for free users; referral only for Plus */}
-      {!isPlus ? <CardSubscriptionUpsell /> : <CardReferral code={code} />}
+      {!isPlus && <CardSubscriptionUpsell />}
 
       {/* Week calendar — parked at the bottom for now (Gabi 2026-07-24:
           no strong use for it up top yet) */}

@@ -78,12 +78,8 @@ const NavykyTracker = lazy(() => import('./pages/v2/NavykyTracker'));
 const TeloPrograms = lazy(() => import('./pages/v2/TeloPrograms'));
 const ProgramDetail = lazy(() => import('./pages/v2/ProgramDetail'));
 const PostpartumInfo = lazy(() => import('./pages/v2/PostpartumInfo'));
-const ReferralLanding = lazy(() => import('./pages/v2/ReferralLanding'));
-const ReferralCenter = lazy(() => import('./components/v2/referral/ReferralCenter'));
-const ReferralPage = lazy(() => import('./pages/v2/ReferralPage'));
 const Admin = lazy(() => import('./pages/v2/Admin'));
 const AdminLogin = lazy(() => import('./pages/v2/AdminLogin'));
-const AdminReferrals = lazy(() => import('./pages/v2/AdminReferrals'));
 const TeloExtra = lazy(() => import('./pages/v2/TeloExtra'));
 const TeloStrecing = lazy(() => import('./pages/v2/TeloStrecing'));
 const SymptomCalendar = lazy(() => import('./pages/v2/SymptomCalendar'));
@@ -286,7 +282,6 @@ export default function AppV2() {
             <Route path="/onboarding/programs" element={<OnboardingPrograms />} />
             <Route path="/onboarding/notifications" element={<OnboardingNotifications />} />
             <Route path="/onboarding/legacy" element={<Onboarding />} />
-            <Route path="/ref/:code" element={<ReferralLanding />} />
             {/* Public legal pages — must be reachable without auth so
                 Google's OAuth verification crawler can fetch them. */}
             <Route path="/zasady-ochrany-osobnych-udajov" element={<PrivacyPolicy />} />
@@ -373,12 +368,9 @@ export default function AppV2() {
               <Route path="/profil" element={<Profil />} />
               <Route path="/profil/predplatne" element={<SubscriptionManagement />} />
               <Route path="/partner" element={<AffiliateDashboard />} />
-              <Route path="/referral" element={<ReferralPage />} />
-              <Route path="/referral-center" element={<ReferralCenter />} />
               <Route path="/admin" element={<RequireAdmin><Admin /></RequireAdmin>} />
               <Route path="/admin-new" element={<Navigate to="/admin" replace />} />
               <Route path="/admin/dashboard" element={<Navigate to="/admin" replace />} />
-              <Route path="/admin/referrals" element={<RequireAdmin><AdminReferrals /></RequireAdmin>} />
               <Route path="/recepty" element={<Recepty />} />
               <Route path="/recept/:id" element={<RecipeDetail />} />
               <Route path="/meditacie" element={<Meditacie />} />

@@ -278,7 +278,6 @@ export default function SubscriptionManagement() {
           its own mx-5, stacking them offset these cards to the right. */}
       <div className="mt-4">
         <SettingsGroup label="Možnosti" className="mb-4">
-          <SettingsRow label="Odporučiť kamarátke" value="Mesiac zadarmo" onClick={() => navigate('/referral')} />
           <SettingsRow label="Notifikácie" onClick={() => navigate('/settings/notifications')} />
           <SettingsRow label="História platieb" onClick={handleBilling} />
         </SettingsGroup>

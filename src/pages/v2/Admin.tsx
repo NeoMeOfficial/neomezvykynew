@@ -49,7 +49,6 @@ const navigationItems = [
   { id: 'meditations', label: 'Meditations', icon: Music, description: 'Audio Content' },
   { id: 'community', label: 'Community', icon: Flag, description: 'Post Moderation' },
   { id: 'messages', label: 'Messages', icon: MessageSquare, description: 'User Support' },
-  { id: 'referrals', label: 'Referrals', icon: Gift, description: 'Reward Program' },
   { id: 'affiliates', label: 'Affiliates', icon: Percent, description: 'Partner Program' },
   { id: 'partner-discounts', label: 'Partner Zľavy', icon: Tag, description: 'Partnerské zľavy' },
   { id: 'promo-codes', label: 'Promo Kódy', icon: Percent, description: 'Zľavové kódy' },
@@ -3880,12 +3879,7 @@ export default function AdminNew() {
             return (
               <button
                 key={item.id}
-                onClick={() => {
-                  // Referrals admin lives on its own route; the tab used to
-                  // fall through to the Dashboard silently.
-                  if (item.id === 'referrals') { navigate('/admin/referrals'); return; }
-                  setActiveTab(item.id);
-                }}
+                onClick={() => setActiveTab(item.id)}
                 style={{
                   all: 'unset', cursor: 'pointer',
                   padding: '9px 12px',
@@ -3985,7 +3979,6 @@ export default function AdminNew() {
     const kpis = [
       { label: 'Celkom používateliek', value: stat(analytics?.totalUsers),          sub: `${stat(analytics?.newUsersMonth)} nových tento mesiac`, color: A.DEEP,  up: true  },
       { label: 'Plus predplatiteľky',  value: stat(analytics?.activeSubscriptions), sub: `${stat(analytics?.freeUsers)} free používateliek`,      color: A.GOLD,  up: true  },
-      { label: 'Referrals',            value: stat(analytics?.referralCount),        sub: 'celkovo odporúčaní',                                      color: A.SAGE,  up: true  },
       { label: 'Príspevky',            value: stat(analytics?.postsCount),           sub: 'v komunite',                                              color: A.TERRA, up: true  },
     ];
     return (
