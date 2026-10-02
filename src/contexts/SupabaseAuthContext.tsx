@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { flushAffiliateAttribution } from '../lib/affiliate';
 import { User, AuthError, Session } from '@supabase/supabase-js';
 import { supabase, isSupabaseConfigured, UserProfile } from '../lib/supabase';
 import { CONSENT_POLICY_VERSION, ConsentType } from '../lib/consents';
@@ -87,6 +88,7 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
         loadUserProfile(session.user.id);
         setAdminRoleIfBootstrap();
         drainPendingConsents();
+        flushAffiliateAttribution();
       }
       setLoading(false);
     });
@@ -98,6 +100,7 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
         loadUserProfile(session.user.id);
         setAdminRoleIfBootstrap();
         drainPendingConsents();
+        flushAffiliateAttribution();
       } else {
         setProfile(null);
       }

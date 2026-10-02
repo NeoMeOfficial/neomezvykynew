@@ -4,6 +4,7 @@ import { useSubscription } from '@/contexts/SubscriptionContext';
 import { useWorkoutHistory } from '@/hooks/useWorkoutHistory';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useReflections } from '@/hooks/useDailyRituals';
+import { useIsAffiliate } from '@/hooks/useIsAffiliate';
 import { Eyebrow } from '@/components/ui/eyebrow';
 import { SerifHeader } from '@/components/ui/serif-header';
 import { BodyText } from '@/components/ui/body-text';
@@ -30,6 +31,7 @@ export default function Profil() {
   const totalWorkouts = stats?.totalWorkouts ?? 0;
 
   const { balance } = usePointsLedger();
+  const isAffiliate = useIsAffiliate();
   const milestone = useNextMilestone(balance);
   const { badges } = useUserBadges();
   const earnedBadges = badges.filter(b => b.earned);
@@ -249,6 +251,12 @@ export default function Profil() {
         <SettingsRow label="Súkromie" onClick={() => navigate('/settings/privacy')} />
         <SettingsRow label="Všetky nastavenia" onClick={() => navigate('/settings')} />
       </SettingsGroup>
+
+      {isAffiliate && (
+        <SettingsGroup label="Spolupráca">
+          <SettingsRow label="Partnerský program" onClick={() => navigate('/partner')} />
+        </SettingsGroup>
+      )}
 
       <SettingsGroup>
         <SettingsRow label="Odhlásiť sa" tone="danger" onClick={handleSignOut} />

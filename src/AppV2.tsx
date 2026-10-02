@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
+import { captureAffiliateRef } from './lib/affiliate';
 import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SupabaseAuthProvider, useSupabaseAuth } from './contexts/SupabaseAuthContext';
@@ -43,6 +44,7 @@ const CompletionWorkout = lazy(() => import('./pages/v2/CompletionWorkout'));
 const CompletionProgram = lazy(() => import('./pages/v2/CompletionProgram'));
 const ReflectionEntry = lazy(() => import('./pages/v2/ReflectionEntry'));
 const CyklusLog = lazy(() => import('./pages/v2/CyklusLog'));
+const AffiliateDashboard = lazy(() => import('./pages/v2/AffiliateDashboard'));
 const KomunitaPostDetail = lazy(() => import('./pages/v2/KomunitaPostDetail'));
 const KomunitaCompose = lazy(() => import('./pages/v2/KomunitaCompose'));
 const SpravyThread = lazy(() => import('./pages/v2/SpravyThread'));
@@ -210,6 +212,10 @@ function RequireAdmin({ children }: { children: React.ReactNode }) {
 }
 
 export default function AppV2() {
+  // Affiliate links point anywhere in the app with ?ref=KOD — stash the
+  // code before routing so it survives signup + email confirmation.
+  captureAffiliateRef();
+
   return (
     <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
@@ -366,6 +372,7 @@ export default function AppV2() {
               <Route path="/workout-demo" element={<WorkoutDemo />} />
               <Route path="/profil" element={<Profil />} />
               <Route path="/profil/predplatne" element={<SubscriptionManagement />} />
+              <Route path="/partner" element={<AffiliateDashboard />} />
               <Route path="/referral" element={<ReferralPage />} />
               <Route path="/referral-center" element={<ReferralCenter />} />
               <Route path="/admin" element={<RequireAdmin><Admin /></RequireAdmin>} />

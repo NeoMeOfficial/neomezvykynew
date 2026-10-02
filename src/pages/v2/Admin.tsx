@@ -50,6 +50,7 @@ const navigationItems = [
   { id: 'community', label: 'Community', icon: Flag, description: 'Post Moderation' },
   { id: 'messages', label: 'Messages', icon: MessageSquare, description: 'User Support' },
   { id: 'referrals', label: 'Referrals', icon: Gift, description: 'Reward Program' },
+  { id: 'affiliates', label: 'Affiliates', icon: Percent, description: 'Partner Program' },
   { id: 'partner-discounts', label: 'Partner Zľavy', icon: Tag, description: 'Partnerské zľavy' },
   { id: 'promo-codes', label: 'Promo Kódy', icon: Percent, description: 'Zľavové kódy' },
 ] as const;
@@ -2473,6 +2474,139 @@ async function adminSeed(type: string, items: Record<string, unknown>[]) {
   return inserted;
 }
 
+function AffiliatesTab() {
+  const [rows, setRows] = useState<any[]>([]);
+  const [payouts, setPayouts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [grantEmail, setGrantEmail] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState<string | null>(null);
+
+  const call = async (init?: RequestInit) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    return fetch('/.netlify/functions/admin-affiliates', {
+      ...init,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+        ...(init?.headers ?? {}),
+      },
+    });
+  };
+
+  const load = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await call();
+      if (!res.ok) throw new Error((await res.json()).error ?? 'load failed');
+      const data = await res.json();
+      setRows(data.affiliates ?? []);
+      setPayouts(data.payouts ?? []);
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => { load(); }, []);
+
+  const act = async (body: any, okMsg: string) => {
+    setBusy(true);
+    setMsg(null);
+    try {
+      const res = await call({ method: 'POST', body: JSON.stringify(body) });
+      const data = await res.json();
+      if (!res.ok) setMsg(data.error ?? 'Akcia zlyhala');
+      else { setMsg(okMsg); await load(); }
+    } catch {
+      setMsg('Akcia zlyhala');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const eurc = (c: number) => `${(c / 100).toFixed(2)} €`;
+  const inputS: React.CSSProperties = { padding: '8px 12px', borderRadius: 10, border: `1px solid ${_A.HAIR}`, fontFamily: 'DM Sans, system-ui', fontSize: 13, outline: 'none', background: '#fff' };
+  const btnS = (danger = false): React.CSSProperties => ({ all: 'unset', cursor: 'pointer', padding: '7px 14px', borderRadius: 999, background: danger ? 'rgba(194,122,110,0.12)' : _A.DEEP, color: danger ? '#B4584A' : '#fff', fontFamily: 'DM Sans, system-ui', fontSize: 12, fontWeight: 500 });
+
+  const pendingPayouts = payouts.filter((pp) => pp.status === 'requested');
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+      <AdminCard>
+        <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 14, fontWeight: 600, color: _A.DEEP, marginBottom: 10 }}>Pridať partnera</div>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <input value={grantEmail} onChange={(e) => setGrantEmail(e.target.value)} placeholder="email existujúceho používateľa" style={{ ...inputS, flex: 1, minWidth: 240 }} />
+          <button disabled={busy} onClick={() => act({ action: 'grant', email: grantEmail.trim() }, 'Partner pridaný — kód si vyberie v aplikácii (Profil → Partnerský program).')} style={btnS()}>Pridať</button>
+        </div>
+        {msg && <div style={{ marginTop: 8, fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>{msg}</div>}
+      </AdminCard>
+
+      {pendingPayouts.length > 0 && (
+        <AdminCard>
+          <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 14, fontWeight: 600, color: _A.DEEP, marginBottom: 10 }}>Žiadosti o vyplatenie ({pendingPayouts.length})</div>
+          {pendingPayouts.map((pp) => {
+            const aff = rows.find((r) => r.user_id === pp.affiliate_user_id);
+            return (
+              <div key={pp.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderTop: `1px solid ${_A.HAIR}`, flexWrap: 'wrap' }}>
+                <div style={{ flex: 1, minWidth: 220, fontFamily: 'DM Sans, system-ui', fontSize: 13, color: _A.DEEP }}>
+                  <b>{aff?.email ?? pp.affiliate_user_id}</b> · {eurc(pp.amount_cents)}
+                  <div style={{ fontSize: 11.5, color: _A.MUTED, marginTop: 2 }}>{new Date(pp.requested_at).toLocaleDateString('sk-SK')} · {pp.payment_detail}</div>
+                </div>
+                <button disabled={busy} onClick={() => act({ action: 'payout_paid', payoutId: pp.id }, 'Označené ako vyplatené.')} style={btnS()}>Vyplatené ✓</button>
+                <button disabled={busy} onClick={() => act({ action: 'payout_rejected', payoutId: pp.id }, 'Žiadosť zamietnutá — suma sa vrátila medzi dostupné.')} style={btnS(true)}>Zamietnuť</button>
+              </div>
+            );
+          })}
+        </AdminCard>
+      )}
+
+      <AdminCard>
+        <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 14, fontWeight: 600, color: _A.DEEP, marginBottom: 10 }}>Partneri ({rows.length})</div>
+        {loading ? (
+          <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 13, color: _A.MUTED }}>Načítavam…</div>
+        ) : error ? (
+          <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 13, color: '#B4584A' }}>{error} — spustil si už affiliates.sql?</div>
+        ) : rows.length === 0 ? (
+          <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 13, color: _A.MUTED }}>Zatiaľ žiadni partneri.</div>
+        ) : rows.map((r) => (
+          <div key={r.user_id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', borderTop: `1px solid ${_A.HAIR}`, flexWrap: 'wrap' }}>
+            <div style={{ flex: 1, minWidth: 240 }}>
+              <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 13.5, fontWeight: 600, color: _A.DEEP }}>{r.email ?? r.user_id}</div>
+              <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED, marginTop: 2 }}>
+                kód: <b>{r.code ?? '— ešte nevybraný'}</b> · {r.referral_count} odporúčaní · {r.status === 'active' ? 'aktívny' : 'pozastavený'}
+              </div>
+              <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED, marginTop: 2 }}>
+                k vyplateniu {eurc(r.totals.available)} · čaká 30 dní {eurc(r.totals.pending)} · v spracovaní {eurc(r.totals.requested)} · vyplatené {eurc(r.totals.paid)}
+              </div>
+            </div>
+            <label style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED, display: 'flex', alignItems: 'center', gap: 6 }}>
+              provízia
+              <input
+                type="number" min={0} max={100} defaultValue={r.commission_pct}
+                onBlur={(e) => {
+                  const v = Number(e.target.value);
+                  if (Number.isFinite(v) && v !== r.commission_pct) act({ action: 'set_rate', userId: r.user_id, commission_pct: v }, 'Provízia upravená.');
+                }}
+                style={{ ...inputS, width: 64, padding: '6px 8px' }}
+              /> %
+            </label>
+            <button
+              disabled={busy}
+              onClick={() => act({ action: 'set_status', userId: r.user_id, status: r.status === 'active' ? 'disabled' : 'active' }, 'Stav zmenený.')}
+              style={btnS(r.status === 'active')}
+            >
+              {r.status === 'active' ? 'Pozastaviť' : 'Aktivovať'}
+            </button>
+          </div>
+        ))}
+      </AdminCard>
+    </div>
+  );
+}
+
 const AdminCard = ({ children, className = '', title }: { children: React.ReactNode; className?: string; title?: string }) => (
   <div className={className} style={{ background: '#FFFFFF', borderRadius: 16, border: `1px solid rgba(61,41,33,0.08)`, padding: '22px 24px' }}>{children}</div>
 );
@@ -4023,6 +4157,7 @@ export default function AdminNew() {
 
   const renderMessages = () => <MessagesTab />;
 
+  
   const renderContent = () => {
     switch (activeTab) {
       case 'overview':
@@ -4045,6 +4180,8 @@ export default function AdminNew() {
         return <BlogPostsTab />;
       case 'partner-discounts':
         return <PartnerDiscountsTab />;
+      case 'affiliates':
+        return <AffiliatesTab />;
       case 'promo-codes':
         return <PromoCodesTab />;
       default:

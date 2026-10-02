@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { AFFILIATE_REF_KEY } from '../../lib/affiliate';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { useSupabaseAuth } from '../../contexts/SupabaseAuthContext';
 import { supabase, isSupabaseConfigured } from '../../lib/supabase';
@@ -100,6 +101,12 @@ export default function AuthReal() {
     // relevant action (Art. 7(4) — consent must be freely given and
     // granular per Recital 32).
     tosPrivacyConsent: false,
+    // Optional affiliate code — prefilled when the user arrived via a
+    // partner link (?ref=KOD); attribution itself happens server-side
+    // after the first session.
+    refCode: (() => {
+      try { return localStorage.getItem(AFFILIATE_REF_KEY) ?? ''; } catch { return ''; }
+    })(),
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
@@ -427,6 +434,20 @@ export default function AuthReal() {
                 autoComplete="new-password"
               />
               {errors.confirmPassword && <FieldError>{errors.confirmPassword}</FieldError>}
+              <Field
+                label="Odporúčací kód (nepovinné)"
+                type="text"
+                value={formData.refCode}
+                onChange={(v) => {
+                  set('refCode', v);
+                  try {
+                    if (v.trim()) localStorage.setItem(AFFILIATE_REF_KEY, v.trim());
+                    else localStorage.removeItem(AFFILIATE_REF_KEY);
+                  } catch { /* ignore */ }
+                }}
+                placeholder="Napr. kód od ambasádorky"
+                autoComplete="off"
+              />
               {/* Required: TOS + Privacy Policy acknowledgment. Splitting
                   health-data consent into a separate prompt on first
                   cycle-screen visit keeps consent "freely given" per

@@ -67,6 +67,11 @@ export async function handler(event: any) {
         }
         break;
       }
+      case 'invoice.payment_succeeded': {
+        const invoice = stripeEvent.data.object as Stripe.Invoice;
+        await handleAffiliateCommission(invoice);
+        break;
+      }
       case 'invoice.payment_failed': {
         // Subscription renewal payment failed — user's card was declined
         // or has insufficient funds. Logged so the UI can surface a
@@ -264,6 +269,71 @@ async function handleOneTimePayment(session: Stripe.Checkout.Session) {
   } else {
     console.log(`Meal plan purchased — user ${userId} unlocked.`);
   }
+
+  await accrueAffiliateCommission(userId, session.amount_total ?? 0, 'one_time', session.id);
+}
+
+// Affiliate program (Sam 2026-10-02): every paid invoice from an
+// attributed user accrues commission_pct of the amount to their
+// affiliate. stripe_ref is unique, so webhook retries can't double-pay;
+// the earning matures (becomes payable) 30 days later.
+async function accrueAffiliateCommission(
+  userId: string,
+  amountCents: number,
+  source: 'subscription' | 'one_time',
+  stripeRef: string,
+) {
+  if (!amountCents || amountCents <= 0) return;
+
+  const { data: attribution, error: attrErr } = await supabase
+    .from('affiliate_referrals')
+    .select('affiliate_user_id')
+    .eq('referred_user_id', userId)
+    .maybeSingle();
+  // Table missing (migration not run yet) or no attribution — nothing to do.
+  if (attrErr || !attribution) return;
+
+  const { data: affiliate } = await supabase
+    .from('affiliates')
+    .select('commission_pct, status')
+    .eq('user_id', attribution.affiliate_user_id)
+    .maybeSingle();
+  if (!affiliate || affiliate.status !== 'active') return;
+
+  const commission = Math.floor((amountCents * Number(affiliate.commission_pct)) / 100);
+  if (commission <= 0) return;
+
+  const availableAt = new Date(Date.now() + 30 * 24 * 3600 * 1000).toISOString();
+  const { error } = await supabase.from('affiliate_earnings').insert({
+    affiliate_user_id: attribution.affiliate_user_id,
+    referred_user_id: userId,
+    amount_cents: commission,
+    source,
+    stripe_ref: stripeRef,
+    available_at: availableAt,
+  });
+  if (error) {
+    if ((error as any).code === '23505') return; // retry — already accrued
+    console.error('Affiliate commission accrual failed:', error);
+  } else {
+    console.log(`Affiliate commission ${commission}c accrued to ${attribution.affiliate_user_id} (${source} ${stripeRef})`);
+  }
+}
+
+async function handleAffiliateCommission(invoice: Stripe.Invoice) {
+  // userId travels in subscription metadata (set at checkout); Stripe
+  // copies it onto the invoice via subscription_details.
+  let userId = (invoice as any).subscription_details?.metadata?.userId as string | undefined;
+  if (!userId && typeof invoice.subscription === 'string') {
+    try {
+      const sub = await stripe.subscriptions.retrieve(invoice.subscription);
+      userId = sub.metadata?.userId;
+    } catch (err) {
+      console.error('Invoice subscription lookup failed:', err);
+    }
+  }
+  if (!userId) return;
+  await accrueAffiliateCommission(userId, invoice.amount_paid, 'subscription', invoice.id);
 }
 
 // When a new subscription goes active, check if the user was referred and award
