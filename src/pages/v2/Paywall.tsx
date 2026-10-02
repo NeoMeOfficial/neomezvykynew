@@ -51,8 +51,8 @@ function PaywallWarm({ onContinueFree, onClose, onActivate }: { onContinueFree: 
   const benefits = [
     { t: '4 programy na výber', d: 'Postpartum · BodyForming · ElasticBands · Strong&Sexy' },
     { t: 'Cyklus s odporúčaniami', d: 'Fázy, nálady, potraviny, pohyb na mieru' },
-    { t: 'Vlastné návyky a reflexia s históriou', d: 'Denník bez limitu, štatistiky, exporty' },
-    { t: 'Prístup k celej knižnici', d: 'Stovky meditácií, cvičení, receptov' },
+    { t: 'Vlastné návyky a reflexia s históriou', d: 'Denník bez limitu a štatistiky' },
+    { t: 'Prístup k celej knižnici', d: 'Meditácie, cvičenia a 142 receptov' },
   ];
   return (
     <div style={{ background: NM.BG, minHeight: '100vh', position: 'relative', paddingBottom: 220, fontFamily: NM.SANS, color: NM.DEEP }}>

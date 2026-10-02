@@ -99,10 +99,6 @@ export const ACTIVITY_POINTS: Record<string, number> = {
   receive_10_hearts:     10,  // once per post
   help_member:           20,
 
-  // Referrals
-  referral_signup:       50,   // referred user created account
-  referral_subscribed:   300,  // referred user converted to paid (max 3/year)
-
   // Onboarding (one-time)
   onboarding_complete:   30,
   cycle_setup:           20,

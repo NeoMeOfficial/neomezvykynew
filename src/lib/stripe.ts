@@ -65,16 +65,16 @@ export const SUBSCRIPTION_PLANS = {
     interval: 'month',
     name: 'NeoMe Plus',
     features: [
-      'Všetky fitness programy (4 úrovne)',
-      'Neobmedzený prístup k 120+ receptom',
+      'Všetky 4 cvičebné programy',
+      'Celá knižnica 142 receptov zladených s cyklom',
       'Sledovanie menštruačného cyklu a symptómov',
-      'Komunita slovenských žien a buddy systém',
-      'Osobný denník a sledovanie návykov',
-      'Offline prístup k obsahu a meditáciám'
+      'Komunita slovenských žien',
+      'Osobný denník a návyky bez limitu',
+      'Meditácie pre pokojnejšiu myseľ'
     ],
     highlights: [
       '15-minútové tréningy prispôsobené cyklu',
-      'Recepty s ingredienciami z Tesca',
+      'Recepty z bežných surovín',
       'Podpora od skúsených mám',
       'Bez dlhodobých záväzkov'
     ],

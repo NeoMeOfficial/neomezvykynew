@@ -183,7 +183,7 @@ export default function Recepty() {
       </div>
 
       {!loading && (
-        <PlusUnlockBanner label="Zadarmo máš 15 receptov mesačne — všetkých 225 odomkneš s NeoMe Plus" />
+        <PlusUnlockBanner label="Zadarmo máš 15 receptov mesačne — všetkých 142 odomkneš s NeoMe Plus" />
       )}
 
       <div style={{ padding: '0 18px 10px', display: 'flex', flexDirection: 'column', gap: 18 }}>
