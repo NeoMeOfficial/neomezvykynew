@@ -883,7 +883,7 @@ export default function DomovNew() {
   const { userProgram } = useUserProgram();
   // Program-only users (program_purchases grant, no subscription) still get
   // their program card — hasProgram covers both subscribers and grantees.
-  const { hasProgram: hasProgramAccess } = useProgramAccess();
+  const { hasProgram: hasProgramAccess, purchased: purchasedPrograms } = useProgramAccess();
   const { pick: teloPick, hasCycle: teloHasCycle } = useDailyTeloPick();
   const { todayPlan } = useMealPlan();
   const { recipes } = useRecipes();
@@ -1130,6 +1130,42 @@ export default function DomovNew() {
       />
 
       {!isPlus && <PersistenceNotice />}
+
+      {/* Invited single-program user who hasn't started her program yet:
+          nothing else on home points her to the Monday picker (Sam
+          2026-10-02) — this banner is the missing bridge. */}
+      {!userProgram && purchasedPrograms.size > 0 && (() => {
+        const slug = [...purchasedPrograms][0];
+        const PROGRAM_NAMES: Record<string, string> = {
+          postpartum: 'Postpartum', bodyforming: 'BodyForming',
+          'elastic-bands': 'Elastické gumy', 'strong-sexy': 'Strong & Sexy',
+        };
+        return (
+          <div style={{ margin: '0 20px 18px' }}>
+            <button
+              onClick={() => navigate(`/program/${slug}`)}
+              style={{
+                all: 'unset', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 14,
+                width: '100%', boxSizing: 'border-box', padding: '16px 18px',
+                background: '#fff', border: '1.5px solid #B8864A', borderRadius: 18,
+              }}
+            >
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 9.5, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#B8864A', fontWeight: 600, marginBottom: 5 }}>
+                  Tvoj program
+                </div>
+                <div style={{ fontFamily: 'Gilda Display, serif', fontSize: 17, color: '#2E2218', lineHeight: 1.2 }}>
+                  Máš prístup k programu {PROGRAM_NAMES[slug] ?? slug}
+                </div>
+                <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: '#8B7560', marginTop: 4 }}>
+                  Vyber si pondelok, kedy chceš začať.
+                </div>
+              </div>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B8864A" strokeWidth="2" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
+            </button>
+          </div>
+        );
+      })()}
 
       {selectedDay && <DayPlanSheet date={selectedDay} onClose={() => setSelectedDay(null)} />}
 
