@@ -12,7 +12,7 @@
 create table if not exists public.affiliates (
   user_id        uuid primary key references auth.users(id) on delete cascade,
   code           text,
-  commission_pct numeric(5,2) not null default 20.00
+  commission_pct numeric(5,2) not null default 10.00
                  check (commission_pct >= 0 and commission_pct <= 100),
   status         text not null default 'active' check (status in ('active', 'disabled')),
   created_at     timestamptz not null default now()

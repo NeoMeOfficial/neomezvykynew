@@ -7,6 +7,7 @@
 import { requireAdmin } from './_adminAuth';
 import { serviceClient } from './_userAuth';
 import { auditLog } from './_auditLog';
+import { sendTransactionalEmail, renderBrandedEmail } from './_resend';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -106,6 +107,27 @@ export async function handler(event: any) {
       .upsert({ user_id: userId, status: 'active' }, { onConflict: 'user_id' });
     if (error) return json(500, { error: error.message });
     await auditLog(supabase, { actor: { userId: auth.userId, email: auth.email }, action: 'affiliate_granted', detail: { email, userId } });
+
+    // Tell the new partner — without this, nothing in their app hints
+    // that the Partnerský program row exists. Best-effort: a failed
+    // email must not undo the grant.
+    try {
+      await sendTransactionalEmail({
+        to: email,
+        subject: 'Vitaj v partnerskom programe NeoMe',
+        html: renderBrandedEmail({
+          preheader: 'Vyber si svoj kód a začni odporúčať.',
+          headline: 'Vitaj v partnerskom programe',
+          body: 'Zaradili sme ťa do partnerského programu NeoMe. V aplikácii si teraz vyberieš svoj osobný kód a dostaneš odkaz, ktorý môžeš zdieľať — z každej platby odporúčanej používateľky ti patrí provízia. Všetko (odporúčania, zárobky aj žiadosti o vyplatenie) sleduješ priamo v aplikácii v časti <b>Profil → Partnerský program</b>.',
+          ctaLabel: 'Otvoriť partnerský program',
+          ctaHref: 'https://app.neome.com.au/partner',
+          footnote: 'Provízia sa uvoľňuje 30 dní po platbe; o vyplatenie požiadaš jedným klikom v aplikácii.',
+        }),
+      });
+    } catch (err) {
+      console.error('affiliate grant email failed:', err);
+    }
+
     return json(200, { ok: true, userId });
   }
 
