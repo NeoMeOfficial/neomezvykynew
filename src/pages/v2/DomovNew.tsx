@@ -16,7 +16,7 @@ import { usePointsLedger } from '@/hooks/usePointsLedger';
 import { useReflections } from '@/hooks/useDailyRituals';
 import { computeEnergyPatterns, parseStructured } from '@/features/dennik/structuredEntry';
 import SectionEyebrow from '@/components/v2/home/SectionEyebrow';
-import OnboardingTour from '@/components/v2/OnboardingTour';
+import OnboardingTour, { TourNudge } from '@/components/v2/OnboardingTour';
 import { DayPlanSheet } from '@/components/v2/home/DayPlanSheet';
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
@@ -1094,6 +1094,7 @@ export default function DomovNew() {
 
       {!isPlus && <PersistenceNotice />}
       <OnboardingTour />
+      <TourNudge />
 
       {/* Invited single-program user who hasn't started her program yet:
           nothing else on home points her to the Monday picker (Sam
