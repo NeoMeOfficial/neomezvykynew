@@ -326,8 +326,11 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
         const email = getUserEmail();
 
         if (isStripeConfigured()) {
-          const { url } = await createCheckoutSession(priceId, userId || 'anon', email || '');
-          if (url) window.location.href = url;
+          // In-app checkout page (Sam 2026-10-05) — our design, Stripe
+          // Payment Element inside. Replaces the hosted-Checkout redirect
+          // for subscriptions; one-time purchases (meal plan) still go
+          // through createCheckoutSession.
+          window.location.href = `/checkout/plus?price=${encodeURIComponent(priceId)}`;
         } else {
           const sessionId = await createCheckoutSessionMock(priceId, userId || 'demo', email || 'demo@neome.sk');
           if (sessionId === 'demo_session_success') {

@@ -52,6 +52,9 @@ export async function handler(event: any) {
         // restrict access). Audit C2.
         const active = (sub.status === 'active' || sub.status === 'trialing') && !sub.pause_collection;
         await upsertSubscription(sub, active);
+        if (active && sub.metadata?.userId) {
+          await sendPlusWelcomeMessage(sub.metadata.userId);
+        }
         break;
       }
       case 'customer.subscription.deleted': {
@@ -413,6 +416,35 @@ async function handleAffiliateCommission(invoice: Stripe.Invoice) {
   }
   if (!userId) return;
   await accrueAffiliateCommission(userId, invoice.amount_paid, 'subscription', invoice.id);
+}
+
+// Sam 2026-10-05: every new subscriber gets a short in-app hello from
+// Gabi in Správy. The exact-body lookup is the dedupe — renewal events
+// re-enter this path but never produce a second copy.
+const PLUS_WELCOME_BODY =
+  'Vitaj v NeoMe Plus 💛 Som rada, že si tu. Ak budeš mať akékoľvek otázky, pokojne mi sem napíš.';
+
+async function sendPlusWelcomeMessage(userId: string) {
+  try {
+    const { data: existing } = await supabase
+      .from('messages')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('is_from_admin', true)
+      .eq('body', PLUS_WELCOME_BODY)
+      .limit(1)
+      .maybeSingle();
+    if (existing) return;
+    const { error } = await supabase.from('messages').insert({
+      user_id: userId,
+      body: PLUS_WELCOME_BODY,
+      is_from_admin: true,
+      sender_name: 'Gabi',
+    });
+    if (error) console.error('plus welcome message insert failed:', error);
+  } catch (err) {
+    console.error('plus welcome message failed:', err);
+  }
 }
 
 async function upsertSubscription(sub: Stripe.Subscription, active: boolean) {

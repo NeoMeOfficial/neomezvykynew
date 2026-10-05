@@ -33,6 +33,7 @@ const Onboarding = lazy(() => import('./pages/v2/Onboarding'));
 const OnboardingWelcome = lazy(() => import('./pages/v2/OnboardingWelcome'));
 const OnboardingPlan = lazy(() => import('./pages/v2/OnboardingPlan'));
 const CheckoutLauncher = lazy(() => import('./pages/v2/CheckoutLauncher'));
+const CheckoutPlus = lazy(() => import('./pages/v2/CheckoutPlus'));
 const OnboardingCycle = lazy(() => import('./pages/v2/OnboardingCycle'));
 const OnboardingPrograms = lazy(() => import('./pages/v2/OnboardingPrograms'));
 const OnboardingNotifications = lazy(() => import('./pages/v2/OnboardingNotifications'));
@@ -259,6 +260,7 @@ export default function AppV2() {
             <Route element={<RequireAuth><TosConsentGate><Outlet /></TosConsentGate></RequireAuth>}>
               <Route path="/paywall" element={<Paywall />} />
               <Route path="/checkout" element={<CheckoutLauncher />} />
+              <Route path="/checkout/plus" element={<CheckoutPlus />} />
               <Route path="/checkout/success" element={<CheckoutSuccess />} />
               <Route path="/checkout/canceled" element={<CheckoutCanceled />} />
             </Route>
