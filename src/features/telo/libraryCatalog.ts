@@ -65,6 +65,9 @@ export function catalogExercises(exercises: DbExercise[]): CatalogExercise[] {
         isFree = equip === 'none' && band === '15' && !freeSeen.has(focus);
         if (isFree) freeSeen.add(focus);
       }
+      // Admin override wins over the heuristic (Sam 2026-10-05).
+      if (e.free_override === true) isFree = true;
+      if (e.free_override === false) isFree = false;
       return {
         e,
         focus,
@@ -96,6 +99,9 @@ export function catalogStretches(stretches: DbStretch[]): CatalogStretch[] {
         isFree = equip === 'none' && band === '15' && !freeSeen.has(focus);
         if (isFree) freeSeen.add(focus);
       }
+      // Admin override wins over the heuristic (Sam 2026-10-05).
+      if (s.free_override === true) isFree = true;
+      if (s.free_override === false) isFree = false;
       return {
         s,
         focus,

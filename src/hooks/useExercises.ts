@@ -28,6 +28,7 @@ export interface DbExercise {
   video_id: string | null;
   video_provider: 'vimeo' | 'youtube' | 'bunny' | null;
   free: boolean;
+  free_override?: boolean | null;
   sort_order: number;
   diastasis_safe: boolean;
   description: string | null;
@@ -104,6 +105,7 @@ function adapt(row: RawExercise, index: number): DbExercise {
     video_provider: detectProvider(row.video_url),
     is_new: !!row.created_at && Date.now() - new Date(row.created_at).getTime() < 14 * 24 * 3600 * 1000,
     free: (row.level ?? 0) <= 1 || row.id.startsWith('ranne-prebudenie') || row.id.startsWith('jemny-core'),
+    free_override: (row as { free?: boolean | null }).free ?? null,
     sort_order: index + 1,
     diastasis_safe: row.diastasis_safe ?? true,
     description: row.description,
@@ -157,7 +159,7 @@ export function useExercises() {
     }
     supabase
       .from('exercises')
-      .select('id, content_type, name, duration, category, body, equip, level, diastasis_safe, thumb, description, video_url, active, created_at')
+      .select('id, content_type, name, duration, category, body, equip, level, diastasis_safe, thumb, description, video_url, active, created_at, free')
       .eq('content_type', 'exercise')
       .eq('active', true)
       // Creation order keeps series numbering (č. 1, č. 2 …) stable as new

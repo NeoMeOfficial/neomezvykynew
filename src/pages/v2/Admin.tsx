@@ -3132,6 +3132,7 @@ interface ExerciseRow {
   description: string; video_url: string;
   status: 'draft' | 'published' | 'archived'; active: boolean;
   updated_at?: string; created_at?: string;
+  free?: boolean | null;
 }
 
 function ExercisesTab() {
@@ -3185,6 +3186,7 @@ function ExercisesTab() {
         thumb: form.thumb ?? '',
         description: form.description ?? '',
         video_url: form.video_url ?? '',
+        free: form.free ?? null,
         status,
         active: status === 'published',
       };
@@ -3366,6 +3368,18 @@ function ExercisesTab() {
             <div style={{ gridColumn: '1 / -1' }}>
               <label style={labelStyle}>Video URL (Vimeo alebo YouTube)</label>
               <input value={form.video_url ?? ''} onChange={e => setForm(f => ({ ...f, video_url: e.target.value }))} placeholder="Bunny ID / vimeo.com/… — dá sa doplniť aj neskôr" style={inputStyle} />
+              <div style={{ marginTop: 10 }}>
+                <label style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED, display: 'block', marginBottom: 5 }}>Dostupnosť videa</label>
+                <select
+                  value={form.free === true ? 'free' : form.free === false ? 'plus' : 'auto'}
+                  onChange={e => setForm(f => ({ ...f, free: e.target.value === 'free' ? true : e.target.value === 'plus' ? false : null }))}
+                  style={inputStyle}
+                >
+                  <option value="auto">Auto — prvé cvičenie bez pomôcok v kategórii je zadarmo</option>
+                  <option value="free">Zadarmo — aj bez Plus</option>
+                  <option value="plus">Len s Plus</option>
+                </select>
+              </div>
               {(() => {
                 // Same detection the app player uses — instant feedback that
                 // the pasted link will actually play.
@@ -3446,6 +3460,8 @@ function ExercisesTab() {
                       </span>
                       <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED }}>{r.duration}</span>
                       {r.body && <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED }}>{r.body}</span>}
+                      {r.free === true && <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '2px 7px', borderRadius: 999, background: 'rgba(184,134,74,0.15)', color: _A.GOLD }}>free</span>}
+                      {r.free === false && <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '2px 7px', borderRadius: 999, background: 'rgba(137,176,188,0.18)', color: '#5B8290' }}>plus</span>}
                       {r.video_url
                         ? <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '2px 7px', borderRadius: 999, background: 'rgba(139,158,136,0.15)', color: _A.SAGE }}>▶ video</span>
                         : <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '2px 7px', borderRadius: 999, background: 'rgba(184,134,74,0.15)', color: _A.GOLD }}>bez videa</span>}
