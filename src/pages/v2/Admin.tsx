@@ -905,7 +905,18 @@ function UsersTab({ isFullAdmin }: { isFullAdmin: boolean }) {
   const [settingTier, setSettingTier] = useState<string | null>(null);
   const [tierMenuOpen, setTierMenuOpen] = useState<string | null>(null);
   const [expandedUser, setExpandedUser] = useState<string | null>(null);
-  const [kebabOpen, setKebabOpen] = useState<{ id: string; x: number; y: number } | null>(null);
+  const [kebabOpen, setKebabOpen] = useState<{ id: string; el: HTMLElement } | null>(null);
+  const [, setKebabTick] = useState(0);
+  useEffect(() => {
+    if (!kebabOpen) return;
+    const track = () => setKebabTick(t => t + 1);
+    window.addEventListener('scroll', track, true);
+    window.addEventListener('resize', track);
+    return () => {
+      window.removeEventListener('scroll', track, true);
+      window.removeEventListener('resize', track);
+    };
+  }, [kebabOpen]);
   const [userDetails, setUserDetails] = useState<Record<string, UserDetail>>({});
   const [loadingDetail, setLoadingDetail] = useState<string | null>(null);
   const [stripeDetails, setStripeDetails] = useState<Record<string, StripeDetail | { error: string }>>({});
@@ -1519,8 +1530,7 @@ function UsersTab({ isFullAdmin }: { isFullAdmin: boolean }) {
                         aria-label="Akcie"
                         onClick={(e) => {
                           if (kebabOpen?.id === user.id) { setKebabOpen(null); return; }
-                          const r = (e.currentTarget as HTMLButtonElement).getBoundingClientRect();
-                          setKebabOpen({ id: user.id, x: r.right, y: r.bottom });
+                          setKebabOpen({ id: user.id, el: e.currentTarget as HTMLElement });
                           if (isFullAdmin) loadProgramInfo(user.id);
                         }}
                         style={{ all: 'unset', cursor: 'pointer', width: 30, height: 30, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${_A.HAIR}`, color: _A.DEEP, fontSize: 15, letterSpacing: '1px', background: kebabOpen?.id === user.id ? _A.CREAM2 : 'transparent' }}
@@ -1545,12 +1555,15 @@ function UsersTab({ isFullAdmin }: { isFullAdmin: boolean }) {
                         const grants = userGrants[user.id] ?? [];
                         const roleNow = user.role === 'admin' ? 'admin' : user.role === 'support' ? 'support' : 'user';
                         const PROGS: [string, string][] = [['postpartum', 'Postpartum'], ['bodyforming', 'BodyForming'], ['elastic-bands', 'Elastické gumy'], ['strong-sexy', 'Strong & Sexy']];
-                        const menuH = 420;
-                        const top = Math.min(kebabOpen!.y + 4, Math.max(8, window.innerHeight - menuH));
+                        // Re-measured every render; the scroll listener
+                        // ticks state so the menu follows its button.
+                        const r = kebabOpen!.el.getBoundingClientRect();
+                        const menuH = Math.min(420, window.innerHeight - 16);
+                        const top = Math.max(8, Math.min(r.bottom + 4, window.innerHeight - menuH));
                         return (
                           <>
                           <div onClick={() => setKebabOpen(null)} style={{ position: 'fixed', inset: 0, zIndex: 1190 }} />
-                          <div style={{ position: 'fixed', left: Math.max(8, kebabOpen!.x - 230), top, background: '#fff', border: `1px solid ${_A.HAIR}`, borderRadius: 12, zIndex: 1200, minWidth: 230, maxHeight: 'calc(100vh - 16px)', overflowY: 'auto', boxShadow: '0 10px 30px rgba(31,35,40,0.18)', paddingBottom: 4 }}>
+                          <div style={{ position: 'fixed', left: Math.max(8, r.right - 230), top, background: '#fff', border: `1px solid ${_A.HAIR}`, borderRadius: 12, zIndex: 1200, minWidth: 230, maxHeight: menuH, overflowY: 'auto', boxShadow: '0 10px 30px rgba(31,35,40,0.18)', paddingBottom: 4 }}>
                             {item('✉ Napísať správu', () => {
                               try { sessionStorage.setItem('neome_admin_msg_user', user.id); } catch { /* ignore */ }
                               window.dispatchEvent(new CustomEvent('neome:admin-open-messages'));
