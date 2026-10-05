@@ -13,7 +13,7 @@
 // Body: { postId: string, status: 'visible' | 'removed' }
 
 import { createClient } from '@supabase/supabase-js';
-import { requireAdmin } from './_adminAuth';
+import { requireStaff } from './_adminAuth';
 import { auditLog } from './_auditLog';
 
 const CORS = {
@@ -40,7 +40,7 @@ export async function handler(event: any) {
   if (event.httpMethod !== 'POST') return jsonResponse({ error: 'Method not allowed' }, 405);
 
   try {
-    const auth = await requireAdmin(event.headers.authorization || event.headers.Authorization);
+    const auth = await requireStaff(event.headers.authorization || event.headers.Authorization);
     if (!auth.ok) return jsonResponse({ error: auth.error }, auth.status);
 
     const { postId, status } = JSON.parse(event.body || '{}') as {

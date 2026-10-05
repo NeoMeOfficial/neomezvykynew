@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { requireAdmin } from './_adminAuth';
+import { requireStaff } from './_adminAuth';
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
@@ -17,7 +17,7 @@ export async function handler(event: any) {
   if (event.httpMethod !== 'GET') return { statusCode: 405, headers: CORS, body: JSON.stringify({ error: 'Method not allowed' }) };
 
   // Admin-only: every caller must present a valid admin JWT.
-  const auth = await requireAdmin(event.headers?.authorization ?? event.headers?.Authorization);
+  const auth = await requireStaff(event.headers?.authorization ?? event.headers?.Authorization);
   if (!auth.ok) {
     return { statusCode: auth.status, headers: CORS, body: JSON.stringify({ error: auth.error }) };
   }

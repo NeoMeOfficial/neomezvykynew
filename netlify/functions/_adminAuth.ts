@@ -25,10 +25,10 @@ function client() {
 }
 
 export type AdminAuthResult =
-  | { ok: true; userId: string; email: string | null }
+  | { ok: true; userId: string; email: string | null; role: 'admin' | 'support' }
   | { ok: false; status: 401 | 403; error: string };
 
-export async function requireAdmin(authHeader: string | undefined): Promise<AdminAuthResult> {
+async function resolveStaff(authHeader: string | undefined): Promise<AdminAuthResult> {
   if (!authHeader) return { ok: false, status: 401, error: 'Unauthorized' };
 
   const supabase = client();
@@ -37,21 +37,38 @@ export async function requireAdmin(authHeader: string | undefined): Promise<Admi
   );
   if (authErr || !user) return { ok: false, status: 401, error: 'Unauthorized' };
 
-  // Fast path: JWT already has the admin claim.
+  // Fast path: JWT already carries a staff claim.
   const jwtRole = (user.app_metadata as Record<string, unknown> | null)?.role;
-  if (jwtRole === 'admin') {
-    return { ok: true, userId: user.id, email: user.email ?? null };
+  if (jwtRole === 'admin' || jwtRole === 'support') {
+    return { ok: true, userId: user.id, email: user.email ?? null, role: jwtRole };
   }
 
-  // Slow path: query profiles.role.
+  // Slow path: profiles.role is canonical.
   const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
     .maybeSingle();
-  if (profile?.role === 'admin') {
-    return { ok: true, userId: user.id, email: user.email ?? null };
+  if (profile?.role === 'admin' || profile?.role === 'support') {
+    return { ok: true, userId: user.id, email: user.email ?? null, role: profile.role };
   }
 
   return { ok: false, status: 403, error: 'Forbidden' };
+}
+
+/**
+ * Full admin ONLY — the default for every existing endpoint, so all
+ * financial surfaces (metrics, affiliates, Stripe actions, tier and
+ * program grants, promo codes) exclude support without changes.
+ */
+export async function requireAdmin(authHeader: string | undefined): Promise<AdminAuthResult> {
+  const res = await resolveStaff(authHeader);
+  if (!res.ok) return res;
+  if (res.role !== 'admin') return { ok: false, status: 403, error: 'Forbidden' };
+  return res;
+}
+
+/** Admin OR support — opt-in for the non-financial surfaces. */
+export async function requireStaff(authHeader: string | undefined): Promise<AdminAuthResult> {
+  return resolveStaff(authHeader);
 }

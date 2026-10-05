@@ -892,7 +892,7 @@ function fmtCents(cents: number, currency: string): string {
   }
 }
 
-function UsersTab() {
+function UsersTab({ isFullAdmin }: { isFullAdmin: boolean }) {
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -1139,7 +1139,7 @@ function UsersTab() {
   // "Pridať používateľku" — invite (create + set-password email) with an
   // optional single-program grant in one step.
   const [inviteOpen, setInviteOpen] = useState(false);
-  const [inviteForm, setInviteForm] = useState({ email: '', name: '', programId: '' });
+  const [inviteForm, setInviteForm] = useState<{ email: string; name: string; programId: string; role?: string }>({ email: '', name: '', programId: '' });
   const [inviting, setInviting] = useState(false);
   const submitInvite = async () => {
     if (inviting) return;
@@ -1156,6 +1156,7 @@ function UsersTab() {
           email: inviteForm.email,
           name: inviteForm.name || undefined,
           programId: inviteForm.programId || undefined,
+          role: inviteForm.role || undefined,
         }),
       });
       const body = await res.json();
@@ -1218,12 +1219,15 @@ function UsersTab() {
     }
   };
 
-  const handleToggleAdmin = async (user: AdminUser) => {
-    const next: 'admin' | 'user' = user.role === 'admin' ? 'user' : 'admin';
-    const msg = next === 'admin'
-      ? `Povýšiť ${user.email} na admin? Bude mať prístup k celému admin panelu.`
-      : `Odobrať ${user.email} admin role?`;
-    if (!window.confirm(msg)) return;
+  const handleSetRole = async (user: AdminUser, next: string) => {
+    const current = user.role === 'admin' ? 'admin' : user.role === 'support' ? 'support' : 'user';
+    if (next === current) return;
+    const LABEL: Record<string, string> = {
+      admin: 'ADMIN — plný prístup vrátane financií',
+      support: 'SUPPORT — celý panel OKREM financií (tržby, affiliates, Stripe akcie, granty)',
+      user: 'bežná používateľka (bez admin panelu)',
+    };
+    if (!window.confirm(`Zmeniť rolu ${user.email} na ${LABEL[next]}?`)) return;
     setTogglingRole(user.id);
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -1237,16 +1241,17 @@ function UsersTab() {
       });
       const body = await res.json();
       if (!res.ok) throw new Error(body.error);
-      setUsers(prev => prev.map(u => (u.id === user.id ? { ...u, role: next } : u)));
-      if (next === 'admin') {
-        alert(`${user.email} je teraz admin. Dôležité: musí sa odhlásiť a znova prihlásiť, aby jej fungovali všetky admin akcie (nový token).`);
+      setUsers(prev => prev.map(u => (u.id === user.id ? { ...u, role: next === 'user' ? null : next } : u)));
+      if (next !== 'user') {
+        alert(`${user.email} je teraz ${next}. Dôležité: musí sa odhlásiť a znova prihlásiť, aby jej platil nový token.`);
       }
     } catch (err: any) {
-      alert('Chyba pri zmene admin role: ' + err.message);
+      alert('Chyba pri zmene role: ' + err.message);
     } finally {
       setTogglingRole(null);
     }
   };
+
   const handleToggleMealPlan = async (user: AdminUser) => {
     const next = !user.nutrition_plan_purchased;
     const confirmMsg = next
@@ -1411,6 +1416,7 @@ function UsersTab() {
               <input value={inviteForm.name} onChange={e => setInviteForm(fm => ({ ...fm, name: e.target.value }))} placeholder="Katka"
                 style={{ width: '100%', boxSizing: 'border-box', padding: '9px 12px', borderRadius: 10, border: `1px solid ${_A.HAIR2}`, fontFamily: 'DM Sans, system-ui', fontSize: 13 }} />
             </div>
+            {isFullAdmin && (
             <div>
               <label style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED, display: 'block', marginBottom: 5 }}>Prístup k programu (voliteľné)</label>
               <select value={inviteForm.programId} onChange={e => setInviteForm(fm => ({ ...fm, programId: e.target.value }))}
@@ -1422,6 +1428,18 @@ function UsersTab() {
                 <option value="strong-sexy">Strong & Sexy</option>
               </select>
             </div>
+            )}
+            {isFullAdmin && (
+            <div>
+              <label style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED, display: 'block', marginBottom: 5 }}>Rola (voliteľné)</label>
+              <select value={inviteForm.role ?? ''} onChange={e => setInviteForm(fm => ({ ...fm, role: e.target.value }))}
+                style={{ width: '100%', boxSizing: 'border-box', padding: '9px 12px', borderRadius: 10, border: `1px solid ${_A.HAIR2}`, fontFamily: 'DM Sans, system-ui', fontSize: 13, background: '#fff' }}>
+                <option value="">— používateľka —</option>
+                <option value="support">Support (admin bez financií)</option>
+                <option value="admin">Admin (plný prístup)</option>
+              </select>
+            </div>
+            )}
             <button onClick={submitInvite} disabled={inviting || !inviteForm.email} style={{ ...btnPrimary, opacity: inviting || !inviteForm.email ? 0.6 : 1, whiteSpace: 'nowrap' }}>
               {inviting ? 'Posielam…' : 'Poslať pozvánku'}
             </button>
@@ -1506,31 +1524,18 @@ function UsersTab() {
                     </button>
                     <span style={tierBadgeStyle(tier)}>{tierLabel(tier)}</span>
 
-                    {/* Admin role chip — click to promote / demote */}
-                    <button
-                      onClick={() => handleToggleAdmin(user)}
+                    {isFullAdmin && (<>
+                    <select
+                      value={user.role === 'admin' ? 'admin' : user.role === 'support' ? 'support' : 'user'}
                       disabled={togglingRole === user.id}
-                      title={user.role === 'admin' ? 'Odobrať admin role' : 'Povýšiť na admin'}
-                      style={{
-                        all: 'unset',
-                        cursor: togglingRole === user.id ? 'not-allowed' : 'pointer',
-                        padding: '4px 8px',
-                        borderRadius: 999,
-                        fontFamily: 'DM Sans, system-ui',
-                        fontSize: 10,
-                        fontWeight: 500,
-                        letterSpacing: '0.06em',
-                        textTransform: 'uppercase' as const,
-                        background: user.role === 'admin' ? _A.DEEP : 'transparent',
-                        color: user.role === 'admin' ? '#fff' : _A.MUTED,
-                        border: user.role === 'admin' ? `1px solid ${_A.DEEP}` : `1px solid ${_A.HAIR2}`,
-                        opacity: togglingRole === user.id ? 0.6 : 1,
-                      }}
+                      onChange={(e) => handleSetRole(user, e.target.value)}
+                      title="Rola v admin paneli"
+                      style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10.5, fontWeight: 500, padding: '3px 6px', borderRadius: 8, border: `1px solid ${_A.HAIR}`, background: user.role === 'admin' ? 'rgba(184,134,74,0.12)' : user.role === 'support' ? 'rgba(137,176,188,0.15)' : '#fff', color: _A.DEEP, cursor: 'pointer' }}
                     >
-                      {togglingRole === user.id ? '…' : (user.role === 'admin' ? 'Admin ✓' : '+ Admin')}
-                    </button>
-
-                    {/* Meal-plan add-on chip — click to toggle */}
+                      <option value="user">user</option>
+                      <option value="support">support</option>
+                      <option value="admin">admin</option>
+                    </select>
                     <button
                       onClick={() => handleToggleMealPlan(user)}
                       disabled={togglingMeal === user.id}
@@ -1555,6 +1560,7 @@ function UsersTab() {
                     </button>
 
                     {/* Single-program access (program_purchases) */}
+                    </>)}
                     <button
                       onClick={() => openProgramGrants(user.id)}
                       title="Prístup len k vybraným programom (bez predplatného)"
@@ -1643,6 +1649,7 @@ function UsersTab() {
                       Reset hesla
                     </button>
 
+                    {isFullAdmin && (<>
                     {/* Access picker */}
                     <div style={{ position: 'relative' }}>
                       <button
@@ -1698,6 +1705,7 @@ function UsersTab() {
                         <Trash2 style={{ width: 14, height: 14, color: _A.TERRA }} />
                       </button>
                     )}
+                    </>)}
                     <ChevronRight style={{ width: 14, height: 14, color: _A.TERTIARY, transform: isExpanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s' }} />
                   </div>
                 </div>
@@ -4091,6 +4099,17 @@ export default function AdminNew() {
     window.addEventListener('neome:admin-open-messages', open);
     return () => window.removeEventListener('neome:admin-open-messages', open);
   }, []);
+  const [myRole, setMyRole] = useState<string | null>(null);
+  useEffect(() => {
+    (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const jwtRole = (user.app_metadata as Record<string, unknown> | null)?.role;
+      if (jwtRole === 'admin' || jwtRole === 'support') { setMyRole(jwtRole as string); return; }
+      const { data } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle();
+      setMyRole(data?.role ?? null);
+    })();
+  }, []);
   const [analytics, setAnalytics] = useState<AdminAnalytics | null>(null);
   const [analyticsLoading, setAnalyticsLoading] = useState(true);
   const unreadMessagesCount = useUnreadAdminMessagesCount();
@@ -4127,7 +4146,7 @@ export default function AdminNew() {
       <nav style={{ padding: '14px 12px 8px', flex: 1, overflowY: 'auto' }}>
         <div style={{ paddingLeft: 8, paddingBottom: 10, fontFamily: 'DM Sans, system-ui', fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: A.EYEBROW, fontWeight: 500 }}>Hlavné</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-          {navigationItems.map((item) => {
+          {navigationItems.filter((item) => myRole === 'admin' || !['affiliates', 'referrers', 'promo-codes', 'partner-discounts'].includes(item.id)).map((item) => {
             const isActive = activeTab === item.id;
             const badge = badgeCounts[item.id] ?? 0;
             return (
@@ -4408,7 +4427,7 @@ export default function AdminNew() {
   const renderContent = () => {
     switch (activeTab) {
       case 'overview':
-        return (<><AdminTodo goTab={setActiveTab} /><BusinessMetrics />{renderOverview()}</>);
+        return (<><AdminTodo goTab={setActiveTab} />{myRole === 'admin' && <BusinessMetrics />}{renderOverview()}</>);
       case 'programs':
         return <ProgramsTab />;
       case 'exercises':
@@ -4422,7 +4441,7 @@ export default function AdminNew() {
       case 'messages':
         return renderMessages();
       case 'users':
-        return <UsersTab />;
+        return <UsersTab isFullAdmin={myRole === 'admin'} />;
       case 'blog':
         return <BlogPostsTab />;
       case 'partner-discounts':

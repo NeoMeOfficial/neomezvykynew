@@ -144,7 +144,7 @@ function RequireAdmin({ children }: { children: React.ReactNode }) {
     if (!user) { setChecking(false); return; }
     // Fast path: JWT app_metadata already says admin.
     const jwtRole = (user.app_metadata as Record<string, unknown> | null)?.role;
-    if (jwtRole === 'admin') {
+    if (jwtRole === 'admin' || jwtRole === 'support') {
       setAllowed(true);
       setChecking(false);
       return;
@@ -158,7 +158,7 @@ function RequireAdmin({ children }: { children: React.ReactNode }) {
       .maybeSingle()
       .then(({ data }) => {
         if (cancelled) return;
-        setAllowed(data?.role === 'admin');
+        setAllowed(data?.role === 'admin' || data?.role === 'support');
         setChecking(false);
       });
     return () => { cancelled = true; };

@@ -10,7 +10,7 @@
 // Body: { email: string, name?: string, programId?: string }
 
 import { createClient } from '@supabase/supabase-js';
-import { requireAdmin } from './_adminAuth';
+import { requireStaff } from './_adminAuth';
 import { auditLog } from './_auditLog';
 
 const supabase = createClient(
@@ -31,15 +31,17 @@ export async function handler(event: any) {
   if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers: CORS, body: '' };
   if (event.httpMethod !== 'POST') return { statusCode: 405, headers: CORS, body: JSON.stringify({ error: 'Method not allowed' }) };
 
-  const auth = await requireAdmin(event.headers?.authorization ?? event.headers?.Authorization);
+  const auth = await requireStaff(event.headers?.authorization ?? event.headers?.Authorization);
   if (!auth.ok) return { statusCode: auth.status, headers: CORS, body: JSON.stringify({ error: auth.error }) };
 
   let email = '';
+  let newRole = '';
   let name = '';
   let programId = '';
   try {
     const body = JSON.parse(event.body || '{}');
     email = String(body.email ?? '').trim().toLowerCase();
+    newRole = String(body.role ?? '').trim();
     name = String(body.name ?? '').trim();
     programId = String(body.programId ?? '').trim();
   } catch {
@@ -50,6 +52,13 @@ export async function handler(event: any) {
   }
   if (programId && !VALID_PROGRAMS.includes(programId)) {
     return { statusCode: 400, headers: CORS, body: JSON.stringify({ error: 'Neznámy program' }) };
+  }
+  // Grants and role assignment hand out value/power — full admin only.
+  if (auth.role !== 'admin' && (programId || newRole)) {
+    return { statusCode: 403, headers: CORS, body: JSON.stringify({ error: 'Program a rola sú len pre admin účty.' }) };
+  }
+  if (newRole && !['support', 'admin'].includes(newRole)) {
+    return { statusCode: 400, headers: CORS, body: JSON.stringify({ error: 'Rola musí byť support alebo admin.' }) };
   }
 
   // Invite = create + send the set-your-password email in one step.
@@ -67,6 +76,11 @@ export async function handler(event: any) {
   }
   const userId = data.user?.id;
 
+  if (userId && newRole) {
+    const { error: roleErr } = await supabase.from('profiles').update({ role: newRole }).eq('id', userId);
+    if (roleErr) console.warn('[admin-create-user] role set failed:', roleErr.message);
+  }
+
   let granted = false;
   if (userId && programId) {
     const { error: grantErr } = await supabase.from('program_purchases').upsert(
@@ -81,7 +95,7 @@ export async function handler(event: any) {
     actor: { userId: auth.userId, email: auth.email },
     action: 'user_invited',
     targetUserId: userId ?? null,
-    detail: { email, programId: programId || null, granted },
+    detail: { email, programId: programId || null, granted, role: newRole || null },
   }).catch(() => {});
 
   return {

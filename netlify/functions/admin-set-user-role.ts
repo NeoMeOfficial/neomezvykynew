@@ -6,7 +6,7 @@
 // migrated to read profiles.role directly — once that's done the
 // app_metadata update here becomes belt-and-braces.
 //
-// Body: { userId: string, role: 'admin' | 'user' }
+// Body: { userId: string, role: 'admin' | 'support' | 'user' }
 //
 // Auth: caller must be authenticated AND have profiles.role = 'admin'.
 // Self-demotion is blocked so you can't accidentally lock yourself out.
@@ -40,10 +40,10 @@ export async function handler(event: any) {
 
     const { userId, role } = JSON.parse(event.body || '{}') as { userId?: string; role?: string };
     if (!userId) return jsonResponse({ error: 'userId required' }, 400);
-    if (role !== 'admin' && role !== 'user') {
-      return jsonResponse({ error: 'role must be "admin" or "user"' }, 400);
+    if (role !== 'admin' && role !== 'support' && role !== 'user') {
+      return jsonResponse({ error: 'role must be "admin", "support" or "user"' }, 400);
     }
-    if (userId === auth.userId && role === 'user') {
+    if (userId === auth.userId && role !== 'admin') {
       return jsonResponse({ error: 'Nemôžeš sa sám odobrať z admin role.' }, 400);
     }
 
@@ -60,7 +60,7 @@ export async function handler(event: any) {
     const { data: targetUser } = await supabase.auth.admin.getUserById(userId);
     const existingMeta = (targetUser?.user?.app_metadata ?? {}) as Record<string, unknown>;
     const nextMeta: Record<string, unknown> = { ...existingMeta };
-    if (role === 'admin') nextMeta.role = 'admin';
+    if (role === 'admin' || role === 'support') nextMeta.role = role;
     else delete nextMeta.role;
 
     const { error: authErr } = await supabase.auth.admin.updateUserById(userId, {

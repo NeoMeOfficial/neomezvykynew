@@ -11,7 +11,7 @@
 // Requires RESEND_API_KEY in Netlify env (read-only key is fine).
 
 import { createClient } from '@supabase/supabase-js';
-import { requireAdmin } from './_adminAuth';
+import { requireStaff } from './_adminAuth';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -43,7 +43,7 @@ export async function handler(event: any) {
 
   try {
     // Admin auth
-    const auth = await requireAdmin(event.headers.authorization || event.headers.Authorization);
+    const auth = await requireStaff(event.headers.authorization || event.headers.Authorization);
     if (!auth.ok) return jsonResponse({ error: auth.error }, auth.status);
 
     const { userId } = JSON.parse(event.body || '{}') as { userId?: string };

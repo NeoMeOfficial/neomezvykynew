@@ -8,7 +8,7 @@
 // confirmed their email, fresh cancellations (churn outreach), and
 // refund-reversed commissions (clawback check).
 
-import { requireAdmin } from './_adminAuth';
+import { requireStaff } from './_adminAuth';
 import { serviceClient } from './_userAuth';
 
 const CORS = {
@@ -27,7 +27,7 @@ export async function handler(event: any) {
   if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers: CORS, body: '' };
   if (event.httpMethod !== 'GET') return json(405, { error: 'Method not allowed' });
 
-  const auth = await requireAdmin(event.headers?.authorization ?? event.headers?.Authorization);
+  const auth = await requireStaff(event.headers?.authorization ?? event.headers?.Authorization);
   if (!auth.ok) return json(auth.status, { error: auth.error });
 
   const supabase = serviceClient();
@@ -139,15 +139,18 @@ export async function handler(event: any) {
     })),
   );
 
+  // Support sees no money: payouts, approval-to-money, declined
+  // payments, cancellations and clawbacks are admin-only rows.
+  const isAdmin = auth.role === 'admin';
   return json(200, {
-    payouts: payoutItems,
-    ripe_candidates: ripe,
+    payouts: isAdmin ? payoutItems : [],
+    ripe_candidates: isAdmin ? ripe : [],
     unread_messages: messages,
     reported_content: reports,
     new_posts: (newPosts ?? []).length,
-    declined_payments: declined,
+    declined_payments: isAdmin ? declined : [],
     unconfirmed_signups: unconfirmed,
-    cancellations,
-    reversals,
+    cancellations: isAdmin ? cancellations : [],
+    reversals: isAdmin ? reversals : [],
   });
 }
