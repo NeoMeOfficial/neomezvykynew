@@ -2069,7 +2069,7 @@ function BlogPostsTab() {
             <div>
               <label style={labelStyle}>Cover obrázok (JPEG, PNG, WebP)</label>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleImageUpload} disabled={uploadingImage} style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED }} />
+                <input type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif" onChange={handleImageUpload} disabled={uploadingImage} style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED }} />
                 {uploadingImage && <p style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED }}>Konvertujem a nahrávam…</p>}
                 {imageError && <p style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.TERRA }}>{imageError}</p>}
                 {form.cover_image && !uploadingImage && (
@@ -3131,6 +3131,7 @@ interface ExerciseRow {
   level: number | null; diastasis_safe: boolean; thumb: string;
   description: string; video_url: string;
   status: 'draft' | 'published' | 'archived'; active: boolean;
+  updated_at?: string; created_at?: string;
 }
 
 function ExercisesTab() {
@@ -3141,9 +3142,10 @@ function ExercisesTab() {
   const [saving, setSaving] = useState(false);
   const [seeding, setSeeding] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [form, setForm] = useState<Partial<ExerciseRow>>({ content_type: 'exercise', duration: '15 min', status: 'draft', diastasis_safe: true });
+  const [form, setForm] = useState<Partial<ExerciseRow>>({ content_type: 'exercise', duration: '15 min', status: 'published', diastasis_safe: true });
   const [uploadingThumb, setUploadingThumb] = useState(false);
   const [thumbError, setThumbError] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<'updated' | 'name'>('updated');
   const thumbInputRef = useRef<HTMLInputElement>(null);
 
   const load = async () => {
@@ -3153,7 +3155,7 @@ function ExercisesTab() {
   };
   useEffect(() => { load(); }, []);
 
-  const openAdd = () => { setForm({ content_type: 'exercise', duration: '15 min', status: 'draft', diastasis_safe: true }); setEditId(null); setShowForm(true); setError(null); };
+  const openAdd = () => { setForm({ content_type: 'exercise', duration: '15 min', status: 'published', diastasis_safe: true }); setEditId(null); setShowForm(true); setError(null); };
   const openEdit = (r: ExerciseRow) => { setForm({ ...r }); setEditId(r.id); setShowForm(true); setError(null); };
   const closeForm = () => { setShowForm(false); setEditId(null); setError(null); };
 
@@ -3244,8 +3246,12 @@ function ExercisesTab() {
     setSeeding(false);
   };
 
-  const exercises = items.filter(i => i.content_type === 'exercise');
-  const stretches = items.filter(i => i.content_type === 'stretch');
+  const bySort = (a: ExerciseRow, b: ExerciseRow) =>
+    sortBy === 'updated'
+      ? (b.updated_at ?? b.created_at ?? '').localeCompare(a.updated_at ?? a.created_at ?? '')
+      : a.name.localeCompare(b.name, 'sk');
+  const exercises = items.filter(i => i.content_type === 'exercise').sort(bySort);
+  const stretches = items.filter(i => i.content_type === 'stretch').sort(bySort);
 
   const exStatusBadge = (status: string) => {
     const map: Record<string, { bg: string; col: string; label: string }> = {
@@ -3260,7 +3266,11 @@ function ExercisesTab() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div />
+        <select value={sortBy} onChange={e => setSortBy(e.target.value as 'updated' | 'name')}
+          style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, padding: '6px 10px', borderRadius: 10, border: `1px solid ${_A.HAIR}`, background: '#fff', color: _A.DEEP, cursor: 'pointer' }}>
+          <option value="updated">Zoradiť: naposledy upravené</option>
+          <option value="name">Zoradiť: podľa názvu</option>
+        </select>
         <div style={{ display: 'flex', gap: 10 }}>
           <button onClick={seedFromStatic} disabled={seeding} style={btnSecondary}>
             {seeding ? 'Importujem…' : `Import katalógu (${TeloExtraStaticData.length + TeloStrecingStaticData.length})`}
@@ -3349,7 +3359,7 @@ function ExercisesTab() {
                 </button>
                 {thumbError && <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.TERRA }}>{thumbError}</span>}
               </div>
-              <input ref={thumbInputRef} type="file" accept="image/jpeg,image/png,image/webp" style={{ display: 'none' }} onChange={handleThumbUpload} />
+              <input ref={thumbInputRef} type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif" style={{ display: 'none' }} onChange={handleThumbUpload} />
             </div>
             <div style={{ gridColumn: '1 / -1' }}>
               <label style={labelStyle}>Video URL (Vimeo alebo YouTube)</label>
@@ -3895,7 +3905,7 @@ function ProgramsTab() {
                   style={{ ...btnSecondary, opacity: uploadingCover ? 0.5 : 1 }}>
                   {uploadingCover ? 'Nahrávam…' : editing.image ? 'Zmeniť obrázok' : 'Nahrať obrázok'}
                 </button>
-                <input ref={coverInputRef} type="file" accept="image/jpeg,image/png,image/webp" style={{ display: 'none' }} onChange={handleCoverUpload} />
+                <input ref={coverInputRef} type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif" style={{ display: 'none' }} onChange={handleCoverUpload} />
               </div>
               {coverError && <p style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.TERRA, marginTop: 4 }}>{coverError}</p>}
             </div>

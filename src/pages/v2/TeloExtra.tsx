@@ -205,6 +205,7 @@ export default function TeloExtra() {
                 titleParts={p.titleParts}
                 meta={`${p.e.duration_min} min · ${EQUIP_SHORT[p.equip]}`}
                 diastasisSafe={p.e.diastasis_safe}
+                isNew={p.e.is_new}
                 locked={!p.isFree && !isPremium}
                 onOpen={() => openExercise(p)}
                 divider={i < arr.length - 1}

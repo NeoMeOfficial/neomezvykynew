@@ -7,6 +7,7 @@ interface Props {
   meta: string;
   diastasisSafe?: boolean;
   locked: boolean;
+  isNew?: boolean;
   onOpen: () => void;
   divider?: boolean;
 }
@@ -15,7 +16,7 @@ interface Props {
  * Row card for one exercise/stretch — shared by the Telo listings and
  * Obľúbené so a favourited cvičenie looks exactly like it does in its section.
  */
-export function ExerciseListRow({ thumbUrl, title, titleParts, meta, diastasisSafe, locked, onOpen, divider }: Props) {
+export function ExerciseListRow({ thumbUrl, title, titleParts, meta, diastasisSafe, locked, isNew, onOpen, divider }: Props) {
   return (
     <button
       onClick={onOpen}
@@ -57,6 +58,9 @@ export function ExerciseListRow({ thumbUrl, title, titleParts, meta, diastasisSa
           {titleParts
             ? <>{titleParts.before}{' '}<strong style={{ color: '#B8864A', fontWeight: 700, fontSize: 16 }}>{titleParts.em}</strong><span style={{ fontFamily: NM.SANS, fontSize: 12, fontWeight: 600, color: '#B8864A', marginLeft: 3 }}>{titleParts.num}</span></>
             : title}
+          {isNew && (
+            <span style={{ fontFamily: NM.SANS, fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#fff', background: '#B8864A', borderRadius: 999, padding: '2px 7px', marginLeft: 7, verticalAlign: 2 }}>Nové</span>
+          )}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginTop: 3 }}>
           <span style={{ fontFamily: NM.SANS, fontSize: 10.5, color: NM.EYEBROW, fontWeight: 400 }}>

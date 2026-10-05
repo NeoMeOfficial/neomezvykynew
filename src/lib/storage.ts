@@ -54,9 +54,19 @@ export async function uploadContentImage(
   file: File,
   prefix: ContentImagePrefix,
 ): Promise<UploadResult> {
+  // iPhone photos arrive as HEIC — convert to JPEG first so the admin
+  // can upload straight from the camera roll (Sam 2026-10-05).
+  const isHeic =
+    file.type === 'image/heic' || file.type === 'image/heif' ||
+    /\.heic$|\.heif$/i.test(file.name);
+  if (isHeic) {
+    const { default: heic2any } = await import('heic2any');
+    const jpeg = (await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.9 })) as Blob;
+    file = new File([jpeg], file.name.replace(/\.(heic|heif)$/i, '.jpg'), { type: 'image/jpeg' });
+  }
   if (!ALLOWED_INPUT_TYPES.includes(file.type as typeof ALLOWED_INPUT_TYPES[number])) {
     throw new ImageUploadError(
-      'Use JPEG, PNG, or WebP. (HEIC, SVG, GIF, BMP are not supported.)',
+      'Use JPEG, PNG, WebP or iPhone HEIC. (SVG, GIF, BMP are not supported.)',
       'invalid_type',
     );
   }

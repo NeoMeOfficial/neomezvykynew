@@ -74,6 +74,7 @@ function adapt(row: RawExercise, index: number): DbStretch {
   return {
     id: row.id,
     name: row.name,
+    is_new: !!(row as { created_at?: string | null }).created_at && Date.now() - new Date((row as { created_at?: string | null }).created_at!).getTime() < 14 * 24 * 3600 * 1000,
     duration_min: dur,
     body_target: row.body ?? 'Celé telo',
     equipment: row.equip ?? 'Bez pomôcok',
@@ -132,7 +133,7 @@ export function useStretches() {
     }
     supabase
       .from('exercises')
-      .select('id, content_type, name, duration, category, body, equip, level, thumb, description, video_url, active')
+      .select('id, content_type, name, duration, category, body, equip, level, thumb, description, video_url, active, created_at')
       .eq('content_type', 'stretch')
       .eq('active', true)
       // Creation order keeps series numbering stable — see exerciseTaxonomy.ts.
