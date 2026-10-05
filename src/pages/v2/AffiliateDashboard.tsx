@@ -18,7 +18,7 @@ interface DashData {
   code: string | null;
   commission_pct: number;
   status: string;
-  referrals: { label: string; joined: string; earned_cents: number }[];
+  referrals: { label: string; joined: string; earned_cents: number; paying?: boolean }[];
   totals: { pending: number; available: number; requested: number; paid: number };
   payouts: { id: string; amount_cents: number; status: string; requested_at: string; processed_at: string | null }[];
 }
@@ -288,9 +288,14 @@ export default function AffiliateDashboard() {
           </div>
         ) : (
           data.referrals.map((r, i) => (
-            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderTop: i > 0 ? `1px solid ${NM.HAIR}` : 'none', fontSize: 13.5, color: NM.MUTED }}>
-              <span>{r.label} · od {fmtDate(r.joined)}</span>
-              <span style={{ color: NM.DEEP, fontVariantNumeric: 'tabular-nums' }}>{eur(r.earned_cents)}</span>
+            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, padding: '8px 0', borderTop: i > 0 ? `1px solid ${NM.HAIR}` : 'none', fontSize: 13.5, color: NM.MUTED }}>
+              <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.label} · od {fmtDate(r.joined)}</span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+                <span style={{ fontSize: 10.5, fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase', borderRadius: 999, padding: '3px 9px', color: r.paying ? '#5E7A5C' : NM.TERTIARY, background: r.paying ? 'rgba(139,158,136,0.16)' : 'rgba(61,41,33,0.05)' }}>
+                  {r.paying ? 'Platí' : 'Zatiaľ neplatí'}
+                </span>
+                {r.earned_cents > 0 && <span style={{ color: NM.DEEP, fontVariantNumeric: 'tabular-nums' }}>{eur(r.earned_cents)}</span>}
+              </span>
             </div>
           ))
         )}

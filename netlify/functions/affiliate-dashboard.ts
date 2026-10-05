@@ -75,14 +75,39 @@ export async function handler(event: any) {
     else available += e.amount_cents;
   }
 
+  // "Platí" must not depend on WHEN the referral first paid: payments
+  // during the referrer's candidacy earn +150 points, not commission,
+  // so earnings rows alone under-report (Sam 2026-10-05). Union of:
+  // live subscription state, candidacy-era point refs, commission rows.
+  const referredIds = (referrals ?? []).map((r) => r.referred_user_id);
+  const [subsRes, ptsRes] = await Promise.all([
+    referredIds.length
+      ? supabase.from('subscriptions').select('user_id, active').in('user_id', referredIds)
+      : Promise.resolve({ data: [] as { user_id: string; active: boolean }[] }),
+    supabase
+      .from('points_ledger')
+      .select('ref_id')
+      .eq('event_type', 'referral_paid')
+      .eq('user_id', auth.userId),
+  ]);
+  const activeSubs = new Set((subsRes.data ?? []).filter((s) => s.active).map((s) => s.user_id));
+  const pointsPaid = new Set(
+    (ptsRes.data ?? []).map((p) => String(p.ref_id ?? '').replace('referral_', '')),
+  );
+
   // Masked emails for the referred users (service role; batched).
   const userRows = await Promise.all(
     (referrals ?? []).slice(0, 100).map(async (r) => {
       const { data } = await supabase.auth.admin.getUserById(r.referred_user_id);
+      const earned = perUser.get(r.referred_user_id) ?? 0;
       return {
         label: maskEmail(data?.user?.email),
         joined: r.created_at,
-        earned_cents: perUser.get(r.referred_user_id) ?? 0,
+        earned_cents: earned,
+        paying:
+          activeSubs.has(r.referred_user_id) ||
+          pointsPaid.has(r.referred_user_id) ||
+          earned > 0,
       };
     }),
   );
