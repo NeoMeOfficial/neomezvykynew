@@ -74,6 +74,18 @@ export async function handler(event: any) {
         await handleAffiliateCommission(invoice);
         break;
       }
+      case 'charge.refunded':
+      case 'charge.dispute.created': {
+        // Refunded/disputed money must not pay commission — reverse the
+        // matching earning while it's still inside the 30-day maturity
+        // window (audit 2026-10-05).
+        const obj = stripeEvent.data.object as any;
+        const charge: Stripe.Charge = stripeEvent.type === 'charge.refunded'
+          ? obj
+          : await stripe.charges.retrieve(obj.charge as string);
+        await reverseAffiliateCommission(charge);
+        break;
+      }
       case 'invoice.payment_failed': {
         // Subscription renewal payment failed — user's card was declined
         // or has insufficient funds. Logged so the UI can surface a
@@ -319,6 +331,50 @@ async function accrueAffiliateCommission(
     console.error('Affiliate commission accrual failed:', error);
   } else {
     console.log(`Affiliate commission ${commission}c accrued to ${attribution.affiliate_user_id} (${source} ${stripeRef})`);
+  }
+}
+
+// Flip the earning tied to a refunded/disputed payment to 'reversed'.
+// stripe_ref is the invoice id (subscriptions) or the checkout session
+// id (one-time) — resolve both from the charge. Already-paid earnings
+// are left alone but logged loudly so Gabi can claw back manually.
+async function reverseAffiliateCommission(charge: Stripe.Charge) {
+  const refs: string[] = [];
+  if (typeof charge.invoice === 'string') refs.push(charge.invoice);
+  if (typeof charge.payment_intent === 'string') {
+    try {
+      const sessions = await stripe.checkout.sessions.list({
+        payment_intent: charge.payment_intent,
+        limit: 1,
+      });
+      if (sessions.data[0]?.id) refs.push(sessions.data[0].id);
+    } catch (err) {
+      console.error('Refund reversal: session lookup failed:', err);
+    }
+  }
+  if (refs.length === 0) return;
+
+  const { data: reversed, error } = await supabase
+    .from('affiliate_earnings')
+    .update({ status: 'reversed' })
+    .in('stripe_ref', refs)
+    .eq('status', 'accrued')
+    .select('id, affiliate_user_id, amount_cents');
+  if (error) {
+    console.error('Refund reversal failed:', error);
+    return;
+  }
+  if (reversed && reversed.length > 0) {
+    console.log(`Reversed ${reversed.length} affiliate earning(s) for refunded charge ${charge.id}`);
+  } else {
+    const { data: paid } = await supabase
+      .from('affiliate_earnings')
+      .select('id, affiliate_user_id, amount_cents, status')
+      .in('stripe_ref', refs)
+      .neq('status', 'accrued');
+    if (paid && paid.length > 0) {
+      console.error(`ATTENTION: refund on charge ${charge.id} but earning already ${paid[0].status} — manual clawback needed:`, JSON.stringify(paid));
+    }
   }
 }
 

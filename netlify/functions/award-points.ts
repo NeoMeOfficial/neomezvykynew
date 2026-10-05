@@ -33,6 +33,10 @@ const CORS = {
 interface Rule {
   points: number;
   refType: string;
+  // One-time milestones (program completion) don't count against the
+  // daily activity cap — a 50-point award under a 40-point cap would
+  // otherwise be unreachable (audit 2026-10-05).
+  exemptFromDailyCap?: boolean;
   // Server builds ref_id itself — the ref is the dedupe key, so the
   // client only contributes an entity id, never the full key.
   buildRef: (refId: string | undefined, day: string) => string | null;
@@ -50,7 +54,7 @@ const RULES: Record<string, Rule> = {
   // by deleting exactly that ref when a post is removed.
   post_published:       { points: 5,  refType: 'community',  buildRef: (r) => (r ? `post_${r}` : null), dailyLimit: 1 },
   community_like:       { points: 1,  refType: 'community',  buildRef: (r) => (r ? `like_${r}` : null), dailyLimit: 5 },
-  program_completed:    { points: 50, refType: 'program',    buildRef: (r) => r ?? null },
+  program_completed:    { points: 50, refType: 'program',    buildRef: (r) => r ?? null, exemptFromDailyCap: true },
 };
 
 const DAILY_CAP = 40;
@@ -58,6 +62,17 @@ const DAILY_CAP = 40;
 /** YYYY-MM-DD in the app's home timezone — the user-visible "day". */
 function skToday(): string {
   return new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Bratislava' });
+}
+
+/** Start of the Bratislava day as an ISO instant (DST-correct). */
+function skDayStartISO(day: string): string {
+  const offset = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Europe/Bratislava',
+    timeZoneName: 'longOffset',
+  })
+    .formatToParts(new Date())
+    .find((p) => p.type === 'timeZoneName')?.value?.replace('GMT', '') || '+01:00';
+  return `${day}T00:00:00${offset}`;
 }
 
 function json(status: number, body: unknown) {
@@ -109,10 +124,10 @@ export async function handler(event: any) {
       .select('event_type, points')
       .eq('user_id', userId)
       .in('event_type', Object.keys(RULES))
-      .gte('created_at', `${day}T00:00:00+02:00`);
+      .gte('created_at', skDayStartISO(day));
 
     const earnedToday = (todayRows ?? []).reduce((s, r) => s + Math.max(0, r.points), 0);
-    if (earnedToday + rule.points > DAILY_CAP) {
+    if (!rule.exemptFromDailyCap && earnedToday + rule.points > DAILY_CAP) {
       return json(200, { awarded: 0, reason: 'daily_cap' });
     }
     if (rule.dailyLimit) {
