@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
 /**
  * Install PWA prompt — fires Chromium's beforeinstallprompt + offers
@@ -44,6 +45,7 @@ function isIOSSafari(): boolean {
 }
 
 export default function InstallPrompt() {
+  const location = useLocation();
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showIosHint, setShowIosHint] = useState(false);
   const [consentBlocking, setConsentBlocking] = useState(false);
@@ -100,6 +102,22 @@ export default function InstallPrompt() {
 
   if (!deferredPrompt && !showIosHint) return null;
   if (consentBlocking) return null;
+
+  // Install belongs to the onboarding tour first (Sam 2026-10-05): the
+  // banner stays silent until the tour is done — so registration and a
+  // user's very first session never see it — and never shows on
+  // auth/admin surfaces. After the tour it may return as a gentle
+  // reminder (14-day dismiss window) for anyone who skipped the step.
+  const path = location.pathname;
+  if (path.startsWith('/auth') || path.startsWith('/register') || path.startsWith('/login')
+    || path.startsWith('/reset-password') || path.startsWith('/admin') || path === '/') {
+    return null;
+  }
+  try {
+    const tour = JSON.parse(localStorage.getItem('neome_tour_v2') ?? 'null');
+    const legacy = localStorage.getItem('neome_tour_done_v1');
+    if (!tour?.core && !legacy) return null;
+  } catch { /* unreadable state — show as before */ }
 
   const isIOS = !deferredPrompt && showIosHint;
 
