@@ -904,6 +904,7 @@ function UsersTab({ isFullAdmin }: { isFullAdmin: boolean }) {
   const [settingTier, setSettingTier] = useState<string | null>(null);
   const [tierMenuOpen, setTierMenuOpen] = useState<string | null>(null);
   const [expandedUser, setExpandedUser] = useState<string | null>(null);
+  const [kebabOpen, setKebabOpen] = useState<string | null>(null);
   const [userDetails, setUserDetails] = useState<Record<string, UserDetail>>({});
   const [loadingDetail, setLoadingDetail] = useState<string | null>(null);
   const [stripeDetails, setStripeDetails] = useState<Record<string, StripeDetail | { error: string }>>({});
@@ -1052,6 +1053,7 @@ function UsersTab({ isFullAdmin }: { isFullAdmin: boolean }) {
     } else {
       setExpandedUser(userId);
       fetchUserDetail(userId);
+      loadProgramInfo(userId);
       const u = users.find(x => x.id === userId);
       if (u) {
         fetchStripeDetail(u);
@@ -1175,9 +1177,7 @@ function UsersTab({ isFullAdmin }: { isFullAdmin: boolean }) {
     ['postpartum', 'Postpartum'], ['bodyforming', 'BodyForming'],
     ['elastic-bands', 'El. gumy'], ['strong-sexy', 'Strong&Sexy'],
   ];
-  const openProgramGrants = async (userId: string) => {
-    if (programsOpenFor === userId) { setProgramsOpenFor(null); return; }
-    setProgramsOpenFor(userId);
+  const loadProgramInfo = async (userId: string) => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       const res = await fetch(`/.netlify/functions/admin-set-program-access?userId=${encodeURIComponent(userId)}`, {
@@ -1189,7 +1189,7 @@ function UsersTab({ isFullAdmin }: { isFullAdmin: boolean }) {
         setUserActiveProgram(prev => ({ ...prev, [userId]: body.active ?? null }));
         setUserProgramHistory(prev => ({ ...prev, [userId]: body.history ?? [] }));
       }
-    } catch { /* chips just show unknown state */ }
+    } catch { /* blocks just show unknown state */ }
   };
   const toggleProgramGrant = async (userId: string, programId: string) => {
     const grant = !(userGrants[userId] ?? []).includes(programId);
@@ -1509,204 +1509,70 @@ function UsersTab({ isFullAdmin }: { isFullAdmin: boolean }) {
                     </div>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', rowGap: 6, justifyContent: 'flex-end', maxWidth: '100%' }} onClick={e => e.stopPropagation()}>
-                    <button
-                      onClick={() => {
-                        // Admin-initiated conversation (Sam 2026-10-05):
-                        // preselect the user in Messages even when she
-                        // never wrote first.
-                        try { sessionStorage.setItem('neome_admin_msg_user', user.id); } catch { /* ignore */ }
-                        window.dispatchEvent(new CustomEvent('neome:admin-open-messages'));
-                      }}
-                      title="Napísať správu ako Gabi"
-                      style={{ all: 'unset', cursor: 'pointer', padding: '4px 10px', borderRadius: 999, border: `1px solid ${_A.HAIR}`, fontFamily: 'DM Sans, system-ui', fontSize: 10.5, fontWeight: 500, color: _A.DEEP }}
-                    >
-                      ✉ Správa
-                    </button>
                     <span style={tierBadgeStyle(tier)}>{tierLabel(tier)}</span>
 
-                    {isFullAdmin && (<>
-                    <select
-                      value={user.role === 'admin' ? 'admin' : user.role === 'support' ? 'support' : 'user'}
-                      disabled={togglingRole === user.id}
-                      onChange={(e) => handleSetRole(user, e.target.value)}
-                      title="Rola v admin paneli"
-                      style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10.5, fontWeight: 500, padding: '3px 6px', borderRadius: 8, border: `1px solid ${_A.HAIR}`, background: user.role === 'admin' ? 'rgba(184,134,74,0.12)' : user.role === 'support' ? 'rgba(137,176,188,0.15)' : '#fff', color: _A.DEEP, cursor: 'pointer' }}
-                    >
-                      <option value="user">user</option>
-                      <option value="support">support</option>
-                      <option value="admin">admin</option>
-                    </select>
-                    <button
-                      onClick={() => handleToggleMealPlan(user)}
-                      disabled={togglingMeal === user.id}
-                      title={user.nutrition_plan_purchased ? 'Odobrať jedálniček' : 'Pridať jedálniček'}
-                      style={{
-                        all: 'unset',
-                        cursor: togglingMeal === user.id ? 'not-allowed' : 'pointer',
-                        padding: '4px 8px',
-                        borderRadius: 999,
-                        fontFamily: 'DM Sans, system-ui',
-                        fontSize: 10,
-                        fontWeight: 500,
-                        letterSpacing: '0.06em',
-                        textTransform: 'uppercase' as const,
-                        background: user.nutrition_plan_purchased ? _A.GOLD : 'transparent',
-                        color: user.nutrition_plan_purchased ? '#fff' : _A.MUTED,
-                        border: user.nutrition_plan_purchased ? `1px solid ${_A.GOLD}` : `1px solid ${_A.HAIR2}`,
-                        opacity: togglingMeal === user.id ? 0.6 : 1,
-                      }}
-                    >
-                      {togglingMeal === user.id ? '…' : (user.nutrition_plan_purchased ? 'Jedálniček ✓' : '+ Jedálniček')}
-                    </button>
-
-                    {/* Single-program access (program_purchases) */}
-                    </>)}
-                    <button
-                      onClick={() => openProgramGrants(user.id)}
-                      title="Prístup len k vybraným programom (bez predplatného)"
-                      style={{ ...btnSecondary, padding: '6px 10px', fontSize: 11 }}
-                    >
-                      Programy{(userGrants[user.id]?.length ?? 0) > 0 ? ` ✓${userGrants[user.id].length}` : ''}
-                    </button>
-                    {programsOpenFor === user.id && PROGRAM_OPTIONS.map(([pid, plabel]) => {
-                      const has = (userGrants[user.id] ?? []).includes(pid);
-                      const busy = togglingProgram === `${user.id}:${pid}`;
-                      return (
-                        <button
-                          key={pid}
-                          onClick={() => toggleProgramGrant(user.id, pid)}
-                          disabled={busy}
-                          style={{
-                            all: 'unset', cursor: 'pointer', padding: '4px 8px', borderRadius: 999,
-                            fontFamily: 'DM Sans, system-ui', fontSize: 10, fontWeight: 500,
-                            letterSpacing: '0.04em',
-                            background: has ? _A.TERRA : 'transparent',
-                            color: has ? '#fff' : _A.MUTED,
-                            border: has ? `1px solid ${_A.TERRA}` : `1px solid ${_A.HAIR2}`,
-                            opacity: busy ? 0.5 : 1,
-                          }}
-                        >
-                          {busy ? '…' : `${has ? '✓ ' : ''}${plabel}`}
-                        </button>
-                      );
-                    })}
-                    {programsOpenFor === user.id && (() => {
-                      const act = userActiveProgram[user.id];
-                      const WEEKS: Record<string, number> = { postpartum: 8, bodyforming: 6, 'elastic-bands': 6, 'strong-sexy': 6 };
-                      const NAMES: Record<string, string> = { postpartum: 'Postpartum', bodyforming: 'BodyForming', 'elastic-bands': 'Elastické gumy', 'strong-sexy': 'Strong & Sexy' };
-                      let line: string;
-                      if (!act) {
-                        line = (userGrants[user.id]?.length ?? 0) > 0
-                          ? 'Žiadny program zatiaľ nespustila — vyberie si štartový pondelok v appke.'
-                          : 'Žiadny aktívny program.';
-                      } else {
-                        const total = WEEKS[act.program_id] ?? 8;
-                        const start = new Date(act.start_date + 'T00:00:00');
-                        const today = new Date(); today.setHours(0, 0, 0, 0);
-                        const daysSince = Math.round((today.getTime() - start.getTime()) / 86400000);
-                        const name = NAMES[act.program_id] ?? act.program_id;
-                        const startLabel = start.toLocaleDateString('sk-SK');
-                        if (daysSince < 0) {
-                          line = `${name}: štartuje v pondelok ${startLabel}.`;
-                        } else {
-                          const week = Math.floor(daysSince / 7) + 1;
-                          if (week > total) line = `${name}: po termíne — štart ${startLabel}, ${total} týž. uplynulo (dokončenie si zatiaľ neevidujeme).`;
-                          else line = `${name}: beží — štart ${startLabel} · týž. ${week} z ${total} · deň ${daysSince + 1}.`;
-                        }
-                      }
-                      const hist = userProgramHistory[user.id] ?? [];
-                      const STATUS_SK: Record<string, string> = { completed: 'dokončený', paused: 'pozastavený', canceled: 'zrušený', replaced: 'nahradený iným' };
-                      return (
-                        <span style={{ flexBasis: '100%', fontFamily: 'DM Sans, system-ui', fontSize: 11.5, color: _A.MUTED, paddingTop: 2, display: 'block' }}>
-                          {line}
-                          {hist.length > 0 && (
-                            <span style={{ display: 'block', marginTop: 4 }}>
-                              História: {hist.map(h =>
-                                `${NAMES[h.program_id] ?? h.program_id} ${STATUS_SK[h.status] ?? h.status} ${new Date(h.ended_at).toLocaleDateString('sk-SK')}${h.weeks_reached ? ` (týž. ${h.weeks_reached})` : ''}`
-                              ).join(' · ')}
-                            </span>
-                          )}
-                        </span>
-                      );
-                    })()}
-
-                    {/* Auth helpers — generate magic link or password
-                        reset link the admin can copy and forward. */}
-                    <button
-                      onClick={() => runAuthAction(user, 'magiclink')}
-                      disabled={authActionBusy === user.id}
-                      title="Vygenerovať jednorazový magic link na prihlásenie"
-                      style={{ ...btnSecondary, padding: '6px 10px', fontSize: 11, opacity: authActionBusy === user.id ? 0.5 : 1 }}
-                    >
-                      {authActionBusy === user.id ? '…' : 'Magic link'}
-                    </button>
-                    <button
-                      onClick={() => runAuthAction(user, 'recovery')}
-                      disabled={authActionBusy === user.id}
-                      title="Vygenerovať odkaz na reset hesla"
-                      style={{ ...btnSecondary, padding: '6px 10px', fontSize: 11, opacity: authActionBusy === user.id ? 0.5 : 1 }}
-                    >
-                      Reset hesla
-                    </button>
-
-                    {isFullAdmin && (<>
-                    {/* Access picker */}
+                    {/* Kebab — every per-user action lives here (Sam
+                        2026-10-05: rows show only what's necessary). */}
                     <div style={{ position: 'relative' }}>
                       <button
-                        onClick={() => setTierMenuOpen(menuOpen ? null : user.id)}
-                        disabled={isSettingThis}
-                        style={{ ...btnSecondary, padding: '6px 10px', fontSize: 11, display: 'flex', alignItems: 'center', gap: 5, opacity: isSettingThis ? 0.5 : 1 }}
-                      >
-                        {isSettingThis ? <RefreshCw style={{ width: 11, height: 11 }} /> : <Edit3 style={{ width: 11, height: 11 }} />}
-                        Prístup
-                      </button>
-                      {menuOpen && (
-                        <div style={{ position: 'absolute', right: 0, top: '100%', marginTop: 4, background: _A.CARD, border: `1px solid ${_A.HAIR}`, borderRadius: 10, zIndex: 100, minWidth: 160, boxShadow: '0 4px 20px rgba(61,41,33,0.10)', overflow: 'hidden' }}>
-                          {[
-                            { value: 'free',           label: 'Free',    color: _A.MUTED },
-                            { value: 'neome_plus',      label: 'Premium', color: _A.SAGE },
-                            { value: 'program_bundle',  label: 'Bundle',  color: _A.GOLD },
-                          ].map(opt => (
-                            <button
-                              key={opt.value}
-                              onClick={() => handleSetTier(user.id, opt.value)}
-                              style={{ all: 'unset', display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '10px 14px', cursor: 'pointer', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.DEEP, background: tier === opt.value ? _A.CREAM2 : 'transparent', boxSizing: 'border-box' }}
-                              onMouseEnter={e => { if (tier !== opt.value) (e.currentTarget as HTMLButtonElement).style.background = _A.CREAM2; }}
-                              onMouseLeave={e => { if (tier !== opt.value) (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
-                            >
-                              <span style={{ width: 8, height: 8, borderRadius: 999, background: opt.color, display: 'inline-block', flexShrink: 0 }} />
-                              {opt.label}
-                              {tier === opt.value && <Check style={{ width: 12, height: 12, color: _A.SAGE, marginLeft: 'auto' }} />}
-                            </button>
-                          ))}
-                        </div>
-                      )}
+                        aria-label="Akcie"
+                        onClick={() => {
+                          const next = kebabOpen === user.id ? null : user.id;
+                          setKebabOpen(next);
+                          if (next && isFullAdmin) loadProgramInfo(user.id);
+                        }}
+                        style={{ all: 'unset', cursor: 'pointer', width: 30, height: 30, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${_A.HAIR}`, color: _A.DEEP, fontSize: 15, letterSpacing: '1px', background: kebabOpen === user.id ? _A.CREAM2 : 'transparent' }}
+                      >⋯</button>
+                      {kebabOpen === user.id && (() => {
+                        const item = (label: string, onClick: () => void, opts?: { danger?: boolean; active?: boolean; busy?: boolean }) => (
+                          <button
+                            key={label}
+                            disabled={!!opts?.busy}
+                            onClick={() => onClick()}
+                            style={{ all: 'unset', display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', padding: '8px 14px', cursor: 'pointer', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: opts?.danger ? _A.TERRA : _A.DEEP, boxSizing: 'border-box', opacity: opts?.busy ? 0.5 : 1 }}
+                            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = _A.CREAM2; }}
+                            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
+                          >
+                            <span>{label}</span>
+                            {opts?.active && <span style={{ color: _A.SAGE, fontWeight: 600 }}>✓</span>}
+                          </button>
+                        );
+                        const head = (label: string) => (
+                          <div key={`h-${label}`} style={{ padding: '8px 14px 3px', fontFamily: 'DM Sans, system-ui', fontSize: 8.5, letterSpacing: '0.16em', textTransform: 'uppercase', color: _A.EYEBROW, fontWeight: 600, borderTop: `1px solid ${_A.HAIR}`, marginTop: 4 }}>{label}</div>
+                        );
+                        const grants = userGrants[user.id] ?? [];
+                        const roleNow = user.role === 'admin' ? 'admin' : user.role === 'support' ? 'support' : 'user';
+                        const PROGS: [string, string][] = [['postpartum', 'Postpartum'], ['bodyforming', 'BodyForming'], ['elastic-bands', 'Elastické gumy'], ['strong-sexy', 'Strong & Sexy']];
+                        return (
+                          <div style={{ position: 'absolute', right: 0, top: '100%', marginTop: 4, background: '#fff', border: `1px solid ${_A.HAIR}`, borderRadius: 12, zIndex: 120, minWidth: 230, boxShadow: '0 10px 30px rgba(31,35,40,0.14)', overflow: 'hidden', paddingBottom: 4 }}>
+                            {item('✉ Napísať správu', () => {
+                              try { sessionStorage.setItem('neome_admin_msg_user', user.id); } catch { /* ignore */ }
+                              window.dispatchEvent(new CustomEvent('neome:admin-open-messages'));
+                              setKebabOpen(null);
+                            })}
+                            {item('Magic link na prihlásenie', () => runAuthAction(user, 'magiclink'), { busy: authActionBusy === user.id })}
+                            {item('Reset hesla', () => runAuthAction(user, 'recovery'), { busy: authActionBusy === user.id })}
+                            {isFullAdmin && (<>
+                              {head('Prístup')}
+                              {item('Free', () => handleSetTier(user.id, 'free'), { active: tier === 'free', busy: isSettingThis })}
+                              {item('Premium', () => handleSetTier(user.id, 'neome_plus'), { active: tier === 'neome_plus', busy: isSettingThis })}
+                              {item(user.nutrition_plan_purchased ? 'Odobrať jedálniček' : 'Pridať jedálniček', () => handleToggleMealPlan(user), { busy: togglingMeal === user.id })}
+                              {head('Programy (prístup bez Plus)')}
+                              {PROGS.map(([pid, pname]) => item(pname, () => toggleProgramGrant(user.id, pid), { active: grants.includes(pid), busy: togglingProgram === `${user.id}:${pid}` }))}
+                              {head('Rola')}
+                              {item('Používateľka', () => handleSetRole(user, 'user'), { active: roleNow === 'user', busy: togglingRole === user.id })}
+                              {item('Support (bez financií)', () => handleSetRole(user, 'support'), { active: roleNow === 'support', busy: togglingRole === user.id })}
+                              {item('Admin', () => handleSetRole(user, 'admin'), { active: roleNow === 'admin', busy: togglingRole === user.id })}
+                              {head('Nebezpečné')}
+                              {sub?.stripe_subscription_id && !sub?.cancel_at_period_end &&
+                                item('Zrušiť predplatné', () => handleCancelSubscription(user), { danger: true, busy: cancelling === user.id })}
+                              {item('Vymazať účet', () => { if (window.confirm(`Naozaj vymazať ${user.email}? Nenávratné.`)) handleDeleteUser(user.id); }, { danger: true, busy: deleting === user.id })}
+                            </>)}
+                          </div>
+                        );
+                      })()}
                     </div>
-
-                    {sub?.stripe_subscription_id && !sub?.cancel_at_period_end && (
-                      <button
-                        onClick={() => handleCancelSubscription(user)}
-                        disabled={cancelling === user.id}
-                        style={{ ...btnDanger, padding: '7px 12px', fontSize: 11, opacity: cancelling === user.id ? 0.6 : 1 }}
-                      >
-                        {cancelling === user.id ? '...' : 'Zrušiť'}
-                      </button>
-                    )}
-                    {confirmDelete === user.id ? (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.TERRA }}>Naozaj?</span>
-                        <button onClick={() => handleDeleteUser(user.id)} disabled={deleting === user.id} style={{ ...btnDanger, padding: '6px 10px', fontSize: 11 }}>
-                          {deleting === user.id ? '...' : 'Áno'}
-                        </button>
-                        <button onClick={() => setConfirmDelete(null)} style={{ ...btnSecondary, padding: '6px 10px', fontSize: 11 }}>Nie</button>
-                      </div>
-                    ) : (
-                      <button onClick={e => { e.stopPropagation(); setConfirmDelete(user.id); }} style={{ all: 'unset', cursor: 'pointer', padding: 8, borderRadius: 8 }}>
-                        <Trash2 style={{ width: 14, height: 14, color: _A.TERRA }} />
-                      </button>
-                    )}
-                    </>)}
-                    <ChevronRight style={{ width: 14, height: 14, color: _A.TERTIARY, transform: isExpanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s' }} />
+                                        <ChevronRight style={{ width: 14, height: 14, color: _A.TERTIARY, transform: isExpanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s' }} />
                   </div>
                 </div>
 
@@ -1716,7 +1582,7 @@ function UsersTab({ isFullAdmin }: { isFullAdmin: boolean }) {
                     {isLoadingDetail ? (
                       <div style={{ padding: '12px 0', textAlign: 'center', fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED }}>Načítavam…</div>
                     ) : (
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: 10 }}>
 
                         {/* Subscription block */}
                         <div style={{ background: _A.CARD, borderRadius: 10, border: `1px solid ${_A.HAIR}`, padding: '12px 14px' }}>
@@ -1797,6 +1663,68 @@ function UsersTab({ isFullAdmin }: { isFullAdmin: boolean }) {
                                 )}
                               </div>
                             );
+                          })()}
+                        </div>
+
+                        {/* Program block (Sam 2026-10-05: same treatment
+                            as subscription — grants, start, progress,
+                            history, read-only; granting lives in ⋯). */}
+                        <div style={{ background: _A.CARD, borderRadius: 10, border: `1px solid ${_A.HAIR}`, padding: '12px 14px' }}>
+                          <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: _A.EYEBROW, fontWeight: 500, marginBottom: 10 }}>Programy</div>
+                          {(() => {
+                            const NAMES: Record<string, string> = { postpartum: 'Postpartum', bodyforming: 'BodyForming', 'elastic-bands': 'Elastické gumy', 'strong-sexy': 'Strong & Sexy' };
+                            const WEEKS: Record<string, number> = { postpartum: 8, bodyforming: 6, 'elastic-bands': 6, 'strong-sexy': 6 };
+                            const grants = userGrants[user.id];
+                            const act = userActiveProgram[user.id];
+                            const hist = userProgramHistory[user.id] ?? [];
+                            const STATUS_SK: Record<string, string> = { completed: 'dokončený', paused: 'pozastavený', canceled: 'zrušený', replaced: 'nahradený' };
+                            if (grants === undefined && !act) {
+                              return <p style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED }}>Načítavam…</p>;
+                            }
+                            const rows: React.ReactNode[] = [];
+                            if ((grants ?? []).length > 0) {
+                              rows.push(
+                                <div key="g" style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
+                                  <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10.5, color: _A.EYEBROW }}>Pridelené</span>
+                                  <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10.5, color: _A.DEEP, fontWeight: 500, textAlign: 'right' }}>{(grants ?? []).map(g => NAMES[g] ?? g).join(', ')}</span>
+                                </div>,
+                              );
+                            }
+                            if (act) {
+                              const total = WEEKS[act.program_id] ?? 8;
+                              const start = new Date(act.start_date + 'T00:00:00');
+                              const today = new Date(); today.setHours(0, 0, 0, 0);
+                              const daysSince = Math.round((today.getTime() - start.getTime()) / 86400000);
+                              const week = Math.floor(daysSince / 7) + 1;
+                              rows.push(
+                                <div key="a1" style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
+                                  <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10.5, color: _A.EYEBROW }}>Beží</span>
+                                  <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10.5, color: _A.DEEP, fontWeight: 500 }}>{NAMES[act.program_id] ?? act.program_id}</span>
+                                </div>,
+                                <div key="a2" style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
+                                  <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10.5, color: _A.EYEBROW }}>Štart</span>
+                                  <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10.5, color: _A.DEEP, fontWeight: 500 }}>{start.toLocaleDateString('sk-SK')}</span>
+                                </div>,
+                                <div key="a3" style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
+                                  <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10.5, color: _A.EYEBROW }}>Postup</span>
+                                  <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10.5, color: daysSince < 0 ? _A.GOLD : week > total ? _A.TERRA : _A.SAGE, fontWeight: 500 }}>
+                                    {daysSince < 0 ? 'štartuje v pondelok' : week > total ? `po termíne (${total} týž.)` : `týždeň ${week} z ${total} · deň ${daysSince + 1}`}
+                                  </span>
+                                </div>,
+                              );
+                            }
+                            for (const h of hist.slice(0, 4)) {
+                              rows.push(
+                                <div key={`h-${h.program_id}-${h.ended_at}`} style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
+                                  <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10.5, color: _A.EYEBROW }}>{NAMES[h.program_id] ?? h.program_id}</span>
+                                  <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10.5, color: _A.MUTED }}>{STATUS_SK[h.status] ?? h.status} {new Date(h.ended_at).toLocaleDateString('sk-SK')}{h.weeks_reached ? ` · týž. ${h.weeks_reached}` : ''}</span>
+                                </div>,
+                              );
+                            }
+                            if (rows.length === 0) {
+                              return <p style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.TERTIARY }}>Žiadne programy — prístup pridelíš cez ⋯ menu.</p>;
+                            }
+                            return <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>{rows}</div>;
                           })()}
                         </div>
 
