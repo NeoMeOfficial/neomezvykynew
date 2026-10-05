@@ -14,6 +14,7 @@ import { exercises as LOCAL_FALLBACK } from '../data/exercises';
 
 export interface DbStretch {
   id: string;
+  is_new?: boolean;
   name: string;
   duration_min: number;
   body_target: string;
