@@ -3448,7 +3448,7 @@ function ExercisesTab() {
         {loading ? <div style={{ padding: '32px 0', textAlign: 'center', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>Načítavam...</div> : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {items.length === 0 && <p style={{ padding: '24px 0', textAlign: 'center', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>Žiadne cvičenia. Pridaj prvé.</p>}
-            {items.map(r => (
+            {[...items].sort(bySort).map(r => (
               <div key={r.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', borderRadius: 12, border: `1px solid ${_A.HAIR}`, background: _A.BG }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   {r.thumb && <img src={r.thumb} alt="" style={{ width: 40, height: 40, borderRadius: 10, objectFit: 'cover' }} />}
@@ -3685,7 +3685,7 @@ function MeditationsTab() {
         {loading ? <div style={{ padding: '32px 0', textAlign: 'center', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>Načítavam...</div> : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {items.length === 0 && <p style={{ padding: '24px 0', textAlign: 'center', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>Žiadne meditácie. Importuj existujúce alebo pridaj novú.</p>}
-            {items.map(r => (
+            {[...items].sort(bySort).map(r => (
               <div key={r.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', borderRadius: 12, border: `1px solid ${_A.HAIR}`, background: _A.BG }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   {r.image && <img src={r.image} alt="" style={{ width: 40, height: 40, borderRadius: 10, objectFit: 'cover' }} />}
