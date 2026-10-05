@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import LoadingScreen from '../../components/v2/LoadingScreen';
 import { useNavigate } from 'react-router-dom';
 import { Page, BackHeader, Eye, Ser, Body, NM } from '../../components/v2/neome';
 import { useBlogPosts } from '../../hooks/useBlog';
@@ -58,9 +59,7 @@ export default function Blog() {
     return (
       <Page>
         <BackHeader title="Knižnica" />
-        <div style={{ padding: '40px 22px', textAlign: 'center', fontFamily: NM.SANS, fontSize: 13, color: NM.EYEBROW }}>
-          Načítavam…
-        </div>
+        <LoadingScreen fullScreen={false} />
       </Page>
     );
   }

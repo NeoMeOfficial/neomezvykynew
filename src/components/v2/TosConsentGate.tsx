@@ -1,4 +1,5 @@
 import { ReactNode, useEffect, useState } from 'react';
+import LoadingScreen from './LoadingScreen';
 import { useSupabaseAuth } from '../../contexts/SupabaseAuthContext';
 import { useConsents } from '../../hooks/useConsents';
 import { CONSENT_TYPES } from '../../lib/consents';
@@ -42,11 +43,7 @@ export function TosConsentGate({ children }: { children: ReactNode }) {
   }, [blocking]);
 
   if (loading) {
-    return (
-      <div style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', background: NM.BG }}>
-        <div style={{ fontFamily: NM.SANS, color: NM.MUTED, fontSize: 13 }}>Načítavam…</div>
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   if (isGranted(CONSENT_TYPES.TOS_PRIVACY)) {

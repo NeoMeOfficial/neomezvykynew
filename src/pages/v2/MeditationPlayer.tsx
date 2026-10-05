@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import LoadingScreen from '../../components/v2/LoadingScreen';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { NM } from '../../components/v2/neome';
 import { useAchievements } from '../../hooks/useAchievements';
@@ -142,11 +143,7 @@ export default function MeditationPlayer() {
   }
 
   if (loading) {
-    return (
-      <div style={{ minHeight: '100vh', background: NM.DEEP_2, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: NM.SANS }}>
-        <div>Načítavam meditáciu…</div>
-      </div>
-    );
+    return <LoadingScreen label="Načítavam meditáciu…" />;
   }
 
   if (!meditation) {

@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { captureAffiliateRef } from './lib/affiliate';
+import LoadingScreen from './components/v2/LoadingScreen';
 import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SupabaseAuthProvider, useSupabaseAuth } from './contexts/SupabaseAuthContext';
@@ -104,46 +105,11 @@ const Search = lazy(() => import('./pages/v2/Search'));
 const CyklusInsights = lazy(() => import('./pages/v2/CyklusInsights'));
 const Odznaky = lazy(() => import('./pages/v2/Odznaky'));
 
-function LoadingSpinner() {
-  const [loadingText, setLoadingText] = useState('Načítavam...');
-  
-  useEffect(() => {
-    const messages = [
-      'Načítavam...',
-      'Pripájam sa k serveru...',
-      'Takmer hotovo...',
-      'Ešte chvíľu...'
-    ];
-    
-    let index = 0;
-    const interval = setInterval(() => {
-      index = (index + 1) % messages.length;
-      setLoadingText(messages[index]);
-    }, 1500);
-    
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <div className="min-h-screen flex flex-col items-center justify-center" style={{ background: '#F0E6DA' }}>
-      <div className="flex gap-1.5 mb-4">
-        {[0, 1, 2].map((i) => (
-          <div
-            key={i}
-            className="w-2 h-2 rounded-full animate-pulse"
-            style={{ background: '#B8864A', animationDelay: `${i * 0.2}s` }}
-          />
-        ))}
-      </div>
-      <p className="text-sm text-[#8B7560] animate-pulse">{loadingText}</p>
-    </div>
-  );
-}
 
 /* Auth guard — redirects to /auth if no Supabase session. */
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const { user, loading } = useSupabaseAuth();
-  if (loading) return <LoadingSpinner />;
+  if (loading) return <LoadingScreen />;
   if (!user) return <Navigate to="/auth" replace />;
   return <>{children}</>;
 }
@@ -198,7 +164,7 @@ function RequireAdmin({ children }: { children: React.ReactNode }) {
     return () => { cancelled = true; };
   }, [user, loading]);
 
-  if (loading || checking) return <LoadingSpinner />;
+  if (loading || checking) return <LoadingScreen />;
   if (!user) {
     const next = encodeURIComponent(pathname + search);
     return <Navigate to={`/admin/login?next=${next}`} replace />;
@@ -223,7 +189,7 @@ export default function AppV2() {
         <ScrollToTop />
         <CookieBanner />
         <InstallPrompt />
-        <Suspense fallback={<LoadingSpinner />}>
+        <Suspense fallback={<LoadingScreen />}>
             <Routes>
             {/* Public routes */}
             <Route path="/auth-demo" element={<AuthDemo />} />

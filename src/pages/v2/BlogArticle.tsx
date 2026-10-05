@@ -1,4 +1,5 @@
 import { useNavigate, useParams } from 'react-router-dom';
+import LoadingScreen from '../../components/v2/LoadingScreen';
 import { Page, Eye, Ser, NM } from '../../components/v2/neome';
 import { useBlogPost } from '../../hooks/useBlog';
 
@@ -39,9 +40,7 @@ export default function BlogArticle() {
   if (loading) {
     return (
       <Page paddingBottom={40}>
-        <div style={{ padding: '40px 22px', textAlign: 'center', fontFamily: NM.SANS, fontSize: 13, color: NM.EYEBROW }}>
-          Načítavam…
-        </div>
+        <LoadingScreen fullScreen={false} />
       </Page>
     );
   }

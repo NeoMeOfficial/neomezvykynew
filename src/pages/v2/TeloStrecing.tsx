@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import LoadingScreen from '../../components/v2/LoadingScreen';
 import { useNavigate } from 'react-router-dom';
 import { useSubscription } from '../../contexts/SubscriptionContext';
 import { useStretches } from '../../hooks/useStretches';
@@ -160,11 +161,7 @@ export default function TeloStrecing() {
         ))}
       </div>
 
-      {loading && (
-        <div style={{ margin: '26px 18px', color: NM.MUTED, fontFamily: NM.SANS, fontSize: 13 }}>
-          Načítavam…
-        </div>
-      )}
+      {loading && <LoadingScreen fullScreen={false} />}
 
       {!loading && list.length === 0 && (
         <div style={{ margin: '26px 18px', color: NM.MUTED, fontFamily: NM.SANS, fontSize: 13 }}>

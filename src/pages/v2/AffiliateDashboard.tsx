@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import LoadingScreen from '../../components/v2/LoadingScreen';
 import { useNavigate } from 'react-router-dom';
 import { NM } from '../../components/v2/neome';
 import { supabase } from '../../lib/supabase';
@@ -162,11 +163,7 @@ export default function AffiliateDashboard() {
   });
 
   if (loading) {
-    return (
-      <div style={{ minHeight: '100vh', background: NM.BG, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: NM.SANS, color: NM.MUTED }}>
-        Načítavam…
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   if (notAffiliate || !data) {
