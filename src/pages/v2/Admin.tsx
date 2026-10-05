@@ -3155,8 +3155,10 @@ function ExercisesTab() {
   };
   useEffect(() => { load(); }, []);
 
-  const openAdd = () => { setForm({ content_type: 'exercise', duration: '15 min', status: 'published', diastasis_safe: true }); setEditId(null); setShowForm(true); setError(null); };
-  const openEdit = (r: ExerciseRow) => { setForm({ ...r }); setEditId(r.id); setShowForm(true); setError(null); };
+  const formRef = useRef<HTMLDivElement>(null);
+  const scrollToForm = () => setTimeout(() => formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+  const openAdd = () => { setForm({ content_type: 'exercise', duration: '15 min', status: 'published', diastasis_safe: true }); setEditId(null); setShowForm(true); setError(null); scrollToForm(); };
+  const openEdit = (r: ExerciseRow) => { setForm({ ...r }); setEditId(r.id); setShowForm(true); setError(null); scrollToForm(); };
   const closeForm = () => { setShowForm(false); setEditId(null); setError(null); };
 
   const save = async () => {
@@ -3267,9 +3269,9 @@ function ExercisesTab() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <select value={sortBy} onChange={e => setSortBy(e.target.value as 'updated' | 'name')}
-          style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, padding: '6px 10px', borderRadius: 10, border: `1px solid ${_A.HAIR}`, background: '#fff', color: _A.DEEP, cursor: 'pointer' }}>
-          <option value="updated">Zoradiť: naposledy upravené</option>
-          <option value="name">Zoradiť: podľa názvu</option>
+          style={{ ...btnSecondary, appearance: 'none', WebkitAppearance: 'none', cursor: 'pointer', paddingRight: 26, backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' stroke='%238A8F98' stroke-width='1.5' fill='none' stroke-linecap='round'/></svg>")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}>
+          <option value="updated">Naposledy upravené</option>
+          <option value="name">Podľa názvu</option>
         </select>
         <div style={{ display: 'flex', gap: 10 }}>
           <button onClick={seedFromStatic} disabled={seeding} style={btnSecondary}>
