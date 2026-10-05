@@ -1491,6 +1491,19 @@ function UsersTab() {
                     </div>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', rowGap: 6, justifyContent: 'flex-end', maxWidth: '100%' }} onClick={e => e.stopPropagation()}>
+                    <button
+                      onClick={() => {
+                        // Admin-initiated conversation (Sam 2026-10-05):
+                        // preselect the user in Messages even when she
+                        // never wrote first.
+                        try { sessionStorage.setItem('neome_admin_msg_user', user.id); } catch { /* ignore */ }
+                        window.dispatchEvent(new CustomEvent('neome:admin-open-messages'));
+                      }}
+                      title="Napísať správu ako Gabi"
+                      style={{ all: 'unset', cursor: 'pointer', padding: '4px 10px', borderRadius: 999, border: `1px solid ${_A.HAIR}`, fontFamily: 'DM Sans, system-ui', fontSize: 10.5, fontWeight: 500, color: _A.DEEP }}
+                    >
+                      ✉ Správa
+                    </button>
                     <span style={tierBadgeStyle(tier)}>{tierLabel(tier)}</span>
 
                     {/* Admin role chip — click to promote / demote */}
@@ -2190,6 +2203,18 @@ function MessagesTab() {
   }, [conversations, filter]);
 
   const selectedConv = conversations.find(c => c.user_id === selectedUserId);
+
+  // A "Správa" click in the Users tab lands here with the target user
+  // stashed — open her thread even if she never messaged first.
+  React.useEffect(() => {
+    try {
+      const uid = sessionStorage.getItem('neome_admin_msg_user');
+      if (uid) {
+        sessionStorage.removeItem('neome_admin_msg_user');
+        setSelectedUserId(uid);
+      }
+    } catch { /* ignore */ }
+  }, [setSelectedUserId]);
 
   // Fetch display names for conversation user IDs
   React.useEffect(() => {
@@ -3939,6 +3964,11 @@ export default function AdminNew() {
     setActiveTabState(t);
     try { sessionStorage.setItem('neome_admin_tab', t); } catch { /* ignore */ }
   };
+  useEffect(() => {
+    const open = () => setActiveTab('messages');
+    window.addEventListener('neome:admin-open-messages', open);
+    return () => window.removeEventListener('neome:admin-open-messages', open);
+  }, []);
   const [analytics, setAnalytics] = useState<AdminAnalytics | null>(null);
   const [analyticsLoading, setAnalyticsLoading] = useState(true);
   const unreadMessagesCount = useUnreadAdminMessagesCount();
