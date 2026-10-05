@@ -2,8 +2,6 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { NM, Eye } from '../../components/v2/neome';
 import { useSubscription } from '../../contexts/SubscriptionContext';
-import { useConsentGuard } from '../../contexts/ConsentGuardContext';
-import { CONSENT_TYPES } from '../../lib/consents';
 
 /**
  * Post-checkout confirmation — full-screen celebration + CTA.
@@ -29,7 +27,6 @@ export default function CheckoutSuccess() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const { isPremium, hasMealPlanner, refreshSubscription, loading } = useSubscription();
-  const requireConsent = useConsentGuard();
   const askedMarketingRef = useRef(false);
 
   const type: CheckoutType = useMemo(() => {
@@ -86,25 +83,20 @@ export default function CheckoutSuccess() {
     }
   }, [phase, params, devOverride]);
 
-  // Contextual marketing-consent prompt — fires once when the purchase
-  // is confirmed. Transactional emails about the purchase itself don't
-  // need consent (Art. 6(1)(b) — performance of contract); this prompt
-  // is for ongoing marketing (newsletters, product news). Truly
-  // optional: decline closes the sheet and the user proceeds normally.
+  // Marketing consent is deliberately NOT asked here (Sam 2026-10-05:
+  // right after paying it feels overwhelming). We only stamp tomorrow's
+  // date; the home screen asks on her first visit of a later day. Legal
+  // stays clean — no marketing is sent before she answers, and
+  // transactional purchase emails need no consent (Art. 6(1)(b)).
   useEffect(() => {
     if (phase !== 'confirmed') return;
     if (askedMarketingRef.current) return;
     askedMarketingRef.current = true;
-    requireConsent(CONSENT_TYPES.MARKETING, {
-      title: 'Chceš dostávať novinky od NeoMe?',
-      description:
-        'Občasné e-maily o nových programoch, receptoch a tipoch pre teba. (Tvoj nákup ti potvrdíme bez ohľadu na túto voľbu.)',
-      acceptLabel: 'Áno, posielajte',
-      declineLabel: 'Nie, neposielajte',
-    }).catch(() => {
-      // Non-fatal — the user can always opt in later from Settings → Súkromie.
-    });
-  }, [phase, requireConsent]);
+    try {
+      const t = new Date(Date.now() + 24 * 3600 * 1000).toISOString().slice(0, 10);
+      localStorage.setItem('neome_marketing_ask_from', t);
+    } catch { /* ignore */ }
+  }, [phase]);
 
   const onRetry = () => {
     setAttempt(0);

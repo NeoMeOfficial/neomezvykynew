@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Shield, Flame } from 'lucide-react';
 import { useCommunityPosts } from '../../hooks/useCommunityPosts';
@@ -6,6 +6,7 @@ import { useAuthContext } from '../../contexts/AuthContext';
 import { usePointsLedger } from '../../hooks/usePointsLedger';
 import { Page, Eye, Ser, Body, NM } from '../../components/v2/neome';
 import { getShieldTier, getShieldInfo, SHIELD_TIERS } from '../../data/achievements';
+import { supabase } from '../../lib/supabase';
 
 /**
  * Komunita — R2 feed
@@ -215,6 +216,27 @@ export default function Komunita() {
   // Sub-tab within the "Nové príspevky" feed: all, only questions, or
   // only posts. Lets users find Q&A quickly without scrolling.
   const [feedType, setFeedType] = useState<'all' | 'questions' | 'posts'>('all');
+  const [liveStats, setLiveStats] = useState<{ workouts: number; habits: number; meditations: number } | null>(null);
+
+  // Today's real community activity (distinct women per action, from
+  // the points ledger via a server endpoint) — added on top of the
+  // visual baseline in the "Dnes v komunite" line.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return;
+        const res = await fetch('/.netlify/functions/community-stats', {
+          headers: { Authorization: `Bearer ${session.access_token}` },
+        });
+        if (!res.ok) return;
+        const body = await res.json();
+        if (!cancelled) setLiveStats(body);
+      } catch { /* baseline alone is fine */ }
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   const handleToggleLike = (postId: string) => {
     const wasLiked = likedIds.has(postId);
@@ -276,7 +298,7 @@ export default function Komunita() {
       <div style={{ padding: '6px 24px 22px' }}>
         <Eye color={NM.SAGE} style={{ marginBottom: 10 }}>Priestor pre ženy</Eye>
         <Ser size={32} style={{ lineHeight: 1.04, marginBottom: 12 }}>
-          2 400 žien.
+          Viac ako 4 000 žien.
           <br />
           Jedna komunita.
         </Ser>
@@ -317,10 +339,10 @@ export default function Komunita() {
           <Eye style={{ marginBottom: 8 }}>Dnes v komunite</Eye>
           <div style={{ fontFamily: NM.SERIF, fontSize: 17, fontWeight: 400, color: NM.DEEP, lineHeight: 1.45, letterSpacing: '-0.005em' }}>
             {(() => {
-              // Pseudo-dynamic counters — deterministic per day, with a floor so
-              // the room never feels empty. Stable across all users on a given
-              // day. Will be replaced by real aggregate stats from points_ledger
-              // once volume justifies it (TODO: KOMUNITA-LIVE-STATS).
+              // Real counts from today's points ledger + a daily-varying
+              // baseline floor so the room never feels empty at launch
+              // (Sam 2026-10-05). Dial the ranges down — eventually to
+              // 0–0 — as real volume grows; real numbers then take over.
               const today = new Date();
               const seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
               const rand = (offset: number, min: number, max: number) => {
@@ -328,9 +350,9 @@ export default function Komunita() {
                 const frac = x - Math.floor(x);
                 return Math.floor(min + frac * (max - min + 1));
               };
-              const exercised = rand(1, 40, 110);
-              const habits    = rand(2, 70, 180);
-              const meditated = rand(3, 20, 60);
+              const exercised = rand(1, 40, 110) + (liveStats?.workouts ?? 0);
+              const habits    = rand(2, 70, 180) + (liveStats?.habits ?? 0);
+              const meditated = rand(3, 20, 60) + (liveStats?.meditations ?? 0);
               return `${exercised} žien cvičilo · ${habits} dokončilo návyk · ${meditated} meditovalo`;
             })()}
           </div>

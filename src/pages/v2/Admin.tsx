@@ -2599,6 +2599,7 @@ function BusinessMetrics() {
         {tile('Komentáre', `${e.comments.week ?? '—'}`, `za 7 dní · spolu ${e.comments.total ?? '—'}`)}
         {tile('Likes', `${e.likes.week ?? '—'}`, `za 7 dní · spolu ${e.likes.total ?? '—'}`)}
         {tile('Odporúčania', `${e.referrals.week ?? 0}`, `za 7 dní · spolu ${e.referrals.total ?? 0} · platiacich ${e.referrals.paying}`)}
+        {tile('Jedálniček — čakačka', `${e.meal_plan_waitlist ?? 0}`, 'chcú vedieť o spustení')}
       </div>
     </div>
   );

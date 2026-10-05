@@ -72,13 +72,14 @@ export async function handler(event: any) {
     return error ? null : (count ?? 0);
   };
 
-  const [posts7, postsAll, replies7, repliesAll, likes7, likesAll, candidatesAll, referrals7, referralsAll] =
+  const [posts7, postsAll, replies7, repliesAll, likes7, likesAll, candidatesAll, referrals7, referralsAll, waitlistAll] =
     await Promise.all([
       cnt('community_posts', 'created_at', d7), cnt('community_posts'),
       cnt('community_replies', 'created_at', d7), cnt('community_replies'),
       cnt('community_likes', 'created_at', d7), cnt('community_likes'),
       cnt('affiliates'), // everyone with a referral code (candidates + partners)
       cnt('affiliate_referrals', 'created_at', d7), cnt('affiliate_referrals'),
+      cnt('meal_plan_waitlist'), // 6-week plan launch audience
     ]);
   const { count: payingReferrals } = await supabase
     .from('points_ledger').select('*', { count: 'exact', head: true }).eq('event_type', 'referral_paid');
@@ -172,6 +173,7 @@ export async function handler(event: any) {
       likes: { week: likes7, total: likesAll },
       referrers: candidatesAll,
       referrals: { week: referrals7, total: referralsAll, paying: payingReferrals ?? 0 },
+      meal_plan_waitlist: waitlistAll,
     },
     revenue: {
       last_week: sum(lastWeek.getTime(), thisWeek.getTime()),

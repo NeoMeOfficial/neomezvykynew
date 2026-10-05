@@ -1,6 +1,9 @@
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { NM, Eye } from '../../../components/v2/neome';
 import { PlusPage, TopBar, HeroHead } from './shared';
+import { supabase } from '../../../lib/supabase';
+import { useSupabaseAuth } from '../../../contexts/SupabaseAuthContext';
 
 /**
  * /onboarding-plus/jedalnicek — meal-plan announcement.
@@ -12,6 +15,26 @@ import { PlusPage, TopBar, HeroHead } from './shared';
  */
 export default function PlusNutritionPrompt() {
   const navigate = useNavigate();
+  const { user } = useSupabaseAuth();
+  // Waitlist (Sam 2026-10-05): instead of a dead "coming soon" badge,
+  // she can ask to be told when the plan launches — captured in
+  // meal_plan_waitlist so the launch audience lives in the database.
+  const [joined, setJoined] = useState(false);
+  const [joining, setJoining] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase.from('meal_plan_waitlist').select('user_id').eq('user_id', user.id).maybeSingle()
+      .then(({ data }) => { if (data) setJoined(true); });
+  }, [user?.id]);
+
+  const joinWaitlist = async () => {
+    if (!user || joined || joining) return;
+    setJoining(true);
+    const { error } = await supabase.from('meal_plan_waitlist').insert({ user_id: user.id });
+    if (!error || (error as any).code === '23505') setJoined(true);
+    setJoining(false);
+  };
 
   return (
     <PlusPage>
@@ -45,23 +68,29 @@ export default function PlusNutritionPrompt() {
             <div style={{ marginTop: 10, fontFamily: NM.SERIF, fontSize: 20, color: NM.DEEP, lineHeight: 1.2 }}>
               6-týždňový plán na mieru
             </div>
-            <div
+            <button
+              onClick={joinWaitlist}
+              disabled={joined || joining}
               style={{
+                all: 'unset',
+                boxSizing: 'border-box',
+                cursor: joined ? 'default' : 'pointer',
                 display: 'inline-flex',
                 alignItems: 'center',
+                gap: 7,
                 marginTop: 16,
-                padding: '10px 18px',
+                padding: '11px 18px',
                 borderRadius: 999,
-                background: 'rgba(139,158,136,0.16)',
+                background: joined ? NM.SAGE : 'rgba(139,158,136,0.16)',
                 border: `1px solid ${NM.SAGE}`,
                 fontFamily: NM.SANS,
                 fontSize: 12.5,
                 fontWeight: 600,
-                color: NM.SAGE,
+                color: joined ? '#fff' : NM.SAGE,
               }}
             >
-              V ponuke čoskoro
-            </div>
+              {joined ? '✓ Dáme ti vedieť' : joining ? 'Moment…' : 'Daj mi vedieť, keď bude dostupný'}
+            </button>
           </div>
         </div>
 

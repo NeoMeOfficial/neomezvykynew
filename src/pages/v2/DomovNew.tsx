@@ -11,7 +11,8 @@ import { useRecipes, recipeImage, dailyRecipeOf } from '@/hooks/useRecipes';
 import { useSupabaseHabits } from '@/hooks/useSupabaseHabits';
 import { useAchievements } from '@/hooks/useAchievements';
 import { useDailyMeditation } from '@/hooks/useDailyContent';
-import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
+import { useConsentGuard } from '@/contexts/ConsentGuardContext';
+import { CONSENT_TYPES } from '@/lib/consents';
 import { usePointsLedger } from '@/hooks/usePointsLedger';
 import { useReflections } from '@/hooks/useDailyRituals';
 import { computeEnergyPatterns, parseStructured } from '@/features/dennik/structuredEntry';
@@ -58,23 +59,17 @@ function getTimeGreeting(): string {
   return 'Krásny večer';
 }
 
-function getDaysSince(iso: string | null | undefined): number {
-  if (!iso) return 1;
-  return Math.max(1, Math.floor((Date.now() - new Date(iso).getTime()) / 86_400_000));
-}
 
 // ─── Greeting ─────────────────────────────────────────────────────────────────
-function Greeting({ name, points, streakDays, plus, onPointsClick }: {
-  name: string; points: number; streakDays: number; plus: boolean; onPointsClick: () => void;
+function Greeting({ name, points, plus, onPointsClick }: {
+  name: string; points: number; plus: boolean; onPointsClick: () => void;
 }) {
   return (
     <div style={{ padding: '62px 22px 0', fontFamily: SANS }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10 }}>
         <div style={{ fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: FG3, fontWeight: 500, paddingTop: 9 }}>
           {getDateEyebrow()}
-          {plus
-            ? <> · <span style={{ color: GOLD }}>Plus</span></>
-            : <> · <span style={{ color: FG3 }}>Free</span></>}
+          {plus && <> · <span style={{ color: GOLD }}>Plus</span></>}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
           <button onClick={onPointsClick} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 11px 7px 9px', borderRadius: 999, background: WHITE, border: `1px solid ${HAIR2}`, cursor: 'pointer', fontSize: 12, fontWeight: 500, color: INK }}>
@@ -90,34 +85,14 @@ function Greeting({ name, points, streakDays, plus, onPointsClick }: {
         </div>
       </div>
       <div style={{ fontFamily: SERIF, fontSize: 32, lineHeight: 1.04, letterSpacing: '-0.012em', marginTop: 16, color: INK, fontWeight: 500 }}>
-        {getTimeGreeting()},<br/>
-        <em style={{ fontStyle: 'italic', color: GOLD, fontWeight: 500 }}>{name}</em>
-      </div>
-      <div style={{ marginTop: 10, fontSize: 12.5, lineHeight: 1.5, color: FG2, fontWeight: 400, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' as const }}>
-        <span>Silné telo vzniká z malých rozhodnutí</span>
-        <span style={{ width: 3, height: 3, borderRadius: 999, background: HAIR2, display: 'inline-block' }} />
-        <span style={{ fontSize: 11.5, fontStyle: 'italic', fontFamily: SERIF, color: FG3 }}>{streakDays}. deň spolu</span>
+        {name
+          ? <>{getTimeGreeting()},<br/><em style={{ fontStyle: 'italic', color: GOLD, fontWeight: 500 }}>{name}</em></>
+          : <>{getTimeGreeting()}.</>}
       </div>
     </div>
   );
 }
 
-// ─── Persistence notice (Free only) ───────────────────────────────────────────
-function PersistenceNotice() {
-  return (
-    <div style={{ padding: '14px 18px 0' }}>
-      <div style={{ padding: '10px 14px', borderRadius: 14, background: 'rgba(184,134,74,0.08)', border: `1px solid rgba(184,134,74,0.30)`, display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={GOLD} strokeWidth="1.7" style={{ flexShrink: 0, marginTop: 2 }}>
-          <path d="M12 2L2 7v6c0 5 4 9 10 9s10-4 10-9V7l-10-5z" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 11.5, color: INK, fontWeight: 500, lineHeight: 1.35 }}>Tvoje denníky a údaje sa s Free verziou neukladajú.</div>
-          <div style={{ fontSize: 11, color: FG2, fontWeight: 300, marginTop: 2, lineHeight: 1.4 }}>Predplatné NeoMe ich uchová pre teba — kdekoľvek a kedykoľvek.</div>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 // ─── Weekly calendar strip ────────────────────────────────────────────────────
 function WeekCalendar({ onSelectDay }: { onSelectDay: (d: Date) => void }) {
@@ -853,8 +828,27 @@ export default function DomovNew() {
   const { todayPlan } = useMealPlan();
   const { recipes } = useRecipes();
   const { meditation } = useDailyMeditation();
-  const { profile } = useSupabaseAuth();
   const { balance: points } = usePointsLedger();
+  const requireConsent = useConsentGuard();
+
+  // Marketing consent, deferred (Sam 2026-10-05): the purchase-success
+  // screen only stamps a date; the ask happens here, on the first home
+  // visit of a LATER day, so the purchase moment stays calm.
+  useEffect(() => {
+    try {
+      const from = localStorage.getItem('neome_marketing_ask_from');
+      if (!from) return;
+      if (new Date().toISOString().slice(0, 10) < from) return;
+      localStorage.removeItem('neome_marketing_ask_from');
+      requireConsent(CONSENT_TYPES.MARKETING, {
+        title: 'Chceš dostávať novinky od NeoMe?',
+        description:
+          'Občasné e-maily o nových programoch, receptoch a tipoch pre teba.',
+        acceptLabel: 'Áno, posielajte',
+        declineLabel: 'Nie, neposielajte',
+      }).catch(() => {});
+    } catch { /* ignore */ }
+  }, [requireConsent]);
 
   const isPlus    = user.tier === 'plus';
   const hasMealPlanAddon = user.hasMealPlanAddon;
@@ -862,7 +856,6 @@ export default function DomovNew() {
   // Purchased the add-on but hasn't filled the questionnaire yet —
   // we prompt for setup instead of showing the upsell again.
   const mealPlanNeedsSetup = hasMealPlanAddon && !user.hasMealPlan;
-  const streakDays = getDaysSince((profile as any)?.created_at);
 
   const meditationTitle = meditation?.title ?? 'Ranný pokoj';
 
@@ -1087,12 +1080,9 @@ export default function DomovNew() {
       <Greeting
         name={user.name}
         points={points}
-        streakDays={streakDays}
         plus={isPlus}
         onPointsClick={() => setShowPointsInfo(true)}
       />
-
-      {!isPlus && <PersistenceNotice />}
       <OnboardingTour />
       <TourNudge />
 
@@ -1137,16 +1127,7 @@ export default function DomovNew() {
       {/* Dnes pre teba — six equal pillars, stacked. Big serif header so
           the section reads as the heart of the page, not one label among
           many. */}
-      <div style={{ padding: '30px 22px 16px' }}>
-        <div style={{ fontFamily: SERIF, fontSize: 26, lineHeight: 1.1, color: INK, letterSpacing: '-0.01em', fontWeight: 500 }}>
-          Dnes <em style={{ fontStyle: 'italic', color: GOLD }}>pre teba</em>
-        </div>
-        {/* Keep this honest — picks aren't cycle-driven yet (phase→content
-            linking is a planned feature), so no "vybrané pre tvoju fázu". */}
-        <div style={{ marginTop: 6, fontSize: 12, color: FG2, fontWeight: 300, lineHeight: 1.5 }}>
-          Tvoj výber na dnešný deň — pohyb, jedlo aj pokoj.
-        </div>
-      </div>
+      <div style={{ height: 24 }} />
       <PillarStack items={pillars} />
       <CardDiary free={!isPlus} prompt={diaryPrompt} sub={diarySub} savedToday={diarySavedToday} onOpen={() => navigate('/dennik/new')} />
       <CardGoals />

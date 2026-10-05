@@ -23,10 +23,25 @@ export function useUser(): UserProfile {
   const { todayPlan } = useMealPlan();
   const { hasData: hasCycleData } = useCycle();
 
-  const firstName = profile?.first_name ?? profile?.full_name?.split(' ')[0] ?? 'Eva';
+  // What she asked to be called (onboarding step, Sam 2026-10-05) wins;
+  // then the registration first name — but never anything that looks
+  // like an email local-part ("samuelgrecner+referal"), which the
+  // signup trigger uses as a fallback full_name. Empty string = the
+  // greeting renders without a name instead of inventing one.
+  const storedName = (() => {
+    try { return localStorage.getItem('neome_preferred_name') ?? ''; } catch { return ''; }
+  })();
+  const emailLocal = profile?.email?.split('@')[0] ?? '';
+  let name =
+    ((profile as any)?.preferred_name as string | undefined) ||
+    storedName ||
+    profile?.first_name ||
+    profile?.full_name?.split(' ')[0] ||
+    '';
+  if (name && (name.includes('@') || name.includes('+') || name === emailLocal)) name = '';
 
   return {
-    name: firstName,
+    name,
     tier: tier === 'premium' ? 'plus' : 'free',
     hasProgram: !!userProgram,
     hasMealPlanAddon: hasMealPlanner,

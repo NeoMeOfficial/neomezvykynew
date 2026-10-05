@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { NM } from './neome';
 import { useSupabaseAuth } from '../../contexts/SupabaseAuthContext';
+import { supabase } from '../../lib/supabase';
 
 /**
  * Two-level onboarding (Sam 2026-10-02).
@@ -80,6 +81,10 @@ interface Step {
   title: string;
   text: string;
   cta?: { label: string; to: string };
+  /** Renders a text input; the value is saved as the preferred name. */
+  input?: boolean;
+  /** Numbered how-to rows (install step) instead of a prose paragraph. */
+  guide?: string[];
 }
 
 const INSTALL_STEP: Step = {
@@ -90,10 +95,20 @@ const INSTALL_STEP: Step = {
   text: '',
 };
 
-function installText(): string {
+// Numbered, follow-along steps (Sam 2026-10-05: the prose version
+// didn't tell people what to actually DO).
+function installGuide(): string[] {
   return isIOS()
-    ? 'NeoMe si pridáš na plochu ako appku: dole v Safari ťukni na Zdieľať (štvorček so šípkou) a vyber „Pridať na plochu“. Odvtedy sa otvára jedným ťuknutím, ako každá iná appka.'
-    : 'NeoMe si nainštaluješ ako appku: v prehliadači otvor menu (⋮ vpravo hore) a vyber „Inštalovať aplikáciu“ alebo „Pridať na plochu“. Odvtedy sa otvára jedným ťuknutím, ako každá iná appka.';
+    ? [
+        'Dole v Safari ťukni na Zdieľať — štvorček so šípkou nahor.',
+        'V ponuke vyber „Pridať na plochu“.',
+        'Potvrď Pridať — a NeoMe máš na ploche ako appku.',
+      ]
+    : [
+        'V prehliadači otvor menu — tri bodky vpravo hore.',
+        'Vyber „Inštalovať aplikáciu“ alebo „Pridať na plochu“.',
+        'Potvrď — a NeoMe máš na ploche ako appku.',
+      ];
 }
 
 const CORE_STEPS: Step[] = [
@@ -162,29 +177,49 @@ const TOPIC_STEPS: Step[] = [
   },
 ];
 
+const NAME_STEP: Step = {
+  eyebrow: 'Vitaj',
+  accent: NM.GOLD,
+  title: 'Ako ťa máme volať?',
+  text: 'Takto ťa budeme v appke oslovovať — napríklad pri rannom pozdrave.',
+  input: true,
+};
+
 function buildCoreSteps(): Step[] {
-  const steps = [...CORE_STEPS];
-  if (!isStandalone()) steps.push({ ...INSTALL_STEP, text: installText() });
+  const steps = [NAME_STEP, ...CORE_STEPS];
+  if (!isStandalone()) steps.push({ ...INSTALL_STEP, text: 'Otvára sa potom jedným ťuknutím, ako každá iná appka.', guide: installGuide() });
   return steps;
 }
 
 function buildTopicSteps(st: TourState): Step[] {
   const steps = TOPIC_STEPS.filter((t) => !st.topics[t.key as TopicKey]);
-  if (!isStandalone() && !st.topics.install) steps.push({ ...INSTALL_STEP, text: installText() });
+  if (!isStandalone() && !st.topics.install) steps.push({ ...INSTALL_STEP, text: 'Otvára sa potom jedným ťuknutím, ako každá iná appka.', guide: installGuide() });
   return steps;
 }
 
-function TourSheet({ steps, onFinish, onMore, onTopicSeen }: {
+function TourSheet({ steps, onFinish, onMore, onTopicSeen, defaultName, onSaveName }: {
   steps: Step[];
   onFinish: (how: 'done' | 'skipped') => void;
   /** Present only on the core run — the "Ukáž mi viac" longer version. */
   onMore?: () => void;
   onTopicSeen?: (key: TopicKey) => void;
+  defaultName?: string;
+  onSaveName?: (name: string) => void;
 }) {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
+  const [nameVal, setNameVal] = useState(defaultName ?? '');
   const s = steps[step];
   const last = step === steps.length - 1;
+  // "Ukáž mi viac" lives on the step BEFORE install, so the install
+  // step stays single-purpose (Sam 2026-10-05).
+  const installIdx = steps.findIndex((x) => x.key === 'install');
+  const moreStepIdx = installIdx > 0 ? installIdx - 1 : steps.length - 1;
+  const advance = () => {
+    if (s?.input && onSaveName) onSaveName(nameVal);
+    if (last) onFinish('done');
+    else setStep(step + 1);
+  };
 
   // A displayed topic counts as seen — it never repeats in level 2.
   useEffect(() => {
@@ -220,6 +255,36 @@ function TourSheet({ steps, onFinish, onMore, onTopicSeen }: {
         </div>
         <div style={{ fontFamily: NM.SANS, fontSize: 14.5, color: NM.MUTED, lineHeight: 1.6, minHeight: 92 }}>
           {s.text}
+          {s.input && (
+            <input
+              value={nameVal}
+              onChange={(e) => setNameVal(e.target.value)}
+              placeholder="Tvoje meno"
+              maxLength={40}
+              autoComplete="given-name"
+              style={{
+                display: 'block', width: '100%', boxSizing: 'border-box', marginTop: 14,
+                padding: '13px 16px', borderRadius: 14, border: `1px solid ${NM.HAIR_2}`,
+                background: '#fff', fontFamily: NM.SANS, fontSize: 16, color: NM.DEEP,
+                outline: 'none',
+              }}
+            />
+          )}
+          {s.guide && (
+            <div style={{ display: 'grid', gap: 10, marginTop: 14 }}>
+              {s.guide.map((g, i) => (
+                <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                  <span style={{
+                    flexShrink: 0, width: 22, height: 22, borderRadius: 999,
+                    background: `${s.accent}22`, color: s.accent,
+                    display: 'grid', placeItems: 'center',
+                    fontFamily: NM.SANS, fontSize: 11.5, fontWeight: 700,
+                  }}>{i + 1}</span>
+                  <span style={{ fontSize: 13.5, lineHeight: 1.5 }}>{g}</span>
+                </div>
+              ))}
+            </div>
+          )}
           {s.cta && (
             <div style={{ marginTop: 12 }}>
               <button
@@ -261,7 +326,7 @@ function TourSheet({ steps, onFinish, onMore, onTopicSeen }: {
                 Späť
               </button>
             )}
-            {last && onMore && (
+            {step === moreStepIdx && onMore && (
               <button
                 onClick={onMore}
                 style={{ all: 'unset', cursor: 'pointer', fontFamily: NM.SANS, fontSize: 13.5, fontWeight: 500, color: NM.DEEP, padding: '11px 16px', borderRadius: 999, border: `1px solid ${NM.HAIR_2}` }}
@@ -270,7 +335,7 @@ function TourSheet({ steps, onFinish, onMore, onTopicSeen }: {
               </button>
             )}
             <button
-              onClick={() => (last ? onFinish('done') : setStep(step + 1))}
+              onClick={advance}
               style={{ all: 'unset', cursor: 'pointer', fontFamily: NM.SANS, fontSize: 13.5, fontWeight: 500, color: '#fff', background: NM.DEEP, padding: '11px 22px', borderRadius: 999 }}
             >
               {last ? 'Poďme na to' : 'Ďalej'}
@@ -284,7 +349,26 @@ function TourSheet({ steps, onFinish, onMore, onTopicSeen }: {
 }
 
 export default function OnboardingTour() {
-  const { user } = useSupabaseAuth();
+  const { user, profile } = useSupabaseAuth();
+
+  // Saved from the name step — profile column + local copy so the
+  // greeting updates immediately without a profile refetch.
+  const saveName = (raw: string) => {
+    const clean = raw.trim().slice(0, 40);
+    if (!clean) return;
+    try { localStorage.setItem('neome_preferred_name', clean); } catch { /* ignore */ }
+    if (user) {
+      supabase.from('profiles').update({ preferred_name: clean } as any).eq('id', user.id)
+        .then(({ error }) => { if (error) console.warn('preferred_name save failed:', error.message); });
+    }
+  };
+
+  const emailLocal = (user?.email ?? '').split('@')[0];
+  const nameSuggestion = (() => {
+    const c = ((profile as any)?.preferred_name as string) || profile?.first_name || '';
+    if (!c || c.includes('@') || c.includes('+') || c === emailLocal) return '';
+    return c;
+  })();
   const [state, setState] = useState<TourState | null>(null);
   const [mode, setMode] = useState<'core' | 'topics' | null>(null);
 
@@ -330,6 +414,8 @@ export default function OnboardingTour() {
       <TourSheet
         key="core"
         steps={coreSteps}
+        defaultName={nameSuggestion}
+        onSaveName={saveName}
         onTopicSeen={markTopicSeen}
         onFinish={(how) => {
           update({ core: how, completedAt: new Date().toISOString() });

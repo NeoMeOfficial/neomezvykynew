@@ -153,11 +153,12 @@ function PaywallWarm({ onContinueFree, onClose, onActivate }: { onContinueFree: 
 
 // ─── Variant B · Dark elegant ──────────────────────────────────
 function PaywallDark({ onContinueFree, onClose, onActivate }: { onContinueFree: () => void; onClose: () => void; onActivate: () => void }) {
+  // Mirrors the deployed website's pricing-card facts (Sam 2026-10-05).
   const tiles = [
-    { t: '4 programy', s: 'Na výber' },
-    { t: 'Cyklus', s: 'S odporúčaniami' },
-    { t: 'Reflexia', s: 'S históriou' },
-    { t: 'Návyky', s: 'Bez limitu' },
+    { t: '4 programy', s: '130 cvičení à 15 minút' },
+    { t: '120+ receptov', s: 'Bez diét' },
+    { t: '60+ meditácií', s: 'Od 3 do 15 minút' },
+    { t: 'Periodka', s: 'Tipy pre každú fázu' },
   ];
   return (
     <div style={{ background: NM.DEEP_2, minHeight: '100vh', position: 'relative', paddingBottom: 220, color: '#fff', fontFamily: NM.SANS }}>
@@ -170,14 +171,12 @@ function PaywallDark({ onContinueFree, onClose, onActivate }: { onContinueFree: 
         <div style={{ padding: '40px 22px 0' }}>
           <Eye color={NM.GOLD} size={10}>NeoMe Plus</Eye>
           <Ser size={46} color="#fff" style={{ marginTop: 16, letterSpacing: '-0.025em', lineHeight: 1 }}>
-            Všetko,
-            <br />
-            čo
+            Všetko, čo
             <br />
             <em style={{ color: NM.GOLD, fontStyle: 'italic', fontWeight: 500 }}>potrebuješ.</em>
           </Ser>
           <div style={{ marginTop: 18, fontFamily: NM.SERIF, fontSize: 15, color: 'rgba(255,255,255,0.72)', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.5 }}>
-            Štyri programy, živý cyklus, plná knižnica — tvoja cesta bez reklám a bez obmedzení.
+            Cvičenie, jedlo, myseľ aj Periodka — v jednom predplatnom, svojím tempom.
           </div>
         </div>
         <div style={{ padding: '36px 22px 0', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>

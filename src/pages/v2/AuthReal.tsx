@@ -470,10 +470,22 @@ export default function AuthReal() {
               {errors.gdpr && <FieldError>{errors.gdpr}</FieldError>}
             </div>
             {errors.submit && <Banner tone="error">{errors.submit}</Banner>}
-            {errors.success && <Banner tone="info">{errors.success}</Banner>}
-            <button type="submit" disabled={submitting} style={primaryPill(submitting)}>
-              {submitting ? 'Spracovávam…' : 'Vytvoriť účet'}
-            </button>
+            {errors.success ? (
+              <div
+                role="status"
+                style={{
+                  padding: '15px 22px', background: '#7A9E78', color: '#fff',
+                  borderRadius: 999, fontSize: 13.5, fontWeight: 600,
+                  textAlign: 'center', letterSpacing: '0.02em',
+                }}
+              >
+                ✓ {errors.success}
+              </div>
+            ) : (
+              <button type="submit" disabled={submitting} style={primaryPill(submitting)}>
+                {submitting ? 'Spracovávam…' : 'Vytvoriť účet'}
+              </button>
+            )}
           </form>
         )}
 
