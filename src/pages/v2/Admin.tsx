@@ -2204,6 +2204,25 @@ function MessagesTab() {
 
   const selectedConv = conversations.find(c => c.user_id === selectedUserId);
 
+  // User search — find ANYONE and open a thread with her, whether or
+  // not she ever wrote first (Sam 2026-10-05). Admin RLS allows the
+  // profiles read.
+  const [userSearch, setUserSearch] = React.useState('');
+  const [searchHits, setSearchHits] = React.useState<{ id: string; email: string | null; full_name: string | null }[]>([]);
+  React.useEffect(() => {
+    const q = userSearch.trim();
+    if (q.length < 2) { setSearchHits([]); return; }
+    const t = setTimeout(async () => {
+      const { data } = await supabase
+        .from('profiles')
+        .select('id, email, full_name')
+        .or(`email.ilike.%${q}%,full_name.ilike.%${q}%`)
+        .limit(8);
+      setSearchHits(data ?? []);
+    }, 250);
+    return () => clearTimeout(t);
+  }, [userSearch]);
+
   // A "Správa" click in the Users tab lands here with the target user
   // stashed — open her thread even if she never messaged first.
   React.useEffect(() => {
@@ -2265,6 +2284,29 @@ function MessagesTab() {
         {/* Conversation list */}
         <div style={{ background: _A.CARD, borderRadius: 16, border: `1px solid ${_A.HAIR}`, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
           <div style={{ padding: '14px 18px', borderBottom: `1px solid ${_A.HAIR}`, fontFamily: 'DM Sans, system-ui', fontSize: 9.5, letterSpacing: '0.18em', textTransform: 'uppercase', color: _A.EYEBROW, fontWeight: 500 }}>Conversations</div>
+          {/* User search — opens a thread with anyone */}
+          <div style={{ padding: '10px 14px', borderBottom: `1px solid ${_A.HAIR}`, position: 'relative' }}>
+            <input
+              value={userSearch}
+              onChange={e => setUserSearch(e.target.value)}
+              placeholder="Nájsť používateľku (e-mail alebo meno)…"
+              style={{ width: '100%', boxSizing: 'border-box', padding: '8px 12px', borderRadius: 10, border: `1px solid ${_A.HAIR}`, fontFamily: 'DM Sans, system-ui', fontSize: 12, outline: 'none', background: '#fff', color: _A.DEEP }}
+            />
+            {searchHits.length > 0 && (
+              <div style={{ position: 'absolute', left: 14, right: 14, top: '100%', zIndex: 30, background: '#fff', border: `1px solid ${_A.HAIR}`, borderRadius: 10, boxShadow: '0 8px 24px rgba(31,35,40,0.12)', overflow: 'hidden' }}>
+                {searchHits.map(h => (
+                  <button
+                    key={h.id}
+                    onClick={() => { setSelectedUserId(h.id); setUserSearch(''); setSearchHits([]); }}
+                    style={{ all: 'unset', cursor: 'pointer', display: 'block', width: '100%', padding: '9px 12px', borderBottom: `1px solid ${_A.HAIR}`, boxSizing: 'border-box' }}
+                  >
+                    <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12.5, fontWeight: 500, color: _A.DEEP }}>{h.full_name || h.email || h.id.slice(0, 8)}</div>
+                    {h.email && h.full_name && <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, color: _A.MUTED }}>{h.email}</div>}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
           {/* Filter pills */}
           <div style={{ display: 'flex', gap: 6, padding: '10px 14px', borderBottom: `1px solid ${_A.HAIR}`, flexWrap: 'wrap' }}>
             {([
