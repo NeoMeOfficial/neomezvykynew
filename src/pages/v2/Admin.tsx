@@ -2473,6 +2473,64 @@ async function adminSeed(type: string, items: Record<string, unknown>[]) {
   return inserted;
 }
 
+
+function AdminTodo({ goTab }: { goTab: (id: string) => void }) {
+  const [data, setData] = useState<any | null>(null);
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const res = await fetch('/.netlify/functions/admin-todo', {
+          headers: { ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}) },
+        });
+        if (res.ok) setData(await res.json());
+      } catch { /* panel is best-effort */ }
+    })();
+  }, []);
+
+  if (!data) return null;
+  const eurc = (c: number) => `${(c / 100).toFixed(2)} €`;
+  const fmtD = (iso: string) => new Date(iso).toLocaleDateString('sk-SK');
+  const actionCount = (data.payouts?.length ?? 0) + (data.ripe_candidates?.length ?? 0) + (data.unread_messages?.length ?? 0);
+
+  const row = (key: string, onClick: (() => void) | null, main: string, sub: string, urgent: boolean) => (
+    <div key={key} onClick={onClick ?? undefined} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0', borderTop: `1px solid ${_A.HAIR}`, cursor: onClick ? 'pointer' : 'default' }}>
+      <span style={{ width: 8, height: 8, borderRadius: 999, background: urgent ? _A.TERRA : _A.SAGE, flexShrink: 0 }} />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 13, fontWeight: 500, color: _A.DEEP }}>{main}</div>
+        <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11.5, color: _A.MUTED }}>{sub}</div>
+      </div>
+      {onClick && <ChevronRight style={{ width: 14, height: 14, color: _A.MUTED, flexShrink: 0 }} />}
+    </div>
+  );
+
+  return (
+    <AdminCard className="mb-5">
+      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 6 }}>
+        <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 14, fontWeight: 600, color: _A.DEEP }}>Čaká na teba</div>
+        <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11.5, color: actionCount ? _A.TERRA : _A.MUTED, fontWeight: 600 }}>
+          {actionCount ? `${actionCount} ${actionCount === 1 ? 'úloha' : actionCount <= 4 ? 'úlohy' : 'úloh'}` : 'všetko vybavené ✓'}
+        </div>
+      </div>
+      {(data.payouts ?? []).map((pp: any) =>
+        row(`po-${pp.id}`, () => goTab('affiliates'), `Vyplatiť ${eurc(pp.amount_cents)} — ${pp.email}`, `žiadosť z ${fmtD(pp.requested_at)}`, true))}
+      {(data.ripe_candidates ?? []).map((c: any) =>
+        row(`rc-${c.email}`, () => goTab('affiliates'), `Schváliť partnerku: ${c.email}`, `${c.paying} platiacich odporúčaní — splnila podmienky`, true))}
+      {(data.unread_messages ?? []).map((m: any) =>
+        row(`um-${m.email}`, () => goTab('messages'), `Neprečítané správy: ${m.email}`, `${m.unread} ${m.unread === 1 ? 'správa' : 'správy'}`, true))}
+      {(data.new_users ?? []).map((u: any) =>
+        row(`nu-${u.email}`, () => goTab('users'),
+          `Nová používateľka: ${u.email}${u.confirmed ? '' : ' (nepotvrdený e-mail)'}`,
+          `${fmtD(u.created_at)}${u.via_code ? ` · prišla cez kód ${u.via_code} (${u.via_email})` : ''}`, false))}
+      {(data.new_active_subscriptions ?? 0) > 0 && (
+        <div style={{ paddingTop: 9, borderTop: `1px solid ${_A.HAIR}`, fontFamily: 'DM Sans, system-ui', fontSize: 11.5, color: _A.MUTED }}>
+          Nové aktívne predplatné za 7 dní: <b style={{ color: _A.SAGE }}>{data.new_active_subscriptions}</b>
+        </div>
+      )}
+    </AdminCard>
+  );
+}
+
 function AffiliatesTab() {
   const [rows, setRows] = useState<any[]>([]);
   const [payouts, setPayouts] = useState<any[]>([]);
@@ -2580,6 +2638,15 @@ function AffiliatesTab() {
               <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED, marginTop: 2 }}>
                 k vyplateniu {eurc(r.totals.available)} · čaká 30 dní {eurc(r.totals.pending)} · v spracovaní {eurc(r.totals.requested)} · vyplatené {eurc(r.totals.paid)}
               </div>
+              {(r.referral_list ?? []).length > 0 && (
+                <div style={{ marginTop: 6, paddingLeft: 10, borderLeft: `2px solid ${_A.HAIR}` }}>
+                  {(r.referral_list ?? []).map((ru: any, i: number) => (
+                    <div key={i} style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11.5, color: _A.MUTED, padding: '2px 0' }}>
+                      {ru.email} · od {new Date(ru.joined).toLocaleDateString('sk-SK')} · {ru.paid ? (ru.earned_cents > 0 ? `platí (provízie ${eurc(ru.earned_cents)})` : 'platí ✓') : 'zatiaľ neplatí'}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             <label style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED, display: 'flex', alignItems: 'center', gap: 6 }}>
               provízia
@@ -4163,7 +4230,7 @@ export default function AdminNew() {
   const renderContent = () => {
     switch (activeTab) {
       case 'overview':
-        return renderOverview();
+        return (<><AdminTodo goTab={setActiveTab} />{renderOverview()}</>);
       case 'programs':
         return <ProgramsTab />;
       case 'exercises':

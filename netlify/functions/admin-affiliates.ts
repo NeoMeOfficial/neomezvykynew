@@ -47,20 +47,38 @@ export async function handler(event: any) {
   if (event.httpMethod === 'GET') {
     const [{ data: affiliates }, { data: earnings }, { data: payouts }] = await Promise.all([
       supabase.from('affiliates').select('user_id, code, commission_pct, status, created_at'),
-      supabase.from('affiliate_earnings').select('affiliate_user_id, amount_cents, status, available_at, payout_id'),
+      supabase.from('affiliate_earnings').select('affiliate_user_id, referred_user_id, amount_cents, status, available_at, payout_id'),
       supabase.from('affiliate_payouts').select('*').order('requested_at', { ascending: false }).limit(50),
     ]);
 
-    const { data: refCounts } = await supabase
+    const { data: refRows } = await supabase
       .from('affiliate_referrals')
-      .select('affiliate_user_id');
+      .select('affiliate_user_id, referred_user_id, created_at')
+      .order('created_at', { ascending: false });
+    const refCounts = refRows;
 
     // Candidates qualify for partnership at 5 PAYING referrals — each
-    // +150 referral_paid award marks exactly one first payment.
+    // +150 referral_paid award marks exactly one first payment; its
+    // ref_id ("referral_<uid>") names WHICH referred user paid.
     const { data: paidRefs } = await supabase
       .from('points_ledger')
-      .select('user_id')
+      .select('user_id, ref_id')
       .eq('event_type', 'referral_paid');
+    const paidReferredIds = new Set(
+      (paidRefs ?? []).map((r) => String(r.ref_id ?? '').replace('referral_', '')),
+    );
+
+    // Referred-user detail per affiliate (Sam 2026-10-05: "I want to
+    // see who the affiliate onboards and who starts paying").
+    const emailCache = new Map<string, string>();
+    const emailOf = async (id: string): Promise<string> => {
+      if (emailCache.has(id)) return emailCache.get(id)!;
+      const { data: u } = await supabase.auth.admin.getUserById(id);
+      const email = u?.user?.email ?? id.slice(0, 8);
+      emailCache.set(id, email);
+      return email;
+    };
+    const earnedByReferred = new Map<string, number>();
 
     const now = Date.now();
     const rows = await Promise.all(
@@ -74,10 +92,25 @@ export async function handler(event: any) {
           else if (new Date(e.available_at).getTime() > now) pending += e.amount_cents;
           else available += e.amount_cents;
         }
+        for (const e of earnings ?? []) {
+          if (e.affiliate_user_id !== a.user_id || e.status === 'reversed') continue;
+          const prev = earnedByReferred.get((e as any).referred_user_id) ?? 0;
+          earnedByReferred.set((e as any).referred_user_id, prev + e.amount_cents);
+        }
+        const myRefs = (refRows ?? []).filter((r) => r.affiliate_user_id === a.user_id).slice(0, 25);
+        const referral_list = await Promise.all(
+          myRefs.map(async (r) => ({
+            email: await emailOf(r.referred_user_id),
+            joined: r.created_at,
+            paid: paidReferredIds.has(r.referred_user_id) || (earnedByReferred.get(r.referred_user_id) ?? 0) > 0,
+            earned_cents: earnedByReferred.get(r.referred_user_id) ?? 0,
+          })),
+        );
         return {
           user_id: a.user_id,
           email: u?.user?.email ?? null,
           code: a.code,
+          referral_list,
           commission_pct: Number(a.commission_pct),
           status: a.status,
           referral_count: (refCounts ?? []).filter((r) => r.affiliate_user_id === a.user_id).length,
