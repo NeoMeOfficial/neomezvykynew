@@ -9,6 +9,7 @@ import {
   BookOpen, RefreshCw, ExternalLink, Search
 } from 'lucide-react';
 import { colors } from '../../theme/warmDusk';
+import { parseFocus, parseStretchFocus, seriesTitle, stretchSeriesTitle } from '../../features/telo/exerciseTaxonomy';
 import { supabase } from '../../lib/supabase';
 import { uploadContentImage } from '../../lib/storage';
 import BlogEditor from '../../components/admin/BlogEditor';
@@ -3250,6 +3251,35 @@ function ExercisesTab() {
     setSeeding(false);
   };
 
+  // What the APP will call each row — the taxonomy generates series
+  // names (category + running number, Gabi's locked scheme), so the DB
+  // name is only the admin label. Mirrors libraryCatalog's ordering.
+  const appNames = React.useMemo(() => {
+    const map = new Map<string, string>();
+    const counters = new Map<string, number>();
+    const ordered = [...items]
+      .filter(i => i.status !== 'archived')
+      .sort((a, b) => (a.created_at ?? '').localeCompare(b.created_at ?? ''));
+    for (const r of ordered) {
+      if (r.content_type === 'exercise') {
+        const f = parseFocus(r.body);
+        if (f) {
+          const seq = (counters.get(`e:${f}`) ?? 0) + 1;
+          counters.set(`e:${f}`, seq);
+          map.set(r.id, seriesTitle(f, seq));
+        }
+      } else {
+        const f = parseStretchFocus(r.body);
+        if (f) {
+          const seq = (counters.get(`s:${f}`) ?? 0) + 1;
+          counters.set(`s:${f}`, seq);
+          map.set(r.id, stretchSeriesTitle(f, seq));
+        }
+      }
+    }
+    return map;
+  }, [items]);
+
   const bySort = (a: ExerciseRow, b: ExerciseRow) =>
     sortBy === 'updated'
       ? (b.updated_at ?? b.created_at ?? '').localeCompare(a.updated_at ?? a.created_at ?? '')
@@ -3454,6 +3484,9 @@ function ExercisesTab() {
                   {r.thumb && <img src={r.thumb} alt="" style={{ width: 40, height: 40, borderRadius: 10, objectFit: 'cover' }} />}
                   <div>
                     <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 13, fontWeight: 500, color: _A.DEEP }}>{r.name}</div>
+                    {appNames.get(r.id) && appNames.get(r.id) !== r.name && (
+                      <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10.5, color: _A.GOLD, marginTop: 1 }}>v appke: {appNames.get(r.id)}</div>
+                    )}
                     <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 3 }}>
                       <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', padding: '2px 7px', borderRadius: 999, background: r.content_type === 'exercise' ? 'rgba(193,133,106,0.15)' : 'rgba(168,132,139,0.15)', color: r.content_type === 'exercise' ? _A.TERRA : _A.MAUVE }}>
                         {r.content_type === 'exercise' ? 'Silové' : 'Strečing'}

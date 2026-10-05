@@ -452,43 +452,9 @@ export default function ExercisePlayer() {
           </div>
         )}
 
-        {/* Next up — replaces the old generic 'O cvičení' text (Gabi 2026-07-25).
-            The heading itself links into the full library section. */}
-        {suggestions.length > 0 && (
-          <div className="rounded-card bg-white border border-ink/[0.08] shadow-nm-sm p-4">
-            <button
-              onClick={() => navigate(exercise.category === 'stretch' ? '/kniznica/telo/strecing' : '/kniznica/telo/extra')}
-              className="w-full flex items-center justify-between mb-2"
-            >
-              <Eyebrow>{exercise.category === 'stretch' ? 'Ďalšie strečingy' : 'Ďalšie cvičenia'}</Eyebrow>
-              <span className="flex items-center gap-1 font-sans text-[11px] text-ink/50 font-medium">
-                Všetky
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
-              </span>
-            </button>
-            {suggestions.map((row) => (
-              <button
-                key={row.id}
-                onClick={() => navigate(row.route, { state: row.state, replace: true })}
-                className="w-full flex items-center gap-3 py-2.5 text-left border-b border-ink/[0.06] last:border-0"
-              >
-                <div
-                  className="w-12 h-12 rounded-xl bg-cover bg-center flex-shrink-0 bg-ink/[0.06]"
-                  style={row.thumb ? { backgroundImage: `url(${row.thumb})` } : undefined}
-                />
-                <div className="flex-1 min-w-0">
-                  <div className="font-serif text-[14px] text-ink truncate">
-                    {row.titleParts
-                      ? <>{row.titleParts.before}{' '}<strong className="font-bold text-[15px]" style={{ color: '#B8864A' }}>{row.titleParts.em}</strong><span className="font-sans text-[12px] font-semibold ml-0.5" style={{ color: '#B8864A' }}>{row.titleParts.num}</span></>
-                      : row.title}
-                  </div>
-                  <div className="font-sans text-[11px] text-ink/50 mt-0.5">{row.meta}</div>
-                </div>
-                <span className="text-ink/30 text-sm">›</span>
-              </button>
-            ))}
-          </div>
-        )}
+        {/* 'Ďalšie cvičenia' suggestions removed (Sam 2026-10-05:
+            no distractions under the video). Revert if Gabi misses her
+            2026-07-26 diverse-focus alternatives. */}
 
         {/* Her hearted workouts — the top-bar heart saves them here */}
         {favoriteRows.length > 0 && (
