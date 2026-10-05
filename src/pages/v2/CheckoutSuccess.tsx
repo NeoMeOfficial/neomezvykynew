@@ -100,7 +100,7 @@ export default function CheckoutSuccess() {
       description:
         'Občasné e-maily o nových programoch, receptoch a tipoch pre teba. (Tvoj nákup ti potvrdíme bez ohľadu na túto voľbu.)',
       acceptLabel: 'Áno, posielajte',
-      declineLabel: 'Iba potrebné správy',
+      declineLabel: 'Nie, neposielajte',
     }).catch(() => {
       // Non-fatal — the user can always opt in later from Settings → Súkromie.
     });
