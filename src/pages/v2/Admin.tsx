@@ -906,6 +906,7 @@ function UsersTab({ isFullAdmin }: { isFullAdmin: boolean }) {
   const [tierMenuOpen, setTierMenuOpen] = useState<string | null>(null);
   const [expandedUser, setExpandedUser] = useState<string | null>(null);
   const [kebabOpen, setKebabOpen] = useState<{ id: string; el: HTMLElement } | null>(null);
+  const [roleEditFor, setRoleEditFor] = useState<string | null>(null);
   const [, setKebabTick] = useState(0);
   useEffect(() => {
     if (!kebabOpen) return;
@@ -1447,7 +1448,7 @@ function UsersTab({ isFullAdmin }: { isFullAdmin: boolean }) {
               <select value={inviteForm.role ?? ''} onChange={e => setInviteForm(fm => ({ ...fm, role: e.target.value }))}
                 style={{ width: '100%', boxSizing: 'border-box', padding: '9px 12px', borderRadius: 10, border: `1px solid ${_A.HAIR2}`, fontFamily: 'DM Sans, system-ui', fontSize: 13, background: '#fff' }}>
                 <option value="">— používateľka —</option>
-                <option value="support">Support (admin bez financií)</option>
+                <option value="support">Support</option>
                 <option value="admin">Admin (plný prístup)</option>
               </select>
             </div>
@@ -1529,8 +1530,9 @@ function UsersTab({ isFullAdmin }: { isFullAdmin: boolean }) {
                       <button
                         aria-label="Akcie"
                         onClick={(e) => {
-                          if (kebabOpen?.id === user.id) { setKebabOpen(null); return; }
+                          if (kebabOpen?.id === user.id) { setKebabOpen(null); setRoleEditFor(null); return; }
                           setKebabOpen({ id: user.id, el: e.currentTarget as HTMLElement });
+                          setRoleEditFor(null);
                           if (isFullAdmin) loadProgramInfo(user.id);
                         }}
                         style={{ all: 'unset', cursor: 'pointer', width: 30, height: 30, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${_A.HAIR}`, color: _A.DEEP, fontSize: 15, letterSpacing: '1px', background: kebabOpen?.id === user.id ? _A.CREAM2 : 'transparent' }}
@@ -1562,7 +1564,7 @@ function UsersTab({ isFullAdmin }: { isFullAdmin: boolean }) {
                         const top = Math.max(8, Math.min(r.bottom + 4, window.innerHeight - menuH));
                         return (
                           <>
-                          <div onClick={() => setKebabOpen(null)} style={{ position: 'fixed', inset: 0, zIndex: 1190 }} />
+                          <div onClick={() => { setKebabOpen(null); setRoleEditFor(null); }} style={{ position: 'fixed', inset: 0, zIndex: 1190 }} />
                           <div style={{ position: 'fixed', left: Math.max(8, r.right - 230), top, background: '#fff', border: `1px solid ${_A.HAIR}`, borderRadius: 12, zIndex: 1200, minWidth: 230, maxHeight: menuH, overflowY: 'auto', boxShadow: '0 10px 30px rgba(31,35,40,0.18)', paddingBottom: 4 }}>
                             {item('✉ Napísať správu', () => {
                               try { sessionStorage.setItem('neome_admin_msg_user', user.id); } catch { /* ignore */ }
@@ -1577,11 +1579,34 @@ function UsersTab({ isFullAdmin }: { isFullAdmin: boolean }) {
                               {item('Premium', () => handleSetTier(user.id, 'neome_plus'), { active: tier === 'neome_plus', busy: isSettingThis })}
                               {item(user.nutrition_plan_purchased ? 'Odobrať jedálniček' : 'Pridať jedálniček', () => handleToggleMealPlan(user), { busy: togglingMeal === user.id })}
                               {head('Programy (prístup bez Plus)')}
-                              {PROGS.map(([pid, pname]) => item(pname, () => toggleProgramGrant(user.id, pid), { active: grants.includes(pid), busy: togglingProgram === `${user.id}:${pid}` }))}
+                              {PROGS.map(([pid, pname]) => item(pname, () => {
+                                const has = grants.includes(pid);
+                                if (!has) {
+                                  // Assigning hands out paid value — typed
+                                  // confirmation required (Sam 2026-10-05).
+                                  const typed = window.prompt(`Naozaj prideliť program ${pname} používateľke ${user.email}?\n\nPre potvrdenie napíš: PRIDAT`);
+                                  if ((typed ?? '').trim().toUpperCase() !== 'PRIDAT') return;
+                                } else if (!window.confirm(`Odobrať program ${pname} používateľke ${user.email}?`)) {
+                                  return;
+                                }
+                                toggleProgramGrant(user.id, pid);
+                              }, { active: grants.includes(pid), busy: togglingProgram === `${user.id}:${pid}` }))}
                               {head('Rola')}
-                              {item('Používateľka', () => handleSetRole(user, 'user'), { active: roleNow === 'user', busy: togglingRole === user.id })}
-                              {item('Support (bez financií)', () => handleSetRole(user, 'support'), { active: roleNow === 'support', busy: togglingRole === user.id })}
-                              {item('Admin', () => handleSetRole(user, 'admin'), { active: roleNow === 'admin', busy: togglingRole === user.id })}
+                              {roleEditFor !== user.id ? (
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 14px' }}>
+                                  <span style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.DEEP }}>
+                                    {roleNow === 'admin' ? 'Admin' : roleNow === 'support' ? 'Support' : 'Používateľka'}
+                                  </span>
+                                  <button
+                                    onClick={() => setRoleEditFor(user.id)}
+                                    style={{ all: 'unset', cursor: 'pointer', fontFamily: 'DM Sans, system-ui', fontSize: 11, fontWeight: 500, color: _A.GOLD, padding: '2px 6px' }}
+                                  >Zmeniť</button>
+                                </div>
+                              ) : (<>
+                                {item('Používateľka', () => { setRoleEditFor(null); handleSetRole(user, 'user'); }, { active: roleNow === 'user', busy: togglingRole === user.id })}
+                                {item('Support', () => { setRoleEditFor(null); handleSetRole(user, 'support'); }, { active: roleNow === 'support', busy: togglingRole === user.id })}
+                                {item('Admin', () => { setRoleEditFor(null); handleSetRole(user, 'admin'); }, { active: roleNow === 'admin', busy: togglingRole === user.id })}
+                              </>)}
                               {head('Nebezpečné')}
                               {sub?.stripe_subscription_id && !sub?.cancel_at_period_end &&
                                 item('Zrušiť predplatné', () => handleCancelSubscription(user), { danger: true, busy: cancelling === user.id })}
