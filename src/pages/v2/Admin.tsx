@@ -3291,7 +3291,7 @@ function ExercisesTab() {
 
       {error && <div style={{ padding: '12px 16px', borderRadius: 12, background: 'rgba(193,133,106,0.12)', border: `1px solid ${_A.TERRA}30`, fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.TERRA, display: 'flex', alignItems: 'center', gap: 8 }}><AlertTriangle style={{ width: 14, height: 14, flexShrink: 0 }} />{error}</div>}
 
-      {showForm && (
+      {showForm && (<div ref={formRef}>
         <AdminCard>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
             <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 18, fontWeight: 500, color: _A.DEEP }}>{editId ? 'Upraviť cvičenie' : 'Nové cvičenie'}</div>
@@ -3428,7 +3428,7 @@ function ExercisesTab() {
             </button>
           </div>
         </AdminCard>
-      )}
+      </div>)}
 
       <AdminCard>
         {loading ? <div style={{ padding: '32px 0', textAlign: 'center', fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>Načítavam...</div> : (
