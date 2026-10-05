@@ -223,6 +223,26 @@ export default function Profil() {
         </div>
       </div>
 
+      {/* Refer-a-friend / partner entry — dark brown card so it stands
+          out (Sam 2026-10-05): white title, gold value, above Predplatné. */}
+      <div className="px-5 mb-6">
+        <button
+          onClick={() => navigate(isAffiliate ? '/partner' : '/odporuc')}
+          className="w-full text-left rounded-card p-5 flex items-center gap-4 transition-all active:scale-[0.99]"
+          style={{ background: '#3D2921' }}
+        >
+          <div className="flex-1 min-w-0">
+            <div className="font-serif text-h3" style={{ color: '#FFFFFF' }}>
+              {isAffiliate ? 'Partnerský program' : 'Odporuč kamarátke'}
+            </div>
+            <div className="font-sans text-sm mt-0.5" style={{ color: '#B8964A', fontWeight: 500 }}>
+              {isAffiliate ? 'Tvoje provízie a kód' : '+150 bodov za každú, ktorá si predplatí'}
+            </div>
+          </div>
+          <ChevronRight className="size-5 flex-shrink-0" style={{ color: 'rgba(255,255,255,0.55)' }} />
+        </button>
+      </div>
+
       {/* Subscription */}
       <div className="px-5 mb-6">
         <SectionHeader eyebrow="Predplatné" className="mb-3" />
@@ -251,14 +271,6 @@ export default function Profil() {
         <SettingsRow label="Upozornenia" onClick={() => navigate('/settings/notifications')} />
         <SettingsRow label="Súkromie" onClick={() => navigate('/settings/privacy')} />
         <SettingsRow label="Všetky nastavenia" onClick={() => navigate('/settings')} />
-      </SettingsGroup>
-
-      <SettingsGroup label="Spolupráca">
-        {isAffiliate ? (
-          <SettingsRow label="Partnerský program" onClick={() => navigate('/partner')} />
-        ) : (
-          <SettingsRow label="Odporuč kamarátke" value="+150 bodov" onClick={() => navigate('/odporuc')} />
-        )}
       </SettingsGroup>
 
       <SettingsGroup>
