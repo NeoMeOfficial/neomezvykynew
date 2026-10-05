@@ -2542,6 +2542,86 @@ async function adminSeed(type: string, items: Record<string, unknown>[]) {
 }
 
 
+
+function BusinessMetrics() {
+  const [m, setM] = useState<any | null>(null);
+  const [err, setErr] = useState(false);
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const res = await fetch('/.netlify/functions/admin-metrics', {
+          headers: { ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}) },
+        });
+        if (res.ok) setM(await res.json()); else setErr(true);
+      } catch { setErr(true); }
+    })();
+  }, []);
+
+  if (err) return null;
+  const eur = (c: number) => `${(c / 100).toLocaleString('sk-SK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €`;
+  const fmtD = (iso: string) => new Date(iso).toLocaleDateString('sk-SK');
+  const tile = (label: string, value: string, sub?: string) => (
+    <div key={label} style={{ flex: '1 1 150px', background: '#fff', border: `1px solid ${_A.HAIR}`, borderRadius: 14, padding: '14px 16px' }}>
+      <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 9.5, letterSpacing: '0.14em', textTransform: 'uppercase', color: _A.EYEBROW, fontWeight: 500, marginBottom: 6 }}>{label}</div>
+      <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 21, color: _A.DEEP, fontVariantNumeric: 'tabular-nums' }}>{value}</div>
+      {sub && <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 10.5, color: _A.MUTED, marginTop: 3 }}>{sub}</div>}
+    </div>
+  );
+
+  if (!m) return null;
+  const r = m.revenue; const e = m.engagement; const subs = m.subscriptions;
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 20 }}>
+      <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 9.5, letterSpacing: '0.18em', textTransform: 'uppercase', color: _A.EYEBROW, fontWeight: 500 }}>Biznis</div>
+      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+        {tile('Minulý týždeň', eur(r.last_week))}
+        {tile('Tento týždeň', eur(r.this_week), 'zatiaľ')}
+        {tile('Tento mesiac', eur(r.month_to_date), 'month-to-date')}
+        {tile('Očakávané · 30 dní', eur(r.expected_30d), 'obnovy aktívnych predplatných')}
+        {tile('Tento rok', eur(r.year_to_date), 'year-to-date')}
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 10 }}>
+        <AdminCard>
+          <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12.5, fontWeight: 600, color: _A.DEEP, marginBottom: 8 }}>Ročné tržby podľa produktu</div>
+          {Object.entries(r.by_plan_ytd as Record<string, number>).sort((a, b) => b[1] - a[1]).map(([plan, cents]) => (
+            <div key={plan} style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', borderTop: `1px solid ${_A.HAIR}`, fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>
+              <span>{plan}</span><span style={{ color: _A.DEEP, fontVariantNumeric: 'tabular-nums' }}>{eur(cents as number)}</span>
+            </div>
+          ))}
+          {Object.keys(r.by_plan_ytd).length === 0 && <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>Zatiaľ žiadne platby.</div>}
+        </AdminCard>
+
+        <AdminCard>
+          <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12.5, fontWeight: 600, color: _A.DEEP, marginBottom: 8 }}>Predplatné · aktívnych {subs.active}</div>
+          {(subs.upcoming_7d ?? []).map((u: any, i: number) => (
+            <div key={`u${i}`} style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', borderTop: `1px solid ${_A.HAIR}`, fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>
+              <span>obnova · {u.email}</span><span style={{ color: _A.SAGE }}>{fmtD(u.renews)} · {eur(u.cents)}</span>
+            </div>
+          ))}
+          {(subs.expiring ?? []).map((x: any, i: number) => (
+            <div key={`x${i}`} style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', borderTop: `1px solid ${_A.HAIR}`, fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>
+              <span>končí · {x.email}</span><span style={{ color: _A.TERRA }}>{fmtD(x.ends)}</span>
+            </div>
+          ))}
+          {(subs.upcoming_7d ?? []).length === 0 && (subs.expiring ?? []).length === 0 && (
+            <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>Najbližších 7 dní žiadne obnovy ani konce.</div>
+          )}
+        </AdminCard>
+      </div>
+
+      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+        {tile('Príspevky', `${e.posts.week ?? '—'}`, `za 7 dní · spolu ${e.posts.total ?? '—'}`)}
+        {tile('Komentáre', `${e.comments.week ?? '—'}`, `za 7 dní · spolu ${e.comments.total ?? '—'}`)}
+        {tile('Likes', `${e.likes.week ?? '—'}`, `za 7 dní · spolu ${e.likes.total ?? '—'}`)}
+        {tile('Odporúčania', `${e.referrals.week ?? 0}`, `za 7 dní · spolu ${e.referrals.total ?? 0} · platiacich ${e.referrals.paying}`)}
+      </div>
+    </div>
+  );
+}
+
 function AdminTodo({ goTab }: { goTab: (id: string) => void }) {
   const [data, setData] = useState<any | null>(null);
   useEffect(() => {
@@ -4328,7 +4408,7 @@ export default function AdminNew() {
   const renderContent = () => {
     switch (activeTab) {
       case 'overview':
-        return (<><AdminTodo goTab={setActiveTab} />{renderOverview()}</>);
+        return (<><AdminTodo goTab={setActiveTab} /><BusinessMetrics />{renderOverview()}</>);
       case 'programs':
         return <ProgramsTab />;
       case 'exercises':
