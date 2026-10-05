@@ -49,7 +49,8 @@ const navigationItems = [
   { id: 'meditations', label: 'Meditations', icon: Music, description: 'Audio Content' },
   { id: 'community', label: 'Community', icon: Flag, description: 'Post Moderation' },
   { id: 'messages', label: 'Messages', icon: MessageSquare, description: 'User Support' },
-  { id: 'affiliates', label: 'Affiliates', icon: Percent, description: 'Partner Program' },
+  { id: 'affiliates', label: 'Affiliates', icon: Percent, description: 'Partnerky — provízie' },
+  { id: 'referrers', label: 'Refer a friend', icon: Gift, description: 'Kandidátky — body' },
   { id: 'partner-discounts', label: 'Partner Zľavy', icon: Tag, description: 'Partnerské zľavy' },
   { id: 'promo-codes', label: 'Promo Kódy', icon: Percent, description: 'Zľavové kódy' },
 ] as const;
@@ -2515,7 +2516,7 @@ function AdminTodo({ goTab }: { goTab: (id: string) => void }) {
       {(data.payouts ?? []).map((pp: any) =>
         row(`po-${pp.id}`, () => goTab('affiliates'), `Vyplatiť ${eurc(pp.amount_cents)} — ${pp.email}`, `žiadosť z ${fmtD(pp.requested_at)}`, true))}
       {(data.ripe_candidates ?? []).map((c: any) =>
-        row(`rc-${c.email}`, () => goTab('affiliates'), `Schváliť partnerku: ${c.email}`, `${c.paying} platiacich odporúčaní — splnila podmienky`, true))}
+        row(`rc-${c.email}`, () => goTab('referrers'), `Schváliť partnerku: ${c.email}`, `${c.paying} platiacich odporúčaní — splnila podmienky`, true))}
       {(data.unread_messages ?? []).map((m: any) =>
         row(`um-${m.email}`, () => goTab('messages'), `Neprečítané správy: ${m.email}`, `${m.unread} ${m.unread === 1 ? 'správa' : 'správy'}`, true))}
       {(data.new_users ?? []).map((u: any) =>
@@ -2531,7 +2532,8 @@ function AdminTodo({ goTab }: { goTab: (id: string) => void }) {
   );
 }
 
-function AffiliatesTab() {
+function AffiliatesTab({ mode }: { mode: 'partners' | 'candidates' }) {
+  const partnersMode = mode === 'partners';
   const [rows, setRows] = useState<any[]>([]);
   const [payouts, setPayouts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -2590,8 +2592,11 @@ function AffiliatesTab() {
 
   const pendingPayouts = payouts.filter((pp) => pp.status === 'requested');
 
+  const shown = rows.filter((r) => (partnersMode ? r.status !== 'candidate' : r.status === 'candidate'));
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+      {partnersMode && (
       <AdminCard>
         <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 14, fontWeight: 600, color: _A.DEEP, marginBottom: 10 }}>Pridať partnera</div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -2600,8 +2605,12 @@ function AffiliatesTab() {
         </div>
         {msg && <div style={{ marginTop: 8, fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>{msg}</div>}
       </AdminCard>
+      )}
+      {!partnersMode && msg && (
+        <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED }}>{msg}</div>
+      )}
 
-      {pendingPayouts.length > 0 && (
+      {partnersMode && pendingPayouts.length > 0 && (
         <AdminCard>
           <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 14, fontWeight: 600, color: _A.DEEP, marginBottom: 10 }}>Žiadosti o vyplatenie ({pendingPayouts.length})</div>
           {pendingPayouts.map((pp) => {
@@ -2621,14 +2630,21 @@ function AffiliatesTab() {
       )}
 
       <AdminCard>
-        <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 14, fontWeight: 600, color: _A.DEEP, marginBottom: 10 }}>Partneri ({rows.length})</div>
+        <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 14, fontWeight: 600, color: _A.DEEP, marginBottom: 10 }}>
+          {partnersMode ? `Partnerky (${shown.length})` : `Kandidátky — odporúčajú za body (${shown.length})`}
+        </div>
+        {!partnersMode && (
+          <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED, marginBottom: 8 }}>
+            Každá používateľka s odporúčacím odkazom. Za platiace kamarátky zbiera body (+150). Po 5 platiacich ju tlačidlom schváliš za partnerku — presunie sa do záložky Affiliates a začne zarábať provízie.
+          </div>
+        )}
         {loading ? (
           <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 13, color: _A.MUTED }}>Načítavam…</div>
         ) : error ? (
           <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 13, color: '#B4584A' }}>{error} — spustil si už affiliates.sql?</div>
-        ) : rows.length === 0 ? (
-          <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 13, color: _A.MUTED }}>Zatiaľ žiadni partneri.</div>
-        ) : rows.map((r) => (
+        ) : shown.length === 0 ? (
+          <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 13, color: _A.MUTED }}>{partnersMode ? 'Zatiaľ žiadne partnerky.' : 'Zatiaľ žiadne kandidátky.'}</div>
+        ) : shown.map((r) => (
           <div key={r.user_id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', borderTop: `1px solid ${_A.HAIR}`, flexWrap: 'wrap' }}>
             <div style={{ flex: 1, minWidth: 240 }}>
               <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 13.5, fontWeight: 600, color: _A.DEEP }}>{r.email ?? r.user_id}</div>
@@ -2648,6 +2664,7 @@ function AffiliatesTab() {
                 </div>
               )}
             </div>
+            {partnersMode && (
             <label style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED, display: 'flex', alignItems: 'center', gap: 6 }}>
               provízia
               <input
@@ -2659,6 +2676,7 @@ function AffiliatesTab() {
                 style={{ ...inputS, width: 64, padding: '6px 8px' }}
               /> %
             </label>
+            )}
             {r.status === 'candidate' && (
               <button
                 disabled={busy}
@@ -4250,7 +4268,9 @@ export default function AdminNew() {
       case 'partner-discounts':
         return <PartnerDiscountsTab />;
       case 'affiliates':
-        return <AffiliatesTab />;
+        return <AffiliatesTab mode="partners" />;
+      case 'referrers':
+        return <AffiliatesTab mode="candidates" />;
       case 'promo-codes':
         return <PromoCodesTab />;
       default:
