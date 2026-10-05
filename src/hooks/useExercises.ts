@@ -26,7 +26,7 @@ export interface DbExercise {
   phase: 'menstrual' | 'follicular' | 'ovulation' | 'luteal' | 'all';
   intensity: 'low' | 'medium' | 'high';
   video_id: string | null;
-  video_provider: 'vimeo' | 'youtube' | null;
+  video_provider: 'vimeo' | 'youtube' | 'bunny' | null;
   free: boolean;
   sort_order: number;
   diastasis_safe: boolean;
