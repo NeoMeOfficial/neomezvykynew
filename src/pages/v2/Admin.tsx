@@ -2575,7 +2575,7 @@ function AffiliatesTab() {
             <div style={{ flex: 1, minWidth: 240 }}>
               <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 13.5, fontWeight: 600, color: _A.DEEP }}>{r.email ?? r.user_id}</div>
               <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED, marginTop: 2 }}>
-                kód: <b>{r.code ?? '— ešte nevybraný'}</b> · {r.referral_count} odporúčaní · {r.status === 'active' ? 'aktívny' : 'pozastavený'}
+                kód: <b>{r.code ?? '— ešte nevybraný'}</b> · {r.referral_count} odporúčaní · {r.status === 'active' ? 'aktívny partner' : r.status === 'candidate' ? `kandidátka (${r.paying_referrals ?? 0} z 5 platiacich)` : 'pozastavený'}
               </div>
               <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED, marginTop: 2 }}>
                 k vyplateniu {eurc(r.totals.available)} · čaká 30 dní {eurc(r.totals.pending)} · v spracovaní {eurc(r.totals.requested)} · vyplatené {eurc(r.totals.paid)}
@@ -2592,12 +2592,21 @@ function AffiliatesTab() {
                 style={{ ...inputS, width: 64, padding: '6px 8px' }}
               /> %
             </label>
+            {r.status === 'candidate' && (
+              <button
+                disabled={busy}
+                onClick={() => act({ action: 'set_status', userId: r.user_id, status: 'active' }, 'Schválená za partnerku — od teraz zarába provízie namiesto bodov.')}
+                style={btnS()}
+              >
+                Schváliť za partnerku
+              </button>
+            )}
             <button
               disabled={busy}
-              onClick={() => act({ action: 'set_status', userId: r.user_id, status: r.status === 'active' ? 'disabled' : 'active' }, 'Stav zmenený.')}
-              style={btnS(r.status === 'active')}
+              onClick={() => act({ action: 'set_status', userId: r.user_id, status: r.status === 'disabled' ? 'active' : 'disabled' }, 'Stav zmenený.')}
+              style={btnS(r.status !== 'disabled')}
             >
-              {r.status === 'active' ? 'Pozastaviť' : 'Aktivovať'}
+              {r.status === 'disabled' ? 'Aktivovať' : 'Pozastaviť'}
             </button>
           </div>
         ))}

@@ -55,6 +55,13 @@ export async function handler(event: any) {
       .from('affiliate_referrals')
       .select('affiliate_user_id');
 
+    // Candidates qualify for partnership at 5 PAYING referrals — each
+    // +150 referral_paid award marks exactly one first payment.
+    const { data: paidRefs } = await supabase
+      .from('points_ledger')
+      .select('user_id')
+      .eq('event_type', 'referral_paid');
+
     const now = Date.now();
     const rows = await Promise.all(
       (affiliates ?? []).map(async (a) => {
@@ -74,6 +81,7 @@ export async function handler(event: any) {
           commission_pct: Number(a.commission_pct),
           status: a.status,
           referral_count: (refCounts ?? []).filter((r) => r.affiliate_user_id === a.user_id).length,
+          paying_referrals: (paidRefs ?? []).filter((r) => r.user_id === a.user_id).length,
           totals: { pending, available, requested, paid },
         };
       }),

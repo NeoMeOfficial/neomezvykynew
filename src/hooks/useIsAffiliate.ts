@@ -3,27 +3,32 @@ import { supabase } from '../lib/supabase';
 import { useSupabaseAuth } from '../contexts/SupabaseAuthContext';
 
 /**
- * True when the signed-in user has an affiliates row (admin-granted).
- * RLS only ever exposes the user's own row, so this is a cheap probe —
- * used to decide whether Profil shows the Partnerský program entry.
+ * Affiliate status of the signed-in user ('active' | 'candidate' |
+ * 'disabled' | null). RLS only exposes the user's own row. Profil
+ * shows the partner dashboard entry only for 'active'; everyone else
+ * gets the refer-a-friend entry instead.
  */
-export function useIsAffiliate(): boolean {
+export function useAffiliateStatus(): string | null {
   const { user } = useSupabaseAuth();
-  const [isAffiliate, setIsAffiliate] = useState(false);
+  const [status, setStatus] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
-    if (!user?.id) { setIsAffiliate(false); return; }
+    if (!user?.id) { setStatus(null); return; }
     (async () => {
       const { data } = await supabase
         .from('affiliates')
-        .select('user_id')
+        .select('status')
         .eq('user_id', user.id)
         .maybeSingle();
-      if (!cancelled) setIsAffiliate(!!data);
+      if (!cancelled) setStatus(data?.status ?? null);
     })();
     return () => { cancelled = true; };
   }, [user?.id]);
 
-  return isAffiliate;
+  return status;
+}
+
+export function useIsAffiliate(): boolean {
+  return useAffiliateStatus() === 'active';
 }

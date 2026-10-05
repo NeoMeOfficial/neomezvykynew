@@ -65,13 +65,15 @@ export default function AffiliateDashboard() {
       const res = await authedFetch('/.netlify/functions/affiliate-dashboard');
       if (res.status === 403) { setNotAffiliate(true); return; }
       if (!res.ok) throw new Error('load-failed');
-      setData(await res.json());
+      const body = await res.json();
+      if (body.status !== 'active') { navigate('/odporuc', { replace: true }); return; }
+      setData(body);
     } catch {
       setNotAffiliate(true);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [navigate]);
 
   useEffect(() => { load(); }, [load]);
 

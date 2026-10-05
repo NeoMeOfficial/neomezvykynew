@@ -13,6 +13,7 @@ export type AwardEvent =
   | 'habit_checkin'
   | 'post_published'
   | 'community_like'
+  | 'comment_published'
   | 'program_completed';
 
 export const POINTS_AWARDED_EVENT = 'neome:points-awarded';

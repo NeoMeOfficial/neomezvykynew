@@ -17,6 +17,7 @@
 //   habit_checkin         3   per habit per day, max 5 habits
 //   post_published        5   per post, max 1 earning post per day
 //   community_like        1   once per post ever, max 5 per day
+//   comment_published     2   per comment, max 3 per day
 //   program_completed    50   once per program
 //   (referral_sub 300 is awarded by stripe-webhook, not here)
 //
@@ -54,6 +55,7 @@ const RULES: Record<string, Rule> = {
   // by deleting exactly that ref when a post is removed.
   post_published:       { points: 5,  refType: 'community',  buildRef: (r) => (r ? `post_${r}` : null), dailyLimit: 1 },
   community_like:       { points: 1,  refType: 'community',  buildRef: (r) => (r ? `like_${r}` : null), dailyLimit: 5 },
+  comment_published:    { points: 2,  refType: 'community',  buildRef: (r) => (r ? `comment_${r}` : null), dailyLimit: 3 },
   program_completed:    { points: 50, refType: 'program',    buildRef: (r) => r ?? null, exemptFromDailyCap: true },
 };
 
@@ -149,7 +151,49 @@ export async function handler(event: any) {
       return json(500, { error: 'Insert failed' });
     }
 
-    return json(200, { awarded: rule.points });
+    // Weekly programme bonus (Sam 2026-10-05): the 3rd programme-week
+    // workout earns +15 on top, computed server-side from the ledger
+    // (the old client-side week counting was unreliable and is gone).
+    // Cap-exempt like other milestones; dedupe per program per week.
+    let bonus = 0;
+    if (body.event === 'workout_completed') {
+      try {
+        const { data: prog } = await supabase
+          .from('user_active_programs')
+          .select('program_id')
+          .eq('user_id', userId)
+          .maybeSingle();
+        if (prog?.program_id) {
+          const monday = (() => {
+            const d = new Date(`${day}T12:00:00Z`);
+            const shift = (d.getUTCDay() + 6) % 7;
+            d.setUTCDate(d.getUTCDate() - shift);
+            return d.toISOString().slice(0, 10);
+          })();
+          const { count } = await supabase
+            .from('points_ledger')
+            .select('id', { count: 'exact', head: true })
+            .eq('user_id', userId)
+            .eq('event_type', 'workout_completed')
+            .gte('created_at', skDayStartISO(monday));
+          if ((count ?? 0) === 3) {
+            const { error: bonusErr } = await supabase.from('points_ledger').insert({
+              user_id: userId,
+              event_type: 'program_week',
+              points: 15,
+              ref_id: `${prog.program_id}_wk${monday}`,
+              ref_type: 'program',
+            });
+            if (!bonusErr) bonus = 15;
+            else if ((bonusErr as any).code !== '23505') console.error('program_week bonus failed:', bonusErr);
+          }
+        }
+      } catch (err) {
+        console.error('program_week check failed:', err);
+      }
+    }
+
+    return json(200, { awarded: rule.points + bonus, bonus: bonus || undefined });
   } catch (err: any) {
     console.error('award-points error:', err);
     return json(500, { error: err.message });

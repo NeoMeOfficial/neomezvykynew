@@ -312,7 +312,28 @@ async function accrueAffiliateCommission(
     .select('commission_pct, status')
     .eq('user_id', attribution.affiliate_user_id)
     .maybeSingle();
-  if (!affiliate || affiliate.status !== 'active') return;
+  if (!affiliate) return;
+
+  // Candidate referrers earn POINTS, approved affiliates earn MONEY —
+  // never both for the same payment (Sam's Decision B, 2026-10-05).
+  // ref_id is keyed on the referred user, so only her FIRST payment
+  // pays the +150 (renewals hit the unique index and are skipped).
+  if (affiliate.status === 'candidate') {
+    const { error: ptsErr } = await supabase.from('points_ledger').insert({
+      user_id: attribution.affiliate_user_id,
+      event_type: 'referral_paid',
+      points: 150,
+      ref_id: `referral_${userId}`,
+      ref_type: 'referral',
+    });
+    if (ptsErr && (ptsErr as any).code !== '23505') {
+      console.error('Referral points award failed:', ptsErr);
+    } else if (!ptsErr) {
+      console.log(`Referral +150 pts awarded to candidate ${attribution.affiliate_user_id} (referred ${userId} paid)`);
+    }
+    return;
+  }
+  if (affiliate.status !== 'active') return;
 
   const commission = Math.floor((amountCents * Number(affiliate.commission_pct)) / 100);
   if (commission <= 0) return;

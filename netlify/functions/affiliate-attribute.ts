@@ -46,7 +46,8 @@ export async function handler(event: any) {
     .maybeSingle();
   // Unknown/disabled code: report "done" so the client clears its stash —
   // there is nothing to retry.
-  if (!affiliate || affiliate.status !== 'active') return json(200, { attributed: false, reason: 'unknown_code' });
+  // Candidate links attribute too (points funnel); only disabled is dead.
+  if (!affiliate || affiliate.status === 'disabled') return json(200, { attributed: false, reason: 'unknown_code' });
   if (affiliate.user_id === auth.userId) return json(200, { attributed: false, reason: 'self' });
 
   const { data: userRow, error: userErr } = await supabase.auth.admin.getUserById(auth.userId);

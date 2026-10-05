@@ -10,6 +10,7 @@
  * signed-out users browsing the seed feed.
  */
 import { useCallback, useEffect, useState } from 'react';
+import { awardPoints } from '../lib/points';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { useSupabaseAuth } from '../contexts/SupabaseAuthContext';
 
@@ -140,6 +141,8 @@ export function useCommunityReplies(postId: string | undefined) {
 
       if (!error && data) {
         setReplies((prev) => [...prev, data as CommunityReply]);
+        // +2 server-side, max 3/day — supporting each other earns.
+        awardPoints('comment_published', (data as CommunityReply).id);
       }
     },
     [postId, user, profile, replies],

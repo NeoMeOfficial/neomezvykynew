@@ -45,6 +45,7 @@ const CompletionProgram = lazy(() => import('./pages/v2/CompletionProgram'));
 const ReflectionEntry = lazy(() => import('./pages/v2/ReflectionEntry'));
 const CyklusLog = lazy(() => import('./pages/v2/CyklusLog'));
 const AffiliateDashboard = lazy(() => import('./pages/v2/AffiliateDashboard'));
+const OdporucPage = lazy(() => import('./pages/v2/OdporucPage'));
 const KomunitaPostDetail = lazy(() => import('./pages/v2/KomunitaPostDetail'));
 const KomunitaCompose = lazy(() => import('./pages/v2/KomunitaCompose'));
 const SpravyThread = lazy(() => import('./pages/v2/SpravyThread'));
@@ -366,6 +367,7 @@ export default function AppV2() {
               <Route path="/profil" element={<Profil />} />
               <Route path="/profil/predplatne" element={<SubscriptionManagement />} />
               <Route path="/partner" element={<AffiliateDashboard />} />
+              <Route path="/odporuc" element={<OdporucPage />} />
               <Route path="/admin" element={<RequireAdmin><Admin /></RequireAdmin>} />
               <Route path="/admin-new" element={<Navigate to="/admin" replace />} />
               <Route path="/admin/dashboard" element={<Navigate to="/admin" replace />} />

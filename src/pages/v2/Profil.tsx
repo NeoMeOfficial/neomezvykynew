@@ -253,11 +253,13 @@ export default function Profil() {
         <SettingsRow label="Všetky nastavenia" onClick={() => navigate('/settings')} />
       </SettingsGroup>
 
-      {isAffiliate && (
-        <SettingsGroup label="Spolupráca">
+      <SettingsGroup label="Spolupráca">
+        {isAffiliate ? (
           <SettingsRow label="Partnerský program" onClick={() => navigate('/partner')} />
-        </SettingsGroup>
-      )}
+        ) : (
+          <SettingsRow label="Odporuč kamarátke" value="+150 bodov" onClick={() => navigate('/odporuc')} />
+        )}
+      </SettingsGroup>
 
       <SettingsGroup>
         <SettingsRow label="Odhlásiť sa" tone="danger" onClick={handleSignOut} />
