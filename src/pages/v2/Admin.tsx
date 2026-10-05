@@ -240,7 +240,7 @@ function PartnerDiscountsTab() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 22, fontWeight: 500, color: _A.DEEP }}>Partner Zľavy · pool kódov</div>
+        <div />
         <button onClick={loadAll} disabled={loading} style={{ ...btnSecondary, display: 'flex', alignItems: 'center', gap: 8 }}>
           <RefreshCw style={{ width: 13, height: 13, animation: loading ? 'spin 1s linear infinite' : 'none' }} />
           Obnoviť
@@ -506,7 +506,7 @@ function PromoCodesTab() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 22, fontWeight: 500, color: _A.DEEP }}>Promo Kódy</div>
+        <div />
         <button onClick={openAdd} style={{ ...btnPrimary, display: 'flex', alignItems: 'center', gap: 8 }}>
           <Plus style={{ width: 14, height: 14 }} />Nový kód
         </button>
@@ -754,7 +754,7 @@ function CommunityModerationTab() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 22, fontWeight: 500, color: _A.DEEP }}>Community Moderácia</div>
+        <div />
         <div style={{ display: 'flex', gap: 8 }}>
           {(['unreviewed', 'all', 'removed'] as const).map(f => {
             const labels: Record<typeof f, string> = { unreviewed: 'Nepreskúmané', all: 'Všetky', removed: 'Odstránené' };
@@ -1384,7 +1384,7 @@ function UsersTab() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }} onClick={() => setTierMenuOpen(null)}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 22, fontWeight: 500, color: _A.DEEP }}>User Management</div>
+        <div />
         <div style={{ display: 'flex', gap: 10 }}>
           <button onClick={() => setInviteOpen(v => !v)} style={{ ...btnPrimary, display: 'flex', alignItems: 'center', gap: 8 }}>
             <Plus style={{ width: 13, height: 13 }} /> Pridať používateľku
@@ -2054,7 +2054,7 @@ function BlogPostsTab() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 22, fontWeight: 500, color: _A.DEEP }}>Blog</div>
+        <div />
         <button onClick={openAdd} style={{ ...btnPrimary, display: 'flex', alignItems: 'center', gap: 8 }}>
           <Plus style={{ width: 14, height: 14 }} /> Nový príspevok
         </button>
@@ -2273,7 +2273,7 @@ function MessagesTab() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 22, fontWeight: 500, color: _A.DEEP }}>Messages</div>
+          <div />
           {totalUnread > 0 && (
             <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', padding: '3px 8px', borderRadius: 999, background: 'rgba(193,133,106,0.15)', color: _A.TERRA }}>{totalUnread} new</span>
           )}
@@ -2938,7 +2938,7 @@ function RecipesTab() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 22, fontWeight: 500, color: _A.DEEP }}>Recipe Database</div>
+        <div />
         <button onClick={openAdd} style={{ ...btnPrimary, display: 'flex', alignItems: 'center', gap: 8 }}>
           <Plus style={{ width: 14, height: 14 }} />Nový recept
         </button>
@@ -3199,7 +3199,7 @@ function ExercisesTab() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 22, fontWeight: 500, color: _A.DEEP }}>Exercise Library</div>
+        <div />
         <div style={{ display: 'flex', gap: 10 }}>
           <button onClick={seedFromStatic} disabled={seeding} style={btnSecondary}>
             {seeding ? 'Importujem…' : `Import katalógu (${TeloExtraStaticData.length + TeloStrecingStaticData.length})`}
@@ -3508,7 +3508,7 @@ function MeditationsTab() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 22, fontWeight: 500, color: _A.DEEP }}>Meditation Content</div>
+        <div />
         <div style={{ display: 'flex', gap: 10 }}>
           <button onClick={seedFromStatic} disabled={seeding} style={btnSecondary}>
             {seeding ? 'Importujem...' : 'Import 17 meditácií'}
@@ -3774,7 +3774,7 @@ function ProgramsTab() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 22, fontWeight: 500, color: _A.DEEP }}>Fitness Programy</div>
+        <div />
         <div style={{ display: 'flex', gap: 10 }}>
           {/* Seed button intentionally lives only in the empty state below —
               here it sat one misclick away from wiping live programme
@@ -4233,7 +4233,7 @@ export default function AdminNew() {
   const renderCommunity = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ fontFamily: 'Gilda Display, Georgia, serif', fontSize: 22, fontWeight: 500, color: A.DEEP }}>Community Management</div>
+        <div />
         <button style={{ ...btnPrimary, display: 'flex', alignItems: 'center', gap: 8 }}>
           <Flag style={{ width: 14, height: 14 }} />Create Featured Post
         </button>
