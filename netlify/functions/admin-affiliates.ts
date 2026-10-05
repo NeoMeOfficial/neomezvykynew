@@ -23,13 +23,9 @@ const json = (status: number, body: unknown) => ({
 
 async function findUserIdByEmail(email: string): Promise<string | null> {
   const supabase = serviceClient();
-  const { data } = await supabase
-    .from('profiles')
-    .select('id')
-    .ilike('email', email)
-    .maybeSingle();
-  if (data?.id) return data.id;
-  // profiles.email can lag auth — page through auth as a fallback.
+  // Auth is the authority (audit 2026-10-05): profiles.email is
+  // user-editable, so resolving grants from it first let anyone
+  // squatting a victim's address intercept their affiliate grant.
   for (let page = 1; page <= 5; page++) {
     const { data: list, error } = await supabase.auth.admin.listUsers({ page, perPage: 200 });
     if (error || !list?.users?.length) break;
