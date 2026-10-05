@@ -52,18 +52,26 @@ export default function OdporucPage() {
 
   const shareLink = data ? `https://app.neome.com.au/auth?mode=register&ref=${data.code}` : null;
 
+  // Share ONLY the URL: when text+url are both present, iOS's share-sheet
+  // "Copy" concatenates them and the pasted link breaks (Sam 2026-10-05).
   const share = async () => {
     if (!shareLink) return;
-    const text = 'Pridaj sa ku mne v NeoMe — cvičenie, recepty a starostlivosť o seba zladené s tvojím cyklom.';
     try {
       if (navigator.share) {
-        await navigator.share({ title: 'NeoMe', text, url: shareLink });
+        await navigator.share({ url: shareLink });
       } else {
-        await navigator.clipboard.writeText(shareLink);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+        await copyLink();
       }
     } catch { /* user cancelled share sheet */ }
+  };
+
+  const copyLink = async () => {
+    if (!shareLink) return;
+    try {
+      await navigator.clipboard.writeText(shareLink);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch { /* clipboard blocked */ }
   };
 
   const card: React.CSSProperties = {
@@ -98,12 +106,20 @@ export default function OdporucPage() {
             <div style={{ fontSize: 12.5, color: NM.MUTED, wordBreak: 'break-all', background: NM.BG, borderRadius: 10, padding: '10px 12px', marginBottom: 12 }}>
               {shareLink}
             </div>
-            <button
-              onClick={share}
-              style={{ all: 'unset', cursor: 'pointer', padding: '11px 20px', borderRadius: 999, background: NM.DEEP, color: '#fff', fontFamily: NM.SANS, fontSize: 13.5, fontWeight: 500 }}
-            >
-              {copied ? 'Skopírované ✓' : 'Zdieľať odkaz'}
-            </button>
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+              <button
+                onClick={share}
+                style={{ all: 'unset', cursor: 'pointer', padding: '11px 20px', borderRadius: 999, background: NM.DEEP, color: '#fff', fontFamily: NM.SANS, fontSize: 13.5, fontWeight: 500 }}
+              >
+                Zdieľať odkaz
+              </button>
+              <button
+                onClick={copyLink}
+                style={{ all: 'unset', cursor: 'pointer', padding: '11px 20px', borderRadius: 999, border: `1px solid ${NM.HAIR_2}`, color: NM.DEEP, fontFamily: NM.SANS, fontSize: 13.5, fontWeight: 500 }}
+              >
+                {copied ? 'Skopírované ✓' : 'Kopírovať odkaz'}
+              </button>
+            </div>
           </div>
 
           <div style={{ ...card, marginBottom: 14 }}>
