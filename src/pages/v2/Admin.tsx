@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import {
   Users, Gift, BarChart3, Euro, Dumbbell, Utensils, Music, Flag, MessageSquare,
@@ -904,7 +905,7 @@ function UsersTab({ isFullAdmin }: { isFullAdmin: boolean }) {
   const [settingTier, setSettingTier] = useState<string | null>(null);
   const [tierMenuOpen, setTierMenuOpen] = useState<string | null>(null);
   const [expandedUser, setExpandedUser] = useState<string | null>(null);
-  const [kebabOpen, setKebabOpen] = useState<string | null>(null);
+  const [kebabOpen, setKebabOpen] = useState<{ id: string; x: number; y: number } | null>(null);
   const [userDetails, setUserDetails] = useState<Record<string, UserDetail>>({});
   const [loadingDetail, setLoadingDetail] = useState<string | null>(null);
   const [stripeDetails, setStripeDetails] = useState<Record<string, StripeDetail | { error: string }>>({});
@@ -1516,14 +1517,15 @@ function UsersTab({ isFullAdmin }: { isFullAdmin: boolean }) {
                     <div style={{ position: 'relative' }}>
                       <button
                         aria-label="Akcie"
-                        onClick={() => {
-                          const next = kebabOpen === user.id ? null : user.id;
-                          setKebabOpen(next);
-                          if (next && isFullAdmin) loadProgramInfo(user.id);
+                        onClick={(e) => {
+                          if (kebabOpen?.id === user.id) { setKebabOpen(null); return; }
+                          const r = (e.currentTarget as HTMLButtonElement).getBoundingClientRect();
+                          setKebabOpen({ id: user.id, x: r.right, y: r.bottom });
+                          if (isFullAdmin) loadProgramInfo(user.id);
                         }}
-                        style={{ all: 'unset', cursor: 'pointer', width: 30, height: 30, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${_A.HAIR}`, color: _A.DEEP, fontSize: 15, letterSpacing: '1px', background: kebabOpen === user.id ? _A.CREAM2 : 'transparent' }}
+                        style={{ all: 'unset', cursor: 'pointer', width: 30, height: 30, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${_A.HAIR}`, color: _A.DEEP, fontSize: 15, letterSpacing: '1px', background: kebabOpen?.id === user.id ? _A.CREAM2 : 'transparent' }}
                       >⋯</button>
-                      {kebabOpen === user.id && (() => {
+                      {kebabOpen?.id === user.id && createPortal((() => {
                         const item = (label: string, onClick: () => void, opts?: { danger?: boolean; active?: boolean; busy?: boolean }) => (
                           <button
                             key={label}
@@ -1543,8 +1545,12 @@ function UsersTab({ isFullAdmin }: { isFullAdmin: boolean }) {
                         const grants = userGrants[user.id] ?? [];
                         const roleNow = user.role === 'admin' ? 'admin' : user.role === 'support' ? 'support' : 'user';
                         const PROGS: [string, string][] = [['postpartum', 'Postpartum'], ['bodyforming', 'BodyForming'], ['elastic-bands', 'Elastické gumy'], ['strong-sexy', 'Strong & Sexy']];
+                        const menuH = 420;
+                        const top = Math.min(kebabOpen!.y + 4, Math.max(8, window.innerHeight - menuH));
                         return (
-                          <div style={{ position: 'absolute', right: 0, top: '100%', marginTop: 4, background: '#fff', border: `1px solid ${_A.HAIR}`, borderRadius: 12, zIndex: 120, minWidth: 230, boxShadow: '0 10px 30px rgba(31,35,40,0.14)', overflow: 'hidden', paddingBottom: 4 }}>
+                          <>
+                          <div onClick={() => setKebabOpen(null)} style={{ position: 'fixed', inset: 0, zIndex: 1190 }} />
+                          <div style={{ position: 'fixed', left: Math.max(8, kebabOpen!.x - 230), top, background: '#fff', border: `1px solid ${_A.HAIR}`, borderRadius: 12, zIndex: 1200, minWidth: 230, maxHeight: 'calc(100vh - 16px)', overflowY: 'auto', boxShadow: '0 10px 30px rgba(31,35,40,0.18)', paddingBottom: 4 }}>
                             {item('✉ Napísať správu', () => {
                               try { sessionStorage.setItem('neome_admin_msg_user', user.id); } catch { /* ignore */ }
                               window.dispatchEvent(new CustomEvent('neome:admin-open-messages'));
@@ -1569,8 +1575,9 @@ function UsersTab({ isFullAdmin }: { isFullAdmin: boolean }) {
                               {item('Vymazať účet', () => { if (window.confirm(`Naozaj vymazať ${user.email}? Nenávratné.`)) handleDeleteUser(user.id); }, { danger: true, busy: deleting === user.id })}
                             </>)}
                           </div>
+                          </>
                         );
-                      })()}
+                      })(), document.body)}
                     </div>
                                         <ChevronRight style={{ width: 14, height: 14, color: _A.TERTIARY, transform: isExpanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s' }} />
                   </div>
