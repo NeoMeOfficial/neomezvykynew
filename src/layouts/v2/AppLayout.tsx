@@ -2,7 +2,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 import BottomNav from '../../components/v2/BottomNav';
 import ErrorBoundary from '../../components/v2/ErrorBoundary';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 /**
  * Real status-bar inset. iOS standalone PWAs with status-bar-style
@@ -98,14 +98,21 @@ function UpdateBanner({ onRefresh, topInset }: { onRefresh: () => void; topInset
   );
 }
 
+// Mid-session auto-reload would lose playback position here — on these
+// routes the update waits for the next app open instead.
+const PLAYER_ROUTES = ['/meditacia/', '/exercise-player', '/stretch/', '/exercise/'];
+const isPlayerRoute = (p: string) => PLAYER_ROUTES.some((r) => p.startsWith(r));
+
 export default function AppLayout() {
+  const registrationRef = useRef<ServiceWorkerRegistration | null>(null);
   const {
     needRefresh: [needRefresh],
     updateServiceWorker,
   } = useRegisterSW({
     onRegisteredSW(_swUrl, registration) {
-      // Poll for updates every 15 minutes so users on long-lived
-      // sessions still get prompted to refresh after a deploy.
+      registrationRef.current = registration ?? null;
+      // Long-lived visible sessions (desktop tabs) still learn about
+      // deploys without a foreground/background cycle.
       if (registration) {
         setInterval(() => {
           registration.update().catch(() => {});
@@ -119,6 +126,30 @@ export default function AppLayout() {
   };
 
   const { pathname } = useLocation();
+
+  // Deploys reach users without any action on their part. iOS freezes
+  // timers in backgrounded PWAs, so the interval above never fires for
+  // short daily sessions — instead: every return to foreground fetches
+  // the deployed SW, and the moment the user LEAVES the app any waiting
+  // update applies itself (the reload happens while the app is hidden,
+  // so the next open simply starts on the new version).
+  const needRefreshRef = useRef(needRefresh);
+  needRefreshRef.current = needRefresh;
+  const pathnameRef = useRef(pathname);
+  pathnameRef.current = pathname;
+  const applyingRef = useRef(false);
+  useEffect(() => {
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        registrationRef.current?.update().catch(() => {});
+      } else if (needRefreshRef.current && !applyingRef.current && !isPlayerRoute(pathnameRef.current)) {
+        applyingRef.current = true;
+        void updateServiceWorker(true);
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => document.removeEventListener('visibilitychange', onVisibility);
+  }, [updateServiceWorker]);
   const topInset = useStatusBarInset();
   const focusMode = !TAB_ROOTS.includes(pathname.replace(/\/+$/, '') || '/');
 
