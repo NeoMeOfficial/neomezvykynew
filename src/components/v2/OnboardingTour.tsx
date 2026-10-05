@@ -328,6 +328,7 @@ export default function OnboardingTour() {
   if (mode === 'core') {
     return (
       <TourSheet
+        key="core"
         steps={coreSteps}
         onTopicSeen={markTopicSeen}
         onFinish={(how) => {
@@ -345,6 +346,7 @@ export default function OnboardingTour() {
   if (mode === 'topics' && topicSteps.length > 0) {
     return (
       <TourSheet
+        key="topics"
         steps={topicSteps}
         onTopicSeen={markTopicSeen}
         onFinish={() => setMode(null)}
@@ -394,6 +396,7 @@ export function TourNudge() {
   if (open) {
     return (
       <TourSheet
+        key={`nudge-${remaining.length}`}
         steps={remaining}
         onTopicSeen={markTopicSeen}
         onFinish={() => setOpen(false)}
