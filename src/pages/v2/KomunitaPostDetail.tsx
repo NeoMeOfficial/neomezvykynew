@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { supabase } from '../../lib/supabase';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useCommunityPosts } from '../../hooks/useCommunityPosts';
 import { useCommunityReplies } from '../../hooks/useCommunityReplies';
@@ -94,6 +95,7 @@ export default function KomunitaPostDetail() {
   const { replies, addReply, formatRelativeTime } = useCommunityReplies(id);
   const post = posts.find((p) => p.id === id);
   const [reply, setReply] = useState('');
+  const [reported, setReported] = useState(false);
   const isSamplePost = id?.startsWith('seed-') ?? false;
   const showSampleReplies = isSamplePost && replies.length === 0;
   const displayReplies = isSamplePost ? replies : replies;
@@ -110,6 +112,17 @@ export default function KomunitaPostDetail() {
     toggleLike(post.id, user?.id);
   };
 
+  // Report feeds the admin "Čaká na teba" panel. Duplicate reports from
+  // the same person hit the unique index — treated as already done.
+  const handleReport = async () => {
+    if (!post || !user?.id || isSamplePost || reported) return;
+    const { error } = await supabase
+      .from('community_reports')
+      .insert({ reporter_id: user.id, post_id: post.id });
+    if (!error || (error as { code?: string }).code === '23505') setReported(true);
+    else console.warn('report failed:', error.message);
+  };
+
   return (
     <Page paddingBottom={150}>
       <div style={{ padding: 'calc(env(safe-area-inset-top) + 14px) 18px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -119,12 +132,12 @@ export default function KomunitaPostDetail() {
           </svg>
         </button>
         <Eye>Vlákno</Eye>
-        <button aria-label="Viac" style={{ all: 'unset', cursor: 'pointer', padding: 6 }}>
-          <svg width="16" height="4" viewBox="0 0 16 4" fill="none">
-            <circle cx="2" cy="2" r="1.5" fill={NM.DEEP} />
-            <circle cx="8" cy="2" r="1.5" fill={NM.DEEP} />
-            <circle cx="14" cy="2" r="1.5" fill={NM.DEEP} />
-          </svg>
+        <button
+          aria-label="Nahlásiť príspevok"
+          onClick={handleReport}
+          style={{ all: 'unset', cursor: reported ? 'default' : 'pointer', padding: '4px 8px', fontFamily: NM.SANS, fontSize: 11.5, color: reported ? NM.SAGE : NM.TERTIARY }}
+        >
+          {reported ? 'Nahlásené ✓' : 'Nahlásiť'}
         </button>
       </div>
 

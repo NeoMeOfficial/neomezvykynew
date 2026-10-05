@@ -2492,11 +2492,16 @@ function AdminTodo({ goTab }: { goTab: (id: string) => void }) {
   if (!data) return null;
   const eurc = (c: number) => `${(c / 100).toFixed(2)} €`;
   const fmtD = (iso: string) => new Date(iso).toLocaleDateString('sk-SK');
-  const actionCount = (data.payouts?.length ?? 0) + (data.ripe_candidates?.length ?? 0) + (data.unread_messages?.length ?? 0);
+  const actionCount =
+    (data.payouts?.length ?? 0) + (data.ripe_candidates?.length ?? 0) +
+    (data.unread_messages?.length ?? 0) + (data.reported_content?.length ?? 0) +
+    (data.declined_payments?.length ?? 0) + (data.unconfirmed_signups?.length ?? 0) +
+    (data.reversals?.length ?? 0) + ((data.new_posts ?? 0) > 0 ? 1 : 0) +
+    (data.cancellations?.length ?? 0);
 
   const row = (key: string, onClick: (() => void) | null, main: string, sub: string, urgent: boolean) => (
     <div key={key} onClick={onClick ?? undefined} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0', borderTop: `1px solid ${_A.HAIR}`, cursor: onClick ? 'pointer' : 'default' }}>
-      <span style={{ width: 8, height: 8, borderRadius: 999, background: urgent ? _A.TERRA : _A.SAGE, flexShrink: 0 }} />
+      <span style={{ width: 8, height: 8, borderRadius: 999, background: urgent ? _A.TERRA : _A.GOLD, flexShrink: 0 }} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 13, fontWeight: 500, color: _A.DEEP }}>{main}</div>
         <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11.5, color: _A.MUTED }}>{sub}</div>
@@ -2510,24 +2515,27 @@ function AdminTodo({ goTab }: { goTab: (id: string) => void }) {
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 6 }}>
         <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 14, fontWeight: 600, color: _A.DEEP }}>Čaká na teba</div>
         <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11.5, color: actionCount ? _A.TERRA : _A.MUTED, fontWeight: 600 }}>
-          {actionCount ? `${actionCount} ${actionCount === 1 ? 'úloha' : actionCount <= 4 ? 'úlohy' : 'úloh'}` : 'všetko vybavené ✓'}
+          {actionCount ? `${actionCount} ${actionCount === 1 ? 'položka' : actionCount <= 4 ? 'položky' : 'položiek'}` : 'všetko vybavené ✓'}
         </div>
       </div>
       {(data.payouts ?? []).map((pp: any) =>
         row(`po-${pp.id}`, () => goTab('affiliates'), `Vyplatiť ${eurc(pp.amount_cents)} — ${pp.email}`, `žiadosť z ${fmtD(pp.requested_at)}`, true))}
+      {(data.reported_content ?? []).map((rc: any) =>
+        row(`rep-${rc.post_id}`, () => goTab('community'), `Nahlásený príspevok (${rc.count}× nahlásenie)`, 'posúď a prípadne skry v moderácii', true))}
       {(data.ripe_candidates ?? []).map((c: any) =>
         row(`rc-${c.email}`, () => goTab('referrers'), `Schváliť partnerku: ${c.email}`, `${c.paying} platiacich odporúčaní — splnila podmienky`, true))}
       {(data.unread_messages ?? []).map((m: any) =>
         row(`um-${m.email}`, () => goTab('messages'), `Neprečítané správy: ${m.email}`, `${m.unread} ${m.unread === 1 ? 'správa' : 'správy'}`, true))}
-      {(data.new_users ?? []).map((u: any) =>
-        row(`nu-${u.email}`, () => goTab('users'),
-          `Nová používateľka: ${u.email}${u.confirmed ? '' : ' (nepotvrdený e-mail)'}`,
-          `${fmtD(u.created_at)}${u.via_code ? ` · prišla cez kód ${u.via_code} (${u.via_email})` : ''}`, false))}
-      {(data.new_active_subscriptions ?? 0) > 0 && (
-        <div style={{ paddingTop: 9, borderTop: `1px solid ${_A.HAIR}`, fontFamily: 'DM Sans, system-ui', fontSize: 11.5, color: _A.MUTED }}>
-          Nové aktívne predplatné za 7 dní: <b style={{ color: _A.SAGE }}>{data.new_active_subscriptions}</b>
-        </div>
-      )}
+      {(data.declined_payments ?? []).map((d: any) =>
+        row(`dp-${d.email}`, () => goTab('users'), `Zamietnutá platba: ${d.email}`, `obnova predplatného zlyhala ${fmtD(d.at)} — hrozí strata prístupu, zváž e-mail`, true))}
+      {(data.reversals ?? []).map((rv: any) =>
+        row(`rev-${rv.email}`, () => goTab('affiliates'), `Stornovaná provízia ${eurc(rv.amount_cents)} — ${rv.email}`, `refundácia/spor ${fmtD(rv.at)} — over, či nebola už vyplatená`, true))}
+      {(data.unconfirmed_signups ?? []).map((u: any) =>
+        row(`uc-${u.email}`, () => goTab('users'), `Nepotvrdený e-mail: ${u.email}`, `registrácia ${fmtD(u.created_at)} — pošli magic link alebo potvrď ručne`, false))}
+      {(data.cancellations ?? []).map((cn: any) =>
+        row(`cn-${cn.email}`, () => goTab('users'), `Zrušila predplatné: ${cn.email}`, `prístup končí ${cn.ends ? fmtD(cn.ends) : 'na konci obdobia'} — priestor na záchranný e-mail`, false))}
+      {(data.new_posts ?? 0) > 0 &&
+        row('np', () => goTab('community'), `Nové príspevky v komunite: ${data.new_posts}`, 'za posledných 48 h — rýchla kontrola obsahu', false)}
     </AdminCard>
   );
 }

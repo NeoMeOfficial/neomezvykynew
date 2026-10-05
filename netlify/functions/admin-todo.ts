@@ -1,8 +1,12 @@
 // netlify/functions/admin-todo.ts
 //
-// The admin "Čaká na teba" inbox (Sam 2026-10-05): one aggregated feed
-// of everything that needs the owner's attention or awareness, so no
-// payout, approval, message or signup slips through tab-checking.
+// The admin "Čaká na teba" inbox (Sam 2026-10-05, refined same day):
+// ONLY items that need the owner's attention or action — no plain
+// "new user" noise. Covered: payouts to send, candidates ripe for
+// partner approval, unread user messages, reported community content,
+// new posts to review, declined renewal payments, signups that never
+// confirmed their email, fresh cancellations (churn outreach), and
+// refund-reversed commissions (clawback check).
 
 import { requireAdmin } from './_adminAuth';
 import { serviceClient } from './_userAuth';
@@ -27,22 +31,32 @@ export async function handler(event: any) {
   if (!auth.ok) return json(auth.status, { error: auth.error });
 
   const supabase = serviceClient();
-  const since = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString();
+  const now = Date.now();
+  const d7 = new Date(now - 7 * 24 * 3600 * 1000).toISOString();
+  const d2 = new Date(now - 2 * 24 * 3600 * 1000).toISOString();
+  const h24 = new Date(now - 24 * 3600 * 1000).toISOString();
 
   const [
     { data: payouts },
     { data: candidates },
     { data: paidRefs },
     { data: unreadMsgs },
-    { data: newRefs },
-    { data: newSubs },
+    reportsRes,
+    { data: newPosts },
+    paymentFailsRes,
+    { data: cancelling },
+    { data: reversed },
   ] = await Promise.all([
     supabase.from('affiliate_payouts').select('id, affiliate_user_id, amount_cents, requested_at').eq('status', 'requested').order('requested_at'),
-    supabase.from('affiliates').select('user_id, code, status').eq('status', 'candidate'),
-    supabase.from('points_ledger').select('user_id, ref_id, created_at').eq('event_type', 'referral_paid'),
-    supabase.from('messages').select('user_id, created_at').eq('is_from_admin', false).is('read_at', null),
-    supabase.from('affiliate_referrals').select('affiliate_user_id, referred_user_id, code_used, created_at').gte('created_at', since).order('created_at', { ascending: false }),
-    supabase.from('subscriptions').select('user_id, updated_at').eq('active', true).gte('updated_at', since),
+    supabase.from('affiliates').select('user_id, code').eq('status', 'candidate'),
+    supabase.from('points_ledger').select('user_id').eq('event_type', 'referral_paid'),
+    supabase.from('messages').select('user_id').eq('is_from_admin', false).is('read_at', null),
+    // Table may not exist until Sam runs community_reports.sql.
+    supabase.from('community_reports').select('post_id, reply_id, reason, created_at').is('resolved_at', null),
+    supabase.from('community_posts').select('id, author_name, type, created_at').eq('status', 'visible').gte('created_at', d2),
+    supabase.from('payment_events').select('user_id, event_type, created_at').eq('event_type', 'invoice_payment_failed').gte('created_at', d7),
+    supabase.from('subscriptions').select('user_id, cancel_at_period_end, current_period_end, updated_at').eq('active', true).eq('cancel_at_period_end', true).gte('updated_at', d7),
+    supabase.from('affiliate_earnings').select('affiliate_user_id, amount_cents, created_at, status').eq('status', 'reversed').gte('created_at', d7),
   ]);
 
   const emailCache = new Map<string, string>();
@@ -54,32 +68,7 @@ export async function handler(event: any) {
     return email;
   };
 
-  // New signups (last 7 days) — with referral source where known.
-  const refByUser = new Map((newRefs ?? []).map((r) => [r.referred_user_id, r]));
-  let newUsers: any[] = [];
-  try {
-    const { data: list } = await supabase.auth.admin.listUsers({ page: 1, perPage: 100 });
-    newUsers = await Promise.all(
-      (list?.users ?? [])
-        .filter((u) => u.created_at >= since)
-        .sort((a, b) => (a.created_at < b.created_at ? 1 : -1))
-        .slice(0, 25)
-        .map(async (u) => {
-          const ref = refByUser.get(u.id);
-          return {
-            email: u.email,
-            created_at: u.created_at,
-            confirmed: !!u.email_confirmed_at,
-            via_code: ref?.code_used ?? null,
-            via_email: ref ? await emailOf(ref.affiliate_user_id) : null,
-          };
-        }),
-    );
-  } catch (err) {
-    console.error('admin-todo listUsers failed:', err);
-  }
-
-  // Payouts to process.
+  // Payouts to send.
   const payoutItems = await Promise.all(
     (payouts ?? []).map(async (p) => ({
       id: p.id,
@@ -89,30 +78,64 @@ export async function handler(event: any) {
     })),
   );
 
-  // Candidates ripe for approval (>= 5 paying referrals).
+  // Candidates ripe for approval (>= 5 paying).
   const payingByUser = new Map<string, number>();
-  for (const r of paidRefs ?? []) {
-    payingByUser.set(r.user_id, (payingByUser.get(r.user_id) ?? 0) + 1);
-  }
+  for (const r of paidRefs ?? []) payingByUser.set(r.user_id, (payingByUser.get(r.user_id) ?? 0) + 1);
   const ripe = await Promise.all(
     (candidates ?? [])
       .filter((c) => (payingByUser.get(c.user_id) ?? 0) >= 5)
-      .map(async (c) => ({
-        email: await emailOf(c.user_id),
-        code: c.code,
-        paying: payingByUser.get(c.user_id) ?? 0,
-      })),
+      .map(async (c) => ({ email: await emailOf(c.user_id), code: c.code, paying: payingByUser.get(c.user_id) ?? 0 })),
   );
 
-  // Unread messages grouped per user.
+  // Unread messages per user.
   const unreadByUser = new Map<string, number>();
-  for (const m of unreadMsgs ?? []) {
-    unreadByUser.set(m.user_id, (unreadByUser.get(m.user_id) ?? 0) + 1);
-  }
+  for (const m of unreadMsgs ?? []) unreadByUser.set(m.user_id, (unreadByUser.get(m.user_id) ?? 0) + 1);
   const messages = await Promise.all(
-    [...unreadByUser.entries()].slice(0, 25).map(async ([uid, n]) => ({
-      email: await emailOf(uid),
-      unread: n,
+    [...unreadByUser.entries()].slice(0, 25).map(async ([uid, n]) => ({ email: await emailOf(uid), unread: n })),
+  );
+
+  // Reported content, grouped per post (table may not exist yet).
+  const reportRows = reportsRes.error ? [] : (reportsRes.data ?? []);
+  const reportsByPost = new Map<string, number>();
+  for (const r of reportRows) reportsByPost.set(r.post_id, (reportsByPost.get(r.post_id) ?? 0) + 1);
+  const reports = [...reportsByPost.entries()].slice(0, 25).map(([post_id, n]) => ({ post_id, count: n }));
+
+  // Declined renewal payments — card failed; access is at risk.
+  const failRows = paymentFailsRes.error ? [] : (paymentFailsRes.data ?? []);
+  const failedByUser = new Map<string, string>();
+  for (const f of failRows) {
+    if (f.user_id && !failedByUser.has(f.user_id)) failedByUser.set(f.user_id, f.created_at);
+  }
+  const declined = await Promise.all(
+    [...failedByUser.entries()].slice(0, 25).map(async ([uid, at]) => ({ email: await emailOf(uid), at })),
+  );
+
+  // Signed up but never confirmed the email (>24h old, last 7 days).
+  let unconfirmed: any[] = [];
+  try {
+    const { data: list } = await supabase.auth.admin.listUsers({ page: 1, perPage: 200 });
+    unconfirmed = (list?.users ?? [])
+      .filter((u) => !u.email_confirmed_at && u.created_at >= d7 && u.created_at <= h24)
+      .slice(0, 25)
+      .map((u) => ({ email: u.email, created_at: u.created_at }));
+  } catch (err) {
+    console.error('admin-todo listUsers failed:', err);
+  }
+
+  // Fresh cancellations — subscription still active, set to end.
+  const cancellations = await Promise.all(
+    (cancelling ?? []).slice(0, 25).map(async (c) => ({
+      email: await emailOf(c.user_id),
+      ends: c.current_period_end,
+    })),
+  );
+
+  // Reversed commissions (refund/chargeback clawbacks) — verify payouts.
+  const reversals = await Promise.all(
+    (reversed ?? []).slice(0, 10).map(async (r) => ({
+      email: await emailOf(r.affiliate_user_id),
+      amount_cents: r.amount_cents,
+      at: r.created_at,
     })),
   );
 
@@ -120,7 +143,11 @@ export async function handler(event: any) {
     payouts: payoutItems,
     ripe_candidates: ripe,
     unread_messages: messages,
-    new_users: newUsers,
-    new_active_subscriptions: (newSubs ?? []).length,
+    reported_content: reports,
+    new_posts: (newPosts ?? []).length,
+    declined_payments: declined,
+    unconfirmed_signups: unconfirmed,
+    cancellations,
+    reversals,
   });
 }
