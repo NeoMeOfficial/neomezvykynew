@@ -403,18 +403,51 @@ async function reverseAffiliateCommission(charge: Stripe.Charge) {
 }
 
 async function handleAffiliateCommission(invoice: Stripe.Invoice) {
-  // userId travels in subscription metadata (set at checkout); Stripe
-  // copies it onto the invoice via subscription_details.
-  let userId = (invoice as any).subscription_details?.metadata?.userId as string | undefined;
-  if (!userId && typeof invoice.subscription === 'string') {
-    try {
-      const sub = await stripe.subscriptions.retrieve(invoice.subscription);
-      userId = sub.metadata?.userId;
-    } catch (err) {
-      console.error('Invoice subscription lookup failed:', err);
+  // userId travels in subscription metadata (set at checkout). WHERE it
+  // sits on the invoice depends on the webhook endpoint's pinned API
+  // version: older payloads carry subscription_details at the top
+  // level, 2025+ payloads nest it under invoice.parent. The old-shape
+  // lookup alone made this handler a silent no-op on new endpoints
+  // (found 2026-10-05: two attributed test payments, zero commission,
+  // all deliveries 200).
+  const inv = invoice as any;
+  let userId: string | undefined =
+    inv.subscription_details?.metadata?.userId ||
+    inv.parent?.subscription_details?.metadata?.userId;
+  let via = userId ? 'invoice metadata' : '';
+
+  if (!userId) {
+    const subId: string | undefined =
+      typeof inv.subscription === 'string'
+        ? inv.subscription
+        : inv.parent?.subscription_details?.subscription;
+    if (subId) {
+      try {
+        const sub = await stripe.subscriptions.retrieve(subId);
+        userId = sub.metadata?.userId;
+        via = 'subscription retrieve';
+      } catch (err) {
+        console.error('Invoice subscription lookup failed:', err);
+      }
     }
   }
-  if (!userId) return;
+
+  if (!userId && typeof inv.customer === 'string') {
+    // Last resort: our own table maps Stripe customer → user.
+    const { data } = await supabase
+      .from('subscriptions')
+      .select('user_id')
+      .eq('stripe_customer_id', inv.customer)
+      .maybeSingle();
+    userId = data?.user_id;
+    via = 'customer lookup';
+  }
+
+  if (!userId) {
+    console.error(`invoice.payment_succeeded ${invoice.id}: could not resolve userId — no commission accrued`);
+    return;
+  }
+  console.log(`invoice.payment_succeeded ${invoice.id}: userId ${userId} via ${via}, amount ${invoice.amount_paid}`);
   await accrueAffiliateCommission(userId, invoice.amount_paid, 'subscription', invoice.id);
 }
 
