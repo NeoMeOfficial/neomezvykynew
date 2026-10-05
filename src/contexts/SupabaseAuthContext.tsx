@@ -204,6 +204,12 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
             last_name: lastName,
             gdpr_consent: gdprConsent,
             gdpr_consent_at: gdprConsent ? new Date().toISOString() : null,
+            // Referral code survives the email-confirmation round-trip
+            // server-side — the localStorage stash is lost whenever the
+            // confirm link opens in a different browser than the signup.
+            referral_code: (() => {
+              try { return localStorage.getItem('neome_affiliate_ref') || undefined; } catch { return undefined; }
+            })(),
           },
         },
       });

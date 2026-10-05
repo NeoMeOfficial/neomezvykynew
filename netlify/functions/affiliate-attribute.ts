@@ -35,9 +35,21 @@ export async function handler(event: any) {
   } catch {
     return json(400, { error: 'Invalid JSON' });
   }
-  if (!code || code.length > 40) return json(400, { error: 'Invalid code' });
 
   const supabase = serviceClient();
+
+  const { data: userRow, error: userErr } = await supabase.auth.admin.getUserById(auth.userId);
+  if (userErr || !userRow?.user) return json(500, { error: 'User lookup failed' });
+
+  // localStorage stash dies when the confirmation email is opened in a
+  // different browser than the signup (found 2026-10-05: incognito
+  // signup, confirm in the main browser → attribution lost). The code
+  // is therefore also baked into signup metadata server-side; an empty
+  // body falls back to it.
+  if (!code) {
+    code = String((userRow.user.user_metadata as any)?.referral_code ?? '').trim();
+  }
+  if (!code || code.length > 40) return json(200, { attributed: false, reason: 'no_code' });
 
   const { data: affiliate } = await supabase
     .from('affiliates')
@@ -50,8 +62,6 @@ export async function handler(event: any) {
   if (!affiliate || affiliate.status === 'disabled') return json(200, { attributed: false, reason: 'unknown_code' });
   if (affiliate.user_id === auth.userId) return json(200, { attributed: false, reason: 'self' });
 
-  const { data: userRow, error: userErr } = await supabase.auth.admin.getUserById(auth.userId);
-  if (userErr || !userRow?.user) return json(500, { error: 'User lookup failed' });
   const createdAt = new Date(userRow.user.created_at).getTime();
   if (Date.now() - createdAt > SIGNUP_WINDOW_DAYS * 24 * 3600 * 1000) {
     return json(200, { attributed: false, reason: 'not_new' });

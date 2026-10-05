@@ -22,17 +22,20 @@ export async function flushAffiliateAttribution() {
   try {
     code = localStorage.getItem(AFFILIATE_REF_KEY);
   } catch { /* ignore */ }
-  if (!code) return;
   try {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session?.access_token) return;
+    // No local stash (confirm link opened in another browser) — the
+    // code may still live in signup metadata; an empty body tells the
+    // server to use that copy. Skip the call entirely for everyone else.
+    if (!code && !(session.user?.user_metadata as Record<string, unknown> | undefined)?.referral_code) return;
     const res = await fetch('/.netlify/functions/affiliate-attribute', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${session.access_token}`,
       },
-      body: JSON.stringify({ code }),
+      body: JSON.stringify(code ? { code } : {}),
     });
     // Any definitive answer (attributed, unknown code, already bound,
     // not a fresh account) ends the retry loop; only network/5xx keeps
