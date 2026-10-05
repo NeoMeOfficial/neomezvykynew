@@ -62,8 +62,9 @@ function levelToIntensity(level: number | null): 'low' | 'medium' | 'high' {
   return 'high';
 }
 
-function detectProvider(videoUrl: string | null): 'vimeo' | 'youtube' | null {
+function detectProvider(videoUrl: string | null): 'vimeo' | 'youtube' | 'bunny' | null {
   if (!videoUrl) return null;
+  if (/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/.test(videoUrl)) return 'bunny';
   if (videoUrl.includes('vimeo.com') || /^\d+$/.test(videoUrl)) return 'vimeo';
   if (videoUrl.includes('youtu')) return 'youtube';
   return null;
@@ -71,6 +72,9 @@ function detectProvider(videoUrl: string | null): 'vimeo' | 'youtube' | null {
 
 function extractVideoId(videoUrl: string | null): string | null {
   if (!videoUrl) return null;
+  // Bunny Stream GUID — bare or inside an embed/play URL.
+  const b = videoUrl.match(/([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})/);
+  if (b) return b[1].toLowerCase();
   // Already a bare id?
   if (/^\d+$/.test(videoUrl)) return videoUrl;
   if (/^[A-Za-z0-9_-]{11}$/.test(videoUrl)) return videoUrl;

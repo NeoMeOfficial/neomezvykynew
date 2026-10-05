@@ -71,6 +71,8 @@ function localDayISO(d: Date): string {
 function extractVideoId(videoUrl: string | null | undefined): string | null {
   if (!videoUrl) return null;
   const v = videoUrl.trim();
+  const bunny = v.match(/([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})/);
+  if (bunny) return bunny[1].toLowerCase();
   const vimeo = v.match(/vimeo\.com\/(\d+)/);
   if (vimeo) return vimeo[1];
   const yt = v.match(/(?:youtube\.com\/.*[?&]v=|youtu\.be\/|youtube\.com\/embed\/)([\w-]{11})/);

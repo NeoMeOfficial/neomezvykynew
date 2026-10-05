@@ -1,5 +1,6 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useEffect, useMemo, useRef } from 'react';
+import { supabase } from '../../lib/supabase';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Player from '@vimeo/player';
 import { Share2, Heart } from 'lucide-react';
 import { TopBar } from '@/components/v2/top-bar';
@@ -105,6 +106,7 @@ export default function ExercisePlayer() {
   if (!exercise) exercise = exercises[0];
 
   const isVimeo = !!exercise.videoUrl && /^\d+$/.test(exercise.videoUrl);
+  const isBunny = !!exercise.videoUrl && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(exercise.videoUrl);
 
   // Library rows for the suggestion + favorites sections under the video.
   const { exercises: dbExercises } = useExercises();
@@ -247,6 +249,82 @@ export default function ExercisePlayer() {
     };
   }, [isVimeo, exercise.videoUrl, entitlement.loading, entitlement.allowed]);
 
+  // ── Bunny Stream (signed playback, Sam 2026-10-05) ──────────
+  // The embed URL comes from video-token (authenticated, 4h expiry) so
+  // raw GUIDs in the DB are unplayable. The Bunny player speaks the
+  // player.js protocol over postMessage: we subscribe to timeupdate
+  // (for the 10s view log) and ended (completion → +10 chain).
+  const [bunnyEmbed, setBunnyEmbed] = useState<string | null>(null);
+  const bunnyFrameRef = useRef<HTMLIFrameElement | null>(null);
+
+  useEffect(() => {
+    if (!isBunny || entitlement.loading || !allowed) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.access_token) return;
+        const res = await fetch('/.netlify/functions/video-token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+          body: JSON.stringify({ videoId: exercise.videoUrl }),
+        });
+        if (!res.ok) return;
+        const body = await res.json();
+        if (!cancelled) setBunnyEmbed(body.embedUrl);
+      } catch { /* player shows the fallback note */ }
+    })();
+    return () => { cancelled = true; };
+  }, [isBunny, exercise.videoUrl, entitlement.loading, allowed]);
+
+  useEffect(() => {
+    if (!isBunny || !bunnyEmbed) return;
+
+    const subscribe = () => {
+      const w = bunnyFrameRef.current?.contentWindow;
+      if (!w) return;
+      for (const ev of ['timeupdate', 'ended']) {
+        w.postMessage(JSON.stringify({ context: 'player.js', version: '0.0.11', method: 'addEventListener', value: ev }), '*');
+      }
+    };
+
+    const onMessage = (e: MessageEvent) => {
+      if (typeof e.data !== 'string') return;
+      let msg: any;
+      try { msg = JSON.parse(e.data); } catch { return; }
+      if (msg?.context !== 'player.js') return;
+      if (msg.event === 'ready') subscribe();
+      if (msg.event === 'timeupdate') {
+        const seconds = msg.value?.seconds ?? 0;
+        const delta = seconds - lastTimeRef.current;
+        if (delta > 0 && delta < 1.5) {
+          playedSecRef.current += delta;
+          if (playedSecRef.current >= 10 && !viewLoggedRef.current) {
+            viewLoggedRef.current = true;
+            entitlement.logView();
+          }
+        }
+        lastTimeRef.current = seconds;
+      }
+      if (msg.event === 'ended') {
+        navigate('/completion/workout', {
+          replace: true,
+          state: {
+            exerciseId: exercise.id,
+            title: exercise.name,
+            type: contentType,
+            duration: Math.round(playedSecRef.current / 60) || undefined,
+            program: location.state?.fromProgram ? activeProg?.program_id : undefined,
+          },
+        });
+      }
+    };
+
+    window.addEventListener('message', onMessage);
+    const t = setTimeout(subscribe, 1200); // belt & braces if 'ready' already fired
+    return () => { window.removeEventListener('message', onMessage); clearTimeout(t); };
+  }, [isBunny, bunnyEmbed, entitlement, navigate, contentType, activeProg?.program_id]);
+
   const handleShare = async () => {
     const videoUrl = exercise.videoUrl
       ? (isVimeo ? `https://vimeo.com/${exercise.videoUrl}` : `https://youtu.be/${exercise.videoUrl}`)
@@ -303,7 +381,20 @@ export default function ExercisePlayer() {
         {/* Video */}
         <div className="rounded-card bg-black overflow-hidden">
           <div className="relative aspect-video">
-            {isVimeo ? (
+            {isBunny ? (
+              bunnyEmbed ? (
+                <iframe
+                  ref={bunnyFrameRef}
+                  src={bunnyEmbed}
+                  title={exercise.name}
+                  allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+                  allowFullScreen
+                  className="w-full h-full border-0"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-white/70 font-sans text-sm">Pripravujem video…</div>
+              )
+            ) : isVimeo ? (
               <div ref={vimeoMountRef} className="w-full h-full" />
             ) : exercise.videoUrl ? (
               <iframe

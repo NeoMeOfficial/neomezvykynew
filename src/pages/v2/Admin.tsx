@@ -3353,12 +3353,18 @@ function ExercisesTab() {
             </div>
             <div style={{ gridColumn: '1 / -1' }}>
               <label style={labelStyle}>Video URL (Vimeo alebo YouTube)</label>
-              <input value={form.video_url ?? ''} onChange={e => setForm(f => ({ ...f, video_url: e.target.value }))} placeholder="https://vimeo.com/123456789 — dá sa doplniť aj neskôr" style={inputStyle} />
+              <input value={form.video_url ?? ''} onChange={e => setForm(f => ({ ...f, video_url: e.target.value }))} placeholder="Bunny ID / vimeo.com/… — dá sa doplniť aj neskôr" style={inputStyle} />
               {(() => {
                 // Same detection the app player uses — instant feedback that
                 // the pasted link will actually play.
                 const v = (form.video_url ?? '').trim();
                 if (!v) return null;
+                const bunny = v.match(/(?:mediadelivery\.net\/(?:embed|play)\/\d+\/|video\.bunnycdn\.com\/play\/\d+\/)?([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})/)?.[1] ?? null;
+                if (bunny) return (
+                  <div style={{ marginTop: 6, fontFamily: 'DM Sans, system-ui', fontSize: 11.5, color: _A.SAGE }}>
+                    ✓ Bunny Stream · {bunny.toLowerCase()} — ulož ako samotné ID (appka podpíše prehrávanie tokenom)
+                  </div>
+                );
                 const vimeo = v.match(/vimeo\.com\/(\d+)/)?.[1] ?? (/^\d+$/.test(v) ? v : null);
                 const yt = v.match(/(?:youtube\.com\/.*[?&]v=|youtu\.be\/|youtube\.com\/embed\/)([\w-]{11})/)?.[1]
                   ?? (/^[\w-]{11}$/.test(v) && !/^\d+$/.test(v) ? v : null);
