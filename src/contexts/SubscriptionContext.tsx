@@ -165,6 +165,38 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     }
   }, [demoMode]);
 
+  // ------ Follow the logged-in account ------
+  // The mount-time load above reads whoever is in localStorage at boot.
+  // Without this listener, logging out and into a DIFFERENT account kept
+  // the previous account's tier in memory (paid→free showed phantom Plus)
+  // until a full app restart.
+  useEffect(() => {
+    if (demoMode) return;
+    const { data: { subscription: authSub } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_OUT') {
+        setSubscription(null);
+        setMealPlannerPurchased(false);
+        localStorage.removeItem(MEAL_PLANNER_KEY);
+      } else if (event === 'SIGNED_IN') {
+        loadSubscription();
+      }
+    });
+    return () => authSub.unsubscribe();
+  }, [demoMode]);
+
+  // ------ Refresh on return to foreground ------
+  // A PWA resumed from the app switcher doesn't remount, so tier changes
+  // made while backgrounded (admin grant/demotion, webhook writes) only
+  // showed after a force-quit. Re-read whenever the app becomes visible.
+  useEffect(() => {
+    if (demoMode) return;
+    const onVisible = () => {
+      if (document.visibilityState === 'visible' && getUserId()) loadSubscription();
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => document.removeEventListener('visibilitychange', onVisible);
+  }, [demoMode]);
+
   const loadSubscription = async () => {
     setLoading(true);
     try {
