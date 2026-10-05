@@ -2523,7 +2523,7 @@ function AdminTodo({ goTab }: { goTab: (id: string) => void }) {
       {(data.reported_content ?? []).map((rc: any) =>
         row(`rep-${rc.post_id}`, () => goTab('community'), `Nahlásený príspevok (${rc.count}× nahlásenie)`, 'posúď a prípadne skry v moderácii', true))}
       {(data.ripe_candidates ?? []).map((c: any) =>
-        row(`rc-${c.email}`, () => goTab('referrers'), `Schváliť partnerku: ${c.email}`, `${c.paying} platiacich odporúčaní — splnila podmienky`, true))}
+        row(`rc-${c.email}`, () => goTab('referrers'), `Schváliť ako affiliate: ${c.email}`, `${c.paying} platiacich odporúčaní — splnila podmienky`, true))}
       {(data.unread_messages ?? []).map((m: any) =>
         row(`um-${m.email}`, () => goTab('messages'), `Neprečítané správy: ${m.email}`, `${m.unread} ${m.unread === 1 ? 'správa' : 'správy'}`, true))}
       {(data.declined_payments ?? []).map((d: any) =>
@@ -2643,7 +2643,7 @@ function AffiliatesTab({ mode }: { mode: 'partners' | 'candidates' }) {
         </div>
         {!partnersMode && (
           <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: _A.MUTED, marginBottom: 8 }}>
-            Každá používateľka s odporúčacím odkazom. Za platiace kamarátky zbiera body (+150). Po 5 platiacich ju tlačidlom schváliš za partnerku — presunie sa do záložky Affiliates a začne zarábať provízie.
+            Každá používateľka s odporúčacím odkazom. Za platiace kamarátky zbiera body (+150). Po 5 platiacich ju schváliš ako affiliate — presunie sa do záložky Affiliates a začne zarábať provízie.
           </div>
         )}
         {loading ? (
@@ -2688,10 +2688,10 @@ function AffiliatesTab({ mode }: { mode: 'partners' | 'candidates' }) {
             {r.status === 'candidate' && (
               <button
                 disabled={busy}
-                onClick={() => act({ action: 'set_status', userId: r.user_id, status: 'active' }, 'Schválená za partnerku — od teraz zarába provízie namiesto bodov.')}
+                onClick={() => act({ action: 'set_status', userId: r.user_id, status: 'active' }, 'Schválená ako affiliate — presunula sa do záložky Affiliates a od teraz zarába provízie namiesto bodov.')}
                 style={btnS()}
               >
-                Schváliť za partnerku
+                Schváliť ako affiliate
               </button>
             )}
             <button
