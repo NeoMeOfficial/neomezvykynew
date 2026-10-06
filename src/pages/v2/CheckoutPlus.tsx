@@ -74,11 +74,11 @@ const eur = (n: number) => `${n.toFixed(2).replace('.', ',').replace(',00', '')}
 function tierWords(tier: SubscriptionTier | null) {
   switch (tier?.key) {
     case 'quarterly':
-      return { order: '3 mesiace s NeoMe', period: '3 mesiacoch', renews: 'Po 3 mesiacoch predplatné pokračuje ďalej za rovnakú cenu.' };
+      return { order: '12 týždňov s NeoMe', period: '12 týždňoch', renews: 'Po 12 týždňoch predplatné pokračuje ďalej za rovnakú cenu.' };
     case 'yearly':
       return { order: 'Rok s NeoMe', period: 'roku', renews: 'Po roku predplatné pokračuje ďalej za rovnakú cenu.' };
     default:
-      return { order: 'Mesiac s NeoMe', period: 'mesiaci', renews: 'Predplatné sa každý mesiac obnoví za rovnakú cenu.' };
+      return { order: 'Mesiac s NeoMe', period: 'mesiaci', renews: 'Prvý mesiac zaplatíš 19 €, potom sa predplatné každý mesiac obnoví za 29 €.' };
   }
 }
 

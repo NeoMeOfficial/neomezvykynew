@@ -99,7 +99,7 @@ export const SUBSCRIPTION_PLANS = {
         perMonth: 23,
         interval: 'month',
         intervalCount: 3,
-        label: 'Na 3 mesiace',
+        label: '12 týždňov',
         savingsPct: 21,
       },
       yearly: {

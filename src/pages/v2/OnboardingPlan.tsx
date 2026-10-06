@@ -205,8 +205,8 @@ export default function OnboardingPlan() {
             <div style={{ fontFamily: NM.SANS, fontSize: 11, opacity: 0.65, marginTop: 2, fontWeight: 400 }}>
               {plan === 'plus'
                 ? (billing === 'monthly'
-                    ? 'Zrušíš kedykoľvek'
-                    : `${formatPrice(activeTier.price)} ${billing === 'quarterly' ? 'za 3 mesiace' : 'ročne'} · zrušíš kedykoľvek`)
+                    ? 'Prvý mesiac 19 € · zrušíš kedykoľvek'
+                    : `${formatPrice(activeTier.price)} ${billing === 'quarterly' ? 'za 12 týždňov' : 'ročne'} · zrušíš kedykoľvek`)
                 : 'Bez kreditnej karty'}
             </div>
           </div>
@@ -219,6 +219,7 @@ export default function OnboardingPlan() {
               {(['monthly', 'quarterly', 'yearly'] as SubscriptionTierKey[]).map((k) => {
                 const t = TIERS[k];
                 const active = billing === k;
+                const recommended = k === 'quarterly';
                 const disabled = !t.priceId;
                 return (
                   <button
@@ -233,8 +234,12 @@ export default function OnboardingPlan() {
                       textAlign: 'center',
                       padding: '12px 6px',
                       borderRadius: 14,
-                      background: active ? `${NM.GOLD}24` : 'rgba(255,255,255,0.06)',
-                      border: active ? `1.5px solid ${NM.GOLD}` : `1px solid rgba(255,255,255,0.12)`,
+                      background: active ? `${NM.GOLD}24` : recommended ? `${NM.GOLD}10` : 'rgba(255,255,255,0.06)',
+                      border: active
+                        ? `1.5px solid ${NM.GOLD}`
+                        : recommended
+                          ? `1px solid ${NM.GOLD}88`
+                          : `1px solid rgba(255,255,255,0.12)`,
                       opacity: disabled ? 0.35 : 1,
                       position: 'relative',
                       transition: 'all .15s',
@@ -249,6 +254,11 @@ export default function OnboardingPlan() {
                     <div style={{ marginTop: 1, fontFamily: NM.SANS, fontSize: 9, color: 'rgba(255,255,255,0.5)', fontWeight: 400 }}>
                       /mes
                     </div>
+                    {k === 'monthly' && (
+                      <div style={{ marginTop: 3, fontFamily: NM.SANS, fontSize: 8.5, color: NM.GOLD, fontWeight: 600 }}>
+                        1. mesiac 19 €
+                      </div>
+                    )}
                     {t.savingsPct != null && (
                       <div
                         style={{
@@ -266,7 +276,7 @@ export default function OnboardingPlan() {
                           textTransform: 'uppercase' as const,
                         }}
                       >
-                        −{t.savingsPct}%
+                        {recommended ? `Odporúčané · −${t.savingsPct}%` : `−${t.savingsPct}%`}
                       </div>
                     )}
                   </button>

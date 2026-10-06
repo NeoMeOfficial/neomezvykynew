@@ -192,10 +192,10 @@ function PaywallDark({ onContinueFree, onClose, onActivate }: { onContinueFree: 
             <Eye color={NM.GOLD} size={10}>NeoMe Plus</Eye>
             <div style={{ marginTop: 8, display: 'flex', alignItems: 'baseline', gap: 10 }}>
               <span style={{ fontFamily: NM.SERIF, fontSize: 38, fontWeight: 500, color: '#fff', letterSpacing: '-0.025em' }}>69 €</span>
-              <span style={{ fontFamily: NM.SANS, fontSize: 12, color: 'rgba(255,255,255,0.55)', fontWeight: 400 }}>/ 3 mesiace</span>
+              <span style={{ fontFamily: NM.SANS, fontSize: 12, color: 'rgba(255,255,255,0.55)', fontWeight: 400 }}>/ 12 týždňov</span>
             </div>
             <div style={{ fontFamily: NM.SANS, fontSize: 11.5, color: 'rgba(255,255,255,0.55)', marginTop: 4, fontWeight: 400 }}>To je 23 € mesačne · zrušíš kedykoľvek</div>
-            <div style={{ fontFamily: NM.SANS, fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 10, fontWeight: 400 }}>Alebo mesačne 29 € · ročne 199 €</div>
+            <div style={{ fontFamily: NM.SANS, fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 10, fontWeight: 400 }}>Alebo mesačne 29 € (prvý mesiac 19 €) · ročne 199 €</div>
           </div>
         </div>
       </div>
