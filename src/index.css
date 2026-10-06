@@ -718,11 +718,11 @@ All colors MUST be HSL.
    The reduced-motion block above neutralises all of this for users
    who ask for less motion. */
 @keyframes nmPageIn {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(6px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 .nm-page-in {
-  animation: nmPageIn 0.32s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  animation: nmPageIn 0.28s ease-out both;
   will-change: opacity, transform;
 }
 

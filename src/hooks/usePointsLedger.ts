@@ -51,6 +51,17 @@ export interface UserBadgeRow extends BadgeRow {
 }
 
 const DEMO_LEDGER_KEY = 'neome_points_ledger_v2';
+const LEDGER_CACHE_PREFIX = 'neome_points_cache_';
+
+function loadLedgerCache(userId: string): LedgerEntry[] | null {
+  try {
+    const raw = localStorage.getItem(LEDGER_CACHE_PREFIX + userId);
+    return raw ? JSON.parse(raw) : null;
+  } catch { return null; }
+}
+function saveLedgerCache(userId: string, entries: LedgerEntry[]) {
+  try { localStorage.setItem(LEDGER_CACHE_PREFIX + userId, JSON.stringify(entries)); } catch { /* ignore */ }
+}
 
 function loadDemoLedger(): LedgerEntry[] {
   try {
@@ -62,8 +73,9 @@ function loadDemoLedger(): LedgerEntry[] {
 
 export function usePointsLedger() {
   const { user } = useSupabaseAuth();
-  const [entries, setEntries] = useState<LedgerEntry[]>([]);
-  const [loading, setLoading] = useState(true);
+  const cachedInit = user?.id ? loadLedgerCache(user.id) : null;
+  const [entries, setEntries] = useState<LedgerEntry[]>(cachedInit ?? []);
+  const [loading, setLoading] = useState(cachedInit == null);
   const [isDemo, setIsDemo] = useState(false);
 
   const isRealUser = !!user?.id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(user.id);
@@ -75,7 +87,6 @@ export function usePointsLedger() {
       setLoading(false);
       return;
     }
-    setLoading(true);
     const { data, error } = await supabase
       .from('points_ledger')
       .select('*')
@@ -90,6 +101,7 @@ export function usePointsLedger() {
     } else {
       setEntries(data as LedgerEntry[]);
       setIsDemo(false);
+      if (user?.id) saveLedgerCache(user.id, data as LedgerEntry[]);
     }
     setLoading(false);
   }, [isRealUser, user]);

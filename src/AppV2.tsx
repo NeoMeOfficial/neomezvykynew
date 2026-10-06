@@ -173,6 +173,18 @@ function RequireAdmin({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+// Suspense fallback that stays invisible for the first moment — fast
+// (cached) chunk loads just fade in via nm-page-in, so navigation no
+// longer flashes "Načítavam…". Only genuinely slow loads show it.
+function DelayedFallback() {
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setShow(true), 260);
+    return () => clearTimeout(t);
+  }, []);
+  return show ? <LoadingScreen /> : null;
+}
+
 export default function AppV2() {
   // Affiliate links point anywhere in the app with ?ref=KOD — stash the
   // code before routing so it survives signup + email confirmation.
@@ -189,7 +201,7 @@ export default function AppV2() {
         <ScrollToTop />
         <CookieBanner />
         <InstallPrompt />
-        <Suspense fallback={<LoadingScreen />}>
+        <Suspense fallback={<DelayedFallback />}>
             <Routes>
             {/* Public routes */}
             <Route path="/auth-demo" element={<AuthDemo />} />
