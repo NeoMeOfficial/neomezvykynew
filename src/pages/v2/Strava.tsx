@@ -180,10 +180,9 @@ export default function Strava() {
               <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 12, color: 'rgba(245,239,229,0.85)', lineHeight: 1.5, fontWeight: 300, marginBottom: 18, maxWidth: 280 }}>
                 Personalizovaný jedálniček, ktorý zohľadňuje tvoje preferencie — naplnený Gabikinými receptami tak, aby ti pomohol dosiahnuť tvoje ciele.
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div style={{ background: 'rgba(245,239,229,0.16)', border: '1px solid rgba(245,239,229,0.45)', color: '#F5EFE5', padding: '11px 20px', borderRadius: 999, fontFamily: 'DM Sans, system-ui', fontSize: 13, fontWeight: 600, display: 'inline-flex', alignItems: 'center' }}>
-                  V ponuke čoskoro
-                </div>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, color: 'rgba(245,239,229,0.75)', fontFamily: 'DM Sans, system-ui', fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                <span style={{ width: 6, height: 6, borderRadius: 999, background: 'rgba(245,239,229,0.6)' }} />
+                V ponuke čoskoro
               </div>
             </div>
           </div>

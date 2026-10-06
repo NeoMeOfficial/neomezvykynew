@@ -61,8 +61,8 @@ function getTimeGreeting(): string {
 
 
 // ─── Greeting ─────────────────────────────────────────────────────────────────
-function Greeting({ name, points, plus, onPointsClick }: {
-  name: string; points: number; plus: boolean; onPointsClick: () => void;
+function Greeting({ name, points, plus, onPointsClick, onMenu }: {
+  name: string; points: number; plus: boolean; onPointsClick: () => void; onMenu: () => void;
 }) {
   return (
     <div style={{ padding: '62px 22px 0', fontFamily: SANS }}>
@@ -79,7 +79,7 @@ function Greeting({ name, points, plus, onPointsClick }: {
             <span style={{ fontFamily: SERIF, fontSize: 13, fontWeight: 500 }}>{points}</span>
             <span style={{ fontSize: 10, color: FG3, letterSpacing: '0.06em' }}>bodov</span>
           </button>
-          <button style={{ width: 38, height: 38, borderRadius: '50%', border: `1px solid ${HAIR2}`, background: WHITE, display: 'grid', placeItems: 'center', cursor: 'pointer', padding: 0 }}>
+          <button onClick={onMenu} aria-label="Profil a nastavenia" style={{ width: 40, height: 40, borderRadius: '50%', border: `1px solid ${HAIR2}`, background: WHITE, display: 'grid', placeItems: 'center', cursor: 'pointer', padding: 0 }}>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={INK} strokeWidth="1.6" strokeLinecap="round"><path d="M6 8h12M6 12h12M6 16h8"/></svg>
           </button>
         </div>
@@ -1082,6 +1082,7 @@ export default function DomovNew() {
         points={points}
         plus={isPlus}
         onPointsClick={() => setShowPointsInfo(true)}
+        onMenu={() => navigate('/profil')}
       />
       <OnboardingTour />
       <TourNudge />

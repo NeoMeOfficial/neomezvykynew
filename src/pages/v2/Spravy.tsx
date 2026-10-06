@@ -104,24 +104,6 @@ export default function Spravy() {
         </Ser>
       </div>
 
-      <div
-        style={{
-          margin: '20px 20px 14px',
-          padding: '11px 14px',
-          background: '#fff',
-          borderRadius: 999,
-          border: `1px solid ${NM.HAIR}`,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 10,
-        }}
-      >
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={NM.MUTED} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="11" cy="11" r="7" />
-          <path d="M20 20l-3.5-3.5" />
-        </svg>
-        <div style={{ flex: 1, fontFamily: NM.SANS, fontSize: 12.5, color: NM.TERTIARY, fontWeight: 400 }}>Hľadaj správu alebo meno…</div>
-      </div>
 
       {threads.length === 0 ? (
         <div style={{ margin: '0 20px', background: '#fff', borderRadius: 18, border: `1px solid ${NM.HAIR}`, overflow: 'hidden' }}>

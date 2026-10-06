@@ -198,25 +198,6 @@ export default function KomunitaCompose() {
           gap: 10,
         }}
       >
-        {/* FEATURE-NEEDED-KOMUNITA-ATTACHMENTS: image upload */}
-        {[
-          <svg key="img" width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <rect x="2.5" y="3.5" width="15" height="13" rx="2" stroke={NM.DEEP} strokeWidth="1.4" />
-            <circle cx="7" cy="8" r="1.3" fill={NM.DEEP} />
-            <path d="M3 14l4-3 4 3 6-5" stroke={NM.DEEP} strokeWidth="1.4" strokeLinejoin="round" />
-          </svg>,
-          <svg key="tag" width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <path d="M10 3h6l1 6-7 7-7-7 7-6z" stroke={NM.DEEP} strokeWidth="1.4" strokeLinejoin="round" />
-            <circle cx="13" cy="7" r="1" fill={NM.DEEP} />
-          </svg>,
-          <svg key="link" width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <path d="M8 12l4-4m-3 7l-2 2a3 3 0 11-4-4l2-2m6-6l2-2a3 3 0 114 4l-2 2" stroke={NM.DEEP} strokeWidth="1.4" strokeLinecap="round" />
-          </svg>,
-        ].map((icon, i) => (
-          <button key={i} aria-label={['Pridať obrázok', 'Tag', 'Odkaz'][i]} style={{ all: 'unset', cursor: 'pointer', width: 40, height: 40, borderRadius: 999, background: 'rgba(255,255,255,0.6)', border: `1px solid ${NM.HAIR}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            {icon}
-          </button>
-        ))}
         <div style={{ flex: 1, textAlign: 'right', fontFamily: NM.SANS, fontSize: 11, color: NM.TERTIARY }}>
           {text.length} / {MAX_CHARS}
         </div>

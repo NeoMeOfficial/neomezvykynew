@@ -124,9 +124,9 @@ export default function KomunitaPostDetail() {
   };
 
   return (
-    <Page paddingBottom={150}>
+    <Page paddingBottom={110}>
       <div style={{ padding: 'calc(env(safe-area-inset-top) + 14px) 18px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <button onClick={() => navigate(-1)} aria-label="Späť" style={{ all: 'unset', cursor: 'pointer', width: 36, height: 36, borderRadius: 999, background: '#fff', border: `1px solid ${NM.HAIR}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <button onClick={() => navigate(-1)} aria-label="Späť" style={{ all: 'unset', cursor: 'pointer', width: 40, height: 40, borderRadius: 999, background: '#fff', border: `1px solid ${NM.HAIR}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={NM.DEEP} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
             <path d="M15 18l-6-6 6-6" />
           </svg>
@@ -233,13 +233,14 @@ export default function KomunitaPostDetail() {
         </div>
       )}
 
-      {/* Sticky reply composer — sits above the BottomNav (~64px) */}
+      {/* Sticky reply composer — focus-mode route (no BottomNav), so anchored to the bottom edge. */}
       <div
         style={{
           position: 'fixed',
           left: 0,
           right: 0,
-          bottom: 'calc(64px + env(safe-area-inset-bottom, 0px))',
+          bottom: 0,
+          paddingBottom: 'calc(10px + env(safe-area-inset-bottom, 0px))',
           padding: '10px 18px 10px',
           background: 'rgba(248,245,240,0.96)',
           backdropFilter: 'blur(20px)',

@@ -562,12 +562,12 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
   const [sheetAddingSymptom, setSheetAddingSymptom] = useState(false);
   const [sheetNewSymptomText, setSheetNewSymptomText] = useState('');
 
-  const dayDetailSheet = selectedDay !== null && (
+  const dayDetailSheet = selectedDay !== null ? createPortal((
     <div
       role="dialog"
       aria-modal="true"
       onClick={() => setSelectedDay(null)}
-      style={{ position: 'fixed', inset: 0, background: 'rgba(42,26,20,0.55)', backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', zIndex: 100 }}
+      style={{ position: 'fixed', inset: 0, background: 'rgba(42,26,20,0.55)', backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', zIndex: 9999 }}
     >
       <div
         onClick={(e) => e.stopPropagation()}
@@ -722,7 +722,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
         </button>
       </div>
     </div>
-  );
+  ), document.body) : null;
 
   // Phase-tailored daily advice — one concrete tip per category for the
   // current sub-phase state, from the same shared source as the daily

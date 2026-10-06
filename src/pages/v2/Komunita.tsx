@@ -288,7 +288,7 @@ export default function Komunita() {
     <Page>
       <div style={{ padding: 'calc(env(safe-area-inset-top) + 16px) 18px 8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ fontFamily: NM.SERIF, fontSize: 18, fontWeight: 500, color: NM.DEEP }}>Komunita</div>
-        <button aria-label="Profil" style={{ all: 'unset', cursor: 'pointer', padding: 6 }}>
+        <button aria-label="Môj profil" onClick={() => navigate('/profil')} style={{ all: 'unset', cursor: 'pointer', width: 40, height: 40, borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
             <path d="M15 5a2 2 0 11-4 0 2 2 0 014 0zM17 16c0-2.8-3.1-5-7-5s-7 2.2-7 5" stroke={NM.DEEP} strokeWidth="1.4" strokeLinecap="round" />
           </svg>

@@ -39,7 +39,6 @@ const OnboardingPrograms = lazy(() => import('./pages/v2/OnboardingPrograms'));
 const OnboardingNotifications = lazy(() => import('./pages/v2/OnboardingNotifications'));
 const DomovNew = lazy(() => import('./pages/v2/DomovNew'));
 const Kniznica = lazy(() => import('./pages/v2/Kniznica'));
-const KniznicaPreview = lazy(() => import('./pages/v2/KniznicaPreview'));
 const PostpartumLanding = lazy(() => import('./pages/v2/PostpartumLanding'));
 const Paywall = lazy(() => import('./pages/v2/Paywall'));
 const CompletionWorkout = lazy(() => import('./pages/v2/CompletionWorkout'));
@@ -289,7 +288,6 @@ export default function AppV2() {
               <Route path="/domov-new" element={<DomovNew />} />
               <Route path="/new-home" element={<DomovNew />} />
               <Route path="/kniznica" element={<Kniznica />} />
-              <Route path="/kniznica/preview" element={<KniznicaPreview />} />
               <Route path="/completion/workout" element={<CompletionWorkout />} />
               <Route path="/completion/program" element={<CompletionProgram />} />
               <Route path="/dennik/new" element={<ReflectionEntry />} />
