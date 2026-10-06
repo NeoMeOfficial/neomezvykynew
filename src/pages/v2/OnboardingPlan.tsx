@@ -268,31 +268,6 @@ export default function OnboardingPlan() {
               })}
             </div>
           )}
-                    {t.savingsPct != null && (
-                      <div
-                        style={{
-                          position: 'absolute',
-                          top: -8,
-                          right: 6,
-                          padding: '2px 7px',
-                          borderRadius: 999,
-                          background: NM.GOLD,
-                          color: NM.DEEP,
-                          fontFamily: NM.SANS,
-                          fontSize: 9,
-                          fontWeight: 700,
-                          letterSpacing: '0.06em',
-                          textTransform: 'uppercase' as const,
-                        }}
-                      >
-                        {recommended ? `Odporúčané · −${t.savingsPct}%` : `−${t.savingsPct}%`}
-                      </div>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          )}
 
           {/* Feature list — every row shown for both tabs. Included rows
               get an accent check; excluded rows are dim + strike-through
@@ -311,9 +286,9 @@ export default function OnboardingPlan() {
               </div>
             ))}
             {plan === 'free' && FEATURES.map((feat) => {
-              const included = feat[plan];
-              const muted = plan === 'plus' ? 'rgba(255,255,255,0.35)' : NM.TERTIARY;
-              const fg = plan === 'plus' ? '#fff' : NM.DEEP;
+              const included = feat.free;
+              const muted = NM.TERTIARY;
+              const fg = NM.DEEP;
               return (
                 <div
                   key={feat.label}
