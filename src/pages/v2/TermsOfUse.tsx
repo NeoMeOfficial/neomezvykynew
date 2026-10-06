@@ -137,10 +137,10 @@ export default function TermsOfUse() {
             ktorú si predplatíš v jednej z troch periodicít:
           </P>
           <Bullet>
-            <Strong>Mesačne</Strong> — 24,90 € s opakovanou platbou každý mesiac.
+            <Strong>Mesačne</Strong> — 29 € s opakovanou platbou každý mesiac.
           </Bullet>
           <Bullet>
-            <Strong>Štvrťročne</Strong> — 63 € (≈ 21 €/mesiac) s opakovanou platbou
+            <Strong>Na 3 mesiace</Strong> — 69 € (≈ 23 €/mesiac) s opakovanou platbou
             každé tri mesiace.
           </Bullet>
           <Bullet>

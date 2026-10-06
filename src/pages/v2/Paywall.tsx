@@ -191,10 +191,11 @@ function PaywallDark({ onContinueFree, onClose, onActivate }: { onContinueFree: 
           <div style={{ padding: '18px 20px', borderRadius: 18, background: 'rgba(255,255,255,0.06)', border: `1px solid ${NM.GOLD}44`, position: 'relative', overflow: 'hidden' }}>
             <Eye color={NM.GOLD} size={10}>NeoMe Plus</Eye>
             <div style={{ marginTop: 8, display: 'flex', alignItems: 'baseline', gap: 10 }}>
-              <span style={{ fontFamily: NM.SERIF, fontSize: 38, fontWeight: 500, color: '#fff', letterSpacing: '-0.025em' }}>{PLAN_PRICE_LABEL}</span>
-              <span style={{ fontFamily: NM.SANS, fontSize: 12, color: 'rgba(255,255,255,0.55)', fontWeight: 400 }}>/ mesiac</span>
+              <span style={{ fontFamily: NM.SERIF, fontSize: 38, fontWeight: 500, color: '#fff', letterSpacing: '-0.025em' }}>69 €</span>
+              <span style={{ fontFamily: NM.SANS, fontSize: 12, color: 'rgba(255,255,255,0.55)', fontWeight: 400 }}>/ 3 mesiace</span>
             </div>
-            <div style={{ fontFamily: NM.SANS, fontSize: 11.5, color: 'rgba(255,255,255,0.55)', marginTop: 4, fontWeight: 400 }}>Zrušíš kedykoľvek</div>
+            <div style={{ fontFamily: NM.SANS, fontSize: 11.5, color: 'rgba(255,255,255,0.55)', marginTop: 4, fontWeight: 400 }}>To je 23 € mesačne · zrušíš kedykoľvek</div>
+            <div style={{ fontFamily: NM.SANS, fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 10, fontWeight: 400 }}>Alebo mesačne 29 € · ročne 199 €</div>
           </div>
         </div>
       </div>
@@ -371,7 +372,7 @@ export default function Paywall() {
     if (busy) return;
     setBusy(true);
     try {
-      await startCheckout(SUBSCRIPTION_PLANS.premium.priceId);
+      await startCheckout(SUBSCRIPTION_PLANS.premium.tiers.quarterly.priceId);
     } catch (err) {
       console.error('[paywall] checkout failed', err);
       setBusy(false);

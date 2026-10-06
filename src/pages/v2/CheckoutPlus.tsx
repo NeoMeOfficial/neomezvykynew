@@ -297,13 +297,13 @@ function Faq({ period }: { period: string }) {
   );
 }
 
-function PayForm({ tier }: { tier: SubscriptionTier | null }) {
+function PayForm({ tier, amountCents }: { tier: SubscriptionTier | null; amountCents: number | null }) {
   const stripe = useStripe();
   const elements = useElements();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
-  const price = tier?.price ?? SUBSCRIPTION_PLANS.premium.price;
+  const price = amountCents != null ? amountCents / 100 : (tier?.price ?? SUBSCRIPTION_PLANS.premium.price);
 
   const onPay = async () => {
     if (!stripe || !elements || submitting) return;
@@ -365,9 +365,10 @@ export default function CheckoutPlus() {
   const priceId = params.get('price') ?? SUBSCRIPTION_PLANS.premium.priceId;
   const tier = useMemo(() => tierForPrice(priceId), [priceId]);
   const words = tierWords(tier);
-  const price = tier?.price ?? SUBSCRIPTION_PLANS.premium.price;
+  const fallbackPrice = tier?.price ?? SUBSCRIPTION_PLANS.premium.price;
 
   const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [amountCents, setAmountCents] = useState<number | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const requested = useRef(false);
 
@@ -392,6 +393,7 @@ export default function CheckoutPlus() {
         const body = await res.json();
         if (!res.ok) throw new Error(body.error || 'Platbu sa nepodarilo pripraviť.');
         setClientSecret(body.clientSecret);
+        if (typeof body.amount_cents === 'number') setAmountCents(body.amount_cents);
       } catch (err: any) {
         setLoadError(err.message ?? 'Platbu sa nepodarilo pripraviť.');
       }
@@ -434,7 +436,9 @@ export default function CheckoutPlus() {
             </div>
             <div style={{ fontFamily: NM.SERIF, fontSize: 16, color: NM.DEEP, marginTop: 5 }}>{words.order}</div>
           </div>
-          <div style={{ fontFamily: NM.SERIF, fontSize: 22, color: NM.DEEP, flexShrink: 0 }}>{eur(price)}</div>
+          <div style={{ fontFamily: NM.SERIF, fontSize: 22, color: NM.DEEP, flexShrink: 0 }}>
+            {eur(amountCents != null ? amountCents / 100 : fallbackPrice)}
+          </div>
         </div>
 
         <ProofBar />
@@ -451,7 +455,7 @@ export default function CheckoutPlus() {
           </div>
         ) : clientSecret ? (
           <Elements stripe={stripePromise} options={{ clientSecret, appearance, fonts, locale: 'sk' }}>
-            <PayForm tier={tier} />
+            <PayForm tier={tier} amountCents={amountCents} />
           </Elements>
         ) : (
           <div style={{ marginTop: 14 }}>

@@ -113,6 +113,9 @@ export async function handler(event: any) {
     return json(200, {
       clientSecret: intent.client_secret,
       subscriptionId: subscription.id,
+      // Stripe's own charge amount — the page displays this, so a
+      // mispicked price ID can never show one number and charge another.
+      amount_cents: intent.amount,
     });
   } catch (err: any) {
     console.error('create-subscription-intent error:', err);

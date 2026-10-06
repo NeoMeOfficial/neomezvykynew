@@ -45,7 +45,7 @@ export default function OnboardingPlan() {
   const navigate = useNavigate();
   const [plan, setPlan] = useState<Plan>('plus');
   // Billing-period selector only shown for Plus. Default monthly.
-  const [billing, setBilling] = useState<SubscriptionTierKey>('monthly');
+  const [billing, setBilling] = useState<SubscriptionTierKey>('quarterly');
   const touchStartX = useRef<number | null>(null);
 
   const activeTier = TIERS[billing];

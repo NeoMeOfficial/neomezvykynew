@@ -35,9 +35,10 @@ export const MEAL_PLAN_PRICE_ID =
 // the UI can disable them until the env vars are filled in.
 //
 // Tier prices (total per billing period) and per-month equivalents:
-//   monthly   24,90 €/mo  ·  24,90 €/mo  ·  baseline
-//   quarterly 63,00 €/3mo ·  21,00 €/mo  ·  ~15% saving vs monthly
-//   yearly    199,00 €/yr ·  16,58 €/mo  ·  ~33% saving vs monthly
+//   monthly    29,00 €/mo  ·  29,00 €/mo  ·  baseline (website: 19 € first month via coupon)
+//   quarterly  69,00 €/3mo ·  23,00 €/mo  ·  ~21% saving vs monthly — PRIMARY offer
+//   yearly    199,00 €/yr  ·  16,58 €/mo  ·  ~43% saving vs monthly
+// Switched to the website's pricing model (Sam 2026-10-06).
 export type SubscriptionTierKey = 'monthly' | 'quarterly' | 'yearly';
 
 export interface SubscriptionTier {
@@ -60,7 +61,7 @@ export const SUBSCRIPTION_PLANS = {
     // Existing fields kept for backwards compatibility with callers
     // that haven't been migrated to .tiers yet (Paywall.tsx, etc.).
     priceId: MONTHLY_PRICE_ID,
-    price: 24.90,
+    price: 29,
     currency: 'EUR',
     interval: 'month',
     name: 'NeoMe Plus',
@@ -82,8 +83,8 @@ export const SUBSCRIPTION_PLANS = {
       monthly: {
         key: 'monthly',
         priceId: MONTHLY_PRICE_ID,
-        price: 24.90,
-        perMonth: 24.90,
+        price: 29,
+        perMonth: 29,
         interval: 'month',
         intervalCount: 1,
         label: 'Mesačne',
@@ -93,25 +94,25 @@ export const SUBSCRIPTION_PLANS = {
         key: 'quarterly',
         priceId:
           env('VITE_STRIPE_SUBSCRIPTION_QUARTERLY_PRICE_ID') ||
-          'price_1TY3sXEpPqBqxo4mJ6EhEPM3',
-        price: 63,
-        perMonth: 21,
+          'price_1TY3qHEpPqBqxo4mtleFrBFq',
+        price: 69,
+        perMonth: 23,
         interval: 'month',
         intervalCount: 3,
-        label: 'Štvrťročne',
-        savingsPct: 15,
+        label: 'Na 3 mesiace',
+        savingsPct: 21,
       },
       yearly: {
         key: 'yearly',
         priceId:
           env('VITE_STRIPE_SUBSCRIPTION_YEARLY_PRICE_ID') ||
-          'price_1TY3d6EpPqBqxo4mtqFHOXOz',
+          'price_1TY3ieEpPqBqxo4mSz5sgRru',
         price: 199,
         perMonth: 16.58,
         interval: 'year',
         intervalCount: 1,
         label: 'Ročne',
-        savingsPct: 33,
+        savingsPct: 43,
       },
     } as Record<SubscriptionTierKey, SubscriptionTier>,
   },
