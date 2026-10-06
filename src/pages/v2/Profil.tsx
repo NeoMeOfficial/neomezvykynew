@@ -277,11 +277,27 @@ export default function Profil() {
         <SettingsRow label="Odhlásiť sa" tone="danger" onClick={handleSignOut} />
       </SettingsGroup>
 
-      {/* Build stamp — lets support/you see exactly which version this
-          device is running (PWA caches per device). */}
-      <div style={{ textAlign: 'center', padding: '14px 0 4px', fontFamily: '"DM Sans", sans-serif', fontSize: 10.5, color: 'rgba(61,41,33,0.42)', letterSpacing: '0.04em' }}>
-        NeoMe · verzia {typeof __BUILD_ID__ !== 'undefined' ? __BUILD_ID__ : 'dev'}
-      </div>
+      {/* Build stamp — shows which version THIS device runs (PWA caches
+          per device). Tap it to force the newest version: unregister the
+          service worker, clear caches, reload. */}
+      <button
+        onClick={async () => {
+          try {
+            if ('serviceWorker' in navigator) {
+              const regs = await navigator.serviceWorker.getRegistrations();
+              await Promise.all(regs.map((r) => r.unregister()));
+            }
+            if ('caches' in window) {
+              const keys = await caches.keys();
+              await Promise.all(keys.map((k) => caches.delete(k)));
+            }
+          } catch { /* ignore */ }
+          location.reload();
+        }}
+        style={{ all: 'unset', cursor: 'pointer', display: 'block', width: '100%', textAlign: 'center', padding: '14px 0 4px', fontFamily: '"DM Sans", sans-serif', fontSize: 10.5, color: 'rgba(61,41,33,0.42)', letterSpacing: '0.04em' }}
+      >
+        NeoMe · verzia {typeof __BUILD_ID__ !== 'undefined' ? __BUILD_ID__ : 'dev'} · ťukni pre aktualizáciu
+      </button>
 
     </div>
   );
