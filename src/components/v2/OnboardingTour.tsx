@@ -316,6 +316,14 @@ function TourSheet({ steps, onFinish, onMore, onTopicSeen, defaultName, onSaveNa
           ))}
         </div>
 
+        {step === moreStepIdx && onMore && (
+          <button
+            onClick={onMore}
+            style={{ all: 'unset', cursor: 'pointer', display: 'block', width: '100%', boxSizing: 'border-box', textAlign: 'center', fontFamily: NM.SANS, fontSize: 13.5, fontWeight: 500, color: NM.DEEP, padding: '12px 16px', borderRadius: 999, border: `1px solid ${NM.HAIR_2}`, marginBottom: 10 }}
+          >
+            Ukáž mi viac
+          </button>
+        )}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
           <button
             onClick={() => onFinish('skipped')}
@@ -330,14 +338,6 @@ function TourSheet({ steps, onFinish, onMore, onTopicSeen, defaultName, onSaveNa
                 style={{ all: 'unset', cursor: 'pointer', fontFamily: NM.SANS, fontSize: 13.5, fontWeight: 500, color: NM.DEEP, padding: '11px 16px', borderRadius: 999, border: `1px solid ${NM.HAIR_2}` }}
               >
                 Späť
-              </button>
-            )}
-            {step === moreStepIdx && onMore && (
-              <button
-                onClick={onMore}
-                style={{ all: 'unset', cursor: 'pointer', fontFamily: NM.SANS, fontSize: 13.5, fontWeight: 500, color: NM.DEEP, padding: '11px 16px', borderRadius: 999, border: `1px solid ${NM.HAIR_2}` }}
-              >
-                Ukáž mi viac
               </button>
             )}
             <button

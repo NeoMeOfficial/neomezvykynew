@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { NM, Eye } from '../../../components/v2/neome';
-import { PlusPage, TopBar, HeroHead } from './shared';
+import { PlusPage, TopBar, HeroHead, StickyCTA } from './shared';
 import { supabase } from '../../../lib/supabase';
 import { useSupabaseAuth } from '../../../contexts/SupabaseAuthContext';
 
@@ -94,30 +94,8 @@ export default function PlusNutritionPrompt() {
           </div>
         </div>
 
-        <button
-          onClick={() => navigate('/onboarding-plus/hotovo')}
-          style={{
-            all: 'unset',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginTop: 18,
-            padding: '15px 22px',
-            background: NM.DEEP,
-            color: '#fff',
-            borderRadius: 999,
-            fontFamily: NM.SANS,
-            fontSize: 13.5,
-            fontWeight: 500,
-            letterSpacing: '0.02em',
-            width: '100%',
-            boxSizing: 'border-box',
-          }}
-        >
-          Pokračovať
-        </button>
       </div>
+      <StickyCTA label="Pokračovať" onClick={() => navigate('/onboarding-plus/hotovo')} />
     </PlusPage>
   );
 }

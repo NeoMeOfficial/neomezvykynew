@@ -105,8 +105,9 @@ export default function Profil() {
               <span className="font-sans text-[11px] text-gold font-medium">Vymeniť za odmeny ›</span>
             </button>
 
-            <div
-              className="flex-1 rounded-xl p-4"
+            <button
+              onClick={() => navigate('/body')}
+              className="flex-1 text-left rounded-xl p-4"
               style={{ background: 'rgba(107,76,59,0.07)', border: '1px solid rgba(107,76,59,0.14)' }}
             >
               <div className="flex items-center gap-2 mb-1.5">
@@ -120,7 +121,7 @@ export default function Profil() {
               <span className="font-sans text-[11px] text-ink/40">
                 {longest > 0 ? `Rekord: ${longest} dní` : 'Začiatok cesty'}
               </span>
-            </div>
+            </button>
           </div>
 
           {/* Next reward milestone */}

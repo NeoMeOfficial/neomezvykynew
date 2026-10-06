@@ -10,6 +10,13 @@ import { useCycleData } from '../../../features/cycle/useCycleData';
  * auto-adjust programs or nutrition.
  */
 
+function toLocalISODate(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
 const SK_MONTHS = ['januára', 'februára', 'marca', 'apríla', 'mája', 'júna', 'júla', 'augusta', 'septembra', 'októbra', 'novembra', 'decembra'];
 
 export default function PlusCycleInfo() {
@@ -65,8 +72,8 @@ export default function PlusCycleInfo() {
           {editingDate ? (
             <input
               type="date"
-              value={periodDate.toISOString().slice(0, 10)}
-              max={today.toISOString().slice(0, 10)}
+              value={toLocalISODate(periodDate)}
+              max={toLocalISODate(today)}
               onChange={(e) => {
                 if (e.target.value) setPeriodDate(new Date(e.target.value));
               }}

@@ -388,7 +388,7 @@ export default function OnboardingPlan() {
       <div
         style={{
           position: 'fixed', bottom: 0, left: 0, right: 0,
-          padding: '18px 22px 28px',
+          padding: '18px 22px calc(env(safe-area-inset-bottom, 0px) + 28px)',
           background: 'linear-gradient(180deg, rgba(248,245,240,0) 0%, rgba(248,245,240,0.98) 30%, rgba(248,245,240,1) 100%)',
         }}
       >
