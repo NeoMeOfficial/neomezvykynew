@@ -59,10 +59,10 @@ const PLUS_FEATURES: string[] = [
 // Anchor = what the same thing costs without the deal (monthly's full
 // price, or the equivalent months bought one by one), shown struck
 // through next to the real price (Sam 2026-10-06).
-const OFFER: Record<SubscriptionTierKey, { anchor: number; price: number; unit: string; note: string }> = {
-  monthly:   { anchor: 29,  price: 19,  unit: 'prvý mesiac',   note: 'Potom 29 € mesačne · zrušíš kedykoľvek' },
-  quarterly: { anchor: 87,  price: 69,  unit: 'za 12 týždňov', note: 'Po 12 týždňoch sa obnoví automaticky · zrušíš kedykoľvek' },
-  yearly:    { anchor: 348, price: 199, unit: '/ rok',         note: 'Obnoví sa raz ročne · zrušíš kedykoľvek' },
+const OFFER: Record<SubscriptionTierKey, { anchor: number | null; price: number; unit: string; note: string }> = {
+  monthly:   { anchor: null, price: 29,  unit: '/ mesiac',      note: 'Zrušíš kedykoľvek' },
+  quarterly: { anchor: 87,   price: 69,  unit: 'za 12 týždňov', note: 'Po 12 týždňoch sa obnoví automaticky · zrušíš kedykoľvek' },
+  yearly:    { anchor: 348,  price: 199, unit: '/ rok',         note: 'Obnoví sa raz ročne · zrušíš kedykoľvek' },
 };
 
 export default function OnboardingPlan() {
@@ -218,10 +218,15 @@ export default function OnboardingPlan() {
             <Eye color={accent} size={10}>
               {plan === 'plus' ? 'NeoMe Plus' : 'NeoMe Free'}
             </Eye>
+            {plan === 'plus' && billing === 'quarterly' && (
+              <div style={{ display: 'inline-block', marginTop: 12, padding: '4px 11px', borderRadius: 999, background: NM.GOLD, color: NM.DEEP, fontFamily: NM.SANS, fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                Špeciálna ponuka
+              </div>
+            )}
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginTop: 10 }}>
-              {plan === 'plus' && (
+              {plan === 'plus' && OFFER[billing].anchor != null && (
                 <span style={{ fontFamily: NM.SERIF, fontSize: 21, fontWeight: 400, textDecoration: 'line-through', opacity: 0.45 }}>
-                  {eur(OFFER[billing].anchor)}
+                  {eur(OFFER[billing].anchor!)}
                 </span>
               )}
               <span style={{ fontFamily: NM.SERIF, fontSize: 40, fontWeight: 500, letterSpacing: '-0.02em' }}>
@@ -241,7 +246,7 @@ export default function OnboardingPlan() {
               accidentally start a checkout that 404s. */}
           {plan === 'plus' && (
             <div style={{ marginTop: 16, display: 'flex', width: '100%', boxSizing: 'border-box', gap: 4, padding: 4, borderRadius: 999, background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)' }}>
-              {(['quarterly', 'monthly', 'yearly'] as SubscriptionTierKey[]).map((k) => {
+              {(['monthly', 'quarterly', 'yearly'] as SubscriptionTierKey[]).map((k) => {
                 const active = billing === k;
                 const disabled = !TIERS[k].priceId;
                 const label = k === 'quarterly' ? '12 týždňov' : k === 'monthly' ? 'Mesačne' : 'Ročne';

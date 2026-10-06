@@ -195,7 +195,7 @@ function PaywallDark({ onContinueFree, onClose, onActivate }: { onContinueFree: 
               <span style={{ fontFamily: NM.SANS, fontSize: 12, color: 'rgba(255,255,255,0.55)', fontWeight: 400 }}>/ 12 týždňov</span>
             </div>
             <div style={{ fontFamily: NM.SANS, fontSize: 11.5, color: 'rgba(255,255,255,0.55)', marginTop: 4, fontWeight: 400 }}>To je 23 € mesačne · zrušíš kedykoľvek</div>
-            <div style={{ fontFamily: NM.SANS, fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 10, fontWeight: 400 }}>Alebo mesačne 29 € (prvý mesiac 19 €) · ročne 199 €</div>
+            <div style={{ fontFamily: NM.SANS, fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 10, fontWeight: 400 }}>Alebo mesačne 29 € · ročne 199 €</div>
           </div>
         </div>
       </div>

@@ -78,7 +78,7 @@ function tierWords(tier: SubscriptionTier | null) {
     case 'yearly':
       return { order: 'Rok s NeoMe', period: 'roku', renews: 'Po roku predplatné pokračuje ďalej za rovnakú cenu.' };
     default:
-      return { order: 'Mesiac s NeoMe', period: 'mesiaci', renews: 'Prvý mesiac zaplatíš 19 €, potom sa predplatné každý mesiac obnoví za 29 €.' };
+      return { order: 'Mesiac s NeoMe', period: 'mesiaci', renews: 'Predplatné sa každý mesiac obnoví za rovnakú cenu.' };
   }
 }
 
