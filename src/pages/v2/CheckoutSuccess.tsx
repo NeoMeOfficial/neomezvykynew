@@ -309,8 +309,8 @@ function SubscriptionConfirmed({ onPrimary, loading }: { onPrimary: () => void; 
         aria-hidden
         style={{
           position: 'fixed', inset: 0, zIndex: 0,
-          backgroundImage: 'url(/images/founder-beach-900.webp), url(/images/founder-beach-900.jpg)',
-          backgroundSize: 'cover', backgroundPosition: 'center 28%',
+          backgroundImage: 'url(/images/hero-yoga.jpg)',
+          backgroundSize: 'cover', backgroundPosition: 'center 30%',
         }}
       />
       <div
