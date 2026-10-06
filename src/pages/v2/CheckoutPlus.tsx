@@ -68,6 +68,20 @@ function tierForPrice(priceId: string): SubscriptionTier | null {
   return tiers.find((t) => t.priceId === priceId) ?? null;
 }
 
+// The website links with a friendly plan name (?plan=12tyzdnov) rather
+// than a raw Stripe price id (Sam 2026-10-06). Accept both; plan wins.
+function priceIdFromParams(params: URLSearchParams): string {
+  const plan = (params.get('plan') ?? '').toLowerCase();
+  const T = SUBSCRIPTION_PLANS.premium.tiers;
+  const map: Record<string, string> = {
+    monthly: T.monthly.priceId, mesacne: T.monthly.priceId, month: T.monthly.priceId,
+    quarterly: T.quarterly.priceId, '12tyzdnov': T.quarterly.priceId, '12weeks': T.quarterly.priceId, '3mesiace': T.quarterly.priceId,
+    yearly: T.yearly.priceId, rocne: T.yearly.priceId, year: T.yearly.priceId,
+  };
+  if (plan && map[plan]) return map[plan];
+  return params.get('price') ?? SUBSCRIPTION_PLANS.premium.tiers.quarterly.priceId;
+}
+
 const eur = (n: number) => `${n.toFixed(2).replace('.', ',').replace(',00', '')} €`;
 
 // Per-tier wording for the order row + renewal assurance + FAQ.
@@ -361,7 +375,7 @@ function PayForm({ tier, amountCents }: { tier: SubscriptionTier | null; amountC
 export default function CheckoutPlus() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
-  const priceId = params.get('price') ?? SUBSCRIPTION_PLANS.premium.priceId;
+  const priceId = priceIdFromParams(params);
   const tier = useMemo(() => tierForPrice(priceId), [priceId]);
   const words = tierWords(tier);
   const fallbackPrice = tier?.price ?? SUBSCRIPTION_PLANS.premium.price;
@@ -413,7 +427,11 @@ export default function CheckoutPlus() {
       const res = await fetch('/.netlify/functions/create-subscription-intent-guest', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ priceId, email: guestEmail.trim() }),
+        body: JSON.stringify({
+          priceId,
+          email: guestEmail.trim(),
+          ref: (() => { try { return localStorage.getItem('neome_affiliate_ref') || undefined; } catch { return undefined; } })(),
+        }),
       });
       const body = await res.json();
       if (!res.ok) throw new Error(body.error || 'Platbu sa nepodarilo pripraviť.');

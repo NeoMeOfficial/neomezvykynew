@@ -50,10 +50,12 @@ export async function handler(event: any) {
 
   let priceId = '';
   let email = '';
+  let ref = '';
   try {
     const body = JSON.parse(event.body || '{}');
     priceId = String(body.priceId ?? '');
     email = String(body.email ?? '').trim().toLowerCase();
+    ref = String(body.ref ?? '').trim();
   } catch {
     return json(400, { error: 'Invalid JSON' });
   }
@@ -76,6 +78,30 @@ export async function handler(event: any) {
       return json(500, { error: 'Účet sa nepodarilo pripraviť.' });
     }
     const userId = created.user.id;
+
+    // Attribute the referral NOW — before payment — so the
+    // invoice.payment_succeeded webhook (which pays commission/points)
+    // already sees the affiliate_referrals row. Website partner links
+    // carry ?ref= into checkout; without this the first payment's
+    // commission would be missed (Sam 2026-10-06). Best-effort.
+    if (ref && ref.length <= 40) {
+      try {
+        const { data: aff } = await supabase
+          .from('affiliates')
+          .select('user_id, code, status')
+          .ilike('code', ref)
+          .maybeSingle();
+        if (aff && aff.status !== 'disabled' && aff.user_id !== userId) {
+          await supabase.from('affiliate_referrals').insert({
+            affiliate_user_id: aff.user_id,
+            referred_user_id: userId,
+            code_used: aff.code,
+          });
+        }
+      } catch (err) {
+        console.error('guest referral attribution failed (non-fatal):', err);
+      }
+    }
 
     const customer = await stripe.customers.create({
       email,
