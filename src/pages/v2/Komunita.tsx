@@ -172,7 +172,7 @@ function FeedPost({ post, followedIds, onToggleFollow, onToggleLike }: { post: D
       <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
         <button
           onClick={(e) => { e.stopPropagation(); onToggleLike(post.id); }}
-          style={{ all: 'unset', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
+          style={{ all: 'unset', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, padding: '12px 10px', margin: '-12px -10px' }}
           aria-label={post.liked ? 'Odlajkovať' : 'Lajkovať'}
         >
           <svg width="16" height="16" viewBox="0 0 17 17" fill={post.liked ? NM.TERRA : 'none'}>
@@ -188,7 +188,7 @@ function FeedPost({ post, followedIds, onToggleFollow, onToggleLike }: { post: D
         </div>
         <button
           onClick={(e) => { e.stopPropagation(); onToggleFollow(post.id); }}
-          style={{ all: 'unset', cursor: 'pointer', marginLeft: 'auto', fontFamily: NM.SANS, fontSize: 11, color: following ? NM.TERRA : NM.SAGE, fontWeight: 500, letterSpacing: '0.02em', flexShrink: 0 }}
+          style={{ all: 'unset', cursor: 'pointer', marginLeft: 'auto', fontFamily: NM.SANS, fontSize: 11, color: following ? NM.TERRA : NM.SAGE, fontWeight: 500, letterSpacing: '0.02em', flexShrink: 0, padding: '12px 8px', marginRight: -8 }}
         >
           {following ? 'Sledujem ✓' : 'Sledovať'}
         </button>

@@ -957,7 +957,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
             <button
               onClick={() => setMonthOffset((o) => Math.max(o - 1, -12))}
               aria-label="Predchádzajúci mesiac"
-              style={{ all: 'unset', cursor: 'pointer', width: 28, height: 28, display: 'grid', placeItems: 'center', color: monthOffset <= -12 ? NM.HAIR_2 : NM.MUTED }}
+              style={{ all: 'unset', cursor: 'pointer', width: 40, height: 40, display: 'grid', placeItems: 'center', color: monthOffset <= -12 ? NM.HAIR_2 : NM.MUTED }}
             >
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M15 6l-6 6 6 6"/></svg>
             </button>
@@ -965,7 +965,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
             <button
               onClick={() => setMonthOffset((o) => Math.min(o + 1, 0))}
               aria-label="Ďalší mesiac"
-              style={{ all: 'unset', cursor: monthOffset === 0 ? 'default' : 'pointer', width: 28, height: 28, display: 'grid', placeItems: 'center', color: monthOffset === 0 ? NM.HAIR_2 : NM.MUTED }}
+              style={{ all: 'unset', cursor: monthOffset === 0 ? 'default' : 'pointer', width: 40, height: 40, display: 'grid', placeItems: 'center', color: monthOffset === 0 ? NM.HAIR_2 : NM.MUTED }}
             >
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
             </button>

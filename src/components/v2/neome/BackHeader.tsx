@@ -26,8 +26,8 @@ export function BackHeader({ title, onBack, showSearch = true, onSearch }: Props
           style={{
             all: 'unset',
             cursor: 'pointer',
-            width: 36,
-            height: 36,
+            width: 40,
+            height: 40,
             borderRadius: 999,
             background: '#fff',
             border: `1px solid ${NM.HAIR}`,

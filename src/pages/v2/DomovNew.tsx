@@ -129,7 +129,7 @@ function WeekCalendar({ onSelectDay }: { onSelectDay: (d: Date) => void }) {
             type="button"
             onClick={() => setOffset((o) => o - 1)}
             aria-label="Predchádzajúci týždeň"
-            style={{ all: 'unset', cursor: 'pointer', width: 24, height: 24, display: 'grid', placeItems: 'center', color: FG3 }}
+            style={{ all: 'unset', cursor: 'pointer', width: 40, height: 40, display: 'grid', placeItems: 'center', color: FG3 }}
           >
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               <path d="M15 6l-6 6 6 6" />
@@ -151,7 +151,7 @@ function WeekCalendar({ onSelectDay }: { onSelectDay: (d: Date) => void }) {
             type="button"
             onClick={() => setOffset((o) => o + 1)}
             aria-label="Ďalší týždeň"
-            style={{ all: 'unset', cursor: 'pointer', width: 24, height: 24, display: 'grid', placeItems: 'center', color: FG3 }}
+            style={{ all: 'unset', cursor: 'pointer', width: 40, height: 40, display: 'grid', placeItems: 'center', color: FG3 }}
           >
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               <path d="M9 6l6 6-6 6" />
@@ -371,8 +371,10 @@ function CardGoals() {
                 return (
                   <div key={h.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: i < shown.length - 1 ? `1px solid ${HAIR}` : 'none' }}>
                     {/* Check-in must not bubble into the card's navigate. */}
-                    <button onClick={(e) => { e.stopPropagation(); handleToggle(h.id); }} style={{ all: 'unset', cursor: 'pointer', width: 19, height: 19, borderRadius: 10, flexShrink: 0, border: `1.5px solid ${done ? TELO : HAIR2}`, background: done ? TELO : 'transparent', display: 'grid', placeItems: 'center' }}>
-                      {done && <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12l5 5 9-11"/></svg>}
+                    <button aria-label={`Označiť návyk ${h.name}`} onClick={(e) => { e.stopPropagation(); handleToggle(h.id); }} style={{ all: 'unset', cursor: 'pointer', padding: 10, margin: -10, flexShrink: 0, display: 'grid', placeItems: 'center' }}>
+                      <span style={{ width: 20, height: 20, borderRadius: 10, border: `1.5px solid ${done ? TELO : HAIR2}`, background: done ? TELO : 'transparent', display: 'grid', placeItems: 'center' }}>
+                        {done && <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12l5 5 9-11"/></svg>}
+                      </span>
                     </button>
                     <div style={{ flex: 1, minWidth: 0, fontFamily: SERIF, fontSize: 14.5, fontWeight: 400, color: done ? FG3 : INK, textDecoration: done ? 'line-through' : 'none', whiteSpace: 'nowrap' as const, overflow: 'hidden', textOverflow: 'ellipsis' }}>{h.name}</div>
                   </div>
