@@ -137,8 +137,10 @@ function Assurances({ renews }: { renews: string }) {
 }
 
 function GabiPromise() {
+  // Deliberately the one dark-brown section on the page (Sam
+  // 2026-10-06): the promise is personal, so it wears Gabi's colour.
   return (
-    <div style={{ ...card, marginTop: 26 }}>
+    <div style={{ ...card, marginTop: 26, background: NM.DEEP, border: 'none' }}>
       <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
         <img
           src="/images/founder-gabi.png"
@@ -148,23 +150,23 @@ function GabiPromise() {
           style={{ borderRadius: 999, objectFit: 'cover', flexShrink: 0 }}
         />
         <div>
-          <div style={{ fontFamily: NM.SERIF, fontSize: 17, color: NM.DEEP, lineHeight: 1.25 }}>
+          <div style={{ fontFamily: NM.SERIF, fontSize: 17, color: '#fff', lineHeight: 1.25 }}>
             Môj prísľub, pre všetky klientky
           </div>
-          <div style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.EYEBROW, marginTop: 3 }}>
+          <div style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.GOLD, marginTop: 3 }}>
             Gabi · zakladateľka NeoMe
           </div>
         </div>
       </div>
-      <p style={{ fontFamily: NM.SANS, fontSize: 13.5, color: NM.MUTED, lineHeight: 1.6, margin: '14px 0 12px' }}>
+      <p style={{ fontFamily: NM.SANS, fontSize: 13.5, color: 'rgba(255,255,255,0.8)', lineHeight: 1.6, margin: '14px 0 12px' }}>
         Spokojnosť mojich klientiek je pre mňa to najdôležitejšie. Pokiaľ nebudeš z akéhokoľvek dôvodu
         počas prvých 7 dní spokojná, stačí mi napísať a bez otázok ti vrátim peniaze.
       </p>
       <div style={{ display: 'grid', gap: 7 }}>
         {['100 % garancia vrátenia peňazí', 'Bez zbytočných otázok', 'Klientska podpora na gabi@neome.com.au'].map((x) => (
           <div key={x} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <span style={{ color: NM.SAGE, fontSize: 12 }}>✓</span>
-            <span style={{ fontFamily: NM.SANS, fontSize: 12.5, color: NM.MUTED }}>{x}</span>
+            <span style={{ color: NM.GOLD, fontSize: 12 }}>✓</span>
+            <span style={{ fontFamily: NM.SANS, fontSize: 12.5, color: 'rgba(255,255,255,0.75)' }}>{x}</span>
           </div>
         ))}
       </div>
@@ -187,11 +189,13 @@ function Experts() {
   ];
   return (
     <div style={{ marginTop: 26 }}>
-      <SectionEye>Odporúčané odborníčkami</SectionEye>
+      <div style={{ fontFamily: NM.SANS, fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: NM.SAGE }}>
+        Odporúčané odborníčkami
+      </div>
       <div style={{ display: 'grid', gap: 10, marginTop: 12 }}>
         {items.map((e) => (
-          <div key={e.name} style={card}>
-            <div style={{ fontFamily: NM.SANS, fontSize: 10.5, letterSpacing: '0.06em', textTransform: 'uppercase', color: NM.EYEBROW }}>{e.disc}</div>
+          <div key={e.name} style={{ ...card, borderLeft: `3px solid ${NM.SAGE}` }}>
+            <div style={{ fontFamily: NM.SANS, fontSize: 10.5, letterSpacing: '0.06em', textTransform: 'uppercase', color: NM.SAGE }}>{e.disc}</div>
             <div style={{ fontFamily: NM.SANS, fontSize: 13.5, fontWeight: 600, color: NM.DEEP, marginTop: 4 }}>{e.name}</div>
             <p style={{ fontFamily: NM.SERIF, fontSize: 14, fontStyle: 'italic', color: NM.MUTED, lineHeight: 1.55, margin: '8px 0 0' }}>{e.q}</p>
           </div>
@@ -223,7 +227,7 @@ function Testimonials() {
       </div>
       <div style={{ display: 'grid', gap: 10, marginTop: 12 }}>
         {items.map((t) => (
-          <figure key={t.name} style={{ ...card, margin: 0 }}>
+          <figure key={t.name} style={{ ...card, margin: 0, background: 'rgba(184,134,74,0.07)', border: '1px solid rgba(184,134,74,0.22)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <span style={{
                 width: 42, height: 42, borderRadius: 999, flexShrink: 0,
@@ -469,8 +473,6 @@ export default function CheckoutPlus() {
           </div>
         </div>
 
-        <ProofBar />
-
         {guest && !clientSecret && (
           <section style={{ ...card, marginTop: 14 }}>
             <div style={{ fontFamily: NM.SERIF, fontSize: 17, color: NM.DEEP, marginBottom: 6 }}>
@@ -540,6 +542,8 @@ export default function CheckoutPlus() {
         <div style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.TERTIARY, textAlign: 'center', marginTop: 16 }}>
           Platba cez Stripe · Visa, Mastercard, Apple Pay
         </div>
+
+        <ProofBar />
 
         <GabiPromise />
         <Experts />
