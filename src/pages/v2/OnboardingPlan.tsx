@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { NM, Eye, Ser } from '../../components/v2/neome';
-import { SUBSCRIPTION_PLANS, formatPrice, type SubscriptionTierKey } from '../../lib/stripe';
+import { SUBSCRIPTION_PLANS, type SubscriptionTierKey } from '../../lib/stripe';
 
 /**
  * /onboarding/plan — first screen of the new-user onboarding.
@@ -40,6 +40,33 @@ const FEATURES: { label: string; free: boolean; plus: boolean }[] = [
 ];
 
 const TIERS = SUBSCRIPTION_PLANS.premium.tiers;
+
+const eur = (n: number) => (n % 1 === 0 ? `${n} €` : `${n.toFixed(2).replace('.', ',')} €`);
+
+// The Plus offer, copied from the website's pricing card (source of
+// truth, Sam 2026-10-06) — one price on screen, website bullets.
+const PLUS_FEATURES: string[] = [
+  'Štyri programy, 130 cvičení — od základov po jednoručky. Každé 15 minút.',
+  'Extra 15-minútové aj 5-minútové cvičenia a strečingy',
+  '120+ vyvážených receptov bez diét',
+  '60+ meditácií od 3 do 15 minút — aj päťminútové',
+  'Sledovanie cyklu s tipmi pre každú fázu a možnosťou zapisovať symptómy',
+  'Denník, reflexia, návyky a ciele',
+  'Komunita a Q&A s Gabi',
+  'Získavanie bodov a zľavy u partnerov',
+];
+
+const TIER_UNIT: Record<SubscriptionTierKey, string> = {
+  monthly: '/ mesiac',
+  quarterly: 'za 12 týždňov',
+  yearly: '/ rok',
+};
+
+const TIER_NOTE: Record<SubscriptionTierKey, string> = {
+  monthly: 'Prvý mesiac 19 € · zrušíš kedykoľvek',
+  quarterly: 'Po 12 týždňoch sa obnoví automaticky · zrušíš kedykoľvek',
+  yearly: 'Obnoví sa raz ročne · zrušíš kedykoľvek',
+};
 
 export default function OnboardingPlan() {
   const navigate = useNavigate();
@@ -194,20 +221,16 @@ export default function OnboardingPlan() {
             <Eye color={accent} size={10}>
               {plan === 'plus' ? 'NeoMe Plus' : 'NeoMe Free'}
             </Eye>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 10 }}>
-              <span style={{ fontFamily: NM.SERIF, fontSize: 36, fontWeight: 500, letterSpacing: '-0.02em' }}>
-                {plan === 'plus' ? `${activeTier.perMonth.toFixed(2).replace('.', ',')} €` : '0 €'}
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 10 }}>
+              <span style={{ fontFamily: NM.SERIF, fontSize: 40, fontWeight: 500, letterSpacing: '-0.02em' }}>
+                {plan === 'plus' ? eur(activeTier.price) : '0 €'}
               </span>
-              <span style={{ fontFamily: NM.SANS, fontSize: 11, opacity: 0.65, fontWeight: 400 }}>
-                {plan === 'plus' ? '/ mesiac' : 'navždy'}
+              <span style={{ fontFamily: NM.SANS, fontSize: 11.5, opacity: 0.65, fontWeight: 400 }}>
+                {plan === 'plus' ? TIER_UNIT[billing] : 'navždy'}
               </span>
             </div>
-            <div style={{ fontFamily: NM.SANS, fontSize: 11, opacity: 0.65, marginTop: 2, fontWeight: 400 }}>
-              {plan === 'plus'
-                ? (billing === 'monthly'
-                    ? 'Prvý mesiac 19 € · zrušíš kedykoľvek'
-                    : `${formatPrice(activeTier.price)} ${billing === 'quarterly' ? 'za 12 týždňov' : 'ročne'} · zrušíš kedykoľvek`)
-                : 'Bez kreditnej karty'}
+            <div style={{ fontFamily: NM.SANS, fontSize: 11, opacity: 0.65, marginTop: 4, fontWeight: 400 }}>
+              {plan === 'plus' ? TIER_NOTE[billing] : 'Bez kreditnej karty'}
             </div>
           </div>
 
@@ -215,50 +238,36 @@ export default function OnboardingPlan() {
               configured yet (env var empty) are disabled so we can't
               accidentally start a checkout that 404s. */}
           {plan === 'plus' && (
-            <div style={{ marginTop: 18, display: 'flex', gap: 6 }}>
-              {(['monthly', 'quarterly', 'yearly'] as SubscriptionTierKey[]).map((k) => {
-                const t = TIERS[k];
+            <div style={{ marginTop: 16, display: 'inline-flex', gap: 4, padding: 4, borderRadius: 999, background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)' }}>
+              {(['quarterly', 'monthly', 'yearly'] as SubscriptionTierKey[]).map((k) => {
                 const active = billing === k;
-                const recommended = k === 'quarterly';
-                const disabled = !t.priceId;
+                const disabled = !TIERS[k].priceId;
+                const label = k === 'quarterly' ? '12 týždňov' : k === 'monthly' ? 'Mesačne' : 'Ročne';
                 return (
                   <button
                     key={k}
                     onClick={() => !disabled && setBilling(k)}
                     disabled={disabled}
-                    title={disabled ? 'Čoskoro dostupné' : undefined}
                     style={{
                       all: 'unset',
-                      flex: 1,
                       cursor: disabled ? 'not-allowed' : 'pointer',
-                      textAlign: 'center',
-                      padding: '12px 6px',
-                      borderRadius: 14,
-                      background: active ? `${NM.GOLD}24` : recommended ? `${NM.GOLD}10` : 'rgba(255,255,255,0.06)',
-                      border: active
-                        ? `1.5px solid ${NM.GOLD}`
-                        : recommended
-                          ? `1px solid ${NM.GOLD}88`
-                          : `1px solid rgba(255,255,255,0.12)`,
+                      padding: '8px 14px',
+                      borderRadius: 999,
+                      fontFamily: NM.SANS,
+                      fontSize: 11.5,
+                      fontWeight: active ? 600 : 400,
+                      color: active ? NM.DEEP : 'rgba(255,255,255,0.7)',
+                      background: active ? NM.GOLD : 'transparent',
                       opacity: disabled ? 0.35 : 1,
-                      position: 'relative',
                       transition: 'all .15s',
                     }}
                   >
-                    <div style={{ fontFamily: NM.SANS, fontSize: 11, fontWeight: 500, color: active ? NM.GOLD : 'rgba(255,255,255,0.78)', letterSpacing: '0.02em' }}>
-                      {t.label}
-                    </div>
-                    <div style={{ marginTop: 4, fontFamily: NM.SERIF, fontSize: 15, fontWeight: 500, color: '#fff' }}>
-                      {t.perMonth.toFixed(2).replace('.', ',')} €
-                    </div>
-                    <div style={{ marginTop: 1, fontFamily: NM.SANS, fontSize: 9, color: 'rgba(255,255,255,0.5)', fontWeight: 400 }}>
-                      /mes
-                    </div>
-                    {k === 'monthly' && (
-                      <div style={{ marginTop: 3, fontFamily: NM.SANS, fontSize: 8.5, color: NM.GOLD, fontWeight: 600 }}>
-                        1. mesiac 19 €
-                      </div>
-                    )}
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
                     {t.savingsPct != null && (
                       <div
                         style={{
@@ -289,7 +298,19 @@ export default function OnboardingPlan() {
               get an accent check; excluded rows are dim + strike-through
               so the user can see *exactly* what they're missing. */}
           <div style={{ marginTop: 22, display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {FEATURES.map((feat) => {
+            {plan === 'plus' && PLUS_FEATURES.map((label) => (
+              <div key={label} style={{ display: 'flex', gap: 11, alignItems: 'flex-start' }}>
+                <div style={{ width: 20, height: 20, borderRadius: 999, flexShrink: 0, background: `${accent}28`, display: 'grid', placeItems: 'center', marginTop: 1 }}>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={accent} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20 6L9 17l-5-5" />
+                  </svg>
+                </div>
+                <div style={{ fontFamily: NM.SANS, fontSize: 13, lineHeight: 1.45, color: '#fff', fontWeight: 500 }}>
+                  {label}
+                </div>
+              </div>
+            ))}
+            {plan === 'free' && FEATURES.map((feat) => {
               const included = feat[plan];
               const muted = plan === 'plus' ? 'rgba(255,255,255,0.35)' : NM.TERTIARY;
               const fg = plan === 'plus' ? '#fff' : NM.DEEP;
@@ -338,10 +359,18 @@ export default function OnboardingPlan() {
             style={{
               marginTop: 18, paddingTop: 14,
               borderTop: `1px solid ${plan === 'plus' ? 'rgba(255,255,255,0.12)' : NM.HAIR}`,
-              fontFamily: NM.SANS, fontSize: 11.5, opacity: 0.7, fontWeight: 400,
+              fontFamily: NM.SANS, fontSize: 11.5, opacity: plan === 'plus' ? 0.85 : 0.7, fontWeight: 400,
+              display: 'flex', gap: 8, alignItems: 'flex-start',
             }}
           >
-            Zahrnuté: {includedCount} z {FEATURES.length} funkcií
+            {plan === 'plus' ? (
+              <>
+                <span style={{ color: NM.GOLD, flexShrink: 0 }}>★</span>
+                <span><b>7-dňová záruka vrátenia peňazí.</b> Napíš nám do siedmich dní od aktivácie a vrátime ti celú sumu. Bez otázok.</span>
+              </>
+            ) : (
+              <span>Zahrnuté: {includedCount} z {FEATURES.length} funkcií</span>
+            )}
           </div>
         </div>
 
@@ -383,10 +412,10 @@ export default function OnboardingPlan() {
             cursor: 'pointer',
           }}
         >
-          <span>Pokračovať s {plan === 'plus' ? 'Plus' : 'Free'}</span>
+          <span>{plan === 'plus' ? 'Chcem sa pridať' : 'Pokračovať s Free'}</span>
           {plan === 'plus' && (
             <span style={{ fontWeight: 400, opacity: 0.7 }}>
-              · {activeTier.perMonth.toFixed(2).replace('.', ',')} €/mes
+              · {eur(activeTier.price)}
             </span>
           )}
         </button>
