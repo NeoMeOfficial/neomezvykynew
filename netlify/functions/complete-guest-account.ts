@@ -48,7 +48,12 @@ export async function handler(event: any) {
   if (password.length < 8) return json(400, { error: 'Heslo musí mať aspoň 8 znakov.' });
 
   try {
-    const intent = await stripe.paymentIntents.retrieve(m[1]);
+    let intent: Stripe.PaymentIntent;
+    try {
+      intent = await stripe.paymentIntents.retrieve(m[1]);
+    } catch {
+      return json(403, { error: 'Invalid payment reference' });
+    }
     if (intent.client_secret !== clientSecret) return json(403, { error: 'Invalid payment reference' });
     if (intent.status !== 'succeeded') return json(409, { error: 'Platba ešte nie je dokončená.' });
 
