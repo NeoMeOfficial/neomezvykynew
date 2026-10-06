@@ -191,13 +191,7 @@ function DelayedFallback() {
     const t = setTimeout(() => setShow(true), 260);
     return () => clearTimeout(t);
   }, []);
-  if (!show) return null;
-  // Genuine slow loads: a frosted glass panel rather than a bare spinner.
-  return (
-    <div className="nm-glass-loader">
-      <LoadingScreen />
-    </div>
-  );
+  return show ? <LoadingScreen /> : null;
 }
 
 export default function AppV2() {
