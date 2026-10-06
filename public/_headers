@@ -3,7 +3,7 @@
   X-Content-Type-Options: nosniff
   X-Frame-Options: SAMEORIGIN
   Referrer-Policy: strict-origin-when-cross-origin
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' blob: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://*.ingest.de.sentry.io https://*.ingest.sentry.io https://video.bunnycdn.com https://*.b-cdn.net; frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://iframe.mediadelivery.net; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://m.stripe.network; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' blob: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://m.stripe.network https://*.stripe.com https://*.ingest.de.sentry.io https://*.ingest.sentry.io https://video.bunnycdn.com https://*.b-cdn.net; frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://m.stripe.network https://iframe.mediadelivery.net https://pay.google.com https://applepay.cdn-apple.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'
   Cross-Origin-Embedder-Policy: unsafe-none
   Cross-Origin-Opener-Policy: same-origin-allow-popups
   Cross-Origin-Resource-Policy: cross-origin
