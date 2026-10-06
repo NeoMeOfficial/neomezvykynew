@@ -718,44 +718,15 @@ All colors MUST be HSL.
    The reduced-motion block above neutralises all of this for users
    who ask for less motion. */
 @keyframes nmPageIn {
-  from { opacity: 0; transform: translateY(6px); }
+  from { opacity: 0; transform: translateY(4px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 .nm-page-in {
-  animation: nmPageIn 0.28s ease-out both;
-  will-change: opacity, transform;
+  animation: nmPageIn 0.17s ease-out both;
+  will-change: opacity;
 }
 
-/* Frosted-glass navigation veil: the incoming screen resolves out of
-   glass as this layer de-blurs and fades. Sits above content but below
-   the nav (z-50) and modals (z>=100), and never blocks taps. */
-@keyframes nmGlassClear {
-  0%   { opacity: 1; backdrop-filter: blur(16px) saturate(1.1); -webkit-backdrop-filter: blur(16px) saturate(1.1); }
-  60%  { opacity: 0.5; }
-  100% { opacity: 0; backdrop-filter: blur(0px) saturate(1); -webkit-backdrop-filter: blur(0px) saturate(1); }
-}
-.nm-glass-veil {
-  position: fixed;
-  inset: 0;
-  z-index: 40;
-  pointer-events: none;
-  background: rgba(248, 245, 240, 0.28);
-  animation: nmGlassClear 0.52s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
-}
-@media (prefers-color-scheme: dark) {
-  .nm-glass-veil { background: rgba(42, 26, 20, 0.30); }
-}
 
-/* Slow-load fallback: the loading indicator shown on a frosted panel. */
-.nm-glass-loader {
-  position: fixed;
-  inset: 0;
-  z-index: 45;
-  background: rgba(248, 245, 240, 0.55);
-  backdrop-filter: blur(18px) saturate(1.1);
-  -webkit-backdrop-filter: blur(18px) saturate(1.1);
-  animation: nmPageIn 0.3s ease-out both;
-}
 
 /* Gentle, universal interactive feedback. Elements using `all: unset`
    opt out automatically (they reset transition), which is fine — their

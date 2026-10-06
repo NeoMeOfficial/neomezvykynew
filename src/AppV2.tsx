@@ -125,15 +125,6 @@ function RequireAuth({ children }: { children: React.ReactNode }) {
  * mid-scroll rendered "somewhere in the middle". Reset to top on every
  * pathname change (browser back/forward keeps native restoration).
  */
-// A frosted-glass veil that covers the incoming screen and clears
-// (de-blurs + fades) as it mounts, so a new page resolves OUT of glass
-// instead of flashing a spinner (Sam 2026-10-06). pointer-events:none
-// so it never blocks taps; below modals/nav.
-function GlassVeil() {
-  const { pathname } = useLocation();
-  return <div key={pathname} className="nm-glass-veil" aria-hidden="true" />;
-}
-
 function ScrollToTop() {
   const { pathname } = useLocation();
   useEffect(() => {
@@ -208,7 +199,6 @@ export default function AppV2() {
       <Toaster />
       <BrowserRouter>
         <ScrollToTop />
-        <GlassVeil />
         <CookieBanner />
         <InstallPrompt />
         <Suspense fallback={<DelayedFallback />}>

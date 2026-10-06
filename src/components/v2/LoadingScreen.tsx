@@ -51,7 +51,7 @@ export default function LoadingScreen({ fullScreen = true }: {
         background: 'rgba(248, 245, 240, 0.55)',
         backdropFilter: 'blur(18px) saturate(1.1)',
         WebkitBackdropFilter: 'blur(18px) saturate(1.1)',
-        animation: 'nmFadeIn 0.3s ease-out both',
+        animation: 'nmFadeIn 0.18s ease-out both',
       }}
     >
       <style>{'@keyframes nmFadeIn { from { opacity: 0 } to { opacity: 1 } }'}</style>
