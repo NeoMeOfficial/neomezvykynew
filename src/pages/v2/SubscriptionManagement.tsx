@@ -265,7 +265,7 @@ export default function SubscriptionManagement() {
               <CreditCard className="size-4 text-ink/40 flex-shrink-0" />
               <BodyText size="sm" tone="secondary" className="flex-1">Platobná karta a faktúry</BodyText>
               <button onClick={handleBilling} disabled={actionLoading}
-                className="font-sans text-xs font-medium text-terra disabled:opacity-50">
+                className="font-sans text-sm font-medium text-terra disabled:opacity-50 px-3 py-2 -mr-2 rounded-lg">
                 {actionLoading ? '…' : 'Spravovať'}
               </button>
             </div>

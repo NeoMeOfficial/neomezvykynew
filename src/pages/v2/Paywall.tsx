@@ -29,8 +29,8 @@ function CloseButton({ dark = false, onClick }: { dark?: boolean; onClick: () =>
       style={{
         all: 'unset',
         cursor: 'pointer',
-        width: 36,
-        height: 36,
+        width: 40,
+        height: 40,
         borderRadius: 999,
         background: dark ? 'rgba(255,255,255,0.08)' : '#fff',
         border: dark ? '1px solid rgba(255,255,255,0.12)' : `1px solid ${NM.HAIR}`,
