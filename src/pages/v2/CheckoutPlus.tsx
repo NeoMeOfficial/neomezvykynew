@@ -99,31 +99,37 @@ function SectionEye({ children }: { children: React.ReactNode }) {
 }
 
 function ProofBar() {
-  const items = [
-    { b: '4 000+', s: 'slovenských žien' },
-    { b: '★ 4,9', s: '230+ recenzií · Google' },
-    { b: '7 dní', s: 'záruka vrátenia peňazí' },
-  ];
+  // Two facts, one card (the guarantee lives in Gabi's promise now).
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, margin: '14px 0 0' }}>
-      {items.map((i) => (
-        <div key={i.b} style={{ ...card, padding: '12px 8px', textAlign: 'center' }}>
-          <div style={{ fontFamily: NM.SERIF, fontSize: 16, color: NM.DEEP }}>{i.b}</div>
-          <div style={{ fontFamily: NM.SANS, fontSize: 10, color: NM.MUTED, marginTop: 3, lineHeight: 1.35 }}>{i.s}</div>
+    <div style={{ ...card, marginTop: 14, padding: '16px 14px', background: 'rgba(184,134,74,0.06)', border: '1px solid rgba(184,134,74,0.22)', display: 'flex', alignItems: 'center' }}>
+      <div style={{ flex: 1, textAlign: 'center' }}>
+        <div style={{ fontFamily: NM.SERIF, fontSize: 24, color: NM.DEEP, letterSpacing: '-0.01em' }}>4 000+</div>
+        <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.MUTED, marginTop: 3 }}>slovenských žien</div>
+      </div>
+      <div style={{ width: 1, alignSelf: 'stretch', background: 'rgba(184,134,74,0.25)' }} />
+      <div style={{ flex: 1, textAlign: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 6 }}>
+          <span style={{ color: NM.GOLD, fontSize: 13, letterSpacing: 2 }}>★★★★★</span>
+          <span style={{ fontFamily: NM.SERIF, fontSize: 24, color: NM.DEEP }}>4,9</span>
         </div>
-      ))}
+        <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.MUTED, marginTop: 3 }}>230+ recenzií · Google</div>
+      </div>
     </div>
   );
 }
 
 
-function GabiPromise({ renews }: { renews: string }) {
+function GabiPromise() {
   // Deliberately the one dark-brown section on the page (Sam
   // 2026-10-06): the promise is personal, so it wears Gabi's colour —
   // and it carries EVERY payment assurance (guarantee, renewal, no
-  // hidden fees) in one place.
+  // hidden fees) in one place. Gold radial glow mirrors the paywall
+  // pricing card.
   return (
-    <div style={{ ...card, marginTop: 22, background: NM.DEEP, border: 'none' }}>
+    <div style={{ ...card, marginTop: 22, background: NM.DEEP, border: `1px solid ${NM.GOLD}44`, position: 'relative', overflow: 'hidden' }}>
+      <div aria-hidden style={{ position: 'absolute', top: -70, right: -70, width: 240, height: 240, borderRadius: 999, background: 'radial-gradient(circle, rgba(184,134,74,0.32), transparent 62%)', pointerEvents: 'none' }} />
+      <div aria-hidden style={{ position: 'absolute', bottom: -90, left: -80, width: 220, height: 220, borderRadius: 999, background: 'radial-gradient(circle, rgba(184,134,74,0.16), transparent 62%)', pointerEvents: 'none' }} />
+      <div style={{ position: 'relative' }}>
       <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
         <img
           src="/images/founder-gabi.png"
@@ -147,8 +153,7 @@ function GabiPromise({ renews }: { renews: string }) {
       </p>
       <div style={{ display: 'grid', gap: 9 }}>
         {[
-          '7-dňová záruka vrátenia peňazí — celá suma späť, bez otázok',
-          `${renews} Zrušíš kedykoľvek, jedným klikom v aplikácii`,
+          'Predplatné pokračuje automaticky, kým ho nezrušíš — zrušiť ho môžeš kedykoľvek, jedným klikom v aplikácii',
           'Žiadne skryté poplatky — cena, ktorú vidíš, je cena, ktorú platíš',
           'Klientska podpora na gabi@neome.com.au',
         ].map((x) => (
@@ -157,6 +162,7 @@ function GabiPromise({ renews }: { renews: string }) {
             <span style={{ fontFamily: NM.SANS, fontSize: 12.5, color: 'rgba(255,255,255,0.78)', lineHeight: 1.5 }}>{x}</span>
           </div>
         ))}
+      </div>
       </div>
     </div>
   );
@@ -529,7 +535,7 @@ export default function CheckoutPlus() {
           Platba cez Stripe · Visa, Mastercard, Apple Pay
         </div>
 
-        <GabiPromise renews={words.renews} />
+        <GabiPromise />
 
         <ProofBar />
         <Experts />
