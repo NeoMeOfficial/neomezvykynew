@@ -6,6 +6,14 @@ import { VitePWA } from "vite-plugin-pwa";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  // Build stamp so a user (or support) can see exactly which version a
+  // device is running — invaluable for the PWA "why does my desktop
+  // look different from my phone" question (per-device cache snapshots).
+  define: {
+    __BUILD_ID__: JSON.stringify(
+      (process.env.COMMIT_REF || process.env.BUILD_ID || 'dev').slice(0, 7),
+    ),
+  },
   server: {
     host: "::",
     port: 8080,
