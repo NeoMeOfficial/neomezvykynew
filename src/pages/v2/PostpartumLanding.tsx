@@ -234,7 +234,7 @@ export default function PostpartumLanding() {
           {/* Video Preview */}
           <div className="relative rounded-3xl overflow-hidden mb-6 shadow-lg">
             <img 
-              src="https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&h=450&fit=crop"
+              src="/images/r9/lifestyle-mother-baby.jpg"
               alt="Postpartum Program Preview"
               className="w-full h-56 object-cover"
             />
@@ -450,8 +450,8 @@ export default function PostpartumLanding() {
           
           <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-6 mb-6 shadow-sm">
             <div className="text-center">
-              <div className="text-4xl font-black text-[#2E2218] mb-2">29 €</div>
-              <p className="text-sm text-[#8B7560] mb-4">mesačne · zrušíš kedykoľvek</p>
+              <div className="text-4xl font-black text-[#2E2218] mb-2">69 €</div>
+              <p className="text-sm text-[#8B7560] mb-4">na 12 týždňov (23 €/mes) · zrušíš kedykoľvek</p>
 
               <div className="text-left space-y-2 mb-6">
                 <div className="flex items-center gap-2 text-sm">
@@ -480,7 +480,7 @@ export default function PostpartumLanding() {
               </button>
 
               <p className="text-xs text-[#8B7560] mt-3">
-                Ročne 199 € · ušetríš 33 %
+                Alebo mesačne 29 € · ročne 199 €
               </p>
             </div>
           </div>

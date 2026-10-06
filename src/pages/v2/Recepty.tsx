@@ -238,31 +238,6 @@ export default function Recepty() {
         )}
       </div>
 
-      {/* Upsell banner — shown to free users */}
-      {!isPremium && !loading && filtered.length > 0 && (
-        <div style={{ margin: '8px 18px 24px', padding: '18px 20px', background: NM.DEEP, borderRadius: 16 }}>
-          <div style={{ fontFamily: NM.SANS, fontSize: 9.5, letterSpacing: '0.22em', textTransform: 'uppercase', color: NM.GOLD, marginBottom: 8, fontWeight: 500 }}>
-            NeoMe Plus
-          </div>
-          <div style={{ fontFamily: NM.SERIF, fontSize: 18, color: '#F5EFE5', lineHeight: 1.25, marginBottom: 6 }}>
-            Odomkni všetkých 225 receptov
-          </div>
-          <div style={{ fontFamily: NM.SANS, fontSize: 12, color: 'rgba(245,239,229,0.65)', marginBottom: 14 }}>
-            Raňajky, hlavné jedlá aj snacky — plná knižnica so živinami.
-          </div>
-          <button
-            onClick={() => navigate('/paywall')}
-            style={{
-              all: 'unset', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6,
-              background: NM.GOLD, color: '#fff', padding: '10px 18px',
-              borderRadius: 999, fontFamily: NM.SANS, fontSize: 13, fontWeight: 600,
-            }}
-          >
-            Získať Plus
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
-          </button>
-        </div>
-      )}
     </Page>
   );
 }

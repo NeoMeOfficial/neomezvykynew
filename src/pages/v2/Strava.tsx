@@ -148,18 +148,7 @@ export default function Strava() {
 
       {/* Meal plan section — shows active plan or upsell depending on purchase */}
       <div className="px-5 pb-8">
-        {hasMealPlanner ? (
-          <button
-            onClick={() => navigate('/jedalnicek')}
-            className="w-full text-left rounded-card p-5 bg-ink text-cream flex items-center gap-4 transition-all active:scale-[0.99]"
-          >
-            <div className="flex-1 min-w-0">
-              <Eyebrow tone="muted" className="text-cream/50 mb-1">Tvoj jedálniček</Eyebrow>
-              <div className="font-serif text-h2 text-cream leading-snug">Plán na tento týždeň</div>
-              <div className="font-sans text-sm text-cream/72 mt-1">Otvoriť môj plán →</div>
-            </div>
-          </button>
-        ) : (
+        {hasMealPlanner ? null : (
           /* Not purchasable at first launch (Gabi 2026-09-02) — the card stays
              as an announcement, so no tap-through to the sales page. */
           <div

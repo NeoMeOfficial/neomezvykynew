@@ -131,13 +131,11 @@ export default function CyklusLog() {
   return (
     <Page paddingBottom={40}>
       <div style={{ padding: 'calc(env(safe-area-inset-top) + 14px) 18px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <button onClick={() => navigate(-1)} style={{ all: 'unset', cursor: 'pointer', fontFamily: NM.SANS, fontSize: 12, color: NM.MUTED, fontWeight: 400, padding: 6 }}>
-          Zrušiť
+        <button onClick={() => navigate(-1)} aria-label="Zavrieť" style={{ all: 'unset', cursor: 'pointer', width: 40, height: 40, borderRadius: 999, background: '#fff', border: `1px solid ${NM.HAIR}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={NM.DEEP} strokeWidth="1.8" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12" /></svg>
         </button>
         <Eye>Dnešný záznam</Eye>
-        <button onClick={onSave} style={{ all: 'unset', cursor: 'pointer', fontFamily: NM.SANS, fontSize: 12, color: NM.MAUVE, fontWeight: 500, padding: 6 }}>
-          Uložiť
-        </button>
+        <div style={{ width: 40 }} />
       </div>
 
       <PlusUnlockBanner label="Náhľad bez ukladania — s NeoMe Plus sa tvoje záznamy uložia a získaš za ne body" />
