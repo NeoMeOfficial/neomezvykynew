@@ -14,7 +14,7 @@ const SK_MONTHS = ['januára', 'februára', 'marca', 'apríla', 'mája', 'júna'
 
 export default function PlusCycleInfo() {
   const navigate = useNavigate();
-  const { saveCycleData, cycleData } = useCycleData();
+  const { setLastPeriodStart, setCycleLength: persistCycleLength, cycleData } = useCycleData();
   const today = useMemo(() => new Date(), []);
   const [periodDate, setPeriodDate] = useState<Date>(() => {
     if (cycleData?.lastPeriodStart) return new Date(cycleData.lastPeriodStart);
@@ -26,13 +26,11 @@ export default function PlusCycleInfo() {
   const [editingDate, setEditingDate] = useState(false);
 
   const saveAndNext = () => {
-    saveCycleData({
-      ...(cycleData ?? { customSettings: {} as never, periodLength: 5 }),
-      lastPeriodStart: periodDate.toISOString().slice(0, 10),
-      cycleLength,
-      periodLength: cycleData?.periodLength ?? 5,
-      customSettings: cycleData?.customSettings ?? ({} as never),
-    });
+    // Use the hook's real API (saveCycleData is internal, not exported —
+    // calling it crashed 'p is not a function' on this step). Both
+    // setters persist via updateCycleData.
+    setLastPeriodStart(periodDate);
+    persistCycleLength(cycleLength);
     navigate('/onboarding-plus/jedalnicek');
   };
 
