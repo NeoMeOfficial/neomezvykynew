@@ -87,7 +87,7 @@ export default function CheckoutSuccess() {
       setAttempt((n) => n + 1);
     }, POLL_INTERVAL_MS);
     return () => clearTimeout(id);
-  }, [phase, confirmed, attempt, refreshSubscription, devOverride]);
+  }, [phase, confirmed, attempt, refreshSubscription, devOverride, claimNeeded]);
 
   // Once confirmed, scrub the query params so a back-button doesn't
   // re-trigger the flow on a stale session_id. Skip when previewing —
@@ -98,7 +98,7 @@ export default function CheckoutSuccess() {
     if (phase === 'confirmed' && (params.get('session_id') || params.get('type'))) {
       window.history.replaceState(null, '', '/checkout/success');
     }
-  }, [phase, params, devOverride]);
+  }, [phase, params, devOverride, claimNeeded]);
 
   // Marketing consent is deliberately NOT asked here (Sam 2026-10-05:
   // right after paying it feels overwhelming). We only stamp tomorrow's
