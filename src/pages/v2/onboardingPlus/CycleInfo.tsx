@@ -46,8 +46,8 @@ export default function PlusCycleInfo() {
       />
       <HeroHead
         eyebrow="Cyklus"
-        title="Tvoj"
-        accentTitle="rytmus."
+        title="Tvoj cyklus,"
+        accentTitle="tvoj rytmus."
         accentColor={NM.MAUVE}
         helper="Spoznaj, čo sa s tebou deje v jednotlivých fázach — energia, nálada, chute, spánok. Nič ti neprispôsobujeme; iba ti dáme jazyk, ktorým si vieš lepšie porozumieť."
         size={30}

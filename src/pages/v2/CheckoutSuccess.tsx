@@ -301,27 +301,46 @@ function Timeout({ onRetry, onSkip }: { onRetry: () => void; onSkip: () => void 
 
 function SubscriptionConfirmed({ onPrimary, loading }: { onPrimary: () => void; loading: boolean }) {
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+    <>
+      {/* Gabi full-bleed background (Sam 2026-10-06) — a warm welcome
+          face behind the confirmation. Fixed so it fills under the
+          padded container; dark scrim keeps white text readable. */}
+      <div
+        aria-hidden
+        style={{
+          position: 'fixed', inset: 0, zIndex: 0,
+          backgroundImage: 'url(/images/founder-beach-900.webp), url(/images/founder-beach-900.jpg)',
+          backgroundSize: 'cover', backgroundPosition: 'center 28%',
+        }}
+      />
+      <div
+        aria-hidden
+        style={{
+          position: 'fixed', inset: 0, zIndex: 0,
+          background: 'linear-gradient(180deg, rgba(42,26,20,0.35) 0%, rgba(42,26,20,0.55) 52%, rgba(42,26,20,0.92) 100%)',
+        }}
+      />
+      {/* Content bottom-aligned — no artificial mid-screen gap. */}
+      <div style={{ position: 'relative', zIndex: 1, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
         <CheckMark />
-        <Eye color={NM.GOLD} size={10} style={{ marginTop: 28 }}>NeoMe Plus · aktivované</Eye>
-        <div style={{ marginTop: 14, fontFamily: NM.SERIF, fontSize: 38, lineHeight: 1.05, letterSpacing: '-0.015em' }}>
+        <Eye color={NM.GOLD} size={10} style={{ marginTop: 20 }}>NeoMe Plus · aktivované</Eye>
+        <div style={{ marginTop: 12, fontFamily: NM.SERIF, fontSize: 38, lineHeight: 1.05, letterSpacing: '-0.015em', color: '#fff' }}>
           Vitaj{' '}
           <em style={{ color: NM.GOLD, fontWeight: 400 }}>doma.</em>
         </div>
-        <div style={{ marginTop: 16, fontFamily: NM.SANS, fontSize: 15, color: NM.MUTED, fontWeight: 300, lineHeight: 1.55, maxWidth: 320 }}>
+        <div style={{ marginTop: 14, fontFamily: NM.SANS, fontSize: 15, color: 'rgba(255,255,255,0.82)', fontWeight: 300, lineHeight: 1.55, maxWidth: 320 }}>
           Plný prístup k cvičeniam, výžive, cyklu aj meditáciám je odomknutý.
         </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 24 }}>
+          {/* Single CTA — the program now/later question lives on the next
+              screen (ProgramPrompt); asking here too was a duplicate
+              (Sam 2026-10-06). */}
+          <button onClick={onPrimary} disabled={loading} style={ctaPrimary()}>
+            Pokračovať
+          </button>
+        </div>
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-        {/* Single CTA — the program now/later question lives on the next
-            screen (ProgramPrompt); asking here too was a duplicate
-            (Sam 2026-10-06). */}
-        <button onClick={onPrimary} disabled={loading} style={ctaPrimary()}>
-          Pokračovať
-        </button>
-      </div>
-    </div>
+    </>
   );
 }
 
