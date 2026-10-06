@@ -13,7 +13,7 @@ export interface TopBarProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export const TopBar = React.forwardRef<HTMLDivElement, TopBarProps>(
-  ({ className, title, backHref, onBack, right, ...props }, ref) => {
+  ({ className, title, backHref, onBack, right, style, ...props }, ref) => {
     const navigate = useNavigate();
     const handleBack = onBack ?? (() => backHref ? navigate(backHref) : navigate(-1));
 
@@ -21,9 +21,10 @@ export const TopBar = React.forwardRef<HTMLDivElement, TopBarProps>(
       <div
         ref={ref}
         className={cn(
-          'flex items-center gap-2 px-3 pt-12 pb-3 bg-cream',
+          'flex items-center gap-2 px-3 pb-3 bg-cream',
           className
         )}
+        style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 14px)', ...(style || {}) }}
         {...props}
       >
         <IconButton variant="ghost" onClick={handleBack} aria-label="Späť">

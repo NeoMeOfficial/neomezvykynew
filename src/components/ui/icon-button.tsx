@@ -14,7 +14,7 @@ export interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonEl
 
 const sizeClass = {
   sm: 'h-8 w-8 [&_svg]:size-4',
-  md: 'h-9 w-9 [&_svg]:size-[18px]',
+  md: 'h-10 w-10 [&_svg]:size-[18px]',
   lg: 'h-11 w-11 [&_svg]:size-5',
 };
 
