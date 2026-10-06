@@ -1,4 +1,5 @@
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Home, BookOpen, Users, MessageCircle, User } from 'lucide-react';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 import BottomNav from '../../components/v2/BottomNav';
 import ErrorBoundary from '../../components/v2/ErrorBoundary';
@@ -103,6 +104,71 @@ function UpdateBanner({ onRefresh, topInset }: { onRefresh: () => void; topInset
 const PLAYER_ROUTES = ['/meditacia/', '/exercise-player', '/stretch/', '/exercise/'];
 const isPlayerRoute = (p: string) => PLAYER_ROUTES.some((r) => p.startsWith(r));
 
+const DESKTOP_MIN = 900;
+
+function useIsDesktop(): boolean {
+  const [desk, setDesk] = useState(
+    typeof window !== 'undefined' ? window.matchMedia(`(min-width:${DESKTOP_MIN}px)`).matches : false,
+  );
+  useEffect(() => {
+    const mq = window.matchMedia(`(min-width:${DESKTOP_MIN}px)`);
+    const on = () => setDesk(mq.matches);
+    mq.addEventListener('change', on);
+    return () => mq.removeEventListener('change', on);
+  }, []);
+  return desk;
+}
+
+const NAV = [
+  { path: '/domov-new', icon: Home,          label: 'Domov' },
+  { path: '/kniznica',  icon: BookOpen,       label: 'Knižnica' },
+  { path: '/komunita',  icon: Users,          label: 'Komunita' },
+  { path: '/spravy',    icon: MessageCircle,  label: 'Správy' },
+  { path: '/profil',    icon: User,           label: 'Profil' },
+];
+
+// Desktop web-app chrome: a persistent left sidebar replacing the mobile
+// bottom bar (Sam 2026-10-06). It scrolls with the page (not fixed over
+// content) and the content sits in a comfortable centred column.
+function DesktopSidebar() {
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  return (
+    <aside
+      style={{
+        width: 236, flexShrink: 0, alignSelf: 'stretch',
+        borderRight: '1px solid rgba(61,41,33,0.08)',
+        padding: '28px 18px', boxSizing: 'border-box',
+        display: 'flex', flexDirection: 'column', gap: 4,
+      }}
+    >
+      <div style={{ fontFamily: '"Gilda Display", Georgia, serif', fontSize: 24, color: '#3D2921', padding: '2px 12px 22px' }}>
+        Neo<span style={{ color: '#B8864A' }}>Me</span>
+      </div>
+      {NAV.map((t) => {
+        const active = pathname.startsWith(t.path);
+        const Icon = t.icon;
+        return (
+          <button
+            key={t.path}
+            onClick={() => navigate(t.path)}
+            style={{
+              all: 'unset', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12,
+              padding: '11px 12px', borderRadius: 12,
+              background: active ? 'rgba(184,134,74,0.12)' : 'transparent',
+              color: active ? '#3D2921' : 'rgba(61,41,33,0.62)',
+              fontFamily: '"DM Sans", sans-serif', fontSize: 14, fontWeight: active ? 600 : 400,
+            }}
+          >
+            <Icon size={19} strokeWidth={active ? 2.2 : 1.8} color={active ? '#B8864A' : 'currentColor'} />
+            {t.label}
+          </button>
+        );
+      })}
+    </aside>
+  );
+}
+
 export default function AppLayout() {
   const registrationRef = useRef<ServiceWorkerRegistration | null>(null);
   const {
@@ -152,6 +218,32 @@ export default function AppLayout() {
   }, [updateServiceWorker]);
   const topInset = useStatusBarInset();
   const focusMode = !TAB_ROOTS.includes(pathname.replace(/\/+$/, '') || '/');
+
+  const isDesktop = useIsDesktop();
+
+  if (isDesktop) {
+    // Web-app layout: sidebar + centred cream content column on the
+    // brown/gold backdrop (painted by #root media query).
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', justifyContent: 'center', padding: '28px 20px' }}>
+        <div
+          style={{
+            width: '100%', maxWidth: 1100, display: 'flex',
+            background: '#F8F5F0', borderRadius: 22, overflow: 'hidden',
+            boxShadow: '0 24px 80px rgba(42,26,20,0.28)', minHeight: 'calc(100vh - 56px)',
+          }}
+        >
+          {!focusMode && <DesktopSidebar />}
+          <main className="relative z-10" style={{ flex: 1, minWidth: 0, maxWidth: focusMode ? '100%' : 760, margin: focusMode ? 0 : '0 auto', width: '100%' }}>
+            {needRefresh && <UpdateBanner onRefresh={onRefresh} topInset="0px" />}
+            <ErrorBoundary>
+              <Outlet />
+            </ErrorBoundary>
+          </main>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
