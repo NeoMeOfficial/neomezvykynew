@@ -47,7 +47,7 @@ function CloseButton({ dark = false, onClick }: { dark?: boolean; onClick: () =>
 }
 
 // ─── Variant A · Warm editorial ────────────────────────────────
-function PaywallWarm({ onContinueFree, onClose, onActivate }: { onContinueFree: () => void; onClose: () => void; onActivate: () => void }) {
+function PaywallWarm({ onContinueFree, onClose, onActivate, busy }: { onContinueFree: () => void; onClose: () => void; onActivate: () => void; busy: boolean }) {
   const benefits = [
     { t: '4 programy na výber', d: 'Postpartum · BodyForming · ElasticBands · Strong&Sexy' },
     { t: 'Cyklus s odporúčaniami', d: 'Fázy, nálady, potraviny, pohyb na mieru' },
@@ -55,7 +55,7 @@ function PaywallWarm({ onContinueFree, onClose, onActivate }: { onContinueFree: 
     { t: 'Prístup k celej knižnici', d: 'Meditácie, cvičenia a 142 receptov' },
   ];
   return (
-    <div style={{ background: NM.BG, minHeight: '100vh', position: 'relative', paddingBottom: 220, fontFamily: NM.SANS, color: NM.DEEP }}>
+    <div style={{ background: NM.BG, minHeight: '100vh', position: 'relative', paddingBottom: 220, fontFamily: NM.SANS, color: NM.DEEP, maxWidth: 460, margin: '0 auto' }}>
       <div style={{ padding: 'calc(env(safe-area-inset-top) + 16px) 18px 0', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
         <CloseButton onClick={onClose} />
       </div>
@@ -86,7 +86,7 @@ function PaywallWarm({ onContinueFree, onClose, onActivate }: { onContinueFree: 
           </div>
         ))}
       </div>
-      <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, padding: '18px 22px 28px', background: 'linear-gradient(180deg, rgba(248,245,240,0) 0%, rgba(248,245,240,0.98) 30%, rgba(248,245,240,1) 100%)' }}>
+      <div style={{ position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)', width: '100%', maxWidth: 460, boxSizing: 'border-box', padding: '18px 22px 28px', background: 'linear-gradient(180deg, rgba(248,245,240,0) 0%, rgba(248,245,240,0.98) 30%, rgba(248,245,240,1) 100%)' }}>
         <div
           style={{
             padding: '14px 18px',
@@ -111,9 +111,11 @@ function PaywallWarm({ onContinueFree, onClose, onActivate }: { onContinueFree: 
         </div>
         <button
           onClick={onActivate}
+          disabled={busy}
           style={{
             width: '100%',
             padding: '16px',
+            opacity: busy ? 0.6 : 1,
             background: NM.DEEP,
             color: '#fff',
             border: 'none',
@@ -152,7 +154,7 @@ function PaywallWarm({ onContinueFree, onClose, onActivate }: { onContinueFree: 
 }
 
 // ─── Variant B · Dark elegant ──────────────────────────────────
-function PaywallDark({ onContinueFree, onClose, onActivate }: { onContinueFree: () => void; onClose: () => void; onActivate: () => void }) {
+function PaywallDark({ onContinueFree, onClose, onActivate, busy }: { onContinueFree: () => void; onClose: () => void; onActivate: () => void; busy: boolean }) {
   // Mirrors the deployed website's pricing-card facts (Sam 2026-10-05).
   const tiles = [
     { t: '4 programy', s: '130 cvičení à 15 minút' },
@@ -161,7 +163,7 @@ function PaywallDark({ onContinueFree, onClose, onActivate }: { onContinueFree: 
     { t: 'Periodka', s: 'Tipy pre každú fázu' },
   ];
   return (
-    <div style={{ background: NM.DEEP_2, minHeight: '100vh', position: 'relative', paddingBottom: 220, color: '#fff', fontFamily: NM.SANS }}>
+    <div style={{ background: NM.DEEP_2, minHeight: '100vh', position: 'relative', paddingBottom: 220, color: '#fff', fontFamily: NM.SANS, maxWidth: 460, margin: '0 auto' }}>
       <div style={{ position: 'absolute', top: -80, right: -120, width: 320, height: 320, borderRadius: 999, background: `radial-gradient(circle, ${NM.GOLD}2e, transparent 65%)`, pointerEvents: 'none' }} />
       <div style={{ position: 'absolute', top: 280, left: -100, width: 280, height: 280, borderRadius: 999, background: `radial-gradient(circle, ${NM.TERRA}24, transparent 65%)`, pointerEvents: 'none' }} />
       <div style={{ position: 'relative' }}>
@@ -199,12 +201,14 @@ function PaywallDark({ onContinueFree, onClose, onActivate }: { onContinueFree: 
           </div>
         </div>
       </div>
-      <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, padding: '18px 22px 28px', background: 'linear-gradient(180deg, rgba(42,26,20,0) 0%, rgba(42,26,20,0.9) 40%, rgba(42,26,20,1) 100%)' }}>
+      <div style={{ position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)', width: '100%', maxWidth: 460, boxSizing: 'border-box', padding: '18px 22px 28px', background: 'linear-gradient(180deg, rgba(42,26,20,0) 0%, rgba(42,26,20,0.9) 40%, rgba(42,26,20,1) 100%)' }}>
         <button
           onClick={onActivate}
+          disabled={busy}
           style={{
             width: '100%',
             padding: '16px',
+            opacity: busy ? 0.6 : 1,
             background: NM.GOLD,
             color: '#fff',
             border: 'none',
@@ -243,7 +247,7 @@ function PaywallDark({ onContinueFree, onClose, onActivate }: { onContinueFree: 
 }
 
 // ─── Variant C · Compare table ─────────────────────────────────
-export function PaywallCompare({ onContinueFree, onClose, onActivate }: { onContinueFree: () => void; onClose: () => void; onActivate: () => void }) {
+export function PaywallCompare({ onContinueFree, onClose, onActivate, busy }: { onContinueFree: () => void; onClose: () => void; onActivate: () => void; busy: boolean }) {
   const features = [
     { f: 'Knižnica cvičení, receptov, meditácií', free: true, plus: true },
     { f: 'Reflexia a denník (7 dní histórie)', free: true, plus: true },
@@ -254,7 +258,7 @@ export function PaywallCompare({ onContinueFree, onClose, onActivate }: { onCont
     { f: 'Reflexia s celou históriou', free: false, plus: true },
   ];
   return (
-    <div style={{ background: NM.BG, minHeight: '100vh', position: 'relative', paddingBottom: 220, fontFamily: NM.SANS, color: NM.DEEP }}>
+    <div style={{ background: NM.BG, minHeight: '100vh', position: 'relative', paddingBottom: 220, fontFamily: NM.SANS, color: NM.DEEP, maxWidth: 460, margin: '0 auto' }}>
       <div style={{ padding: 'calc(env(safe-area-inset-top) + 16px) 18px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Eye>Vyber si</Eye>
         <CloseButton onClick={onClose} />
@@ -314,12 +318,14 @@ export function PaywallCompare({ onContinueFree, onClose, onActivate }: { onCont
           ))}
         </div>
       </div>
-      <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, padding: '18px 22px 28px', background: 'linear-gradient(180deg, rgba(248,245,240,0) 0%, rgba(248,245,240,0.98) 30%, rgba(248,245,240,1) 100%)' }}>
+      <div style={{ position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)', width: '100%', maxWidth: 460, boxSizing: 'border-box', padding: '18px 22px 28px', background: 'linear-gradient(180deg, rgba(248,245,240,0) 0%, rgba(248,245,240,0.98) 30%, rgba(248,245,240,1) 100%)' }}>
         <button
           onClick={onActivate}
+          disabled={busy}
           style={{
             width: '100%',
             padding: '16px',
+            opacity: busy ? 0.6 : 1,
             background: NM.DEEP,
             color: '#fff',
             border: 'none',
@@ -381,7 +387,7 @@ export default function Paywall() {
   const onClose = () => navigate(-1);
   const onContinueFree = () => navigate('/domov-new');
 
-  if (variant === 'warm') return <PaywallWarm onActivate={onActivate} onClose={onClose} onContinueFree={onContinueFree} />;
-  if (variant === 'compare') return <PaywallCompare onActivate={onActivate} onClose={onClose} onContinueFree={onContinueFree} />;
-  return <PaywallDark onActivate={onActivate} onClose={onClose} onContinueFree={onContinueFree} />;
+  if (variant === 'warm') return <PaywallWarm onActivate={onActivate} onClose={onClose} onContinueFree={onContinueFree} busy={busy} />;
+  if (variant === 'compare') return <PaywallCompare onActivate={onActivate} onClose={onClose} onContinueFree={onContinueFree} busy={busy} />;
+  return <PaywallDark onActivate={onActivate} onClose={onClose} onContinueFree={onContinueFree} busy={busy} />;
 }

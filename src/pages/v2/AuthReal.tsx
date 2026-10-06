@@ -251,7 +251,7 @@ export default function AuthReal() {
         background: 'linear-gradient(180deg, rgba(248,245,240,0) 0%, rgba(248,245,240,0) 28%, rgba(248,245,240,0.6) 45%, rgba(248,245,240,0.95) 58%, rgba(248,245,240,1) 70%)',
       }} />
 
-      <div style={{ position: 'relative', minHeight: '100vh', padding: 'calc(env(safe-area-inset-top) + 28px) 24px calc(env(safe-area-inset-bottom) + 32px)', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ position: 'relative', minHeight: '100vh', width: '100%', maxWidth: 440, margin: '0 auto', padding: 'calc(env(safe-area-inset-top) + 28px) 24px calc(env(safe-area-inset-bottom) + 32px)', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
         {/* Brand mark */}
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10 }}>
           <div style={{

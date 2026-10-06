@@ -321,7 +321,7 @@ function SubscriptionConfirmed({ onPrimary, loading }: { onPrimary: () => void; 
         }}
       />
       {/* Content bottom-aligned — no artificial mid-screen gap. */}
-      <div style={{ position: 'relative', zIndex: 1, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+      <div style={{ position: 'relative', zIndex: 1, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', width: '100%', maxWidth: 400, marginInline: 'auto' }}>
         <Eye color={NM.GOLD} size={10}>NeoMe Plus · aktivované</Eye>
         <div style={{ marginTop: 12, fontFamily: NM.SERIF, fontSize: 38, lineHeight: 1.05, letterSpacing: '-0.015em', color: '#fff' }}>
           Vitaj{' '}
@@ -345,7 +345,7 @@ function SubscriptionConfirmed({ onPrimary, loading }: { onPrimary: () => void; 
 
 function MealConfirmed({ onNow, onLater, loading }: { onNow: () => void; onLater: () => void; loading: boolean }) {
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', width: '100%', maxWidth: 360, marginInline: 'auto' }}>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
         <CheckMark tint={NM.SAGE} />
         <Eye color={NM.GOLD} size={10} style={{ marginTop: 28 }}>Jedálniček · odomknutý</Eye>

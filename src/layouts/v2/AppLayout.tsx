@@ -238,7 +238,7 @@ export default function AppLayout() {
           }}
         >
           {!focusMode && <DesktopSidebar />}
-          <main className="relative z-10" style={{ flex: 1, minWidth: 0, maxWidth: focusMode ? '100%' : 760, margin: focusMode ? 0 : '0 auto', width: '100%' }}>
+          <main className="relative z-10" style={{ flex: 1, minWidth: 0, maxWidth: 760, margin: '0 auto', width: '100%' }}>
             {needRefresh && <UpdateBanner onRefresh={onRefresh} topInset="0px" />}
             <ErrorBoundary>
               <div key={pathname} className="nm-page-in">

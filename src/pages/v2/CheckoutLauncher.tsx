@@ -52,7 +52,7 @@ export default function CheckoutLauncher() {
   }, [startCheckout, navigate]);
 
   return (
-    <div style={{ background: NM.BG, minHeight: '100vh', padding: '48px 22px', fontFamily: NM.SANS, color: NM.DEEP }}>
+    <div style={{ background: NM.BG, minHeight: '100vh', padding: '48px 22px', fontFamily: NM.SANS, color: NM.DEEP, maxWidth: 440, margin: '0 auto', boxSizing: 'border-box' }}>
       <Eye color={NM.GOLD} size={10}>NeoMe Plus</Eye>
       <Ser size={28} style={{ marginTop: 10 }}>
         Otvárame <em style={{ color: NM.GOLD, fontStyle: 'italic', fontWeight: 500 }}>platbu</em>…
