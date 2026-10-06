@@ -152,7 +152,6 @@ export default function CheckoutSuccess() {
         {phase === 'confirmed' && type === 'subscription' && (
           <SubscriptionConfirmed
             onPrimary={() => navigate('/onboarding-plus/program')}
-            onSkip={() => navigate('/domov-new')}
             loading={loading}
           />
         )}
@@ -300,7 +299,7 @@ function Timeout({ onRetry, onSkip }: { onRetry: () => void; onSkip: () => void 
   );
 }
 
-function SubscriptionConfirmed({ onPrimary, onSkip, loading }: { onPrimary: () => void; onSkip: () => void; loading: boolean }) {
+function SubscriptionConfirmed({ onPrimary, loading }: { onPrimary: () => void; loading: boolean }) {
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
@@ -311,15 +310,15 @@ function SubscriptionConfirmed({ onPrimary, onSkip, loading }: { onPrimary: () =
           <em style={{ color: NM.GOLD, fontWeight: 400 }}>doma.</em>
         </div>
         <div style={{ marginTop: 16, fontFamily: NM.SANS, fontSize: 15, color: NM.MUTED, fontWeight: 300, lineHeight: 1.55, maxWidth: 320 }}>
-          Plný prístup k cvičeniam, výžive, cyklu aj meditáciám je odomknutý. Vyber si program, ktorý ťa najviac osloví — môžeš ho kedykoľvek zmeniť.
+          Plný prístup k cvičeniam, výžive, cyklu aj meditáciám je odomknutý.
         </div>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {/* Single CTA — the program now/later question lives on the next
+            screen (ProgramPrompt); asking here too was a duplicate
+            (Sam 2026-10-06). */}
         <button onClick={onPrimary} disabled={loading} style={ctaPrimary()}>
-          Vybrať si program
-        </button>
-        <button onClick={onSkip} style={ctaText()}>
-          Preskočiť, prejdem na hlavnú stránku
+          Pokračovať
         </button>
       </div>
     </div>
