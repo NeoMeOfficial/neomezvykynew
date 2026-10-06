@@ -77,41 +77,70 @@ export default function Profil() {
         </div>
       </div>
 
-      {/* Progress card */}
+      {/* Tvoj pokrok — one dashboard (Sam 2026-10-06): points + streak as
+          the two headline numbers, milestone under points, a clear
+          lifetime-activity row, badges, and a single rewards CTA. The
+          old split into two near-identical cards confused what was
+          being measured. */}
       <div className="px-5 mb-6">
         <div className="rounded-card p-5 bg-white border border-ink/[0.08] shadow-nm-sm">
-          <div className="flex items-center justify-between mb-4">
-            <Eyebrow tone="muted">Tvoj pokrok</Eyebrow>
+          <Eyebrow tone="muted" className="mb-4">Tvoj pokrok</Eyebrow>
+
+          {/* Two headline tiles: redeemable points + consistency streak */}
+          <div className="flex gap-2.5 mb-4">
             <button
-              onClick={() => navigate('/body')}
-              className="font-sans text-[11px] text-terra font-medium"
+              onClick={() => navigate('/body/odmeny')}
+              className="flex-1 text-left rounded-xl p-4"
+              style={{ background: 'rgba(184,134,74,0.10)', border: '1px solid rgba(184,134,74,0.22)' }}
             >
-              Detaily ›
+              <div className="flex items-center gap-2 mb-1.5">
+                <Star className="size-4 text-gold fill-gold/30" />
+                <span className="font-sans text-[10px] uppercase tracking-[0.16em] text-ink/45">Body</span>
+              </div>
+              <div className="flex items-baseline gap-1">
+                <span className="font-serif text-h1 text-ink leading-none">{balance}</span>
+                <span className="font-sans text-[11px] text-ink/50">bodov</span>
+              </div>
+              <span className="font-sans text-[11px] text-gold font-medium">Vymeniť za odmeny ›</span>
             </button>
-          </div>
 
-          {/* Streak */}
-          <div className="flex items-center gap-3 mb-4">
-            <div className="h-11 w-11 rounded-xl bg-terra/10 flex items-center justify-center flex-shrink-0">
-              <Flame className="size-5 text-terra" />
-            </div>
-            <div>
-              <div className="flex items-baseline gap-1.5">
+            <div
+              className="flex-1 rounded-xl p-4"
+              style={{ background: 'rgba(107,76,59,0.07)', border: '1px solid rgba(107,76,59,0.14)' }}
+            >
+              <div className="flex items-center gap-2 mb-1.5">
+                <Flame className="size-4 text-terra" />
+                <span className="font-sans text-[10px] uppercase tracking-[0.16em] text-ink/45">Séria</span>
+              </div>
+              <div className="flex items-baseline gap-1">
                 <span className="font-serif text-h1 text-ink leading-none">{streak}</span>
-                <span className="font-sans text-sm text-ink/56">dní v rade</span>
+                <span className="font-sans text-[11px] text-ink/50">dní v rade</span>
               </div>
-              <div className="font-sans text-[11px] text-ink/40 mt-0.5">
+              <span className="font-sans text-[11px] text-ink/40">
                 {longest > 0 ? `Rekord: ${longest} dní` : 'Začiatok cesty'}
-              </div>
+              </span>
             </div>
           </div>
 
-          {/* Stats row */}
-          <div className="flex gap-2">
+          {/* Next reward milestone */}
+          {milestone && (
+            <div className="mb-4">
+              <div className="flex items-baseline justify-between mb-1.5">
+                <span className="font-sans text-[11px] text-ink/56 font-medium">Ďalšia odmena: {milestone.name}</span>
+                <span className="font-sans text-[11px] text-ink/40">ešte {milestone.remaining} bodov</span>
+              </div>
+              <div className="h-1.5 rounded-full bg-cream-200 overflow-hidden">
+                <div className="h-full rounded-full bg-gold transition-all duration-500" style={{ width: `${milestone.pct}%` }} />
+              </div>
+            </div>
+          )}
+
+          {/* Lifetime activity — what you've actually done */}
+          <div className="flex gap-2 pt-4 border-t border-ink/[0.06]">
             {[
-              { n: totalWorkouts, label: 'cvičení',   color: 'text-pillar-strava' },
+              { n: totalWorkouts, label: 'cvičení', color: 'text-pillar-strava' },
               { n: reflectionCount ?? 0, label: 'reflexií', color: 'text-pillar-mysel' },
-              { n: favoritesCount, label: 'receptov', color: 'text-gold' },
+              { n: favoritesCount, label: 'obľúbené', color: 'text-gold' },
             ].map(s => (
               <div key={s.label} className="flex-1 rounded-xl bg-cream-200 py-3 px-2 text-center">
                 <div className={`font-serif text-h2 leading-none ${s.color}`}>{s.n}</div>
@@ -119,60 +148,6 @@ export default function Profil() {
               </div>
             ))}
           </div>
-        </div>
-      </div>
-
-      {/* Points card */}
-      <div className="px-5 mb-6">
-        <div className="rounded-card p-5 bg-white border border-ink/[0.08] shadow-nm-sm">
-          <div className="flex items-center justify-between mb-4">
-            <Eyebrow tone="muted">Body a odmeny</Eyebrow>
-            <button
-              onClick={() => navigate('/body/odmeny')}
-              className="font-sans text-[11px] text-terra font-medium"
-            >
-              Vymeniť ›
-            </button>
-          </div>
-
-          {/* Balance */}
-          <div className="flex items-center gap-3 mb-4">
-            <div className="h-11 w-11 rounded-xl bg-gold/15 flex items-center justify-center flex-shrink-0">
-              <Star className="size-5 text-gold fill-gold/30" />
-            </div>
-            <div>
-              <div className="flex items-baseline gap-1.5">
-                <span className="font-serif text-h1 text-ink leading-none">{balance}</span>
-                <span className="font-sans text-sm text-ink/56">bodov</span>
-              </div>
-              <button
-                onClick={() => navigate('/body')}
-                className="font-sans text-[11px] text-ink/40 mt-0.5 text-left"
-              >
-                Zobraziť históriu ›
-              </button>
-            </div>
-          </div>
-
-          {/* Next milestone */}
-          {milestone ? (
-            <div>
-              <div className="flex items-baseline justify-between mb-1.5">
-                <span className="font-sans text-[11px] text-ink/56 font-medium">{milestone.name}</span>
-                <span className="font-sans text-[11px] text-ink/40">{milestone.remaining} bodov</span>
-              </div>
-              <div className="h-1.5 rounded-full bg-cream-200 overflow-hidden">
-                <div
-                  className="h-full rounded-full bg-gold transition-all duration-500"
-                  style={{ width: `${milestone.pct}%` }}
-                />
-              </div>
-            </div>
-          ) : (
-            <div className="font-sans text-[12px] text-ink/40 text-center py-1">
-              Všetky odmeny splnené
-            </div>
-          )}
 
           {/* Badges */}
           {badges.length > 0 && (
@@ -194,13 +169,7 @@ export default function Profil() {
                           opacity: b.earned ? 1 : 0.5,
                         }}
                       >
-                        <Star
-                          className="size-4"
-                          style={{
-                            stroke: b.earned ? '#fff' : '#A0907E',
-                            fill: b.earned ? 'rgba(255,255,255,0.25)' : 'none',
-                          }}
-                        />
+                        <Star className="size-4" style={{ stroke: b.earned ? '#fff' : '#A0907E', fill: b.earned ? 'rgba(255,255,255,0.25)' : 'none' }} />
                       </div>
                       <span className="font-sans text-center leading-tight" style={{ fontSize: 9, color: b.earned ? '#3D2921' : '#A0907E', fontWeight: b.earned ? 500 : 400 }}>
                         {b.name}
@@ -212,16 +181,17 @@ export default function Profil() {
             </div>
           )}
 
-          {/* All rewards row */}
+          {/* One clear way deeper — points history + all rewards */}
           <button
-            onClick={() => navigate('/body/odmeny')}
+            onClick={() => navigate('/body')}
             className="mt-4 pt-4 border-t border-ink/[0.06] w-full flex items-center justify-between"
           >
-            <span className="font-sans text-[13px] text-ink font-medium">Všetky odmeny a zľavy</span>
+            <span className="font-sans text-[13px] text-ink font-medium">Body, história a odmeny</span>
             <ChevronRight className="size-4 text-ink/40" />
           </button>
         </div>
       </div>
+
 
       {/* Refer-a-friend / partner entry — dark brown card so it stands
           out (Sam 2026-10-05): white title, gold value, above Predplatné. */}
