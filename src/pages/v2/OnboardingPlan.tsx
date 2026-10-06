@@ -59,10 +59,10 @@ const PLUS_FEATURES: string[] = [
 // Anchor = what the same thing costs without the deal (monthly's full
 // price, or the equivalent months bought one by one), shown struck
 // through next to the real price (Sam 2026-10-06).
-const OFFER: Record<SubscriptionTierKey, { anchor: number | null; price: number; unit: string; note: string }> = {
-  monthly:   { anchor: null, price: 29,  unit: '/ mesiac',      note: 'Zrušíš kedykoľvek' },
-  quarterly: { anchor: 87,   price: 69,  unit: 'za 12 týždňov', note: 'Po 12 týždňoch sa obnoví automaticky · zrušíš kedykoľvek' },
-  yearly:    { anchor: 348,  price: 199, unit: '/ rok',         note: 'Obnoví sa raz ročne · zrušíš kedykoľvek' },
+const OFFER: Record<SubscriptionTierKey, { anchor: number | null; price: number; unit: string; note: string; chip: string }> = {
+  monthly:   { anchor: null, price: 29,  unit: '/ mesiac',      note: 'Zrušíš kedykoľvek',                                         chip: 'Ideálna na vyskúšanie' },
+  quarterly: { anchor: 87,   price: 69,  unit: 'za 12 týždňov', note: 'Po 12 týždňoch sa obnoví automaticky · zrušíš kedykoľvek', chip: 'Špeciálna ponuka' },
+  yearly:    { anchor: 348,  price: 199, unit: '/ rok',         note: 'Obnoví sa raz ročne · zrušíš kedykoľvek',                   chip: 'Pre skutočnú zmenu' },
 };
 
 export default function OnboardingPlan() {
@@ -77,12 +77,15 @@ export default function OnboardingPlan() {
   const onConfirm = () => {
     localStorage.setItem(INTENDED_PLAN_KEY, plan);
     if (plan === 'plus') {
+      // Pay first, account after (Sam 2026-10-06): straight to the
+      // checkout — it works without a login and creates the account
+      // at payment time; the password is set on the success screen.
       localStorage.setItem(INTENDED_PRICE_ID_KEY, activeTier.priceId);
-      localStorage.setItem(POST_SIGNUP_ROUTE_KEY, '/checkout');
-    } else {
-      localStorage.removeItem(INTENDED_PRICE_ID_KEY);
-      localStorage.setItem(POST_SIGNUP_ROUTE_KEY, '/domov-new');
+      navigate(`/checkout/plus?price=${encodeURIComponent(activeTier.priceId)}`);
+      return;
     }
+    localStorage.removeItem(INTENDED_PRICE_ID_KEY);
+    localStorage.setItem(POST_SIGNUP_ROUTE_KEY, '/domov-new');
     navigate('/auth?mode=register');
   };
 
@@ -218,15 +221,23 @@ export default function OnboardingPlan() {
             <Eye color={accent} size={10}>
               {plan === 'plus' ? 'NeoMe Plus' : 'NeoMe Free'}
             </Eye>
-            {plan === 'plus' && billing === 'quarterly' && (
-              <div style={{ display: 'inline-block', marginTop: 12, padding: '4px 11px', borderRadius: 999, background: NM.GOLD, color: NM.DEEP, fontFamily: NM.SANS, fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-                Špeciálna ponuka
+            {plan === 'plus' && (
+              <div
+                style={{
+                  display: 'inline-block', marginTop: 12, padding: '4px 11px', borderRadius: 999,
+                  background: billing === 'quarterly' ? NM.GOLD : 'transparent',
+                  border: billing === 'quarterly' ? '1px solid transparent' : '1px solid rgba(255,255,255,0.25)',
+                  color: billing === 'quarterly' ? NM.DEEP : 'rgba(255,255,255,0.75)',
+                  fontFamily: NM.SANS, fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase',
+                }}
+              >
+                {OFFER[billing].chip}
               </div>
             )}
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginTop: 10 }}>
-              {plan === 'plus' && OFFER[billing].anchor != null && (
-                <span style={{ fontFamily: NM.SERIF, fontSize: 21, fontWeight: 400, textDecoration: 'line-through', opacity: 0.45 }}>
-                  {eur(OFFER[billing].anchor!)}
+              {plan === 'plus' && (
+                <span style={{ fontFamily: NM.SERIF, fontSize: 21, fontWeight: 400, textDecoration: 'line-through', opacity: 0.45, minWidth: 1 }}>
+                  {OFFER[billing].anchor != null ? eur(OFFER[billing].anchor!) : '\u00A0'}
                 </span>
               )}
               <span style={{ fontFamily: NM.SERIF, fontSize: 40, fontWeight: 500, letterSpacing: '-0.02em' }}>

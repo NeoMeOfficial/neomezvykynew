@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { NM, Eye } from '../../components/v2/neome';
 import { useSubscription } from '../../contexts/SubscriptionContext';
+import { supabase } from '../../lib/supabase';
 
 /**
  * Post-checkout confirmation — full-screen celebration + CTA.
@@ -52,11 +53,26 @@ export default function CheckoutSuccess() {
   );
   const [attempt, setAttempt] = useState(0);
 
+  // Pay-first flow: a guest arrives here with a succeeded payment and
+  // NO session. The PI client secret in the redirect URL is the proof
+  // of possession — she sets a password, we claim the silently created
+  // account and sign her in, then the normal polling takes over.
+  const [claimNeeded, setClaimNeeded] = useState<boolean | null>(null);
+  const piSecret = params.get('payment_intent_client_secret');
+  useEffect(() => {
+    (async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setClaimNeeded(!session && !!piSecret);
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Poll until the relevant flag flips, or until we time out. Skip the
   // poll entirely when a dev override is active so the preview state
   // doesn't shift under us.
   useEffect(() => {
     if (devOverride) return;
+    if (claimNeeded !== false) return;
     if (phase !== 'pending') return;
     if (confirmed) {
       setPhase('confirmed');
@@ -78,6 +94,7 @@ export default function CheckoutSuccess() {
   // we want the dev override to survive a reload.
   useEffect(() => {
     if (devOverride) return;
+    if (claimNeeded !== false) return;
     if (phase === 'confirmed' && (params.get('session_id') || params.get('type'))) {
       window.history.replaceState(null, '', '/checkout/success');
     }
@@ -123,6 +140,13 @@ export default function CheckoutSuccess() {
           padding: 'calc(env(safe-area-inset-top) + 24px) 22px calc(env(safe-area-inset-bottom) + 28px)',
         }}
       >
+        {claimNeeded && piSecret ? (
+          <ClaimAccount
+            piSecret={piSecret}
+            onDone={() => { setClaimNeeded(false); setAttempt(0); setPhase('pending'); refreshSubscription(); }}
+          />
+        ) : claimNeeded === null ? null : (
+          <>
         {phase === 'pending' && <Pending />}
         {phase === 'timeout' && <Timeout onRetry={onRetry} onSkip={() => navigate('/domov-new')} />}
         {phase === 'confirmed' && type === 'subscription' && (
@@ -139,12 +163,84 @@ export default function CheckoutSuccess() {
             loading={loading}
           />
         )}
+          </>
+        )}
       </div>
     </div>
   );
 }
 
 // ─── States ─────────────────────────────────────────────────────────
+
+function ClaimAccount({ piSecret, onDone }: { piSecret: string; onDone: () => void }) {
+  const [password, setPassword] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const submit = async () => {
+    if (busy) return;
+    if (password.length < 8) { setError('Heslo musí mať aspoň 8 znakov.'); return; }
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await fetch('/.netlify/functions/complete-guest-account', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ payment_intent_client_secret: piSecret, password }),
+      });
+      const body = await res.json();
+      if (!res.ok) throw new Error(body.error || 'Účet sa nepodarilo dokončiť.');
+      const { error: signInErr } = await supabase.auth.signInWithPassword({ email: body.email, password });
+      if (signInErr) throw new Error('Prihlásenie zlyhalo — skús sa prihlásiť ručne.');
+      onDone();
+    } catch (err: any) {
+      setError(err.message ?? 'Účet sa nepodarilo dokončiť.');
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', maxWidth: 340, marginInline: 'auto', width: '100%' }}>
+      <Eye color={NM.GOLD} size={10}>Platba prebehla</Eye>
+      <div style={{ marginTop: 14, fontFamily: NM.SERIF, fontSize: 30, lineHeight: 1.1, letterSpacing: '-0.015em' }}>
+        Posledný krok —
+        <br />
+        <em style={{ fontStyle: 'italic', color: NM.GOLD }}>nastav si heslo.</em>
+      </div>
+      <div style={{ marginTop: 12, fontFamily: NM.SANS, fontSize: 13.5, color: NM.MUTED, fontWeight: 300, lineHeight: 1.55 }}>
+        Účet sme ti vytvorili pri platbe. S heslom sa prihlásiš na akomkoľvek zariadení.
+      </div>
+      <input
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        onKeyDown={(e) => { if (e.key === 'Enter') submit(); }}
+        placeholder="Nové heslo (min. 8 znakov)"
+        autoComplete="new-password"
+        style={{
+          display: 'block', width: '100%', boxSizing: 'border-box', marginTop: 20,
+          padding: '14px 16px', borderRadius: 14, border: `1px solid ${NM.HAIR_2 ?? 'rgba(61,41,33,0.14)'}`,
+          fontFamily: NM.SANS, fontSize: 16, color: NM.DEEP, outline: 'none', background: '#fff',
+        }}
+      />
+      {error && (
+        <div style={{ marginTop: 10, fontFamily: NM.SANS, fontSize: 12.5, color: '#8E372F' }}>{error}</div>
+      )}
+      <button
+        onClick={submit}
+        disabled={busy}
+        style={{
+          all: 'unset', boxSizing: 'border-box', display: 'block', width: '100%', textAlign: 'center',
+          marginTop: 14, background: NM.DEEP, color: '#fff', borderRadius: 999, padding: '15px 0',
+          fontFamily: NM.SANS, fontSize: 14.5, fontWeight: 600, cursor: busy ? 'default' : 'pointer',
+          opacity: busy ? 0.55 : 1,
+        }}
+      >
+        {busy ? 'Moment…' : 'Dokončiť účet'}
+      </button>
+    </div>
+  );
+}
 
 function Pending() {
   return (

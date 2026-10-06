@@ -257,11 +257,14 @@ export default function AppV2() {
             <Route path="/terms" element={<TermsOfUse />} />
 
             {/* Full-screen protected routes — no BottomNav */}
+            {/* Guest-reachable: pay first, account after (Sam 2026-10-06).
+                CheckoutPlus serves both guests (email field) and logged-in
+                users; CheckoutSuccess claims the account post-payment. */}
+            <Route path="/checkout/plus" element={<CheckoutPlus />} />
+            <Route path="/checkout/success" element={<CheckoutSuccess />} />
             <Route element={<RequireAuth><TosConsentGate><Outlet /></TosConsentGate></RequireAuth>}>
               <Route path="/paywall" element={<Paywall />} />
               <Route path="/checkout" element={<CheckoutLauncher />} />
-              <Route path="/checkout/plus" element={<CheckoutPlus />} />
-              <Route path="/checkout/success" element={<CheckoutSuccess />} />
               <Route path="/checkout/canceled" element={<CheckoutCanceled />} />
             </Route>
 

@@ -354,6 +354,7 @@ function PayForm({ tier, amountCents }: { tier: SubscriptionTier | null; amountC
       </button>
       <p style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.TERTIARY, textAlign: 'center', lineHeight: 1.5, margin: '12px 0 0' }}>
         Číslo karty zadávaš priamo Stripu — na náš server sa nikdy nedostane.
+        Zaplatením súhlasíš s Podmienkami používania a Zásadami ochrany osobných údajov.
       </p>
     </section>
   );
@@ -370,6 +371,12 @@ export default function CheckoutPlus() {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [amountCents, setAmountCents] = useState<number | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
+  // Pay-first flow (Sam 2026-10-06): no account needed to reach this
+  // page. Guests give an email; the account is created silently at
+  // payment time and claimed with a password on the success screen.
+  const [guest, setGuest] = useState(false);
+  const [guestEmail, setGuestEmail] = useState('');
+  const [preparing, setPreparing] = useState(false);
   const requested = useRef(false);
 
   useEffect(() => {
@@ -379,7 +386,7 @@ export default function CheckoutPlus() {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) {
-          navigate('/auth', { replace: true });
+          setGuest(true);
           return;
         }
         const res = await fetch('/.netlify/functions/create-subscription-intent', {
@@ -399,6 +406,27 @@ export default function CheckoutPlus() {
       }
     })();
   }, [priceId, navigate]);
+
+  const startGuestCheckout = async () => {
+    if (preparing) return;
+    setPreparing(true);
+    setLoadError(null);
+    try {
+      const res = await fetch('/.netlify/functions/create-subscription-intent-guest', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ priceId, email: guestEmail.trim() }),
+      });
+      const body = await res.json();
+      if (!res.ok) throw new Error(body.error || 'Platbu sa nepodarilo pripraviť.');
+      setClientSecret(body.clientSecret);
+      if (typeof body.amount_cents === 'number') setAmountCents(body.amount_cents);
+    } catch (err: any) {
+      setLoadError(err.message ?? 'Platbu sa nepodarilo pripraviť.');
+    } finally {
+      setPreparing(false);
+    }
+  };
 
   return (
     <div style={{ minHeight: '100vh', background: NM.BG }}>
@@ -443,6 +471,50 @@ export default function CheckoutPlus() {
 
         <ProofBar />
 
+        {guest && !clientSecret && (
+          <section style={{ ...card, marginTop: 14 }}>
+            <div style={{ fontFamily: NM.SERIF, fontSize: 17, color: NM.DEEP, marginBottom: 6 }}>
+              Tvoj e-mail
+            </div>
+            <p style={{ fontFamily: NM.SANS, fontSize: 12.5, color: NM.MUTED, lineHeight: 1.5, margin: '0 0 12px' }}>
+              Naň ti pošleme potvrdenie platby. Účet a heslo si nastavíš hneď po zaplatení.
+            </p>
+            <input
+              type="email"
+              value={guestEmail}
+              onChange={(e) => setGuestEmail(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') startGuestCheckout(); }}
+              placeholder="tvoj@email.sk"
+              autoComplete="email"
+              inputMode="email"
+              style={{
+                display: 'block', width: '100%', boxSizing: 'border-box',
+                padding: '13px 14px', borderRadius: 12, border: '1px solid rgba(61,41,33,0.14)',
+                fontFamily: NM.SANS, fontSize: 15, color: NM.DEEP, outline: 'none', background: '#fff',
+              }}
+            />
+            <button
+              onClick={startGuestCheckout}
+              disabled={preparing || !guestEmail.includes('@')}
+              style={{
+                all: 'unset', boxSizing: 'border-box', display: 'block', width: '100%',
+                textAlign: 'center', marginTop: 12, background: NM.DEEP, color: '#fff',
+                borderRadius: 999, padding: '14px 0', fontFamily: NM.SANS, fontSize: 14,
+                fontWeight: 600, cursor: preparing || !guestEmail.includes('@') ? 'default' : 'pointer',
+                opacity: preparing || !guestEmail.includes('@') ? 0.55 : 1,
+              }}
+            >
+              {preparing ? 'Moment…' : 'Pokračovať k platbe'}
+            </button>
+            <p style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.TERTIARY, textAlign: 'center', margin: '10px 0 0' }}>
+              Už máš účet?{' '}
+              <button onClick={() => navigate('/auth')} style={{ all: 'unset', cursor: 'pointer', textDecoration: 'underline', textUnderlineOffset: 2, color: NM.MUTED }}>
+                Prihlás sa
+              </button>
+            </p>
+          </section>
+        )}
+
         {loadError ? (
           <div
             style={{
@@ -457,7 +529,7 @@ export default function CheckoutPlus() {
           <Elements stripe={stripePromise} options={{ clientSecret, appearance, fonts, locale: 'sk' }}>
             <PayForm tier={tier} amountCents={amountCents} />
           </Elements>
-        ) : (
+        ) : guest ? null : (
           <div style={{ marginTop: 14 }}>
             <LoadingScreen label="Pripravujem platbu…" fullScreen={false} />
           </div>
