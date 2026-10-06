@@ -322,8 +322,7 @@ function SubscriptionConfirmed({ onPrimary, loading }: { onPrimary: () => void; 
       />
       {/* Content bottom-aligned — no artificial mid-screen gap. */}
       <div style={{ position: 'relative', zIndex: 1, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
-        <CheckMark />
-        <Eye color={NM.GOLD} size={10} style={{ marginTop: 20 }}>NeoMe Plus · aktivované</Eye>
+        <Eye color={NM.GOLD} size={10}>NeoMe Plus · aktivované</Eye>
         <div style={{ marginTop: 12, fontFamily: NM.SERIF, fontSize: 38, lineHeight: 1.05, letterSpacing: '-0.015em', color: '#fff' }}>
           Vitaj{' '}
           <em style={{ color: NM.GOLD, fontWeight: 400 }}>doma.</em>
@@ -335,7 +334,7 @@ function SubscriptionConfirmed({ onPrimary, loading }: { onPrimary: () => void; 
           {/* Single CTA — the program now/later question lives on the next
               screen (ProgramPrompt); asking here too was a duplicate
               (Sam 2026-10-06). */}
-          <button onClick={onPrimary} disabled={loading} style={ctaPrimary()}>
+          <button onClick={onPrimary} disabled={loading} style={ctaPrimary({ background: '#fff', color: NM.DEEP })}>
             Pokračovať
           </button>
         </div>
