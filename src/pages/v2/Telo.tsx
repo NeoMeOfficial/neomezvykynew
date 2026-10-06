@@ -71,12 +71,12 @@ export default function Telo() {
     <div style={{ background: '#F8F5F0', minHeight: '100vh', paddingBottom: 120 }}>
 
       {/* Back header */}
-      <div style={{ padding: '56px 20px 18px' }}>
+      <div style={{ padding: 'calc(env(safe-area-inset-top) + 18px) 20px 18px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <button
             onClick={smartBack}
             style={{
-              width: 36, height: 36, borderRadius: 999,
+              width: 40, height: 40, borderRadius: 999,
               background: '#fff', border: `1px solid ${HAIR}`,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: 'pointer',
@@ -92,7 +92,7 @@ export default function Telo() {
           <button
             onClick={() => navigate('/hladat')}
             style={{
-              width: 36, height: 36, borderRadius: 999,
+              width: 40, height: 40, borderRadius: 999,
               background: '#fff', border: `1px solid ${HAIR}`,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: 'pointer',

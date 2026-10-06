@@ -369,7 +369,7 @@ export default function ExercisePlayer() {
             />
             <button
               onClick={handleShare}
-              className="h-9 w-9 rounded-full flex items-center justify-center active:scale-95 transition-transform"
+              className="h-10 w-10 rounded-full flex items-center justify-center active:scale-95 transition-transform"
             >
               <Share2 className="size-4 text-ink/50" />
             </button>

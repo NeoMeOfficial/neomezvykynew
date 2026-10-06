@@ -221,7 +221,7 @@ export default function ProgramDetail() {
   })();
 
   return (
-    <div style={{ background: NM.BG, minHeight: '100vh', paddingBottom: 160, fontFamily: NM.SANS, color: NM.DEEP }}>
+    <div style={{ background: NM.BG, minHeight: '100vh', paddingBottom: 48, fontFamily: NM.SANS, color: NM.DEEP }}>
       {/* Hero */}
       <div
         style={{

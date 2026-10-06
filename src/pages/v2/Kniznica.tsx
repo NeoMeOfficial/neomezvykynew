@@ -263,10 +263,10 @@ export default function Kniznica() {
   const [showSearch, setShowSearch] = useState(false);
 
   return (
-    <div style={{ background: '#F8F5F0', minHeight: '100vh', paddingBottom: 120 }}>
+    <div style={{ background: '#F8F5F0', minHeight: '100vh', paddingBottom: 24 }}>
 
       {/* Header */}
-      <div style={{ padding: '60px 20px 18px' }}>
+      <div style={{ padding: 'calc(env(safe-area-inset-top) + 18px) 20px 18px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ fontFamily: 'DM Sans, system-ui', fontSize: 11, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(61,41,33,0.55)', fontWeight: 500, display: 'flex', alignItems: 'center', gap: 8 }}>
             Knižnica

@@ -80,8 +80,10 @@ export default function OdporucPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: NM.BG, padding: '0 18px 60px', fontFamily: NM.SANS }}>
-      <div style={{ padding: 'calc(env(safe-area-inset-top) + 18px) 0 6px' }}>
-        <button onClick={() => navigate('/profil')} style={{ all: 'unset', cursor: 'pointer', fontSize: 14, color: NM.DEEP, padding: 6 }}>← Späť</button>
+      <div style={{ padding: 'calc(env(safe-area-inset-top) + 14px) 0 6px', display: 'flex', alignItems: 'center', gap: 12 }}>
+        <button onClick={() => navigate('/profil')} aria-label="Späť" style={{ all: 'unset', cursor: 'pointer', width: 40, height: 40, borderRadius: 999, background: '#fff', border: `1px solid ${NM.HAIR}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={NM.DEEP} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M15 6l-6 6 6 6" /></svg>
+        </button>
       </div>
 
       <h1 style={{ fontFamily: NM.SERIF, fontSize: 26, fontWeight: 500, color: NM.DEEP, margin: '6px 0 2px' }}>Odporuč kamarátke</h1>

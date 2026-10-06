@@ -122,7 +122,7 @@ export default function RecipeDetail() {
   const related = [...sameCat.slice(relStart), ...sameCat.slice(0, relStart)].slice(0, 3);
 
   return (
-    <div style={{ background: NM.BG, minHeight: '100vh', position: 'relative', fontFamily: NM.SANS, color: NM.DEEP, paddingBottom: 'calc(env(safe-area-inset-bottom) + 100px)' }}>
+    <div style={{ background: NM.BG, minHeight: '100vh', position: 'relative', fontFamily: NM.SANS, color: NM.DEEP, paddingBottom: 'calc(env(safe-area-inset-bottom) + 124px)' }}>
       {/* Hero image */}
       <div
         style={{
@@ -140,7 +140,7 @@ export default function RecipeDetail() {
           style={{
             all: 'unset', cursor: 'pointer', position: 'absolute',
             top: 'calc(env(safe-area-inset-top) + 8px)', left: 18,
-            width: 38, height: 38, borderRadius: 999,
+            width: 40, height: 40, borderRadius: 999,
             background: 'rgba(255,255,255,0.92)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             boxShadow: '0 2px 8px rgba(0,0,0,0.12)',

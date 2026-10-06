@@ -459,7 +459,7 @@ export default function CheckoutPlus() {
           </div>
           <button
             onClick={() => navigate(-1)}
-            style={{ all: 'unset', cursor: 'pointer', fontFamily: NM.SANS, fontSize: 13, color: NM.MUTED }}
+            style={{ all: 'unset', cursor: 'pointer', fontFamily: NM.SANS, fontSize: 13, color: NM.MUTED, padding: '8px 10px', margin: '-8px -10px' }}
           >
             ← Späť
           </button>

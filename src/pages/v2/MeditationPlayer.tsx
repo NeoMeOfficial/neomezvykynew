@@ -172,7 +172,7 @@ export default function MeditationPlayer() {
         minHeight: '100vh',
         background: `linear-gradient(160deg, ${NM.DEEP_2} 0%, #4A3327 40%, #3E2820 100%)`,
         position: 'relative',
-        overflow: 'hidden',
+        overflowY: 'auto',
         fontFamily: NM.SANS,
       }}
     >
@@ -215,8 +215,8 @@ export default function MeditationPlayer() {
             all: 'unset',
             cursor: 'pointer',
             background: 'rgba(255,255,255,0.12)',
-            width: 36,
-            height: 36,
+            width: 40,
+            height: 40,
             borderRadius: 999,
             display: 'flex',
             alignItems: 'center',

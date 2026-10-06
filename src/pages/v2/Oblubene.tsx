@@ -215,7 +215,7 @@ export default function Oblubene() {
                 <button
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key)}
-                  className={`flex-shrink-0 px-4 py-2 rounded-full font-sans text-sm font-medium transition-all ${
+                  className={`flex-shrink-0 px-4 py-2.5 min-h-10 rounded-full font-sans text-sm font-medium transition-all ${
                     activeTab === tab.key
                       ? 'bg-ink text-cream'
                       : 'bg-white border border-ink/[0.08] text-ink/72'
