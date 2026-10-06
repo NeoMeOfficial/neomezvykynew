@@ -225,7 +225,11 @@ export default function AppLayout() {
     // Web-app layout: sidebar + centred cream content column on the
     // brown/gold backdrop (painted by #root media query).
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', justifyContent: 'center', padding: '28px 20px' }}>
+      <div style={{
+        minHeight: '100vh', display: 'flex', justifyContent: 'center', padding: '28px 20px',
+        boxSizing: 'border-box',
+        background: 'radial-gradient(60% 55% at 50% 40%, rgba(184,134,74,0.22), transparent 70%), #2A1A14',
+      }}>
         <div
           style={{
             width: '100%', maxWidth: 1100, display: 'flex',
