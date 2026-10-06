@@ -31,7 +31,8 @@ export default function Profil() {
   const longest = stats?.longestStreak ?? 0;
   const totalWorkouts = stats?.totalWorkouts ?? 0;
 
-  const { balance } = usePointsLedger();
+  const { balance, entries } = usePointsLedger();
+  const meditationsDone = entries.filter((e) => e.event_type === 'meditation_completed').length;
   const isAffiliate = useIsAffiliate();
   const milestone = useNextMilestone(balance);
   const { badges } = useUserBadges();
@@ -140,7 +141,7 @@ export default function Profil() {
             {[
               { n: totalWorkouts, label: 'cvičení', color: 'text-pillar-strava' },
               { n: reflectionCount ?? 0, label: 'reflexií', color: 'text-pillar-mysel' },
-              { n: favoritesCount, label: 'obľúbené', color: 'text-gold' },
+              { n: meditationsDone, label: 'meditácií', color: 'text-pillar-mysel' },
             ].map(s => (
               <div key={s.label} className="flex-1 rounded-xl bg-cream-200 py-3 px-2 text-center">
                 <div className={`font-serif text-h2 leading-none ${s.color}`}>{s.n}</div>
@@ -181,10 +182,20 @@ export default function Profil() {
             </div>
           )}
 
+          {/* Favourites are saved-for-later, not an achievement — a quick
+              link to the saved-content page, not a progress number. */}
+          <button
+            onClick={() => navigate('/oblubene')}
+            className="mt-4 pt-4 border-t border-ink/[0.06] w-full flex items-center justify-between"
+          >
+            <span className="font-sans text-[13px] text-ink font-medium">Obľúbené {favoritesCount > 0 ? `(${favoritesCount})` : ''}</span>
+            <ChevronRight className="size-4 text-ink/40" />
+          </button>
+
           {/* One clear way deeper — points history + all rewards */}
           <button
             onClick={() => navigate('/body')}
-            className="mt-4 pt-4 border-t border-ink/[0.06] w-full flex items-center justify-between"
+            className="mt-3 pt-4 border-t border-ink/[0.06] w-full flex items-center justify-between"
           >
             <span className="font-sans text-[13px] text-ink font-medium">Body, história a odmeny</span>
             <ChevronRight className="size-4 text-ink/40" />
