@@ -445,7 +445,7 @@ export default function CheckoutPlus() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: NM.BG }}>
+    <div className="nm-page-in" style={{ minHeight: '100vh', background: NM.BG }}>
       <div
         style={{
           maxWidth: 440, margin: '0 auto',

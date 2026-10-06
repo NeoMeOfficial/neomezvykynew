@@ -241,7 +241,9 @@ export default function AppLayout() {
           <main className="relative z-10" style={{ flex: 1, minWidth: 0, maxWidth: focusMode ? '100%' : 760, margin: focusMode ? 0 : '0 auto', width: '100%' }}>
             {needRefresh && <UpdateBanner onRefresh={onRefresh} topInset="0px" />}
             <ErrorBoundary>
-              <Outlet />
+              <div key={pathname} className="nm-page-in">
+                <Outlet />
+              </div>
             </ErrorBoundary>
           </main>
         </div>
@@ -285,7 +287,9 @@ export default function AppLayout() {
         style={!focusMode ? { paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 96px)' } : undefined}
       >
         <ErrorBoundary>
-          <Outlet />
+          <div key={pathname} className="nm-page-in">
+            <Outlet />
+          </div>
         </ErrorBoundary>
       </main>
       {!focusMode && <BottomNav />}
