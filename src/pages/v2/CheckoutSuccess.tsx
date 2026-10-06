@@ -173,6 +173,7 @@ export default function CheckoutSuccess() {
 // ─── States ─────────────────────────────────────────────────────────
 
 function ClaimAccount({ piSecret, onDone }: { piSecret: string; onDone: () => void }) {
+  const [name, setName] = useState('');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -192,6 +193,16 @@ function ClaimAccount({ piSecret, onDone }: { piSecret: string; onDone: () => vo
       if (!res.ok) throw new Error(body.error || 'Účet sa nepodarilo dokončiť.');
       const { error: signInErr } = await supabase.auth.signInWithPassword({ email: body.email, password });
       if (signInErr) throw new Error('Prihlásenie zlyhalo — skús sa prihlásiť ručne.');
+      // Preferred name — same storage the onboarding tour uses, so the
+      // home greeting works immediately and the tour skips its name step.
+      const clean = name.trim().slice(0, 40);
+      if (clean) {
+        try { localStorage.setItem('neome_preferred_name', clean); } catch { /* ignore */ }
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          await supabase.from('profiles').update({ preferred_name: clean } as any).eq('id', user.id);
+        }
+      }
       onDone();
     } catch (err: any) {
       setError(err.message ?? 'Účet sa nepodarilo dokončiť.');
@@ -211,6 +222,19 @@ function ClaimAccount({ piSecret, onDone }: { piSecret: string; onDone: () => vo
         Účet sme ti vytvorili pri platbe. S heslom sa prihlásiš na akomkoľvek zariadení.
       </div>
       <input
+        type="text"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        placeholder="Ako ťa máme volať?"
+        autoComplete="given-name"
+        maxLength={40}
+        style={{
+          display: 'block', width: '100%', boxSizing: 'border-box', marginTop: 20,
+          padding: '14px 16px', borderRadius: 14, border: `1px solid ${NM.HAIR_2 ?? 'rgba(61,41,33,0.14)'}`,
+          fontFamily: NM.SANS, fontSize: 16, color: NM.DEEP, outline: 'none', background: '#fff',
+        }}
+      />
+      <input
         type="password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
@@ -218,7 +242,7 @@ function ClaimAccount({ piSecret, onDone }: { piSecret: string; onDone: () => vo
         placeholder="Nové heslo (min. 8 znakov)"
         autoComplete="new-password"
         style={{
-          display: 'block', width: '100%', boxSizing: 'border-box', marginTop: 20,
+          display: 'block', width: '100%', boxSizing: 'border-box', marginTop: 10,
           padding: '14px 16px', borderRadius: 14, border: `1px solid ${NM.HAIR_2 ?? 'rgba(61,41,33,0.14)'}`,
           fontFamily: NM.SANS, fontSize: 16, color: NM.DEEP, outline: 'none', background: '#fff',
         }}

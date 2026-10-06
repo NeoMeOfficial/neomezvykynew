@@ -185,8 +185,14 @@ const NAME_STEP: Step = {
   input: true,
 };
 
+function hasPreferredName(): boolean {
+  try { if (localStorage.getItem('neome_preferred_name')) return true; } catch { /* ignore */ }
+  return false;
+}
+
 function buildCoreSteps(): Step[] {
-  const steps = [NAME_STEP, ...CORE_STEPS];
+  // Asked at checkout-claim already? Don't ask twice.
+  const steps = hasPreferredName() ? [...CORE_STEPS] : [NAME_STEP, ...CORE_STEPS];
   if (!isStandalone()) steps.push({ ...INSTALL_STEP, text: 'Otvára sa potom jedným ťuknutím, ako každá iná appka.', guide: installGuide() });
   return steps;
 }
