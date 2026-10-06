@@ -1,3 +1,4 @@
+import DOMPurify from 'dompurify';
 import { useNavigate, useParams } from 'react-router-dom';
 import LoadingScreen from '../../components/v2/LoadingScreen';
 import { Page, Eye, Ser, NM } from '../../components/v2/neome';
@@ -108,7 +109,7 @@ export default function BlogArticle() {
       <div
         className="blog-prose"
         style={{ padding: '22px 22px 0' }}
-        dangerouslySetInnerHTML={{ __html: post.content ?? '' }}
+        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content ?? '') }}
       />
     </Page>
   );

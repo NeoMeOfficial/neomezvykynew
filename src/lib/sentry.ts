@@ -17,6 +17,26 @@ export function initSentry() {
   Sentry.init({
     dsn: SENTRY_DSN,
     environment: import.meta.env.MODE,
+    // Never send PII to Sentry (health app — Art. 9 data must not leak
+    // into error reports). Strip user identity, cookies, request bodies,
+    // query strings and any email-looking substrings from messages.
+    sendDefaultPii: false,
+    beforeSend(event) {
+      delete event.user;
+      if (event.request) {
+        delete event.request.cookies;
+        delete (event.request as any).data;
+        if (event.request.url) event.request.url = event.request.url.split('?')[0];
+        delete event.request.query_string;
+      }
+      const scrub = (t?: string) =>
+        t?.replace(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g, '[email]');
+      if (event.message) event.message = scrub(event.message)!;
+      for (const ex of event.exception?.values ?? []) {
+        if (ex.value) ex.value = scrub(ex.value)!;
+      }
+      return event;
+    },
     // Performance + replay are off by default to keep the quota for
     // actual errors. Enable later if you need timing data.
     tracesSampleRate: 0,

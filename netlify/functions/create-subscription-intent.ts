@@ -94,17 +94,6 @@ export async function handler(event: any) {
       customerId = customer.id;
     }
 
-    // Website promise: monthly is 19 € the first month, 29 € after —
-    // implemented as a once-coupon applied automatically here.
-    const monthlyIds = new Set(
-      [
-        process.env.VITE_STRIPE_SUBSCRIPTION_PRICE_ID,
-        process.env.VITE_STRIPE_SUBSCRIPTION_PRICE_ID_TEST,
-      ].filter(Boolean),
-    );
-    const firstMonthCoupon =
-      process.env.STRIPE_FIRST_MONTH_COUPON_TEST || process.env.STRIPE_FIRST_MONTH_COUPON;
-
     const subscription = await stripe.subscriptions.create({
       customer: customerId,
       items: [{ price: priceId }],
@@ -112,9 +101,6 @@ export async function handler(event: any) {
       payment_settings: { save_default_payment_method: 'on_subscription' },
       expand: ['latest_invoice.payment_intent'],
       metadata: { userId: auth.userId },
-      ...(monthlyIds.has(priceId) && firstMonthCoupon
-        ? { discounts: [{ coupon: firstMonthCoupon }] }
-        : {}),
     });
 
     const invoice = subscription.latest_invoice as Stripe.Invoice | null;

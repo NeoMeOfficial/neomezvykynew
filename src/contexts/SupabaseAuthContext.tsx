@@ -265,6 +265,25 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
 
       const { error } = await supabase.auth.signOut();
       setProfile(null);
+      // Clear per-user cached state so the next user on a shared device
+      // never inherits the previous one's name, tour progress, prefs,
+      // or dev overrides (security batch 2, 2026-10-06).
+      try {
+        const EXACT = [
+          'neome_preferred_name', 'neome_tour_v2', 'neome_tour_done_v1',
+          'neome_marketing_ask_from', 'neome_meal_planner_purchased',
+          'neome_affiliate_ref', 'intended_plan', 'intended_price_id',
+          'post_signup_route', 'neome_admin_msg_user',
+        ];
+        EXACT.forEach((k) => localStorage.removeItem(k));
+        // Prefixed per-user keys (dev tier override, cached subs).
+        for (let i = localStorage.length - 1; i >= 0; i--) {
+          const key = localStorage.key(i);
+          if (key && (key.startsWith('dev_tier_override_') || key.startsWith('subscription_'))) {
+            localStorage.removeItem(key);
+          }
+        }
+      } catch { /* ignore */ }
       return { error };
     } catch (error) {
       console.error('Error signing out:', error);

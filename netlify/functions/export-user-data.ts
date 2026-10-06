@@ -44,6 +44,10 @@ const USER_TABLES = [
   'notifications',
   'points_ledger',
   'user_badges',
+  'user_app_data',
+  'meal_plan_waitlist',
+  'affiliate_referrals',
+  'affiliate_earnings',
 ];
 
 export async function handler(event: { httpMethod: string; headers: Record<string, string> }) {

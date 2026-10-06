@@ -35,7 +35,7 @@ export const MEAL_PLAN_PRICE_ID =
 // the UI can disable them until the env vars are filled in.
 //
 // Tier prices (total per billing period) and per-month equivalents:
-//   monthly    29,00 €/mo  ·  29,00 €/mo  ·  baseline (website: 19 € first month via coupon)
+//   monthly    29,00 €/mo  ·  29,00 €/mo  ·  baseline
 //   quarterly  69,00 €/3mo ·  23,00 €/mo  ·  ~21% saving vs monthly — PRIMARY offer
 //   yearly    199,00 €/yr  ·  16,58 €/mo  ·  ~43% saving vs monthly
 // Switched to the website's pricing model (Sam 2026-10-06).
