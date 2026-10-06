@@ -129,7 +129,7 @@ export function loadRecipes(): Promise<SupabaseRecipe[]> {
     } catch {}
   }
 
-  loadPromise = supabase
+  loadPromise = (supabase
     .from('recipes')
     .select('*')
     .eq('active', true)
@@ -142,7 +142,7 @@ export function loadRecipes(): Promise<SupabaseRecipe[]> {
       freeIdCache = buildFreeIds(list);
       sessionStorage.setItem(CACHE_KEY, JSON.stringify({ at: Date.now(), list }));
       return list;
-    });
+    }) as Promise<SupabaseRecipe[]>);
   return loadPromise;
 }
 

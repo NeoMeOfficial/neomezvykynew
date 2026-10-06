@@ -100,7 +100,7 @@ export function useAchievements(externalPoints?: number) {
     const activity: CommunityActivity = {
       id: `${Date.now()}_${Math.random().toString(36).slice(2, 9)}`,
       userId: userId ?? 'demo',
-      type,
+      type: type as CommunityActivity['type'],
       points: pts,
       metadata,
       timestamp: now,

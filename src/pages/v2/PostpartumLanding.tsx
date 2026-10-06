@@ -156,7 +156,7 @@ export default function PostpartumLanding() {
             </h3>
             <div className="relative rounded-2xl overflow-hidden mb-4">
               <img 
-                src={userProgram.todaysExercise.thumbnail} 
+                src={userProgram.todaysExercise.thumb ?? undefined} 
                 alt={userProgram.todaysExercise.title}
                 className="w-full h-40 object-cover"
               />

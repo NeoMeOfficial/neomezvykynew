@@ -1,5 +1,7 @@
 import { useEditor, EditorContent } from '@tiptap/react';
-import { BubbleMenu } from '@tiptap/react/menus';
+import { BubbleMenu as _BubbleMenu } from '@tiptap/react/menus';
+// tiptap's BubbleMenu typings lag its runtime props (style/tippyOptions).
+const BubbleMenuAny = _BubbleMenu as unknown as React.FC<any>;
 import StarterKit from '@tiptap/starter-kit';
 import TiptapImage from '@tiptap/extension-image';
 import Placeholder from '@tiptap/extension-placeholder';
@@ -37,7 +39,7 @@ export default function BlogEditor({ content, onChange }: Props) {
   useEffect(() => {
     if (!editor) return;
     if (content !== editor.getHTML()) {
-      editor.commands.setContent(content || '', false);
+      editor.commands.setContent(content || '');
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [content]);
@@ -109,7 +111,7 @@ export default function BlogEditor({ content, onChange }: Props) {
       </div>
 
       {/* Floating bubble menu on text selection */}
-      <BubbleMenu
+      <BubbleMenuAny
         editor={editor}
         tippyOptions={{ duration: 120, placement: 'top' }}
         className="flex items-center gap-0.5 px-1.5 py-1 rounded-lg shadow-xl"
@@ -122,7 +124,7 @@ export default function BlogEditor({ content, onChange }: Props) {
         <Btn active={editor.isActive('heading', { level: 3 })} onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} label="H3" title="Podnadpis" />
         <div className="w-px h-3.5 bg-gray-200 mx-0.5" />
         <Btn active={editor.isActive('blockquote')} onClick={() => editor.chain().focus().toggleBlockquote().run()} label="❝" title="Pull quote" />
-      </BubbleMenu>
+      </BubbleMenuAny>
 
       {/* Editor content area */}
       <EditorContent

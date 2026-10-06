@@ -400,14 +400,14 @@ export function useCycleSymptoms() {
     if (error) {
       // The note column ships via migration — fall back gracefully until
       // it's applied so the whole cycle screen never breaks.
-      ({ data } = await supabase
+      ({ data } = await (supabase
         .from('cycle_symptoms')
         .select('date, symptoms')
         .eq('user_id', user!.id)
         .gte('date', since.toISOString().slice(0, 10))
-        .order('date', { ascending: false }));
+        .order('date', { ascending: false }) as any));
     }
-    setDays((data as SymptomDay[] | null) ?? []);
+    setDays((data as unknown as SymptomDay[] | null) ?? []);
     setLoading(false);
   }, [real, user?.id]);
 

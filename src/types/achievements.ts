@@ -32,7 +32,7 @@ export interface CommunityActivity {
 }
 
 export interface CommunityRank {
-  rank: 'Nováčik' | 'Podporovateľka' | 'Motivátorka' | 'Inšpirátorka' | 'Komunitná Hviezda';
+  rank: string;
   minPoints: number;
   maxPoints: number;
   color: string;

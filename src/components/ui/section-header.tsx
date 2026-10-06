@@ -12,7 +12,7 @@ import { SerifHeader } from './serif-header';
  */
 export interface SectionHeaderProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
   eyebrow?: React.ReactNode;
-  title: React.ReactNode;
+  title?: React.ReactNode;
   size?: 'h2' | 'h1';
   link?: React.ReactNode;
   onLinkClick?: React.MouseEventHandler<HTMLButtonElement>;

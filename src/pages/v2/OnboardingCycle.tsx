@@ -18,7 +18,7 @@ export default function OnboardingCycle() {
 
   const handleContinue = () => {
     if (lastPeriod) {
-      setLastPeriodStart(lastPeriod.toISOString().split('T')[0]);
+      setLastPeriodStart(lastPeriod);
       setCycleLength(cycleLength);
       setPeriodLength(periodLength);
     }

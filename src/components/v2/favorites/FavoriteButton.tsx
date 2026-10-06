@@ -1,6 +1,6 @@
 import { Heart } from 'lucide-react';
 import { useUniversalFavorites, ContentType } from '../../../hooks/useUniversalFavorites';
-import { colors, glassCard } from '../../theme/warmDusk';
+import { colors, glassCard } from '../../../theme/warmDusk';
 
 interface FavoriteButtonProps {
   itemId: string | number;

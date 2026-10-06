@@ -25,7 +25,7 @@ const PeriodkaTestingConsole: React.FC = () => {
 
   // Calculate results based on current inputs
   const testResults = useMemo(() => {
-    const currentDay = getCurrentCycleDay(format(testDate, 'yyyy-MM-dd'), today);
+    const currentDay = getCurrentCycleDay(format(testDate, 'yyyy-MM-dd'), today, cycleLength);
     const phaseRanges = getPhaseRanges(cycleLength, periodLength);
     const currentPhase = getPhaseByDay(currentDay, phaseRanges, cycleLength);
     

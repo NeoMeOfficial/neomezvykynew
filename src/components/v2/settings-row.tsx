@@ -41,7 +41,7 @@ SettingsGroup.displayName = 'SettingsGroup';
  * <SettingsRow label="Údaje" value="2 GB" onClick={…} />
  * <SettingsRow label="Vymazať účet" tone="danger" onClick={…} />
  */
-export interface SettingsRowProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface SettingsRowProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'value'> {
   label: React.ReactNode;
   value?: React.ReactNode;
   right?: React.ReactNode;

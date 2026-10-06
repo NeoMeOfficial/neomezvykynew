@@ -70,7 +70,9 @@ self.addEventListener('push', (event: PushEvent) => {
   }
 
   const title = payload.title || 'NeoMe';
-  const options: NotificationOptions = {
+  // renotify isn't in this TS lib's NotificationOptions yet, but Chrome
+  // honours it — type it explicitly.
+  const options: NotificationOptions & { renotify?: boolean } = {
     body: payload.body,
     icon: payload.icon || '/icon-192.png',
     badge: '/icon-192.png',
