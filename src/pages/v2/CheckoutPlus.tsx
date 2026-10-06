@@ -116,37 +116,20 @@ function ProofBar() {
   );
 }
 
-function Assurances({ renews }: { renews: string }) {
-  const rows = [
-    { b: 'Obnoví sa automaticky.', t: `${renews} Zrušiť môžeš kedykoľvek, jedným klikom v aplikácii.` },
-    { b: '7-dňová záruka vrátenia peňazí.', t: 'Napíš nám do siedmich dní od aktivácie a vrátime ti celú sumu. Bez otázok.' },
-    { b: 'Žiadne skryté poplatky.', t: 'Cena, ktorú vidíš, je cena, ktorú platíš.' },
-  ];
-  return (
-    <div style={{ display: 'grid', gap: 12, marginTop: 18 }}>
-      {rows.map((r) => (
-        <div key={r.b} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-          <span style={{ color: NM.GOLD, fontSize: 13, lineHeight: '20px', flexShrink: 0 }}>★</span>
-          <span style={{ fontFamily: NM.SANS, fontSize: 13, color: NM.MUTED, lineHeight: 1.55 }}>
-            <strong style={{ color: NM.DEEP, fontWeight: 600 }}>{r.b}</strong> {r.t}
-          </span>
-        </div>
-      ))}
-    </div>
-  );
-}
 
-function GabiPromise() {
+function GabiPromise({ renews }: { renews: string }) {
   // Deliberately the one dark-brown section on the page (Sam
-  // 2026-10-06): the promise is personal, so it wears Gabi's colour.
+  // 2026-10-06): the promise is personal, so it wears Gabi's colour —
+  // and it carries EVERY payment assurance (guarantee, renewal, no
+  // hidden fees) in one place.
   return (
-    <div style={{ ...card, marginTop: 26, background: NM.DEEP, border: 'none' }}>
+    <div style={{ ...card, marginTop: 22, background: NM.DEEP, border: 'none' }}>
       <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
         <img
           src="/images/founder-gabi.png"
-          alt=""
-          width={64}
-          height={64}
+          alt="Gabi, zakladateľka NeoMe"
+          width={72}
+          height={72}
           style={{ borderRadius: 999, objectFit: 'cover', flexShrink: 0 }}
         />
         <div>
@@ -162,11 +145,16 @@ function GabiPromise() {
         Spokojnosť mojich klientiek je pre mňa to najdôležitejšie. Pokiaľ nebudeš z akéhokoľvek dôvodu
         počas prvých 7 dní spokojná, stačí mi napísať a bez otázok ti vrátim peniaze.
       </p>
-      <div style={{ display: 'grid', gap: 7 }}>
-        {['100 % garancia vrátenia peňazí', 'Bez zbytočných otázok', 'Klientska podpora na gabi@neome.com.au'].map((x) => (
-          <div key={x} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <span style={{ color: NM.GOLD, fontSize: 12 }}>✓</span>
-            <span style={{ fontFamily: NM.SANS, fontSize: 12.5, color: 'rgba(255,255,255,0.75)' }}>{x}</span>
+      <div style={{ display: 'grid', gap: 9 }}>
+        {[
+          '7-dňová záruka vrátenia peňazí — celá suma späť, bez otázok',
+          `${renews} Zrušíš kedykoľvek, jedným klikom v aplikácii`,
+          'Žiadne skryté poplatky — cena, ktorú vidíš, je cena, ktorú platíš',
+          'Klientska podpora na gabi@neome.com.au',
+        ].map((x) => (
+          <div key={x} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+            <span style={{ color: NM.GOLD, fontSize: 12, lineHeight: '18px' }}>✓</span>
+            <span style={{ fontFamily: NM.SANS, fontSize: 12.5, color: 'rgba(255,255,255,0.78)', lineHeight: 1.5 }}>{x}</span>
           </div>
         ))}
       </div>
@@ -537,15 +525,13 @@ export default function CheckoutPlus() {
           </div>
         )}
 
-        <Assurances renews={words.renews} />
-
         <div style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.TERTIARY, textAlign: 'center', marginTop: 16 }}>
           Platba cez Stripe · Visa, Mastercard, Apple Pay
         </div>
 
-        <ProofBar />
+        <GabiPromise renews={words.renews} />
 
-        <GabiPromise />
+        <ProofBar />
         <Experts />
         <Testimonials />
         <Faq period={words.period} />
