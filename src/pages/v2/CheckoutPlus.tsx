@@ -8,16 +8,17 @@ import { NM } from '../../components/v2/neome';
 import LoadingScreen from '../../components/v2/LoadingScreen';
 
 /**
- * /checkout/plus?price=<priceId> — in-app checkout in the NeoMe design
- * (Sam 2026-10-05: hosted Stripe Checkout looked foreign; only the card
- * fields remain Stripe's PCI iframe, themed to Warm Dusk via the
- * Appearance API).
+ * /checkout/plus?price=<priceId> — in-app checkout, ported from the
+ * deployed website's checkout design (Sam 2026-10-06): order summary,
+ * social-proof bar, Stripe Payment Element, Gabi's guarantee, expert
+ * endorsements, testimonials and the payment FAQ. The website mocks a
+ * payment-method chooser; here the Payment Element renders the real
+ * one (card + Apple Pay/Google Pay appear natively once the domain is
+ * registered per mode).
  *
- * Flow: create-subscription-intent mints a default_incomplete
- * subscription + client secret → PaymentElement collects the payment →
- * confirmPayment redirects to /checkout/success, which polls until the
- * webhook flips subscriptions.active. Abandoned attempts expire in
- * Stripe on their own.
+ * Flow unchanged: create-subscription-intent mints a
+ * default_incomplete subscription + client secret → confirmPayment →
+ * /checkout/success polls until the webhook flips the subscription.
  */
 
 const appearance: Appearance = {
@@ -67,58 +68,229 @@ function tierForPrice(priceId: string): SubscriptionTier | null {
   return tiers.find((t) => t.priceId === priceId) ?? null;
 }
 
-const eur = (n: number) =>
-  `${n.toFixed(2).replace('.', ',').replace(',00', '')} €`;
+const eur = (n: number) => `${n.toFixed(2).replace('.', ',').replace(',00', '')} €`;
 
-function PlanCard({ tier }: { tier: SubscriptionTier | null }) {
-  const periodLabel = tier
-    ? tier.intervalCount === 1 && tier.interval === 'month'
-      ? 'mesačne'
-      : tier.intervalCount === 3
-        ? 'každé 3 mesiace'
-        : 'ročne'
-    : 'mesačne';
-  const price = tier?.price ?? SUBSCRIPTION_PLANS.premium.price;
+// Per-tier wording for the order row + renewal assurance + FAQ.
+function tierWords(tier: SubscriptionTier | null) {
+  switch (tier?.key) {
+    case 'quarterly':
+      return { order: '3 mesiace s NeoMe', period: '3 mesiacoch', renews: 'Po 3 mesiacoch predplatné pokračuje ďalej za rovnakú cenu.' };
+    case 'yearly':
+      return { order: 'Rok s NeoMe', period: 'roku', renews: 'Po roku predplatné pokračuje ďalej za rovnakú cenu.' };
+    default:
+      return { order: 'Mesiac s NeoMe', period: 'mesiaci', renews: 'Predplatné sa každý mesiac obnoví za rovnakú cenu.' };
+  }
+}
+
+const card: React.CSSProperties = {
+  background: '#FFFFFF',
+  border: `1px solid ${NM.HAIR}`,
+  borderRadius: 18,
+  padding: '18px 18px',
+  boxSizing: 'border-box',
+};
+
+function SectionEye({ children }: { children: React.ReactNode }) {
   return (
-    <div
-      style={{
-        background: 'rgba(255,255,255,0.72)',
-        border: `1px solid ${NM.HAIR}`,
-        borderRadius: 18,
-        padding: '18px 20px',
-        marginBottom: 18,
-      }}
-    >
-      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-        <div style={{ fontFamily: NM.SERIF, fontSize: 19, color: NM.DEEP }}>NeoMe Plus</div>
-        {tier && (
-          <span
-            style={{
-              fontFamily: NM.SANS, fontSize: 10, fontWeight: 600, letterSpacing: '0.08em',
-              textTransform: 'uppercase', color: NM.GOLD, background: 'rgba(184,134,74,0.12)',
-              borderRadius: 999, padding: '3px 9px',
-            }}
-          >
-            {tier.label}
-          </span>
-        )}
-      </div>
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 8 }}>
-        <span style={{ fontFamily: NM.SERIF, fontSize: 26, color: NM.DEEP }}>{eur(price)}</span>
-        <span style={{ fontFamily: NM.SANS, fontSize: 13, color: NM.MUTED }}>{periodLabel}</span>
-      </div>
-      {tier && tier.savingsPct ? (
-        <div style={{ fontFamily: NM.SANS, fontSize: 12, color: NM.MUTED, marginTop: 2 }}>
-          {eur(tier.perMonth)} mesačne · ušetríš {tier.savingsPct} %
+    <div style={{ fontFamily: NM.SANS, fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: NM.EYEBROW }}>
+      {children}
+    </div>
+  );
+}
+
+function ProofBar() {
+  const items = [
+    { b: '4 000+', s: 'slovenských žien' },
+    { b: '★ 4,9', s: '230+ recenzií · Google' },
+    { b: '7 dní', s: 'záruka vrátenia peňazí' },
+  ];
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, margin: '14px 0 0' }}>
+      {items.map((i) => (
+        <div key={i.b} style={{ ...card, padding: '12px 8px', textAlign: 'center' }}>
+          <div style={{ fontFamily: NM.SERIF, fontSize: 16, color: NM.DEEP }}>{i.b}</div>
+          <div style={{ fontFamily: NM.SANS, fontSize: 10, color: NM.MUTED, marginTop: 3, lineHeight: 1.35 }}>{i.s}</div>
         </div>
-      ) : null}
-      <div style={{ height: 1, background: NM.HAIR, margin: '14px 0' }} />
-      <div style={{ display: 'grid', gap: 6 }}>
-        {SUBSCRIPTION_PLANS.premium.features.slice(0, 3).map((f) => (
-          <div key={f} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <span style={{ color: NM.GOLD, fontSize: 12 }}>✓</span>
-            <span style={{ fontFamily: NM.SANS, fontSize: 13, color: NM.MUTED }}>{f}</span>
+      ))}
+    </div>
+  );
+}
+
+function Assurances({ renews }: { renews: string }) {
+  const rows = [
+    { b: 'Obnoví sa automaticky.', t: `${renews} Zrušiť môžeš kedykoľvek, jedným klikom v aplikácii.` },
+    { b: '7-dňová záruka vrátenia peňazí.', t: 'Napíš nám do siedmich dní od aktivácie a vrátime ti celú sumu. Bez otázok.' },
+    { b: 'Žiadne skryté poplatky.', t: 'Cena, ktorú vidíš, je cena, ktorú platíš.' },
+  ];
+  return (
+    <div style={{ display: 'grid', gap: 12, marginTop: 18 }}>
+      {rows.map((r) => (
+        <div key={r.b} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+          <span style={{ color: NM.GOLD, fontSize: 13, lineHeight: '20px', flexShrink: 0 }}>★</span>
+          <span style={{ fontFamily: NM.SANS, fontSize: 13, color: NM.MUTED, lineHeight: 1.55 }}>
+            <strong style={{ color: NM.DEEP, fontWeight: 600 }}>{r.b}</strong> {r.t}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function GabiPromise() {
+  return (
+    <div style={{ ...card, marginTop: 26 }}>
+      <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
+        <img
+          src="/images/founder-gabi.png"
+          alt=""
+          width={64}
+          height={64}
+          style={{ borderRadius: 999, objectFit: 'cover', flexShrink: 0 }}
+        />
+        <div>
+          <div style={{ fontFamily: NM.SERIF, fontSize: 17, color: NM.DEEP, lineHeight: 1.25 }}>
+            Môj prísľub, pre všetky klientky
           </div>
+          <div style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.EYEBROW, marginTop: 3 }}>
+            Gabi · zakladateľka NeoMe
+          </div>
+        </div>
+      </div>
+      <p style={{ fontFamily: NM.SANS, fontSize: 13.5, color: NM.MUTED, lineHeight: 1.6, margin: '14px 0 12px' }}>
+        Spokojnosť mojich klientiek je pre mňa to najdôležitejšie. Pokiaľ nebudeš z akéhokoľvek dôvodu
+        počas prvých 7 dní spokojná, stačí mi napísať a bez otázok ti vrátim peniaze.
+      </p>
+      <div style={{ display: 'grid', gap: 7 }}>
+        {['100 % garancia vrátenia peňazí', 'Bez zbytočných otázok', 'Klientska podpora na gabi@neome.com.au'].map((x) => (
+          <div key={x} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <span style={{ color: NM.SAGE, fontSize: 12 }}>✓</span>
+            <span style={{ fontFamily: NM.SANS, fontSize: 12.5, color: NM.MUTED }}>{x}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Experts() {
+  const items = [
+    {
+      disc: 'Fyzioterapeutka · Auramedica',
+      name: 'PhDr. Magdaléna C.',
+      q: '„Postpartum program je presne to, čo mamy po pôrode potrebujú — bezpečne, postupne, s rešpektom k ich telu.“',
+    },
+    {
+      disc: 'Špecialistka na panvové dno',
+      name: 'Mgr. Petra H.',
+      q: '„Pohyb, výživa a myseľ — spolu. Presne taký prístup hľadajú moje pacientky.“',
+    },
+  ];
+  return (
+    <div style={{ marginTop: 26 }}>
+      <SectionEye>Odporúčané odborníčkami</SectionEye>
+      <div style={{ display: 'grid', gap: 10, marginTop: 12 }}>
+        {items.map((e) => (
+          <div key={e.name} style={card}>
+            <div style={{ fontFamily: NM.SANS, fontSize: 10.5, letterSpacing: '0.06em', textTransform: 'uppercase', color: NM.EYEBROW }}>{e.disc}</div>
+            <div style={{ fontFamily: NM.SANS, fontSize: 13.5, fontWeight: 600, color: NM.DEEP, marginTop: 4 }}>{e.name}</div>
+            <p style={{ fontFamily: NM.SERIF, fontSize: 14, fontStyle: 'italic', color: NM.MUTED, lineHeight: 1.55, margin: '8px 0 0' }}>{e.q}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Testimonials() {
+  const items = [
+    {
+      mono: 'IŠ',
+      name: 'Ivana Štompfová',
+      role: 'Topmodelka',
+      q: '„Programy NeoMe mi pomohli po pôrode cítiť sa opäť skvele a pripraviť sa na kastingy. Odporúčam ho každej mamine.“',
+    },
+    {
+      mono: 'SŠ',
+      name: 'Silvia Škultéty',
+      role: 'MiniDiamond Blog',
+      q: '„Tých 15 minút bolo pre mňa doslova návykových. Okrem skvelých popôrodných cvičení mi program pomohol dať pravidelne sama sebe prioritu, čo je veľmi dôležité.“',
+    },
+  ];
+  return (
+    <div style={{ marginTop: 26 }}>
+      <div style={{ fontFamily: NM.SERIF, fontSize: 19, color: NM.DEEP }}>
+        Čo o nás povedali <em style={{ fontStyle: 'italic', color: NM.GOLD }}>známe tváre</em>
+      </div>
+      <div style={{ display: 'grid', gap: 10, marginTop: 12 }}>
+        {items.map((t) => (
+          <figure key={t.name} style={{ ...card, margin: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{
+                width: 42, height: 42, borderRadius: 999, flexShrink: 0,
+                background: 'rgba(184,134,74,0.14)', color: NM.GOLD,
+                display: 'grid', placeItems: 'center',
+                fontFamily: NM.SANS, fontSize: 13, fontWeight: 700,
+              }}>{t.mono}</span>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontFamily: NM.SANS, fontSize: 13.5, fontWeight: 600, color: NM.DEEP }}>{t.name}</div>
+                <div style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.EYEBROW }}>{t.role}</div>
+              </div>
+              <span style={{ color: NM.GOLD, fontSize: 11, letterSpacing: 2, flexShrink: 0 }} aria-label="5 z 5">★★★★★</span>
+            </div>
+            <blockquote style={{ fontFamily: NM.SERIF, fontSize: 14, fontStyle: 'italic', color: NM.MUTED, lineHeight: 1.55, margin: '10px 0 0' }}>
+              {t.q}
+            </blockquote>
+          </figure>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Faq({ period }: { period: string }) {
+  const items = [
+    {
+      q: 'Ako funguje 7-dňová záruka?',
+      a: 'Máš 7 dní od aktivácie na vyskúšanie. Ak ti to nevyhovuje, napíšeš nám email a peniaze ti vrátime — celých 100 %. Bez otázok, bez vyplňania formulárov. Iba úprimná spätná väzba, ak chceš.',
+    },
+    {
+      q: `Čo sa stane po ${period}?`,
+      a: 'Nič sa nezatvorí. Predplatné sa automaticky obnoví za rovnakú cenu a ty pokračuješ tam, kde si skončila — programy, recepty, Periodka aj komunita ostávajú. Zrušiť môžeš kedykoľvek jedným klikom v aplikácii, aj deň pred obnovením.',
+    },
+    {
+      q: 'Čo sa stane, keď zruším predplatné?',
+      a: 'Prístup ti zostane do konca zaplateného obdobia — nič ti nevypneme skôr. Potom sa programy, recepty a Periodka uzamknú, ale tvoj denník, návyky a komunitné príspevky zostanú nedotknuté. Kedykoľvek sa môžeš vrátiť tam, kde si prestala.',
+    },
+    {
+      q: 'Je v cene naozaj všetko?',
+      a: 'Áno. Jedno predplatné, celá aplikácia — všetky programy, 120+ receptov, plná Periodka, meditácie aj komunita. Žiadne vyššie plány, žiadne doplatky, žiadne odomykanie funkcií za príplatok.',
+    },
+    {
+      q: 'Aké platobné metódy akceptujete?',
+      a: 'Apple Pay, Google Pay a všetky bežné platobné karty (Visa, Mastercard). Platby spracovávame cez Stripe — bezpečne, šifrovane, podľa európskych štandardov.',
+    },
+  ];
+  return (
+    <div style={{ marginTop: 26 }}>
+      <SectionEye>Platba · časté otázky</SectionEye>
+      <div style={{ fontFamily: NM.SERIF, fontSize: 19, color: NM.DEEP, marginTop: 8 }}>
+        Možno sa <em style={{ fontStyle: 'italic', color: NM.GOLD }}>pýtaš…</em>
+      </div>
+      <div style={{ display: 'grid', gap: 8, marginTop: 12 }}>
+        {items.map((f, i) => (
+          <details key={f.q} open={i === 0} style={{ ...card, padding: 0, overflow: 'hidden' }}>
+            <summary style={{
+              listStyle: 'none', cursor: 'pointer', padding: '14px 16px',
+              fontFamily: NM.SANS, fontSize: 13.5, fontWeight: 600, color: NM.DEEP,
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10,
+            }}>
+              {f.q}
+              <span style={{ color: NM.GOLD, fontSize: 16, fontWeight: 400, flexShrink: 0 }}>+</span>
+            </summary>
+            <div style={{ padding: '0 16px 14px', fontFamily: NM.SANS, fontSize: 13, color: NM.MUTED, lineHeight: 1.6 }}>
+              {f.a}
+            </div>
+          </details>
         ))}
       </div>
     </div>
@@ -149,17 +321,11 @@ function PayForm({ tier }: { tier: SubscriptionTier | null }) {
   };
 
   return (
-    <>
-      <div
-        style={{
-          background: '#FFFFFF',
-          border: `1px solid ${NM.HAIR}`,
-          borderRadius: 18,
-          padding: '18px 16px',
-        }}
-      >
-        <PaymentElement options={{ layout: 'tabs' }} onReady={() => setReady(true)} />
+    <section style={{ ...card, marginTop: 14 }} aria-label="Spôsob platby">
+      <div style={{ fontFamily: NM.SERIF, fontSize: 17, color: NM.DEEP, marginBottom: 14 }}>
+        Spôsob platby
       </div>
+      <PaymentElement options={{ layout: 'tabs' }} onReady={() => setReady(true)} />
 
       {error && (
         <div
@@ -184,30 +350,12 @@ function PayForm({ tier }: { tier: SubscriptionTier | null }) {
           opacity: !ready || submitting ? 0.55 : 1,
         }}
       >
-        {submitting ? 'Spracúvam platbu…' : `Zaplatiť ${eur(price)}`}
+        {submitting ? 'Spracúvam platbu…' : `Zaplatiť · ${eur(price)}`}
       </button>
-
-      <div
-        style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-          marginTop: 14, fontFamily: NM.SANS, fontSize: 11.5, color: NM.TERTIARY,
-        }}
-      >
-        <svg width="11" height="13" viewBox="0 0 11 13" fill="none" aria-hidden>
-          <rect x="1" y="5" width="9" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.2" />
-          <path d="M3 5V3.5a2.5 2.5 0 0 1 5 0V5" stroke="currentColor" strokeWidth="1.2" />
-        </svg>
-        Platbu bezpečne spracúva Stripe
-      </div>
-      <p
-        style={{
-          fontFamily: NM.SANS, fontSize: 11.5, color: NM.TERTIARY, textAlign: 'center',
-          lineHeight: 1.5, margin: '10px 0 0',
-        }}
-      >
-        Predplatné sa automaticky obnovuje. Zrušiť ho môžeš kedykoľvek v aplikácii v časti Profil → Predplatné.
+      <p style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.TERTIARY, textAlign: 'center', lineHeight: 1.5, margin: '12px 0 0' }}>
+        Číslo karty zadávaš priamo Stripu — na náš server sa nikdy nedostane.
       </p>
-    </>
+    </section>
   );
 }
 
@@ -216,6 +364,8 @@ export default function CheckoutPlus() {
   const [params] = useSearchParams();
   const priceId = params.get('price') ?? SUBSCRIPTION_PLANS.premium.priceId;
   const tier = useMemo(() => tierForPrice(priceId), [priceId]);
+  const words = tierWords(tier);
+  const price = tier?.price ?? SUBSCRIPTION_PLANS.premium.price;
 
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -253,42 +403,46 @@ export default function CheckoutPlus() {
       <div
         style={{
           maxWidth: 440, margin: '0 auto',
-          padding: 'calc(env(safe-area-inset-top, 0px) + 18px) 20px calc(env(safe-area-inset-bottom, 0px) + 32px)',
+          padding: 'calc(env(safe-area-inset-top, 0px) + 14px) 20px calc(env(safe-area-inset-bottom, 0px) + 36px)',
         }}
       >
-        <button
-          onClick={() => navigate(-1)}
-          aria-label="Späť"
-          style={{
-            all: 'unset', cursor: 'pointer', display: 'flex', alignItems: 'center',
-            justifyContent: 'center', width: 36, height: 36, borderRadius: 999,
-            background: 'rgba(255,255,255,0.7)', border: `1px solid ${NM.HAIR}`,
-            color: NM.DEEP, marginBottom: 18,
-          }}
-        >
-          <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
-            <path d="M9.5 3 5 7.5 9.5 12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </button>
-
-        <div
-          style={{
-            fontFamily: NM.SANS, fontSize: 11, fontWeight: 600, letterSpacing: '0.12em',
-            textTransform: 'uppercase', color: NM.EYEBROW, marginBottom: 6,
-          }}
-        >
-          NeoMe Plus
+        {/* Top bar — brand + one way back, like the website's stripped checkout chrome. */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 22 }}>
+          <div style={{ fontFamily: NM.SERIF, fontSize: 18, color: NM.DEEP }}>
+            Neo<span style={{ color: NM.GOLD }}>Me</span>
+          </div>
+          <button
+            onClick={() => navigate(-1)}
+            style={{ all: 'unset', cursor: 'pointer', fontFamily: NM.SANS, fontSize: 13, color: NM.MUTED }}
+          >
+            ← Späť
+          </button>
         </div>
-        <h1 style={{ fontFamily: NM.SERIF, fontSize: 25, fontWeight: 500, color: NM.DEEP, margin: '0 0 18px' }}>
-          Dokončiť objednávku
+
+        <SectionEye>Objednávka</SectionEye>
+        <h1 style={{ fontFamily: NM.SERIF, fontSize: 30, fontWeight: 500, color: NM.DEEP, lineHeight: 1.1, letterSpacing: '-0.015em', margin: '10px 0 0' }}>
+          Ešte jeden krok
+          <br />
+          <em style={{ fontStyle: 'italic', color: NM.GOLD }}>a začínaš.</em>
         </h1>
 
-        <PlanCard tier={tier} />
+        {/* Order summary */}
+        <div style={{ ...card, marginTop: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
+          <div>
+            <div style={{ fontFamily: NM.SANS, fontSize: 10.5, letterSpacing: '0.08em', textTransform: 'uppercase', color: NM.EYEBROW }}>
+              Tvoja objednávka
+            </div>
+            <div style={{ fontFamily: NM.SERIF, fontSize: 16, color: NM.DEEP, marginTop: 5 }}>{words.order}</div>
+          </div>
+          <div style={{ fontFamily: NM.SERIF, fontSize: 22, color: NM.DEEP, flexShrink: 0 }}>{eur(price)}</div>
+        </div>
+
+        <ProofBar />
 
         {loadError ? (
           <div
             style={{
-              borderRadius: 12, padding: '12px 14px',
+              marginTop: 14, borderRadius: 12, padding: '12px 14px',
               background: 'rgba(179,70,60,0.09)', border: '1px solid rgba(179,70,60,0.25)',
               fontFamily: NM.SANS, fontSize: 13, color: '#8E372F',
             }}
@@ -296,15 +450,25 @@ export default function CheckoutPlus() {
             {loadError}
           </div>
         ) : clientSecret ? (
-          <Elements
-            stripe={stripePromise}
-            options={{ clientSecret, appearance, fonts, locale: 'sk' }}
-          >
+          <Elements stripe={stripePromise} options={{ clientSecret, appearance, fonts, locale: 'sk' }}>
             <PayForm tier={tier} />
           </Elements>
         ) : (
-          <LoadingScreen label="Pripravujem platbu…" fullScreen={false} />
+          <div style={{ marginTop: 14 }}>
+            <LoadingScreen label="Pripravujem platbu…" fullScreen={false} />
+          </div>
         )}
+
+        <Assurances renews={words.renews} />
+
+        <div style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.TERTIARY, textAlign: 'center', marginTop: 16 }}>
+          Platba cez Stripe · Visa, Mastercard, Apple Pay
+        </div>
+
+        <GabiPromise />
+        <Experts />
+        <Testimonials />
+        <Faq period={words.period} />
       </div>
     </div>
   );
