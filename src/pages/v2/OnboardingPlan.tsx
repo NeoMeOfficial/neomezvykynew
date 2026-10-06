@@ -56,16 +56,13 @@ const PLUS_FEATURES: string[] = [
   'Získavanie bodov a zľavy u partnerov',
 ];
 
-const TIER_UNIT: Record<SubscriptionTierKey, string> = {
-  monthly: '/ mesiac',
-  quarterly: 'za 12 týždňov',
-  yearly: '/ rok',
-};
-
-const TIER_NOTE: Record<SubscriptionTierKey, string> = {
-  monthly: 'Prvý mesiac 19 € · zrušíš kedykoľvek',
-  quarterly: 'Po 12 týždňoch sa obnoví automaticky · zrušíš kedykoľvek',
-  yearly: 'Obnoví sa raz ročne · zrušíš kedykoľvek',
+// Anchor = what the same thing costs without the deal (monthly's full
+// price, or the equivalent months bought one by one), shown struck
+// through next to the real price (Sam 2026-10-06).
+const OFFER: Record<SubscriptionTierKey, { anchor: number; price: number; unit: string; note: string }> = {
+  monthly:   { anchor: 29,  price: 19,  unit: 'prvý mesiac',   note: 'Potom 29 € mesačne · zrušíš kedykoľvek' },
+  quarterly: { anchor: 87,  price: 69,  unit: 'za 12 týždňov', note: 'Po 12 týždňoch sa obnoví automaticky · zrušíš kedykoľvek' },
+  yearly:    { anchor: 348, price: 199, unit: '/ rok',         note: 'Obnoví sa raz ročne · zrušíš kedykoľvek' },
 };
 
 export default function OnboardingPlan() {
@@ -221,16 +218,21 @@ export default function OnboardingPlan() {
             <Eye color={accent} size={10}>
               {plan === 'plus' ? 'NeoMe Plus' : 'NeoMe Free'}
             </Eye>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginTop: 10 }}>
+              {plan === 'plus' && (
+                <span style={{ fontFamily: NM.SERIF, fontSize: 21, fontWeight: 400, textDecoration: 'line-through', opacity: 0.45 }}>
+                  {eur(OFFER[billing].anchor)}
+                </span>
+              )}
               <span style={{ fontFamily: NM.SERIF, fontSize: 40, fontWeight: 500, letterSpacing: '-0.02em' }}>
-                {plan === 'plus' ? eur(activeTier.price) : '0 €'}
+                {plan === 'plus' ? eur(OFFER[billing].price) : '0 €'}
               </span>
               <span style={{ fontFamily: NM.SANS, fontSize: 11.5, opacity: 0.65, fontWeight: 400 }}>
-                {plan === 'plus' ? TIER_UNIT[billing] : 'navždy'}
+                {plan === 'plus' ? OFFER[billing].unit : 'navždy'}
               </span>
             </div>
             <div style={{ fontFamily: NM.SANS, fontSize: 11, opacity: 0.65, marginTop: 4, fontWeight: 400 }}>
-              {plan === 'plus' ? TIER_NOTE[billing] : 'Bez kreditnej karty'}
+              {plan === 'plus' ? OFFER[billing].note : 'Bez kreditnej karty'}
             </div>
           </div>
 
@@ -238,7 +240,7 @@ export default function OnboardingPlan() {
               configured yet (env var empty) are disabled so we can't
               accidentally start a checkout that 404s. */}
           {plan === 'plus' && (
-            <div style={{ marginTop: 16, display: 'inline-flex', gap: 4, padding: 4, borderRadius: 999, background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)' }}>
+            <div style={{ marginTop: 16, display: 'flex', width: '100%', boxSizing: 'border-box', gap: 4, padding: 4, borderRadius: 999, background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)' }}>
               {(['quarterly', 'monthly', 'yearly'] as SubscriptionTierKey[]).map((k) => {
                 const active = billing === k;
                 const disabled = !TIERS[k].priceId;
@@ -250,8 +252,10 @@ export default function OnboardingPlan() {
                     disabled={disabled}
                     style={{
                       all: 'unset',
+                      flex: 1,
+                      textAlign: 'center',
                       cursor: disabled ? 'not-allowed' : 'pointer',
-                      padding: '8px 14px',
+                      padding: '9px 0',
                       borderRadius: 999,
                       fontFamily: NM.SANS,
                       fontSize: 11.5,
@@ -390,7 +394,7 @@ export default function OnboardingPlan() {
           <span>{plan === 'plus' ? 'Chcem sa pridať' : 'Pokračovať s Free'}</span>
           {plan === 'plus' && (
             <span style={{ fontWeight: 400, opacity: 0.7 }}>
-              · {eur(activeTier.price)}
+              · {eur(OFFER[billing].price)}
             </span>
           )}
         </button>
