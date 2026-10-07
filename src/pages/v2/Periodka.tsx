@@ -367,9 +367,22 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
   const ovulationStart = phases.find((p) => p.key === 'ovulation')?.start ?? 14;
   const daysToOvulation = ovulationStart > currentDay ? ovulationStart - currentDay : Math.max(0, totalDays + ovulationStart - currentDay);
 
-  // Predicted next-period date
-  const nextPeriodDate = new Date(today);
-  nextPeriodDate.setDate(today.getDate() + daysToMenstruation);
+  // Predicted next-period date — anchored to lastPeriodStart + cycleLength
+  // (the SAME source as the calendar), NOT `today + daysToMenstruation`.
+  // The old form clamped to 0 once overdue, so the text showed "today"
+  // while the calendar showed the real predicted day (Sam 2026-10-07:
+  // "5.10 v kalendári vs 7.10 v texte"). isLate (currentDay > totalDays)
+  // drives the "mešká" wording elsewhere; the date itself stays honest.
+  const nextPeriodDate = (() => {
+    if (cycleData.lastPeriodStart) {
+      const d = new Date(cycleData.lastPeriodStart + 'T00:00:00');
+      d.setDate(d.getDate() + totalDays);
+      return d;
+    }
+    const d = new Date(today);
+    d.setDate(d.getDate() + daysToMenstruation);
+    return d;
+  })();
   const nextPeriodLabel = `${nextPeriodDate.getDate()}. ${SK_MONTHS_SHORT_LOWER[nextPeriodDate.getMonth()]}.`;
 
   const ovulationDate = new Date(today);
@@ -421,7 +434,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     && currentDay <= periodLength + 3;
 
   const isLate = currentDay > totalDays;
-  const daysLate = isLate ? currentDay - totalDays : 0;
+  const daysLate = isLate ? Math.max(1, currentDay - totalDays - 1) : 0;
 
   // Headline copy comes from the shared getDailyHeadline (sub-phase
   // accurate, rotates daily) so the home Periodka card reads identically;
@@ -1298,7 +1311,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
         <div style={{ padding: '14px 12px', background: '#fff', border: `1px solid ${NM.HAIR}`, borderRadius: 18, textAlign: 'center' }}>
           <Eye size={9} color={NM.TERTIARY}>Ďalšia perióda</Eye>
           <div style={{ marginTop: 8, fontFamily: NM.SERIF, fontSize: 21, fontWeight: 400, color: PHASE.MENSTR, letterSpacing: '-0.01em', lineHeight: 1.1 }}>
-            {isLate ? 'mešká' : nextPeriodLabel.replace(/\.$/, '')}
+            {isLate ? `mešká ${daysLate} ${daysLate === 1 ? 'deň' : daysLate >= 2 && daysLate <= 4 ? 'dni' : 'dní'}` : nextPeriodLabel.replace(/\.$/, '')}
           </div>
           <div style={{ marginTop: 4, fontFamily: NM.SANS, fontSize: 11, color: NM.MUTED, fontWeight: 400 }}>
             {isLate
@@ -1550,7 +1563,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     : null;
 
   const cyclusRows: { t: string; c: string; last: string; next: string; nextSub?: string; edit?: boolean }[] = [
-    { t: 'Perióda', c: PHASE.MENSTR, last: lastPeriodLabel, next: fmtNumDate(nextPeriodDate), nextSub: inDaysLabel(daysToMenstruation).toLowerCase(), edit: true },
+    { t: 'Perióda', c: PHASE.MENSTR, last: lastPeriodLabel, next: fmtNumDate(nextPeriodDate), nextSub: isLate ? `mešká ${daysLate} ${daysLate === 1 ? 'deň' : daysLate >= 2 && daysLate <= 4 ? 'dni' : 'dní'}` : inDaysLabel(daysToMenstruation).toLowerCase(), edit: true },
     { t: 'Ovulácia', c: PHASE.OVULAT, last: lastOvulationDate ? fmtNumDate(lastOvulationDate) : '—', next: fmtNumDate(ovulationDate), nextSub: inDaysLabel(daysToOvulation).toLowerCase() },
     { t: 'Dĺžka cyklu', c: NM.GOLD, last: `${totalDays} dní`, next: `~${totalDays} dní`, nextSub: 'podľa posledných cyklov' },
   ];
