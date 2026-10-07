@@ -120,12 +120,16 @@ export function useMessages() {
       return;
     }
 
-    await supabase
-      .from('messages')
-      .update({ read_at: new Date().toISOString() })
-      .eq('user_id', user.id)
-      .eq('is_from_admin', true)
-      .is('read_at', null);
+    // Optimistically clear locally so the unread dot disappears immediately
+    // (and even if the server call is slow/offline).
+    const now = new Date().toISOString();
+    setMessages(prev => prev.map(m =>
+      m.is_from_admin && !m.read_at ? { ...m, read_at: now } : m
+    ));
+    // SECURITY DEFINER RPC — a plain UPDATE is blocked by RLS (no user
+    // UPDATE policy on messages). See migration 20261007130000.
+    const { error } = await supabase.rpc('mark_messages_read');
+    if (error) console.warn('[messages] mark read failed:', error.message);
   }, [user?.id]);
 
   const unreadCount = messages.filter(m => m.is_from_admin && !m.read_at).length;

@@ -68,6 +68,20 @@ export function useCommunityPosts() {
         }))
       );
     }
+    // Hydrate which posts THIS user has liked, so the filled-heart state
+    // survives reload instead of resetting from in-memory only.
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: likes } = await supabase
+          .from('community_likes')
+          .select('post_id')
+          .eq('user_id', user.id);
+        if (likes) setLikedIds(new Set(likes.map((l) => l.post_id as string)));
+      }
+    } catch (err) {
+      console.warn('[community] failed to hydrate likes:', err);
+    }
     setLoading(false);
   }, []);
 
@@ -148,10 +162,23 @@ export function useCommunityPosts() {
 
       if (!isSupabaseConfigured() || !userId || postId.startsWith('seed-') || postId.startsWith('temp-')) return;
 
-      if (isLiked) {
-        await supabase.from('community_likes').delete().match({ user_id: userId, post_id: postId });
-      } else {
-        await supabase.from('community_likes').insert({ user_id: userId, post_id: postId });
+      const { error } = isLiked
+        ? await supabase.from('community_likes').delete().match({ user_id: userId, post_id: postId })
+        : await supabase.from('community_likes').insert({ user_id: userId, post_id: postId });
+
+      if (error) {
+        // Write failed — undo the optimistic toggle so the heart + count
+        // reflect reality instead of silently reverting on the next reload.
+        setLikedIds((prev) => {
+          const next = new Set(prev);
+          isLiked ? next.add(postId) : next.delete(postId);
+          return next;
+        });
+        setPosts((prev) =>
+          prev.map((p) =>
+            p.id === postId ? { ...p, likes: isLiked ? p.likes + 1 : p.likes - 1 } : p
+          )
+        );
       }
     },
     [likedIds]
