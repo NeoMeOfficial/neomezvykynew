@@ -42,7 +42,7 @@ export default function SettingsHub() {
               window.location.href = 'mailto:klientky@neome.com.au?subject=NeoMe%20-%20Podpora';
             }}
           />
-          <SettingsRow label="Zásady súkromia" onClick={() => navigate('/settings/privacy')} />
+          <SettingsRow label="Zásady súkromia" onClick={() => navigate('/privacy')} />
           <SettingsRow label="Podmienky používania" onClick={() => navigate('/terms')} />
         </SettingsGroup>
 

@@ -282,8 +282,8 @@ export default function JedalnicekPromo() {
       >
         <button
           onClick={onPrimary}
-          disabled={buying}
-          className="w-full py-4 rounded-full bg-pillar-strava text-white font-sans font-semibold transition-all active:scale-[0.98] disabled:opacity-60"
+          disabled={buying || (!hasMealPlanner && !PURCHASABLE)}
+          className="w-full py-4 rounded-full bg-pillar-strava text-white font-sans font-semibold transition-all active:scale-[0.98] disabled:opacity-60 disabled:active:scale-100"
         >
           {hasMealPlanner
             ? 'Vytvoriť môj jedálniček'

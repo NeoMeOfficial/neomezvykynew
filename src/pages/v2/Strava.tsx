@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useRecipes, dailyRecipeOf, recipeCategories, recipeCategoryLabel, CATEGORY_KEYS, CATEGORY_LABEL, categoryImage } from '@/hooks/useRecipes';
+import { useRecipes, dailyRecipeOf, recipeCategories, recipeCategoryLabel, recipeImage, CATEGORY_KEYS, CATEGORY_LABEL, categoryImage } from '@/hooks/useRecipes';
 import { useCycleInfo } from '@/hooks/use-cycle';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import { useUniversalFavorites } from '@/hooks/useUniversalFavorites';
@@ -76,7 +76,7 @@ export default function Strava() {
             style={{
               display: 'block', width: '100%', border: 'none', cursor: 'pointer',
               borderRadius: 18, overflow: 'hidden', aspectRatio: '4/3', position: 'relative',
-              backgroundImage: 'url(/images/r9/testimonial-recipe.jpg)',
+              backgroundImage: `url(${recipeImage(featured)})`,
               backgroundSize: 'cover', backgroundPosition: 'center',
             }}
           >

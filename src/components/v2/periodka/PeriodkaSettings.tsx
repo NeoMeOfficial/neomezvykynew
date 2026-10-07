@@ -398,6 +398,9 @@ export default function PeriodkaSettings() {
   const [showPicker, setShowPicker] = useState(() =>
     typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('pick') === '1'
   );
+  // Whether the picker was opened by "menštruácia mi začala" (→ default
+  // today) rather than "Zmeniť" (→ default the recorded start date).
+  const [startFromToday, setStartFromToday] = useState(false);
   const [periodHistory, setPeriodHistory] = useState<PeriodHistoryEntry[]>([]);
   const today = useMemo(() => new Date(), []);
 
@@ -528,14 +531,14 @@ export default function PeriodkaSettings() {
         phaseName={phase.name}
         dayOfCycle={currentDay}
         headline={headlineCopy}
-        onPeriodStarted={() => setShowPicker(true)}
+        onPeriodStarted={() => { setStartFromToday(true); setShowPicker(true); }}
       />
 
       <DateCard
         label="Začiatok poslednej menštruácie"
         date={lastPeriodStart ? fmtFullDate(new Date(lastPeriodStart + 'T00:00:00')) : 'Nezaznačené'}
         action="Zmeniť"
-        onAction={() => setShowPicker(true)}
+        onAction={() => { setStartFromToday(false); setShowPicker(true); }}
       />
 
       {lastPeriodStart && (
@@ -610,7 +613,10 @@ export default function PeriodkaSettings() {
 
       <DatePickerSheet
         open={showPicker}
-        value={lastPeriodStart ? new Date(lastPeriodStart + 'T00:00:00') : null}
+        // "Menštruácia mi začala" (from PhaseHero) means now — default to
+        // today; the "Zmeniť" action edits the existing start, so it opens
+        // on the recorded date.
+        value={startFromToday ? null : (lastPeriodStart ? new Date(lastPeriodStart + 'T00:00:00') : null)}
         onClose={() => setShowPicker(false)}
         onChange={(d) => {
           handlePeriodStarted(d);
@@ -624,7 +630,13 @@ export default function PeriodkaSettings() {
         min={lastPeriodStart ?? undefined}
         value={endValid ? new Date(currentPeriodEnd! + 'T00:00:00') : new Date()}
         onClose={() => setShowEndPicker(false)}
-        onChange={(d) => {
+        onChange={async (d) => {
+          // Same Art.9(2)(a) health-data consent gate as every other
+          // menstruation write — this one was missing it.
+          const consented = await requireConsent(CONSENT_TYPES.HEALTH_DATA, {
+            acceptLabel: 'Súhlasím a uložiť',
+          });
+          if (!consented) { setShowEndPicker(false); return; }
           correctPeriodEnd(d);
           setShowEndPicker(false);
           toast.success('Koniec menštruácie upravený');
