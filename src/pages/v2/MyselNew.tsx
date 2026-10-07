@@ -228,7 +228,21 @@ export default function MyselNew() {
             Zatiaľ tu nič nemáš — ulož si meditáciu srdiečkom a nájdeš ju tu.
           </div>
         ) : filteredMeds.length === 0 ? (
-          <FallbackRows />
+          <div
+            style={{
+              background: '#FFFFFF',
+              borderRadius: 18,
+              border: `1px solid ${NM.HAIR}`,
+              padding: '18px 20px',
+              fontFamily: NM.SANS,
+              fontSize: 12.5,
+              color: NM.MUTED,
+              fontWeight: 300,
+              lineHeight: 1.55,
+            }}
+          >
+            Pre túto kategóriu tu zatiaľ nemáme meditácie.
+          </div>
         ) : (
           filteredMeds.map((m, i) => (
             <MeditationListRow
@@ -340,12 +354,3 @@ function SectionHeader({
   );
 }
 
-function FallbackRows() {
-  return (
-    <>
-      <MeditationListRow eye="Emócie · 12 min" title="Upokojenie úzkosti" done />
-      <MeditationListRow eye="Večer · 15 min" title="Dych pre spánok" />
-      <MeditationListRow eye="Telo · 8 min" title="Prijatie tela" last />
-    </>
-  );
-}

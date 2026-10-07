@@ -101,7 +101,7 @@ export function useCommunityReplies(postId: string | undefined) {
   const addReply = useCallback(
     async (content: string) => {
       const trimmed = content.trim();
-      if (!trimmed || !postId) return;
+      if (!trimmed || !postId) return false;
 
       // Demo path: signed-out, or no Supabase. Store locally.
       const useDemo = !isSupabaseConfigured() || !user?.id || postId.startsWith('seed-');
@@ -117,7 +117,7 @@ export function useCommunityReplies(postId: string | undefined) {
         const next = [...replies, newReply];
         setReplies(next);
         saveDemo(postId, next);
-        return;
+        return true;
       }
 
       // Real path — insert into Supabase. Trigger updates parent comments_count.
@@ -143,7 +143,10 @@ export function useCommunityReplies(postId: string | undefined) {
         setReplies((prev) => [...prev, data as CommunityReply]);
         // +2 server-side, max 3/day — supporting each other earns.
         awardPoints('comment_published', (data as CommunityReply).id);
+        return true;
       }
+      // Insert failed — signal the caller so it can keep the text + warn.
+      return false;
     },
     [postId, user, profile, replies],
   );

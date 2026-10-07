@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useCommunityPosts } from '../../hooks/useCommunityPosts';
 import { useCommunityReplies } from '../../hooks/useCommunityReplies';
 import { useSupabaseAuth } from '../../contexts/SupabaseAuthContext';
+import { useToast } from '@/hooks/use-toast';
 import { Page, Eye, NM } from '../../components/v2/neome';
 
 /**
@@ -93,6 +94,7 @@ export default function KomunitaPostDetail() {
   const { user } = useSupabaseAuth();
   const { posts, likedIds, toggleLike } = useCommunityPosts();
   const { replies, addReply, formatRelativeTime } = useCommunityReplies(id);
+  const { toast } = useToast();
   const post = posts.find((p) => p.id === id);
   const [reply, setReply] = useState('');
   const [reported, setReported] = useState(false);
@@ -103,8 +105,13 @@ export default function KomunitaPostDetail() {
   const handleSendReply = async () => {
     const trimmed = reply.trim();
     if (!trimmed) return;
-    await addReply(trimmed);
-    setReply('');
+    const ok = await addReply(trimmed);
+    if (ok) {
+      setReply('');
+    } else {
+      // Keep the text and warn — don't let the comment silently vanish.
+      toast({ title: 'Komentár sa neodoslal', description: 'Skús to znova.', variant: 'destructive' });
+    }
   };
 
   const handleTogglePostLike = () => {

@@ -52,6 +52,7 @@ export default function MeditationPlayer() {
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const completedRef = useRef(false);
+  const [justCompleted, setJustCompleted] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentSec, setCurrentSec] = useState(0);
   const [durationSec, setDurationSec] = useState(0);
@@ -134,12 +135,16 @@ export default function MeditationPlayer() {
   };
 
   function handleComplete() {
+    if (justCompleted) return;
     if (!completedRef.current) {
       completedRef.current = true;
       awardPoints('meditation_completed', meditationId);
       addActivity('meditation_complete', { ref_id: meditationId, ref_type: 'meditation' });
     }
-    goBack();
+    // Confirm visibly before leaving — the old version credited points and
+    // bounced back instantly with no acknowledgement.
+    setJustCompleted(true);
+    setTimeout(goBack, 1100);
   }
 
   if (loading) {
@@ -310,12 +315,12 @@ export default function MeditationPlayer() {
           onClick={handleComplete}
           style={{
             all: 'unset',
-            cursor: 'pointer',
+            cursor: justCompleted ? 'default' : 'pointer',
             display: 'block',
             width: '100%',
             padding: '15px 0',
-            background: 'rgba(255,255,255,0.12)',
-            border: '1px solid rgba(255,255,255,0.20)',
+            background: justCompleted ? 'rgba(122,158,120,0.30)' : 'rgba(255,255,255,0.12)',
+            border: `1px solid ${justCompleted ? 'rgba(122,158,120,0.55)' : 'rgba(255,255,255,0.20)'}`,
             borderRadius: 999,
             textAlign: 'center',
             fontFamily: NM.SANS,
@@ -325,9 +330,10 @@ export default function MeditationPlayer() {
             letterSpacing: '0.02em',
             marginBottom: 'calc(env(safe-area-inset-bottom) + 20px)',
             boxSizing: 'border-box',
+            transition: 'background 0.2s ease',
           }}
         >
-          Dokončiť meditáciu
+          {justCompleted ? 'Hotovo ✓ · +8 bodov' : 'Dokončiť meditáciu'}
         </button>
       </div>
     </div>

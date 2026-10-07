@@ -7,7 +7,13 @@ import { SUBSCRIPTION_PLANS, formatPrice } from '../../lib/stripe';
 // Canonical paywall price label — derived from the Stripe constant so a
 // price change anywhere only needs SUBSCRIPTION_PLANS.premium.price
 // updated.
-const PLAN_PRICE_LABEL = formatPrice(SUBSCRIPTION_PLANS.premium.price);
+// The activate button charges the QUARTERLY tier (the primary offer), so
+// the price shown next to it must be the quarterly price — not the 29 €
+// monthly headline. (The warm/compare variants used to show 29 €/mesiac
+// while billing 69 €.)
+const CHARGED_TIER = SUBSCRIPTION_PLANS.premium.tiers.quarterly;
+const PLAN_PRICE_LABEL = formatPrice(CHARGED_TIER.price);
+const PLAN_PERIOD_LABEL = `/ ${CHARGED_TIER.label}`;
 
 /**
  * Paywall — R7 (three editorial variants)
@@ -104,9 +110,9 @@ function PaywallWarm({ onContinueFree, onClose, onActivate, busy }: { onContinue
             <Eye color={NM.GOLD} size={10.5}>NeoMe Plus</Eye>
             <div style={{ marginTop: 4, display: 'flex', alignItems: 'baseline', gap: 8 }}>
               <span style={{ fontFamily: NM.SERIF, fontSize: 28, fontWeight: 500, color: NM.DEEP, letterSpacing: '-0.02em' }}>{PLAN_PRICE_LABEL}</span>
-              <span style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.EYEBROW, fontWeight: 400 }}>/ mesiac</span>
+              <span style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.EYEBROW, fontWeight: 400 }}>{PLAN_PERIOD_LABEL}</span>
             </div>
-            <div style={{ fontFamily: NM.SANS, fontSize: 10.5, color: NM.TERTIARY, marginTop: 2, fontWeight: 400 }}>Zrušíš kedykoľvek</div>
+            <div style={{ fontFamily: NM.SANS, fontSize: 10.5, color: NM.TERTIARY, marginTop: 2, fontWeight: 400 }}>≈ 23 € mesačne · zrušíš kedykoľvek</div>
           </div>
         </div>
         <button
@@ -285,9 +291,9 @@ export function PaywallCompare({ onContinueFree, onClose, onActivate, busy }: { 
             <Eye color={NM.GOLD} size={10}>Plus · odporúčané</Eye>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 8 }}>
               <span style={{ fontFamily: NM.SERIF, fontSize: 26, fontWeight: 500, letterSpacing: '-0.02em' }}>{PLAN_PRICE_LABEL}</span>
-              <span style={{ fontFamily: NM.SANS, fontSize: 10, color: 'rgba(255,255,255,0.6)', fontWeight: 400 }}>/ mesiac</span>
+              <span style={{ fontFamily: NM.SANS, fontSize: 10, color: 'rgba(255,255,255,0.6)', fontWeight: 400 }}>{PLAN_PERIOD_LABEL}</span>
             </div>
-            <div style={{ fontFamily: NM.SANS, fontSize: 10.5, color: 'rgba(255,255,255,0.6)', marginTop: 2, fontWeight: 400 }}>Zrušíš kedykoľvek</div>
+            <div style={{ fontFamily: NM.SANS, fontSize: 10.5, color: 'rgba(255,255,255,0.6)', marginTop: 2, fontWeight: 400 }}>≈ 23 € mesačne · zrušíš kedykoľvek</div>
             <div style={{ marginTop: 14, padding: '10px 0', borderTop: '1px solid rgba(255,255,255,0.1)', fontFamily: NM.SANS, fontSize: 11.5, color: 'rgba(255,255,255,0.8)', fontWeight: 400 }}>
               Všetko vo Free + 4 programy, plný cyklus, návyky bez limitu.
             </div>

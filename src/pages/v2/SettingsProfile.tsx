@@ -70,9 +70,14 @@ export default function SettingsProfile() {
     }
     // Mirror to localStorage — use-user falls back to it before first_name.
     try { localStorage.setItem('neome_preferred_name', firstName); } catch { /* ignore */ }
-    // Also sync to auth user_metadata so the name shows everywhere immediately
+    // Also sync to auth user_metadata — including username/birthdate/city,
+    // which the form reads back from here. They were previously dropped, so
+    // "Uložené" was shown but those three silently reverted on reload.
     await supabase.auth.updateUser({
-      data: { full_name: trimmed, first_name: firstName, last_name: lastName, preferred_name: firstName },
+      data: {
+        full_name: trimmed, first_name: firstName, last_name: lastName, preferred_name: firstName,
+        username: username.trim(), birthdate, city: city.trim(),
+      },
     });
     setSaving(false);
     toast({ title: 'Uložené' });

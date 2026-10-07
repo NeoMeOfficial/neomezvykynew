@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useMessages } from '../../hooks/useMessages';
+import { useToast } from '@/hooks/use-toast';
 import { Page, NM } from '../../components/v2/neome';
 
 /**
@@ -42,6 +43,7 @@ export default function SpravyThread() {
   const navigate = useNavigate();
   const { threadId } = useParams<{ threadId: string }>();
   const { messages, sending, sendMessage, markRead } = useMessages();
+  const { toast } = useToast();
   const [draft, setDraft] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -65,7 +67,9 @@ export default function SpravyThread() {
     try {
       await sendMessage(text);
     } catch {
+      // Restore what she typed and tell her — don't let the message vanish.
       setDraft(text);
+      toast({ title: 'Správa sa neodoslala', description: 'Skús to znova.', variant: 'destructive' });
     }
   };
 

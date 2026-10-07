@@ -4,6 +4,7 @@ import { useAchievements } from '../../hooks/useAchievements';
 import { usePointsLedger } from '../../hooks/usePointsLedger';
 import { useReflections } from '../../hooks/useDailyRituals';
 import { useSmartBack } from '../../hooks/useSmartBack';
+import { useLocation } from 'react-router-dom';
 import { computeEnergyPatterns, parseStructured } from '../../features/dennik/structuredEntry';
 import {
   ENERGY_CHIPS,
@@ -174,6 +175,7 @@ export default function ReflectionEntry() {
   // 2026-07-30); reopening the same day re-loads today's entry into the
   // form, and a second save UPDATES it instead of adding a duplicate.
   const todayISO = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+  const location = useLocation();
   const todayEntry = entries.find(
     (e) => (e.date || e.created_at || '').slice(0, 10) === todayISO && parseStructured(e.text || ''),
   );
@@ -190,6 +192,18 @@ export default function ReflectionEntry() {
     setReflection(s.reflection);
     setSaved(true);
   }, [todayEntry]);
+
+  // Carry over text typed in the home diary quick-entry card
+  // (navigate('/dennik/new', { state: { prefill } })). Previously dropped,
+  // so the user arrived at an empty form.
+  const prefillState = (location.state as { prefill?: string } | null)?.prefill;
+  const prefillRef = useRef(false);
+  useEffect(() => {
+    if (prefillRef.current || !prefillState || touchedRef.current) return;
+    prefillRef.current = true;
+    touchedRef.current = true; // beat the todayEntry hydrate so it isn't overwritten
+    setReflection((cur) => cur || prefillState);
+  }, [prefillState]);
 
   // One diary page (Gabi 2026-07-30): today's entry on top, patterns in
   // the middle, previous days at the bottom — /kniznica/dennik and

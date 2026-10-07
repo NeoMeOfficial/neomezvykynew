@@ -103,8 +103,13 @@ export function useMessages() {
       .select()
       .single();
 
-    if (!error && data) setMessages(prev => [...prev, data as Message]);
     setSending(false);
+    if (error || !data) {
+      // Throw so the caller can restore the draft + warn the user, instead
+      // of the message silently vanishing.
+      throw new Error(error?.message ?? 'send failed');
+    }
+    setMessages(prev => [...prev, data as Message]);
   }, [user?.id]);
 
   // Mark admin messages as read when user opens the thread
