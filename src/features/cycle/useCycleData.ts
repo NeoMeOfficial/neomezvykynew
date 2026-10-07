@@ -264,6 +264,10 @@ export function useCycleData(accessCode?: string) {
         ...current,
         lastPeriodStart: dateString,
         currentPeriodEnd: null,
+        // A recorded ovulation belongs to the cycle it was logged in; a new
+        // cycle starts fresh (the previous override would otherwise linger
+        // and mis-mark the new cycle's ovulation).
+        ovulationOverride: isNewCycle ? null : current.ovulationOverride,
         history,
         cycleLength,
       };
@@ -271,6 +275,14 @@ export function useCycleData(accessCode?: string) {
       return updated;
     });
   }, [saveCycleData]);
+
+  // Record the ACTUAL ovulation day for the current cycle (or clear it with
+  // null). Corrects the predicted ovulation when she noticed it fell on a
+  // different day. Does not touch cycleLength — that still learns from real
+  // period starts, which is the reliable signal.
+  const setOvulationDate = useCallback((date: Date | null) => {
+    updateCycleData({ ovulationOverride: date ? format(date, 'yyyy-MM-dd') : null });
+  }, [updateCycleData]);
 
   // Mark the current period as ended ("Skončila dnes"). Records the actual
   // bleed length and — after 3 recorded periods — auto-calibrates
@@ -520,6 +532,7 @@ export function useCycleData(accessCode?: string) {
     markPeriodEnded,
     correctPeriodEnd,
     correctPeriod,
+    setOvulationDate,
     addPeriodToHistory,
     updateCustomSettings,
     updateCycleData,

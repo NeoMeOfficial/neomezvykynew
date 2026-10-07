@@ -40,6 +40,11 @@ export interface CycleData {
   /** Actual bleed lengths of recent periods (newest last, max 6) — feeds
    *  the periodLength auto-calibration after ≥3 recorded periods. */
   bleedLengths?: number[];
+  /** User-recorded ACTUAL ovulation day for the CURRENT cycle (ISO
+   *  YYYY-MM-DD), when she noticed she ovulated on a different day than
+   *  predicted. Overrides the computed ovulation in the "Tvoj cyklus"
+   *  card + calendar. Reset to null when a new period starts. */
+  ovulationOverride?: string | null;
 }
 
 export interface DerivedState {

@@ -209,12 +209,13 @@ interface PaidViewProps {
   onMarkPeriodStart: () => void;
   onMarkPeriodEnd: (date: Date) => void;
   onCorrectPeriod: (start: Date, end: Date | null) => void;
+  onSetOvulation: (date: Date | null) => void;
 }
 
 const SK_MONTHS_FULL = ['január', 'február', 'marec', 'apríl', 'máj', 'jún', 'júl', 'august', 'september', 'október', 'november', 'december'];
 const SK_MONTHS_SHORT_LOWER = ['jan', 'feb', 'mar', 'apr', 'máj', 'jún', 'júl', 'aug', 'sep', 'okt', 'nov', 'dec'];
 
-function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMarkPeriodEnd, onCorrectPeriod }: PaidViewProps) {
+function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMarkPeriodEnd, onCorrectPeriod, onSetOvulation }: PaidViewProps) {
   // Same featured picks as the home cards (Gabi 2026-09-02): the advice
   // rows below deep-link to the identical phase-aligned exercise/recipe/
   // meditation views instead of the bare section hubs.
@@ -346,6 +347,16 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     } else if (bleedLen !== null && rawDay <= thisLen && key === 'menstrual') {
       key = 'follicular';
     }
+    // Recorded ovulation (current cycle only): the exact day she logged wins,
+    // and the generic predicted ovulation band is reassigned to the adjacent
+    // phase so the calendar doesn't show two ovulation marks.
+    if (isCurrentCycle && cycleData.ovulationOverride && cycleData.ovulationOverride >= anchor) {
+      if (targetISO === cycleData.ovulationOverride) {
+        key = 'ovulation';
+      } else if (key === 'ovulation') {
+        key = targetISO < cycleData.ovulationOverride ? 'follicular' : 'luteal';
+      }
+    }
     return { cycleDay: rawDay, key };
   };
   const phaseKeyForCalendarDay = (d: number): string | null => cycleInfoForCalendarDay(d)?.key ?? null;
@@ -400,13 +411,28 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
   // same fix as the next-period date (Sam 2026-10-07). If this cycle's
   // ovulation already passed, show the next cycle's.
   const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
-  const ovulationDate = (() => {
+  // User-recorded actual ovulation for THIS cycle, honoured only if it
+  // falls on/after the current period start (a stale override is ignored
+  // as a safety net; setLastPeriodStart also clears it on a new cycle).
+  const ovulationOverrideISO =
+    cycleData.ovulationOverride && cycleData.lastPeriodStart && cycleData.ovulationOverride >= cycleData.lastPeriodStart
+      ? cycleData.ovulationOverride
+      : null;
+  // This cycle's ovulation: the recorded day if present, else predicted
+  // from the current period start + ovulation day.
+  const currentCycleOvulation = (() => {
+    if (ovulationOverrideISO) return new Date(ovulationOverrideISO + 'T00:00:00');
     const base = cycleData.lastPeriodStart ? new Date(cycleData.lastPeriodStart + 'T00:00:00') : new Date(today);
     const d = new Date(base);
     d.setDate(d.getDate() + (ovulationStart - 1));
-    if (d.getTime() < todayMidnight) d.setDate(d.getDate() + totalDays);
     return d;
   })();
+  const ovulationPassed = currentCycleOvulation.getTime() < todayMidnight;
+  // "Next" ovulation: this cycle's if still upcoming, else next cycle's
+  // (prediction rolls forward by the current cycle length).
+  const ovulationDate = ovulationPassed
+    ? new Date(currentCycleOvulation.getTime() + totalDays * 86400000)
+    : currentCycleOvulation;
   const daysToOvulation = Math.max(0, Math.round((ovulationDate.getTime() - todayMidnight) / 86400000));
   const fmtShortDate = (d: Date) => `${d.getDate()}. ${SK_MONTHS_SHORT_LOWER[d.getMonth()]}.`;
 
@@ -436,6 +462,30 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
       draftEnd ? new Date(draftEnd + 'T00:00:00') : null,
     );
     setPeriodEditOpen(false);
+  };
+
+  // ✎ editor for the recorded ovulation day ("Tvoj cyklus" section). Lets
+  // her correct the ovulation if she noticed it fell on a different day
+  // than predicted (e.g. from tests or symptoms).
+  const [ovulEditOpen, setOvulEditOpen] = useState(false);
+  const [draftOvul, setDraftOvul] = useState('');
+  const openOvulationEditor = () => {
+    // Always target THIS cycle's ovulation (what the override stores), so
+    // the date picker opens on the recorded day or the current prediction —
+    // never a previous cycle's date it could not save.
+    setDraftOvul(ovulationOverrideISO ?? format(currentCycleOvulation, 'yyyy-MM-dd'));
+    setOvulEditOpen(true);
+  };
+  const ovulMinISO = cycleData.lastPeriodStart ?? undefined;
+  const draftOvulValid = !!draftOvul && draftOvul <= editTodayISO && (!ovulMinISO || draftOvul >= ovulMinISO);
+  const saveOvulEdit = () => {
+    if (!draftOvulValid) return;
+    onSetOvulation(new Date(draftOvul + 'T00:00:00'));
+    setOvulEditOpen(false);
+  };
+  const clearOvulOverride = () => {
+    onSetOvulation(null);
+    setOvulEditOpen(false);
   };
   // Just past the assumed length with no recorded end — ask instead of
   // silently assuming. Dismissable for the rest of the day.
@@ -1586,9 +1636,14 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
       : bleedingOngoing
         ? `od ${fmtNumDate(lastStartDate)}`
         : `${fmtNumDate(lastStartDate)} – ${fmtNumDate(assumedEndDate!)}`;
-  const lastOvulationDate = lastStartDate
-    ? new Date(lastStartDate.getTime() + (ovulationStart - 1 - (currentDay >= ovulationStart ? 0 : totalDays)) * 86400000)
-    : null;
+  // Recorded/predicted ovulation flows from currentCycleOvulation: if this
+  // cycle's ovulation already happened it IS the "last"; otherwise the last
+  // one was in the previous cycle.
+  const lastOvulationDate = !lastStartDate
+    ? null
+    : ovulationPassed
+      ? currentCycleOvulation
+      : new Date(currentCycleOvulation.getTime() - totalDays * 86400000);
 
   // Concrete predicted day (Sam 2026-10-07): a start-uncertainty RANGE
   // here clashed with the 'last period' row, which shows the bleed
@@ -1601,9 +1656,9 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     : prediction.learning
       ? `odhad · o ${daysToMenstruation} ${daysWord(daysToMenstruation)}`
       : inDaysLabel(daysToMenstruation).toLowerCase();
-  const cyclusRows: { t: string; c: string; last: string; next: string; nextSub?: string; edit?: boolean }[] = [
-    { t: 'Perióda', c: PHASE.MENSTR, last: lastPeriodLabel, next: periodNext, nextSub: periodNextSub, edit: true },
-    { t: 'Ovulácia', c: PHASE.OVULAT, last: lastOvulationDate ? fmtNumDate(lastOvulationDate) : '—', next: fmtNumDate(ovulationDate), nextSub: inDaysLabel(daysToOvulation).toLowerCase() },
+  const cyclusRows: { t: string; c: string; last: string; next: string; nextSub?: string; onEdit?: () => void; editColor?: string; editLabel?: string }[] = [
+    { t: 'Perióda', c: PHASE.MENSTR, last: lastPeriodLabel, next: periodNext, nextSub: periodNextSub, onEdit: openPeriodEditor, editColor: PHASE.MENSTR, editLabel: 'Upraviť dátumy poslednej periódy' },
+    { t: 'Ovulácia', c: PHASE.OVULAT, last: lastOvulationDate ? fmtNumDate(lastOvulationDate) : '—', next: fmtNumDate(ovulationDate), nextSub: inDaysLabel(daysToOvulation).toLowerCase(), onEdit: openOvulationEditor, editColor: PHASE.OVULAT, editLabel: 'Upraviť deň ovulácie' },
     { t: 'Dĺžka cyklu', c: NM.GOLD, last: `${totalDays} dní`, next: `~${totalDays} dní`, nextSub: 'podľa posledných cyklov' },
   ];
 
@@ -1633,13 +1688,13 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
               <div style={{ flex: 1, fontFamily: NM.SANS, fontSize: 13, color: NM.DEEP, fontWeight: 400 }}>{u.t}</div>
               <div style={{ width: 104, display: 'flex', alignItems: 'center', gap: 6 }}>
                 <span style={{ fontFamily: NM.SERIF, fontSize: 13.5, color: NM.DEEP, letterSpacing: '-0.005em', whiteSpace: 'nowrap' }}>{u.last}</span>
-                {u.edit && (
+                {u.onEdit && (
                   <button
-                    onClick={openPeriodEditor}
-                    aria-label="Upraviť dátumy poslednej periódy"
+                    onClick={u.onEdit}
+                    aria-label={u.editLabel}
                     style={{ all: 'unset', cursor: 'pointer', display: 'inline-flex', padding: 4, margin: -4, marginLeft: -2 }}
                   >
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={PHASE.MENSTR} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={u.editColor ?? PHASE.MENSTR} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M17 3a2.828 2.828 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
                     </svg>
                   </button>
@@ -1715,6 +1770,56 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     document.body,
   ) : null;
 
+  // Bottom sheet for recording the actual ovulation day.
+  const ovulEditSheet = ovulEditOpen ? createPortal(
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(42,26,20,0.55)', backdropFilter: 'blur(6px)', zIndex: 9999, display: 'flex', alignItems: 'flex-end' }}>
+      <div onClick={() => setOvulEditOpen(false)} style={{ position: 'absolute', inset: 0 }} />
+      <div style={{ position: 'relative', width: '100%', background: NM.BG, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: '22px 22px calc(env(safe-area-inset-bottom) + 22px)', boxShadow: '0 -10px 32px rgba(61,41,33,0.18)' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 14 }}>
+          <div style={{ width: 38, height: 4, borderRadius: 999, background: NM.HAIR_2 }} />
+        </div>
+        <Eye color={PHASE.OVULAT}>Deň ovulácie</Eye>
+        <div style={{ marginTop: 14 }}>
+          <div style={{ fontFamily: NM.SANS, fontSize: 12, color: NM.MUTED, marginBottom: 6 }}>Kedy si ovulovala?</div>
+          <input
+            type="date"
+            value={draftOvul}
+            min={ovulMinISO}
+            max={todayISO}
+            onChange={(e) => setDraftOvul(e.target.value)}
+            style={dateInputStyle}
+          />
+          <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.TERTIARY, marginTop: 6 }}>
+            Ak si ovuláciu spozorovala iný deň než sme predpovedali, uprav ho tu. Platí pre aktuálny cyklus.
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
+          <button
+            onClick={() => setOvulEditOpen(false)}
+            style={{ all: 'unset', cursor: 'pointer', flex: 1, textAlign: 'center', padding: '14px 0', borderRadius: 999, border: `1px solid ${NM.HAIR_2}`, fontFamily: NM.SANS, fontSize: 13, color: NM.DEEP, fontWeight: 500 }}
+          >
+            Zrušiť
+          </button>
+          <button
+            onClick={saveOvulEdit}
+            style={{ all: 'unset', cursor: draftOvulValid ? 'pointer' : 'default', flex: 1, textAlign: 'center', padding: '14px 0', borderRadius: 999, background: draftOvulValid ? PHASE.OVULAT : NM.HAIR_2, color: '#fff', fontFamily: NM.SANS, fontSize: 13, fontWeight: 500, opacity: draftOvulValid ? 1 : 0.7 }}
+          >
+            Uložiť
+          </button>
+        </div>
+        {ovulationOverrideISO && (
+          <button
+            onClick={clearOvulOverride}
+            style={{ all: 'unset', cursor: 'pointer', display: 'block', width: '100%', textAlign: 'center', marginTop: 14, fontFamily: NM.SANS, fontSize: 12, color: NM.TERTIARY, textDecoration: 'underline' }}
+          >
+            Vrátiť na automatický odhad
+          </button>
+        )}
+      </div>
+    </div>,
+    document.body,
+  ) : null;
+
   const irregularBlock = prediction.irregular ? (() => {
     const len = prediction.irregular.length;
     const lead =
@@ -1751,6 +1856,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
       {calendarBlock}
       {dayDetailSheet}
       {periodEditSheet}
+      {ovulEditSheet}
     </>
   );
 }
@@ -1868,7 +1974,7 @@ function FreeView({ navigate }: { navigate: (p: string) => void }) {
 
 export default function Periodka() {
   const navigate = useNavigate();
-  const { cycleData, derivedState, setLastPeriodStart, markPeriodEnded, correctPeriod } = useCycleData();
+  const { cycleData, derivedState, setLastPeriodStart, markPeriodEnded, correctPeriod, setOvulationDate } = useCycleData();
   const [confirmStartOpen, setConfirmStartOpen] = useState(false);
   const requireConsent = useConsentGuard();
 
@@ -1908,6 +2014,7 @@ export default function Periodka() {
           onMarkPeriodStart={() => setConfirmStartOpen(true)}
           onMarkPeriodEnd={handleMarkPeriodEnded}
           onCorrectPeriod={correctPeriod}
+          onSetOvulation={setOvulationDate}
         />
       ) : (
         <FreeView navigate={navigate} />
