@@ -269,7 +269,13 @@ export default function ExercisePlayer() {
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
           body: JSON.stringify({ videoId: exercise.videoUrl }),
         });
-        if (!res.ok) return;
+        if (!res.ok) {
+          // Server-side paywall (402) — the client gate normally redirects
+          // first, so this only hits on an edge/stale state. Send to paywall
+          // rather than hang on "Pripravujem video…".
+          if (res.status === 402 && !cancelled) navigate('/paywall', { replace: true });
+          return;
+        }
         const body = await res.json();
         if (!cancelled) setBunnyEmbed(body.embedUrl);
       } catch { /* player shows the fallback note */ }
