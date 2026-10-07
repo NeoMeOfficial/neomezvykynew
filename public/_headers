@@ -1,5 +1,5 @@
 /*
-  Permissions-Policy: publickey-credentials-get=*, publickey-credentials-create=*
+  Permissions-Policy: publickey-credentials-get=*, publickey-credentials-create=*, fullscreen=*, picture-in-picture=*, autoplay=*, encrypted-media=*
   X-Content-Type-Options: nosniff
   X-Frame-Options: SAMEORIGIN
   Referrer-Policy: strict-origin-when-cross-origin
