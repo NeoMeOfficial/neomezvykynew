@@ -206,39 +206,6 @@ export default function JedalnicekPlanner() {
         </div>
       )}
 
-      <div style={{ padding: '4px 18px 20px' }}>
-        <button
-          onClick={() => navigate('/kniznica/strava')}
-          style={{
-            all: 'unset',
-            cursor: 'pointer',
-            display: 'flex',
-            width: '100%',
-            alignItems: 'center',
-            gap: 14,
-            padding: '16px 18px',
-            background: '#fff',
-            border: `1px solid ${NM.HAIR_2}`,
-            borderRadius: 16,
-            boxSizing: 'border-box',
-          }}
-        >
-          <div style={{ width: 40, height: 40, borderRadius: 12, background: NM.CREAM_3 ?? '#EAE3D6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-              <path d="M3 4h2l1.5 8h8L16 6H5.5" stroke={NM.DEEP} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-              <circle cx="7" cy="15" r="1" fill={NM.DEEP} />
-              <circle cx="13" cy="15" r="1" fill={NM.DEEP} />
-            </svg>
-          </div>
-          <div style={{ flex: 1, textAlign: 'left' }}>
-            <div style={{ fontFamily: NM.SERIF, fontSize: 15, fontWeight: 500, color: NM.DEEP, letterSpacing: '-0.005em', marginBottom: 2 }}>Nákupný zoznam</div>
-            <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.MUTED }}>{plan?.days.length ?? 0} dní · všetko pre tento týždeň</div>
-          </div>
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M6 4l4 4-4 4" stroke={NM.TERTIARY} strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </button>
-      </div>
     </Page>
   );
 }

@@ -41,8 +41,7 @@ const EARN_RULES: { a: string; p: string }[] = [
   { a: 'Dokončený návyk', p: '+3' },
   { a: 'Lajk v komunite', p: '+1 (max 5/deň)' },
   { a: 'Príspevok v komunite', p: '+20' },
-  { a: 'Odporúčanie · registrácia', p: '+50' },
-  { a: 'Odporúčanie · predplatné', p: '+300' },
+  { a: 'Odporúčanie · predplatné', p: '+150' },
 ];
 
 
