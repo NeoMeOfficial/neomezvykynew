@@ -397,3 +397,70 @@ export function isOvulationDate(date: Date, lastPeriodStart: string, cycleLength
   
   return dayInCurrentCycle === ovulationDay;
 }
+// ─── Krok 2: range prediction + irregularity (Sam 2026-10-07) ──────────
+export interface CyclePrediction {
+  /** Most likely next-period start (lastPeriodStart + cycleLength). */
+  predictedNextStart: Date | null;
+  /** Honest window around the prediction; null while still learning. */
+  rangeStart: Date | null;
+  rangeEnd: Date | null;
+  /** Count of real, in-range (21–45d) cycle lengths available. */
+  cycleCount: number;
+  /** Std-dev of recent cycle lengths (days). Lower = tighter range. */
+  stdDev: number;
+  /** True until 3 real cycles exist → show a single estimate, not a range. */
+  learning: boolean;
+  lastCycleLength: number | null;
+  /** The most recent cycle's irregularity flag, if any. */
+  irregular: null | { kind: 'short' | 'long' | 'variation'; length: number };
+}
+
+export function getCyclePrediction(cycleData: CycleData): CyclePrediction {
+  const starts = Array.from(new Set([
+    ...(cycleData.history ?? []).map(h => h.startDate),
+    ...(cycleData.lastPeriodStart ? [cycleData.lastPeriodStart] : []),
+  ].filter(Boolean))).sort(); // ascending ISO
+
+  const lastStart = starts.length ? starts[starts.length - 1] : null;
+  const predLen = cycleData.cycleLength || 28;
+  const predictedNextStart = lastStart
+    ? addDays(new Date(lastStart + 'T00:00:00'), predLen)
+    : null;
+
+  // Real cycle lengths between consecutive starts.
+  const lengths: number[] = [];
+  for (let i = 1; i < starts.length; i++) {
+    lengths.push(Math.round(
+      (new Date(starts[i] + 'T00:00:00').getTime() - new Date(starts[i - 1] + 'T00:00:00').getTime()) / 86400000,
+    ));
+  }
+  const recent = lengths.slice(-6);
+  const valid = recent.filter(l => l >= 21 && l <= 45);
+  const cycleCount = valid.length;
+
+  const mean = cycleCount ? valid.reduce((s, l) => s + l, 0) / cycleCount : predLen;
+  const variance = cycleCount ? valid.reduce((s, l) => s + (l - mean) ** 2, 0) / cycleCount : 0;
+  const stdDev = Math.sqrt(variance);
+
+  const learning = cycleCount < 3;
+  let rangeStart: Date | null = null;
+  let rangeEnd: Date | null = null;
+  if (!learning && predictedNextStart) {
+    // ±1 std-dev, clamped to a sensible 1–4 days. Regular cycles → tight.
+    const margin = Math.min(4, Math.max(1, Math.round(stdDev)));
+    rangeStart = addDays(predictedNextStart, -margin);
+    rangeEnd = addDays(predictedNextStart, margin);
+  }
+
+  const lastCycleLength = lengths.length ? lengths[lengths.length - 1] : null;
+  let irregular: CyclePrediction['irregular'] = null;
+  if (lastCycleLength != null) {
+    if (lastCycleLength < 21) irregular = { kind: 'short', length: lastCycleLength };
+    else if (lastCycleLength > 45) irregular = { kind: 'long', length: lastCycleLength };
+    else if (cycleCount >= 3 && Math.abs(lastCycleLength - mean) > Math.max(7, 2 * stdDev)) {
+      irregular = { kind: 'variation', length: lastCycleLength };
+    }
+  }
+
+  return { predictedNextStart, rangeStart, rangeEnd, cycleCount, stdDev, learning, lastCycleLength, irregular };
+}

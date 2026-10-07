@@ -11,7 +11,7 @@ import { getDailyTips, getStravaWants } from '../../features/cycle/dailyHeadline
 import type { DerivedState, CycleData } from '../../features/cycle/types';
 import { PHASE_NAMES } from '../../features/cycle/constants';
 import { getDailyHeadline } from '../../features/cycle/dailyHeadlines';
-import { getPhaseRanges } from '../../features/cycle/utils';
+import { getPhaseRanges, getCyclePrediction } from '../../features/cycle/utils';
 import { useConsentGuard } from '../../contexts/ConsentGuardContext';
 import { useSubscription } from '../../contexts/SubscriptionContext';
 import { CONSENT_TYPES } from '../../lib/consents';
@@ -384,6 +384,15 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     return d;
   })();
   const nextPeriodLabel = `${nextPeriodDate.getDate()}. ${SK_MONTHS_SHORT_LOWER[nextPeriodDate.getMonth()]}.`;
+
+  // Krok 2: honest range prediction + irregularity flag.
+  const prediction = getCyclePrediction(cycleData);
+  const fmtDM = (d: Date) => `${d.getDate()}. ${SK_MONTHS_SHORT_LOWER[d.getMonth()]}`;
+  const rangeLabel = (a: Date, b: Date) =>
+    a.getMonth() === b.getMonth()
+      ? `${a.getDate()}.–${b.getDate()}. ${SK_MONTHS_SHORT_LOWER[b.getMonth()]}`
+      : `${fmtDM(a)} – ${fmtDM(b)}`;
+  const daysWord = (n: number) => (n === 1 ? 'deň' : n >= 2 && n <= 4 ? 'dni' : 'dní');
 
   const ovulationDate = new Date(today);
   ovulationDate.setDate(today.getDate() + daysToOvulation);
@@ -1562,8 +1571,18 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     ? new Date(lastStartDate.getTime() + (ovulationStart - 1 - (currentDay >= ovulationStart ? 0 : totalDays)) * 86400000)
     : null;
 
+  const periodNext = isLate
+    ? `mešká ${daysLate} ${daysWord(daysLate)}`
+    : (prediction.rangeStart && prediction.rangeEnd)
+      ? rangeLabel(prediction.rangeStart, prediction.rangeEnd)
+      : fmtNumDate(nextPeriodDate);
+  const periodNextSub = isLate
+    ? 'podľa predpovede'
+    : prediction.learning
+      ? 'ešte sa učím tvoj cyklus'
+      : inDaysLabel(daysToMenstruation).toLowerCase();
   const cyclusRows: { t: string; c: string; last: string; next: string; nextSub?: string; edit?: boolean }[] = [
-    { t: 'Perióda', c: PHASE.MENSTR, last: lastPeriodLabel, next: fmtNumDate(nextPeriodDate), nextSub: isLate ? `mešká ${daysLate} ${daysLate === 1 ? 'deň' : daysLate >= 2 && daysLate <= 4 ? 'dni' : 'dní'}` : inDaysLabel(daysToMenstruation).toLowerCase(), edit: true },
+    { t: 'Perióda', c: PHASE.MENSTR, last: lastPeriodLabel, next: periodNext, nextSub: periodNextSub, edit: true },
     { t: 'Ovulácia', c: PHASE.OVULAT, last: lastOvulationDate ? fmtNumDate(lastOvulationDate) : '—', next: fmtNumDate(ovulationDate), nextSub: inDaysLabel(daysToOvulation).toLowerCase() },
     { t: 'Dĺžka cyklu', c: NM.GOLD, last: `${totalDays} dní`, next: `~${totalDays} dní`, nextSub: 'podľa posledných cyklov' },
   ];
@@ -1676,6 +1695,27 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     document.body,
   ) : null;
 
+  const irregularBlock = prediction.irregular ? (() => {
+    const len = prediction.irregular.length;
+    const lead =
+      prediction.irregular.kind === 'short'
+        ? `Tvoj posledný cyklus bol kratší ako zvyčajne — ${len} dní.`
+        : prediction.irregular.kind === 'long'
+          ? `Tvoj posledný cyklus bol dlhší ako zvyčajne — ${len} dní.`
+          : `Tvoj posledný cyklus sa dosť líšil od tvojho priemeru — ${len} dní.`;
+    return (
+      <div style={{ padding: '0 22px 4px' }}>
+        <div style={{ display: 'flex', gap: 12, padding: '14px 16px', borderRadius: 16, background: 'rgba(194,122,110,0.10)', border: `1px solid rgba(194,122,110,0.28)` }}>
+          <div style={{ flexShrink: 0, width: 22, height: 22, borderRadius: 999, background: 'rgba(194,122,110,0.2)', color: PHASE.MENSTR, display: 'grid', placeItems: 'center', fontFamily: NM.SANS, fontSize: 13, fontWeight: 700 }}>!</div>
+          <div style={{ fontFamily: NM.SANS, fontSize: 12.5, color: NM.DEEP, lineHeight: 1.5, fontWeight: 400 }}>
+            {lead}{' '}
+            <span style={{ color: NM.MUTED }}>Občas sa to stáva. Ak sa to opakuje alebo ťa niečo trápi, pokojne to prober s lekárkou.</span>
+          </div>
+        </div>
+      </div>
+    );
+  })() : null;
+
   return (
     <>
       {headerBlock}
@@ -1686,6 +1726,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
       {wellbeingBlock}
       {periodCtaBlock}
       {ringBlock}
+      {irregularBlock}
       {upcomingBlock}
       {calendarBlock}
       {dayDetailSheet}
