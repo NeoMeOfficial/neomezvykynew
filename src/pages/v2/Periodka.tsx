@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -11,6 +11,7 @@ import { getDailyTips, getStravaWants } from '../../features/cycle/dailyHeadline
 import type { DerivedState, CycleData } from '../../features/cycle/types';
 import { PHASE_NAMES } from '../../features/cycle/constants';
 import { getDailyHeadline } from '../../features/cycle/dailyHeadlines';
+import { getPhaseRanges } from '../../features/cycle/utils';
 import { useConsentGuard } from '../../contexts/ConsentGuardContext';
 import { useSubscription } from '../../contexts/SubscriptionContext';
 import { CONSENT_TYPES } from '../../lib/consents';
@@ -269,21 +270,67 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
   // Day-of-month → cycle-day → phase key. Maps a calendar date in the
   // visible month back to a phase. Both the cell tint AND the legend
   // highlight derive from this so they're guaranteed to agree.
+  // All real period starts (recorded history + current), newest first.
+  // Krok 1 (2026-10-07): the calendar now draws REAL past cycles from
+  // history — each with its own real length and recorded bleed — and
+  // only projects where there's no data yet (future, or before the
+  // earliest record).
+  const realStarts = useMemo(() => {
+    const starts = [
+      ...(cycleData.history ?? []).map((h) => h.startDate),
+      ...(cycleData.lastPeriodStart ? [cycleData.lastPeriodStart] : []),
+    ].filter(Boolean);
+    return Array.from(new Set(starts)).sort(); // ascending ISO
+  }, [cycleData.history, cycleData.lastPeriodStart]);
+
+  const daysBetweenISO = (a: string, b: string) =>
+    Math.round((new Date(b + 'T00:00:00').getTime() - new Date(a + 'T00:00:00').getTime()) / 86400000);
+
   const cycleInfoForCalendarDay = (d: number): { cycleDay: number; key: string | null } | null => {
     if (!cycleData.lastPeriodStart) return null;
     const target = new Date(yearIdx, monthIdx, d);
-    const start = new Date(cycleData.lastPeriodStart + 'T00:00:00');
-    const daysSince = Math.floor((target.getTime() - start.getTime()) / 86400000);
-    // Wrap both directions — past months approximate previous cycles with
-    // the current cycle length (same rule as phaseKeyForDateISO).
-    const cycleDay = ((daysSince % totalDays) + totalDays) % totalDays + 1;
-    const range = phases.find((p) => cycleDay >= p.start && cycleDay <= p.end);
-    let key = range?.key ?? null;
-    // Current cycle with a recorded end: menstrual days follow the ACTUAL
-    // bleed, not the assumed average.
-    const inCurrentCycle = daysSince >= 0 && daysSince < totalDays;
-    if (inCurrentCycle && actualBleedLen !== null) {
-      if (cycleDay <= actualBleedLen) key = 'menstrual';
+    const y = target.getFullYear();
+    const m = String(target.getMonth() + 1).padStart(2, '0');
+    const day = String(target.getDate()).padStart(2, '0');
+    const targetISO = `${y}-${m}-${day}`;
+
+    // Anchor = the latest real start on or before this date.
+    let anchorIdx = -1;
+    for (let i = realStarts.length - 1; i >= 0; i--) {
+      if (realStarts[i] <= targetISO) { anchorIdx = i; break; }
+    }
+
+    if (anchorIdx === -1) {
+      // Before the earliest record → project backward with current length.
+      const start = new Date(cycleData.lastPeriodStart + 'T00:00:00');
+      const daysSince = Math.floor((target.getTime() - start.getTime()) / 86400000);
+      const cd = ((daysSince % totalDays) + totalDays) % totalDays + 1;
+      return { cycleDay: cd, key: phases.find((p) => cd >= p.start && cd <= p.end)?.key ?? null };
+    }
+
+    const anchor = realStarts[anchorIdx];
+    const nextStart = realStarts[anchorIdx + 1]; // a later real start, if any
+    const isCurrentCycle = anchorIdx === realStarts.length - 1;
+
+    // Real length of THIS cycle: gap to the next real start, else the
+    // (recalculated) current cycle length for the ongoing/future cycle.
+    const thisLen = nextStart ? Math.max(1, daysBetweenISO(anchor, nextStart)) : totalDays;
+    const cycleDay = daysBetweenISO(anchor, targetISO) + 1;
+
+    // Real bleed length for this cycle: the current cycle uses the live
+    // recorded end; a past cycle uses its history entry's end if present.
+    let bleedLen: number | null = null;
+    if (isCurrentCycle) {
+      bleedLen = actualBleedLen;
+    } else {
+      const entry = (cycleData.history ?? []).find((h) => h.startDate === anchor);
+      if (entry?.endDate && entry.endDate >= anchor) bleedLen = daysBetweenISO(anchor, entry.endDate) + 1;
+    }
+
+    const ranges = getPhaseRanges(thisLen, cycleData.periodLength ?? 5);
+    let key = ranges.find((r) => cycleDay >= r.start && cycleDay <= r.end)?.key ?? null;
+    if (bleedLen !== null) {
+      if (cycleDay <= bleedLen) key = 'menstrual';
       else if (key === 'menstrual') key = 'follicular';
     }
     return { cycleDay, key };

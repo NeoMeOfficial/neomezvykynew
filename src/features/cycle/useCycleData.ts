@@ -220,13 +220,52 @@ export function useCycleData(accessCode?: string) {
     });
   }, [saveCycleData]);
 
-  // Set last period start date — a new period invalidates the previous
-  // "period ended" marker.
+  // Set last period start date. When a genuinely NEW (later) period
+  // begins, the PREVIOUS cycle is committed to `history` and the cycle
+  // length is recomputed from all real starts — this is Krok 1 of the
+  // Periodka rebuild (2026-10-07). Before this, history was never
+  // populated, so the weighted-average prepočet and the calendar's past
+  // cycles both ran on a pure projection from a single anchor point.
   const setLastPeriodStart = useCallback((date: Date) => {
     const dateString = format(date, 'yyyy-MM-dd');
-    updateCycleData({ lastPeriodStart: dateString, currentPeriodEnd: null });
     awardPoints('cycle_log');
-  }, [updateCycleData]);
+    setCycleData(current => {
+      const prevStart = current.lastPeriodStart;
+      let history = current.history ?? [];
+      let cycleLength = current.cycleLength;
+
+      // A later start than the current one = a new cycle has begun.
+      // (Earlier/equal dates are corrections to the current period, not
+      // a new cycle — handled by the pick-date flow, not here.)
+      const isNewCycle = !!prevStart && dateString > prevStart;
+
+      if (isNewCycle && !history.some(h => h.startDate === prevStart)) {
+        // Commit the cycle that just ended (its real start + recorded end).
+        history = [...history, { startDate: prevStart!, endDate: current.currentPeriodEnd ?? undefined }]
+          .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime())
+          .slice(0, 24); // keep ~2 years of cycles
+      }
+
+      if (isNewCycle) {
+        // Recompute from ALL real starts (history + the new one). The
+        // newest cycle length is newStart − prevStart.
+        const allStarts = [{ startDate: dateString }, ...history]
+          .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
+        const avg = calculateAverageCycleLength(allStarts);
+        if (avg && avg.cycleCount >= 3) cycleLength = avg.average;
+      }
+
+      const updated = {
+        ...current,
+        lastPeriodStart: dateString,
+        currentPeriodEnd: null,
+        history,
+        cycleLength,
+      };
+      saveCycleData(updated);
+      return updated;
+    });
+  }, [saveCycleData]);
 
   // Mark the current period as ended ("Skončila dnes"). Records the actual
   // bleed length and — after 3 recorded periods — auto-calibrates
