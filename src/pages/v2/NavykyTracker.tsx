@@ -4,6 +4,7 @@ import { useSupabaseHabits } from '../../hooks/useSupabaseHabits';
 import { useSmartBack } from '../../hooks/useSmartBack';
 import { useAchievements } from '../../hooks/useAchievements';
 import { usePointsLedger } from '../../hooks/usePointsLedger';
+import { useToast } from '@/hooks/use-toast';
 
 /**
  * Návyky a ciele — card layout (Gabi 2026-07-31).
@@ -279,6 +280,7 @@ export default function NavykyTracker() {
   const { habits, loading, addHabit, editHabit, toggleHabitCompletion, setCompletionForDate, removeHabit } = useSupabaseHabits();
   const { addActivity } = useAchievements();
   const { award } = usePointsLedger();
+  const { toast } = useToast();
 
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [justAdded, setJustAdded] = useState<string | null>(null);
@@ -328,6 +330,12 @@ export default function NavykyTracker() {
     if (!habit) return;
     const wasZero = (habit.completions?.[todayISO] ?? 0) === 0;
     const ok = await toggleHabitCompletion(habitId);
+    if (!ok) {
+      // The write failed (offline / RLS) — tell the user instead of leaving
+      // the circle silently unchanged.
+      toast({ title: 'Nepodarilo sa uložiť', description: 'Skús to znova o chvíľu.', variant: 'destructive' });
+      return;
+    }
     // Points only on the first tick of the day, never on re-taps.
     if (ok && wasZero) {
       award('habit_checkin', habitId);

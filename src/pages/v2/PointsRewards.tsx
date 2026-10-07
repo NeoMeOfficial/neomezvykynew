@@ -64,12 +64,6 @@ type ModalState =
   | { type: 'success'; reward: Reward; code: string | null; isStripe: boolean; nextBillingDate: string | null }
   | { type: 'error'; message: string };
 
-const MONTHLY_SUB_PRICE_EUR = 24.9;
-
-function fmtEur(eur: number): string {
-  return `€${eur.toFixed(2).replace('.', ',')}`;
-}
-
 function fmtBillingDate(iso: string | null): string | null {
   if (!iso) return null;
   try {
@@ -435,34 +429,31 @@ export default function PointsRewards() {
 
                 {modal.isStripe ? (
                   (() => {
-                    // Compute the discounted next-invoice amount per
-                    // reward slug. Assumes the standard €24.90 monthly
-                    // subscription; partner / one-time charges aren't
-                    // affected by these subscription-level coupons.
+                    // Describe the discount QUALITATIVELY. The exact euro
+                    // amount depends on the user's plan (29/69/199), which we
+                    // don't know here — a hardcoded figure was wrong for
+                    // quarterly/annual subscribers. The coupon applies the
+                    // real discount server-side regardless.
                     const slug = modal.reward.slug;
-                    const fullPrice = MONTHLY_SUB_PRICE_EUR;
-                    const discountedPrice =
-                      slug === 'sub-month-free' ? 0
-                      : slug === 'sub-50pct' ? fullPrice / 2
-                      : fullPrice;
+                    const discountLabel =
+                      slug === 'sub-month-free' ? 'Ďalšie obdobie máš zadarmo'
+                      : slug === 'sub-50pct' ? '50 % zľava na ďalšiu platbu'
+                      : 'Zľava na tvoju ďalšiu platbu';
                     const dateLabel = fmtBillingDate(modal.nextBillingDate);
                     return (
                       <div style={{ padding: '18px 18px', background: `${NM.GOLD}12`, borderRadius: 14, border: `1px solid ${NM.GOLD}30`, marginBottom: 20, textAlign: 'center' }}>
                         <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.GOLD, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 10 }}>
                           Zľava aplikovaná
                         </div>
-                        <div style={{ fontFamily: NM.SANS, fontSize: 13, color: NM.DEEP, lineHeight: 1.55, marginBottom: 12 }}>
+                        <div style={{ fontFamily: NM.SERIF, fontSize: 22, color: NM.DEEP, fontWeight: 500, letterSpacing: '-0.01em', lineHeight: 1.2 }}>
+                          {discountLabel}
+                        </div>
+                        <div style={{ fontFamily: NM.SANS, fontSize: 12, color: NM.DEEP, lineHeight: 1.55, marginTop: 10 }}>
                           {dateLabel
-                            ? <>Tvoja ďalšia platba <strong>{dateLabel}</strong> bude:</>
-                            : <>Tvoja ďalšia platba bude:</>}
+                            ? <>Uplatní sa na platbu <strong>{dateLabel}</strong>.</>
+                            : <>Uplatní sa na tvoju ďalšiu platbu.</>}
                         </div>
-                        <div style={{ fontFamily: NM.SERIF, fontSize: 28, color: NM.DEEP, fontWeight: 500, letterSpacing: '-0.01em', lineHeight: 1 }}>
-                          {fmtEur(discountedPrice)}
-                          <span style={{ fontFamily: NM.SANS, fontSize: 13, color: NM.MUTED, fontWeight: 400, marginLeft: 8, textDecoration: 'line-through' }}>
-                            {fmtEur(fullPrice)}
-                          </span>
-                        </div>
-                        <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.MUTED, lineHeight: 1.55, marginTop: 12 }}>
+                        <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.MUTED, lineHeight: 1.55, marginTop: 10 }}>
                           Zľava sa uplatní automaticky — nemusíš nič zadávať.
                         </div>
                       </div>

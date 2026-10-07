@@ -538,6 +538,15 @@ export default function CheckoutPlus() {
             }}
           >
             {loadError}
+            {/* Already-subscribed is not an error to dead-end on — give a way out. */}
+            {/aktívne|already/i.test(loadError) && (
+              <button
+                onClick={() => navigate('/domov-new')}
+                style={{ all: 'unset', cursor: 'pointer', display: 'block', marginTop: 10, color: NM.GOLD, fontWeight: 600, textDecoration: 'underline' }}
+              >
+                Prejsť do aplikácie →
+              </button>
+            )}
           </div>
         ) : clientSecret ? (
           <Elements stripe={stripePromise} options={{ clientSecret, appearance, fonts, locale: 'sk' }}>

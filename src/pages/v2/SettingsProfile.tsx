@@ -57,6 +57,10 @@ export default function SettingsProfile() {
       full_name: trimmed,
       first_name: firstName,
       last_name: lastName,
+      // The home greeting (use-user) reads preferred_name FIRST, so a rename
+      // that only touched full_name was silently shadowed by the old
+      // onboarding name. Keep preferred_name in sync here too.
+      preferred_name: firstName,
       bio,
     } as Partial<typeof profile>);
     if (error) {
@@ -64,9 +68,11 @@ export default function SettingsProfile() {
       toast({ title: 'Nepodarilo sa uložiť', description: 'Skús to ešte raz.', variant: 'destructive' });
       return;
     }
+    // Mirror to localStorage — use-user falls back to it before first_name.
+    try { localStorage.setItem('neome_preferred_name', firstName); } catch { /* ignore */ }
     // Also sync to auth user_metadata so the name shows everywhere immediately
     await supabase.auth.updateUser({
-      data: { full_name: trimmed, first_name: firstName, last_name: lastName },
+      data: { full_name: trimmed, first_name: firstName, last_name: lastName, preferred_name: firstName },
     });
     setSaving(false);
     toast({ title: 'Uložené' });

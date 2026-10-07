@@ -31,6 +31,10 @@ function loadPlan(): MealPlan | null {
 }
 
 function savePlan(plan: MealPlan): void {
+  // Stamp the write time so hydration can tell a fresh local edit from a
+  // stale remote copy. Mutating is safe — callers pass a freshly-built plan
+  // and then sync/return this same object, so state/localStorage/remote agree.
+  plan.savedAt = Date.now();
   localStorage.setItem(STORAGE_KEY, JSON.stringify(plan));
 }
 
@@ -68,10 +72,13 @@ export function useMealPlan() {
         if (!isValidPlan(remote)) return;
         setPlan((current) => {
           if (!current) return remote;
-          // Prefer remote if it starts on or after the current plan (i.e. newer).
-          const remoteStart = new Date(remote.days[0]?.date ?? 0).getTime();
-          const currentStart = new Date(current.days[0]?.date ?? 0).getTime();
-          if (remoteStart >= currentStart) {
+          // Accept remote ONLY if it was saved more recently than the local
+          // plan. The old code compared the plan START date, which never
+          // changes across slot edits — so a stale remote won every tie and
+          // clobbered a just-made pick that hadn't finished syncing yet.
+          const remoteSaved = remote.savedAt ?? 0;
+          const currentSaved = current.savedAt ?? 0;
+          if (remoteSaved > currentSaved) {
             savePlan(remote);
             const todayIdx = getTodayDayIndex(remote);
             setActiveDay(todayIdx);

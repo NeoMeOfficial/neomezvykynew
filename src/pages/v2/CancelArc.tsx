@@ -52,18 +52,31 @@ export default function CancelArc() {
   const { subscription, cancelSubscription } = useSubscription();
   const [step, setStep] = useState<0 | 1 | 2>(0);
   const [reason, setReason] = useState<number | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [cancelError, setCancelError] = useState<string | null>(null);
 
   const periodEnd = subscription?.current_period_end ? new Date(subscription.current_period_end * 1000) : null;
   const periodEndLabel = periodEnd ? `${periodEnd.getDate()}. ${SK_MONTHS[periodEnd.getMonth()]} ${periodEnd.getFullYear()}` : 'koniec platnosti';
 
   const onConfirm = async () => {
-    // FEATURE-NEEDED-CANCEL-CONFIRM
+    // Only advance to the farewell once the cancellation actually succeeds —
+    // otherwise the user is told "cancelled" while the subscription keeps
+    // renewing and they get charged again.
+    if (submitting) return;
+    setSubmitting(true);
+    setCancelError(null);
     try {
       await cancelSubscription?.();
-    } catch {
-      /* swallow — visual flow continues */
+      setStep(2);
+    } catch (err) {
+      setCancelError(
+        err instanceof Error && err.message
+          ? err.message
+          : 'Zrušenie sa nepodarilo. Skús to znova alebo nás kontaktuj.',
+      );
+    } finally {
+      setSubmitting(false);
     }
-    setStep(2);
   };
 
   if (step === 0) {
@@ -153,8 +166,13 @@ export default function CancelArc() {
         </div>
 
         <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, padding: `16px 18px calc(env(safe-area-inset-bottom) + 16px)`, background: 'rgba(248,245,240,0.95)', backdropFilter: 'blur(20px)', borderTop: `1px solid ${NM.HAIR}` }}>
-          <button onClick={onConfirm} style={{ width: '100%', padding: '14px 20px', background: 'transparent', color: NM.TERRA, border: `1px solid ${NM.TERRA}`, borderRadius: 999, fontFamily: NM.SANS, fontSize: 13, fontWeight: 500, cursor: 'pointer' }}>
-            Potvrdiť zrušenie
+          {cancelError && (
+            <div style={{ marginBottom: 12, padding: '11px 14px', background: 'rgba(192,84,74,0.1)', border: '1px solid rgba(192,84,74,0.3)', borderRadius: 12, fontFamily: NM.SANS, fontSize: 12, color: '#B04434', lineHeight: 1.45, fontWeight: 400 }}>
+              {cancelError}
+            </div>
+          )}
+          <button onClick={onConfirm} disabled={submitting} style={{ width: '100%', padding: '14px 20px', background: 'transparent', color: NM.TERRA, border: `1px solid ${NM.TERRA}`, borderRadius: 999, fontFamily: NM.SANS, fontSize: 13, fontWeight: 500, cursor: submitting ? 'default' : 'pointer', opacity: submitting ? 0.6 : 1 }}>
+            {submitting ? 'Ruším…' : 'Potvrdiť zrušenie'}
           </button>
           <button onClick={() => navigate('/profil')} style={{ all: 'unset', cursor: 'pointer', display: 'block', width: '100%', marginTop: 10, fontFamily: NM.SANS, fontSize: 12, color: NM.DEEP, textAlign: 'center', fontWeight: 500 }}>
             Nie, vrátiť sa

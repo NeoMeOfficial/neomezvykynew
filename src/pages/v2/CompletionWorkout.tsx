@@ -42,8 +42,9 @@ export default function CompletionWorkout() {
   const location = useLocation();
   const [mood, setMood] = useState<string | null>(null);
   const { award } = usePointsLedger();
-  const { completeWorkout } = useWorkoutHistory();
+  const { completeWorkout, stats, streak } = useWorkoutHistory();
   const { addActivity } = useAchievements();
+  const [granted, setGranted] = useState<number | null>(null);
   const state = (location.state ?? {}) as { exerciseId?: string; title?: string; type?: string; duration?: number; program?: string };
   const exerciseId = state.exerciseId ?? 'preview';
   const title = state.title ?? 'Cvičenie';
@@ -58,7 +59,7 @@ export default function CompletionWorkout() {
     // Server decides the value, dedupes per exercise per day and caps
     // the daily total — the old client-side programme-week milestone
     // counting (localStorage) is gone with the client-trusted points.
-    award('workout_completed', exerciseId);
+    award('workout_completed', exerciseId).then(setGranted);
     completeWorkout(exerciseId, title, type, duration, program);
     addActivity('workout_complete', { ref_id: exerciseId, ref_type: 'exercise' });
   }, [award, addActivity, completeWorkout, exerciseId, title, type, duration, program]);
@@ -75,25 +76,27 @@ export default function CompletionWorkout() {
         }}
       >
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(42,26,20,0.1), rgba(248,245,240,1))' }} />
-        <div
-          style={{
-            position: 'absolute',
-            top: 'calc(env(safe-area-inset-top) + 12px)',
-            right: 18,
-            padding: '8px 14px',
-            borderRadius: 999,
-            background: '#fff',
-            boxShadow: '0 6px 20px rgba(61,41,33,0.15)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-          }}
-        >
-          <div style={{ fontFamily: NM.SERIF, fontSize: 15, color: NM.GOLD, fontWeight: 500 }}>+{WORKOUT_POINTS}</div>
-          <div style={{ fontFamily: NM.SANS, fontSize: 9, color: NM.EYEBROW, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 600 }}>bodov</div>
-        </div>
+        {granted !== 0 && (
+          <div
+            style={{
+              position: 'absolute',
+              top: 'calc(env(safe-area-inset-top) + 12px)',
+              right: 18,
+              padding: '8px 14px',
+              borderRadius: 999,
+              background: '#fff',
+              boxShadow: '0 6px 20px rgba(61,41,33,0.15)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+            }}
+          >
+            <div style={{ fontFamily: NM.SERIF, fontSize: 15, color: NM.GOLD, fontWeight: 500 }}>+{granted ?? WORKOUT_POINTS}</div>
+            <div style={{ fontFamily: NM.SANS, fontSize: 9, color: NM.EYEBROW, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 600 }}>bodov</div>
+          </div>
+        )}
         <div style={{ position: 'absolute', bottom: 16, left: 18, right: 18 }}>
-          <Eye color={NM.TERRA}>Dokončené · Týždeň 3 · deň 4</Eye>
+          <Eye color={NM.TERRA}>Dokončené</Eye>
           <Ser size={38} style={{ marginTop: 10 }}>
             Si
             <br />
@@ -104,15 +107,15 @@ export default function CompletionWorkout() {
 
       <div style={{ padding: '0 18px' }}>
         <Body size={14} color={NM.DEEP} weight={400} style={{ maxWidth: 340 }}>
-          15 minút, ktoré si si dala. Postpartum programu zostáva ešte 6 dní — cítiš, že to ide.
+          {duration} minút, ktoré si si dala{program ? ` v programe ${program}` : ''}. Cítiš, že to ide.
         </Body>
       </div>
 
       <div style={{ margin: '22px 18px 0', padding: '16px 18px', background: '#fff', borderRadius: 18, border: `1px solid ${NM.HAIR}`, display: 'grid', gridTemplateColumns: 'repeat(3,1fr)' }}>
         {[
-          { n: '15', l: 'min' },
-          { n: '128', l: 'kcal' },
-          { n: '4', l: 'seriá' },
+          { n: String(duration), l: 'min' },
+          { n: String(stats.totalWorkouts), l: 'cvičení' },
+          { n: String(stats.thisWeek), l: 'tento týždeň' },
         ].map((s, i) => (
           <div key={s.l} style={{ textAlign: 'center', borderLeft: i > 0 ? `1px solid ${NM.HAIR}` : 'none' }}>
             <div style={{ fontFamily: NM.SERIF, fontSize: 22, color: NM.TERRA, fontWeight: 500, letterSpacing: '-0.01em' }}>{s.n}</div>
@@ -126,8 +129,12 @@ export default function CompletionWorkout() {
           <path d="M8 14s-2 2-2 4a4 4 0 008 0c0-2-4-4-4-10 0 0-2 6-2 6z" />
         </svg>
         <div style={{ flex: 1 }}>
-          <div style={{ fontFamily: NM.SANS, fontSize: 13, color: NM.DEEP, fontWeight: 500 }}>18 dní v rade</div>
-          <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.MUTED, marginTop: 2, fontWeight: 400 }}>Tvoj najdlhší streak</div>
+          <div style={{ fontFamily: NM.SANS, fontSize: 13, color: NM.DEEP, fontWeight: 500 }}>
+            {streak.current > 0 ? `${streak.current} ${streak.current === 1 ? 'deň' : streak.current <= 4 ? 'dni' : 'dní'} v rade` : 'Prvý krok dnes'}
+          </div>
+          <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.MUTED, marginTop: 2, fontWeight: 400 }}>
+            {streak.longest > streak.current ? `Tvoj najdlhší streak: ${streak.longest}` : 'Len tak ďalej'}
+          </div>
         </div>
       </div>
 

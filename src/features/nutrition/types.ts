@@ -84,6 +84,10 @@ export interface MealPlan {
    */
   planVersion: number;
   generatedAt: string;
+  /** Epoch ms of the last local write (generate or slot edit). Used to
+   *  decide local-vs-remote on hydration — the start date never changes
+   *  across edits, so comparing it let a stale remote clobber a fresh pick. */
+  savedAt?: number;
   profileHash: string;
   profile: NutritionProfile;
   days: DayPlan[];     // 42 items for a 6-week plan

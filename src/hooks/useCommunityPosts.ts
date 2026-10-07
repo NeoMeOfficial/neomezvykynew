@@ -111,7 +111,12 @@ export function useCommunityPosts() {
         .select()
         .single();
 
-      if (error || !data) return null;
+      if (error || !data) {
+        // Roll back the optimistic insert — the write did NOT persist, so
+        // the caller can surface a real error instead of a false success.
+        setPosts((prev) => prev.filter((p) => p.id !== optimisticPost.id));
+        return null;
+      }
       // Replace optimistic with real
       setPosts((prev) =>
         prev.map((p) =>

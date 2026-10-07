@@ -21,19 +21,19 @@ import { Page, BackHeader, Eye, NM } from '../../components/v2/neome';
  * Mounted at /body.
  */
 
+// Keys MUST match the event_type values written by the award-points /
+// redeem-reward functions, or the row falls through to the raw slug.
 const ACTIVITY_LABELS: Record<string, string> = {
   workout_completed: 'Dokončené cvičenie',
-  meditation_complete: 'Meditácia',
+  meditation_completed: 'Meditácia',
   reflection_write: 'Reflexia / denník',
   cycle_log: 'Záznam cyklu',
   habit_checkin: 'Dokončený návyk',
+  post_published: 'Príspevok v komunite',
   community_like: 'Lajk v komunite',
-  first_post: 'Príspevok v komunite',
-  program_day1: 'Prvý deň programu',
-  program_week1: 'Týždeň 1 programu',
-  program_week2: 'Týždeň 2 programu',
-  program_week3: 'Týždeň 3 programu',
-  program_complete: 'Program dokončený',
+  comment_published: 'Komentár v komunite',
+  program_week: 'Týždeň programu',
+  program_completed: 'Program dokončený',
   referral_signup: 'Odporúčanie · registrácia',
   referral_sub: 'Odporúčanie · predplatné',
   reward_redeem: 'Vymenená odmena',

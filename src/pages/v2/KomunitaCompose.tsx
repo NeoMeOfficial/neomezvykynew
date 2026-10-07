@@ -61,6 +61,13 @@ export default function KomunitaCompose() {
     setError(null);
     try {
       const created = await submitPost(text.trim(), type, author, user?.id);
+      // A logged-in user whose write didn't persist (null) must NOT be told
+      // it worked — the post was rolled back, so surface the failure.
+      if (user?.id && !created) {
+        setError('Nepodarilo sa odoslať príspevok. Skús to ešte raz.');
+        setSubmitting(false);
+        return;
+      }
       // ref_id becomes `post_<id>` server-side so the admin removal
       // flow can reverse the award.
       if (created && user?.id) award('post_published', created.id);
