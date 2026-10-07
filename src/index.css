@@ -717,13 +717,17 @@ All colors MUST be HSL.
    interactive elements, so navigation feels grounded, not abrupt.
    The reduced-motion block above neutralises all of this for users
    who ask for less motion. */
+/* Pure opacity fade — NO transform. A lingering transform (animation
+   fill-mode: both keeps the final translateY) turns this wrapper into a
+   containing block for position:fixed descendants, which broke every
+   inline fixed overlay rendered inside a page (e.g. ConfirmSheet showed
+   only its backdrop — a grey screen). Opacity has no such side effect. */
 @keyframes nmPageIn {
-  from { opacity: 0; transform: translateY(4px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 .nm-page-in {
   animation: nmPageIn 0.17s ease-out both;
-  will-change: opacity;
 }
 
 
