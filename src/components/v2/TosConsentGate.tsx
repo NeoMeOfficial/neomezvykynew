@@ -32,6 +32,7 @@ export function TosConsentGate({ children }: { children: ReactNode }) {
   const { signOut } = useSupabaseAuth();
   const { isGranted, grant, loading } = useConsents();
   const [submitting, setSubmitting] = useState(false);
+  const [acceptError, setAcceptError] = useState<string | null>(null);
   const blocking = !loading && !isGranted(CONSENT_TYPES.TOS_PRIVACY);
 
   useEffect(() => {
@@ -53,9 +54,15 @@ export function TosConsentGate({ children }: { children: ReactNode }) {
   const onAccept = async () => {
     if (submitting) return;
     setSubmitting(true);
+    setAcceptError(null);
     const { error } = await grant(CONSENT_TYPES.TOS_PRIVACY, 'app');
     setSubmitting(false);
-    if (error) return; // stay on the blocker; retry possible
+    // Surface the failure so a transient error (network blip, momentary
+    // backend issue) reads as "try again", not a dead button that traps
+    // the user. Tapping "Súhlasím" again retries.
+    if (error) {
+      setAcceptError('Súhlas sa nepodarilo uložiť. Skontroluj pripojenie a skús to znova.');
+    }
   };
 
   const onDecline = async () => {
@@ -78,6 +85,23 @@ export function TosConsentGate({ children }: { children: ReactNode }) {
         color: NM.DEEP,
       }}
     >
+      {acceptError && (
+        <div
+          style={{
+            background: 'rgba(192,84,74,0.1)',
+            border: '1px solid rgba(192,84,74,0.3)',
+            borderRadius: 14,
+            padding: '12px 14px',
+            marginBottom: 14,
+            fontFamily: NM.SANS,
+            fontSize: 13,
+            color: '#B04434',
+            lineHeight: 1.5,
+          }}
+        >
+          {acceptError}
+        </div>
+      )}
       <ConsentPromptShell
         title="Pred pokračovaním potrebujeme tvoj súhlas"
         description="Súhlas zahŕňa iba základné údaje účtu (e-mail, meno). Údaje o cykle, marketing a komunitné príspevky si vyžiadame zvlášť — a iba vtedy, keď ich budeš chcieť používať."
