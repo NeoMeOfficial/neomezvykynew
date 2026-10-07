@@ -1,6 +1,6 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Player from '@vimeo/player';
 import { Share2, Heart } from 'lucide-react';
 import { TopBar } from '@/components/v2/top-bar';
@@ -348,6 +348,22 @@ export default function ExercisePlayer() {
       : '/kniznica/telo/extra';
   const smartBack = useSmartBack(backFallback);
 
+  // Manual completion — the same chain as the auto `ended` event. Needed
+  // for YouTube (whose iframe exposes no ended event) and for anyone who
+  // finishes early; without it those sessions log nothing.
+  const markComplete = useCallback(() => {
+    navigate('/completion/workout', {
+      replace: true,
+      state: {
+        exerciseId: exercise.id,
+        title: exercise.name,
+        type: contentType,
+        duration: Math.round(playedSecRef.current / 60) || undefined,
+        program: location.state?.fromProgram ? activeProg?.program_id : undefined,
+      },
+    });
+  }, [navigate, exercise.id, exercise.name, contentType, location.state?.fromProgram, activeProg?.program_id]);
+
   // While entitlement resolves, or if quota is exhausted (redirect in
   // flight), render nothing — avoids a flash of paid content.
   if (entitlement.loading || !allowed) return null;
@@ -418,6 +434,16 @@ export default function ExercisePlayer() {
             )}
           </div>
         </div>
+
+        {/* Manual completion — the auto `ended` event covers Vimeo/Bunny,
+            but YouTube exposes none and nobody always watches to the end.
+            This guarantees the session can be logged. */}
+        <button
+          onClick={markComplete}
+          className="w-full rounded-full bg-terra text-white font-sans text-sm font-medium py-3.5 active:opacity-80"
+        >
+          Označiť ako dokončené
+        </button>
 
         {/* Exercise name — the top bar now carries the section label */}
         <h1 className="font-serif text-[21px] text-ink leading-snug">{exercise.name}</h1>
