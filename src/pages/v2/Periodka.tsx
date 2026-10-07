@@ -365,7 +365,6 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
   // early and disagreed with getNextPeriodDate used by settings.
   const daysToMenstruation = Math.max(0, totalDays + 1 - currentDay);
   const ovulationStart = phases.find((p) => p.key === 'ovulation')?.start ?? 14;
-  const daysToOvulation = ovulationStart > currentDay ? ovulationStart - currentDay : Math.max(0, totalDays + ovulationStart - currentDay);
 
   // Predicted next-period date — anchored to lastPeriodStart + cycleLength
   // (the SAME source as the calendar), NOT `today + daysToMenstruation`.
@@ -394,8 +393,19 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
       : `${fmtDM(a)} – ${fmtDM(b)}`;
   const daysWord = (n: number) => (n === 1 ? 'deň' : n >= 2 && n <= 4 ? 'dni' : 'dní');
 
-  const ovulationDate = new Date(today);
-  ovulationDate.setDate(today.getDate() + daysToOvulation);
+  // Ovulation anchored to lastPeriodStart + (cycle-day of ovulation − 1),
+  // so it auto-recomputes the moment a new period start is logged — the
+  // same fix as the next-period date (Sam 2026-10-07). If this cycle's
+  // ovulation already passed, show the next cycle's.
+  const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
+  const ovulationDate = (() => {
+    const base = cycleData.lastPeriodStart ? new Date(cycleData.lastPeriodStart + 'T00:00:00') : new Date(today);
+    const d = new Date(base);
+    d.setDate(d.getDate() + (ovulationStart - 1));
+    if (d.getTime() < todayMidnight) d.setDate(d.getDate() + totalDays);
+    return d;
+  })();
+  const daysToOvulation = Math.max(0, Math.round((ovulationDate.getTime() - todayMidnight) / 86400000));
   const fmtShortDate = (d: Date) => `${d.getDate()}. ${SK_MONTHS_SHORT_LOWER[d.getMonth()]}.`;
 
   // Actual bleed tracking: "Skončila dnes" sets currentPeriodEnd, which
