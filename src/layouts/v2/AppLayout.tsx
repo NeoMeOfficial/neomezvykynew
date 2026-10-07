@@ -220,8 +220,13 @@ export default function AppLayout() {
   const focusMode = !TAB_ROOTS.includes(pathname.replace(/\/+$/, '') || '/');
 
   const isDesktop = useIsDesktop();
+  // The desktop web-app chrome (sidebar + centred 760px card) is for the
+  // member APP only. Admin is a wide internal dashboard that predates it
+  // and must keep its full-width layout (Sam 2026-10-07) — so admin routes
+  // fall through to the full-width branch below, as before the change.
+  const isAdminRoute = pathname.startsWith('/admin');
 
-  if (isDesktop) {
+  if (isDesktop && !isAdminRoute) {
     // Web-app layout: sidebar + centred cream content column on the
     // brown/gold backdrop (painted by #root media query).
     return (

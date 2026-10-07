@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/lib/supabase';
 import { useUser } from '@/hooks/use-user';
 import { useCycleInfo } from '@/hooks/use-cycle';
 import { useProgramAccess } from '@/hooks/useProgramAccess';
@@ -424,44 +425,91 @@ function CardDiary({ free, prompt, sub, savedToday, onOpen }: { free: boolean; p
 }
 
 // ─── Community highlight ──────────────────────────────────────────────────────
+// The post Gabi pins/highlights (community_posts.pinned = true). Renders the
+// real latest pinned post and opens it; nothing shows when none is pinned.
+// (Was a hardcoded fake "Anna K." testimonial pointing at the generic feed.)
+interface PinnedPost {
+  id: string;
+  author_name: string | null;
+  content: string;
+  likes_count: number | null;
+  comments_count: number | null;
+  created_at: string;
+}
+
+function pinnedRelTime(iso: string): string {
+  const diffMs = Date.now() - new Date(iso).getTime();
+  const h = Math.floor(diffMs / 3_600_000);
+  if (h < 1) return 'pred chvíľou';
+  if (h < 24) return `pred ${h} h`;
+  const d = Math.floor(h / 24);
+  return d === 1 ? 'včera' : `pred ${d} dňami`;
+}
+
 function CardCommunity() {
   const navigate = useNavigate();
+  const [post, setPost] = useState<PinnedPost | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    supabase
+      .from('community_posts')
+      .select('id, author_name, content, likes_count, comments_count, created_at')
+      .eq('pinned', true)
+      .neq('status', 'removed')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+      .then(({ data }) => { if (!cancelled && data) setPost(data as PinnedPost); })
+      .then(undefined, () => { /* no pinned post / query failed → show nothing */ });
+    return () => { cancelled = true; };
+  }, []);
+
+  if (!post) return null;
+
+  const author = post.author_name?.trim() || 'NeoMe';
+  const initial = author.charAt(0).toUpperCase();
+
   return (
-    <div style={{ padding: '0 18px', marginBottom: 12 }}>
-      <div style={{ background: WHITE, borderRadius: 20, border: `1px solid ${HAIR}`, overflow: 'hidden' }}>
-        <div style={{ padding: '14px 16px 0', display: 'flex', justifyContent: 'flex-end' }}>
-          <div style={{ fontSize: 10, color: FG3, letterSpacing: '0.06em' }}>pred 2 h</div>
-        </div>
-        <div style={{ padding: '4px 16px 14px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-            <div style={{ width: 36, height: 36, borderRadius: 999, background: `url(/images/r9/testimonial-anna.jpg) center/cover`, flexShrink: 0 }} />
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontFamily: SERIF, fontSize: 14, color: INK, fontWeight: 500 }}>Anna K.</div>
-              <div style={{ fontSize: 10.5, color: FG3, letterSpacing: '0.06em' }}>3. týždeň · Postpartum</div>
-            </div>
+    <>
+      <div style={{ padding: '0 22px', margin: '32px 0 0', fontSize: 10.5, letterSpacing: '0.24em', textTransform: 'uppercase' as const, fontWeight: 500, color: FG3, fontFamily: SANS }}>Komunita</div>
+      <SectionEyebrow color={TELO}>Vybrala Gabi</SectionEyebrow>
+      <div style={{ padding: '0 18px', marginBottom: 12 }}>
+        <div style={{ background: WHITE, borderRadius: 20, border: `1px solid ${HAIR}`, overflow: 'hidden' }}>
+          <div style={{ padding: '14px 16px 0', display: 'flex', justifyContent: 'flex-end' }}>
+            <div style={{ fontSize: 10, color: FG3, letterSpacing: '0.06em' }}>{pinnedRelTime(post.created_at)}</div>
           </div>
-          <div style={{ fontFamily: SERIF, fontSize: 16, color: INK, lineHeight: 1.35, fontStyle: 'italic', marginBottom: 12 }}>
-            „Prvý raz po pôrode som dnes nečakane vstala bez bolesti chrbta. Tie 6 minút pohybu denne fungujú."
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', gap: 16, fontSize: 11, color: FG2, fontWeight: 400 }}>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={FG2} strokeWidth="1.6"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                47
-              </span>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={FG2} strokeWidth="1.6"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-                12
-              </span>
+          <div style={{ padding: '4px 16px 14px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+              <div style={{ width: 36, height: 36, borderRadius: 999, background: TELO, color: WHITE, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: SERIF, fontSize: 15 }}>{initial}</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontFamily: SERIF, fontSize: 14, color: INK, fontWeight: 500 }}>{author}</div>
+                <div style={{ fontSize: 10.5, color: FG3, letterSpacing: '0.06em' }}>Komunita</div>
+              </div>
             </div>
-            <button onClick={() => navigate('/komunita')} style={{ background: 'transparent', border: 0, padding: 0, cursor: 'pointer', fontSize: 11.5, fontWeight: 500, color: INK, display: 'flex', alignItems: 'center', gap: 5 }}>
-              Otvoriť
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={INK} strokeWidth="2" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
-            </button>
+            <div style={{ fontFamily: SERIF, fontSize: 16, color: INK, lineHeight: 1.35, fontStyle: 'italic', marginBottom: 12 }}>
+              {post.content}
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', gap: 16, fontSize: 11, color: FG2, fontWeight: 400 }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={FG2} strokeWidth="1.6"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                  {post.likes_count ?? 0}
+                </span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={FG2} strokeWidth="1.6"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                  {post.comments_count ?? 0}
+                </span>
+              </div>
+              <button onClick={() => navigate(`/komunita/${post.id}`)} style={{ background: 'transparent', border: 0, padding: 0, cursor: 'pointer', fontSize: 11.5, fontWeight: 500, color: INK, display: 'flex', alignItems: 'center', gap: 5 }}>
+                Otvoriť
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={INK} strokeWidth="2" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -1135,11 +1183,8 @@ export default function DomovNew() {
       <CardDiary free={!isPlus} prompt={diaryPrompt} sub={diarySub} savedToday={diarySavedToday} onOpen={() => navigate('/dennik/new')} />
       <CardGoals />
 
-      {/* Komunita divider — plain, no bullet (visual separator between personal and community sections) */}
-      <div style={{ padding: '0 22px', margin: '32px 0 0', fontSize: 10.5, letterSpacing: '0.24em', textTransform: 'uppercase' as const, fontWeight: 500, color: FG3, fontFamily: SANS }}>Komunita</div>
-
-      {/* Vybrala Gabi */}
-      <SectionEyebrow color={TELO}>Vybrala Gabi</SectionEyebrow>
+      {/* Komunita — the "Vybrala Gabi" pinned post. Whole block (divider +
+          eyebrow + card) renders only when Gabi has pinned a post. */}
       <CardCommunity />
 
       {/* Subscription upsell for free users; referral only for Plus */}
