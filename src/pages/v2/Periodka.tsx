@@ -251,6 +251,8 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
   // Calendar month paging (Gabi 2026-07-28): 0 = current month, negative
   // pages into the past (arrows + swipe). Clamped to a year back.
   const [monthOffset, setMonthOffset] = useState(0);
+  const MONTHS_BACK = -12;
+  const MONTHS_FWD = 6; // orientational future projection (recalc per cycle)
   const swipeStartX = useRef<number | null>(null);
   const viewedMonth = new Date(today.getFullYear(), today.getMonth() + monthOffset, 1);
   const monthIdx = viewedMonth.getMonth();
@@ -1045,22 +1047,29 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
           <Eye>Kalendár cyklu</Eye>
           <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             <button
-              onClick={() => setMonthOffset((o) => Math.max(o - 1, -12))}
+              onClick={() => setMonthOffset((o) => Math.max(o - 1, MONTHS_BACK))}
               aria-label="Predchádzajúci mesiac"
-              style={{ all: 'unset', cursor: 'pointer', width: 40, height: 40, display: 'grid', placeItems: 'center', color: monthOffset <= -12 ? NM.HAIR_2 : NM.MUTED }}
+              style={{ all: 'unset', cursor: monthOffset <= MONTHS_BACK ? 'default' : 'pointer', width: 40, height: 40, display: 'grid', placeItems: 'center', color: monthOffset <= MONTHS_BACK ? NM.HAIR_2 : NM.MUTED }}
             >
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M15 6l-6 6 6 6"/></svg>
             </button>
             <div style={{ fontFamily: NM.SERIF, fontSize: 14, color: NM.DEEP, fontWeight: 500, fontStyle: 'italic', minWidth: 96, textAlign: 'center' }}>{monthLabel} {yearIdx}</div>
             <button
-              onClick={() => setMonthOffset((o) => Math.min(o + 1, 0))}
+              onClick={() => setMonthOffset((o) => Math.min(o + 1, MONTHS_FWD))}
               aria-label="Ďalší mesiac"
-              style={{ all: 'unset', cursor: monthOffset === 0 ? 'default' : 'pointer', width: 40, height: 40, display: 'grid', placeItems: 'center', color: monthOffset === 0 ? NM.HAIR_2 : NM.MUTED }}
+              style={{ all: 'unset', cursor: monthOffset >= MONTHS_FWD ? 'default' : 'pointer', width: 40, height: 40, display: 'grid', placeItems: 'center', color: monthOffset >= MONTHS_FWD ? NM.HAIR_2 : NM.MUTED }}
             >
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
             </button>
           </div>
         </div>
+
+        {monthOffset > 0 && (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, margin: '-2px 0 10px', fontFamily: NM.SANS, fontSize: 10.5, color: NM.TERTIARY, fontWeight: 400 }}>
+            <span style={{ width: 5, height: 5, borderRadius: 999, background: NM.TERTIARY, display: 'inline-block' }} />
+            Orientačná predpoveď — spresní sa po ďalšom cykle
+          </div>
+        )}
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', marginBottom: 5 }}>
           {['Po', 'Ut', 'St', 'Št', 'Pi', 'So', 'Ne'].map((d) => (
@@ -1076,8 +1085,8 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
             if (swipeStartX.current === null) return;
             const dx = e.changedTouches[0].clientX - swipeStartX.current;
             swipeStartX.current = null;
-            if (dx > 48) setMonthOffset((o) => Math.max(o - 1, -12));
-            else if (dx < -48) setMonthOffset((o) => Math.min(o + 1, 0));
+            if (dx > 48) setMonthOffset((o) => Math.max(o - 1, MONTHS_BACK));
+            else if (dx < -48) setMonthOffset((o) => Math.min(o + 1, MONTHS_FWD));
           }}
         >
           {weeks.flat().map((c, i) => {
