@@ -1571,16 +1571,16 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     ? new Date(lastStartDate.getTime() + (ovulationStart - 1 - (currentDay >= ovulationStart ? 0 : totalDays)) * 86400000)
     : null;
 
-  // Always show the predicted WINDOW as the main value (the single-day
-  // prediction was false precision); the sub-line carries the context —
-  // how soon, overdue, or still-learning.
-  const periodNext = (prediction.rangeStart && prediction.rangeEnd)
-    ? rangeLabel(prediction.rangeStart, prediction.rangeEnd)
-    : fmtNumDate(nextPeriodDate);
+  // Concrete predicted day (Sam 2026-10-07): a start-uncertainty RANGE
+  // here clashed with the 'last period' row, which shows the bleed
+  // DURATION as a range — two different meanings of X–Y side by side read
+  // as confusing. The sub-line carries context (how soon / overdue /
+  // still learning); the range logic stays for the irregularity warnings.
+  const periodNext = fmtNumDate(nextPeriodDate);
   const periodNextSub = isLate
     ? `mešká ${daysLate} ${daysWord(daysLate)}`
     : prediction.learning
-      ? 'odhad — ešte sa učím tvoj cyklus'
+      ? `odhad · o ${daysToMenstruation} ${daysWord(daysToMenstruation)}`
       : inDaysLabel(daysToMenstruation).toLowerCase();
   const cyclusRows: { t: string; c: string; last: string; next: string; nextSub?: string; edit?: boolean }[] = [
     { t: 'Perióda', c: PHASE.MENSTR, last: lastPeriodLabel, next: periodNext, nextSub: periodNextSub, edit: true },
