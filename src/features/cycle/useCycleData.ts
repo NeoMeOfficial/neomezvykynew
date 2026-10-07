@@ -142,16 +142,19 @@ export function useCycleData(accessCode?: string) {
         const remoteHistoryLen = merged.history?.length ?? 0;
         const localHistoryLen = current.history?.length ?? 0;
         if (merged.lastPeriodStart && remoteHistoryLen >= localHistoryLen) {
-          // Same cycle, remote missing the recorded period end (older schema
-          // or a failed remote write) — keep the local record instead of
-          // silently reverting the correction.
-          const final = (
-            !merged.currentPeriodEnd
-            && current.currentPeriodEnd
-            && current.lastPeriodStart === merged.lastPeriodStart
-          )
-            ? { ...merged, currentPeriodEnd: current.currentPeriodEnd, bleedLengths: current.bleedLengths ?? merged.bleedLengths }
-            : merged;
+          // Same cycle, remote missing a client-side field (older schema or
+          // a failed remote write) — keep the local record instead of
+          // silently reverting the correction. Applies to the recorded
+          // period end AND the recorded ovulation day, both of which live in
+          // columns that may not exist on an un-migrated prod schema.
+          const sameCycle = current.lastPeriodStart === merged.lastPeriodStart;
+          let final = merged;
+          if (sameCycle && !merged.currentPeriodEnd && current.currentPeriodEnd) {
+            final = { ...final, currentPeriodEnd: current.currentPeriodEnd, bleedLengths: current.bleedLengths ?? merged.bleedLengths };
+          }
+          if (sameCycle && !merged.ovulationOverride && current.ovulationOverride) {
+            final = { ...final, ovulationOverride: current.ovulationOverride };
+          }
           try {
             localStorage.setItem(getStorageKey(), JSON.stringify(final));
           } catch (_) { /* ignore */ }

@@ -25,6 +25,8 @@ interface CycleDataRow {
   // Added by migration 20260902100000 — absent (undefined) on older schemas.
   current_period_end?: string | null;
   bleed_lengths?: number[] | null;
+  // Added by migration 20261007120000 — absent (undefined) on older schemas.
+  ovulation_override?: string | null;
 }
 
 const defaultCustomSettings: CustomSettings = {
@@ -44,6 +46,7 @@ function rowToCycleData(row: CycleDataRow): CycleData {
     customSettings: { ...defaultCustomSettings, ...(row.custom_settings ?? {}) },
     currentPeriodEnd: row.current_period_end ?? null,
     bleedLengths: row.bleed_lengths ?? undefined,
+    ovulationOverride: row.ovulation_override ?? null,
   };
 }
 
@@ -113,6 +116,7 @@ export async function saveCycleData(data: CycleData): Promise<void> {
         ...basePayload,
         current_period_end: data.currentPeriodEnd ?? null,
         bleed_lengths: data.bleedLengths ?? null,
+        ovulation_override: data.ovulationOverride ?? null,
       },
       { onConflict: 'user_id' },
     );
