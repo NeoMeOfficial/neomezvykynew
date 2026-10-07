@@ -315,7 +315,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     // Real length of THIS cycle: gap to the next real start, else the
     // (recalculated) current cycle length for the ongoing/future cycle.
     const thisLen = nextStart ? Math.max(1, daysBetweenISO(anchor, nextStart)) : totalDays;
-    const cycleDay = daysBetweenISO(anchor, targetISO) + 1;
+    const rawDay = daysBetweenISO(anchor, targetISO) + 1;
 
     // Real bleed length for this cycle: the current cycle uses the live
     // recorded end; a past cycle uses its history entry's end if present.
@@ -327,13 +327,24 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
       if (entry?.endDate && entry.endDate >= anchor) bleedLen = daysBetweenISO(anchor, entry.endDate) + 1;
     }
 
+    // Past cycles are BOUNDED by the next real start, so rawDay stays in
+    // [1, thisLen] and maps straight to a phase. The current cycle (and
+    // the future) is open-ended: once you pass the cycle length — i.e.
+    // you're overdue — wrap forward so the calendar keeps projecting the
+    // next predicted cycle instead of going blank (Krok 1 fix 2026-10-07).
+    const phaseDay = isCurrentCycle
+      ? ((rawDay - 1) % thisLen + thisLen) % thisLen + 1
+      : rawDay;
     const ranges = getPhaseRanges(thisLen, cycleData.periodLength ?? 5);
-    let key = ranges.find((r) => cycleDay >= r.start && cycleDay <= r.end)?.key ?? null;
-    if (bleedLen !== null) {
-      if (cycleDay <= bleedLen) key = 'menstrual';
-      else if (key === 'menstrual') key = 'follicular';
+    let key = ranges.find((r) => phaseDay >= r.start && phaseDay <= r.end)?.key ?? null;
+    // Bleed override only on the REAL bleed days of this cycle (rawDay,
+    // not the wrapped projection).
+    if (bleedLen !== null && rawDay <= bleedLen) {
+      key = 'menstrual';
+    } else if (bleedLen !== null && rawDay <= thisLen && key === 'menstrual') {
+      key = 'follicular';
     }
-    return { cycleDay, key };
+    return { cycleDay: rawDay, key };
   };
   const phaseKeyForCalendarDay = (d: number): string | null => cycleInfoForCalendarDay(d)?.key ?? null;
   const phaseOf = (d: number) => {

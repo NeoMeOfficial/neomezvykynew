@@ -508,15 +508,15 @@ export default function PeriodkaSettings() {
       setPeriodHistory(updated);
     }
 
+    // Single source of truth: setLastPeriodStart commits the previous
+    // cycle to cycleData.history (for the calendar + recalc) and decides
+    // new-cycle vs correction by the gap. It does NOT inflate periodLength
+    // (the old safePeriodLength = daysSince + 2 bug set it to e.g. 33).
+    setLastPeriodStart(selectedDate);
     const daysSince = differenceInDays(startOfDay(today), startOfDay(selectedDate)) + 1;
-    const safePeriodLength = Math.max(daysSince + 2, 5);
-    updateCycleData({
-      lastPeriodStart: format(selectedDate, 'yyyy-MM-dd'),
-      cycleLength: actualCycle >= 21 && actualCycle <= 45 ? actualCycle : cycleLength,
-      periodLength: safePeriodLength,
-      currentPeriodEnd: null,
-    });
-    toast.success(`Nová menštruácia nastavená — deň ${daysSince}`);
+    toast.success(actualCycle >= 14
+      ? 'Nová menštruácia zaznačená'
+      : `Dátum opravený — deň ${daysSince}`);
   }, [lastPeriodStart, periodLength, cycleLength, currentPeriodEnd, today, setLastPeriodStart, updateCycleData, navigate, requireConsent]);
 
   return (

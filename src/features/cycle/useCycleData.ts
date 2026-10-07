@@ -234,10 +234,15 @@ export function useCycleData(accessCode?: string) {
       let history = current.history ?? [];
       let cycleLength = current.cycleLength;
 
-      // A later start than the current one = a new cycle has begun.
-      // (Earlier/equal dates are corrections to the current period, not
-      // a new cycle — handled by the pick-date flow, not here.)
-      const isNewCycle = !!prevStart && dateString > prevStart;
+      // A sufficiently later start = a NEW cycle. A small gap (< 14 days)
+      // or an earlier date is a CORRECTION of the current period's start,
+      // not a new cycle, so it must not be logged to history as a tiny
+      // cycle (Sam's test 2026-10-07: editing 4.9 → 7.9 was wrongly
+      // treated as a 3-day cycle).
+      const gapDays = prevStart
+        ? Math.round((new Date(dateString + 'T00:00:00').getTime() - new Date(prevStart + 'T00:00:00').getTime()) / 86400000)
+        : 0;
+      const isNewCycle = !!prevStart && gapDays >= 14;
 
       if (isNewCycle && !history.some(h => h.startDate === prevStart)) {
         // Commit the cycle that just ended (its real start + recorded end).
