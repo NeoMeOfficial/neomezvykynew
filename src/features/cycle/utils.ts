@@ -443,11 +443,14 @@ export function getCyclePrediction(cycleData: CycleData): CyclePrediction {
   const stdDev = Math.sqrt(variance);
 
   const learning = cycleCount < 3;
+  // Always show a window. While learning (< 3 cycles) there's no
+  // meaningful std-dev yet, so use a sensible default of ±2 days; once
+  // real data exists, use ±1 std-dev clamped to 1–4 days (regular
+  // cycles → tight, irregular → wider).
   let rangeStart: Date | null = null;
   let rangeEnd: Date | null = null;
-  if (!learning && predictedNextStart) {
-    // ±1 std-dev, clamped to a sensible 1–4 days. Regular cycles → tight.
-    const margin = Math.min(4, Math.max(1, Math.round(stdDev)));
+  if (predictedNextStart) {
+    const margin = learning ? 2 : Math.min(4, Math.max(1, Math.round(stdDev)));
     rangeStart = addDays(predictedNextStart, -margin);
     rangeEnd = addDays(predictedNextStart, margin);
   }

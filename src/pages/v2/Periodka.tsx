@@ -1571,15 +1571,16 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     ? new Date(lastStartDate.getTime() + (ovulationStart - 1 - (currentDay >= ovulationStart ? 0 : totalDays)) * 86400000)
     : null;
 
-  const periodNext = isLate
-    ? `mešká ${daysLate} ${daysWord(daysLate)}`
-    : (prediction.rangeStart && prediction.rangeEnd)
-      ? rangeLabel(prediction.rangeStart, prediction.rangeEnd)
-      : fmtNumDate(nextPeriodDate);
+  // Always show the predicted WINDOW as the main value (the single-day
+  // prediction was false precision); the sub-line carries the context —
+  // how soon, overdue, or still-learning.
+  const periodNext = (prediction.rangeStart && prediction.rangeEnd)
+    ? rangeLabel(prediction.rangeStart, prediction.rangeEnd)
+    : fmtNumDate(nextPeriodDate);
   const periodNextSub = isLate
-    ? 'podľa predpovede'
+    ? `mešká ${daysLate} ${daysWord(daysLate)}`
     : prediction.learning
-      ? 'ešte sa učím tvoj cyklus'
+      ? 'odhad — ešte sa učím tvoj cyklus'
       : inDaysLabel(daysToMenstruation).toLowerCase();
   const cyclusRows: { t: string; c: string; last: string; next: string; nextSub?: string; edit?: boolean }[] = [
     { t: 'Perióda', c: PHASE.MENSTR, last: lastPeriodLabel, next: periodNext, nextSub: periodNextSub, edit: true },
