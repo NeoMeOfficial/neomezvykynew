@@ -2059,9 +2059,10 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
       {todayStatsBlock}
       {wellbeingBlock}
       {periodCtaBlock}
-      {ringBlock}
+      {/* TEMP hidden to evaluate the calendar-only layout (Sam 2026-10-08) */}
+      {false && ringBlock}
       {irregularBlock}
-      {upcomingBlock}
+      {false && upcomingBlock}
       {calendarBlock}
       {dayDetailSheet}
       {periodEditSheet}
