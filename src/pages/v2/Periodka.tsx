@@ -300,7 +300,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
   const daysBetweenISO = (a: string, b: string) =>
     Math.round((new Date(b + 'T00:00:00').getTime() - new Date(a + 'T00:00:00').getTime()) / 86400000);
 
-  const cycleInfoForCalendarDay = (d: number): { cycleDay: number; key: string | null; confirmed: boolean } | null => {
+  const cycleInfoForCalendarDay = (d: number): { cycleDay: number; key: string | null; confirmed: boolean; projected: boolean } | null => {
     if (!cycleData.lastPeriodStart) return null;
     const target = new Date(yearIdx, monthIdx, d);
     const y = target.getFullYear();
@@ -323,7 +323,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
       const start = new Date(cycleData.lastPeriodStart + 'T00:00:00');
       const daysSince = Math.floor((target.getTime() - start.getTime()) / 86400000);
       const cd = ((daysSince % totalDays) + totalDays) % totalDays + 1;
-      return { cycleDay: cd, key: phases.find((p) => cd >= p.start && cd <= p.end)?.key ?? null, confirmed: false };
+      return { cycleDay: cd, key: phases.find((p) => cd >= p.start && cd <= p.end)?.key ?? null, confirmed: false, projected: true };
     }
 
     const anchor = realStarts[anchorIdx];
@@ -379,7 +379,12 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
         key = targetISO < cycleData.ovulationOverride ? 'follicular' : 'luteal';
       }
     }
-    return { cycleDay: rawDay, key, confirmed: targetISO <= todayISOc };
+    // "Projected" = a FUTURE prediction (the wrapped next-cycle region,
+    // beyond today) — these show only an outline for the predicted period,
+    // no phase fill. Real cycle days (past, current, overdue-to-today) are
+    // not projected → full phase colour.
+    const projected = isCurrentCycle && rawDay > thisLen && targetISO > todayISOc;
+    return { cycleDay: rawDay, key, confirmed: targetISO <= todayISOc, projected };
   };
   const phaseKeyForCalendarDay = (d: number): string | null => cycleInfoForCalendarDay(d)?.key ?? null;
   const phaseOf = (d: number) => {
@@ -1274,12 +1279,14 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
           {weeks.flat().map((c, i) => {
             const info = !c.mute ? cycleInfoForCalendarDay(c.d) : null;
             const cellKey = info?.key ?? null;
-            // Confirmed (recorded + already happened) → vivid saturated fill;
-            // projected (future / pre-record) → light pastel tint.
-            // Original pastel phase tints for every day — the confirmed/
-            // projected intensity experiment was dropped (Sam 2026-10-08:
-            // phases stay colourful in the calendar, no second dimension).
-            const tint = cellKey ? phaseTintByKey[cellKey] : null;
+            const isProjected = !!info?.projected;
+            // Real (recorded/current) cycle days → full pastel phase fill.
+            // Future prediction → NO phase fill; only the predicted PERIOD
+            // days get a light outline ("tu sa perióda očakáva"), the rest
+            // stay neutral. (Sam 2026-10-09: don't paint phases that depend
+            // on a menstruation that wasn't recorded.)
+            const tint = cellKey && !isProjected ? phaseTintByKey[cellKey] : null;
+            const predictedPeriod = isProjected && cellKey === 'menstrual';
             const today = !c.mute && monthOffset === 0 && c.d === todayDate;
             const sym = !c.mute && symptomDays.includes(c.d);
             const selected = !c.mute && selectedDay === c.d;
@@ -1299,10 +1306,12 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
                   position: 'relative',
                   aspectRatio: '1',
                   borderRadius: 9,
-                  background: today ? NM.DEEP : filterHit ? NM.GOLD : tint ?? 'transparent',
+                  background: today ? NM.DEEP : filterHit ? NM.GOLD : tint ?? (predictedPeriod ? `${PHASE.MENSTR}14` : 'transparent'),
                   boxShadow: filterHit && today
                     ? `0 0 0 2px ${NM.GOLD}`
-                    : selected && !today && !filterHit && cellPhase ? `0 0 0 1.5px ${cellPhase}` : 'none',
+                    : selected && !today && !filterHit && cellPhase ? `0 0 0 1.5px ${cellPhase}`
+                    : predictedPeriod && !today && !filterHit ? `inset 0 0 0 1.5px ${PHASE.MENSTR}7A`
+                    : 'none',
                   display: 'grid',
                   placeItems: 'center',
                   boxSizing: 'border-box',
