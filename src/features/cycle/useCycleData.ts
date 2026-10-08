@@ -401,6 +401,29 @@ export function useCycleData(accessCode?: string) {
   }, [updateCycleData]);
 
   // Add period to history + silently apply learned cycle length after ≥3 cycles
+  // Edit a PAST cycle's period dates (a history entry), keyed by its
+  // original start. Re-sorts and re-calibrates cycle length. The derived
+  // phases (follicular/luteal) recompute automatically from the new dates.
+  const correctHistoryEntry = useCallback((originalStartISO: string, start: Date, end: Date | null) => {
+    setCycleData(current => {
+      const startStr = format(start, 'yyyy-MM-dd');
+      const history = (current.history ?? [])
+        .map(h => h.startDate === originalStartISO
+          ? { startDate: startStr, endDate: end ? format(end, 'yyyy-MM-dd') : h.endDate }
+          : h)
+        .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
+      const allStarts = [
+        ...history,
+        ...(current.lastPeriodStart ? [{ startDate: current.lastPeriodStart }] : []),
+      ].sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
+      const avg = calculateAverageCycleLength(allStarts);
+      const cycleLength = (avg && avg.cycleCount >= 3) ? avg.average : current.cycleLength;
+      const updated = { ...current, history, cycleLength };
+      saveCycleData(updated);
+      return updated;
+    });
+  }, [saveCycleData]);
+
   const addPeriodToHistory = useCallback((startDate: string, endDate?: string) => {
     setCycleData(current => {
       const history = current.history || [];
@@ -543,6 +566,7 @@ export function useCycleData(accessCode?: string) {
     correctPeriod,
     setOvulationDate,
     acknowledgeGap,
+    correctHistoryEntry,
     addPeriodToHistory,
     updateCustomSettings,
     updateCycleData,

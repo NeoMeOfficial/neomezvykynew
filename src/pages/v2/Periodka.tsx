@@ -213,12 +213,13 @@ interface PaidViewProps {
   onSetOvulation: (date: Date | null) => void;
   onAddMissedPeriod: (startISO: string) => void;
   onAcknowledgeGap: (laterStartISO: string) => void;
+  onCorrectHistory: (originalStartISO: string, start: Date, end: Date | null) => void;
 }
 
 const SK_MONTHS_FULL = ['január', 'február', 'marec', 'apríl', 'máj', 'jún', 'júl', 'august', 'september', 'október', 'november', 'december'];
 const SK_MONTHS_SHORT_LOWER = ['jan', 'feb', 'mar', 'apr', 'máj', 'jún', 'júl', 'aug', 'sep', 'okt', 'nov', 'dec'];
 
-function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMarkPeriodEnd, onCorrectPeriod, onSetOvulation, onAddMissedPeriod, onAcknowledgeGap }: PaidViewProps) {
+function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMarkPeriodEnd, onCorrectPeriod, onSetOvulation, onAddMissedPeriod, onAcknowledgeGap, onCorrectHistory }: PaidViewProps) {
   // Same featured picks as the home cards (Gabi 2026-09-02): the advice
   // rows below deep-link to the identical phase-aligned exercise/recipe/
   // meditation views instead of the bare section hubs.
@@ -509,9 +510,19 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
   const [periodEditOpen, setPeriodEditOpen] = useState(false);
   const [draftStart, setDraftStart] = useState('');
   const [draftEnd, setDraftEnd] = useState('');
+  // When editing a PAST cycle's period, the original history start it maps
+  // to (null = editing the current period).
+  const [editHistoryStart, setEditHistoryStart] = useState<string | null>(null);
   const openPeriodEditor = () => {
+    setEditHistoryStart(null);
     setDraftStart(cycleData.lastPeriodStart ?? '');
     setDraftEnd(periodEnded ? cycleData.currentPeriodEnd! : '');
+    setPeriodEditOpen(true);
+  };
+  const openHistoryPeriodEditor = (origStart: string, endISO: string | null) => {
+    setEditHistoryStart(origStart);
+    setDraftStart(origStart);
+    setDraftEnd(endISO ?? '');
     setPeriodEditOpen(true);
   };
   const editTodayISO = format(today, 'yyyy-MM-dd');
@@ -519,10 +530,10 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     && (!draftEnd || (draftEnd >= draftStart && draftEnd <= editTodayISO));
   const savePeriodEdit = () => {
     if (!draftValid) return;
-    onCorrectPeriod(
-      new Date(draftStart + 'T00:00:00'),
-      draftEnd ? new Date(draftEnd + 'T00:00:00') : null,
-    );
+    const start = new Date(draftStart + 'T00:00:00');
+    const end = draftEnd ? new Date(draftEnd + 'T00:00:00') : null;
+    if (editHistoryStart) onCorrectHistory(editHistoryStart, start, end);
+    else onCorrectPeriod(start, end);
     setPeriodEditOpen(false);
   };
 
@@ -804,6 +815,18 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     luteal: 'v luteálnej fáze',
   };
   const selectedInfo = selectedDay !== null ? cycleInfoForCalendarDay(selectedDay) : null;
+  const selectedDateISO0 = selectedDay !== null
+    ? `${yearIdx}-${String(monthIdx + 1).padStart(2, '0')}-${String(selectedDay).padStart(2, '0')}`
+    : null;
+  // Which recorded cycle the tapped day belongs to (for editing that cycle's
+  // period). anchor = latest real start on/before the day.
+  const selAnchor = selectedDateISO0
+    ? ([...realStarts].reverse().find((s) => s <= selectedDateISO0) ?? null)
+    : null;
+  const selIsCurrentCycle = !!selAnchor && selAnchor === cycleData.lastPeriodStart;
+  const selHistoryEntry = selAnchor && !selIsCurrentCycle
+    ? (cycleData.history ?? []).find((h) => h.startDate === selAnchor) ?? null
+    : null;
   const selectedDateISO = selectedDay !== null
     ? `${yearIdx}-${String(monthIdx + 1).padStart(2, '0')}-${String(selectedDay).padStart(2, '0')}`
     : null;
@@ -849,25 +872,33 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
           <Ser size={22} style={{ marginTop: 10, lineHeight: 1.2 }}>Mimo zaznamenaného cyklu</Ser>
         )}
 
-        {/* Contextual edit from the calendar day: period day → fix the
-            period's dates; ovulation day → fix the ovulation day (which
-            then re-shifts follicular/luteal around it). Only for the
-            current cycle — editing a past cycle's dates is a follow-up. */}
-        {selectedInfo && !!cycleData.lastPeriodStart && !!selectedDateISO
-          && selectedDateISO >= cycleData.lastPeriodStart
-          && (selectedInfo.key === 'menstrual' || selectedInfo.key === 'ovulation') && (
-          <button
-            onClick={() => {
-              if (selectedInfo.key === 'ovulation') openOvulationEditor();
-              else openPeriodEditor();
-              setSelectedDay(null);
-            }}
-            style={{ all: 'unset', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 14, padding: '9px 16px', borderRadius: 999, background: '#fff', border: `1px solid ${selectedInfo.key === 'ovulation' ? PHASE.OVULAT : PHASE.MENSTR}`, color: selectedInfo.key === 'ovulation' ? PHASE.OVULAT : PHASE.MENSTR, fontFamily: NM.SANS, fontSize: 12.5, fontWeight: 500 }}
-          >
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.828 2.828 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z" /></svg>
-            {selectedInfo.key === 'ovulation' ? 'Upraviť deň ovulácie' : 'Upraviť dátumy periódy'}
-          </button>
-        )}
+        {/* Contextual edit from any day of a REAL cycle. Phases are derived,
+            so we only edit the two anchors: the period dates and (current
+            cycle) the ovulation day. Current cycle ovulation day → edit
+            ovulation; any other real day → edit that cycle's period (current
+            → live period; past → the history entry). Projections aren't
+            editable. Past-cycle ovulation edit is a follow-up. */}
+        {selectedInfo && !selectedInfo.projected && selAnchor && (() => {
+          const isOvul = selIsCurrentCycle && selectedInfo.key === 'ovulation';
+          const col = isOvul ? PHASE.OVULAT : PHASE.MENSTR;
+          const label = isOvul
+            ? 'Upraviť deň ovulácie'
+            : (selIsCurrentCycle ? 'Upraviť dátumy periódy' : 'Upraviť periódu tohto cyklu');
+          return (
+            <button
+              onClick={() => {
+                if (isOvul) openOvulationEditor();
+                else if (selIsCurrentCycle) openPeriodEditor();
+                else if (selAnchor) openHistoryPeriodEditor(selAnchor, selHistoryEntry?.endDate ?? null);
+                setSelectedDay(null);
+              }}
+              style={{ all: 'unset', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 14, padding: '9px 16px', borderRadius: 999, background: '#fff', border: `1px solid ${col}`, color: col, fontFamily: NM.SANS, fontSize: 12.5, fontWeight: 500 }}
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.828 2.828 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z" /></svg>
+              {label}
+            </button>
+          );
+        })()}
 
         {selectedIsPast && selectedDateISO ? (
           // Past days are editable — retroactively add or fix symptoms.
@@ -2214,7 +2245,7 @@ function FreeView({ navigate }: { navigate: (p: string) => void }) {
 
 export default function Periodka() {
   const navigate = useNavigate();
-  const { cycleData, derivedState, setLastPeriodStart, markPeriodEnded, correctPeriod, setOvulationDate, acknowledgeGap, addPeriodToHistory } = useCycleData();
+  const { cycleData, derivedState, setLastPeriodStart, markPeriodEnded, correctPeriod, setOvulationDate, acknowledgeGap, addPeriodToHistory, correctHistoryEntry } = useCycleData();
   const [confirmStartOpen, setConfirmStartOpen] = useState(false);
   const requireConsent = useConsentGuard();
 
@@ -2257,6 +2288,7 @@ export default function Periodka() {
           onSetOvulation={setOvulationDate}
           onAddMissedPeriod={(iso) => addPeriodToHistory(iso)}
           onAcknowledgeGap={acknowledgeGap}
+          onCorrectHistory={correctHistoryEntry}
         />
       ) : (
         <FreeView navigate={navigate} />
