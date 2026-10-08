@@ -697,7 +697,17 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
       if (cd !== null && !recentDays.includes(cd)) recentDays.push(cd);
     }
     recentDays.sort((a, b) => a - b);
-    return { total: filteredDates.length, top, recentDays };
+
+    // Krok 3: cross-cycle recurrence — "v X z posledných Y cyklov". Each
+    // real start opens a cycle window [start, nextStart); the newest is
+    // open-ended (current cycle). Count how many of the last ≤4 windows
+    // contain at least one logged occurrence.
+    const windows: [string, string][] = realStarts.map((s, i) => [s, realStarts[i + 1] ?? '9999-12-31']);
+    const recentWindows = windows.slice(-4);
+    const inCycles = recentWindows.filter(([s, e]) => filteredDates.some((d) => d >= s && d < e)).length;
+    const recurrence = recentWindows.length >= 2 ? { inCycles, ofCycles: recentWindows.length } : null;
+
+    return { total: filteredDates.length, top, recentDays, recurrence };
   })();
 
   // ── Day-detail sheet (tap on a calendar day) ────────────────────────
@@ -1362,6 +1372,17 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
                     <div style={{ fontFamily: NM.SANS, fontSize: 12, color: NM.DEEP, fontWeight: 500, lineHeight: 1.45 }}>
                       {activeFilterDef.l} — {filterPhaseSummary.total}× za posledných 12 mesiacov
                     </div>
+                    {filterPhaseSummary.recurrence && filterPhaseSummary.recurrence.inCycles >= 1 && (
+                      <div style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.DEEP, marginTop: 3, lineHeight: 1.45 }}>
+                        Objavilo sa v{' '}
+                        <strong style={{ fontWeight: 600 }}>
+                          {filterPhaseSummary.recurrence.inCycles} z posledných {filterPhaseSummary.recurrence.ofCycles} cyklov
+                        </strong>
+                        {filterPhaseSummary.recurrence.inCycles >= Math.ceil(filterPhaseSummary.recurrence.ofCycles * 0.6)
+                          ? ' — zdá sa, že sa to opakuje pravidelne.'
+                          : '.'}
+                      </div>
+                    )}
                     {filterPhaseSummary.recentDays.length > 0 && (
                       <div style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.DEEP, marginTop: 3, lineHeight: 1.45 }}>
                         Naposledy si sa tak cítila na{' '}
