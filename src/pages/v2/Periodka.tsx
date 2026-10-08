@@ -1249,8 +1249,11 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
             const cellKey = info?.key ?? null;
             // Confirmed (recorded + already happened) → vivid saturated fill;
             // projected (future / pre-record) → light pastel tint.
+            // Same hue, two depths: confirmed = full phase colour, projected
+            // = the SAME colour faded (reads as "prediction", not a new
+            // colour) — so the mental model stays 4 colours, not 8.
             const tint = cellKey
-              ? (info?.confirmed ? phaseColorByKey[cellKey] : phaseTintByKey[cellKey])
+              ? (info?.confirmed ? phaseColorByKey[cellKey] : `${phaseColorByKey[cellKey]}3D`)
               : null;
             const today = !c.mute && monthOffset === 0 && c.d === todayDate;
             const sym = !c.mute && symptomDays.includes(c.d);
