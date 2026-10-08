@@ -1281,11 +1281,14 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
             const cellKey = info?.key ?? null;
             const isProjected = !!info?.projected;
             // Real (recorded/current) cycle days → full pastel phase fill.
-            // Future prediction → NO phase fill; only the predicted PERIOD
-            // days get a light outline ("tu sa perióda očakáva"), the rest
-            // stay neutral. (Sam 2026-10-09: don't paint phases that depend
-            // on a menstruation that wasn't recorded.)
-            const tint = cellKey && !isProjected ? phaseTintByKey[cellKey] : null;
+            // Future prediction → the SAME phase colours but faded (still
+            // distinguishable, reads as "orientačná predpoveď" — useful for
+            // planning). The predicted PERIOD days additionally get a light
+            // outline so they stand out. (Sam 2026-10-09.)
+            const PROJECTED_ALPHA = 'A6'; // ~65% — tunable
+            const tint = cellKey
+              ? (isProjected ? `${phaseTintByKey[cellKey]}${PROJECTED_ALPHA}` : phaseTintByKey[cellKey])
+              : null;
             const predictedPeriod = isProjected && cellKey === 'menstrual';
             const today = !c.mute && monthOffset === 0 && c.d === todayDate;
             const sym = !c.mute && symptomDays.includes(c.d);
@@ -1306,7 +1309,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
                   position: 'relative',
                   aspectRatio: '1',
                   borderRadius: 9,
-                  background: today ? NM.DEEP : filterHit ? NM.GOLD : tint ?? (predictedPeriod ? `${PHASE.MENSTR}14` : 'transparent'),
+                  background: today ? NM.DEEP : filterHit ? NM.GOLD : tint ?? 'transparent',
                   boxShadow: filterHit && today
                     ? `0 0 0 2px ${NM.GOLD}`
                     : selected && !today && !filterHit && cellPhase ? `0 0 0 1.5px ${cellPhase}`
