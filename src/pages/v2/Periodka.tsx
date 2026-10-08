@@ -1185,13 +1185,12 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
         {monthStatus && (() => {
           const meta = {
             ongoing: { c: PHASE.MENSTR, t: 'Perióda prebieha — zaznač aj jej koniec' },
-            recorded: { c: NM.SAGE, t: `${monthLabel} — perióda zaznačená` },
+            recorded: { c: NM.SAGE, t: 'Perióda zaznačená' },
             planned: { c: NM.TERTIARY, t: 'Orientačná predpoveď' },
             gap: { c: NM.TERRA, t: 'Chýba záznam — možno si vynechala periódu' },
           }[monthStatus];
           return (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 6, margin: '-2px 0 10px', fontFamily: NM.SANS, fontSize: 10.5, color: meta.c, fontWeight: 500 }}>
-              <span style={{ width: 5, height: 5, borderRadius: 999, background: meta.c, display: 'inline-block' }} />
+            <div style={{ margin: '-2px 0 10px', fontFamily: NM.SANS, fontSize: 10.5, color: meta.c, fontWeight: 500 }}>
               {meta.t}
             </div>
           );
