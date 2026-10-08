@@ -214,12 +214,13 @@ interface PaidViewProps {
   onAddMissedPeriod: (startISO: string) => void;
   onAcknowledgeGap: (laterStartISO: string) => void;
   onCorrectHistory: (originalStartISO: string, start: Date, end: Date | null) => void;
+  onSetPastOvulation: (cycleStartISO: string, date: Date | null) => void;
 }
 
 const SK_MONTHS_FULL = ['január', 'február', 'marec', 'apríl', 'máj', 'jún', 'júl', 'august', 'september', 'október', 'november', 'december'];
 const SK_MONTHS_SHORT_LOWER = ['jan', 'feb', 'mar', 'apr', 'máj', 'jún', 'júl', 'aug', 'sep', 'okt', 'nov', 'dec'];
 
-function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMarkPeriodEnd, onCorrectPeriod, onSetOvulation, onAddMissedPeriod, onAcknowledgeGap, onCorrectHistory }: PaidViewProps) {
+function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMarkPeriodEnd, onCorrectPeriod, onSetOvulation, onAddMissedPeriod, onAcknowledgeGap, onCorrectHistory, onSetPastOvulation }: PaidViewProps) {
   // Same featured picks as the home cards (Gabi 2026-09-02): the advice
   // rows below deep-link to the identical phase-aligned exercise/recipe/
   // meditation views instead of the bare section hubs.
@@ -383,11 +384,12 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     // Recorded ovulation (current cycle only): the exact day she logged wins,
     // and the generic predicted ovulation band is reassigned to the adjacent
     // phase so the calendar doesn't show two ovulation marks.
-    if (isCurrentCycle && cycleData.ovulationOverride && cycleData.ovulationOverride >= anchor) {
-      if (targetISO === cycleData.ovulationOverride) {
+    const cycleOvul = isCurrentCycle ? cycleData.ovulationOverride : cycleData.ovulationOverrides?.[anchor];
+    if (cycleOvul && cycleOvul >= anchor) {
+      if (targetISO === cycleOvul) {
         key = 'ovulation';
       } else if (key === 'ovulation') {
-        key = targetISO < cycleData.ovulationOverride ? 'follicular' : 'luteal';
+        key = targetISO < cycleOvul ? 'follicular' : 'luteal';
       }
     }
     // "Projected" = a FUTURE prediction (the wrapped next-cycle region,
@@ -546,22 +548,39 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
   const [gapPickMode, setGapPickMode] = useState(false);
   const [gapDraft, setGapDraft] = useState('');
   const [draftOvul, setDraftOvul] = useState('');
+  // Which cycle's ovulation the editor targets: null = current cycle, else
+  // a past cycle (its start + the next start bounding it).
+  const [editOvulCycle, setEditOvulCycle] = useState<{ anchor: string; nextStart: string | null } | null>(null);
   const openOvulationEditor = () => {
-    // Always target THIS cycle's ovulation (what the override stores), so
-    // the date picker opens on the recorded day or the current prediction —
-    // never a previous cycle's date it could not save.
+    setEditOvulCycle(null);
+    // Current cycle: open on the recorded day or the current prediction.
     setDraftOvul(ovulationOverrideISO ?? format(currentCycleOvulation, 'yyyy-MM-dd'));
     setOvulEditOpen(true);
   };
-  const ovulMinISO = cycleData.lastPeriodStart ?? undefined;
-  const draftOvulValid = !!draftOvul && draftOvul <= editTodayISO && (!ovulMinISO || draftOvul >= ovulMinISO);
+  const openPastOvulationEditor = (anchor: string, nextStart: string | null) => {
+    setEditOvulCycle({ anchor, nextStart });
+    const base = new Date(anchor + 'T00:00:00');
+    base.setDate(base.getDate() + (ovulationStart - 1));
+    setDraftOvul(cycleData.ovulationOverrides?.[anchor] ?? format(base, 'yyyy-MM-dd'));
+    setOvulEditOpen(true);
+  };
+  const ovulMinISO = editOvulCycle ? editOvulCycle.anchor : (cycleData.lastPeriodStart ?? undefined);
+  const ovulMaxISO = editOvulCycle
+    ? (editOvulCycle.nextStart
+        ? format(new Date(new Date(editOvulCycle.nextStart + 'T00:00:00').getTime() - 86400000), 'yyyy-MM-dd')
+        : editTodayISO)
+    : editTodayISO;
+  const draftOvulValid = !!draftOvul && draftOvul <= ovulMaxISO && (!ovulMinISO || draftOvul >= ovulMinISO);
   const saveOvulEdit = () => {
     if (!draftOvulValid) return;
-    onSetOvulation(new Date(draftOvul + 'T00:00:00'));
+    const d = new Date(draftOvul + 'T00:00:00');
+    if (editOvulCycle) onSetPastOvulation(editOvulCycle.anchor, d);
+    else onSetOvulation(d);
     setOvulEditOpen(false);
   };
   const clearOvulOverride = () => {
-    onSetOvulation(null);
+    if (editOvulCycle) onSetPastOvulation(editOvulCycle.anchor, null);
+    else onSetOvulation(null);
     setOvulEditOpen(false);
   };
   // Just past the assumed length with no recorded end — ask instead of
@@ -827,6 +846,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
   const selHistoryEntry = selAnchor && !selIsCurrentCycle
     ? (cycleData.history ?? []).find((h) => h.startDate === selAnchor) ?? null
     : null;
+  const selNextStart = selAnchor ? (realStarts.find((s) => s > selAnchor) ?? null) : null;
   const selectedDateISO = selectedDay !== null
     ? `${yearIdx}-${String(monthIdx + 1).padStart(2, '0')}-${String(selectedDay).padStart(2, '0')}`
     : null;
@@ -879,7 +899,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
             → live period; past → the history entry). Projections aren't
             editable. Past-cycle ovulation edit is a follow-up. */}
         {selectedInfo && !selectedInfo.projected && selAnchor && (() => {
-          const isOvul = selIsCurrentCycle && selectedInfo.key === 'ovulation';
+          const isOvul = selectedInfo.key === 'ovulation';
           const col = isOvul ? PHASE.OVULAT : PHASE.MENSTR;
           const label = isOvul
             ? 'Upraviť deň ovulácie'
@@ -887,9 +907,10 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
           return (
             <button
               onClick={() => {
-                if (isOvul) openOvulationEditor();
+                if (isOvul && selIsCurrentCycle) openOvulationEditor();
+                else if (isOvul) openPastOvulationEditor(selAnchor, selNextStart);
                 else if (selIsCurrentCycle) openPeriodEditor();
-                else if (selAnchor) openHistoryPeriodEditor(selAnchor, selHistoryEntry?.endDate ?? null);
+                else openHistoryPeriodEditor(selAnchor, selHistoryEntry?.endDate ?? null);
                 setSelectedDay(null);
               }}
               style={{ all: 'unset', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 14, padding: '9px 16px', borderRadius: 999, background: '#fff', border: `1px solid ${col}`, color: col, fontFamily: NM.SANS, fontSize: 12.5, fontWeight: 500 }}
@@ -1988,12 +2009,12 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
             type="date"
             value={draftOvul}
             min={ovulMinISO}
-            max={todayISO}
+            max={ovulMaxISO}
             onChange={(e) => setDraftOvul(e.target.value)}
             style={dateInputStyle}
           />
           <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.TERTIARY, marginTop: 6 }}>
-            Ak si ovuláciu spozorovala iný deň než sme predpovedali, uprav ho tu. Platí pre aktuálny cyklus.
+            Ak si ovuláciu spozorovala iný deň než sme predpovedali, uprav ho tu.{editOvulCycle ? '' : ' Platí pre aktuálny cyklus.'}
           </div>
         </div>
         <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
@@ -2010,7 +2031,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
             Uložiť
           </button>
         </div>
-        {ovulationOverrideISO && (
+        {(editOvulCycle ? cycleData.ovulationOverrides?.[editOvulCycle.anchor] : ovulationOverrideISO) && (
           <button
             onClick={clearOvulOverride}
             style={{ all: 'unset', cursor: 'pointer', display: 'block', width: '100%', textAlign: 'center', marginTop: 14, fontFamily: NM.SANS, fontSize: 12, color: NM.TERTIARY, textDecoration: 'underline' }}
@@ -2245,7 +2266,7 @@ function FreeView({ navigate }: { navigate: (p: string) => void }) {
 
 export default function Periodka() {
   const navigate = useNavigate();
-  const { cycleData, derivedState, setLastPeriodStart, markPeriodEnded, correctPeriod, setOvulationDate, acknowledgeGap, addPeriodToHistory, correctHistoryEntry } = useCycleData();
+  const { cycleData, derivedState, setLastPeriodStart, markPeriodEnded, correctPeriod, setOvulationDate, acknowledgeGap, addPeriodToHistory, correctHistoryEntry, setPastOvulation } = useCycleData();
   const [confirmStartOpen, setConfirmStartOpen] = useState(false);
   const requireConsent = useConsentGuard();
 
@@ -2289,6 +2310,7 @@ export default function Periodka() {
           onAddMissedPeriod={(iso) => addPeriodToHistory(iso)}
           onAcknowledgeGap={acknowledgeGap}
           onCorrectHistory={correctHistoryEntry}
+          onSetPastOvulation={setPastOvulation}
         />
       ) : (
         <FreeView navigate={navigate} />

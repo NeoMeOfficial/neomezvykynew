@@ -49,6 +49,10 @@ export interface CycleData {
    *  log), keyed by the ISO start of the gap's LATER period. Suppresses the
    *  "Chýba záznam" flag for that gap. */
   acknowledgedGaps?: string[];
+  /** Recorded ovulation day for PAST cycles, keyed by that cycle's start
+   *  ISO → ovulation date ISO. (The CURRENT cycle uses ovulationOverride;
+   *  when a cycle rolls into history, its override moves here.) */
+  ovulationOverrides?: Record<string, string>;
 }
 
 export interface DerivedState {

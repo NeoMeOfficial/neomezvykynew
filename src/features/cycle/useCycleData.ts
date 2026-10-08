@@ -160,6 +160,13 @@ export function useCycleData(accessCode?: string) {
           if (localAck.length > remoteAck.length) {
             final = { ...final, acknowledgedGaps: Array.from(new Set([...remoteAck, ...localAck])) };
           }
+          // Same for per-past-cycle ovulation overrides — keep the union so
+          // an un-migrated remote (no column) doesn't drop local edits.
+          const localOv = current.ovulationOverrides ?? {};
+          const remoteOv = merged.ovulationOverrides ?? {};
+          if (Object.keys(localOv).length > Object.keys(remoteOv).length) {
+            final = { ...final, ovulationOverrides: { ...remoteOv, ...localOv } };
+          }
           try {
             localStorage.setItem(getStorageKey(), JSON.stringify(final));
           } catch (_) { /* ignore */ }
@@ -263,8 +270,13 @@ export function useCycleData(accessCode?: string) {
         currentPeriodEnd: null,
         // A recorded ovulation belongs to the cycle it was logged in; a new
         // cycle starts fresh (the previous override would otherwise linger
-        // and mis-mark the new cycle's ovulation).
+        // and mis-mark the new cycle's ovulation). On a new cycle, the
+        // previous cycle's ovulation moves into the per-cycle map so it's
+        // kept with that (now historical) cycle.
         ovulationOverride: isNewCycle ? null : current.ovulationOverride,
+        ovulationOverrides: (isNewCycle && prevStart && current.ovulationOverride)
+          ? { ...(current.ovulationOverrides ?? {}), [prevStart]: current.ovulationOverride }
+          : current.ovulationOverrides,
         history,
         cycleLength,
       };
@@ -280,6 +292,18 @@ export function useCycleData(accessCode?: string) {
   const setOvulationDate = useCallback((date: Date | null) => {
     updateCycleData({ ovulationOverride: date ? format(date, 'yyyy-MM-dd') : null });
   }, [updateCycleData]);
+
+  // Record/clear the ovulation day for a PAST cycle (keyed by its start).
+  const setPastOvulation = useCallback((cycleStartISO: string, date: Date | null) => {
+    setCycleData(current => {
+      const map = { ...(current.ovulationOverrides ?? {}) };
+      if (date) map[cycleStartISO] = format(date, 'yyyy-MM-dd');
+      else delete map[cycleStartISO];
+      const updated = { ...current, ovulationOverrides: map };
+      saveCycleData(updated);
+      return updated;
+    });
+  }, [saveCycleData]);
 
   // Mark a gap (keyed by the ISO start of its LATER period) as a confirmed
   // long cycle, so "Chýba záznam" stops flagging it.
@@ -565,6 +589,7 @@ export function useCycleData(accessCode?: string) {
     correctPeriodEnd,
     correctPeriod,
     setOvulationDate,
+    setPastOvulation,
     acknowledgeGap,
     correctHistoryEntry,
     addPeriodToHistory,
