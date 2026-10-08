@@ -1249,12 +1249,10 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
             const cellKey = info?.key ?? null;
             // Confirmed (recorded + already happened) → vivid saturated fill;
             // projected (future / pre-record) → light pastel tint.
-            // Same hue, two depths: confirmed = full phase colour, projected
-            // = the SAME colour faded (reads as "prediction", not a new
-            // colour) — so the mental model stays 4 colours, not 8.
-            const tint = cellKey
-              ? (info?.confirmed ? phaseColorByKey[cellKey] : `${phaseColorByKey[cellKey]}3D`)
-              : null;
+            // Original pastel phase tints for every day — the confirmed/
+            // projected intensity experiment was dropped (Sam 2026-10-08:
+            // phases stay colourful in the calendar, no second dimension).
+            const tint = cellKey ? phaseTintByKey[cellKey] : null;
             const today = !c.mute && monthOffset === 0 && c.d === todayDate;
             const sym = !c.mute && symptomDays.includes(c.d);
             const selected = !c.mute && selectedDay === c.d;
