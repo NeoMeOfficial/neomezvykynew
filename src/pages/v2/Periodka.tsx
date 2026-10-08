@@ -542,6 +542,34 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
   const firstOfMonth = new Date(yearIdx, monthIdx, 1);
   const lastOfMonth = new Date(yearIdx, monthIdx + 1, 0);
   const lastOfPrevMonth = new Date(yearIdx, monthIdx, 0);
+
+  // Fáza 1 — per-month status for the viewed month:
+  //  'recorded' = a logged period overlaps this month,
+  //  'planned'  = future month (orientational projection),
+  //  'gap'      = a gap >1.5× the cycle between two logged starts covers
+  //               this month → a period was likely NOT logged (vs a merely
+  //               long cycle, which stays under the threshold → no flag).
+  const monthStatus: 'recorded' | 'planned' | 'gap' | null = (() => {
+    const mStart = firstOfMonth.getTime();
+    const mEnd = lastOfMonth.getTime();
+    const hasRecorded = realStarts.some((s) => {
+      const start = new Date(s + 'T00:00:00').getTime();
+      const entry = (cycleData.history ?? []).find((h) => h.startDate === s);
+      const endISO = s === cycleData.lastPeriodStart
+        ? (cycleData.currentPeriodEnd && cycleData.currentPeriodEnd >= s ? cycleData.currentPeriodEnd : null)
+        : (entry?.endDate && entry.endDate >= s ? entry.endDate : null);
+      const end = endISO ? new Date(endISO + 'T00:00:00').getTime() : start + (periodLength - 1) * 86400000;
+      return start <= mEnd && end >= mStart;
+    });
+    if (hasRecorded) return 'recorded';
+    if (monthOffset > 0) return 'planned';
+    for (let i = 1; i < realStarts.length; i++) {
+      const a = new Date(realStarts[i - 1] + 'T00:00:00').getTime();
+      const b = new Date(realStarts[i] + 'T00:00:00').getTime();
+      if (Math.round((b - a) / 86400000) > Math.round(totalDays * 1.5) && a < mEnd && b > mStart) return 'gap';
+    }
+    return null;
+  })();
   const startDow = (firstOfMonth.getDay() + 6) % 7; // Mon=0
   const weeks: Cell[][] = [];
   let row: Cell[] = [];
@@ -1149,12 +1177,19 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
           </div>
         </div>
 
-        {monthOffset > 0 && (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, margin: '-2px 0 10px', fontFamily: NM.SANS, fontSize: 10.5, color: NM.TERTIARY, fontWeight: 400 }}>
-            <span style={{ width: 5, height: 5, borderRadius: 999, background: NM.TERTIARY, display: 'inline-block' }} />
-            Orientačná predpoveď — spresní sa po ďalšom cykle
-          </div>
-        )}
+        {monthStatus && (() => {
+          const meta = {
+            recorded: { c: NM.SAGE, t: `${monthLabel} — perióda zaznačená` },
+            planned: { c: NM.TERTIARY, t: 'Orientačná predpoveď — spresní sa po ďalšom cykle' },
+            gap: { c: NM.TERRA, t: 'Chýba záznam — možno si vynechala periódu' },
+          }[monthStatus];
+          return (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, margin: '-2px 0 10px', fontFamily: NM.SANS, fontSize: 10.5, color: meta.c, fontWeight: 500 }}>
+              <span style={{ width: 5, height: 5, borderRadius: 999, background: meta.c, display: 'inline-block' }} />
+              {meta.t}
+            </div>
+          );
+        })()}
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', marginBottom: 5 }}>
           {['Po', 'Ut', 'St', 'Št', 'Pi', 'So', 'Ne'].map((d) => (
