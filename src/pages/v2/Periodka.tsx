@@ -549,9 +549,14 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
   //  'gap'      = a gap >1.5× the cycle between two logged starts covers
   //               this month → a period was likely NOT logged (vs a merely
   //               long cycle, which stays under the threshold → no flag).
-  const monthStatus: 'recorded' | 'planned' | 'gap' | null = (() => {
+  const monthStatus: 'ongoing' | 'recorded' | 'planned' | 'gap' | null = (() => {
     const mStart = firstOfMonth.getTime();
     const mEnd = lastOfMonth.getTime();
+    // Current period with only a start logged (no end yet) and still
+    // bleeding → the record is incomplete → "prebieha", not "zaznačená".
+    // Pressing "Skončila dnes" sets currentPeriodEnd → flips to 'recorded'.
+    const lps = cycleData.lastPeriodStart ? new Date(cycleData.lastPeriodStart + 'T00:00:00').getTime() : null;
+    if (lps !== null && !periodEnded && bleedingOngoing && lps >= mStart && lps <= mEnd) return 'ongoing';
     const hasRecorded = realStarts.some((s) => {
       const start = new Date(s + 'T00:00:00').getTime();
       const entry = (cycleData.history ?? []).find((h) => h.startDate === s);
@@ -1179,6 +1184,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
 
         {monthStatus && (() => {
           const meta = {
+            ongoing: { c: PHASE.MENSTR, t: 'Perióda prebieha — zaznač aj jej koniec' },
             recorded: { c: NM.SAGE, t: `${monthLabel} — perióda zaznačená` },
             planned: { c: NM.TERTIARY, t: 'Orientačná predpoveď — spresní sa po ďalšom cykle' },
             gap: { c: NM.TERRA, t: 'Chýba záznam — možno si vynechala periódu' },
