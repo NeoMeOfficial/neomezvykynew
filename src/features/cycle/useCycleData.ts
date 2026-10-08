@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import { CycleData, CustomSettings, PeriodIntensity, DailyPeriodData, PeriodLog } from './types';
-import { useSubscription } from '@/contexts/SubscriptionContext';
 
 // Calculate weighted average cycle length from history
 // More recent cycles have higher weight for better predictions
@@ -91,7 +90,6 @@ export function useCycleData(accessCode?: string) {
   // Persistence is the Plus perk (BC-4 "Náhľad bez ukladania"): free
   // users get the full live UI, but entries stay in-memory only and
   // vanish on reload. Plus members persist to localStorage + cycle_data.
-  const { isPremium } = useSubscription();
   const [cycleData, setCycleData] = useState<CycleData>(defaultCycleData);
   const [loading, setLoading] = useState(false); // Changed to false for instant loading
   const saveTimeoutRef = useRef<NodeJS.Timeout>();
@@ -193,26 +191,15 @@ export function useCycleData(accessCode?: string) {
 
   const saveCycleData = useCallback((data: CycleData) => {
     sessionCycleData = data;
-
-    if (!isPremium) {
-      // Free tier: preview only, nothing persists. sessionCycleData keeps
-      // the preview alive across route changes; the (debounced) event just
-      // syncs instances mounted right now.
-      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
-      saveTimeoutRef.current = setTimeout(() => {
-        window.dispatchEvent(new CustomEvent('cycleDataChanged', {
-          detail: { accessCode, data }
-        }));
-      }, 0);
-      return;
-    }
-
+    // No free tier (Sam 2026-10-08: premium-only) — cycle data always
+    // persists. The old "!isPremium → preview only, never persists" branch
+    // is gone; it stranded users on a stale saved cycle they couldn't edit.
     pendingSaveRef.current = data;
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
     }
     saveTimeoutRef.current = setTimeout(flushSave, 500);
-  }, [accessCode, isPremium, flushSave]);
+  }, [flushSave]);
 
   // Update cycle data and save
   const updateCycleData = useCallback((updates: Partial<CycleData>) => {
