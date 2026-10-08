@@ -211,12 +211,14 @@ interface PaidViewProps {
   onMarkPeriodEnd: (date: Date) => void;
   onCorrectPeriod: (start: Date, end: Date | null) => void;
   onSetOvulation: (date: Date | null) => void;
+  onAddMissedPeriod: (startISO: string) => void;
+  onAcknowledgeGap: (laterStartISO: string) => void;
 }
 
 const SK_MONTHS_FULL = ['január', 'február', 'marec', 'apríl', 'máj', 'jún', 'júl', 'august', 'september', 'október', 'november', 'december'];
 const SK_MONTHS_SHORT_LOWER = ['jan', 'feb', 'mar', 'apr', 'máj', 'jún', 'júl', 'aug', 'sep', 'okt', 'nov', 'dec'];
 
-function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMarkPeriodEnd, onCorrectPeriod, onSetOvulation }: PaidViewProps) {
+function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMarkPeriodEnd, onCorrectPeriod, onSetOvulation, onAddMissedPeriod, onAcknowledgeGap }: PaidViewProps) {
   // Same featured picks as the home cards (Gabi 2026-09-02): the advice
   // rows below deep-link to the identical phase-aligned exercise/recipe/
   // meditation views instead of the bare section hubs.
@@ -502,6 +504,10 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
   // her correct the ovulation if she noticed it fell on a different day
   // than predicted (e.g. from tests or symptoms).
   const [ovulEditOpen, setOvulEditOpen] = useState(false);
+  // Fáza 2 — "Chýba záznam" resolve sheet (forgot a period / long cycle).
+  const [gapSheetOpen, setGapSheetOpen] = useState(false);
+  const [gapPickMode, setGapPickMode] = useState(false);
+  const [gapDraft, setGapDraft] = useState('');
   const [draftOvul, setDraftOvul] = useState('');
   const openOvulationEditor = () => {
     // Always target THIS cycle's ovulation (what the override stores), so
@@ -558,12 +564,27 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
   //  'gap'      = a gap >1.5× the cycle between two logged starts covers
   //               this month → a period was likely NOT logged (vs a merely
   //               long cycle, which stays under the threshold → no flag).
+  const mStart = firstOfMonth.getTime();
+  const mEnd = lastOfMonth.getTime();
+  // Unacknowledged gap (>1.5× cycle between two logged starts) that covers
+  // the viewed month — carries the prev/later starts + an estimated missed
+  // start (prev + cycle length) for the resolve sheet.
+  const ackGaps = new Set(cycleData.acknowledgedGaps ?? []);
+  const monthGapInfo = (() => {
+    for (let i = 1; i < realStarts.length; i++) {
+      const prevISO = realStarts[i - 1];
+      const laterISO = realStarts[i];
+      if (ackGaps.has(laterISO)) continue;
+      const a = new Date(prevISO + 'T00:00:00').getTime();
+      const b = new Date(laterISO + 'T00:00:00').getTime();
+      if (Math.round((b - a) / 86400000) > Math.round(totalDays * 1.5) && a < mEnd && b > mStart) {
+        const est = new Date(a + totalDays * 86400000);
+        return { prevISO, laterISO, estimatedISO: format(est, 'yyyy-MM-dd') };
+      }
+    }
+    return null;
+  })();
   const monthStatus: 'ongoing' | 'recorded' | 'planned' | 'gap' | 'none' | null = (() => {
-    const mStart = firstOfMonth.getTime();
-    const mEnd = lastOfMonth.getTime();
-    // Current period with only a start logged (no end yet) and still
-    // bleeding → the record is incomplete → "prebieha", not "zaznačená".
-    // Pressing "Skončila dnes" sets currentPeriodEnd → flips to 'recorded'.
     const lps = cycleData.lastPeriodStart ? new Date(cycleData.lastPeriodStart + 'T00:00:00').getTime() : null;
     if (lps !== null && !periodEnded && bleedingOngoing && lps >= mStart && lps <= mEnd) return 'ongoing';
     const hasRecorded = realStarts.some((s) => {
@@ -577,11 +598,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     });
     if (hasRecorded) return 'recorded';
     if (monthOffset > 0) return 'planned';
-    for (let i = 1; i < realStarts.length; i++) {
-      const a = new Date(realStarts[i - 1] + 'T00:00:00').getTime();
-      const b = new Date(realStarts[i] + 'T00:00:00').getTime();
-      if (Math.round((b - a) / 86400000) > Math.round(totalDays * 1.5) && a < mEnd && b > mStart) return 'gap';
-    }
+    if (monthGapInfo) return 'gap';
     // Past/current month from account creation onward, nothing logged yet.
     return 'none';
   })();
@@ -1200,6 +1217,17 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
             gap: { c: NM.TERRA, t: 'Chýba záznam — možno si vynechala periódu' },
             none: { c: NM.TERTIARY, t: 'Žiadne údaje' },
           }[monthStatus];
+          if (monthStatus === 'gap') {
+            return (
+              <button
+                onClick={() => { setGapDraft(monthGapInfo?.estimatedISO ?? ''); setGapPickMode(false); setGapSheetOpen(true); }}
+                style={{ all: 'unset', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4, margin: '-2px 0 10px', fontFamily: NM.SANS, fontSize: 10.5, color: meta.c, fontWeight: 600 }}
+              >
+                {meta.t} — doplniť
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={meta.c} strokeWidth="2.4" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
+              </button>
+            );
+          }
           return (
             <div style={{ margin: '-2px 0 10px', fontFamily: NM.SANS, fontSize: 10.5, color: meta.c, fontWeight: 500 }}>
               {meta.t}
@@ -1917,6 +1945,72 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     document.body,
   ) : null;
 
+  // Bottom sheet for resolving a "Chýba záznam" gap (Fáza 2).
+  const gapSheet = gapSheetOpen ? createPortal(
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(42,26,20,0.55)', backdropFilter: 'blur(6px)', zIndex: 9999, display: 'flex', alignItems: 'flex-end' }}>
+      <div onClick={() => setGapSheetOpen(false)} style={{ position: 'absolute', inset: 0 }} />
+      <div style={{ position: 'relative', width: '100%', background: NM.BG, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: '22px 22px calc(env(safe-area-inset-bottom) + 22px)', boxShadow: '0 -10px 32px rgba(61,41,33,0.18)' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 14 }}>
+          <div style={{ width: 38, height: 4, borderRadius: 999, background: NM.HAIR_2 }} />
+        </div>
+        <Eye color={NM.TERRA}>Chýbajúci záznam</Eye>
+        {!gapPickMode ? (
+          <>
+            <div style={{ fontFamily: NM.SANS, fontSize: 13, color: NM.DEEP, lineHeight: 1.5, marginTop: 12, marginBottom: 16 }}>
+              Medzi dvoma zaznačenými periódami je väčšia medzera. Mala si periódu, ktorú si zabudla zaznačiť, alebo bol cyklus naozaj dlhší?
+            </div>
+            <button
+              onClick={() => setGapPickMode(true)}
+              style={{ all: 'unset', cursor: 'pointer', display: 'block', width: '100%', boxSizing: 'border-box', textAlign: 'center', padding: '14px 0', borderRadius: 999, background: PHASE.MENSTR, color: '#fff', fontFamily: NM.SANS, fontSize: 13, fontWeight: 500, marginBottom: 10 }}
+            >
+              Periódu som mala, zabudla som zaznačiť
+            </button>
+            <button
+              onClick={() => { if (monthGapInfo) onAcknowledgeGap(monthGapInfo.laterISO); setGapSheetOpen(false); }}
+              style={{ all: 'unset', cursor: 'pointer', display: 'block', width: '100%', boxSizing: 'border-box', textAlign: 'center', padding: '14px 0', borderRadius: 999, border: `1px solid ${NM.HAIR_2}`, fontFamily: NM.SANS, fontSize: 13, color: NM.DEEP, fontWeight: 500 }}
+            >
+              Nie, cyklus bol taký dlhý
+            </button>
+          </>
+        ) : (
+          <>
+            <div style={{ fontFamily: NM.SANS, fontSize: 12, color: NM.MUTED, marginTop: 14, marginBottom: 6 }}>Kedy približne začala tá perióda?</div>
+            <input
+              type="date"
+              value={gapDraft}
+              min={monthGapInfo?.prevISO}
+              max={monthGapInfo?.laterISO}
+              onChange={(e) => setGapDraft(e.target.value)}
+              style={dateInputStyle}
+            />
+            <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.TERTIARY, marginTop: 6 }}>
+              Navrhli sme dátum podľa tvojho cyklu — uprav ho, ak vieš presnejšie.
+            </div>
+            <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
+              <button
+                onClick={() => setGapPickMode(false)}
+                style={{ all: 'unset', cursor: 'pointer', flex: 1, textAlign: 'center', padding: '14px 0', borderRadius: 999, border: `1px solid ${NM.HAIR_2}`, fontFamily: NM.SANS, fontSize: 13, color: NM.DEEP, fontWeight: 500 }}
+              >
+                Späť
+              </button>
+              <button
+                onClick={() => {
+                  const valid = !!gapDraft && (!monthGapInfo || (gapDraft > monthGapInfo.prevISO && gapDraft < monthGapInfo.laterISO));
+                  if (valid) onAddMissedPeriod(gapDraft);
+                  setGapSheetOpen(false);
+                }}
+                style={{ all: 'unset', cursor: 'pointer', flex: 1, textAlign: 'center', padding: '14px 0', borderRadius: 999, background: PHASE.MENSTR, color: '#fff', fontFamily: NM.SANS, fontSize: 13, fontWeight: 500 }}
+              >
+                Doplniť periódu
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>,
+    document.body,
+  ) : null;
+
   const irregularBlock = prediction.irregular ? (() => {
     const len = prediction.irregular.length;
     const lead =
@@ -1954,6 +2048,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
       {dayDetailSheet}
       {periodEditSheet}
       {ovulEditSheet}
+      {gapSheet}
     </>
   );
 }
@@ -2071,7 +2166,7 @@ function FreeView({ navigate }: { navigate: (p: string) => void }) {
 
 export default function Periodka() {
   const navigate = useNavigate();
-  const { cycleData, derivedState, setLastPeriodStart, markPeriodEnded, correctPeriod, setOvulationDate } = useCycleData();
+  const { cycleData, derivedState, setLastPeriodStart, markPeriodEnded, correctPeriod, setOvulationDate, acknowledgeGap, addPeriodToHistory } = useCycleData();
   const [confirmStartOpen, setConfirmStartOpen] = useState(false);
   const requireConsent = useConsentGuard();
 
@@ -2112,6 +2207,8 @@ export default function Periodka() {
           onMarkPeriodEnd={handleMarkPeriodEnded}
           onCorrectPeriod={correctPeriod}
           onSetOvulation={setOvulationDate}
+          onAddMissedPeriod={(iso) => addPeriodToHistory(iso)}
+          onAcknowledgeGap={acknowledgeGap}
         />
       ) : (
         <FreeView navigate={navigate} />

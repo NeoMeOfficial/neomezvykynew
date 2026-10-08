@@ -153,6 +153,13 @@ export function useCycleData(accessCode?: string) {
           if (sameCycle && !merged.ovulationOverride && current.ovulationOverride) {
             final = { ...final, ovulationOverride: current.ovulationOverride };
           }
+          // Acknowledged gaps aren't cycle-scoped — keep the union so an
+          // un-migrated remote (no column) doesn't drop local acknowledgements.
+          const localAck = current.acknowledgedGaps ?? [];
+          const remoteAck = merged.acknowledgedGaps ?? [];
+          if (localAck.length > remoteAck.length) {
+            final = { ...final, acknowledgedGaps: Array.from(new Set([...remoteAck, ...localAck])) };
+          }
           try {
             localStorage.setItem(getStorageKey(), JSON.stringify(final));
           } catch (_) { /* ignore */ }
@@ -273,6 +280,18 @@ export function useCycleData(accessCode?: string) {
   const setOvulationDate = useCallback((date: Date | null) => {
     updateCycleData({ ovulationOverride: date ? format(date, 'yyyy-MM-dd') : null });
   }, [updateCycleData]);
+
+  // Mark a gap (keyed by the ISO start of its LATER period) as a confirmed
+  // long cycle, so "Chýba záznam" stops flagging it.
+  const acknowledgeGap = useCallback((laterStartISO: string) => {
+    setCycleData(current => {
+      const set = new Set(current.acknowledgedGaps ?? []);
+      set.add(laterStartISO);
+      const updated = { ...current, acknowledgedGaps: Array.from(set) };
+      saveCycleData(updated);
+      return updated;
+    });
+  }, [saveCycleData]);
 
   // Mark the current period as ended ("Skončila dnes"). Records the actual
   // bleed length and — after 3 recorded periods — auto-calibrates
@@ -523,6 +542,7 @@ export function useCycleData(accessCode?: string) {
     correctPeriodEnd,
     correctPeriod,
     setOvulationDate,
+    acknowledgeGap,
     addPeriodToHistory,
     updateCustomSettings,
     updateCycleData,

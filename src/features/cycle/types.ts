@@ -45,6 +45,10 @@ export interface CycleData {
    *  predicted. Overrides the computed ovulation in the "Tvoj cyklus"
    *  card + calendar. Reset to null when a new period starts. */
   ovulationOverride?: string | null;
+  /** Gaps the user confirmed were a genuinely long cycle (not a missed
+   *  log), keyed by the ISO start of the gap's LATER period. Suppresses the
+   *  "Chýba záznam" flag for that gap. */
+  acknowledgedGaps?: string[];
 }
 
 export interface DerivedState {

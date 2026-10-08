@@ -27,6 +27,8 @@ interface CycleDataRow {
   bleed_lengths?: number[] | null;
   // Added by migration 20261007120000 — absent (undefined) on older schemas.
   ovulation_override?: string | null;
+  // Added by migration 20261008120000 — absent (undefined) on older schemas.
+  acknowledged_gaps?: string[] | null;
 }
 
 const defaultCustomSettings: CustomSettings = {
@@ -47,6 +49,7 @@ function rowToCycleData(row: CycleDataRow): CycleData {
     currentPeriodEnd: row.current_period_end ?? null,
     bleedLengths: row.bleed_lengths ?? undefined,
     ovulationOverride: row.ovulation_override ?? null,
+    acknowledgedGaps: row.acknowledged_gaps ?? undefined,
   };
 }
 
@@ -117,6 +120,7 @@ export async function saveCycleData(data: CycleData): Promise<void> {
         current_period_end: data.currentPeriodEnd ?? null,
         bleed_lengths: data.bleedLengths ?? null,
         ovulation_override: data.ovulationOverride ?? null,
+        acknowledged_gaps: data.acknowledgedGaps ?? null,
       },
       { onConflict: 'user_id' },
     );
