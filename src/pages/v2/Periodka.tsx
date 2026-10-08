@@ -300,13 +300,17 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
   const daysBetweenISO = (a: string, b: string) =>
     Math.round((new Date(b + 'T00:00:00').getTime() - new Date(a + 'T00:00:00').getTime()) / 86400000);
 
-  const cycleInfoForCalendarDay = (d: number): { cycleDay: number; key: string | null } | null => {
+  const cycleInfoForCalendarDay = (d: number): { cycleDay: number; key: string | null; confirmed: boolean } | null => {
     if (!cycleData.lastPeriodStart) return null;
     const target = new Date(yearIdx, monthIdx, d);
     const y = target.getFullYear();
     const m = String(target.getMonth() + 1).padStart(2, '0');
     const day = String(target.getDate()).padStart(2, '0');
     const targetISO = `${y}-${m}-${day}`;
+    // "Confirmed" = anchored to a real recorded start AND already happened
+    // (<= today). Confirmed days render vivid; projected days (future, or
+    // backward projection before any record) render pastel.
+    const todayISOc = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
     // Anchor = the latest real start on or before this date.
     let anchorIdx = -1;
@@ -319,7 +323,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
       const start = new Date(cycleData.lastPeriodStart + 'T00:00:00');
       const daysSince = Math.floor((target.getTime() - start.getTime()) / 86400000);
       const cd = ((daysSince % totalDays) + totalDays) % totalDays + 1;
-      return { cycleDay: cd, key: phases.find((p) => cd >= p.start && cd <= p.end)?.key ?? null };
+      return { cycleDay: cd, key: phases.find((p) => cd >= p.start && cd <= p.end)?.key ?? null, confirmed: false };
     }
 
     const anchor = realStarts[anchorIdx];
@@ -368,7 +372,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
         key = targetISO < cycleData.ovulationOverride ? 'follicular' : 'luteal';
       }
     }
-    return { cycleDay: rawDay, key };
+    return { cycleDay: rawDay, key, confirmed: targetISO <= todayISOc };
   };
   const phaseKeyForCalendarDay = (d: number): string | null => cycleInfoForCalendarDay(d)?.key ?? null;
   const phaseOf = (d: number) => {
@@ -1209,31 +1213,18 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
           </div>
         </div>
 
-        {monthStatus && (() => {
-          const meta = {
-            ongoing: { c: PHASE.MENSTR, t: 'Perióda prebieha — zaznač aj jej koniec' },
-            recorded: { c: NM.SAGE, t: 'Perióda zaznačená' },
-            planned: { c: NM.TERTIARY, t: 'Orientačná predpoveď' },
-            gap: { c: NM.TERRA, t: 'Chýba záznam — možno si vynechala periódu' },
-            none: { c: NM.TERTIARY, t: 'Žiadne údaje' },
-          }[monthStatus];
-          if (monthStatus === 'gap') {
-            return (
-              <button
-                onClick={() => { setGapDraft(monthGapInfo?.estimatedISO ?? ''); setGapPickMode(false); setGapSheetOpen(true); }}
-                style={{ all: 'unset', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4, margin: '-2px 0 10px', fontFamily: NM.SANS, fontSize: 10.5, color: meta.c, fontWeight: 600 }}
-              >
-                {meta.t} — doplniť
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={meta.c} strokeWidth="2.4" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
-              </button>
-            );
-          }
-          return (
-            <div style={{ margin: '-2px 0 10px', fontFamily: NM.SANS, fontSize: 10.5, color: meta.c, fontWeight: 500 }}>
-              {meta.t}
-            </div>
-          );
-        })()}
+        {/* Month status is now conveyed by the day colours (vivid = confirmed,
+            pastel = projected). The ONLY status that still needs words is a
+            gap — a small tappable prompt that opens the resolve sheet. */}
+        {monthStatus === 'gap' && monthGapInfo && (
+          <button
+            onClick={() => { setGapDraft(monthGapInfo.estimatedISO); setGapPickMode(false); setGapSheetOpen(true); }}
+            style={{ all: 'unset', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4, margin: '-2px 0 10px', fontFamily: NM.SANS, fontSize: 10.5, color: NM.TERRA, fontWeight: 600 }}
+          >
+            Chýba záznam — možno si vynechala periódu — doplniť
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={NM.TERRA} strokeWidth="2.4" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
+          </button>
+        )}
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', marginBottom: 5 }}>
           {['Po', 'Ut', 'St', 'Št', 'Pi', 'So', 'Ne'].map((d) => (
@@ -1254,11 +1245,17 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
           }}
         >
           {weeks.flat().map((c, i) => {
-            const tint = !c.mute ? phaseTintOf(c.d) : null;
+            const info = !c.mute ? cycleInfoForCalendarDay(c.d) : null;
+            const cellKey = info?.key ?? null;
+            // Confirmed (recorded + already happened) → vivid saturated fill;
+            // projected (future / pre-record) → light pastel tint.
+            const tint = cellKey
+              ? (info?.confirmed ? `${phaseColorByKey[cellKey]}4D` : phaseTintByKey[cellKey])
+              : null;
             const today = !c.mute && monthOffset === 0 && c.d === todayDate;
             const sym = !c.mute && symptomDays.includes(c.d);
             const selected = !c.mute && selectedDay === c.d;
-            const cellPhase = !c.mute ? phaseOf(c.d) : null;
+            const cellPhase = cellKey ? phaseColorByKey[cellKey] : null;
             const filterHit = !c.mute && symptomFilter !== null && filteredMonthDays.includes(c.d);
             return (
               <button
