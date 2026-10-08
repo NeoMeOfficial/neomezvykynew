@@ -355,10 +355,14 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     // the calendar agrees with the header/ring (day 39 = luteal), instead of
     // wrapping today into a phantom next cycle. Only days AFTER today project
     // forward (orientational future).
+    // Beyond the cycle length: if the user is OVERDUE (no new period logged
+    // yet), everything stays luteal ("predĺžený cyklus") — we can't project a
+    // next cycle that assumes a menstruation that hasn't happened. Only when
+    // NOT overdue do future days wrap forward to project the next cycle.
     const phaseDay = isCurrentCycle
       ? (rawDay <= thisLen
           ? rawDay
-          : (targetISO <= todayISOc ? thisLen : ((rawDay - 1) % thisLen + thisLen) % thisLen + 1))
+          : (currentDay > thisLen ? thisLen : ((rawDay - 1) % thisLen + thisLen) % thisLen + 1))
       : rawDay;
     const ranges = getPhaseRanges(thisLen, cycleData.periodLength ?? 5);
     let key = ranges.find((r) => phaseDay >= r.start && phaseDay <= r.end)?.key ?? null;
@@ -1285,7 +1289,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
             // distinguishable, reads as "orientačná predpoveď" — useful for
             // planning). The predicted PERIOD days additionally get a light
             // outline so they stand out. (Sam 2026-10-09.)
-            const PROJECTED_ALPHA = 'A6'; // ~65% — tunable
+            const PROJECTED_ALPHA = '59'; // ~35% — tunable
             const tint = cellKey
               ? (isProjected ? `${phaseTintByKey[cellKey]}${PROJECTED_ALPHA}` : phaseTintByKey[cellKey])
               : null;
