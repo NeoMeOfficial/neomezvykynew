@@ -827,6 +827,26 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
           <Ser size={22} style={{ marginTop: 10, lineHeight: 1.2 }}>Mimo zaznamenaného cyklu</Ser>
         )}
 
+        {/* Contextual edit from the calendar day: period day → fix the
+            period's dates; ovulation day → fix the ovulation day (which
+            then re-shifts follicular/luteal around it). Only for the
+            current cycle — editing a past cycle's dates is a follow-up. */}
+        {selectedInfo && !!cycleData.lastPeriodStart && !!selectedDateISO
+          && selectedDateISO >= cycleData.lastPeriodStart
+          && (selectedInfo.key === 'menstrual' || selectedInfo.key === 'ovulation') && (
+          <button
+            onClick={() => {
+              if (selectedInfo.key === 'ovulation') openOvulationEditor();
+              else openPeriodEditor();
+              setSelectedDay(null);
+            }}
+            style={{ all: 'unset', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 14, padding: '9px 16px', borderRadius: 999, background: '#fff', border: `1px solid ${selectedInfo.key === 'ovulation' ? PHASE.OVULAT : PHASE.MENSTR}`, color: selectedInfo.key === 'ovulation' ? PHASE.OVULAT : PHASE.MENSTR, fontFamily: NM.SANS, fontSize: 12.5, fontWeight: 500 }}
+          >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.828 2.828 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z" /></svg>
+            {selectedInfo.key === 'ovulation' ? 'Upraviť deň ovulácie' : 'Upraviť dátumy periódy'}
+          </button>
+        )}
+
         {selectedIsPast && selectedDateISO ? (
           // Past days are editable — retroactively add or fix symptoms.
           <>
