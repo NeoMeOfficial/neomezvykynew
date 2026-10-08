@@ -402,6 +402,22 @@ export default function PeriodkaSettings() {
   // today) rather than "Zmeniť" (→ default the recorded start date).
   const [startFromToday, setStartFromToday] = useState(false);
   const [periodHistory, setPeriodHistory] = useState<PeriodHistoryEntry[]>([]);
+  const [resetArmed, setResetArmed] = useState(false);
+  const doReset = () => {
+    updateCycleData({
+      lastPeriodStart: null,
+      history: [],
+      currentPeriodEnd: null,
+      bleedLengths: [],
+      ovulationOverride: null,
+      dailyPeriodData: [],
+    });
+    savePeriodHistory([]);
+    setPeriodHistory([]);
+    setResetArmed(false);
+    toast.success('Údaje cyklu vymazané');
+    navigate('/kniznica/periodka');
+  };
   const today = useMemo(() => new Date(), []);
 
   useEffect(() => {
@@ -608,6 +624,39 @@ export default function PeriodkaSettings() {
           </button>
         </div>
       )}
+
+      {/* Reset — clears all cycle dates/history so the user can start clean
+          (and removes any phantom entries from a logging gap). */}
+      <div style={{ padding: '26px 20px 10px' }}>
+        {!resetArmed ? (
+          <button
+            onClick={() => setResetArmed(true)}
+            style={{ all: 'unset', cursor: 'pointer', display: 'block', width: '100%', textAlign: 'center', fontFamily: T.SANS, fontSize: 12.5, color: T.FG_MUTED, textDecoration: 'underline', padding: '8px 0' }}
+          >
+            Resetovať údaje cyklu
+          </button>
+        ) : (
+          <div style={{ background: '#fff', border: '1px solid rgba(192,84,74,0.3)', borderRadius: 16, padding: '16px 18px' }}>
+            <div style={{ fontFamily: T.SANS, fontSize: 13, color: T.INK, lineHeight: 1.5, marginBottom: 12 }}>
+              Vymazať <strong>všetky</strong> dátumy, históriu cyklov, ovuláciu a dĺžku krvácania? Táto akcia sa nedá vrátiť.
+            </div>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button
+                onClick={() => setResetArmed(false)}
+                style={{ all: 'unset', cursor: 'pointer', flex: 1, textAlign: 'center', padding: '12px 0', borderRadius: 999, border: `1px solid ${T.HAIR}`, fontFamily: T.SANS, fontSize: 13, color: T.INK, fontWeight: 500 }}
+              >
+                Zrušiť
+              </button>
+              <button
+                onClick={doReset}
+                style={{ all: 'unset', cursor: 'pointer', flex: 1, textAlign: 'center', padding: '12px 0', borderRadius: 999, background: '#C0544A', color: '#fff', fontFamily: T.SANS, fontSize: 13, fontWeight: 500 }}
+              >
+                Áno, vymazať
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
 
       <PlusUnlockBanner label="Náhľad bez ukladania — nastavenia cyklu sa uložia s NeoMe Plus" />
 
