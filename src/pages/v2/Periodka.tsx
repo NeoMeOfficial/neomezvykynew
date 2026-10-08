@@ -1250,7 +1250,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
             // Confirmed (recorded + already happened) → vivid saturated fill;
             // projected (future / pre-record) → light pastel tint.
             const tint = cellKey
-              ? (info?.confirmed ? `${phaseColorByKey[cellKey]}4D` : phaseTintByKey[cellKey])
+              ? (info?.confirmed ? phaseColorByKey[cellKey] : phaseTintByKey[cellKey])
               : null;
             const today = !c.mute && monthOffset === 0 && c.d === todayDate;
             const sym = !c.mute && symptomDays.includes(c.d);
