@@ -378,7 +378,7 @@ function HistoryEmpty() {
 export default function PeriodkaSettings() {
   const navigate = useNavigate();
   const requireConsent = useConsentGuard();
-  const { cycleData, setLastPeriodStart, setCycleLength, setPeriodLength, updateCycleData, correctPeriodEnd } = useCycleData();
+  const { cycleData, setLastPeriodStart, setCycleLength, setPeriodLength, updateCycleData, correctPeriod, correctPeriodEnd } = useCycleData();
   const { lastPeriodStart, cycleLength, periodLength, currentPeriodEnd } = cycleData;
   const [showEndPicker, setShowEndPicker] = useState(false);
 
@@ -618,9 +618,27 @@ export default function PeriodkaSettings() {
         // on the recorded date.
         value={startFromToday ? null : (lastPeriodStart ? new Date(lastPeriodStart + 'T00:00:00') : null)}
         onClose={() => setShowPicker(false)}
-        onChange={(d) => {
-          handlePeriodStarted(d);
+        onChange={async (d) => {
+          if (startFromToday) {
+            // "Menštruácia mi začala" (vrátane "začala skôr") = NOVÁ perióda
+            // → nový cyklus (commitne predošlý do histórie podľa rozdielu).
+            handlePeriodStarted(d);
+            setShowPicker(false);
+            return;
+          }
+          // "Zmeniť" = OPRAVA začiatku aktuálnej periódy — nikdy nie nový
+          // cyklus. Bez tohto veľká oprava (napr. zo zvyšnutého starého
+          // dátumu) omylom zapísala starý začiatok do histórie ako fantómový
+          // dlhý cyklus (test Gabi 2026-10-08: 55-dňový "cyklus").
+          const consented = await requireConsent(CONSENT_TYPES.HEALTH_DATA, { acceptLabel: 'Súhlasím a uložiť' });
+          if (!consented) { setShowPicker(false); return; }
+          const end = (cycleData.currentPeriodEnd && cycleData.lastPeriodStart
+            && cycleData.currentPeriodEnd >= cycleData.lastPeriodStart)
+            ? new Date(cycleData.currentPeriodEnd + 'T00:00:00')
+            : null;
+          correctPeriod(d, end);
           setShowPicker(false);
+          toast.success('Začiatok menštruácie upravený');
         }}
       />
 
