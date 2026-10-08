@@ -355,14 +355,20 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     // the calendar agrees with the header/ring (day 39 = luteal), instead of
     // wrapping today into a phantom next cycle. Only days AFTER today project
     // forward (orientational future).
-    // Beyond the cycle length: if the user is OVERDUE (no new period logged
-    // yet), everything stays luteal ("predĺžený cyklus") — we can't project a
-    // next cycle that assumes a menstruation that hasn't happened. Only when
-    // NOT overdue do future days wrap forward to project the next cycle.
+    // Beyond the cycle length:
+    //  • OVERDUE (no new period logged): the luteal phase extends REALLY up
+    //    to today, and from TOMORROW a fresh predicted cycle begins (period
+    //    expected tomorrow, then the planned phases). Because `currentDay`
+    //    grows each day, this whole plan slides forward one day per day until
+    //    she logs her period — truthful "cyklus predĺžený" with the plan
+    //    rolling ahead.
+    //  • NOT overdue: future days wrap forward to project the next cycle.
     const phaseDay = isCurrentCycle
       ? (rawDay <= thisLen
           ? rawDay
-          : (currentDay > thisLen ? thisLen : ((rawDay - 1) % thisLen + thisLen) % thisLen + 1))
+          : (currentDay > thisLen
+              ? (rawDay <= currentDay ? thisLen : ((rawDay - currentDay - 1) % thisLen) + 1)
+              : ((rawDay - 1) % thisLen + thisLen) % thisLen + 1))
       : rawDay;
     const ranges = getPhaseRanges(thisLen, cycleData.periodLength ?? 5);
     let key = ranges.find((r) => phaseDay >= r.start && phaseDay <= r.end)?.key ?? null;
