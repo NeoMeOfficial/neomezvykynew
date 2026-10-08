@@ -1190,7 +1190,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
             gap: { c: NM.TERRA, t: 'Chýba záznam — možno si vynechala periódu' },
           }[monthStatus];
           return (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, margin: '-2px 0 10px', fontFamily: NM.SANS, fontSize: 10.5, color: meta.c, fontWeight: 500 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 6, margin: '-2px 0 10px', fontFamily: NM.SANS, fontSize: 10.5, color: meta.c, fontWeight: 500 }}>
               <span style={{ width: 5, height: 5, borderRadius: 999, background: meta.c, display: 'inline-block' }} />
               {meta.t}
             </div>
