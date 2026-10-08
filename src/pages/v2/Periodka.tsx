@@ -350,8 +350,15 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     // the future) is open-ended: once you pass the cycle length — i.e.
     // you're overdue — wrap forward so the calendar keeps projecting the
     // next predicted cycle instead of going blank (Krok 1 fix 2026-10-07).
+    // Current cycle: normal phases within the cycle; once OVERDUE, the days
+    // up to today stay in the last phase (luteal — "cyklus predĺžený"), so
+    // the calendar agrees with the header/ring (day 39 = luteal), instead of
+    // wrapping today into a phantom next cycle. Only days AFTER today project
+    // forward (orientational future).
     const phaseDay = isCurrentCycle
-      ? ((rawDay - 1) % thisLen + thisLen) % thisLen + 1
+      ? (rawDay <= thisLen
+          ? rawDay
+          : (targetISO <= todayISOc ? thisLen : ((rawDay - 1) % thisLen + thisLen) % thisLen + 1))
       : rawDay;
     const ranges = getPhaseRanges(thisLen, cycleData.periodLength ?? 5);
     let key = ranges.find((r) => phaseDay >= r.start && phaseDay <= r.end)?.key ?? null;
