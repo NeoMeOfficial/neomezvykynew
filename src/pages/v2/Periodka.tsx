@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCycleData } from '../../features/cycle/useCycleData';
 import { useDailyTeloPick } from '../../features/telo/useDailyTeloPick';
 import { useRecipes, dailyRecipeOf } from '@/hooks/useRecipes';
+import { useSupabaseAuth } from '../../contexts/SupabaseAuthContext';
 import { useCycleSymptoms } from '../../hooks/useDailyRituals';
 import { Page, Eye, Ser, Body, PlusTag, ConfirmSheet, NM } from '../../components/v2/neome';
 import { getDailyTips, getStravaWants } from '../../features/cycle/dailyHeadlines';
@@ -252,7 +253,15 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
   // Calendar month paging (Gabi 2026-07-28): 0 = current month, negative
   // pages into the past (arrows + swipe). Clamped to a year back.
   const [monthOffset, setMonthOffset] = useState(0);
-  const MONTHS_BACK = -12;
+  // The calendar doesn't page before the account existed (Gabi 2026-10-08):
+  // months from account creation onward show "Žiadne údaje" until logged,
+  // and there's nothing to show from before the account.
+  const { user } = useSupabaseAuth();
+  const createdAt = user?.created_at ? new Date(user.created_at) : null;
+  const createdMonthOffset = createdAt
+    ? (createdAt.getFullYear() * 12 + createdAt.getMonth()) - (today.getFullYear() * 12 + today.getMonth())
+    : -12;
+  const MONTHS_BACK = Math.max(createdMonthOffset, -24); // hard safety cap
   const MONTHS_FWD = 6; // orientational future projection (recalc per cycle)
   const swipeStartX = useRef<number | null>(null);
   const viewedMonth = new Date(today.getFullYear(), today.getMonth() + monthOffset, 1);
@@ -549,7 +558,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
   //  'gap'      = a gap >1.5× the cycle between two logged starts covers
   //               this month → a period was likely NOT logged (vs a merely
   //               long cycle, which stays under the threshold → no flag).
-  const monthStatus: 'ongoing' | 'recorded' | 'planned' | 'gap' | null = (() => {
+  const monthStatus: 'ongoing' | 'recorded' | 'planned' | 'gap' | 'none' | null = (() => {
     const mStart = firstOfMonth.getTime();
     const mEnd = lastOfMonth.getTime();
     // Current period with only a start logged (no end yet) and still
@@ -573,7 +582,8 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
       const b = new Date(realStarts[i] + 'T00:00:00').getTime();
       if (Math.round((b - a) / 86400000) > Math.round(totalDays * 1.5) && a < mEnd && b > mStart) return 'gap';
     }
-    return null;
+    // Past/current month from account creation onward, nothing logged yet.
+    return 'none';
   })();
   const startDow = (firstOfMonth.getDay() + 6) % 7; // Mon=0
   const weeks: Cell[][] = [];
@@ -1188,6 +1198,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
             recorded: { c: NM.SAGE, t: 'Perióda zaznačená' },
             planned: { c: NM.TERTIARY, t: 'Orientačná predpoveď' },
             gap: { c: NM.TERRA, t: 'Chýba záznam — možno si vynechala periódu' },
+            none: { c: NM.TERTIARY, t: 'Žiadne údaje' },
           }[monthStatus];
           return (
             <div style={{ margin: '-2px 0 10px', fontFamily: NM.SANS, fontSize: 10.5, color: meta.c, fontWeight: 500 }}>
