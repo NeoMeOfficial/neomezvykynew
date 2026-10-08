@@ -443,6 +443,31 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     && cycleData.currentPeriodEnd >= cycleData.lastPeriodStart;
   const bleedingOngoing = !periodEnded && currentDay <= periodLength;
 
+  // Ring phase arcs for the CURRENT cycle, adjusted so the dial matches the
+  // table + calendar: the menstrual arc follows the REAL recorded bleed
+  // length (if "Skončila dnes" was used), and the ovulation arc follows the
+  // RECORDED ovulation day (the ✎ override). Falls back to the shared
+  // generic ranges when nothing differs, so past/first-run views are
+  // unchanged.
+  const ringPhases = (() => {
+    const start = cycleData.lastPeriodStart;
+    if (!start) return phases;
+    const bleed = (actualBleedLen && actualBleedLen >= 1 && actualBleedLen <= totalDays)
+      ? actualBleedLen
+      : periodLength;
+    let ovDay = ovulationStart;
+    if (ovulationOverrideISO) {
+      const d = daysBetweenISO(start, ovulationOverrideISO) + 1;
+      if (d > bleed && d < totalDays) ovDay = d;
+    }
+    if (bleed === periodLength && ovDay === ovulationStart) return phases; // nothing recorded differs
+    const r = [{ key: 'menstrual', name: 'Menštruácia', start: 1, end: bleed }];
+    if (bleed + 1 <= ovDay - 1) r.push({ key: 'follicular', name: 'Folikulárna', start: bleed + 1, end: ovDay - 1 });
+    r.push({ key: 'ovulation', name: 'Ovulácia', start: ovDay, end: ovDay });
+    if (ovDay + 1 <= totalDays) r.push({ key: 'luteal', name: 'Luteálna', start: ovDay + 1, end: totalDays });
+    return r;
+  })();
+
   // ✎ editor for the last period's dates ("Tvoj cyklus" section).
   const [periodEditOpen, setPeriodEditOpen] = useState(false);
   const [draftStart, setDraftStart] = useState('');
@@ -937,7 +962,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
       <RingDial
         currentDay={currentDay}
         totalDays={totalDays}
-        phaseRanges={phases}
+        phaseRanges={ringPhases}
         phaseLabel={isLate ? 'Cyklus predĺžený' : currentPhaseName}
         phaseColor={phaseColor}
         daysToNextLabel={
