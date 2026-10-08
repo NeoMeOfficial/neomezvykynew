@@ -1186,7 +1186,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
           const meta = {
             ongoing: { c: PHASE.MENSTR, t: 'Perióda prebieha — zaznač aj jej koniec' },
             recorded: { c: NM.SAGE, t: `${monthLabel} — perióda zaznačená` },
-            planned: { c: NM.TERTIARY, t: 'Orientačná predpoveď — spresní sa po ďalšom cykle' },
+            planned: { c: NM.TERTIARY, t: 'Orientačná predpoveď' },
             gap: { c: NM.TERRA, t: 'Chýba záznam — možno si vynechala periódu' },
           }[monthStatus];
           return (
