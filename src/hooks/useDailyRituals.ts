@@ -510,9 +510,13 @@ export function useCycleSymptoms() {
           .eq('date', date);
         if (error) console.warn('[symptoms] delete failed', error.message);
       } else {
+        // Match toggleSymptomForDate: upsert ONLY symptoms (never `note`) —
+        // the note column ships via a later migration and may be absent in
+        // prod; including it makes the write fail and the optimistic dot
+        // revert. The note has its own save path (setNoteForDate).
         const { error } = await supabase
           .from('cycle_symptoms')
-          .upsert({ user_id: user!.id, date, symptoms: nextMap, note }, { onConflict: 'user_id,date' });
+          .upsert({ user_id: user!.id, date, symptoms: nextMap }, { onConflict: 'user_id,date' });
         if (error) {
           console.warn('[symptoms] level upsert failed', error.message);
           refresh();
