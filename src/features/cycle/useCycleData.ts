@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { format, differenceInDays } from 'date-fns';
+import { format, differenceInDays, addDays } from 'date-fns';
 import { CycleData, CustomSettings, PeriodIntensity, DailyPeriodData, PeriodLog } from './types';
 
 // Calculate weighted average cycle length from history
@@ -451,7 +451,11 @@ export function useCycleData(accessCode?: string) {
   const addPeriodToHistory = useCallback((startDate: string, endDate?: string) => {
     setCycleData(current => {
       const history = current.history || [];
-      const newEntry = { startDate, endDate };
+      // Default a bleed end so the added period has explicit menstruation
+      // days (periodLength long) rather than relying on the generic phase map.
+      const pl = current.periodLength ?? 5;
+      const end = endDate ?? format(addDays(new Date(startDate + 'T00:00:00'), pl - 1), 'yyyy-MM-dd');
+      const newEntry = { startDate, endDate: end };
       const updatedHistory = [...history, newEntry].sort((a, b) =>
         new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
       );

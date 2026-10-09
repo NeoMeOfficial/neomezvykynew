@@ -86,3 +86,6 @@ spoonacular-recipes-*.xlsx
 src/data/recipes-backup-*.ts
 generate-recipe-images.cjs
 merge-neome-recipes.cjs
+
+# Local Netlify folder
+.netlify

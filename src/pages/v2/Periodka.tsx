@@ -547,6 +547,8 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
   const [gapSheetOpen, setGapSheetOpen] = useState(false);
   const [gapPickMode, setGapPickMode] = useState(false);
   const [gapDraft, setGapDraft] = useState('');
+  // The gap currently being resolved (from the month prompt OR a day tap).
+  const [activeGap, setActiveGap] = useState<{ prevISO: string; laterISO: string; estimatedISO: string } | null>(null);
   const [draftOvul, setDraftOvul] = useState('');
   // Which cycle's ovulation the editor targets: null = current cycle, else
   // a past cycle (its start + the next start bounding it).
@@ -847,6 +849,14 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     ? (cycleData.history ?? []).find((h) => h.startDate === selAnchor) ?? null
     : null;
   const selNextStart = selAnchor ? (realStarts.find((s) => s > selAnchor) ?? null) : null;
+  // Is the tapped day inside an unacknowledged GAP (its cycle is abnormally
+  // long)? If so, offer "Doplniť" (add a missed period) rather than editing
+  // the stretched previous cycle.
+  const selDayGapInfo = (selAnchor && selNextStart
+    && Math.round((new Date(selNextStart + 'T00:00:00').getTime() - new Date(selAnchor + 'T00:00:00').getTime()) / 86400000) > Math.round(totalDays * 1.5)
+    && !(cycleData.acknowledgedGaps ?? []).includes(selNextStart))
+    ? { prevISO: selAnchor, laterISO: selNextStart, estimatedISO: format(new Date(new Date(selAnchor + 'T00:00:00').getTime() + totalDays * 86400000), 'yyyy-MM-dd') }
+    : null;
   const selectedDateISO = selectedDay !== null
     ? `${yearIdx}-${String(monthIdx + 1).padStart(2, '0')}-${String(selectedDay).padStart(2, '0')}`
     : null;
@@ -892,13 +902,28 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
           <Ser size={22} style={{ marginTop: 10, lineHeight: 1.2 }}>Mimo zaznamenaného cyklu</Ser>
         )}
 
-        {/* Contextual edit from any day of a REAL cycle. Phases are derived,
-            so we only edit the two anchors: the period dates and (current
-            cycle) the ovulation day. Current cycle ovulation day → edit
-            ovulation; any other real day → edit that cycle's period (current
-            → live period; past → the history entry). Projections aren't
-            editable. Past-cycle ovulation edit is a follow-up. */}
-        {selectedInfo && !selectedInfo.projected && selAnchor && (() => {
+        {/* Day in a GAP (stretched long cycle) → ADD a missed period here,
+            not edit the previous cycle. */}
+        {selDayGapInfo && (
+          <button
+            onClick={() => {
+              setActiveGap(selDayGapInfo);
+              setGapDraft(selDayGapInfo.estimatedISO);
+              setGapPickMode(true);
+              setGapSheetOpen(true);
+              setSelectedDay(null);
+            }}
+            style={{ all: 'unset', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 14, padding: '9px 16px', borderRadius: 999, background: '#fff', border: `1px solid ${NM.TERRA}`, color: NM.TERRA, fontFamily: NM.SANS, fontSize: 12.5, fontWeight: 500 }}
+          >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+            Doplniť chýbajúcu periódu
+          </button>
+        )}
+
+        {/* Contextual edit from any day of a REAL cycle (not a gap). Phases
+            are derived, so we only edit the two anchors: the period dates and
+            (current cycle) the ovulation day. Projections aren't editable. */}
+        {!selDayGapInfo && selectedInfo && !selectedInfo.projected && selAnchor && (() => {
           const isOvul = selectedInfo.key === 'ovulation';
           const col = isOvul ? PHASE.OVULAT : PHASE.MENSTR;
           const label = isOvul
@@ -1312,7 +1337,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
             gap — a small tappable prompt that opens the resolve sheet. */}
         {monthStatus === 'gap' && monthGapInfo && (
           <button
-            onClick={() => { setGapDraft(monthGapInfo.estimatedISO); setGapPickMode(false); setGapSheetOpen(true); }}
+            onClick={() => { setActiveGap(monthGapInfo); setGapDraft(monthGapInfo.estimatedISO); setGapPickMode(false); setGapSheetOpen(true); }}
             style={{ all: 'unset', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4, margin: '-2px 0 10px', fontFamily: NM.SANS, fontSize: 10.5, color: NM.TERRA, fontWeight: 600 }}
           >
             Chýba záznam — možno si vynechala periódu — doplniť
@@ -2065,7 +2090,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
               Periódu som mala, zabudla som zaznačiť
             </button>
             <button
-              onClick={() => { if (monthGapInfo) onAcknowledgeGap(monthGapInfo.laterISO); setGapSheetOpen(false); }}
+              onClick={() => { if (activeGap) onAcknowledgeGap(activeGap.laterISO); setGapSheetOpen(false); }}
               style={{ all: 'unset', cursor: 'pointer', display: 'block', width: '100%', boxSizing: 'border-box', textAlign: 'center', padding: '14px 0', borderRadius: 999, border: `1px solid ${NM.HAIR_2}`, fontFamily: NM.SANS, fontSize: 13, color: NM.DEEP, fontWeight: 500 }}
             >
               Nie, cyklus bol taký dlhý
@@ -2077,8 +2102,8 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
             <input
               type="date"
               value={gapDraft}
-              min={monthGapInfo?.prevISO}
-              max={monthGapInfo?.laterISO}
+              min={activeGap?.prevISO}
+              max={activeGap?.laterISO}
               onChange={(e) => setGapDraft(e.target.value)}
               style={dateInputStyle}
             />
@@ -2094,7 +2119,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
               </button>
               <button
                 onClick={() => {
-                  const valid = !!gapDraft && (!monthGapInfo || (gapDraft > monthGapInfo.prevISO && gapDraft < monthGapInfo.laterISO));
+                  const valid = !!gapDraft && (!activeGap || (gapDraft > activeGap.prevISO && gapDraft < activeGap.laterISO));
                   if (valid) onAddMissedPeriod(gapDraft);
                   setGapSheetOpen(false);
                 }}

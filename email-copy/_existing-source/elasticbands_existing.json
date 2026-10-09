@@ -1,0 +1,422 @@
+{
+  "week_1": {
+    "automation_id": 63,
+    "days": [
+      {
+        "day": 1,
+        "campaign_id": 188,
+        "message_id": "190",
+        "name": "Week 1 Day 1 ElasticBands",
+        "subject": "Týždeň 1 - Deň 1 programu Elastic Bands od NeoMe",
+        "preheader": "Veľmi sa teším, že si sa ku nám pridala a rozhodla sa pravidelne si venovať čas a dopriať si tak prioritu.  Tento 6-týždňový program ti pomôže nadobudnúť nielen pevnejšie, krajšie a zdravšie telo, ale taktiež ti prinesie vnútornú rovnováhu pomocou pravidelných strečingov a meditácií. ",
+        "fromname": "Gabi z Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "https://neome.com.au/svk \n\nAhoj %FIRSTNAME%, \n\nVítam ťa v prvom dni nášho programu ElasticBands.\n\nVeľmi sa teším, že si sa ku nám pridala a rozhodla sa pravidelne si\nvenovať čas a dopriať si tak prioritu.  Tento 6-týždňový\nprogram ti pomôže nadobudnúť nielen pevnejšie, krajšie a zdravšie\ntelo, ale taktiež ti prinesie vnútornú rovnováhu pomocou\npravidelných strečingov a meditácií. \n\nSvoje dnešné cvičenie s NeoMe si nájdeš tu:\n\nNeoMe platforma\n<https://member.neome.com.au/products/elastic-bands-program/categories/2154854886/posts/2175568737>\n\nBehom najbližších 6 týždňov by sme ti okrem pravidelného\ncvičenia s NeoMe chceli pomôcť aj k vybudovaniu alebo upevneniu\nudržateľných, zdravých návykov, ktoré tvoria základ zdravého\nživotného štýlu. \n\nDnes ti chcem pripomenúť prvý z nich: \n\n**Dopraj si pravidelne okrem cvičenia aj 30-minút rýchlej\nchôdze/behu/bicykla **\n\nVedela si, že len 30 minút rýchlej chôdze denne ti môže znížiť\nriziko srdcových ochorení a mŕtvice až o 35% ? Tento úžasný fakt\nti môže pripomínať, aké dôležité je sa počas dňa hýbať,\npočúvať pritom možno obľúbený podcast, hudbu, alebo si len tak\nnechať myseľ a myšlienky plynúť.\n\nInvestuj do svojho zdravia a dopraj si okrem svojich 15-min s Neome aj\n30-min rýchlej chôdze alebo behu na čerstvom vzduchu. \n\nTvoje srdce ti poďakuje. \n\nGabi\nNeoMe\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 15045,
+        "is_correction": false
+      },
+      {
+        "day": 2,
+        "campaign_id": 189,
+        "message_id": "191",
+        "name": "Week 1 Day 2 ElasticBands (SVK)",
+        "subject": "Týždeň 1 - Deň 2 programu Elastic Bands od NeoMe",
+        "preheader": "Snáď sa ti včera podarilo si nájsť na seba čas a aj keď nie, dnes máš nový deň a možnosť urobiť niečo pre seba. Každým dňom sa budeme sústrediť na osvojovanie si a upevňovanie zdravých návykov, ktoré s tebou už ostanú. ",
+        "fromname": "Gabi z Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "https://neome.com.au/svk \n\nAhoj %FIRSTNAME%, \n\nSnáď sa ti včera podarilo si nájsť na seba čas a aj keď nie, dnes\nmáš nový deň a možnosť urobiť niečo pre seba. Každým dňom sa\nbudeme sústrediť na osvojovanie si a upevňovanie zdravých návykov,\nktoré s tebou už ostanú. \n\nSvoje dnešné cvičenie s NeoMe si nájdeš tu:\n\nNeoMe platforma\n<https://member.neome.com.au/products/elastic-bands-program/categories/2154854886/posts/2175568739>\n\nBehom najbližších 6 týždňov si budeš budovať a upevňovať\nudržateľné, zdravé návyky, ktoré tvoria základ zdravého\nživotného štýlu.\n\n**Dnes ti chcem pripomenúť: Vypi aspoň 2 litre čistej vody denne**\n\nČasto sa o tom hovorí, ale vo všeobecnosti platí, že nepijeme\ndosť. Vedela si, že  dostatočný príjem vody je nevyhnutný nielen\npre tvoju hydratáciu, ale aj pre podporu detoxikačných procesov v\ntvojom tele?\n\nTvoje obličky sú zodpovedné za odstraňovanie odpadových látok a\nnadbytočnej tekutiny z tvojho tela a voda je kľúčová pre ich\nefektívne fungovanie. Pitie aspoň 2 litrov vody denne môže zvýšiť\nvýkon tvojich obličiek a pomôcť predchádzať tvorbe obličkových\nkameňov. Tento jednoduchý krok môže mať tak obrovský vplyv na\ntvoje zdravie.\n\nNezabudni si dnes okrem svojich 15-min s Neome, vypiť 2 litre vody a\npodpor tak svoje telo v jeho prirodzenom detoxikačnom procese.\n\nGabi\nNeoMe\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 13569,
+        "is_correction": false
+      },
+      {
+        "day": 3,
+        "campaign_id": 190,
+        "message_id": "192",
+        "name": "Week 1 Day 3 ElasticBands (SVK)",
+        "subject": "Týždeň 1 - Deň 3 programu Elastic Bands od NeoMe",
+        "preheader": "",
+        "fromname": "Gabi z Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "https://neome.com.au/svk \n\nAhoj %FIRSTNAME%, \n\nDnes ťa čaká tvoj prvý strečing a meditácia.\n\n \nNato, aby naše telo fungovalo v rovnováhe, potrebuje byť silné a\nflexibilné. Preto sa aj v našom programe ElasticBands budeme každú\nstredu a piatok venovať strečovaniu a meditácií. \n\nSvoje dnešné cvičenie s NeoMe si nájdeš tu:\n\nhttps://member.neome.com.au/password/new \n\nNeoMe platforma\n<https://member.neome.com.au/products/elastic-bands-program/categories/2154854886/posts/2175568741>\n\nBehom najbližších 6 týždňov si budeš budovať a upevňovať\nudržateľné, zdravé návyky, ktoré tvoria základ zdravého\nživotného štýlu. \n\n**Dnes ti chcem pripomenúť: Zapíš si tri veci, za ktoré si\nvďačná**\n\nVedela si, že praktizovanie vďačnosti môže mať hlboký vplyv na\ntvoje duševné zdravie? \nVýskum ukazuje, že ľudia, ktorí pravidelne praktizujú vďačnosť,\nmajú nižšie úrovne stresu a úzkosti a sú šťastnejší. Aj niečo\ntak jednoduché, ako je denné vymenovanie troch vecí, za ktoré si\nvďačná, ti pomôže zlepšiť tvoju náladu a zvýšiť schopnosť\nprekonávať výzvy. \n\nDopraj si dnes svojich 15-min s NeoMe a večer pred spaním si zapíš\ntri veci, za ktoré si vďačná. Pozoruj, ako sa postupne mení tvoj\npohľad na život k lepšiemu.\n\nGabi\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 14054,
+        "is_correction": false
+      },
+      {
+        "day": 4,
+        "campaign_id": 191,
+        "message_id": "193",
+        "name": "Week 1 Day 4 ElasticBands (SVK)",
+        "subject": "Týždeň 1 - Deň 4 programu Elastic Bands od NeoMe",
+        "preheader": "",
+        "fromname": "Gabi z Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "https://neome.com.au/svk \n\nAhoj %FIRSTNAME%, \n\nTýždeň sa preklápa do druhej polovice, čo u niektorých z nás\nspôsobuje pokles energie aj motivácie si zacvičiť a hýbať sa.\n\nAk sa teda cítiš unavenejšie, dnešný tip ti určite pomôže. \n\nSvoje dnešné cvičenie s NeoMe si nájdeš tu:\n\nhttps://member.neome.com.au/password/new \n\nNeoMe platforma\n<https://member.neome.com.au/products/elastic-bands-program/categories/2154854886/posts/2175568743>\n\nBehom najbližších 6 týždňov si budeš budovať a upevňovať\nudržateľné, zdravé návyky, ktoré tvoria základ zdravého\nživotného štýlu. \n\nDnes ti chcem pripomenúť: Naplň svoj tanier vyváženým jedlom,\nktoré ti dodá energiu. \n\nVedela si, že pestrá strava bohatá na výživné látky môže mať\npriamy vplyv na tvoju energiu a náladu? Naplň svoj tanier komplexnými\nsacharidmi (ovsené vločky, pohánka, bulgur, kuskus, celozrnné\npečivo, quinoa, strukoviny, ovocie, zelenina) , zdravými tukmi (ryby,\navokádo, oriešky, ľanové semená, chia semená), bielkovinami\n(kuracie, morčacie mäso, vajíčka, cottage syr, mlieko, jogurt),\nktoré ti poskytnú pomalý a stály prísun energie. \n\nNaopak vyhni sa  sladkým nápojom, sladkostiam a bielemu pečivu,\nktoré ti do krvi príliš rýchlo dodá príliš veľa paliva (cukru) a\nnásledný pád ťa opäť zanechá unavenú a hladnú.\n\nDopraj si dnes svojich 15-min s NeoMe a priprav chutné a vyvážené\njedlá.  \n\nGabi\nNeoMe\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 14001,
+        "is_correction": false
+      },
+      {
+        "day": 5,
+        "campaign_id": 192,
+        "message_id": "194",
+        "name": "Week 1 Day 5 ElasticBands (SVK)",
+        "subject": "Týždeň 1 - Deň 5 programu Elastic Bands od NeoMe",
+        "preheader": "",
+        "fromname": "Gabi z Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "https://neome.com.au/svk \n\nAhoj %FIRSTNAME%, \n\nZáver prvého týždňa nášho programu je tu a s ním aj pohodový a\nuvoľňujúci strečing s meditáciou. \n\nSvoje dnešné cvičenie s NeoMe si nájdeš tu:\n\nNeoMe platforma\n<https://member.neome.com.au/products/elastic-bands-program/categories/2154854886/posts/2175568745>\n\nBehom najbližších 6 týždňov si budeš budovať a upevňovať\nudržateľné, zdravé návyky, ktoré tvoria základ zdravého\nživotného štýlu. \n\nDnes ti chcem pripomenúť:\n\n**Venuj 10 minút pred spaním sebe a svojim myšlienkam**\n\nVedela si, že pravidelné praktizovanie mindfulness a meditácie pred\nspaním ti môže výrazne zlepšiť kvalitu tvojho spánku? V dnešnej\ndobe plnej stresu a neustáleho pripojenia k digitálnym zariadeniam\nmôže byť náročné \"vypnúť\". Skús si večer pred spaním venovať\n10 minút. Či už budeš meditovať alebo len sedieť v tichu a\nvnímať svoj dych,  pozoruj, ako sa tvoja myseľ upokojí a pripraví\nna nočný oddych. \n\nDopraj si dnes svojich 15-min s NeoMe a pred spaním čas byť v tichu a\nsama so sebou. \n\nGabi\nNeoMe\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 14229,
+        "is_correction": false
+      }
+    ]
+  },
+  "week_2": {
+    "automation_id": 64,
+    "days": [
+      {
+        "day": 1,
+        "campaign_id": 198,
+        "message_id": "200",
+        "name": "Week 2 Day 1 ElasticBands",
+        "subject": "Týždeň 2 - Deň 1 programu Elastic Bands od NeoMe",
+        "preheader": "",
+        "fromname": "Gabi z Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "https://neome.com.au/svk \n\nAhoj %FIRSTNAME%, \n\nDúfam, že sa ti podarilo spraviť si víkend podľa svojich predstáv a dopriať si aspoň trošku času pre seba. \n\nSvoje dnešné cvičenie s NeoMe si nájdeš tu:\n\nNeoMe platforma https://member.neome.com.au/products/elastic-bands-program/categories/2154854887/posts/2175568747\n\nKaždý deň pracujeme na budovaní a upevňovaní udržateľných, zdravých návykov, ktoré tvoria základ zdravého životného štýlu. \n\nDnes ti chcem pripomenúť:\n\n**Dopraj si pravidelne 30-minút rýchlej chôdze/behu/bicykla**\n\nVedela si, že pravidelný pohyb môže významne znížiť riziko vzniku chronických chorôb, ako sú srdcové ochorenia, diabetes typu 2 a niektoré typy rakoviny? Tým, že si každý deň nájdeš čas na fyzickú aktivitu, nielenže zlepšuješ svoje fyzické zdravie, ale aj aktívne pracuješ na prevencii týchto ochorení. \n\nDopraj si dnes svojich 15-min s NeoMe a 30 minút svojej obľúbenej fyzickej aktivity. Budeš sa  cítiť silnejšie s každým krokom, ktorý urobíš. \n\nGabi\nNeoMe\n\nSent to: %EMAIL%\n\nUnsubscribe %UNSUBSCRIBELINK%\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 13714,
+        "is_correction": false
+      },
+      {
+        "day": 2,
+        "campaign_id": 199,
+        "message_id": "201",
+        "name": "Week 2 Day 2 ElasticBands (SVK)",
+        "subject": "Týždeň 2 - Deň 2 programu Elastic Bands od NeoMe",
+        "preheader": "",
+        "fromname": "Gabi z Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "https://neome.com.au/svk \n\nAhoj %FIRSTNAME%, \n\nČi už sa ti podarilo odštartovať týždeň podľa svojich plánov\nalebo si musela riešiť nepredvídateľné situácie a nemala čas na\nveci, ktoré si chcela, povedz si, že “každý deň je nový deň”,\nkedy máš šancu začať nanovo.  \n\nSvoje dnešné cvičenie s NeoMe si nájdeš tu:\n\nNeoMe platforma\n<https://member.neome.com.au/products/elastic-bands-program/categories/2154854887/posts/2175568748>\n\nBehom najbližších 6 týždňov si budeš budovať a upevňovať\nudržateľné, zdravé návyky, ktoré tvoria základ zdravého\nživotného štýlu. \n\nDnes ti chcem pripomenúť: \n\n**Vypi aspoň 2 litre čistej vody denne**\n\nVedela si, že dostatočná hydratácia je kľúčová nielen pre tvoje\nfyzické zdravie, ale aj pre tvoj mozog? Pitie dostatočného množstva\nvody môže zlepšiť tvoje kognitívne funkcie, pamäť a\nkoncentráciu. Zlepši svoju mentálnu výkonnosť a schopnosť\nsústrediť sa s každým dúškom čistej vody.\n\nDopraj si dnes svojich 15-min s NeoMe a vypi aspoň 2 litre čistej\nvody. \n\nGabi\nNeoMe\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 13824,
+        "is_correction": false
+      },
+      {
+        "day": 3,
+        "campaign_id": 200,
+        "message_id": "202",
+        "name": "Week 2 Day 3 ElasticBands (SVK)",
+        "subject": "Týždeň 2 - Deň 3 programu Elastic Bands od NeoMe",
+        "preheader": "",
+        "fromname": "Gabi z Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "https://neome.com.au/svk \n\nAhoj %FIRSTNAME%, \n\nDnes sa spolu stretneme, aby sme si príjemne postrečovali telo a\nuvoľnili z neho napätia. \n\nSvoje dnešné cvičenie s NeoMe si nájdeš tu:\n\nhttps://member.neome.com.au/password/new \n\nNeoMe platforma\n<https://member.neome.com.au/products/elastic-bands-program/categories/2154854887/posts/2175568749>\n\nBehom najbližších 6 týždňov si budeš budovať a upevňovať\nudržateľné, zdravé návyky, ktoré tvoria základ zdravého\nživotného štýlu. \n\nDnes ti chcem pripomenúť: \n\n**Zapíš si tri veci, za ktoré si vďačná**\n\nVedela si, že praktizovanie vďačnosti môže mať pozitívny vplyv\nnielen na tvoje duševné, ale aj fyzické zdravie? Ľudia, ktorí\npravidelne vyjadrujú vďačnosť, často hlásia menej bolesti, lepšie\nspánkové návyky a celkovo lepšie fyzické zdravie.\n\nDopraj si dnes svojich 15-min s NeoMe a večer pred spaním si zapíš\ntri veci, za ktoré si vďačná. Pozoruj, ako sa postupne mení tvoj\npohľad na život k lepšiemu.\n\nGabi\nNeoMe\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 14352,
+        "is_correction": false
+      },
+      {
+        "day": 4,
+        "campaign_id": 201,
+        "message_id": "203",
+        "name": "Week 2 Day 4 ElasticBands (SVK)",
+        "subject": "Týždeň 2 - Deň 4 programu Elastic Bands od NeoMe",
+        "preheader": "",
+        "fromname": "Gabi z Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "https://neome.com.au/svk \n\nAhoj %FIRSTNAME%, \n\nJe prirodzené, že počas týždňa bývajú dni, kedy sa ti chce cvičiť viac a inokedy menej. Každá z nás ich zažíva. Nezabúdaj, že ak chceš vidieť výsledky, je dôležité mať disciplínu, ktorá ti pomôže zachovať pravidelnosť vo svojich zdravých návykoch aj počas týchto dní. \n\nSvoje dnešné cvičenie s NeoMe si nájdeš tu:\n\nNeoMe platforma https://member.neome.com.au/products/elastic-bands-program/categories/2154854887/posts/2175568750\n\nBehom najbližších 6 týždňov si budeš budovať a upevňovať udržateľné, zdravé návyky, ktoré tvoria základ zdravého životného štýlu. \n\nDnes ti chcem pripomenúť: \n\n**Naplň svoj tanier vyváženým jedlom, ktoré ti uľahčí trávenie**\n\nVedela si, že zdravá strava plná vlákniny, probiotík a živín môže mať priamy vplyv na zdravie tvojich čriev a trávenia? Začlenením potravín ako sú obilniny, strukoviny, ovocie, zelenina, semená, orechy a fermentované potraviny (kefír, kambucha, jogurt, kyslá kapusta) do tvojej stravy môžeš podporiť zdravú črevnú flóru a zlepšiť svoje tráviace funkcie. \n\nDopraj si dnes svojich 15-min s NeoMe a jedlo bohaté na vlákninu a probiotiká. \n \n\nGabi\nNeoMe\n\nSent to: %EMAIL%\n\nUnsubscribe %UNSUBSCRIBELINK%\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 13828,
+        "is_correction": false
+      },
+      {
+        "day": 5,
+        "campaign_id": 202,
+        "message_id": "204",
+        "name": "Week 2 Day 5 ElasticBands (SVK)",
+        "subject": "Týždeň 2 - Deň 5 programu Elastic Bands od NeoMe",
+        "preheader": "",
+        "fromname": "Gabi z Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "https://neome.com.au/svk \n\nAhoj %FIRSTNAME%, \n\nDnes ťa čaká už 10 cvičenie v našom programe ElasticBands, gratulujem Ti &#129303;. \nČi už sa ti podarili tieto cvičenia zacvičiť podľa plánu po sebe alebo si mala nútenú prestávku, dôležité je, že pokračuješ a progresuješ ďalej. \n\nSvoje dnešné cvičenie s NeoMe si nájdeš tu:\n\nhttps://member.neome.com.au/password/new \n\nNeoMe platforma https://member.neome.com.au/products/elastic-bands-program/categories/2154854887/posts/2175568751\n\nBehom najbližších 6 týždňov si budeš budovať a upevňovať udržateľné, zdravé návyky, ktoré tvoria základ zdravého životného štýlu. \n\nDnes ti chcem pripomenúť: \n\n**Venuj si 10 minút v tichu**\n\nVedela si, že praktizovanie mindfulness a meditácie podporuje pocit spojenia so sebou a svetom okolo nás? V dnešnej uponáhľanej dobe je dôležité nájsť spôsoby, ako byť v spojení so svojim vnútrom a byť prítomná. \n\nVenuj si aspoň 10 minút v tichu a sústreď sa na svoj dych. Pozoruj, ako sa vnímanie času, tvojho vnútra a okolia mení. Pomôže ti to byť viac prítomnou a otvorenou pre spojenie sa so svojím okolím. \n\nDopraj si dnes svojich 15-min s NeoMe a svoju chvíľu v tichu. \n\nGabi\nNeoMe\n\nSent to: %EMAIL%\n\nUnsubscribe %UNSUBSCRIBELINK%\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 14846,
+        "is_correction": false
+      }
+    ]
+  },
+  "week_3": {
+    "automation_id": 65,
+    "days": [
+      {
+        "day": 1,
+        "campaign_id": 208,
+        "message_id": "210",
+        "name": "Week 3 Day 1 ElasticBands",
+        "subject": "Týždeň 3 - Deň 1 programu Elastic Bands od NeoMe",
+        "preheader": "",
+        "fromname": "Gabi z Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "https://neome.com.au/svk \n\nAhoj %FIRSTNAME%, \n\nPomaličky sa dostávame do polovice nášho programu a ja dúfam, že\nsa ti postupne deň po dni darí si do svojich dní\nzaradovať/upevňovať zdravé návyky, ktoré s tebou už ostanú. \n\nSvoje dnešné cvičenie s NeoMe si nájdeš tu:\n\nhttps://member.neome.com.au/password/new \n\nNeoMe platforma\n<https://member.neome.com.au/products/elastic-bands-program/categories/2154854888/posts/2175568752>\n\nKaždý deň pracujeme na budovaní a upevňovaní udržateľných,\nzdravých návykov, ktoré tvoria základ zdravého životného štýlu.\n\n\nDnes ti chcem pripomenúť: \n\n**Dopraj si pravidelne 30-minút rýchlej chôdze/behu/bicykla** \n\nVedela si, že pravidelný pohyb môže zrýchliť tvoj metabolizmus a\npomôcť ti tak pri chudnutí? Keď sa hýbeš, tvoje telo spáli viac\nkalórií, nielen počas cvičenia, ale aj v pokoji.  \n\nDopraj si dnes svojich 15-min s NeoMe a 30 minút svojej obľúbenej\nfyzickej aktivity a pozoruj, ako sa tvoje telo mení a stáva sa\nsilnejším a zdravším. \n\nGabi\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 14170,
+        "is_correction": false
+      },
+      {
+        "day": 2,
+        "campaign_id": 209,
+        "message_id": "211",
+        "name": "Week 3 Day 2 ElasticBands (SVK)",
+        "subject": "Týždeň 3 - Deň 2 programu Elastic Bands od NeoMe",
+        "preheader": "",
+        "fromname": "Gabi z Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "https://neome.com.au/svk \n\nAhoj %FIRSTNAME%, \n\nČastokrát sa stáva, že my ľudia si zbytočne komplikujeme veci. Hľadáme rôzne nové vychytávky dúfajúc, že nám pomôžu dosiahnuť naše ciele. A pritom to najdôležitejšie, čo potrebujeme na dosahovanie svojich cieľov má každá z nás v sebe. \n\nSvoje dnešné cvičenie s NeoMe si nájdeš tu: \n\nhttps://member.neome.com.au/password/new \n\nNeoMe platforma https://member.neome.com.au/products/elastic-bands-program/categories/2154854888/posts/2175568753\n\nBehom najbližších 6 týždňov si budeš budovať a upevňovať udržateľné, zdravé návyky, ktoré tvoria základ zdravého životného štýlu. \n\nDnes ti chcem pripomenúť: \n\n**Vypi aspoň 2 litre čistej vody denne**\n\nVedela si, že hydratácia je kľúčová nielen pre tvoje vnútorné zdravie, ale aj pre krásu tvojej kože? Dostatočný príjem vody ti môže zlepšiť elasticitu kože, čo prispieva k jej zdravému a mladistvému vzhľadu. \n\nAj tak jednoduchý krok, ktorý môžeš spraviť už dnes, ako  pitie dostatočného množstva vody ti dokáže zlepšiť stav tvoje kože a zároveň podporiť celkové zdravie. \n\nDopraj si dnes svojich 15-min s NeoMe a vypi aspoň 2 litre vody denne. \n\nGabi\nNeoMe\n\nSent to: %EMAIL%\n\nUnsubscribe %UNSUBSCRIBELINK%\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 15531,
+        "is_correction": false
+      },
+      {
+        "day": 3,
+        "campaign_id": 210,
+        "message_id": "212",
+        "name": "Week 3 Day 3 ElasticBands (SVK)",
+        "subject": "Týždeň 3 - Deň 3 programu Elastic Bands od NeoMe",
+        "preheader": "",
+        "fromname": "Gabi z Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "https://neome.com.au/svk \n\nAhoj %FIRSTNAME%, \n\nTak ako aj v živote aj v cvičení je dôležitá harmónia a\nrovnováha. \n\nAk sú určité svaly/šľachy na tvojom tele poskracované, môže to\nvyústiť do pnutia a bolestí, čo môže prispieť k tomu,\nže  tvoje okolité svaly budú kompenzovať-nahrádzať funkciu tých\nposkracovaných a teda budú preťažené. To môže vyústi do\nďalších bolestí či stuhnutia. \n\nSvoje dnešné cvičenie s NeoMe si nájdeš tu:\n\nhttps://member.neome.com.au/password/new \n\nNeoMe platforma\n<https://member.neome.com.au/products/elastic-bands-program/categories/2154854888/posts/2175568754>\n\nBehom najbližších 6 týždňov si budeš budovať a upevňovať\nudržateľné, zdravé návyky, ktoré tvoria základ zdravého\nživotného štýlu. \n\nDnes ti chcem pripomenúť: \n\n**Zapíš si tri veci, za ktoré si vďačná**\n\nVedela si, že praktizovanie vďačnosti ti pomôže sa lepšie\norientovať vo svojom vnútre a môže slúžiť ako katalyzátor tvojho\nosobného rastu, emocionálnej pohody a napokon aj nájdenia harmónie a\nrovnováhy v tvojom živote?\n\nDopraj si dnes svojich 15-min s NeoMe a zapíš si aj dnes tri veci, za\nktoré si vďačná. Ži svoj život v harmónii a rovnováhe. \n\nGabi\nNeoMe\n\nNeoMe Komunita\n<https://join.slack.com/t/neometribeofficial/shared_invite/zt-17qbtcdio-S8cwN3V~aoh7Y3I5JKjpjQ>\n\nPrihlás sa do NeoMe Platformy\nPrihlás sa do NeoMe Komunity\nOd pondelka ti každý deň príde email s linkom na aktuálne\ncvičko.\n\nNeoMe Body Forming je program vytvorený pre teba, aby si sa opäť\ncítila skvele vo svojom tele. \n\nKrásny deň.\n\nGabi\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 15980,
+        "is_correction": false
+      },
+      {
+        "day": 4,
+        "campaign_id": 211,
+        "message_id": "213",
+        "name": "Week 3 Day 4 ElasticBands (SVK)",
+        "subject": "Týždeň 3 - Deň 4 programu Elastic Bands od NeoMe",
+        "preheader": "",
+        "fromname": "Gabi z Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "https://neome.com.au/svk \n\nAhoj %FIRSTNAME%, \n\nDnešným dňom pokračujeme v posilňovaní tvojho tela, v budovaní\nsvalovej hmoty a znižovaní tak možných rizík - pádov, chorôb a\ndiskomfortu, ktoré môžu byť následkom oslabeného a nie plne\nfunkčného tela. \n\nSvoje dnešné cvičenie s NeoMe si nájdeš tu: \n\nNeoMe platforma\n<https://member.neome.com.au/products/elastic-bands-program/categories/2154854888/posts/2175568755>\n\nBehom najbližších 6 týždňov si budeš budovať a upevňovať\nudržateľné, zdravé návyky, ktoré tvoria základ zdravého\nživotného štýlu. \n\nDnes ti chcem pripomenúť: \n\n**Naplň svoj tanier vyváženým jedlom, ktoré ti môže pomôcť\nžiť dlhšie**\n\nVedela si, že ľudia, ktorí konzumujú zdravú, vyváženú stravu si\ndokážu predĺžiť život? U dospelých v strednom veku to môže byť\naž o šesť až sedem rokov a u mladých dospelých to môže byť až\no desať rokov. Fascinujúce, že?\n\n \nSkús do svojho jedálnička zaradiť pestro-farebnú zeleninu, ovocie,\nstrukoviny, ryby, biele mäso, vločky, quinoa, kuskus, pohánku,\nľanové semená, chia semená, orechy, vajíčka,\n\nDopraj si dnes svojich 15-min s NeoMe a bohaté, pestré a výživné\njedlo. \n\nGabi\nNeoMe\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 14558,
+        "is_correction": false
+      },
+      {
+        "day": 5,
+        "campaign_id": 212,
+        "message_id": "214",
+        "name": "Week 3 Day 5 ElasticBands (SVK)",
+        "subject": "Týždeň 3 - Deň 5 programu Elastic Bands od NeoMe",
+        "preheader": "",
+        "fromname": "Gabi z Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "https://neome.com.au/svk \n\nAhoj %FIRSTNAME%, \n\nČas plynie a s ním aj cvičenia, ktorými si postupne prechádzaš.\nPracuješ na sebe a robíš niečo pre seba a svoje zdravie.\nProgresuješ. Rastieš. Gratulujem Ti. \n\nSvoje dnešné cvičenie s NeoMe si nájdeš tu: \n\nhttps://member.neome.com.au/password/new \n\nNeoMe platforma\n<https://member.neome.com.au/products/elastic-bands-program/categories/2154854888/posts/2175568756>\n\nBehom najbližších 6 týždňov si budeš budovať a upevňovať\nudržateľné, zdravé návyky, ktoré tvoria základ zdravého\nživotného štýlu. \n\nDnes ti chcem pripomenúť: \n\n**Venuj si 10 minút v tichu**\n\nVedela si, že , praktizovanie mindfulness môže mať hlboký vplyv na\ntvoje sebavedomie a osobný rast?  Keď sa naučíš byť viac\nprítomná a vedomá si samej seba, začneš lepšie rozumieť svojim\nmyšlienkam, pocitom a reakciám.\n\nDopraj si dnes svojich 15-min s NeoMe a svoju chvíľu v tichu. Sleduj,\nako sa tvoja schopnosť prijímať a milovať samú seba, taká aká si,\nsa zlepšuje. \n\nGabi\n\nNeoMe\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 14331,
+        "is_correction": false
+      }
+    ]
+  },
+  "week_4": {
+    "automation_id": 66,
+    "days": [
+      {
+        "day": 1,
+        "campaign_id": 218,
+        "message_id": "220",
+        "name": "Week 4 Day 1 ElasticBands",
+        "subject": "Týždeň 4 - Deň 1 programu Elastic Bands od NeoMe",
+        "preheader": "",
+        "fromname": "Gabi z Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "https://neome.com.au/svk \n\nAhoj %FIRSTNAME%, \n\nUž štvrtý týždeň sa snažíš si s NeoMe pravidelne dopriať čas\npre seba a urobiť tak niečo pre svoje telo a myseľ. \n\nČi už sa ti darí ísť podľa plánu alebo si mala nútené\nprerušenia, dôležité je, že sa nevzdávaš a ideš ďalej.\nPripomínaj si svoj cieľ a choď si za ním, pokiaľ ho nedosiahneš. \n\nNeoMe platforma\n<https://member.neome.com.au/products/elastic-bands-program/categories/2154854889/posts/2175568757>\n\nKaždý deň pracujeme na budovaní a upevňovaní udržateľných,\nzdravých návykov, ktoré tvoria základ zdravého životného štýlu.\n\n\nDnes ti chcem pripomenúť: \n\n**Dopraj si pravidelne 30-minút rýchlej chôdze/behu/bicykla**\n\nVedela si že, počas aktivít ako sú rýchla chôdza, beh, či bicykel\nsa ti nielen že zvyšuje srdcová frekvencia, ale zlepšuje sa ti aj\nprietok krvi v celom tele a tým pádom sa ti pri správnom dýchaní\ndostáva viac kyslíka rýchlejšie do krvného obehu? \n\nTo má za následok, že sa po takejto aktivite cítiš dobitá, plná\nendorfínov, tvoja nálada sa instantne zlepší a máš väčšiu\nschopnosť koncentrácie. \n\nDopraj si dnes svojich 15-min s NeoMe a 30 minút svojej obľúbenej\nfyzickej aktivity a vnímaj, ako si dobíjaš baterky a máš lepšiu\nnáladu.\n\nGabi z NeoMe\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 14463,
+        "is_correction": false
+      },
+      {
+        "day": 2,
+        "campaign_id": 249,
+        "message_id": "251",
+        "name": "Week 4 Day 2 oprava",
+        "subject": "Oprava ElasticBands (Týždeň 4 Deň 2)",
+        "preheader": "",
+        "fromname": "Gabi z Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "https://neome.com.au/svk \n\nAhoj %FIRSTNAME%, \n\nČi už sa ti týžden začal podľa plánov alebo práve naopak, skús\nna chvíľu odložiť všetky povinnosti na stranu, dať ich na pauzu a\nvenovať čas sebe. \n\nOkrem cvičenia si utorky spolu taktiež pripomíname, aké dôležité\nje piť počas dňa dostatok vody. Urob si dnes sebareflexiu a povedz\nsi, či sa ti to za posledné týždne darilo dodržiavať alebo nie. \n\nAk nie, skús si identifikovať veci, ktoré potrebuješ zmeniť, aby si\nmala od tohto týždňa väčšie šance na úspech. \n\nhttps://member.neome.com.au/password/new \n\nNeoMe platforma\n<https://member.neome.com.au/products/elastic-bands-program/categories/2154854889/posts/2175568758>\n\nKaždý deň pracujeme na budovaní a upevňovaní udržateľných,\nzdravých návykov, ktoré tvoria základ zdravého životného štýlu.\n\nDnes ti chcem pripomenúť: Vypi aspoň 2 litre čistej vody denne.\nVedela si, že pocit únavy môže byť následkom dehydratácie?\nDostatočný príjem vody je kľúčový pre udržanie optimálnej\núrovne energie a môže pomôcť znížiť pocity únavy.\n\nDopraj si dnes svojich 15-min s NeoMe a nezabudnite vypiť aspoň 2\nlitre vody. Skús tak predísť alebo aspoň zmierniť pocity únavy,\nktoré ťa častokrát počas dňa chytajú. \n\nGabi z NeoMe\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 14850,
+        "is_correction": true
+      },
+      {
+        "day": 3,
+        "campaign_id": 220,
+        "message_id": "222",
+        "name": "Week 4 Day 3 ElasticBands (SVK)",
+        "subject": "Týždeň 4 - Deň 3 programu Elastic Bands od NeoMe",
+        "preheader": "",
+        "fromname": "Gabi z Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "https://neome.com.au/svk \n\nAhoj %FIRSTNAME%, \n\nKaždá z nás má svoje silné a slabé stránky. Pre niektoré z nás\nmôže byť strečing tou obľúbenou časťou našich cvičení, pre\niné ani nie…\n\n \nČi už patríš do prvej alebo druhej skupiny žien, dôležité je\npripomínať si, že je rovnako dôležité pracovať na svojich\nsilných aj slabých stránkach\n\nNeoMe platforma\n<https://member.neome.com.au/products/elastic-bands-program/categories/2154854889/posts/2175568759>\n\n\nKaždý deň pracujeme na budovaní a upevňovaní udržateľných,\nzdravých návykov, ktoré tvoria základ zdravého životného štýlu.\n\nDnes ti chcem pripomenúť: \n\n**Zapíš si tri veci, za ktoré si vďačná...**\n\nVedela si, že praktizovanie vďačnosti môže mať pozitívny vplyv na\nkvalitu tvojho spánku?\nĽudia, ktorí si pred spaním vypisujú veci, za ktoré sú vďační,\nzaspávajú rýchlejšie a spia hlbšie. Tento týždeň sa preto\nzameriame na to, ako si môžeš jednoduchými krokmi vďačnosti\nzlepšiť kvalitu svojho spánku.  \n\nDopraj si svojich 15-min s NeoMe a zapíš si aj dnes tri veci, za\nktoré si vďačná. Nechaj sa uspať pozitívnymi myšlienkami, ktoré\nťa privedú do pokojného spánku.. \n\nGabi z NeoMe\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 14232,
+        "is_correction": false
+      },
+      {
+        "day": 4,
+        "campaign_id": 221,
+        "message_id": "223",
+        "name": "Week 4 Day 4 ElasticBands (SVK)",
+        "subject": "Týždeň 4 - Deň 4 programu Elastic Bands od NeoMe",
+        "preheader": "",
+        "fromname": "Gabi z Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "https://neome.com.au/svk \n\nAhoj %FIRSTNAME%, \n\n Aj dnes si sa rozhodla dopriať si 15 minút pre seba, svoje zdravie,\nsvoje telo a vnútornú pohodu.\n\nJedna klientka mi nedávno povedala: \"Vždy som myslela, že nato, aby\nsom sa cítila skvele musím tráviť hodiny v posilke. A keďže ich\nnemám bola som zo seba neustále frustrovaná. Koncept denných 15\nminútoviek mi zmenil otvoril oči a zmenil prístup k samej sebe.\"\n\nVerím, že ti naše cvičenia prinášajú radosť aj skvelý pocit so\nseba. Dnešné cvičko nájdeš tu...\n\nNeoMe platforma\n<https://member.neome.com.au/products/elastic-bands-program/categories/2154854889/posts/2175568760>\n\n\n Naše telo by bez jedla a vody nemohlo dlhodobo fungovať. A aj\nkeď existuje veľa rôznych prístupov k stravovaniu či chudnutiu,\nvšetky sa zhodnú natom, že to, \n\n**Čo, Kedy** a \n\n**V akom množstve** prijímame ovplyvňuje našu energiu, náladu,\nvýkonnosť, či schopnosť sa koncentrovať.\n\nDopriať si vyvážené jedlá v adekvátnom množstve je preto alfou\nomegou, aby sme si mohli užívať bežné dni a zvládali všetko, čo\nk nim patrí. \n\nV NeoMe pracujeme každý deň na budovaní a upevňovaní\nudržateľných, zdravých návykov, ktoré tvoria základ zdravého\nživotného štýlu.\n\nPreto ti chcem dnes pripomenúť: \n\n**Naplň svoj tanier vyváženým jedlom, ktoré ti pomôže posilniť\nimunitný systém. **\n\nVieš, aké vitamíny ti môžu pomôcť posilniť tvoj imunitný\nsystém?\n\nPotraviny bohaté na vitamín A, vitamín C, vitamín D, vitamín E,\nselén a zinok ti pomôžu posilniť tvoju imunitu a zvýšia schopnosť\nbojovať proti chorobám. Nájdeš ich v zelenine a ovocí všetkého\ndruhu, hovädzej pečienke, kuracom, morčacom mäse, rybách,\nvajíčkach, strukovinách, orechoch, semenách, vločkách, cottage\ncheese… \n\nDopraj si aj dnes svojich 15-min s NeoMe a nezabudni si pridať na svoj\ntanier viac ovocia a zeleniny, aby si svojmu telu poskytla palivo,\nktoré potrebuje na udržanie silnej imunity. \n\nGabi z NeoMe\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 15567,
+        "is_correction": false
+      },
+      {
+        "day": 5,
+        "campaign_id": 222,
+        "message_id": "224",
+        "name": "Week 4 Day 5 ElasticBands (SVK)",
+        "subject": "Týždeň 4 - Deň 5 programu Elastic Bands od NeoMe",
+        "preheader": "",
+        "fromname": "Gabi z Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "https://neome.com.au/svk \n\nAhoj %FIRSTNAME%, \n\nSo záverom týždňa ťa čaká príjemný 15-minútový strečing, s\nktorým je spojená aj naša meditácia. Prostredníctvom meditácie sa\nučíme byť mindful - vnímať svoje myšlienky a pocity, bez toho, aby\nsme ich súdili alebo na ne reagovali. Táto mindfulness nám pomáha\nbyť v bežných dňoch viac prítomné a vnímavé voči svojim\nvnútorným pocitom, čo môže viesť k väčšej jasnosti a\nvnútornému pokoju. \n\nV NeoMe pracujeme každý deň na budovaní a upevňovaní\nudržateľných, zdravých návykov, ktoré tvoria základ zdravého\nživotného štýlu.\n\nNeoMe platforma\n<https://member.neome.com.au/products/elastic-bands-program/categories/2154854889/posts/2175568761>\n\n\nDnes ti chcem pripomenúť: \n\n**Venuj si 10 minút v tichu**\n\nVedela si, že nato, aby si sa udržala v dobrej kondícií môžeš\ntrénovať nielen svoje telo, ale aj myseľ? \n\nDopraj si každý deň pre seba aspoň 10-minút v tichu, kedy si\nnecháš priestor pre seba. \n\nUdržiavaním pozornosti v prítomnosti a jej navrátením zakaždým,\nkeď sa zatúla, trénujeme mozgové siete, ktoré používame na\nkontrolu pozornosti. Tento typ tréningu môže zlepšiť naše\nduševné zdravie, podobne ako fyzické cvičenie zlepšuje naše\nfyzické zdravie.\n\nDopraj si dnes 15-min s NeoMe a svoju chvíľu v tichu, kedy\nbudeš  svoje myšlienky a pocity len pozorovať, a nebudeš na ne\nreagovať. \n\nGabi z NeoMe\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 14523,
+        "is_correction": false
+      }
+    ]
+  },
+  "week_5": {
+    "automation_id": 67,
+    "days": [
+      {
+        "day": 1,
+        "campaign_id": 228,
+        "message_id": "230",
+        "name": "Week 5 Day 1 ElasticBands",
+        "subject": "Týždeň 5 - Deň 1 programu Elastic Bands od NeoMe",
+        "preheader": "",
+        "fromname": "Gabi z Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "https://neome.com.au/svk \n\nAhoj %FIRSTNAME%, \n\nKaždý človek, ktorý pravidelne cvičí,  má svoj dôvod, svoju motiváciu, pre ktorú to robí. \n\nAké sú tie tvoje dôvody, pre ktoré chceš byť FIT? \n\nV NeoMe pracujeme každý deň na budovaní a upevňovaní udržateľných, zdravých návykov, ktoré tvoria základ zdravého životného štýlu.\n\nNeoMe platforma https://member.neome.com.au/products/elastic-bands-program/categories/2154854890/posts/2175568762\n\nDnes ti chcem pripomenúť: \n\n**Dopraj si pravidelne 30-minút rýchlej chôdze/behu/bicykla.**\n\nPravidelná fyzická aktivita je nevyhnutná pre tvoje fyzické aj duševné zdravie. Tvoje zdravie je základom pre všetko, čo v živote robíš. To, čo robíš dnes, rozhoduje o tom, aká bude tvoja myseľ a telo neskôr v živote. Či už ide o fyzické alebo duševné zdravie, výhody starostlivosti o seba  sa jasne prejavia vo všetkých oblastiach tvojho života. \n\nDopraj si dnes svojich 15-min s NeoMe a 30 minút svojej obľúbenej fyzickej aktivity a urob niečo pre svoje zdravie aj dnes. \n\nGabi z NeoMe\n\nSent to: %EMAIL%\n\nUnsubscribe %UNSUBSCRIBELINK%\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 15100,
+        "is_correction": false
+      },
+      {
+        "day": 2,
+        "campaign_id": 229,
+        "message_id": "231",
+        "name": "Week 5 Day 2 ElasticBands (SVK)",
+        "subject": "Týždeň 5 - Deň 2 programu Elastic Bands od NeoMe",
+        "preheader": "",
+        "fromname": "Gabi z Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "https://neome.com.au/svk \n\nAhoj %FIRSTNAME%, \n\nÚprimne sa teším, že si sa rozhodla urobiť niečo pre seba a svoje\nzdravie a že NeoMe ti v tom môže pomôcť.\n\nProgram Body Forming, ťa privedie bližšie k tvojmu cieľu, aby si sa\ncítila skvele vo svojom tele.  \n\nUž v pondelok si začneš formovať svoje telo, tónovať svaly,\nuvoľňovať napätie z tela a zrelaxuješ myseľ. Verím, že náš\n6-týždňový program si naplno užiješ a že postupne zapracuješ\npohyb do svojho bežného dňa. Vybuduješ si tak svoju novú rutinu v\nstartostlivostli o seba a svoje zdravie.\n\nČo môžeš očakávať:\n\n* budeme sa “stretávať” od pondelka do piatka na 15-minút \n\n* začneš vnímať cvičenie z novej perspektívy\n\n* NeoMe sa stane sučasťou tvojich bežných dní\n\n* dáš si pravidelne prioritu a to v čase, ktorý vyhovuje tebe\n\n* naučíš sa prepájať svoje telo a myseľ\n\n* dáš si priestor a uvoľníš tak napätie a stres z tela\n\n* budeš sa sprítomňovať pomocou dychu a pravidelných meditácii\n\n**Kľúč k úspechu - konzistencia**\n\nJe lepšie robiť malé kroky pravidelne, ako jeden veľký krok raz za\nčas. Preto sa aj my budeme stretávať každý deň na 15 minút.\n\n**Tvoje cvičenia**\n\nVideá s cvičeniami na každý deň budeš mať kedykoľvek dostupné\nonline cez NeoMe platformu na našej webke. \n\nHeslo si si už vytvorila pri zakúpení, keby si potrebovala nové,\nklikni SEM. <https://member.neome.com.au/password/new>\n\nNeoMe platforma\n<https://member.neome.com.au/products/elastic-bands-program/categories/2154854890/posts/2175568763>\n\n\nSúčasťou programu je aj NeoMe Komunita, o ktorej klientky hovoria,\nže je: \"skoro taká dobrá ako program.\" Prihlás sa do nej cez\nkomunikačnú apku Slack \n\nProstredníctvom Slack-u budeš odomňa dostávať dennú dávku\nmotivácie, môj koučing, ale budeš sa môcť aj inšpirovať od\niných žien, ktoré sú v programe a uvidíš ich progres.\n\nNeoMe budujeme ako globálnu značku a aj naďalej budeme naberať\nčlenov z rôznych krajín sveta. NeoMe Komunita je pestrá, plná\ninšpirácie a podpory. Je to bezpečné miesto, kde môžeš byť sama\nsebou.\n\nNeoMe Komunita\n<https://join.slack.com/t/neometribeofficial/shared_invite/zt-17qbtcdio-S8cwN3V~aoh7Y3I5JKjpjQ>\n\nPrihlás sa do NeoMe Platformy\nPrihlás sa do NeoMe Komunity\nOd pondelka ti každý deň príde email s linkom na aktuálne\ncvičko.\n\nNeoMe Body Forming je program vytvorený pre teba, aby si sa opäť\ncítila skvele vo svojom tele. \n\nKrásny deň.\n\nGabi\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 18485,
+        "is_correction": false
+      },
+      {
+        "day": 3,
+        "campaign_id": 230,
+        "message_id": "232",
+        "name": "Week 5 Day 3 ElasticBands (SVK)",
+        "subject": "Týždeň 5 - Deň 3 programu Elastic Bands od NeoMe",
+        "preheader": "Pre vnútornú pohodu a sebavedomie je dôležité pozitívne vnímanie samej seba. Nato, aby sme to dokázali je nevyhnutné sa cítiť dobre vo svojom tele a byť stotožnené a spokojné s tým, kým sme a ako žijeme svoje životy. ",
+        "fromname": "Gabi z Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "https://neome.com.au/svk \n\nAhoj %FIRSTNAME%, \n\nPre vnútornú pohodu a sebavedomie je dôležité pozitívne vnímanie\nsamej seba. Nato, aby sme to dokázali je nevyhnutné sa cítiť dobre\nvo svojom tele a byť stotožnené a spokojné s tým, kým sme a ako\nžijeme svoje životy. \n\nAk sa nám pravidelne nedarí dosiahnuť to, čo si zaumienime, môže\nto vyústiť do pocitov, že nie sme dosť dobré, že sa nám nedarí\nprogresovať a môžeme si tak podkopávať vlastné sebavedomie...\n\nPreto v NeoMe veríme, že pravidelné aj keď krátke cvičenie ti\nmôže priniesť omnoho viac, ako len spevnené telo. Každý deň\npracujeme na budovaní a upevňovaní udržateľných, zdravých\nnávykov, ktoré tvoria základ zdravého životného štýlu a pomôžu\nti budovať aj pevnejšie sebavedomie.\n\nNeoMe platforma\n<https://member.neome.com.au/products/elastic-bands-program/categories/2154854890/posts/2175568764>\n\n\nDnes ti chcem pripomenúť: \n\n**Zapíš si tri veci, ktoré máš na sebe rada**\n\nVedela si, že ľudia, ktorí hovoria pozitívne o sebe, bývajú\núspešnejší, odolnejší a emocionálne stabilnejší ako tí, ktorí\nhovoria negatívne o sebe? Pozitívna vnímanie samej saba pomáha tiež\nľuďom vyrovnať sa so stresom a nepriazňou osudu a môže podporiť\nväčšiu vnútornú pohodu a pocity šťastia a naplnenia.\n\nDopraj si dnes svojich 15-min s NeoMe a zapíš si tri veci, ktoré\nmáš na sebe rada. Vnímaj svoje silné stránky a s tými slabými\npracuj a postupne ich tak zmeň na svoje silné. \n\nGabi z NeoMe\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 14066,
+        "is_correction": false
+      },
+      {
+        "day": 4,
+        "campaign_id": 231,
+        "message_id": "233",
+        "name": "Week 5 Day 4 ElasticBands (SVK)",
+        "subject": "Týždeň 5 - Deň 4 programu Elastic Bands od NeoMe",
+        "preheader": "",
+        "fromname": "Gabi z Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "https://neome.com.au/svk \n\nAhoj %FIRSTNAME%, \n\nCvičenie a vyvážená strava idú ruka v ruke. Je to ako začarovaný\nkruh. Cvičenie ti dokáže rozprúdiť krv v tele, zlepšiť náladu,\nposilniť svaly, rozhýbať stuhnuté kĺby, navýšiť energetický\nvýdaj a vyvážená strava ti poskytne energiu, aby si počas dňa\ndokázala fungovať a zvládala všetky svoje povinnosti aj radosti a\ndodá ti všetky potrebné živiny, aby tvoje telo správne\nfungovalo.  \n\nDopraj si aj dnes s Neome svojich 15-min a pracuj tak na budovaní a\nupevňovaní svojich udržateľných, zdravých návykov, ktoré tvoria\nzáklad tvojho zdravého životného štýlu. Nezabúdaj, že aj malá\nzmena sa ráta, ak ju robíš pravidelne po dostatočne dlhú dobu. \n\nNeoMe platforma\n<https://member.neome.com.au/products/elastic-bands-program/categories/2154854890/posts/2175568765>\n\n\nDnes ti chcem pripomenúť: \n\n**Vyskladaj si svoj tanier z dostatočného množstva ovocia a\nzeleniny**\n\nSkús si dnes ku každej svojej porcii jedla dopriať extra porciu\nzeleniny a ovocia. Pri najbližšom pripravovaní  jedla najskôr\nnaplň pol taniera zeleninou a až potom pridaj ďalšie prílohy -\ncestovinu/ryžu; mäso/ryby. \n\nNa desiatu a olovrant si dopraj ovocie, zeleninu a to doplň o nejakú\nbielkovinou - cottage cheese, jogurt, vajíčko, oriešky prípadne\nmalé množstvo komplexných sacharidov - vločky, celozrnné pečivo. \n\nDopraj si aj dnes svojich 15-min s NeoMe a nezabudni si pridať na svoj\ntanier viac ovocia a zeleniny, aby si mala dostatok energie. \n\nGabi z NeoMe\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 14295,
+        "is_correction": false
+      },
+      {
+        "day": 5,
+        "campaign_id": 232,
+        "message_id": "234",
+        "name": "Week 5 Day 5 ElasticBands (SVK)",
+        "subject": "Týždeň 5 - Deň 5 programu Elastic Bands od NeoMe",
+        "preheader": "Z času na čas ich má každá z nás -  zlé dni….  Sú bežnou súčasťou našich životov.\n\n\n\nSú to dni, keď máme pocit, že sa vesmír spojil proti nám, keď sa zdá, že všetko, čo sa môže pokaziť, sa pokazí. Ale vtedy si treba pamätať: zlý deň je len deň.. Je to len malý okamih v našom celom živote.",
+        "fromname": "Gabi z Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "https://neome.com.au/svk \n\nAhoj %FIRSTNAME%, \n\nZ času na čas ich má každá z nás -  zlé dni….  Sú bežnou\nsúčasťou našich životov.\n\nSú to dni, keď máme pocit, že sa vesmír spojil proti nám, keď sa\nzdá, že všetko, čo sa môže pokaziť, sa pokazí. Ale vtedy si\ntreba pamätať: zlý deň je len deň.. Je to len malý okamih v našom\ncelom živote. \nPočas týchto dní odlož veci, ktoré nie sú urgentné na zajtra a\nsústreď svoju energiu len na to, čo naozaj musíš spraviť.\nZároveň si dopraj veci, pri ktorých sa cítiš dobre a ktoré ťa\ndokážu dobiť energiou. \n\nDopraj si aj dnes s NeoMe svojich 15-min a pracuj tak na budovaní a\nupevňovaní svojich udržateľných, zdravých návykov, ktoré tvoria\nzáklad tvojho zdravého životného štýlu.\n\n**Svoje dnešné cvičenie s NeoMe si nájdeš tu:**\n\n****\n\nNeoMe platforma\n<https://member.neome.com.au/products/elastic-bands-program/categories/2154854890/posts/2175568766>\n\n\nDnes ti chcem pripomenúť: \n\n**Venuj si 10 minút v tichu a upriam svoju pozornosť na dych**\n\nVedela si, že a pár minút v tichu a hlboké dýchanie ti dokážu\nzmierniť pocity úzkosti a stresu? \n\nPri plytkom dýchaní sa do najnižšej časti pľúc nedostáva plný\npodiel okysličeného vzduchu. Naopak hlboké (bránicové) dýchanie\npodporuje úplnú výmenu prichádzajúceho kyslíka za odchádzajúci\noxid uhličitý, čo nám môže pomôcť spomaliť srdcový tep,\nstabilizovať krvný tlak a odstrániť tak pocity úzkosti a stresu. \n\nDopraj si aj dnes svojich 15-min s NeoMe a 10 minút v tichu. \n\nGabi z NeoMe\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 14988,
+        "is_correction": false
+      }
+    ]
+  },
+  "week_6": {
+    "automation_id": 68,
+    "days": [
+      {
+        "day": 1,
+        "campaign_id": 238,
+        "message_id": "240",
+        "name": "Week 6 Day 1 ElasticBands",
+        "subject": "Týždeň 6 - Deň 1 programu Elastic Bands od NeoMe",
+        "preheader": "",
+        "fromname": "Gabi z Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "https://neome.com.au/svk \n\nAhoj %FIRSTNAME%, \n\nDnes začínaš posledný týždeň nášho 6-týždňového programu\nElastic Bands. A aj keď sa program pomaličky blíži ku koncu, tvoj\nnávyk denne si venovať 15 minút ti ostáva. Kultivuj si tento návyk\na aj naďalej ho udržuj. Pravidelný pohyb je nevyhnutný pre naše\nzdravie a optimálne fungovanie celého tela.  \n\nDopraj si aj dnes s Neome svojich 15-min a naďalej tak pracuj na\nbudovaní a upevňovaní svojich udržateľných, zdravých návykov,\nktoré tvoria základ tvojho zdravého životného štýlu.\n\n**Svoje dnešné cvičenie s NeoMe si nájdeš tu:**\n\n** **\n\nNeoMe platforma\n<https://member.neome.com.au/products/elastic-bands-program/categories/2154854891/posts/2175568767>\n\n\nDnes ti chcem pripomenúť: \n\n**Dopraj si pravidelne 30-minút rýchlej chôdze/behu/bicykla. **\n\nVedela si, že aj pravidelná 30-minútová prechádzka ti okrem\nzvýšenia kardiovaskulárnej kondície, zosilnenia kostí, zníženia\nnadbytočného telesného tuku a zvýšenia vytrvalosti taktiež môže\npomôcť znížiť riziko vzniku ochorení, ako sú srdcové choroby,\ncukrovka 2. typu, osteoporóza a niektoré druhy rakoviny.\n\nDopraj si preto aj dnes svojich 15-min s NeoMe a choď sa na 30-minút\nprejsť, alebo si zabehať, či zabicyklovať. \n\nGabi z NeoMe\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 14178,
+        "is_correction": false
+      },
+      {
+        "day": 2,
+        "campaign_id": 239,
+        "message_id": "241",
+        "name": "Week 6 Day 2 ElasticBands (SVK)",
+        "subject": "Týždeň 6 - Deň 2 programu Elastic Bands od NeoMe",
+        "preheader": "Žijeme v rýchlej dobe, kedy sa dá veľa vecí vyriešiť takmer okamžite. \n\n\n\nChceme si niečo kúpiť - možeme to spraviť online cez telefón; chceme sa porozprávať s kamarátkou, ktorá žije v inom meste - stačí zdvihnúť telefón…. Avšak niektoré veci sa nedajú urýchliť. ",
+        "fromname": "Gabi z Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "https://neome.com.au/svk \n\nAhoj %FIRSTNAME%, \n\nŽijeme v rýchlej dobe, kedy sa dá veľa vecí vyriešiť takmer okamžite. \n\nChceme si niečo kúpiť - možeme to spraviť online cez telefón; chceme sa porozprávať s kamarátkou, ktorá žije v inom meste - stačí zdvihnúť telefón…. Avšak niektoré veci sa nedajú urýchliť. Ako napríklad získanie lepšej kondície, pevnejšieho či štíhlejšieho tela. Špeciálne diéty, džúsy, ktoré sľubujú rýchle výsledky, fungujú, ale poskytnú ti len krátkodobé  a neudržateľné výsledky a nie sú najlepšie pre tvoje zdravie. \n\nNenechaj sa nimi zlákať a radšej si buduj zdravé a udržateľné návyky, ktoré tvoria základ zdravého životného štýlu.\n\nSvoje dnešné cvičenie s NeoMe si nájdeš tu: \n\nNeoMe platforma <https://member.neome.com.au/products/elastic-bands-program/categories/2154854891/posts/2175568768> \n\nDnes ti chcem pripomenúť: \n\n**Vypi aspoň 2 litre čistej vody denne**\n\nVedela si, že pitie dostatočného množstva vody je potrebné pre zdravie tvojej pokožky, napomáha lepšiemu tráveniu, vstrebávaniu živín, pomáha telu zbavovať sa odpadových látok a taktiež udržiava správnu telesnú teplotu?\n\nAj tak jednoduchý zvyk, ako je pravidelné pitie dostatočného množstva vody je nesmierne dôležité nato, aby naše telo dokázalo dobre fungovať. \n\nDopraj si aj dnes svojich 15-min s NeoMe a priebežne počas dňa si dopraj aspoň 2l vody denne. \n\nGabi z NeoMe\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 15272,
+        "is_correction": false
+      },
+      {
+        "day": 3,
+        "campaign_id": 240,
+        "message_id": "242",
+        "name": "Week 6 Day 3 ElasticBands (SVK)",
+        "subject": "Týždeň 6 - Deň 3 programu Elastic Bands od NeoMe",
+        "preheader": "V súčasnej dobe, kedy je všetkého prebytok sa častokrát stáva, že sme tak zahltené vecami, povinnosťami, stretnutiami, krúžkami svojich detí, že zabúdame vnímať jednoduchosť okamihu, byť prítomné a vážiť si to, čo máme.",
+        "fromname": "Gabi z Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "https://neome.com.au/svk \n\nAhoj %FIRSTNAME%, \n\nV súčasnej dobe, kedy je všetkého prebytok sa častokrát stáva,\nže sme tak zahltené vecami, povinnosťami, stretnutiami, krúžkami\nsvojich detí, že zabúdame vnímať jednoduchosť okamihu, byť\nprítomné a vážiť si to, čo máme. Naša myseľ je roztržitá a my\nsa neustále za niečím naháňame, lebo máme pocit, že potrebujeme\nurobiť viac, stihnúť viac, mať viac….\n\nVedieť sa spomaliť a vnímať jednoduchosť bežných okamihov nám\nvšak dokáže prinavrátiť vnútorný pokoj a harmóniu, ktorú\npotrebujeme pre svoje šťastie. \n\nDopraj si aj dnes s Neome svojich 15-min a pracuj tak na budovaní a\nupevňovaní svojich udržateľných, zdravých návykov, ktoré tvoria\nzáklad tvojho zdravého životného štýlu.\n\nSvoje dnešné cvičenie s NeoMe si nájdeš tu:\n\nNeoMe platforma\n<https://member.neome.com.au/products/elastic-bands-program/categories/2154854891/posts/2175568769>\n\n\nDnes ti chcem pripomenúť: \n\n**Zapíš si tri veci, ktoré máš na sebe rada**\n\nSkús sa dnes počas svojich 15-minút odstrihnúť od okolitého sveta,\nod povinností, ktoré na teba čakajú, od požiadaviek, ktoré na teba\ntvoje deti a rodina kladie a vnímaj seba, to čo cítiš, pozoruj svoje\nmyšlienky. Nájdi tri veci, za ktoré si dnes vďačná. Čo sa ti dnes\npáčilo, čo ti urobilo radosť. Venuj im svoju pozornosť a oceň\nich. \n\nDopraj si svojich 15-min s NeoMe a nechaj si priestor, aby si dokázala\nnavnímať a oceniť jednu, dve alebo tri veci, za ktoré si dnes\nvďačná. \n\nGabi z NeoMe\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 14434,
+        "is_correction": false
+      },
+      {
+        "day": 4,
+        "campaign_id": 241,
+        "message_id": "243",
+        "name": "Week 6 Day 4 ElasticBands (SVK)",
+        "subject": "Týždeň 6 - Deň 4 programu Elastic Bands od NeoMe",
+        "preheader": "Poznáš to príslovie, že najlepšia investícia je investícia do svojho zdravia? Naše telo si všetko pamätá….To ako sa staráme o svoje zdravie dnes, nám určuje, aké bude naše zdravie a  kvalita nášho života v budúcnosti. ",
+        "fromname": "Gabi z Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "https://neome.com.au/svk \n\nAhoj %FIRSTNAME%, \n\nPoznáš to príslovie, že najlepšia investícia je investícia do\nsvojho zdravia? Naše telo si všetko pamätá….To ako sa staráme o\nsvoje zdravie dnes, nám určuje, aké bude naše zdravie a  kvalita\nnášho života v budúcnosti. \n\nDopraj si aj dnes s Neome svojich 15-min a pracuj tak na budovaní a\nupevňovaní svojich udržateľných, zdravých návykov, ktoré tvoria\nzáklad tvojho zdravého životného štýlu.\n\n**Svoje dnešné cvičenie s NeoMe si nájdeš tu:** \n\nNeoMe platforma\n<https://member.neome.com.au/products/elastic-bands-program/categories/2154854891/posts/2175568770>\n\n\nDnes ti chcem pripomenúť: \n\n**Naplň svoj tanier dostatočným množstvom ovocia a zeleniny**\n\nSkús nahradiť prisladzované snacky, musli, džúsy, croissanty,\nčokolády, omáčky, polotovary ovocím a zeleninou. Dokážeš si tak\nlepšie udržať stabilnú hladinu cukru v krvi a predídeš prepadom\nenergie a pocitom únavy, ktoré vznikajú ako následok po konzumácií\npotravín s vysoký obsah cukrov. \n\nDopraj si aj dnes svojich 15-min s NeoMe a nezabudni si pridať na svoj\ntanier viac ovocia a zeleniny, aby si mala dostatok energie. \n\nGabi z NeoMe\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 14104,
+        "is_correction": false
+      },
+      {
+        "day": 5,
+        "campaign_id": 242,
+        "message_id": "244",
+        "name": "Week 6 Day 5 ElasticBands (SVK)",
+        "subject": "Týždeň 6 - Deň 5 programu Elastic Bands od NeoMe",
+        "preheader": "Si skvelá! Dokázala si sa prepracovať na záver programu ElasticBands...",
+        "fromname": "Gabi z Neo.Me",
+        "fromemail": "gabi@neome.com.au",
+        "text": "https://neome.com.au/svk \n\nAhoj %FIRSTNAME%, \n\nSi skvelá! \n\nDokázala si sa prepracovať na záver programu ElasticBands a dopriať\nsi tak pravidelné cvičenie/pohyb. Máš za sebou 30 cvičení a či\nuž sa ti ich podarilo odcvičiť po sebe alebo s nejakou menšou\nprestávkou, vnímaj svoj progres a cestu, ktorú si prešla. Gratulujem\nti!\n\nDnes ťa čaká tvoje posledné cvičenie. Uži si ho :-)\n\n**Svoje dnešné cvičenie s NeoMe si nájdeš tu:**<> \n\nNeoMe platforma\n<https://member.neome.com.au/products/elastic-bands-program/categories/2154854891/posts/2175568771>\n\n\nĎakujem, že si si vybrala NeoMe. \n\nSom šťastná,  že som ťa mohla sprevádzať mojimi pravidelnými\ncvičeniami, ktoré ti pomohli si vybudovať nielen pevnejšie a\npružnejšie telo, lepšiu kondíciu a koordináciu, ale taktiež\nverím, že ti pomohli si vybudovať/upevniť množstvo zdravých\nnávykov, ktoré s tebou už ostanú. \n\nGabi\n\nSent to: %EMAIL%\n\nUnsubscribe <%UNSUBSCRIBELINK%>\n\n%SENDER-INFO-SINGLELINE%",
+        "html_len": 13817,
+        "is_correction": false
+      }
+    ]
+  }
+}
