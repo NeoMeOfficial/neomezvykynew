@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { format } from 'date-fns';
+import { format, addDays } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { useCycleData } from '../../features/cycle/useCycleData';
 import { useDailyTeloPick } from '../../features/telo/useDailyTeloPick';
@@ -211,7 +211,7 @@ interface PaidViewProps {
   onMarkPeriodEnd: (date: Date) => void;
   onCorrectPeriod: (start: Date, end: Date | null) => void;
   onSetOvulation: (date: Date | null) => void;
-  onAddMissedPeriod: (startISO: string) => void;
+  onAddMissedPeriod: (startISO: string, endISO?: string) => void;
   onAcknowledgeGap: (laterStartISO: string) => void;
   onCorrectHistory: (originalStartISO: string, start: Date, end: Date | null) => void;
   onSetPastOvulation: (cycleStartISO: string, date: Date | null) => void;
@@ -563,6 +563,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
   const [gapSheetOpen, setGapSheetOpen] = useState(false);
   const [gapPickMode, setGapPickMode] = useState(false);
   const [gapDraft, setGapDraft] = useState('');
+  const [gapEndDraft, setGapEndDraft] = useState('');
   // The gap currently being resolved (from the month prompt OR a day tap).
   const [activeGap, setActiveGap] = useState<{ prevISO: string; laterISO: string; estimatedISO: string } | null>(null);
   const [draftOvul, setDraftOvul] = useState('');
@@ -929,6 +930,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
             onClick={() => {
               setActiveGap(selDayGapInfo);
               setGapDraft(selDayGapInfo.estimatedISO);
+              setGapEndDraft(format(addDays(new Date(selDayGapInfo.estimatedISO + 'T00:00:00'), (cycleData.periodLength ?? 5) - 1), 'yyyy-MM-dd'));
               setGapPickMode(true);
               setGapSheetOpen(true);
               setSelectedDay(null);
@@ -1357,7 +1359,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
             gap — a small tappable prompt that opens the resolve sheet. */}
         {monthStatus === 'gap' && monthGapInfo && (
           <button
-            onClick={() => { setActiveGap(monthGapInfo); setGapDraft(monthGapInfo.estimatedISO); setGapPickMode(false); setGapSheetOpen(true); }}
+            onClick={() => { setActiveGap(monthGapInfo); setGapDraft(monthGapInfo.estimatedISO); setGapEndDraft(format(addDays(new Date(monthGapInfo.estimatedISO + 'T00:00:00'), (cycleData.periodLength ?? 5) - 1), 'yyyy-MM-dd')); setGapPickMode(false); setGapSheetOpen(true); }}
             style={{ all: 'unset', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4, margin: '-2px 0 10px', fontFamily: NM.SANS, fontSize: 10.5, color: NM.TERRA, fontWeight: 600 }}
           >
             Chýba záznam — možno si vynechala periódu — doplniť
@@ -2118,17 +2120,35 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
           </>
         ) : (
           <>
-            <div style={{ fontFamily: NM.SANS, fontSize: 12, color: NM.MUTED, marginTop: 14, marginBottom: 6 }}>Kedy približne začala tá perióda?</div>
+            <div style={{ fontFamily: NM.SANS, fontSize: 12, color: NM.MUTED, marginTop: 14, marginBottom: 6 }}>Kedy začala tá perióda?</div>
             <input
               type="date"
               value={gapDraft}
               min={activeGap?.prevISO}
               max={activeGap?.laterISO}
-              onChange={(e) => setGapDraft(e.target.value)}
+              onChange={(e) => {
+                const v = e.target.value;
+                setGapDraft(v);
+                // Keep the end sensible: default to start + bleed length, and
+                // never let it sit before the start.
+                const pl = cycleData.periodLength ?? 5;
+                if (v && (!gapEndDraft || gapEndDraft < v)) {
+                  setGapEndDraft(format(addDays(new Date(v + 'T00:00:00'), pl - 1), 'yyyy-MM-dd'));
+                }
+              }}
+              style={dateInputStyle}
+            />
+            <div style={{ fontFamily: NM.SANS, fontSize: 12, color: NM.MUTED, marginTop: 14, marginBottom: 6 }}>A kedy skončila?</div>
+            <input
+              type="date"
+              value={gapEndDraft}
+              min={gapDraft || activeGap?.prevISO}
+              max={activeGap?.laterISO}
+              onChange={(e) => setGapEndDraft(e.target.value)}
               style={dateInputStyle}
             />
             <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.TERTIARY, marginTop: 6 }}>
-              Navrhli sme dátum podľa tvojho cyklu — uprav ho, ak vieš presnejšie.
+              Dátumy sme predvyplnili podľa tvojho cyklu — uprav ich, ak vieš presnejšie.
             </div>
             <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
               <button
@@ -2140,7 +2160,8 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
               <button
                 onClick={() => {
                   const valid = !!gapDraft && (!activeGap || (gapDraft > activeGap.prevISO && gapDraft < activeGap.laterISO));
-                  if (valid) onAddMissedPeriod(gapDraft);
+                  const end = gapEndDraft && gapEndDraft >= gapDraft ? gapEndDraft : undefined;
+                  if (valid) onAddMissedPeriod(gapDraft, end);
                   setGapSheetOpen(false);
                 }}
                 style={{ all: 'unset', cursor: 'pointer', flex: 1, textAlign: 'center', padding: '14px 0', borderRadius: 999, background: PHASE.MENSTR, color: '#fff', fontFamily: NM.SANS, fontSize: 13, fontWeight: 500 }}
@@ -2352,7 +2373,7 @@ export default function Periodka() {
           onMarkPeriodEnd={handleMarkPeriodEnded}
           onCorrectPeriod={correctPeriod}
           onSetOvulation={setOvulationDate}
-          onAddMissedPeriod={(iso) => addPeriodToHistory(iso)}
+          onAddMissedPeriod={(iso, end) => addPeriodToHistory(iso, end)}
           onAcknowledgeGap={acknowledgeGap}
           onCorrectHistory={correctHistoryEntry}
           onSetPastOvulation={setPastOvulation}
