@@ -365,20 +365,32 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     //    she logs her period — truthful "cyklus predĺžený" with the plan
     //    rolling ahead.
     //  • NOT overdue: future days wrap forward to project the next cycle.
+    // An UN-resolved long gap between two recorded periods (gap > 1.5× her
+    // normal length, not acknowledged) must NOT stretch one cycle's phases
+    // across the whole gap (that balloons follicular to ~40 days). Instead we
+    // render a NORMAL-length cycle from the start and clamp the leftover gap
+    // days to luteal — exactly like the current overdue cycle ("meškajúca
+    // perióda"). Once she resolves the gap (adds the missed period, or
+    // acknowledges it was genuinely one long cycle) it renders as a full
+    // stretched cycle (delayed ovulation + 14-day luteal).
+    const isUnresolvedGap = !isCurrentCycle && !!nextStart
+      && thisLen > Math.round(totalDays * 1.5)
+      && !(cycleData.acknowledgedGaps ?? []).includes(nextStart);
+    const effLen = isUnresolvedGap ? totalDays : thisLen;
     const phaseDay = isCurrentCycle
       ? (rawDay <= thisLen
           ? rawDay
           : (currentDay > thisLen
               ? (rawDay <= currentDay ? thisLen : ((rawDay - currentDay - 1) % thisLen) + 1)
               : ((rawDay - 1) % thisLen + thisLen) % thisLen + 1))
-      : rawDay;
-    const ranges = getPhaseRanges(thisLen, cycleData.periodLength ?? 5);
+      : (isUnresolvedGap ? Math.min(rawDay, effLen) : rawDay);
+    const ranges = getPhaseRanges(effLen, cycleData.periodLength ?? 5);
     let key = ranges.find((r) => phaseDay >= r.start && phaseDay <= r.end)?.key ?? null;
     // Bleed override only on the REAL bleed days of this cycle (rawDay,
     // not the wrapped projection).
     if (bleedLen !== null && rawDay <= bleedLen) {
       key = 'menstrual';
-    } else if (bleedLen !== null && rawDay <= thisLen && key === 'menstrual') {
+    } else if (bleedLen !== null && rawDay <= effLen && key === 'menstrual') {
       key = 'follicular';
     }
     // Recorded ovulation (current cycle only): the exact day she logged wins,
