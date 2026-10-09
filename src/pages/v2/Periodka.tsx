@@ -408,7 +408,11 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     // beyond today) — these show only an outline for the predicted period,
     // no phase fill. Real cycle days (past, current, overdue-to-today) are
     // not projected → full phase colour.
-    const projected = isCurrentCycle && rawDay > thisLen && targetISO > todayISOc;
+    // Faded ("planned/unconfirmed") when: future projection of the current
+    // cycle, OR the overdue tail of an unresolved long gap — those days have
+    // no confirmed period, so they read as expected, not recorded.
+    const projected = (isCurrentCycle && rawDay > thisLen && targetISO > todayISOc)
+      || (isUnresolvedGap && rawDay > effLen);
     return { cycleDay: rawDay, key, confirmed: targetISO <= todayISOc, projected };
   };
   const phaseKeyForCalendarDay = (d: number): string | null => cycleInfoForCalendarDay(d)?.key ?? null;
@@ -864,8 +868,12 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
   // Is the tapped day inside an unacknowledged GAP (its cycle is abnormally
   // long)? If so, offer "Doplniť" (add a missed period) rather than editing
   // the stretched previous cycle.
-  const selDayGapInfo = (selAnchor && selNextStart
+  // Only the overdue TAIL of an unresolved long gap (days beyond her normal
+  // cycle length) is a "fill a missed period" zone. The real period days and
+  // the normal-cycle phases at the START of the gap stay editable as usual.
+  const selDayGapInfo = (selAnchor && selNextStart && selectedDateISO0
     && Math.round((new Date(selNextStart + 'T00:00:00').getTime() - new Date(selAnchor + 'T00:00:00').getTime()) / 86400000) > Math.round(totalDays * 1.5)
+    && (daysBetweenISO(selAnchor, selectedDateISO0) + 1) > totalDays
     && !(cycleData.acknowledgedGaps ?? []).includes(selNextStart))
     ? { prevISO: selAnchor, laterISO: selNextStart, estimatedISO: format(new Date(new Date(selAnchor + 'T00:00:00').getTime() + totalDays * 86400000), 'yyyy-MM-dd') }
     : null;
