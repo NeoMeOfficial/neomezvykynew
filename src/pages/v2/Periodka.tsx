@@ -885,6 +885,13 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
   const selectedIsToday = selectedDateISO === todayISO;
   const todayNoteText = (symptomDayEntries.find((e) => e.date === todayISO)?.note ?? '').trim();
   const selectedIsPast = !!selectedDateISO && selectedDateISO < todayISO;
+  // Tapping a PLANNED (projected) menstruation day in the past → let her
+  // record that the period really happened. We compute the planned period's
+  // first day from the cycle day so the add sheet prefills the run start.
+  const selPlannedPeriodStart = (selectedInfo?.projected && selectedInfo.key === 'menstrual'
+    && selectedDateISO && selectedDateISO <= todayISO && !selDayGapInfo)
+    ? format(addDays(new Date(selectedDateISO + 'T00:00:00'), -(selectedInfo.cycleDay - 1)), 'yyyy-MM-dd')
+    : null;
   const selectedSymptomLabels = selectedDateISO
     ? Object.keys(symptomDayEntries.find((e) => e.date === selectedDateISO)?.symptoms ?? {})
         .map((k) => allSymptomDefs.find((s) => s.k === k)?.l)
@@ -942,10 +949,29 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
           </button>
         )}
 
+        {/* PLANNED menstruation day (projected, in the past) → record that
+            the period really happened, start + end. */}
+        {selPlannedPeriodStart && (
+          <button
+            onClick={() => {
+              setActiveGap(null);
+              setGapDraft(selPlannedPeriodStart);
+              setGapEndDraft(format(addDays(new Date(selPlannedPeriodStart + 'T00:00:00'), (cycleData.periodLength ?? 5) - 1), 'yyyy-MM-dd'));
+              setGapPickMode(true);
+              setGapSheetOpen(true);
+              setSelectedDay(null);
+            }}
+            style={{ all: 'unset', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 14, padding: '9px 16px', borderRadius: 999, background: '#fff', border: `1px solid ${PHASE.MENSTR}`, color: PHASE.MENSTR, fontFamily: NM.SANS, fontSize: 12.5, fontWeight: 500 }}
+          >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+            Zaznačiť túto periódu
+          </button>
+        )}
+
         {/* Contextual edit from any day of a REAL cycle (not a gap). Phases
             are derived, so we only edit the two anchors: the period dates and
             (current cycle) the ovulation day. Projections aren't editable. */}
-        {!selDayGapInfo && selectedInfo && !selectedInfo.projected && selAnchor && (() => {
+        {!selDayGapInfo && !selPlannedPeriodStart && selectedInfo && !selectedInfo.projected && selAnchor && (() => {
           const isOvul = selectedInfo.key === 'ovulation';
           const col = isOvul ? PHASE.OVULAT : PHASE.MENSTR;
           const label = isOvul
@@ -2099,7 +2125,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 14 }}>
           <div style={{ width: 38, height: 4, borderRadius: 999, background: NM.HAIR_2 }} />
         </div>
-        <Eye color={NM.TERRA}>Chýbajúci záznam</Eye>
+        <Eye color={NM.TERRA}>{activeGap ? 'Chýbajúci záznam' : 'Zaznačiť periódu'}</Eye>
         {!gapPickMode ? (
           <>
             <div style={{ fontFamily: NM.SANS, fontSize: 13, color: NM.DEEP, lineHeight: 1.5, marginTop: 12, marginBottom: 16 }}>
