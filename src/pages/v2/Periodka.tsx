@@ -66,7 +66,7 @@ const SYMPTOM_CATS: SymCat[] = [
   { k: 'breast_tenderness', l: 'Citlivé prsia', kind: 'dots',   levels: ['mierne', 'stredné', 'silné'] },
   { k: 'migraine',          l: 'Migréna',       kind: 'dots',   levels: ['mierna', 'stredná', 'silná'] },
   { k: 'bloating',          l: 'Nafúknutosť',   kind: 'dots',   levels: ['mierna', 'stredná', 'silná'] },
-  { k: 'skin',              l: 'Pleť',          kind: 'dots',   levels: ['akné', 'neutrálna', 'žiarivá'] },
+  { k: 'skin',              l: 'Pleť',          kind: 'dots',   levels: ['akné', 'normálna', 'žiarivá'] },
   { k: 'mood',              l: 'Nálada',        kind: 'emoji',  levels: ['😟', '😐', '🙂'] },
   { k: 'energy',            l: 'Energia',       kind: 'energy', levels: ['nízka', 'stredná', 'vysoká'] },
 ];
