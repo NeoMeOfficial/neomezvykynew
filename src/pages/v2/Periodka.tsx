@@ -57,6 +57,72 @@ const TINT = {
   GOLD_SOFT:  'rgba(184,150,90,0.15)',
 };
 
+// ── Denný log: fixed symptom categories, each with 3 intensity levels ──
+// (Gabi/Sam 2026-10-09). Stored as cycle_symptoms.symptoms[key] = 1|2|3.
+type SymCat = { k: string; l: string; kind: 'dots' | 'emoji' | 'energy'; levels: [string, string, string] };
+const SYMPTOM_CATS: SymCat[] = [
+  { k: 'bleeding',          l: 'Krvácanie',     kind: 'dots',   levels: ['slabé', 'stredné', 'silné'] },
+  { k: 'cramps',            l: 'Bolesť brucha', kind: 'dots',   levels: ['mierna', 'stredná', 'silná'] },
+  { k: 'breast_tenderness', l: 'Citlivé prsia', kind: 'dots',   levels: ['mierne', 'stredné', 'silné'] },
+  { k: 'migraine',          l: 'Migréna',       kind: 'dots',   levels: ['mierna', 'stredná', 'silná'] },
+  { k: 'bloating',          l: 'Nafúknutosť',   kind: 'dots',   levels: ['mierne', 'stredné', 'silné'] },
+  { k: 'skin',              l: 'Pleť',          kind: 'dots',   levels: ['mierne', 'stredné', 'silné'] },
+  { k: 'mood',              l: 'Nálada',        kind: 'emoji',  levels: ['😟', '😐', '🙂'] },
+  { k: 'energy',            l: 'Energia',       kind: 'energy', levels: ['nízka', 'stredná', 'vysoká'] },
+];
+
+// One intensity row. Tapping a level sets it; tapping the active level clears.
+function SymptomLog({ values, onSet }: { values: Record<string, number>; onSet: (k: string, level: number) => void }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
+      {SYMPTOM_CATS.map((c, idx) => {
+        const cur = values[c.k] ?? 0;
+        return (
+          <div key={c.k} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '12px 0', borderBottom: idx < SYMPTOM_CATS.length - 1 ? `1px solid ${NM.HAIR}` : 'none' }}>
+            <div style={{ minWidth: 0 }}>
+              <span style={{ fontFamily: NM.SANS, fontSize: 13.5, color: NM.DEEP }}>{c.l}</span>
+              {cur > 0 && (
+                <span style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.MUTED, marginLeft: 8 }}>{c.levels[cur - 1]}</span>
+              )}
+            </div>
+            <div style={{ display: 'flex', gap: c.kind === 'emoji' ? 10 : 7, flexShrink: 0 }}>
+              {[1, 2, 3].map((lvl) => {
+                const set = () => onSet(c.k, cur === lvl ? 0 : lvl);
+                if (c.kind === 'emoji') {
+                  const active = cur === lvl;
+                  return (
+                    <button key={lvl} type="button" onClick={set} aria-label={c.levels[lvl - 1]}
+                      style={{ all: 'unset', cursor: 'pointer', fontSize: 20, lineHeight: 1, opacity: active ? 1 : 0.3, filter: active ? 'none' : 'grayscale(0.6)', transform: active ? 'scale(1.1)' : 'none', transition: 'opacity .12s, transform .12s' }}>
+                      {c.levels[lvl - 1]}
+                    </button>
+                  );
+                }
+                // dots & energy: cumulative fill (level N highlights 1..N)
+                const filled = cur >= lvl;
+                if (c.kind === 'energy') {
+                  const h = 8 + lvl * 4; // rising bars
+                  return (
+                    <button key={lvl} type="button" onClick={set} aria-label={c.levels[lvl - 1]}
+                      style={{ all: 'unset', cursor: 'pointer', width: 16, height: 20, display: 'grid', placeItems: 'end center' }}>
+                      <span style={{ width: 11, height: h, borderRadius: 3, background: filled ? NM.GOLD : NM.HAIR_2, transition: 'background .12s' }} />
+                    </button>
+                  );
+                }
+                return (
+                  <button key={lvl} type="button" onClick={set} aria-label={c.levels[lvl - 1]}
+                    style={{ all: 'unset', cursor: 'pointer', width: 22, height: 22, borderRadius: 999, display: 'grid', placeItems: 'center' }}>
+                    <span style={{ width: 15, height: 15, borderRadius: 999, background: filled ? PHASE.MENSTR : '#fff', border: `1.5px solid ${filled ? PHASE.MENSTR : NM.HAIR_2}`, transition: 'background .12s, border-color .12s' }} />
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function TopBar({ title, showLock = false, onBack, onSettings }: { title: string; showLock?: boolean; onBack?: () => void; onSettings?: () => void }) {
   return (
     <div style={{ padding: 'calc(env(safe-area-inset-top) + 14px) 18px 10px', display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -701,52 +767,12 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     days: symptomDayEntries,
     todayMap,
     symptomDates,
-    toggleSymptom,
     toggleSymptomForDate,
+    setSymptomLevel,
     setNoteForDate,
-    customDefs,
-    addCustomSymptom,
-    removeCustomSymptom,
   } = useCycleSymptoms();
   const { isPremium } = useSubscription();
-  const [addingSymptom, setAddingSymptom] = useState(false);
-  const [newSymptomText, setNewSymptomText] = useState('');
   const [noteEditing, setNoteEditing] = useState(false);
-  // Long-press any symptom chip → ✕ to remove it (custom chips are
-  // deleted, preset chips hidden per device; history and the calendar
-  // filter keep working — Gabi 2026-08-03).
-  const [hiddenSymptomKeys, setHiddenSymptomKeys] = useState<string[]>(() => {
-    try {
-      const raw = localStorage.getItem('neome_cycle_hidden_symptoms_v1');
-      const parsed = raw ? JSON.parse(raw) : null;
-      return Array.isArray(parsed) ? parsed.filter((x) => typeof x === 'string') : [];
-    } catch { return []; }
-  });
-  const hideSymptomChip = (k: string) => {
-    setHiddenSymptomKeys((prev) => {
-      const next = prev.includes(k) ? prev : [...prev, k];
-      try { localStorage.setItem('neome_cycle_hidden_symptoms_v1', JSON.stringify(next)); } catch { /* full */ }
-      return next;
-    });
-  };
-  const [symptomDeleteFor, setSymptomDeleteFor] = useState<string | null>(null);
-  const symptomLpTimer = useRef<number | null>(null);
-  const symptomLpFired = useRef(false);
-  useEffect(() => {
-    if (!symptomDeleteFor) return;
-    const t = window.setTimeout(() => setSymptomDeleteFor(null), 4000);
-    return () => window.clearTimeout(t);
-  }, [symptomDeleteFor]);
-  const symptomLpStart = (k: string) => {
-    symptomLpFired.current = false;
-    symptomLpTimer.current = window.setTimeout(() => {
-      symptomLpFired.current = true;
-      setSymptomDeleteFor(k);
-    }, 550);
-  };
-  const symptomLpCancel = () => {
-    if (symptomLpTimer.current !== null) { window.clearTimeout(symptomLpTimer.current); symptomLpTimer.current = null; }
-  };
   // Calendar dots — derive day-of-month for the VIEWED month (paging).
   const ym = `${yearIdx}-${String(monthIdx + 1).padStart(2, '0')}`;
   const symptomDays: number[] = symptomDates
@@ -756,23 +782,8 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     .filter((d) => (d.note ?? '').trim() && d.date.startsWith(ym))
     .map((d) => parseInt(d.date.slice(8, 10), 10));
 
-  const SYMPTOM_DEFS = [
-    { l: 'Energická',     k: 'energetic' },
-    { l: 'Sústredená',    k: 'focused' },
-    { l: 'Kreatívna',     k: 'creative' },
-    { l: 'Spoločenská',   k: 'social' },
-    { l: 'Bolesti hlavy', k: 'headache' },
-    { l: 'Citlivé prsia', k: 'breast_tenderness' },
-    { l: 'Nafúknutá',     k: 'bloating' },
-    { l: 'Únava',         k: 'fatigue' },
-  ];
-  const allSymptomDefs = [
-    ...SYMPTOM_DEFS.map((s) => ({ ...s, custom: false as const })),
-    ...customDefs.map((s) => ({ ...s, custom: true as const })),
-  ];
-  const symptoms = allSymptomDefs
-    .filter((s) => !hiddenSymptomKeys.includes(s.k))
-    .map((s) => ({ l: s.l, k: s.k, on: !!todayMap[s.k], custom: s.custom }));
+  // Fixed "Denný log" categories (intensity 1–3) — see SYMPTOM_CATS above.
+  const allSymptomDefs = SYMPTOM_CATS;
 
   // ── Symptom filter on the calendar (Gabi 2026-07-28) ────────────────
   // Pick a symptom → its logged days highlight in the calendar and a
@@ -994,99 +1005,16 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
           );
         })()}
 
-        {selectedIsPast && selectedDateISO ? (
-          // Past days are editable — retroactively add or fix symptoms.
+        {selectedDateISO && (selectedIsPast || selectedIsToday) ? (
+          // Today + past days are editable — the full Denný log with intensity.
           <>
-            <Eye size={10} style={{ marginTop: 18, marginBottom: 10 }}>Cítila som sa</Eye>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-              {allSymptomDefs.map((s) => {
-                const on = !!(symptomDayEntries.find((e) => e.date === selectedDateISO)?.symptoms ?? {})[s.k];
-                return (
-                  <button
-                    key={s.k}
-                    type="button"
-                    onClick={() => toggleSymptomForDate(selectedDateISO, s.k)}
-                    style={{
-                      all: 'unset',
-                      cursor: 'pointer',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: 5,
-                      padding: '7px 13px',
-                      borderRadius: 999,
-                      background: on ? TINT.GOLD_SOFT : '#fff',
-                      color: on ? NM.GOLD : NM.DEEP,
-                      border: `1px solid ${on ? NM.GOLD : NM.HAIR_2}`,
-                      fontFamily: NM.SANS,
-                      fontSize: 12.5,
-                      fontWeight: on ? 500 : 400,
-                    }}
-                  >
-                    {on && (
-                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12l5 5L20 6" /></svg>
-                    )}
-                    {s.l}
-                  </button>
-                );
-              })}
-
-              {sheetAddingSymptom ? (
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    const def = addCustomSymptom(sheetNewSymptomText);
-                    if (def) toggleSymptomForDate(selectedDateISO, def.k);
-                    setSheetNewSymptomText('');
-                    setSheetAddingSymptom(false);
-                  }}
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 6px 4px 14px', borderRadius: 999, background: '#fff', border: `1px solid ${NM.HAIR_2}` }}
-                >
-                  <input
-                    autoFocus
-                    value={sheetNewSymptomText}
-                    onChange={(e) => setSheetNewSymptomText(e.target.value)}
-                    onBlur={() => {
-                      if (!sheetNewSymptomText.trim()) setSheetAddingSymptom(false);
-                    }}
-                    maxLength={28}
-                    placeholder="Vlastný príznak…"
-                    style={{ all: 'unset', fontFamily: NM.SANS, fontSize: 12.5, color: NM.DEEP, minWidth: 0, width: 130 }}
-                  />
-                  <button
-                    type="submit"
-                    disabled={!sheetNewSymptomText.trim()}
-                    style={{ all: 'unset', cursor: sheetNewSymptomText.trim() ? 'pointer' : 'not-allowed', background: NM.DEEP, color: '#fff', padding: '4px 10px', borderRadius: 999, fontFamily: NM.SANS, fontSize: 11.5, fontWeight: 500, opacity: sheetNewSymptomText.trim() ? 1 : 0.5 }}
-                  >
-                    Pridať
-                  </button>
-                </form>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => setSheetAddingSymptom(true)}
-                  style={{ all: 'unset', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4, padding: '7px 12px', borderRadius: 999, background: 'transparent', color: NM.MUTED, border: `1px dashed ${NM.HAIR_2}`, fontFamily: NM.SANS, fontSize: 12.5, fontWeight: 500 }}
-                >
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
-                    <path d="M12 5v14M5 12h14" />
-                  </svg>
-                  Pridať vlastný
-                </button>
-              )}
-            </div>
+            <Eye size={10} style={{ marginTop: 18, marginBottom: 4 }}>{selectedIsToday ? 'Ako sa dnes cítiš' : 'Ako si sa cítila'}</Eye>
+            <SymptomLog
+              values={symptomDayEntries.find((e) => e.date === selectedDateISO)?.symptoms ?? {}}
+              onSet={(k, lvl) => setSymptomLevel(selectedDateISO, k, lvl)}
+            />
             <div style={{ fontFamily: NM.SANS, fontSize: 10.5, color: NM.TERTIARY, fontWeight: 400, marginTop: 10, lineHeight: 1.45 }}>
               Zmeny sa ukladajú automaticky.
-            </div>
-          </>
-        ) : selectedSymptomLabels.length > 0 ? (
-          <>
-            <Eye size={10} style={{ marginTop: 18, marginBottom: 10 }}>Ako sa cítiš</Eye>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-              {selectedSymptomLabels.map((l) => (
-                <div key={l} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '7px 13px', borderRadius: 999, background: TINT.GOLD_SOFT, color: NM.GOLD, border: `1px solid ${NM.GOLD}`, fontFamily: NM.SANS, fontSize: 12.5, fontWeight: 500 }}>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12l5 5L20 6" /></svg>
-                  {l}
-                </div>
-              ))}
             </div>
           </>
         ) : null}
@@ -1658,18 +1586,6 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
       </div>
   );
 
-  // Collapsed chips: first 6 in stable order, plus any selected ones from
-  // the tail so an active selection is never hidden. "+X ďalších" expands.
-  const SYMPTOMS_COLLAPSED_LIMIT = 6;
-  const [symptomsExpanded, setSymptomsExpanded] = useState(false);
-  const visibleSymptoms = symptomsExpanded
-    ? symptoms
-    : [
-        ...symptoms.slice(0, SYMPTOMS_COLLAPSED_LIMIT),
-        ...symptoms.slice(SYMPTOMS_COLLAPSED_LIMIT).filter((s) => s.on),
-      ];
-  const hiddenSymptomCount = symptoms.length - visibleSymptoms.length;
-
   // Two at-a-glance squares under the hero (from-home flow): where am I
   // today + when is the next period. Same card language as the stats row.
   const todayStatsBlock = (
@@ -1706,176 +1622,10 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
         <Ser size={21} style={{ lineHeight: 1.18, marginBottom: 14 }}>
           Zaznač si, ako sa <em style={{ color: NM.GOLD, fontStyle: 'italic', fontWeight: 400 }}>dnes cítiš</em>
         </Ser>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
-          {visibleSymptoms.map((s) => (
-            <span key={s.k} style={{ position: 'relative', display: 'inline-flex' }}>
-              <button
-                type="button"
-                onClick={() => {
-                  if (symptomLpFired.current) { symptomLpFired.current = false; return; }
-                  if (symptomDeleteFor === s.k) { setSymptomDeleteFor(null); return; }
-                  toggleSymptom(s.k);
-                }}
-                onTouchStart={() => symptomLpStart(s.k)}
-                onTouchEnd={symptomLpCancel}
-                onTouchMove={symptomLpCancel}
-                onMouseDown={() => symptomLpStart(s.k)}
-                onMouseUp={symptomLpCancel}
-                onMouseLeave={symptomLpCancel}
-                onContextMenu={(e) => e.preventDefault()}
-                style={{
-                  all: 'unset',
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 5,
-                  padding: '8px 14px',
-                  borderRadius: 999,
-                  background: s.on ? TINT.GOLD_SOFT : '#fff',
-                  color: s.on ? NM.GOLD : NM.DEEP,
-                  border: `1px solid ${s.on ? NM.GOLD : NM.HAIR_2}`,
-                  fontFamily: NM.SANS,
-                  fontSize: 12.5,
-                  fontWeight: s.on ? 500 : 400,
-                  WebkitTouchCallout: 'none',
-                  WebkitUserSelect: 'none',
-                  userSelect: 'none',
-                }}
-              >
-                {s.on && (
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M4 12l5 5L20 6" />
-                  </svg>
-                )}
-                {s.l}
-              </button>
-              {symptomDeleteFor === s.k && (
-                <button
-                  type="button"
-                  aria-label={`Vymazať ${s.l}`}
-                  onClick={() => {
-                    // History is untouchable: a custom symptom with logged
-                    // days is only HIDDEN (its definition must survive so
-                    // past months keep rendering it); truly deleted only
-                    // when it was never used.
-                    if (s.custom && (symptomCounts.get(s.k) ?? 0) === 0) removeCustomSymptom(s.k);
-                    else hideSymptomChip(s.k);
-                    setSymptomDeleteFor(null);
-                  }}
-                  style={{ position: 'absolute', top: -7, right: -7, width: 20, height: 20, borderRadius: 999, background: '#C27A6E', border: '2px solid #fff', display: 'grid', placeItems: 'center', cursor: 'pointer', padding: 0, boxSizing: 'border-box', zIndex: 1 }}
-                >
-                  <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round">
-                    <path d="M6 6l12 12M18 6L6 18" />
-                  </svg>
-                </button>
-              )}
-            </span>
-          ))}
-
-          {!symptomsExpanded && hiddenSymptomCount > 0 && (
-            <button
-              type="button"
-              onClick={() => setSymptomsExpanded(true)}
-              style={{ all: 'unset', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4, padding: '8px 14px', borderRadius: 999, background: 'transparent', color: NM.GOLD, border: `1px dashed ${NM.GOLD}66`, fontFamily: NM.SANS, fontSize: 12.5, fontWeight: 500 }}
-            >
-              +{hiddenSymptomCount} {hiddenSymptomCount < 5 ? 'ďalšie' : 'ďalších'}
-            </button>
-          )}
-
-          {symptomsExpanded && (addingSymptom ? (
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                const def = addCustomSymptom(newSymptomText);
-                if (def) toggleSymptom(def.k);
-                setNewSymptomText('');
-                setAddingSymptom(false);
-              }}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
-                padding: '4px 6px 4px 14px',
-                borderRadius: 999,
-                background: '#fff',
-                border: `1px solid ${NM.HAIR_2}`,
-              }}
-            >
-              <input
-                autoFocus
-                value={newSymptomText}
-                onChange={(e) => setNewSymptomText(e.target.value)}
-                onBlur={() => {
-                  // Cancel if the user taps elsewhere without typing.
-                  if (!newSymptomText.trim()) setAddingSymptom(false);
-                }}
-                maxLength={28}
-                placeholder="Vlastný príznak…"
-                style={{
-                  all: 'unset',
-                  fontFamily: NM.SANS,
-                  fontSize: 12.5,
-                  color: NM.DEEP,
-                  minWidth: 0,
-                  width: 130,
-                }}
-              />
-              <button
-                type="submit"
-                disabled={!newSymptomText.trim()}
-                style={{
-                  all: 'unset',
-                  cursor: newSymptomText.trim() ? 'pointer' : 'not-allowed',
-                  background: NM.DEEP,
-                  color: '#fff',
-                  padding: '4px 10px',
-                  borderRadius: 999,
-                  fontFamily: NM.SANS,
-                  fontSize: 11.5,
-                  fontWeight: 500,
-                  opacity: newSymptomText.trim() ? 1 : 0.5,
-                }}
-              >
-                Pridať
-              </button>
-            </form>
-          ) : (
-            <button
-              type="button"
-              onClick={() => setAddingSymptom(true)}
-              style={{
-                all: 'unset',
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 4,
-                padding: '8px 12px',
-                borderRadius: 999,
-                background: 'transparent',
-                color: NM.MUTED,
-                border: `1px dashed ${NM.HAIR_2}`,
-                fontFamily: NM.SANS,
-                fontSize: 12.5,
-                fontWeight: 500,
-              }}
-            >
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
-                <path d="M12 5v14M5 12h14" />
-              </svg>
-              Pridať vlastný
-            </button>
-          ))}
-
-          {symptomsExpanded && (
-            <button
-              type="button"
-              onClick={() => setSymptomsExpanded(false)}
-              style={{ all: 'unset', cursor: 'pointer', padding: '8px 12px', borderRadius: 999, color: NM.MUTED, fontFamily: NM.SANS, fontSize: 12, fontWeight: 500 }}
-            >
-              Menej
-            </button>
-          )}
-        </div>
+        <SymptomLog
+          values={todayMap}
+          onSet={(k, lvl) => setSymptomLevel(todayISO, k, lvl)}
+        />
         <div style={{ fontFamily: NM.SANS, fontSize: 10.5, color: NM.TERTIARY, fontWeight: 400, marginTop: 12, lineHeight: 1.45 }}>
           Označenia sa ukladajú automaticky — deň so záznamom dostane v kalendári bodku.
         </div>

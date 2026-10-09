@@ -481,6 +481,49 @@ export function useCycleSymptoms() {
     [toggleSymptomForDate],
   );
 
+  // Set an explicit intensity (1–3) for a symptom on any date; level 0
+  // clears it. Powers the "Denný log" intensity rows. Same persistence
+  // rules as toggleSymptomForDate.
+  const setSymptomLevel = useCallback(
+    async (date: string, key: string, level: number) => {
+      const existing = days.find((d) => d.date === date);
+      const entry = existing?.symptoms ?? {};
+      const note = existing?.note ?? null;
+      const lvl = Math.max(0, Math.min(3, Math.round(level)));
+      const nextMap = { ...entry };
+      if (lvl > 0) nextMap[key] = lvl;
+      else delete nextMap[key];
+
+      const rowEmpty = Object.keys(nextMap).length === 0 && !note;
+      const otherDays = days.filter((d) => d.date !== date);
+      const updatedDays = rowEmpty ? otherDays : [{ date, symptoms: nextMap, note }, ...otherDays];
+      setDays(updatedDays);
+
+      if (!isPremium) return;
+      if (!real) { saveDemoSymptoms(updatedDays); return; }
+
+      if (rowEmpty) {
+        const { error } = await supabase
+          .from('cycle_symptoms')
+          .delete()
+          .eq('user_id', user!.id)
+          .eq('date', date);
+        if (error) console.warn('[symptoms] delete failed', error.message);
+      } else {
+        const { error } = await supabase
+          .from('cycle_symptoms')
+          .upsert({ user_id: user!.id, date, symptoms: nextMap, note }, { onConflict: 'user_id,date' });
+        if (error) {
+          console.warn('[symptoms] level upsert failed', error.message);
+          refresh();
+        } else if (lvl > 0) {
+          awardPoints('cycle_log');
+        }
+      }
+    },
+    [days, real, user?.id, isPremium, refresh],
+  );
+
   // Set/clear the free-text note for any date. Same persistence rules as
   // symptoms (Plus persists, free is session-only, demo → localStorage).
   const setNoteForDate = useCallback(
@@ -569,6 +612,7 @@ export function useCycleSymptoms() {
     loading,
     toggleSymptom,
     toggleSymptomForDate,
+    setSymptomLevel,
     setNoteForDate,
     refresh,
     customDefs,
