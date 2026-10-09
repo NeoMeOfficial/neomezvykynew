@@ -209,7 +209,7 @@ function TopBar({ onBack, onEdit }: { onBack: () => void; onEdit: () => void }) 
 }
 
 // ─── Phase hero card ────────────────────────────────────────────────
-function PhaseHero({ phaseName, dayOfCycle, headline, onPeriodStarted }: { phaseName: string; dayOfCycle: number; headline: string; onPeriodStarted: () => void }) {
+function PhaseHero({ phaseName, dayOfCycle, headline, onPeriodStarted, bleedingOngoing, onPeriodEnded }: { phaseName: string; dayOfCycle: number; headline: string; onPeriodStarted: () => void; bleedingOngoing: boolean; onPeriodEnded: () => void }) {
   return (
     <div style={cardOuter()}>
       <div style={{ padding: '26px 22px 22px', textAlign: 'center' }}>
@@ -235,19 +235,21 @@ function PhaseHero({ phaseName, dayOfCycle, headline, onPeriodStarted }: { phase
         <div style={{ marginTop: 12, fontFamily: T.SANS, fontSize: 12.5, color: T.FG_2, lineHeight: 1.5, maxWidth: 280, marginLeft: 'auto', marginRight: 'auto' }}>
           {headline}
         </div>
-        <button onClick={onPeriodStarted} style={{
+        <button onClick={bleedingOngoing ? onPeriodEnded : onPeriodStarted} style={{
           marginTop: 18,
           display: 'inline-flex', alignItems: 'center', gap: 10,
           padding: '13px 22px', borderRadius: 999,
-          background: T.ROSE, color: '#fff', border: 0,
+          background: bleedingOngoing ? '#fff' : T.ROSE,
+          color: bleedingOngoing ? T.ROSE : '#fff',
+          border: bleedingOngoing ? `1.5px solid ${T.ROSE}` : 0,
           fontFamily: T.SANS, fontSize: 13, fontWeight: 500, letterSpacing: '0.01em',
           cursor: 'pointer',
-          boxShadow: '0 8px 24px -8px rgba(201,143,163,0.5)',
+          boxShadow: bleedingOngoing ? 'none' : '0 8px 24px -8px rgba(201,143,163,0.5)',
         }}>
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="#fff">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill={bleedingOngoing ? T.ROSE : '#fff'}>
             <path d="M12 3c-3 4-6 7.5-6 12a6 6 0 1 0 12 0c0-4.5-3-8-6-12z"/>
           </svg>
-          Menštruácia mi začala
+          {bleedingOngoing ? 'Menštruácia mi skončila' : 'Menštruácia mi začala'}
         </button>
       </div>
     </div>
@@ -378,7 +380,7 @@ function HistoryEmpty() {
 export default function PeriodkaSettings() {
   const navigate = useNavigate();
   const requireConsent = useConsentGuard();
-  const { cycleData, setLastPeriodStart, setCycleLength, setPeriodLength, updateCycleData, correctPeriod, correctPeriodEnd } = useCycleData();
+  const { cycleData, setLastPeriodStart, setCycleLength, setPeriodLength, updateCycleData, correctPeriod, correctPeriodEnd, markPeriodEnded } = useCycleData();
   const { lastPeriodStart, cycleLength, periodLength, currentPeriodEnd } = cycleData;
   const [showEndPicker, setShowEndPicker] = useState(false);
 
@@ -441,6 +443,12 @@ export default function PeriodkaSettings() {
       return { key: 'follicular', name: 'Folikulárna fáza' };
     }
   }, [currentDay, ranges, cycleLength]);
+
+  // Mirror the tracker's adaptive CTA: while she's actually bleeding (not yet
+  // marked ended, within the period length) the hero offers "skončila", not
+  // "začala" — otherwise the button contradicts the "5. deň menštruácie" text.
+  const periodEnded = !!currentPeriodEnd && !!lastPeriodStart && currentPeriodEnd >= lastPeriodStart;
+  const bleedingOngoing = !!lastPeriodStart && !periodEnded && currentDay <= periodLength;
 
   const nextPeriod = useMemo(() => {
     if (!lastPeriodStart) return null;
@@ -548,6 +556,8 @@ export default function PeriodkaSettings() {
         dayOfCycle={currentDay}
         headline={headlineCopy}
         onPeriodStarted={() => { setStartFromToday(true); setShowPicker(true); }}
+        bleedingOngoing={bleedingOngoing}
+        onPeriodEnded={() => markPeriodEnded(new Date())}
       />
 
       <DateCard
