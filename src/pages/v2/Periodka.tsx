@@ -912,10 +912,15 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     ? `${selectedIsToday ? 'Nachádzaš sa' : selectedIsPast ? 'Bola si' : 'Budeš'} ${PHASE_LOCATIVE[selectedInfo.key]}.`
     : null;
 
-  // Custom-symptom input inside the day-detail sheet (separate state from
-  // the main section's input so the two never fight over focus).
-  const [sheetAddingSymptom, setSheetAddingSymptom] = useState(false);
-  const [sheetNewSymptomText, setSheetNewSymptomText] = useState('');
+  // Day-detail symptoms: show only what's LOGGED (clean summary); the full
+  // 8-category log is behind "Upraviť" to avoid info overflow. Reset to
+  // summary whenever a different day is opened.
+  const [symptomSheetEdit, setSymptomSheetEdit] = useState(false);
+  useEffect(() => { setSymptomSheetEdit(false); }, [selectedDateISO]);
+  const selDaySymptoms = selectedDateISO
+    ? (symptomDayEntries.find((e) => e.date === selectedDateISO)?.symptoms ?? {})
+    : {};
+  const selLoggedCats = SYMPTOM_CATS.filter((c) => (selDaySymptoms[c.k] ?? 0) > 0);
 
   const dayDetailSheet = selectedDay !== null ? createPortal((
     <div
@@ -1006,16 +1011,61 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
         })()}
 
         {selectedDateISO && (selectedIsPast || selectedIsToday) ? (
-          // Today + past days are editable — the full Denný log with intensity.
           <>
-            <Eye size={10} style={{ marginTop: 18, marginBottom: 4 }}>{selectedIsToday ? 'Ako sa dnes cítiš' : 'Ako si sa cítila'}</Eye>
-            <SymptomLog
-              values={symptomDayEntries.find((e) => e.date === selectedDateISO)?.symptoms ?? {}}
-              onSet={(k, lvl) => setSymptomLevel(selectedDateISO, k, lvl)}
-            />
-            <div style={{ fontFamily: NM.SANS, fontSize: 10.5, color: NM.TERTIARY, fontWeight: 400, marginTop: 10, lineHeight: 1.45 }}>
-              Zmeny sa ukladajú automaticky.
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 18, marginBottom: 4 }}>
+              <Eye size={10}>{selectedIsToday ? 'Ako sa dnes cítiš' : 'Ako si sa cítila'}</Eye>
+              {(selLoggedCats.length > 0 || symptomSheetEdit) && (
+                <button
+                  type="button"
+                  onClick={() => setSymptomSheetEdit((v) => !v)}
+                  style={{ all: 'unset', cursor: 'pointer', fontFamily: NM.SANS, fontSize: 11.5, fontWeight: 500, color: NM.GOLD }}
+                >
+                  {symptomSheetEdit ? 'Hotovo' : 'Upraviť'}
+                </button>
+              )}
             </div>
+
+            {symptomSheetEdit ? (
+              // Full editable log, opened via "Upraviť".
+              <>
+                <SymptomLog values={selDaySymptoms} onSet={(k, lvl) => setSymptomLevel(selectedDateISO, k, lvl)} />
+                <div style={{ fontFamily: NM.SANS, fontSize: 10.5, color: NM.TERTIARY, fontWeight: 400, marginTop: 10, lineHeight: 1.45 }}>
+                  Zmeny sa ukladajú automaticky.
+                </div>
+              </>
+            ) : selLoggedCats.length > 0 ? (
+              // Clean summary — ONLY what she logged, with its level.
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                {selLoggedCats.map((c, i) => {
+                  const v = selDaySymptoms[c.k];
+                  return (
+                    <div key={c.k} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '11px 0', borderBottom: i < selLoggedCats.length - 1 ? `1px solid ${NM.HAIR}` : 'none' }}>
+                      <span style={{ fontFamily: NM.SANS, fontSize: 13.5, color: NM.DEEP }}>{c.l}</span>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontFamily: NM.SANS, fontSize: 12.5, color: NM.MUTED }}>
+                        {c.levels[v - 1]}
+                        {c.kind === 'dots' && (
+                          <span style={{ display: 'inline-flex', gap: 3 }}>
+                            {[1, 2, 3].map((lvl) => (
+                              <span key={lvl} style={{ width: 8, height: 8, borderRadius: 999, background: v >= lvl ? PHASE.MENSTR : NM.HAIR_2 }} />
+                            ))}
+                          </span>
+                        )}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              // Nothing logged yet → quiet prompt to open the log.
+              <button
+                type="button"
+                onClick={() => setSymptomSheetEdit(true)}
+                style={{ all: 'unset', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 6, padding: '9px 16px', borderRadius: 999, background: '#fff', border: `1px dashed ${NM.HAIR_2}`, color: NM.MUTED, fontFamily: NM.SANS, fontSize: 12.5, fontWeight: 500 }}
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
+                {selectedIsToday ? 'Zaznačiť, ako sa cítiš' : 'Zaznačiť, ako si sa cítila'}
+              </button>
+            )}
           </>
         ) : null}
 
