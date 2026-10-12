@@ -295,13 +295,42 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
   const totalDays = cycleData.cycleLength ?? 28;
   const periodLength = cycleData.periodLength ?? 5;
   const currentDay = derivedState?.currentDay ?? 1;
-  const currentPhaseKey = derivedState?.currentPhase?.key ?? 'follicular';
-  const phases = derivedState?.phaseRanges ?? [
-    { key: 'menstrual' as const, name: 'Menštruácia', start: 1, end: periodLength },
-    { key: 'follicular' as const, name: 'Folikulárna', start: periodLength + 1, end: 13 },
-    { key: 'ovulation' as const, name: 'Ovulácia', start: 14, end: 16 },
-    { key: 'luteal' as const, name: 'Luteálna', start: 17, end: totalDays },
-  ];
+  const today = derivedState?.today ?? new Date();
+
+  // ── SINGLE SOURCE OF TRUTH for the CURRENT cycle's phases ────────────
+  // Every section that shows "N. deň + fáza" (top summary, subtitle,
+  // pohyb/strava advice, ring, legend) derives from `phases` here, so they
+  // can never disagree. It respects the ACTUAL recorded bleed end
+  // (currentPeriodEnd → effectivePeriodLength) and a recorded ovulation day
+  // (ovulationOverride) — exactly like the calendar. Fallback: the generic
+  // periodLength / computed ovulation when nothing was recorded.
+  const actualBleedLen = (cycleData.currentPeriodEnd && cycleData.lastPeriodStart
+    && cycleData.currentPeriodEnd >= cycleData.lastPeriodStart)
+    ? Math.floor((new Date(cycleData.currentPeriodEnd + 'T00:00:00').getTime()
+        - new Date(cycleData.lastPeriodStart + 'T00:00:00').getTime()) / 86400000) + 1
+    : null;
+  const effectivePeriodLength = (actualBleedLen && actualBleedLen >= 1 && actualBleedLen <= totalDays)
+    ? actualBleedLen : periodLength;
+  const ovOverrideDay = (cycleData.ovulationOverride && cycleData.lastPeriodStart)
+    ? Math.floor((new Date(cycleData.ovulationOverride + 'T00:00:00').getTime()
+        - new Date(cycleData.lastPeriodStart + 'T00:00:00').getTime()) / 86400000) + 1
+    : null;
+  const phases: { key: string; name: string; start: number; end: number }[] = (() => {
+    if (ovOverrideDay && ovOverrideDay > effectivePeriodLength && ovOverrideDay <= totalDays) {
+      const r = [{ key: 'menstrual', name: 'Menštruácia', start: 1, end: effectivePeriodLength }];
+      if (effectivePeriodLength + 1 <= ovOverrideDay - 1) r.push({ key: 'follicular', name: 'Folikulárna', start: effectivePeriodLength + 1, end: ovOverrideDay - 1 });
+      r.push({ key: 'ovulation', name: 'Ovulácia', start: ovOverrideDay, end: ovOverrideDay });
+      if (ovOverrideDay + 1 <= totalDays) r.push({ key: 'luteal', name: 'Luteálna', start: ovOverrideDay + 1, end: totalDays });
+      return r;
+    }
+    return getPhaseRanges(totalDays, effectivePeriodLength).map((p) => ({ key: p.key, name: p.name, start: p.start, end: p.end }));
+  })();
+  const PHASE_NAME_SK: Record<string, string> = { menstrual: 'Menštruácia', follicular: 'Folikulárna', ovulation: 'Ovulácia', luteal: 'Luteálna' };
+  // Overdue (past cycle length) stays luteal — matches calendar + ring.
+  const currentPhaseKey = currentDay > totalDays
+    ? 'luteal'
+    : (phases.find((p) => currentDay >= p.start && currentDay <= p.end)?.key ?? 'follicular');
+  const currentPhaseName = PHASE_NAME_SK[currentPhaseKey] ?? 'Folikulárna';
   const phaseColorByKey: Record<string, string> = {
     menstrual: PHASE.MENSTR,
     follicular: PHASE.FOLLIC,
@@ -315,8 +344,6 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     luteal: TINT.LUTEAL_100,
   };
   const phaseColor = phaseColorByKey[currentPhaseKey];
-  const currentPhaseName = derivedState?.currentPhase?.name ?? 'Folikulárna';
-  const today = derivedState?.today ?? new Date();
   // Entered via the home card's 'Zisti viac' → today-first section order.
   const fromHome = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('from') === 'home';
   const todayDate = today.getDate();
@@ -339,15 +366,6 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
   const yearIdx = viewedMonth.getFullYear();
   const monthLabel = SK_MONTHS_FULL[monthIdx];
   const monthShort = SK_MONTHS_SHORT_LOWER[monthIdx];
-
-  // Actual bleed length of THIS cycle when its end was recorded — overrides
-  // the assumed periodLength in the calendar so a corrected end date
-  // recolours the days immediately (parked bug, fixed 2026-09-02).
-  const actualBleedLen = (cycleData.currentPeriodEnd && cycleData.lastPeriodStart
-    && cycleData.currentPeriodEnd >= cycleData.lastPeriodStart)
-    ? Math.floor((new Date(cycleData.currentPeriodEnd + 'T00:00:00').getTime()
-        - new Date(cycleData.lastPeriodStart + 'T00:00:00').getTime()) / 86400000) + 1
-    : null;
 
   // Day-of-month → cycle-day → phase key. Maps a calendar date in the
   // visible month back to a phase. Both the cell tint AND the legend
@@ -691,7 +709,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
   // Headline copy comes from the shared getDailyHeadline (sub-phase
   // accurate, rotates daily) so the home Periodka card reads identically;
   // the 'late' bucket covers the overdue override.
-  const head = getDailyHeadline(currentDay, totalDays, periodLength);
+  const head = getDailyHeadline(currentDay, totalDays, effectivePeriodLength);
 
   // Build calendar grid for the current month, Mon-first
   type Cell = { d: number; mute?: boolean };
@@ -1139,12 +1157,12 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     mysel:  { category: 'mysel',  label: 'Myseľ',  title: 'Tvoja myseľ dnes', color: NM.MAUVE, img: 'section-mind.jpg',           path: '/kniznica/mysel' },
   };
 
-  const dailyTips = getDailyTips(currentDay, totalDays, periodLength);
+  const dailyTips = getDailyTips(currentDay, totalDays, effectivePeriodLength);
 
   // Arrow targets mirror the home cards exactly: telo → today's phase pick
   // in the player (with "Ďalšie" + favourites below), strava → recept dňa
   // detail, myseľ → the Myseľ section with today's meditation featured.
-  const dailyRecipe = dailyRecipeOf(recipes, currentPhaseKey, getStravaWants(currentDay, totalDays, periodLength));
+  const dailyRecipe = dailyRecipeOf(recipes, currentPhaseKey, getStravaWants(currentDay, totalDays, effectivePeriodLength));
   const advice = (['telo', 'strava', 'mysel'] as const).map((pillarKey) => {
     const meta = PILLAR_META[pillarKey];
     let path = meta.path;
@@ -2071,9 +2089,6 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
                 : `Toto je tvoj prvý zaznamenaný cyklus. Postupne tu uvidíš, ako si sa cítila v rovnaký deň minulého cyklu.`}
           </div>
         )}
-        <div style={{ fontFamily: NM.SANS, fontSize: 10.5, color: NM.TERTIARY, marginTop: 14, lineHeight: 1.45 }}>
-          Tvoje vlastné záznamy z minulého cyklu — nie je to lekárska rada.
-        </div>
       </div>
     </div>
   );

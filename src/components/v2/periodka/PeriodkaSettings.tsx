@@ -435,20 +435,38 @@ export default function PeriodkaSettings() {
     }
   }, [lastPeriodStart, today, cycleLength]);
 
-  const ranges = useMemo(() => getPhaseRanges(cycleLength, periodLength), [cycleLength, periodLength]);
+  // Same effective-phase logic as the tracker (Periodka.tsx) so settings
+  // shows the IDENTICAL "N. deň + fáza": respect the recorded bleed end and
+  // ovulation day, not just the generic periodLength.
+  const periodEnded = !!currentPeriodEnd && !!lastPeriodStart && currentPeriodEnd >= lastPeriodStart;
+  const effBleedLen = periodEnded
+    ? Math.floor((new Date(currentPeriodEnd! + 'T00:00:00').getTime() - new Date(lastPeriodStart! + 'T00:00:00').getTime()) / 86400000) + 1
+    : null;
+  const effectivePeriodLength = (effBleedLen && effBleedLen >= 1 && effBleedLen <= cycleLength) ? effBleedLen : periodLength;
+  const ovOverrideDay = (cycleData.ovulationOverride && lastPeriodStart)
+    ? Math.floor((new Date(cycleData.ovulationOverride + 'T00:00:00').getTime() - new Date(lastPeriodStart + 'T00:00:00').getTime()) / 86400000) + 1
+    : null;
+  const ranges = useMemo(() => {
+    if (ovOverrideDay && ovOverrideDay > effectivePeriodLength && ovOverrideDay <= cycleLength) {
+      const r = [{ key: 'menstrual', name: 'Menštruácia', start: 1, end: effectivePeriodLength }];
+      if (effectivePeriodLength + 1 <= ovOverrideDay - 1) r.push({ key: 'follicular', name: 'Folikulárna', start: effectivePeriodLength + 1, end: ovOverrideDay - 1 });
+      r.push({ key: 'ovulation', name: 'Ovulácia', start: ovOverrideDay, end: ovOverrideDay });
+      if (ovOverrideDay + 1 <= cycleLength) r.push({ key: 'luteal', name: 'Luteálna', start: ovOverrideDay + 1, end: cycleLength });
+      return r;
+    }
+    return getPhaseRanges(cycleLength, effectivePeriodLength);
+  }, [cycleLength, effectivePeriodLength, ovOverrideDay]);
   const phase = useMemo(() => {
     try {
-      return getPhaseByDay(currentDay, ranges, cycleLength);
+      return getPhaseByDay(currentDay, ranges as any, cycleLength);
     } catch {
       return { key: 'follicular', name: 'Folikulárna fáza' };
     }
   }, [currentDay, ranges, cycleLength]);
 
-  // Mirror the tracker's adaptive CTA: while she's actually bleeding (not yet
-  // marked ended, within the period length) the hero offers "skončila", not
-  // "začala" — otherwise the button contradicts the "5. deň menštruácie" text.
-  const periodEnded = !!currentPeriodEnd && !!lastPeriodStart && currentPeriodEnd >= lastPeriodStart;
-  const bleedingOngoing = !!lastPeriodStart && !periodEnded && currentDay <= periodLength;
+  // While she's actually bleeding (not yet marked ended, within the bleed
+  // length) the hero offers "skončila", not "začala".
+  const bleedingOngoing = !!lastPeriodStart && !periodEnded && currentDay <= effectivePeriodLength;
 
   const nextPeriod = useMemo(() => {
     if (!lastPeriodStart) return null;
