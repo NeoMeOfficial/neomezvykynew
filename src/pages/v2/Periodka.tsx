@@ -856,6 +856,88 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     return { total: filteredDates.length, top, recentDays, recurrence };
   })();
 
+  // ── "Čo sme si všimli": frequency-based patterns, no ML ──────────────
+  // Each logged date is anchored to the ACTUAL cycle it fell in (realStarts
+  // window + that cycle's own length) → accurate cycle day + phase across
+  // cycles of different lengths. Language is calibrated to evidence: 1 cycle
+  // = a recap, 2 = tentative, 3+ = a real pattern. (Gabi to review tone.)
+  const PHASE_LOC2: Record<string, string> = {
+    menstrual: 'počas menštruácie',
+    follicular: 'vo folikulárnej fáze',
+    ovulation: 'okolo ovulácie',
+    luteal: 'v luteálnej fáze',
+  };
+  const cycleCtxForISO = (iso: string): { cycleIndex: number; cycleDay: number; phaseKey: string | null; len: number } | null => {
+    let idx = -1;
+    for (let i = realStarts.length - 1; i >= 0; i--) { if (realStarts[i] <= iso) { idx = i; break; } }
+    if (idx === -1) return null;
+    const anchor = realStarts[idx];
+    const next = realStarts[idx + 1] ?? null;
+    const len = next ? Math.max(1, daysBetweenISO(anchor, next)) : totalDays;
+    const cycleDay = daysBetweenISO(anchor, iso) + 1;
+    if (cycleDay < 1 || cycleDay > len) return null; // gap tail — don't infer
+    const ranges = getPhaseRanges(len, periodLength);
+    const phaseKey = ranges.find((r) => cycleDay >= r.start && cycleDay <= r.end)?.key ?? null;
+    return { cycleIndex: idx, cycleDay, phaseKey, len };
+  };
+
+  const noticedPatterns: { text: string; strength: number }[] = (() => {
+    if (realStarts.length === 0 || symptomDayEntries.length === 0) return [];
+    const minCycleIdx = Math.max(0, realStarts.length - 6); // last ≤6 cycles
+    const out: { text: string; strength: number }[] = [];
+
+    for (const c of SYMPTOM_CATS) {
+      const occ = symptomDayEntries
+        .filter((e) => (e.symptoms[c.k] ?? 0) > 0)
+        .map((e) => ({ level: e.symptoms[c.k], ctx: cycleCtxForISO(e.date) }))
+        .filter((o): o is { level: number; ctx: { cycleIndex: number; cycleDay: number; phaseKey: string; len: number } } =>
+          !!o.ctx && !!o.ctx.phaseKey && o.ctx.cycleIndex >= minCycleIdx);
+      if (occ.length === 0) continue;
+
+      const cycles = new Set(occ.map((o) => o.ctx.cycleIndex));
+      const nCycles = cycles.size;
+
+      if (c.kind === 'dots') {
+        // Presence symptom → recurrence by phase.
+        const perPhase = new Map<string, number>();
+        for (const o of occ) perPhase.set(o.ctx.phaseKey, (perPhase.get(o.ctx.phaseKey) ?? 0) + 1);
+        let domPhase = ''; let domN = 0;
+        for (const [k, n] of perPhase) if (n > domN) { domPhase = k; domN = n; }
+        const consistent = domN / occ.length >= 0.6;
+        const domDays = occ.filter((o) => o.ctx.phaseKey === domPhase).map((o) => o.ctx.cycleDay).sort((a, b) => a - b);
+        const repDay = domDays[Math.floor(domDays.length / 2)];
+        const loc = PHASE_LOC2[domPhase] ?? '';
+        let text = '';
+        if (nCycles >= 3 && consistent) {
+          text = `${c.l} sa ti pravidelne vracia ${loc} — okolo ${repDay}. dňa cyklu (videli sme to v ${nCycles} cykloch).`;
+        } else if (nCycles === 2 && consistent) {
+          text = `Zdá sa, že ${c.l.toLowerCase()} sa ti vracia ${loc} — okolo ${repDay}. dňa cyklu.`;
+        } else if (nCycles === 1) {
+          text = `Tento cyklus si ${c.l.toLowerCase()} zaznačila ${loc} (okolo ${repDay}. dňa).`;
+        }
+        if (text) out.push({ text, strength: nCycles * 100 + occ.length });
+      } else {
+        // Level signal (energia/nálada) → average per phase; flag the phase
+        // that stands out LOW. Needs a few points to mean anything.
+        if (occ.length < 3) continue;
+        const sum = new Map<string, number>(); const cnt = new Map<string, number>();
+        for (const o of occ) { sum.set(o.ctx.phaseKey, (sum.get(o.ctx.phaseKey) ?? 0) + o.level); cnt.set(o.ctx.phaseKey, (cnt.get(o.ctx.phaseKey) ?? 0) + 1); }
+        const overall = occ.reduce((s, o) => s + o.level, 0) / occ.length;
+        let lowPhase = ''; let lowAvg = 99;
+        for (const [k, s] of sum) { const n = cnt.get(k)!; if (n >= 2) { const a = s / n; if (a < lowAvg) { lowAvg = a; lowPhase = k; } } }
+        if (lowPhase && lowAvg <= overall - 0.4) {
+          const loc = PHASE_LOC2[lowPhase] ?? '';
+          const word = c.k === 'energy' ? 'nižšiu energiu' : 'skôr ťažšiu náladu';
+          const text = nCycles >= 2
+            ? `${loc.charAt(0).toUpperCase() + loc.slice(1)} mávaš zvyčajne ${word}.`
+            : `Tento cyklus si ${loc} mala ${word}.`;
+          out.push({ text, strength: nCycles * 100 + occ.length });
+        }
+      }
+    }
+    return out.sort((a, b) => b.strength - a.strength).slice(0, 3);
+  })();
+
   // ── Day-detail sheet (tap on a calendar day) ────────────────────────
   const PHASE_LOCATIVE: Record<string, string> = {
     menstrual: 'v menštruačnej fáze',
@@ -2023,6 +2105,27 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
     );
   })() : null;
 
+  // "Čo sme si všimli" — soft, frequency-based reflections under the
+  // calendar. Shows only when a pattern (or a single-cycle recap) exists.
+  const noticedBlock = noticedPatterns.length > 0 ? (
+    <div style={{ padding: '24px 18px 0' }}>
+      <div style={{ background: '#fff', border: `1px solid ${NM.HAIR}`, borderRadius: 22, padding: '20px 18px' }}>
+        <Eye size={10} color={NM.GOLD}>Čo sme si všimli</Eye>
+        <div style={{ display: 'flex', flexDirection: 'column', marginTop: 12 }}>
+          {noticedPatterns.map((p, i) => (
+            <div key={i} style={{ display: 'flex', gap: 11, alignItems: 'flex-start', padding: '11px 0', borderBottom: i < noticedPatterns.length - 1 ? `1px solid ${NM.HAIR}` : 'none' }}>
+              <span style={{ width: 6, height: 6, borderRadius: 999, background: NM.GOLD, marginTop: 7, flexShrink: 0 }} />
+              <span style={{ fontFamily: NM.SERIF, fontSize: 15, color: NM.DEEP, lineHeight: 1.4 }}>{p.text}</span>
+            </div>
+          ))}
+        </div>
+        <div style={{ fontFamily: NM.SANS, fontSize: 10.5, color: NM.TERTIARY, marginTop: 12, lineHeight: 1.45 }}>
+          Pozorovania z tvojich záznamov — nie sú lekárskou radou. Čím viac zaznačíš, tým presnejšie budú.
+        </div>
+      </div>
+    </div>
+  ) : null;
+
   return (
     <>
       {headerBlock}
@@ -2037,6 +2140,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
       {irregularBlock}
       {false && upcomingBlock}
       {calendarBlock}
+      {noticedBlock}
       {dayDetailSheet}
       {periodEditSheet}
       {ovulEditSheet}
