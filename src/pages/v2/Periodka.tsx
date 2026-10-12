@@ -1271,6 +1271,9 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
               Skončila dnes
             </button>
           </div>
+          <div style={{ fontFamily: NM.SANS, fontSize: 10.5, color: NM.TERTIARY, fontWeight: 400, marginTop: 8, paddingLeft: 2 }}>
+            „Skončila dnes" = dnes bol posledný deň krvácania.
+          </div>
         </div>
       ) : bleedOverduePrompt ? (
         <div style={{ padding: '18px 18px 0' }}>

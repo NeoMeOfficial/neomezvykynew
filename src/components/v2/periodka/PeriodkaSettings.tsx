@@ -251,6 +251,11 @@ function PhaseHero({ phaseName, dayOfCycle, headline, onPeriodStarted, bleedingO
           </svg>
           {bleedingOngoing ? 'Menštruácia mi skončila' : 'Menštruácia mi začala'}
         </button>
+        {bleedingOngoing && (
+          <div style={{ marginTop: 8, fontFamily: T.SANS, fontSize: 11, color: T.FG_MUTED }}>
+            Dnes bol posledný deň krvácania
+          </div>
+        )}
       </div>
     </div>
   );
