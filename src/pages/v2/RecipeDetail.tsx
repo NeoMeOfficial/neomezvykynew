@@ -270,37 +270,8 @@ export default function RecipeDetail() {
           </div>
         )}
 
-        {/* Ďalšie recepty — mirrors the "Ďalšie cvičenia" card on the exercise player */}
-        {related.length > 0 && (
-          <div style={{ margin: '4px 18px 10px', padding: '16px 16px 8px', background: '#fff', borderRadius: 18, border: `1px solid ${NM.HAIR}` }}>
-            {/* "Všetky recepty" lives in the unified links block below. */}
-            <div style={{ marginBottom: 6 }}>
-              <Eye>Ďalšie recepty · {CATEGORY_LABEL[primaryCat]}</Eye>
-            </div>
-            {related.map((r, i) => (
-              <button
-                key={r.id}
-                onClick={() => navigate(`/recept/${r.id}`, { replace: true })}
-                style={{
-                  all: 'unset', cursor: 'pointer', width: '100%', display: 'flex', alignItems: 'center', gap: 12,
-                  padding: '10px 0', boxSizing: 'border-box',
-                  borderBottom: i < related.length - 1 ? `1px solid ${NM.HAIR}` : 'none',
-                }}
-              >
-                <div style={{ width: 48, height: 48, borderRadius: 12, flexShrink: 0, backgroundImage: `url(${recipeImage(r)})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontFamily: NM.SERIF, fontSize: 14, color: NM.DEEP, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {r.name}
-                  </div>
-                  <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.MUTED, marginTop: 2 }}>
-                    {r.prep_minutes ? `${r.prep_minutes} min` : ''}{r.prep_minutes && r.kcal ? ' · ' : ''}{r.kcal ? `${r.kcal} kcal` : ''}
-                  </div>
-                </div>
-                <span style={{ color: NM.TERTIARY, fontSize: 14 }}>›</span>
-              </button>
-            ))}
-          </div>
-        )}
+        {/* "Ďalšie recepty" suggestions removed (Sam 2026-10-13) — keep the
+            page consistent with Telo: just the links block + sticky Pridať. */}
 
         {/* Unified favourites/library links (Pridať is the sticky CTA below) */}
         <div style={{ margin: '4px 18px 14px' }}>
