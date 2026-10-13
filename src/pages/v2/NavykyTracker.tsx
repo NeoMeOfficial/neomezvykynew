@@ -483,19 +483,16 @@ export default function NavykyTracker() {
               const open = expandedId === h.id;
 
               // One measure only (Gabi 2026-07-31): completed days out of
-              // the goal — grows only when she ticks.
+              // the goal. Active goals carry no text line (the timeline says
+              // it); the window END shows a prominent outcome banner instead
+              // of a tiny subtitle, so she can't miss it.
               const subParts: string[] = [];
-              if (goalReached) {
-                // Lally 2009: a few missed days don't derail habit formation
-                // — ≥80% of the window still counts as building the habit.
-                subParts.push(doneDays >= h.durationDays
-                  ? 'cieľ splnený ✓'
-                  : doneDays / h.durationDays >= 0.8
-                  ? `cieľ zvládnutý ✓ · splnených ${doneDays} z ${h.durationDays} dní`
-                  : `cieľ ukončený · splnených ${doneDays} z ${h.durationDays} dní`);
-              }
-              // Active goals carry no text line — the timeline says it;
-              // the count waits inside "Pozri si svoje dni" (Gabi 2026-08-03).
+              // Lally 2009: a few missed days don't derail habit formation —
+              // ≥80% of the window still counts as building the habit.
+              const outcome: 'done' | 'managed' | 'ended' = doneDays >= h.durationDays
+                ? 'done' : doneDays / h.durationDays >= 0.8 ? 'managed' : 'ended';
+              const outcomeTitle = outcome === 'done' ? 'Cieľ splnený' : outcome === 'managed' ? 'Cieľ zvládnutý' : 'Úsek ukončený';
+              const outcomeGood = outcome !== 'ended';
 
               const skippedToday = !done && (skips[h.id] ?? []).includes(todayISO);
               const dragX = drag?.id === h.id ? drag.x : 0;
@@ -567,6 +564,32 @@ export default function NavykyTracker() {
                       ))}
                     </div>
                   </div>
+
+                  {/* Window finished → prominent outcome banner (don't let
+                      her overlook how the goal ended). */}
+                  {goalReached && (
+                    <div style={{
+                      margin: '0 16px 14px',
+                      padding: '13px 15px',
+                      borderRadius: 14,
+                      background: outcomeGood ? 'rgba(122,158,120,0.12)' : 'rgba(184,134,74,0.10)',
+                      border: `1px solid ${outcomeGood ? 'rgba(122,158,120,0.42)' : 'rgba(184,134,74,0.38)'}`,
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+                        <span style={{ width: 22, height: 22, borderRadius: 999, flexShrink: 0, background: outcomeGood ? SAVED_GREEN : NM.GOLD, display: 'grid', placeItems: 'center' }}>
+                          {outcomeGood ? (
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
+                          ) : (
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /></svg>
+                          )}
+                        </span>
+                        <span style={{ fontFamily: NM.SERIF, fontSize: 17, color: NM.DEEP, fontWeight: 600 }}>{outcomeTitle}</span>
+                      </div>
+                      <div style={{ fontFamily: NM.SANS, fontSize: 13, color: NM.DEEP, marginTop: 7, fontWeight: 500 }}>
+                        Splnených {doneDays} z {h.durationDays} dní
+                      </div>
+                    </div>
+                  )}
 
                   {/* Timeline: green fill = completed days, gold notch =
                       where today sits on the journey. */}
