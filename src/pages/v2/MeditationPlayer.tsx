@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import LoadingScreen from '../../components/v2/LoadingScreen';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { NM } from '../../components/v2/neome';
+import FavoriteLinksBlock from '../../components/v2/favorites/FavoriteLinksBlock';
 import { useAchievements } from '../../hooks/useAchievements';
 import { awardPoints } from '../../lib/points';
 import { useMeditation } from '../../hooks/useMeditations';
@@ -309,6 +310,18 @@ export default function MeditationPlayer() {
             Audio nahrávka pre túto meditáciu sa pripravuje.
           </div>
         )}
+
+        {/* Unified favourites/library links (dark variant) */}
+        <div style={{ marginBottom: 16 }}>
+          <FavoriteLinksBlock
+            item={{ id: meditation.id, type: 'meditation', title: meditation.title }}
+            favTab="meditation"
+            allLabel="Všetky meditácie"
+            allPath="/kniznica/mysel"
+            color="#A8848B"
+            dark
+          />
+        </div>
 
         {/* Complete button */}
         <button

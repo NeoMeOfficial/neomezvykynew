@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useUniversalFavorites } from '../../hooks/useUniversalFavorites';
+import FavoriteLinksBlock from '../../components/v2/favorites/FavoriteLinksBlock';
 import { useRecipe, useRecipes, recipeCategories, recipeCategoryLabel, recipeImage, servingsLabel, CATEGORY_LABEL } from '@/hooks/useRecipes';
 import { useMealPlan } from '../../features/nutrition/useMealPlan';
 import { useSubscription } from '../../contexts/SubscriptionContext';
@@ -272,18 +273,10 @@ export default function RecipeDetail() {
         {/* Ďalšie recepty — mirrors the "Ďalšie cvičenia" card on the exercise player */}
         {related.length > 0 && (
           <div style={{ margin: '4px 18px 10px', padding: '16px 16px 8px', background: '#fff', borderRadius: 18, border: `1px solid ${NM.HAIR}` }}>
-            {/* "Všetky" opens the Strava hub with all 6 categories, so any recipe
-                is reachable from here (Gabi 2026-09-02). */}
-            <button
-              onClick={() => navigate('/kniznica/strava')}
-              style={{ all: 'unset', cursor: 'pointer', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6, boxSizing: 'border-box' }}
-            >
+            {/* "Všetky recepty" lives in the unified links block below. */}
+            <div style={{ marginBottom: 6 }}>
               <Eye>Ďalšie recepty · {CATEGORY_LABEL[primaryCat]}</Eye>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontFamily: NM.SANS, fontSize: 11, fontWeight: 500, color: NM.MUTED }}>
-                Všetky
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
-              </span>
-            </button>
+            </div>
             {related.map((r, i) => (
               <button
                 key={r.id}
@@ -308,6 +301,18 @@ export default function RecipeDetail() {
             ))}
           </div>
         )}
+
+        {/* Unified favourites/library links (Pridať is the sticky CTA below) */}
+        <div style={{ margin: '4px 18px 14px' }}>
+          <FavoriteLinksBlock
+            item={{ id: recipe.id, type: 'recipe', title: recipe.name, duration: `${recipe.prep_minutes ?? 0} min`, kcal: recipe.kcal ?? 0, category: recipe.slot }}
+            favTab="recipe"
+            allLabel="Všetky recepty"
+            allPath="/kniznica/strava"
+            color="#7A9E78"
+            showFavToggle={false}
+          />
+        </div>
       </div>
 
       {/* Bottom CTA */}

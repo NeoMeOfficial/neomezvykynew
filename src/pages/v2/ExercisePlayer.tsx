@@ -8,6 +8,7 @@ import { Eyebrow } from '@/components/ui/eyebrow';
 import { BodyText } from '@/components/ui/body-text';
 import { exercises } from '../../data/exercises';
 import FavoriteButton from '../../components/v2/favorites/FavoriteButton';
+import FavoriteLinksBlock from '../../components/v2/favorites/FavoriteLinksBlock';
 import { useEntitlement } from '../../hooks/useEntitlement';
 import { useSmartBack } from '../../hooks/useSmartBack';
 import { useExercises } from '../../hooks/useExercises';
@@ -381,14 +382,6 @@ export default function ExercisePlayer() {
         onBack={smartBack}
         right={
           <div className="flex items-center gap-1">
-            <FavoriteButton
-              itemId={exercise.id}
-              type="workout"
-              title={exercise.name}
-              duration={exercise.duration}
-              category={exercise.category}
-              size="md"
-            />
             <button
               onClick={handleShare}
               className="h-10 w-10 rounded-full flex items-center justify-center active:scale-95 transition-transform"
@@ -483,50 +476,14 @@ export default function ExercisePlayer() {
             no distractions under the video). Revert if Gabi misses her
             2026-07-26 diverse-focus alternatives. */}
 
-        {/* Her hearted workouts — the top-bar heart saves them here */}
-        {favoriteRows.length > 0 && (
-          <div className="rounded-card bg-white border border-ink/[0.08] shadow-nm-sm p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <Heart className="size-3.5 text-pillar-cyklus" fill="currentColor" />
-              <Eyebrow>Tvoje obľúbené</Eyebrow>
-            </div>
-            {favoriteRows.map((row) => (
-              <button
-                key={row.id}
-                onClick={() => navigate(row.route, { state: row.state, replace: true })}
-                className="w-full flex items-center gap-3 py-2.5 text-left border-b border-ink/[0.06] last:border-0"
-              >
-                <div
-                  className="w-12 h-12 rounded-xl bg-cover bg-center flex-shrink-0 bg-ink/[0.06]"
-                  style={row.thumb ? { backgroundImage: `url(${row.thumb})` } : undefined}
-                />
-                <div className="flex-1 min-w-0">
-                  <div className="font-serif text-[14px] text-ink truncate">
-                    {row.titleParts
-                      ? <>{row.titleParts.before}{' '}<strong className="font-bold text-[15px]" style={{ color: '#B8864A' }}>{row.titleParts.em}</strong><span className="font-sans text-[12px] font-semibold ml-0.5" style={{ color: '#B8864A' }}>{row.titleParts.num}</span></>
-                      : row.title}
-                  </div>
-                  <div className="font-sans text-[11px] text-ink/50 mt-0.5">{row.meta}</div>
-                </div>
-                <span className="text-ink/30 text-sm">›</span>
-              </button>
-            ))}
-          </div>
-        )}
-
-        {/* Always a way to browse the whole Telo library (Sam 2026-10-13) */}
-        <button
-          onClick={() => navigate('/kniznica/telo')}
-          className="w-full flex items-center justify-between rounded-card bg-white border border-ink/[0.08] shadow-nm-sm px-5 py-4"
-        >
-          <span className="flex items-center gap-2.5 font-sans text-[13px] font-medium text-ink">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B4C3B" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="3" y="3" width="7" height="7" rx="1.5" /><rect x="14" y="3" width="7" height="7" rx="1.5" /><rect x="3" y="14" width="7" height="7" rx="1.5" /><rect x="14" y="14" width="7" height="7" rx="1.5" />
-            </svg>
-            Všetky cvičenia
-          </span>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6B4C3B" strokeWidth="2" strokeLinecap="round"><path d="M9 6l6 6-6 6" /></svg>
-        </button>
+        {/* Unified footer: Pridať do obľúbených · Tvoje obľúbené · Všetky */}
+        <FavoriteLinksBlock
+          item={{ id: exercise.id, type: 'workout', title: exercise.name, duration: exercise.duration, category: exercise.category }}
+          favTab="workout"
+          allLabel="Všetky cvičenia"
+          allPath="/kniznica/telo"
+          color="#6B4C3B"
+        />
       </div>
     </div>
   );
