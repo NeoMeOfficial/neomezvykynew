@@ -327,12 +327,20 @@ function CardGoals() {
   const { addActivity } = useAchievements();
   const now = new Date();
   const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-  const doneCount = habits.filter((h) => (h.completions?.[today] ?? 0) > 0).length;
-  const allDone = habits.length > 0 && doneCount === habits.length;
+  // Only habits she's STILL building count here — a habit whose goal window
+  // is over isn't being built anymore (it waits on the Návyky page for a
+  // restart). Unlimited habits (≥365) are always ongoing.
+  const activeHabits = habits.filter((h) => {
+    if (h.durationDays >= 365) return true;
+    const daysIn = Math.max(0, Math.floor((Date.parse(today) - Date.parse(h.startDate)) / 86400000)) + 1;
+    return daysIn <= h.durationDays;
+  });
+  const doneCount = activeHabits.filter((h) => (h.completions?.[today] ?? 0) > 0).length;
+  const allDone = activeHabits.length > 0 && doneCount === activeHabits.length;
   // "Nezabudni na …" — only today's unfinished habits, max 2 rows so the
   // card keeps the same height as the other pillars.
-  const shown = habits.filter((h) => (h.completions?.[today] ?? 0) === 0).slice(0, 2);
-  const nHabits = habits.length;
+  const shown = activeHabits.filter((h) => (h.completions?.[today] ?? 0) === 0).slice(0, 2);
+  const nHabits = activeHabits.length;
   const habitWord = nHabits === 1 ? 'návyk' : nHabits >= 2 && nHabits <= 4 ? 'návyky' : 'návykov';
 
   const handleToggle = async (habitId: string) => {
