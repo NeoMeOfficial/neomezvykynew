@@ -624,7 +624,7 @@ export default function NavykyTracker() {
                                 const isToday = iso === todayISO;
                                 const skippedDay = !full && !future && (skips[h.id] ?? []).includes(iso);
                                 const tappable = backfilling && !future;
-                                const iconSize = cols === 7 ? 13 : 9;
+                                const dayOfMonth = parseInt(iso.slice(8, 10), 10);
                                 // Backfill cycles the day: empty → ✓ → ✕ → empty.
                                 const cycle = () => {
                                   if (full) {
@@ -651,22 +651,24 @@ export default function NavykyTracker() {
                                       placeItems: 'center',
                                     }}
                                   >
-                                    {full && (
-                                      <svg width={iconSize} height={iconSize} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                                        <path d="M20 6L9 17l-5-5" />
-                                      </svg>
-                                    )}
-                                    {skippedDay && (
-                                      <svg width={iconSize - 2} height={iconSize - 2} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round">
-                                        <path d="M6 6l12 12M18 6L6 18" />
-                                      </svg>
-                                    )}
+                                    {/* Tiny calendar date so she can place herself
+                                        on the journey; colour carries the status. */}
+                                    <span style={{
+                                      fontFamily: NM.SANS,
+                                      fontSize: cols === 7 ? 11 : cols === 10 ? 9 : 8,
+                                      fontWeight: 600,
+                                      lineHeight: 1,
+                                      fontVariantNumeric: 'tabular-nums',
+                                      color: full || skippedDay ? '#fff' : future ? NM.TERTIARY : NM.MUTED,
+                                    }}>
+                                      {dayOfMonth}
+                                    </span>
                                   </div>
                                 );
                               })}
                             </div>
                             <div style={{ marginTop: 6, fontFamily: NM.SANS, fontSize: 10.5, color: NM.TERTIARY }}>
-                              {unlimited ? 'Posledných 30 dní' : `Tvoj cieľ deň po dni — od 1 do ${h.durationDays}`}
+                              {unlimited ? 'Posledných 30 dní · čísla sú dátumy' : `Tvoj cieľ deň po dni (1–${h.durationDays}) · čísla sú dátumy`}
                             </div>
                             <div style={{ marginTop: 7, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
                               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
