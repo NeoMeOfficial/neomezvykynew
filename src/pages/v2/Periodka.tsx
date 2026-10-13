@@ -1376,7 +1376,8 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
   );
 
   const calendarBlock = (
-      <div style={{ padding: '28px 20px 10px' }}>
+      <div style={{ padding: '24px 18px 0' }}>
+        <div style={{ background: '#fff', border: `1px solid ${NM.HAIR}`, borderRadius: 22, padding: '20px 14px 14px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
           <Eye>Kalendár cyklu</Eye>
           <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -1623,6 +1624,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
           </div>
         )}
 
+        </div>
       </div>
   );
 
