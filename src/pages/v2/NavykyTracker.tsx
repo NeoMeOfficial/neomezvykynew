@@ -546,11 +546,6 @@ export default function NavykyTracker() {
                         </div>
                       ))}
                     </div>
-                    {!done && (
-                      <div style={{ flexShrink: 0, whiteSpace: 'nowrap', fontFamily: NM.SANS, fontSize: 10.5, color: NM.GOLD, fontWeight: 600 }}>
-                        Splnené? Ťukni →
-                      </div>
-                    )}
                   </div>
 
                   {/* Timeline: green fill = completed days, gold notch =
@@ -582,9 +577,11 @@ export default function NavykyTracker() {
                           onClick={() => toggleSkip(h.id)}
                           style={{ all: 'unset', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
                         >
-                          <span style={{ fontFamily: NM.SANS, fontSize: 10.5, color: skippedToday ? NM.MUTED : CORAL, fontWeight: 600 }}>
-                            {skippedToday ? 'Zajtra to skúsiš zas ✓' : 'Dnes nevyšlo? Ťukni →'}
-                          </span>
+                          {skippedToday && (
+                            <span style={{ fontFamily: NM.SANS, fontSize: 10.5, color: NM.MUTED, fontWeight: 600 }}>
+                              Zajtra to skúsiš zas ✓
+                            </span>
+                          )}
                           <span style={{ width: 20, height: 20, borderRadius: 999, background: skippedToday ? CORAL : 'rgba(61,41,33,0.06)', border: skippedToday ? '1px solid transparent' : `1px solid ${NM.HAIR_2}`, display: 'grid', placeItems: 'center', flexShrink: 0, boxSizing: 'border-box' }}>
                             <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke={skippedToday ? '#fff' : 'rgba(61,41,33,0.30)'} strokeWidth="2.6" strokeLinecap="round">
                               <path d="M6 6l12 12M18 6L6 18" />
@@ -726,9 +723,11 @@ export default function NavykyTracker() {
                               onClick={() => toggleSkip(h.id)}
                               style={{ all: 'unset', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
                             >
-                              <span style={{ fontFamily: NM.SANS, fontSize: 10.5, color: skippedToday ? NM.MUTED : CORAL, fontWeight: 600 }}>
-                                {skippedToday ? 'Zajtra zas ✓' : 'Dnes nevyšlo?'}
-                              </span>
+                              {skippedToday && (
+                                <span style={{ fontFamily: NM.SANS, fontSize: 10.5, color: NM.MUTED, fontWeight: 600 }}>
+                                  Zajtra zas ✓
+                                </span>
+                              )}
                               <span style={{ width: 20, height: 20, borderRadius: 999, background: skippedToday ? CORAL : 'rgba(61,41,33,0.06)', border: skippedToday ? '1px solid transparent' : `1px solid ${NM.HAIR_2}`, display: 'grid', placeItems: 'center', flexShrink: 0, boxSizing: 'border-box' }}>
                                 <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke={skippedToday ? '#fff' : 'rgba(61,41,33,0.30)'} strokeWidth="2.6" strokeLinecap="round">
                                   <path d="M6 6l12 12M18 6L6 18" />
