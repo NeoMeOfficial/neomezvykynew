@@ -1666,57 +1666,40 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
           values={todayMap}
           onSet={(k, lvl) => setSymptomLevel(todayISO, k, lvl)}
         />
-        <div style={{ fontFamily: NM.SANS, fontSize: 10.5, color: NM.TERTIARY, fontWeight: 400, marginTop: 12, lineHeight: 1.45 }}>
-          Označenia sa ukladajú automaticky — deň so záznamom dostane v kalendári bodku.
-        </div>
-
-        {/* Poznámka k dnešku — at the bottom of the day log (compact) */}
-        <div style={{ borderTop: `1px solid ${NM.HAIR}`, marginTop: 14, paddingTop: 14 }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
-            <div style={{ fontFamily: NM.SANS, fontSize: 13.5, color: NM.DEEP }}>
-              Poznámka <em style={{ fontFamily: NM.SERIF, fontStyle: 'italic', color: NM.GOLD }}>k dnešku</em>
-            </div>
-            {!noteEditing && !todayNoteText && (
-              <button
-                type="button"
-                onClick={() => setNoteEditing(true)}
-                aria-label="Pridaj si poznámku"
-                style={{ all: 'unset', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 5, padding: '5px 11px', borderRadius: 999, color: NM.GOLD, border: `1px dashed ${NM.GOLD}66`, fontFamily: NM.SANS, fontSize: 11.5, fontWeight: 500 }}
-              >
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4L16.5 3.5z" />
-                </svg>
-                Pridať
-              </button>
-            )}
-          </div>
-          {noteEditing ? (
-            <textarea
-              autoFocus
-              defaultValue={todayNoteText}
-              rows={3}
-              maxLength={500}
-              placeholder={'Detaily a výnimky dňa — „zabudla som tabletku", „bolesť silnejšia než inokedy"…'}
-              onBlur={(e) => { setNoteForDate(todayISO, e.target.value); setNoteEditing(false); }}
-              style={{ width: '100%', marginTop: 10, padding: '11px 13px', borderRadius: 12, border: `1px solid ${NM.GOLD}66`, fontFamily: NM.SERIF, fontSize: 14, color: NM.DEEP, background: NM.BG, outline: 'none', resize: 'none', lineHeight: 1.5, boxSizing: 'border-box' }}
-            />
-          ) : todayNoteText ? (
-            <div
-              role="button"
+        {/* Poznámka k dnešku — one more row right under the symptoms */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '12px 0', borderTop: `1px solid ${NM.HAIR}` }}>
+          <span style={{ fontFamily: NM.SANS, fontSize: 13.5, color: NM.DEEP }}>Tvoja poznámka k dnešku</span>
+          {!noteEditing && (
+            <button
+              type="button"
               onClick={() => setNoteEditing(true)}
-              style={{ marginTop: 10, padding: '10px 12px', borderRadius: 12, background: NM.BG, border: `1px solid ${NM.HAIR}`, cursor: 'pointer', display: 'flex', gap: 8, alignItems: 'flex-start' }}
+              style={{ all: 'unset', cursor: 'pointer', fontFamily: NM.SANS, fontSize: 12.5, fontWeight: 500, color: NM.GOLD }}
             >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={NM.GOLD} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 2 }}>
-                <path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4L16.5 3.5z" />
-              </svg>
-              <div style={{ fontFamily: NM.SERIF, fontSize: 13.5, color: NM.DEEP, lineHeight: 1.5, whiteSpace: 'pre-wrap', flex: 1 }}>{todayNoteText}</div>
-              <span style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.TERTIARY, flexShrink: 0 }}>Uprav</span>
-            </div>
-          ) : (
-            <div style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.TERTIARY, marginTop: 6, lineHeight: 1.5 }}>
-              Čokoľvek špecifické k dnešku — taký deň dostane v kalendári pero ✎.
-            </div>
+              {todayNoteText ? 'Upraviť' : 'Pridať'}
+            </button>
           )}
+        </div>
+        {noteEditing ? (
+          <textarea
+            autoFocus
+            defaultValue={todayNoteText}
+            rows={3}
+            maxLength={500}
+            placeholder={'Detaily a výnimky dňa — „zabudla som tabletku", „bolesť silnejšia než inokedy"…'}
+            onBlur={(e) => { setNoteForDate(todayISO, e.target.value); setNoteEditing(false); }}
+            style={{ width: '100%', padding: '11px 13px', borderRadius: 12, border: `1px solid ${NM.GOLD}66`, fontFamily: NM.SERIF, fontSize: 14, color: NM.DEEP, background: NM.BG, outline: 'none', resize: 'none', lineHeight: 1.5, boxSizing: 'border-box' }}
+          />
+        ) : todayNoteText ? (
+          <div
+            role="button"
+            onClick={() => setNoteEditing(true)}
+            style={{ padding: '10px 12px', borderRadius: 12, background: NM.BG, border: `1px solid ${NM.HAIR}`, cursor: 'pointer', fontFamily: NM.SERIF, fontSize: 13.5, color: NM.DEEP, lineHeight: 1.5, whiteSpace: 'pre-wrap' }}
+          >
+            {todayNoteText}
+          </div>
+        ) : null}
+        <div style={{ fontFamily: NM.SANS, fontSize: 10.5, color: NM.TERTIARY, fontWeight: 400, marginTop: 12, lineHeight: 1.45 }}>
+          Ukladanie je automatické. V kalendári sa ti zobrazí pri dni bodka.
         </div>
 
         {/* Connector: question above → answer below */}
