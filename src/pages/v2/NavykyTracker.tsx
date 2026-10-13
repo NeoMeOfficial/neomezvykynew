@@ -570,22 +570,22 @@ export default function NavykyTracker() {
                   {goalReached && (
                     <div style={{
                       margin: '0 16px 14px',
-                      padding: '13px 15px',
+                      padding: '15px 16px',
                       borderRadius: 14,
-                      background: outcomeGood ? 'rgba(122,158,120,0.12)' : 'rgba(184,134,74,0.10)',
-                      border: `1px solid ${outcomeGood ? 'rgba(122,158,120,0.42)' : 'rgba(184,134,74,0.38)'}`,
+                      background: outcomeGood ? 'rgba(122,158,120,0.14)' : 'rgba(61,41,33,0.055)',
+                      border: `1px solid ${outcomeGood ? 'rgba(122,158,120,0.45)' : 'rgba(61,41,33,0.16)'}`,
                     }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-                        <span style={{ width: 22, height: 22, borderRadius: 999, flexShrink: 0, background: outcomeGood ? SAVED_GREEN : NM.GOLD, display: 'grid', placeItems: 'center' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <span style={{ width: 26, height: 26, borderRadius: 999, flexShrink: 0, background: outcomeGood ? SAVED_GREEN : NM.GOLD, display: 'grid', placeItems: 'center' }}>
                           {outcomeGood ? (
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
                           ) : (
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /></svg>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /></svg>
                           )}
                         </span>
-                        <span style={{ fontFamily: NM.SERIF, fontSize: 17, color: NM.DEEP, fontWeight: 600 }}>{outcomeTitle}</span>
+                        <span style={{ fontFamily: NM.SERIF, fontSize: 19, color: NM.DEEP, fontWeight: 600, letterSpacing: '-0.01em' }}>{outcomeTitle}</span>
                       </div>
-                      <div style={{ fontFamily: NM.SANS, fontSize: 13, color: NM.DEEP, marginTop: 7, fontWeight: 500 }}>
+                      <div style={{ fontFamily: NM.SANS, fontSize: 13.5, color: NM.DEEP, marginTop: 8, fontWeight: 500 }}>
                         Splnených {doneDays} z {h.durationDays} dní
                       </div>
                     </div>
@@ -637,6 +637,14 @@ export default function NavykyTracker() {
 
                   {open && (
                     <div style={{ padding: '2px 16px 14px' }}>
+                      {/* Finished habit: the grid is now REFERENCE — a quiet
+                          eyebrow labels it so the outcome banner (above) and
+                          the restart action (below) stay the loud parts. */}
+                      {goalReached && (
+                        <div style={{ fontFamily: NM.SANS, fontSize: 10, letterSpacing: '0.16em', textTransform: 'uppercase', color: NM.TERTIARY, fontWeight: 600, marginBottom: 10 }}>
+                          Tvoj priebeh
+                        </div>
+                      )}
                       {/* Goal habits: one square per goal day from day 1 —
                           missed days stay empty forever. Unlimited: rolling
                           last 30 days. Backfill mode makes past squares
@@ -741,6 +749,9 @@ export default function NavykyTracker() {
                         );
                       })()}
 
+                      {goalReached && (
+                        <div style={{ height: 1, background: NM.HAIR, margin: '16px 0 2px' }} />
+                      )}
                       {goalReached && (
                         <RestartPanel saving={saving} onRestart={async (days) => {
                           setSaving(true);
