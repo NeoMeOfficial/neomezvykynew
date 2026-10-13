@@ -570,22 +570,22 @@ export default function NavykyTracker() {
                   {goalReached && (
                     <div style={{
                       margin: '0 16px 14px',
-                      padding: '15px 16px',
-                      borderRadius: 14,
+                      padding: '11px 14px',
+                      borderRadius: 12,
                       background: outcomeGood ? 'rgba(122,158,120,0.14)' : 'rgba(61,41,33,0.055)',
                       border: `1px solid ${outcomeGood ? 'rgba(122,158,120,0.45)' : 'rgba(61,41,33,0.16)'}`,
                     }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <span style={{ width: 26, height: 26, borderRadius: 999, flexShrink: 0, background: outcomeGood ? SAVED_GREEN : NM.GOLD, display: 'grid', placeItems: 'center' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                        <span style={{ width: 16, height: 16, borderRadius: 999, flexShrink: 0, background: outcomeGood ? SAVED_GREEN : NM.GOLD, display: 'grid', placeItems: 'center' }}>
                           {outcomeGood ? (
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
                           ) : (
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /></svg>
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /></svg>
                           )}
                         </span>
-                        <span style={{ fontFamily: NM.SERIF, fontSize: 19, color: NM.DEEP, fontWeight: 600, letterSpacing: '-0.01em' }}>{outcomeTitle}</span>
+                        <span style={{ fontFamily: NM.SANS, fontSize: 10.5, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: outcomeGood ? SAVED_GREEN : NM.MUTED }}>{outcomeTitle}</span>
                       </div>
-                      <div style={{ fontFamily: NM.SANS, fontSize: 13.5, color: NM.DEEP, marginTop: 8, fontWeight: 500 }}>
+                      <div style={{ fontFamily: NM.SANS, fontSize: 13.5, color: NM.DEEP, marginTop: 5, fontWeight: 600 }}>
                         Splnených {doneDays} z {h.durationDays} dní
                       </div>
                     </div>
