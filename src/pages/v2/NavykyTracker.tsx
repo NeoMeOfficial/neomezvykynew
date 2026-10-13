@@ -667,7 +667,7 @@ export default function NavykyTracker() {
                                 Ťukni na deň: raz ✓ splnené, druhý raz ✕ nevyšlo, tretí raz prázdne.
                               </div>
                             )}
-                            <div style={{ display: 'grid', gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: 4, maxHeight: 230, overflowY: 'auto', paddingRight: 2 }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: 4, maxHeight: cols === 7 ? 142 : cols === 10 ? 102 : 94, overflowY: 'auto', paddingRight: 2 }}>
                               {gridDays.map((iso, gi) => {
                                 const c = h.completions?.[iso] ?? 0;
                                 const full = c >= h.targetPerDay;
