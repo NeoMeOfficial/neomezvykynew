@@ -1657,6 +1657,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
   // ("zaznač si, ako sa cítiš") flows into the answer ("čo by ti mohlo
   // pomôcť") through an arrow divider.
   const wellbeingBlock = (
+    <>
       <div style={{ padding: '24px 18px 0' }}>
         <div style={{ background: '#fff', border: `1px solid ${NM.HAIR}`, borderRadius: 22, padding: '20px 16px 10px' }}>
         <Ser size={21} style={{ lineHeight: 1.18, marginBottom: 14 }}>
@@ -1702,13 +1703,13 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
           Ukladanie je automatické. V kalendári sa ti zobrazí pri dni bodka.
         </div>
 
-        {/* Connector: question above → answer below */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '20px 0 18px' }}>
-          <div style={{ flex: 1, height: 1, background: NM.HAIR_2 }} />
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={NM.GOLD} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12l7 7 7-7" /></svg>
-          <div style={{ flex: 1, height: 1, background: NM.HAIR_2 }} />
         </div>
+      </div>
 
+      {/* Separate card — "Zaznač si…" and "Čo by ti pomôcť" are no longer
+          fused; a gap (like above the feelings card) divides them. */}
+      <div style={{ padding: '24px 18px 0' }}>
+        <div style={{ background: '#fff', border: `1px solid ${NM.HAIR}`, borderRadius: 22, padding: '20px 16px 10px' }}>
         <Ser size={21} style={{ lineHeight: 1.18 }}>
           Čo by ti mohlo <em style={{ color: NM.GOLD, fontWeight: 400, fontStyle: 'italic' }}>dnes pomôcť?</em>
         </Ser>
@@ -1739,6 +1740,7 @@ function PaidView({ navigate, cycleData, derivedState, onMarkPeriodStart, onMark
         </div>
         </div>
       </div>
+    </>
   );
 
   // "Tvoj cyklus" (Gabi 2026-09-02, replaces "Čaká ťa"): two columns —
