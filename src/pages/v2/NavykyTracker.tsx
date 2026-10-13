@@ -617,7 +617,7 @@ export default function NavykyTracker() {
                               </div>
                             )}
                             <div style={{ display: 'grid', gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: 4 }}>
-                              {gridDays.map((iso) => {
+                              {gridDays.map((iso, gi) => {
                                 const c = h.completions?.[iso] ?? 0;
                                 const full = c >= h.targetPerDay;
                                 const future = iso > todayISO;
@@ -625,6 +625,12 @@ export default function NavykyTracker() {
                                 const skippedDay = !full && !future && (skips[h.id] ?? []).includes(iso);
                                 const tappable = backfilling && !future;
                                 const dayOfMonth = parseInt(iso.slice(8, 10), 10);
+                                // Show the month only where it changes (1st of a
+                                // month, or the very first square) — keeps every
+                                // other square to a single clean number.
+                                const dateLabel = (dayOfMonth === 1 || gi === 0)
+                                  ? `${dayOfMonth}.${parseInt(iso.slice(5, 7), 10)}`
+                                  : `${dayOfMonth}`;
                                 // Backfill cycles the day: empty → ✓ → ✕ → empty.
                                 const cycle = () => {
                                   if (full) {
@@ -661,7 +667,7 @@ export default function NavykyTracker() {
                                       fontVariantNumeric: 'tabular-nums',
                                       color: full || skippedDay ? '#fff' : future ? NM.TERTIARY : NM.MUTED,
                                     }}>
-                                      {dayOfMonth}
+                                      {dateLabel}
                                     </span>
                                   </div>
                                 );
