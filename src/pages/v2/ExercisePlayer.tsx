@@ -474,15 +474,10 @@ export default function ExercisePlayer() {
           )}
         </div>
 
-        {/* Cycle recommendation — only when the pick really came from the
-            phase formula (not stretch-day / no-cycle / free rotation) */}
-        {location.state?.phasePick && (
-          <div className="rounded-card bg-mauve/[0.08] border border-mauve/20 p-4">
-            <BodyText size="sm" className="text-mauve font-medium">
-              Toto cvičenie bolo odporúčané na základe aktuálnej fázy tvojho cyklu.
-            </BodyText>
-          </div>
-        )}
+        {/* Cycle-recommendation box removed (Sam 2026-10-13): first we test
+            that the app reads the cycle correctly; the explicit per-exercise
+            phase recommendation copy comes in a later stage. The phasePick
+            state still arrives — revert this block to show it again. */}
 
         {/* 'Ďalšie cvičenia' suggestions removed (Sam 2026-10-05:
             no distractions under the video). Revert if Gabi misses her
@@ -518,6 +513,20 @@ export default function ExercisePlayer() {
             ))}
           </div>
         )}
+
+        {/* Always a way to browse the whole Telo library (Sam 2026-10-13) */}
+        <button
+          onClick={() => navigate('/kniznica/telo')}
+          className="w-full flex items-center justify-between rounded-card bg-white border border-ink/[0.08] shadow-nm-sm px-5 py-4"
+        >
+          <span className="flex items-center gap-2.5 font-sans text-[13px] font-medium text-ink">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B4C3B" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="3" width="7" height="7" rx="1.5" /><rect x="14" y="3" width="7" height="7" rx="1.5" /><rect x="3" y="14" width="7" height="7" rx="1.5" /><rect x="14" y="14" width="7" height="7" rx="1.5" />
+            </svg>
+            Všetky cvičenia
+          </span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6B4C3B" strokeWidth="2" strokeLinecap="round"><path d="M9 6l6 6-6 6" /></svg>
+        </button>
       </div>
     </div>
   );
