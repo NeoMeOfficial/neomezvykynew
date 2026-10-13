@@ -272,11 +272,40 @@ export function useSupabaseHabits() {
     }
   };
 
+  // Start the same habit over: a fresh window from today with a new
+  // length, wiping the previous completions for a clean slate.
+  const restartHabit = async (id: string, durationDays: number): Promise<boolean> => {
+    if (!user) return false;
+    try {
+      // Clear the old window's ticks first (best-effort — a failure here
+      // shouldn't block the restart; stale past-date rows are harmless).
+      await supabase.from('habit_completions').delete().eq('habit_id', id).eq('user_id', user.id);
+
+      const { error } = await supabase
+        .from('habits')
+        .update({
+          duration_days: durationDays,
+          start_date: localDayISO(),
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', id)
+        .eq('user_id', user.id);
+      if (error) throw error;
+
+      await fetchHabits();
+      return true;
+    } catch (error) {
+      console.error('Error restarting habit:', error);
+      return false;
+    }
+  };
+
   return {
     habits,
     loading,
     addHabit,
     editHabit,
+    restartHabit,
     toggleHabitCompletion,
     setCompletionForDate,
     removeHabit,

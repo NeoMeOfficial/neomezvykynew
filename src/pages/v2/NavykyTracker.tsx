@@ -274,10 +274,30 @@ function CustomCard({ saving, onStart }: { saving: boolean; onStart: (name: stri
   );
 }
 
+// ─── Restart panel — shown when a habit's window is over ─────────────────────
+function RestartPanel({ saving, onRestart }: { saving: boolean; onRestart: (days: number) => void }) {
+  const [dur, setDur] = useState<number | 'custom'>(21);
+  const [custom, setCustom] = useState('');
+  const days = resolveDays(dur, custom);
+  return (
+    <div style={{ marginTop: 14 }}>
+      <div style={{ fontFamily: NM.SERIF, fontSize: 16, color: NM.DEEP, fontWeight: 600 }}>Chceš začať znova?</div>
+      <DurationPicker value={dur} custom={custom} onPick={setDur} onCustom={setCustom} />
+      <button
+        onClick={() => { if (days && !saving) onRestart(days); }}
+        disabled={saving || !days}
+        style={{ all: 'unset', cursor: !saving && days ? 'pointer' : 'default', marginTop: 14, padding: '10px 18px', borderRadius: 999, background: days ? NM.DEEP : NM.HAIR_2, color: days ? '#fff' : NM.TERTIARY, fontFamily: NM.SANS, fontSize: 12.5, fontWeight: 500, display: 'inline-block', opacity: saving ? 0.7 : 1 }}
+      >
+        Začať znova
+      </button>
+    </div>
+  );
+}
+
 // ─── Screen ──────────────────────────────────────────────────────────────────
 export default function NavykyTracker() {
   const smartBack = useSmartBack('/kniznica');
-  const { habits, loading, addHabit, editHabit, toggleHabitCompletion, setCompletionForDate, removeHabit } = useSupabaseHabits();
+  const { habits, loading, addHabit, editHabit, restartHabit, toggleHabitCompletion, setCompletionForDate, removeHabit } = useSupabaseHabits();
   const { addActivity } = useAchievements();
   const { award } = usePointsLedger();
   const { toast } = useToast();
@@ -699,14 +719,13 @@ export default function NavykyTracker() {
                       })()}
 
                       {goalReached && (
-                        <button
-                          onClick={async () => {
-                            await editHabit(h.id, { name: h.name, durationDays: UNLIMITED, unit: h.unit, targetPerDay: h.targetPerDay });
-                          }}
-                          style={{ all: 'unset', cursor: 'pointer', marginTop: 12, padding: '8px 15px', borderRadius: 999, background: NM.DEEP, color: '#fff', fontFamily: NM.SANS, fontSize: 12, fontWeight: 500, display: 'inline-block' }}
-                        >
-                          Pokračovať bez limitu
-                        </button>
+                        <RestartPanel saving={saving} onRestart={async (days) => {
+                          setSaving(true);
+                          await restartHabit(h.id, days);
+                          setSkips((prev) => { const next = { ...prev }; delete next[h.id]; writeSkips(next); return next; });
+                          setSaving(false);
+                          setExpandedId(null);
+                        }} />
                       )}
 
                       {backfillId === h.id ? (
