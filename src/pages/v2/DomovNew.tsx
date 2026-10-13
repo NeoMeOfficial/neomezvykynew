@@ -337,9 +337,13 @@ function CardGoals() {
   });
   const doneCount = activeHabits.filter((h) => (h.completions?.[today] ?? 0) > 0).length;
   const allDone = activeHabits.length > 0 && doneCount === activeHabits.length;
-  // "Nezabudni na …" — only today's unfinished habits, max 2 rows so the
-  // card keeps the same height as the other pillars.
-  const shown = activeHabits.filter((h) => (h.completions?.[today] ?? 0) === 0).slice(0, 2);
+  // Show the habits themselves with their status (✓ done / empty circle) —
+  // unfinished first so what needs action is on top — capped at 3 rows so
+  // the card stays near the other pillars' height; "+N ďalšie" for the rest.
+  const undoneToday = activeHabits.filter((h) => (h.completions?.[today] ?? 0) === 0);
+  const doneToday = activeHabits.filter((h) => (h.completions?.[today] ?? 0) > 0);
+  const shown = [...undoneToday, ...doneToday].slice(0, 3);
+  const moreCount = activeHabits.length - shown.length;
   const nHabits = activeHabits.length;
   const habitWord = nHabits === 1 ? 'návyk' : nHabits >= 2 && nHabits <= 4 ? 'návyky' : 'návykov';
 
@@ -373,7 +377,7 @@ function CardGoals() {
           ) : hasHabits ? (
             <>
               <div style={{ fontFamily: SERIF, fontSize: 17.5, color: INK, lineHeight: 1.22, marginTop: 7 }}>Buduješ si {nHabits} {habitWord}</div>
-              <div style={{ fontSize: 11.5, color: FG2, fontWeight: 300, marginTop: 4, lineHeight: 1.4 }}>{doneCount} z {nHabits} na dnes hotové · nezabudni na:</div>
+              <div style={{ fontSize: 11.5, color: FG2, fontWeight: 300, marginTop: 4, lineHeight: 1.4 }}>{doneCount} z {nHabits} na dnes hotové</div>
             <div style={{ marginTop: 2 }}>
               {shown.map((h, i) => {
                 const done = (h.completions?.[today] ?? 0) > 0;
@@ -389,6 +393,9 @@ function CardGoals() {
                   </div>
                 );
               })}
+              {moreCount > 0 && (
+                <div style={{ fontSize: 11, color: FG3, fontWeight: 400, marginTop: 6 }}>+{moreCount} {moreCount === 1 ? 'ďalší' : moreCount <= 4 ? 'ďalšie' : 'ďalších'}</div>
+              )}
             </div>
             </>
           ) : (
