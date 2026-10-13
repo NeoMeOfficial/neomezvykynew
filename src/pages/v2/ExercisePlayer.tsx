@@ -112,7 +112,7 @@ export default function ExercisePlayer() {
   // Library rows for the suggestion + favorites sections under the video.
   const { exercises: dbExercises } = useExercises();
   const { stretches: dbStretches } = useStretches();
-  const { favorites } = useUniversalFavorites();
+  const { favorites, isFavorite, toggleFavorite } = useUniversalFavorites();
   const isStretchView = exercise.category === 'stretch';
 
   const exRows = useMemo(
@@ -376,7 +376,7 @@ export default function ExercisePlayer() {
   if (entitlement.loading || !allowed) return null;
 
   return (
-    <div className="min-h-screen bg-cream pb-12">
+    <div className="min-h-screen bg-cream pb-32">
       <TopBar
         title="Telo"
         onBack={smartBack}
@@ -476,14 +476,42 @@ export default function ExercisePlayer() {
             no distractions under the video). Revert if Gabi misses her
             2026-07-26 diverse-focus alternatives. */}
 
-        {/* Unified footer: Pridať do obľúbených · Tvoje obľúbené · Všetky */}
+        {/* Unified links (Pridať do obľúbených is the sticky dark CTA below,
+            same as Strava) */}
         <FavoriteLinksBlock
           item={{ id: exercise.id, type: 'workout', title: exercise.name, duration: exercise.duration, category: exercise.category }}
           favTab="workout"
           allLabel="Všetky cvičenia"
           allPath="/kniznica/telo"
           color="#6B4C3B"
+          showFavToggle={false}
         />
+      </div>
+
+      {/* Sticky "Pridať do obľúbených" — same dark CTA as the recipe page */}
+      <div
+        style={{
+          position: 'fixed', left: 0, right: 0, bottom: 0,
+          padding: '16px 18px calc(env(safe-area-inset-bottom) + 16px)',
+          background: 'rgba(248,245,240,0.95)', backdropFilter: 'blur(20px)',
+          borderTop: '1px solid rgba(61,41,33,0.10)', zIndex: 50,
+        }}
+      >
+        <button
+          onClick={() => toggleFavorite({ id: exercise.id, type: 'workout', title: exercise.name, duration: exercise.duration, category: exercise.category })}
+          style={{
+            all: 'unset', cursor: 'pointer', width: '100%', boxSizing: 'border-box',
+            padding: '16px 20px', borderRadius: 999,
+            background: isFavorite(exercise.id, 'workout') ? '#6B4C3B' : '#2E2218', color: '#fff',
+            fontFamily: 'DM Sans, sans-serif', fontSize: 14, fontWeight: 500, letterSpacing: '0.02em',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+          }}
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill={isFavorite(exercise.id, 'workout') ? '#fff' : 'none'} stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" />
+          </svg>
+          {isFavorite(exercise.id, 'workout') ? 'V obľúbených' : 'Pridať do obľúbených'}
+        </button>
       </div>
     </div>
   );
