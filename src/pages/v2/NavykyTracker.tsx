@@ -69,11 +69,12 @@ const isoFromStart = (startISO: string, i: number) => {
   return isoOf(d);
 };
 
-function DurationPicker({ value, custom, onPick, onCustom }: {
+function DurationPicker({ value, custom, onPick, onCustom, trailing }: {
   value: number | 'custom';
   custom: string;
   onPick: (v: number | 'custom') => void;
   onCustom: (v: string) => void;
+  trailing?: React.ReactNode;
 }) {
   // Quiet secondary controls — the card's visual order is title →
   // CTA → duration → edit link, so the chips stay small and muted.
@@ -111,6 +112,7 @@ function DurationPicker({ value, custom, onPick, onCustom }: {
             <span style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.MUTED }}>dní</span>
           </span>
         )}
+        {trailing}
       </div>
     </>
   );
@@ -205,28 +207,32 @@ function PresetCard({ preset, saving, onStart }: {
         </div>
       )}
 
-      <DurationPicker value={dur} custom={custom} onPick={setDur} onCustom={setCustom} />
-
-      <button
-        onClick={() => { if (days && name.trim()) onStart(name.trim(), days); }}
-        disabled={saving || !days || !name.trim()}
-        style={{
-          all: 'unset',
-          cursor: !saving && days && name.trim() ? 'pointer' : 'default',
-          marginTop: 12,
-          padding: '10px 18px',
-          borderRadius: 999,
-          background: days && name.trim() ? NM.DEEP : NM.HAIR_2,
-          color: days && name.trim() ? '#fff' : NM.TERTIARY,
-          fontFamily: NM.SANS,
-          fontSize: 12.5,
-          fontWeight: 500,
-          display: 'inline-block',
-          opacity: saving ? 0.7 : 1,
-        }}
-      >
-        Chcem začať dnes
-      </button>
+      <DurationPicker
+        value={dur}
+        custom={custom}
+        onPick={setDur}
+        onCustom={setCustom}
+        trailing={
+          <button
+            onClick={() => { if (days && name.trim()) onStart(name.trim(), days); }}
+            disabled={saving || !days || !name.trim()}
+            style={{
+              all: 'unset',
+              cursor: !saving && days && name.trim() ? 'pointer' : 'default',
+              padding: '7px 15px',
+              borderRadius: 999,
+              background: days && name.trim() ? NM.DEEP : NM.HAIR_2,
+              color: days && name.trim() ? '#fff' : NM.TERTIARY,
+              fontFamily: NM.SANS,
+              fontSize: 12,
+              fontWeight: 500,
+              opacity: saving ? 0.7 : 1,
+            }}
+          >
+            Chcem začať dnes
+          </button>
+        }
+      />
     </div>
   );
 }
