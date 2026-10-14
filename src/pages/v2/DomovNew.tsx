@@ -368,7 +368,7 @@ function CardGoals() {
       >
         <CardPhoto img="/images/r9/lifestyle-yoga-pose.jpg" />
         <div style={{ position: 'relative', minHeight: PILLAR_CARD_MIN_H, minWidth: 0, padding: '14px 15px 14px 126px', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
-          <PillarEyebrow color={GOLD} label="Moje návyky a ciele" />
+          <PillarEyebrow color={GOLD} label="Návyky a ciele" />
           {allDone ? (
             <>
               <div style={{ fontFamily: SERIF, fontSize: 17.5, color: INK, lineHeight: 1.22, marginTop: 7 }}>Všetky návyky máš dnes hotové ✓</div>
