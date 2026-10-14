@@ -112,7 +112,6 @@ function DurationPicker({ value, custom, onPick, onCustom, trailing }: {
             <span style={{ fontFamily: NM.SANS, fontSize: 11.5, color: NM.MUTED }}>dní</span>
           </span>
         )}
-        {trailing && <span aria-hidden="true" style={{ width: 1, height: 18, background: NM.HAIR_2, margin: '0 5px', flexShrink: 0 }} />}
         {trailing}
       </div>
     </>
@@ -220,6 +219,7 @@ function PresetCard({ preset, saving, onStart }: {
             style={{
               all: 'unset',
               cursor: !saving && days && name.trim() ? 'pointer' : 'default',
+              marginLeft: 'auto',
               padding: '7px 15px',
               borderRadius: 999,
               background: days && name.trim() ? NM.DEEP : NM.HAIR_2,
