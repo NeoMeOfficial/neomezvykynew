@@ -523,39 +523,10 @@ export default function NavykyTracker() {
                     }}
                     onTouchCancel={() => { touchRef.current = null; setDrag(null); }}
                     style={{ position: 'relative', background: justAdded === h.name ? 'rgba(122,158,120,0.07)' : '#fff', borderRadius: 20, border: `1px solid ${justAdded === h.name ? SAVED_GREEN : NM.HAIR}`, overflow: 'hidden', transform: `translateX(${dragX}px)`, transition: dragX === 0 ? 'transform 0.25s ease, background 0.6s ease, border-color 0.6s ease' : 'background 0.6s ease, border-color 0.6s ease', touchAction: 'pan-y' }}>
-                  {/* Corner controls: tick top-right, X bottom-right — both
-                      pre-drawn grey, colouring on tap (Gabi 2026-07-31). */}
-                  <button
-                    onClick={() => handleToggle(h.id)}
-                    aria-label={done ? 'Hotovo' : 'Odfajkni'}
-                    style={{
-                      position: 'absolute',
-                      top: 13,
-                      right: 14,
-                      width: 34,
-                      height: 34,
-                      borderRadius: 999,
-                      cursor: 'pointer',
-                      background: done ? SAVED_GREEN : count > 0 ? 'rgba(122,158,120,0.12)' : '#fff',
-                      border: `1.5px solid ${SAVED_GREEN}`,
-                      display: 'grid',
-                      placeItems: 'center',
-                      padding: 0,
-                      zIndex: 1,
-                      animation: done ? 'habitPop 0.3s ease' : undefined,
-                    }}
-                  >
-                    {count > 0 && !done ? (
-                      <span style={{ fontFamily: NM.SANS, fontSize: 12, fontWeight: 600, color: SAVED_GREEN }}>{count}</span>
-                    ) : (
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={done ? '#fff' : SAVED_GREEN} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M20 6L9 17l-5-5" />
-                      </svg>
-                    )}
-                  </button>
-                  {/* Daily nudge (Gabi 2026-07-31): every day the circle is
-                      unticked, point at it; gone once today is green. */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '15px 58px 15px 16px' }}>
+                  {/* Title + the two daily controls grouped right next to the
+                      name (Sam 2026-10-14): tick + skip side by side, in their
+                      legend colours, instead of scattered top/bottom-right. */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px' }}>
                     <div role="button" onClick={() => { setExpandedId(open ? null : h.id); setBackfillId(null); }} style={{ flex: 1, minWidth: 0, cursor: 'pointer' }}>
                       <div style={{ fontFamily: NM.SERIF, fontSize: 17, color: NM.DEEP, fontWeight: 600, lineHeight: 1.3 }}>{h.name}</div>
                       {subParts.map((part) => (
@@ -563,7 +534,34 @@ export default function NavykyTracker() {
                           {part}
                         </div>
                       ))}
+                      {!goalReached && skippedToday && !done && (
+                        <div style={{ marginTop: 3, fontFamily: NM.SANS, fontSize: 11.5, color: CORAL, fontWeight: 500 }}>Dnes nevyšlo — zajtra to skúsiš zas ✓</div>
+                      )}
                     </div>
+                    {!goalReached && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+                        <button
+                          onClick={() => handleToggle(h.id)}
+                          aria-label={done ? 'Hotovo' : 'Odfajkni'}
+                          style={{ all: 'unset', cursor: 'pointer', width: 34, height: 34, borderRadius: 999, background: done ? SAVED_GREEN : '#fff', border: `1.5px solid ${SAVED_GREEN}`, display: 'grid', placeItems: 'center', boxSizing: 'border-box', animation: done ? 'habitPop 0.3s ease' : undefined }}
+                        >
+                          {count > 0 && !done ? (
+                            <span style={{ fontFamily: NM.SANS, fontSize: 12, fontWeight: 600, color: SAVED_GREEN }}>{count}</span>
+                          ) : (
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={done ? '#fff' : SAVED_GREEN} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
+                          )}
+                        </button>
+                        {!done && (
+                          <button
+                            onClick={() => toggleSkip(h.id)}
+                            aria-label="Dnes nevyšlo"
+                            style={{ all: 'unset', cursor: 'pointer', width: 34, height: 34, borderRadius: 999, background: skippedToday ? CORAL : '#fff', border: `1.5px solid ${CORAL}`, display: 'grid', placeItems: 'center', boxSizing: 'border-box', animation: skippedToday ? 'habitPop 0.3s ease' : undefined }}
+                          >
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={skippedToday ? '#fff' : CORAL} strokeWidth="2.6" strokeLinecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
+                          </button>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   {/* Window finished → prominent outcome banner (don't let
@@ -608,31 +606,14 @@ export default function NavykyTracker() {
                   )}
 
                   {!open && (
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '0 16px 13px' }}>
+                    <div style={{ padding: '0 16px 13px' }}>
                       <div
                         role="button"
                         onClick={() => { setExpandedId(h.id); setBackfillId(null); }}
-                        style={{ fontFamily: NM.SANS, fontSize: 11, color: NM.GOLD, fontWeight: 500, cursor: 'pointer' }}
+                        style={{ display: 'inline-block', fontFamily: NM.SANS, fontSize: 11, color: NM.GOLD, fontWeight: 500, cursor: 'pointer' }}
                       >
                         Pozri si svoje dni ›
                       </div>
-                      {!done && (
-                        <button
-                          onClick={() => toggleSkip(h.id)}
-                          style={{ all: 'unset', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
-                        >
-                          {skippedToday && (
-                            <span style={{ fontFamily: NM.SANS, fontSize: 10.5, color: NM.MUTED, fontWeight: 600 }}>
-                              Zajtra to skúsiš zas ✓
-                            </span>
-                          )}
-                          <span style={{ width: 20, height: 20, borderRadius: 999, background: skippedToday ? CORAL : '#fff', border: `1.5px solid ${CORAL}`, display: 'grid', placeItems: 'center', flexShrink: 0, boxSizing: 'border-box', animation: skippedToday ? 'habitPop 0.3s ease' : undefined }}>
-                            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke={skippedToday ? '#fff' : 'rgba(61,41,33,0.30)'} strokeWidth="2.6" strokeLinecap="round">
-                              <path d="M6 6l12 12M18 6L6 18" />
-                            </svg>
-                          </span>
-                        </button>
-                      )}
                     </div>
                   )}
 
@@ -773,30 +754,13 @@ export default function NavykyTracker() {
                           </button>
                         </div>
                       ) : (
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginTop: 12 }}>
+                        <div style={{ marginTop: 12 }}>
                           <button
                             onClick={() => setBackfillId(h.id)}
                             style={{ all: 'unset', cursor: 'pointer', fontFamily: NM.SANS, fontSize: 12, color: NM.GOLD, fontWeight: 500 }}
                           >
                             Zabudla si si zaznačiť?
                           </button>
-                          {!done && (
-                            <button
-                              onClick={() => toggleSkip(h.id)}
-                              style={{ all: 'unset', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
-                            >
-                              {skippedToday && (
-                                <span style={{ fontFamily: NM.SANS, fontSize: 10.5, color: NM.MUTED, fontWeight: 600 }}>
-                                  Zajtra zas ✓
-                                </span>
-                              )}
-                              <span style={{ width: 20, height: 20, borderRadius: 999, background: skippedToday ? CORAL : '#fff', border: `1.5px solid ${CORAL}`, display: 'grid', placeItems: 'center', flexShrink: 0, boxSizing: 'border-box', animation: skippedToday ? 'habitPop 0.3s ease' : undefined }}>
-                                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke={skippedToday ? '#fff' : 'rgba(61,41,33,0.30)'} strokeWidth="2.6" strokeLinecap="round">
-                                  <path d="M6 6l12 12M18 6L6 18" />
-                                </svg>
-                              </span>
-                            </button>
-                          )}
                         </div>
                       )}
                     </div>
