@@ -574,18 +574,20 @@ export default function NavykyTracker() {
                       background: outcomeGood ? 'rgba(122,158,120,0.14)' : 'rgba(61,41,33,0.055)',
                       border: `1px solid ${outcomeGood ? 'rgba(122,158,120,0.45)' : 'rgba(61,41,33,0.16)'}`,
                     }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-                        <span style={{ width: 16, height: 16, borderRadius: 999, flexShrink: 0, background: outcomeGood ? SAVED_GREEN : NM.GOLD, display: 'grid', placeItems: 'center' }}>
+                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 9 }}>
+                        <span style={{ width: 16, height: 16, borderRadius: 999, flexShrink: 0, marginTop: 1, background: outcomeGood ? SAVED_GREEN : NM.GOLD, display: 'grid', placeItems: 'center' }}>
                           {outcomeGood ? (
                             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
                           ) : (
                             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /></svg>
                           )}
                         </span>
-                        <span style={{ fontFamily: NM.SANS, fontSize: 12.5, fontWeight: 600, color: outcomeGood ? SAVED_GREEN : NM.DEEP }}>{outcomeTitle}</span>
-                      </div>
-                      <div style={{ fontFamily: NM.SANS, fontSize: 13.5, color: NM.DEEP, marginTop: 5, fontWeight: 600 }}>
-                        Splnených {doneDays} z {h.durationDays} dní
+                        <div style={{ minWidth: 0 }}>
+                          <div style={{ fontFamily: NM.SANS, fontSize: 12.5, fontWeight: 600, color: outcomeGood ? SAVED_GREEN : NM.DEEP }}>{outcomeTitle}</div>
+                          <div style={{ fontFamily: NM.SANS, fontSize: 13.5, color: NM.DEEP, marginTop: 4, fontWeight: 600 }}>
+                            Splnených {doneDays} z {h.durationDays} dní
+                          </div>
+                        </div>
                       </div>
                     </div>
                   )}
