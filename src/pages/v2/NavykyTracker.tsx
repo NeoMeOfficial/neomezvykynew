@@ -213,7 +213,7 @@ function PresetCard({ preset, saving, onStart }: {
         style={{
           all: 'unset',
           cursor: !saving && days && name.trim() ? 'pointer' : 'default',
-          marginTop: 16,
+          marginTop: 12,
           padding: '10px 18px',
           borderRadius: 999,
           background: days && name.trim() ? NM.DEEP : NM.HAIR_2,
@@ -256,7 +256,7 @@ function CustomCard({ saving, onStart }: { saving: boolean; onStart: (name: stri
         style={{
           all: 'unset',
           cursor: !saving && days && name.trim() ? 'pointer' : 'default',
-          marginTop: 16,
+          marginTop: 12,
           padding: '10px 18px',
           borderRadius: 999,
           background: days && name.trim() ? NM.DEEP : NM.HAIR_2,
