@@ -80,21 +80,21 @@ function DurationPicker({ value, custom, onPick, onCustom }: {
   const chip = (on: boolean): React.CSSProperties => ({
     all: 'unset',
     cursor: 'pointer',
-    padding: '6px 11px',
+    padding: '5px 9px',
     borderRadius: 999,
     background: on ? NM.GOLD : 'transparent',
     color: on ? '#fff' : NM.MUTED,
     border: on ? '1px solid transparent' : `1px solid ${NM.HAIR_2}`,
     fontFamily: NM.SANS,
-    fontSize: 11.5,
+    fontSize: 11,
     fontWeight: on ? 500 : 400,
   });
   return (
     <>
-      <div style={{ marginTop: 14, fontFamily: NM.SANS, fontSize: 10.5, letterSpacing: '0.12em', textTransform: 'uppercase', color: NM.TERTIARY, fontWeight: 500 }}>
-        Ako dlho?
-      </div>
-      <div style={{ display: 'flex', gap: 6, marginTop: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: 7, marginTop: 14, alignItems: 'center', flexWrap: 'wrap' }}>
+        <span style={{ fontFamily: NM.SANS, fontSize: 10.5, letterSpacing: '0.1em', textTransform: 'uppercase', color: NM.TERTIARY, fontWeight: 500, marginRight: 2 }}>
+          Ako dlho?
+        </span>
         <button onClick={() => onPick(21)} style={chip(value === 21)}>21 dní</button>
         <button onClick={() => onPick(66)} style={chip(value === 66)}>66 dní</button>
         <button onClick={() => onPick('custom')} style={chip(value === 'custom')}>Vlastná</button>
