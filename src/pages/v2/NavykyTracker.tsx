@@ -312,6 +312,7 @@ export default function NavykyTracker() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [justAdded, setJustAdded] = useState<string | null>(null);
   const activeSectionRef = useRef<HTMLDivElement | null>(null);
+  const addedCardRef = useRef<HTMLDivElement | null>(null);
   const [backfillId, setBackfillId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -416,7 +417,12 @@ export default function NavykyTracker() {
     // flash it green so the move is visible (otherwise the card just
     // vanishes from the offer and she taps again).
     setJustAdded(name);
-    setTimeout(() => activeSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 120);
+    // Scroll straight to the NEW card (it may sit anywhere in the list), so
+    // she clearly sees it was added; fall back to the section top.
+    setTimeout(() => {
+      const target = addedCardRef.current ?? activeSectionRef.current;
+      target?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 180);
     setTimeout(() => setJustAdded(null), 3000);
   };
 
@@ -529,6 +535,7 @@ export default function NavykyTracker() {
                       if (wasOpen) setConfirmDeleteId(h.id);
                     }}
                     onTouchCancel={() => { touchRef.current = null; setDrag(null); }}
+                    ref={justAdded === h.name ? addedCardRef : undefined}
                     style={{ position: 'relative', background: justAdded === h.name ? 'rgba(122,158,120,0.07)' : '#fff', borderRadius: 20, border: `1px solid ${justAdded === h.name ? SAVED_GREEN : NM.HAIR}`, overflow: 'hidden', transform: `translateX(${dragX}px)`, transition: dragX === 0 ? 'transform 0.25s ease, background 0.6s ease, border-color 0.6s ease' : 'background 0.6s ease, border-color 0.6s ease', touchAction: 'pan-y' }}>
                   {/* Title + the two daily controls grouped right next to the
                       name (Sam 2026-10-14): tick + skip side by side, in their
