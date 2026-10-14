@@ -10,7 +10,7 @@ import { useToast } from '@/hooks/use-toast';
  * Návyky a ciele — card layout (Gabi 2026-07-31).
  *
  * Diary-style white cards with full-colour serif titles. The five
- * presets sit on screen as ready-made cards with "Chcem začať dnes" —
+ * presets sit on screen as ready-made cards with "Chcem začať" —
  * activation IS the add flow. Each card owns its "Ako dlho?" choice
  * (21 recommended to start / 66 = research average, Lally 2009 /
  * vlastná) and an editable name so a preset becomes her own. Streak
@@ -229,7 +229,7 @@ function PresetCard({ preset, saving, onStart }: {
               opacity: saving ? 0.7 : 1,
             }}
           >
-            Chcem začať dnes
+            Chcem začať
           </button>
         }
       />
@@ -274,7 +274,7 @@ function CustomCard({ saving, onStart }: { saving: boolean; onStart: (name: stri
           opacity: saving ? 0.7 : 1,
         }}
       >
-        Chcem začať dnes
+        Chcem začať
       </button>
     </div>
   );
