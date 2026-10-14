@@ -491,7 +491,7 @@ export default function NavykyTracker() {
               // ≥80% of the window still counts as building the habit.
               const outcome: 'done' | 'managed' | 'ended' = doneDays >= h.durationDays
                 ? 'done' : doneDays / h.durationDays >= 0.8 ? 'managed' : 'ended';
-              const outcomeTitle = outcome === 'done' ? 'Cieľ splnený' : outcome === 'managed' ? 'Cieľ zvládnutý' : 'Úsek máš za sebou';
+              const outcomeTitle = outcome === 'done' ? 'Cieľ splnený' : outcome === 'managed' ? 'Cieľ zvládnutý' : `Tvojich ${h.durationDays} dní je za tebou`;
               const outcomeGood = outcome !== 'ended';
 
               const skippedToday = !done && (skips[h.id] ?? []).includes(todayISO);
@@ -582,7 +582,7 @@ export default function NavykyTracker() {
                             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /></svg>
                           )}
                         </span>
-                        <span style={{ fontFamily: NM.SANS, fontSize: 10.5, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: outcomeGood ? SAVED_GREEN : NM.MUTED }}>{outcomeTitle}</span>
+                        <span style={{ fontFamily: NM.SANS, fontSize: 12.5, fontWeight: 600, color: outcomeGood ? SAVED_GREEN : NM.DEEP }}>{outcomeTitle}</span>
                       </div>
                       <div style={{ fontFamily: NM.SANS, fontSize: 13.5, color: NM.DEEP, marginTop: 5, fontWeight: 600 }}>
                         Splnených {doneDays} z {h.durationDays} dní
