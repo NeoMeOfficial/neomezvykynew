@@ -536,18 +536,19 @@ export default function NavykyTracker() {
                       height: 34,
                       borderRadius: 999,
                       cursor: 'pointer',
-                      background: done ? SAVED_GREEN : count > 0 ? 'rgba(122,158,120,0.12)' : 'rgba(61,41,33,0.06)',
-                      border: done ? '1px solid transparent' : `1px solid ${count > 0 ? SAVED_GREEN : NM.HAIR_2}`,
+                      background: done ? SAVED_GREEN : count > 0 ? 'rgba(122,158,120,0.12)' : '#fff',
+                      border: `1.5px solid ${SAVED_GREEN}`,
                       display: 'grid',
                       placeItems: 'center',
                       padding: 0,
                       zIndex: 1,
+                      animation: done ? 'habitPop 0.3s ease' : undefined,
                     }}
                   >
                     {count > 0 && !done ? (
                       <span style={{ fontFamily: NM.SANS, fontSize: 12, fontWeight: 600, color: SAVED_GREEN }}>{count}</span>
                     ) : (
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={done ? '#fff' : 'rgba(61,41,33,0.30)'} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={done ? '#fff' : SAVED_GREEN} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M20 6L9 17l-5-5" />
                       </svg>
                     )}
@@ -625,7 +626,7 @@ export default function NavykyTracker() {
                               Zajtra to skúsiš zas ✓
                             </span>
                           )}
-                          <span style={{ width: 20, height: 20, borderRadius: 999, background: skippedToday ? CORAL : 'rgba(61,41,33,0.06)', border: skippedToday ? '1px solid transparent' : `1px solid ${NM.HAIR_2}`, display: 'grid', placeItems: 'center', flexShrink: 0, boxSizing: 'border-box' }}>
+                          <span style={{ width: 20, height: 20, borderRadius: 999, background: skippedToday ? CORAL : '#fff', border: `1.5px solid ${CORAL}`, display: 'grid', placeItems: 'center', flexShrink: 0, boxSizing: 'border-box', animation: skippedToday ? 'habitPop 0.3s ease' : undefined }}>
                             <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke={skippedToday ? '#fff' : 'rgba(61,41,33,0.30)'} strokeWidth="2.6" strokeLinecap="round">
                               <path d="M6 6l12 12M18 6L6 18" />
                             </svg>
@@ -789,7 +790,7 @@ export default function NavykyTracker() {
                                   Zajtra zas ✓
                                 </span>
                               )}
-                              <span style={{ width: 20, height: 20, borderRadius: 999, background: skippedToday ? CORAL : 'rgba(61,41,33,0.06)', border: skippedToday ? '1px solid transparent' : `1px solid ${NM.HAIR_2}`, display: 'grid', placeItems: 'center', flexShrink: 0, boxSizing: 'border-box' }}>
+                              <span style={{ width: 20, height: 20, borderRadius: 999, background: skippedToday ? CORAL : '#fff', border: `1.5px solid ${CORAL}`, display: 'grid', placeItems: 'center', flexShrink: 0, boxSizing: 'border-box', animation: skippedToday ? 'habitPop 0.3s ease' : undefined }}>
                                 <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke={skippedToday ? '#fff' : 'rgba(61,41,33,0.30)'} strokeWidth="2.6" strokeLinecap="round">
                                   <path d="M6 6l12 12M18 6L6 18" />
                                 </svg>

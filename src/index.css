@@ -746,3 +746,10 @@ button:not([disabled]):active,
 [role="button"]:active {
   transform: scale(0.97);
 }
+
+/* Habit tick / skip — a quick pop when the button is activated */
+@keyframes habitPop {
+  0%   { transform: scale(1); }
+  45%  { transform: scale(1.22); }
+  100% { transform: scale(1); }
+}
