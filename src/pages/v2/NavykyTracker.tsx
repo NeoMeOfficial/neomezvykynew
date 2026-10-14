@@ -536,7 +536,7 @@ export default function NavykyTracker() {
                     }}
                     onTouchCancel={() => { touchRef.current = null; setDrag(null); }}
                     ref={justAdded === h.name ? addedCardRef : undefined}
-                    style={{ position: 'relative', background: justAdded === h.name ? 'rgba(122,158,120,0.07)' : '#fff', borderRadius: 20, border: `1px solid ${justAdded === h.name ? SAVED_GREEN : NM.HAIR}`, overflow: 'hidden', transform: `translateX(${dragX}px)`, transition: dragX === 0 ? 'transform 0.25s ease, background 0.6s ease, border-color 0.6s ease' : 'background 0.6s ease, border-color 0.6s ease', touchAction: 'pan-y' }}>
+                    style={{ position: 'relative', background: justAdded === h.name ? '#EEF4ED' : '#fff', borderRadius: 20, border: `1px solid ${justAdded === h.name ? SAVED_GREEN : NM.HAIR}`, overflow: 'hidden', transform: `translateX(${dragX}px)`, transition: dragX === 0 ? 'transform 0.25s ease, background 0.6s ease, border-color 0.6s ease' : 'background 0.6s ease, border-color 0.6s ease', touchAction: 'pan-y' }}>
                   {/* Title + the two daily controls grouped right next to the
                       name (Sam 2026-10-14): tick + skip side by side, in their
                       legend colours, instead of scattered top/bottom-right. */}
