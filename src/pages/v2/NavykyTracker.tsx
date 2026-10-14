@@ -491,7 +491,7 @@ export default function NavykyTracker() {
               // ≥80% of the window still counts as building the habit.
               const outcome: 'done' | 'managed' | 'ended' = doneDays >= h.durationDays
                 ? 'done' : doneDays / h.durationDays >= 0.8 ? 'managed' : 'ended';
-              const outcomeTitle = outcome === 'done' ? 'Cieľ splnený' : outcome === 'managed' ? 'Cieľ zvládnutý' : 'Úsek ukončený';
+              const outcomeTitle = outcome === 'done' ? 'Cieľ splnený' : outcome === 'managed' ? 'Cieľ zvládnutý' : 'Úsek máš za sebou';
               const outcomeGood = outcome !== 'ended';
 
               const skippedToday = !done && (skips[h.id] ?? []).includes(todayISO);
