@@ -256,27 +256,33 @@ function CustomCard({ saving, onStart }: { saving: boolean; onStart: (name: stri
         placeholder="Napíš si ho vlastnými slovami…"
         style={{ width: '100%', marginTop: 12, padding: '12px 14px', borderRadius: 14, border: `1px solid ${NM.HAIR}`, fontFamily: NM.SERIF, fontSize: 14.5, color: NM.DEEP, background: NM.BG, outline: 'none', boxSizing: 'border-box' }}
       />
-      <DurationPicker value={dur} custom={custom} onPick={setDur} onCustom={setCustom} />
-      <button
-        onClick={() => { if (days && name.trim()) onStart(name.trim(), days); }}
-        disabled={saving || !days || !name.trim()}
-        style={{
-          all: 'unset',
-          cursor: !saving && days && name.trim() ? 'pointer' : 'default',
-          marginTop: 12,
-          padding: '10px 18px',
-          borderRadius: 999,
-          background: days && name.trim() ? NM.DEEP : NM.HAIR_2,
-          color: days && name.trim() ? '#fff' : NM.TERTIARY,
-          fontFamily: NM.SANS,
-          fontSize: 12.5,
-          fontWeight: 500,
-          display: 'inline-block',
-          opacity: saving ? 0.7 : 1,
-        }}
-      >
-        Chcem začať
-      </button>
+      <DurationPicker
+        value={dur}
+        custom={custom}
+        onPick={setDur}
+        onCustom={setCustom}
+        trailing={
+          <button
+            onClick={() => { if (days && name.trim()) onStart(name.trim(), days); }}
+            disabled={saving || !days || !name.trim()}
+            style={{
+              all: 'unset',
+              cursor: !saving && days && name.trim() ? 'pointer' : 'default',
+              marginLeft: 'auto',
+              padding: '7px 15px',
+              borderRadius: 999,
+              background: days && name.trim() ? NM.DEEP : NM.HAIR_2,
+              color: days && name.trim() ? '#fff' : NM.TERTIARY,
+              fontFamily: NM.SANS,
+              fontSize: 12,
+              fontWeight: 500,
+              opacity: saving ? 0.7 : 1,
+            }}
+          >
+            Chcem začať
+          </button>
+        }
+      />
     </div>
   );
 }
