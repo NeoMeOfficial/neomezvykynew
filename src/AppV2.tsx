@@ -29,14 +29,9 @@ const AuthReal = lazy(() => import('./pages/v2/AuthReal'));
 const ResetPassword = lazy(() => import('./pages/v2/ResetPassword'));
 const AuthDemo = lazy(() => import('./pages/v2/AuthDemo'));
 const Welcome = lazy(() => import('./pages/v2/Welcome'));
-const Onboarding = lazy(() => import('./pages/v2/Onboarding'));
-const OnboardingWelcome = lazy(() => import('./pages/v2/OnboardingWelcome'));
 const OnboardingPlan = lazy(() => import('./pages/v2/OnboardingPlan'));
 const CheckoutLauncher = lazy(() => import('./pages/v2/CheckoutLauncher'));
 const CheckoutPlus = lazy(() => import('./pages/v2/CheckoutPlus'));
-const OnboardingCycle = lazy(() => import('./pages/v2/OnboardingCycle'));
-const OnboardingPrograms = lazy(() => import('./pages/v2/OnboardingPrograms'));
-const OnboardingNotifications = lazy(() => import('./pages/v2/OnboardingNotifications'));
 const DomovNew = lazy(() => import('./pages/v2/DomovNew'));
 const Kniznica = lazy(() => import('./pages/v2/Kniznica'));
 const PostpartumLanding = lazy(() => import('./pages/v2/PostpartumLanding'));
@@ -253,13 +248,7 @@ export default function AppV2() {
               }
             />
             <Route path="/welcome" element={<Welcome />} />
-            <Route path="/onboarding" element={<OnboardingWelcome />} />
-            <Route path="/onboarding/welcome" element={<OnboardingWelcome />} />
             <Route path="/onboarding/plan" element={<OnboardingPlan />} />
-            <Route path="/onboarding/cycle" element={<OnboardingCycle />} />
-            <Route path="/onboarding/programs" element={<OnboardingPrograms />} />
-            <Route path="/onboarding/notifications" element={<OnboardingNotifications />} />
-            <Route path="/onboarding/legacy" element={<Onboarding />} />
             {/* Public legal pages — must be reachable without auth so
                 Google's OAuth verification crawler can fetch them. */}
             <Route path="/zasady-ochrany-osobnych-udajov" element={<PrivacyPolicy />} />
