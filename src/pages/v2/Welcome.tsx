@@ -5,11 +5,12 @@ const DEEP2 = '#2A1A14';
 const GOLD  = '#B8864A';
 
 const PILLARS = [
-  { n: '01', t: 'Telo',     d: 'Cvičenia od postpartum po silu' },
-  { n: '02', t: 'Strava',   d: 'Recepty, plány, cyklová výživa' },
+  { n: '01', t: 'Telo',     d: 'Systematické cvičenia od pôrodu po formovanie' },
+  { n: '02', t: 'Strava',   d: 'Zdravé, rýchle a vyvážené recepty' },
   { n: '03', t: 'Myseľ',    d: 'Meditácie, denník, reflexia' },
-  { n: '04', t: 'Periodka', d: 'Fázy, nálady, intuitívne odporúčania' },
-  { n: '05', t: 'Komunita', d: 'Príspevky, otázky, podpora od žien' },
+  { n: '04', t: 'Periodka', d: 'Zaznač si cyklus, spoznaj svoje fázy, získaj tipy, ktoré ti pomôžu' },
+  { n: '05', t: 'Návyky',   d: 'Buduj si návyky, ktoré s tebou ostanú' },
+  { n: '06', t: 'Komunita', d: 'Príspevky, otázky, podpora od žien ako ty' },
 ];
 
 export default function Welcome() {
@@ -81,7 +82,7 @@ export default function Welcome() {
             cursor: 'pointer',
           }}
         >
-          Začať cestu
+          Získaj svoju NeoMe
         </button>
         <div style={{ textAlign: 'center', marginTop: 14, fontFamily: 'DM Sans', fontSize: 12, color: 'rgba(255,255,255,0.62)', fontWeight: 400 }}>
           Už máš účet?{' '}
