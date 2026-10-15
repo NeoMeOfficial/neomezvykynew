@@ -267,15 +267,15 @@ function Faq({ period }: { period: string }) {
     },
     {
       q: `Čo sa stane po ${period}?`,
-      a: 'Nič sa nezatvorí. Predplatné sa automaticky obnoví za rovnakú cenu a ty pokračuješ tam, kde si skončila — programy, recepty, Periodka aj komunita ostávajú. Zrušiť môžeš kedykoľvek jedným klikom v aplikácii, aj deň pred obnovením.',
+      a: 'Nič sa nezatvorí. Predplatné sa automaticky obnoví za rovnakú cenu a ty pokračuješ tam, kde si skončila — programy, cvičenia, recepty, Periodka, meditácie, denník, návyky, komunita aj články ostávajú. Zrušiť môžeš kedykoľvek jedným klikom v aplikácii, aj deň pred obnovením.',
     },
     {
       q: 'Čo sa stane, keď zruším predplatné?',
-      a: 'Prístup ti zostane do konca zaplateného obdobia — nič ti nevypneme skôr. Potom sa programy, recepty a Periodka uzamknú, ale tvoj denník, návyky a komunitné príspevky zostanú nedotknuté. Kedykoľvek sa môžeš vrátiť tam, kde si prestala.',
+      a: 'Prístup ti zostane do konca zaplateného obdobia — nič ti nevypneme skôr. Po jeho skončení sa ti skončí prístup do aplikácie a všetkých jej funkcií. Kedykoľvek sa môžeš vrátiť tam, kde si prestala.',
     },
     {
       q: 'Je v cene naozaj všetko?',
-      a: 'Áno. Jedno predplatné, celá aplikácia — všetky programy, 120+ receptov, plná Periodka, meditácie aj komunita. Žiadne vyššie plány, žiadne doplatky, žiadne odomykanie funkcií za príplatok.',
+      a: 'Áno. Jedno predplatné, celá aplikácia — všetky programy, cvičenia, recepty, Periodka, meditácie, denník, návyky, komunita aj články. Žiadne vyššie plány, žiadne doplatky, žiadne odomykanie funkcií za príplatok.',
     },
     {
       q: 'Aké platobné metódy akceptujete?',
