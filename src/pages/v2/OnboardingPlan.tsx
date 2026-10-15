@@ -26,9 +26,10 @@ const PLUS_FEATURES: string[] = [
   'Štyri programy, 130 cvičení — od základov po jednoručky. Každé 15 minút.',
   'Extra 15-minútové aj 5-minútové cvičenia a strečingy',
   '120+ vyvážených receptov bez diét',
-  '60+ meditácií od 3 do 15 minút — aj päťminútové',
+  '5-minútové meditácie, žiadna ezoterika',
   'Sledovanie cyklu s tipmi pre každú fázu a možnosťou zapisovať symptómy',
-  'Denník, reflexia, návyky a ciele',
+  'Budovanie návykov, zápisky do denníka, reflexia',
+  'Články o zdraví, cvičení, vyváženom stravovaní, materstve, sebarozvoji',
   'Komunita a Q&A s Gabi',
   'Získavanie bodov a zľavy u partnerov',
 ];
