@@ -46,8 +46,8 @@ export default function Welcome() {
         </div>
 
         <div style={{ fontFamily: 'Gilda Display, serif', fontSize: 40, fontWeight: 500, color: '#fff', lineHeight: 1.05, letterSpacing: '-0.02em' }}>
-          Tvoja cesta<br />
-          <em style={{ color: GOLD, fontStyle: 'italic', fontWeight: 500 }}>späť k sebe.</em>
+          Tvoja nová rutina<br />
+          <em style={{ color: GOLD, fontStyle: 'italic', fontWeight: 500 }}>začína tu.</em>
         </div>
 
         {/* Pillar list */}
