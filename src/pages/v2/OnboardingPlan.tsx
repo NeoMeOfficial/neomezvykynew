@@ -78,9 +78,9 @@ export default function OnboardingPlan() {
 
       <div style={{ padding: '18px 22px 0' }}>
         <Ser size={32}>
-          Všetko pre teba,
+          Všetko <em style={{ color: NM.GOLD, fontStyle: 'italic', fontWeight: 500 }}>pre teba,</em>
           <br />
-          na jednom <em style={{ color: NM.GOLD, fontStyle: 'italic', fontWeight: 500 }}>mieste.</em>
+          na jednom mieste.
         </Ser>
         <div style={{ marginTop: 10, maxWidth: 320, fontFamily: NM.SANS, fontSize: 13.5, color: NM.MUTED, lineHeight: 1.5, fontWeight: 400 }}>
           Vyber si, ako dlho chceš ísť s nami — a všetko sa ti odomkne naraz.
