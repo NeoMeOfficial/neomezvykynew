@@ -39,8 +39,9 @@ export default function Welcome() {
         </span>
       </div>
 
-      {/* Hero copy — bottom-anchored */}
-      <div style={{ position: 'absolute', bottom: 180, left: 0, right: 0, padding: '0 22px' }}>
+      {/* Hero copy — bottom-anchored, lifted clear of the CTA panel so all
+          six pillars stay visible (Sam 2026-10-16). */}
+      <div style={{ position: 'absolute', bottom: 212, left: 0, right: 0, padding: '0 22px' }}>
         <div style={{ fontFamily: 'DM Sans', fontSize: 9, letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.65)', fontWeight: 500, marginBottom: 12 }}>
           Vitaj v NeoMe
         </div>
@@ -51,7 +52,7 @@ export default function Welcome() {
         </div>
 
         {/* Pillar list */}
-        <div style={{ marginTop: 22, display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
           {PILLARS.map(p => (
             <div key={p.n} style={{ display: 'flex', gap: 12, alignItems: 'baseline' }}>
               <div style={{ fontFamily: 'Gilda Display, serif', fontSize: 12, color: GOLD, fontStyle: 'italic', width: 18, fontWeight: 400, flexShrink: 0 }}>
