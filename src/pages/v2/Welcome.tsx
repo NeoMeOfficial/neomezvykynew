@@ -26,22 +26,15 @@ export default function Welcome() {
     <div
       style={{
         minHeight: '100vh', position: 'relative',
-        backgroundImage: 'linear-gradient(180deg, rgba(42,26,20,0.18) 0%, rgba(42,26,20,0.62) 52%, #2A1A14 100%), url(/images/r9/welcome-hero.webp)',
+        backgroundImage: 'linear-gradient(180deg, rgba(42,26,20,0.68) 0%, rgba(42,26,20,0.48) 42%, rgba(42,26,20,0.72) 74%, #2A1A14 100%), url(/images/r9/welcome-hero.webp)',
         backgroundSize: 'cover', backgroundPosition: 'center 25%',
         color: '#fff', paddingBottom: 0,
       }}
     >
 
-      {/* NeoMe wordmark */}
-      <div style={{ padding: '68px 22px 0', display: 'flex', alignItems: 'center', gap: 10 }}>
-        <span style={{ fontFamily: 'Gilda Display, serif', fontSize: 18, fontStyle: 'italic', fontWeight: 500, color: '#fff', letterSpacing: '-0.01em' }}>
-          NeoMe
-        </span>
-      </div>
-
-      {/* Hero copy — bottom-anchored, lifted clear of the CTA panel so all
-          six pillars stay visible (Sam 2026-10-16). */}
-      <div style={{ position: 'absolute', bottom: 212, left: 0, right: 0, padding: '0 22px' }}>
+      {/* Hero copy — top-anchored (Sam 2026-10-16): the wordmark is gone;
+          "Vitaj v NeoMe" now sits at the top, headline right under it. */}
+      <div style={{ padding: 'calc(env(safe-area-inset-top) + 54px) 22px 0' }}>
         <div style={{ fontFamily: 'DM Sans', fontSize: 9, letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.65)', fontWeight: 500, marginBottom: 12 }}>
           Vitaj v NeoMe
         </div>
