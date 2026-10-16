@@ -12,7 +12,7 @@ export default function PlusProgramPrompt() {
   const navigate = useNavigate();
   return (
     <PlusPage>
-      <TopBar onBack={() => navigate('/checkout/success?type=subscription')} centerLabel="Tvoja cesta" />
+      <TopBar onBack={() => navigate('/checkout/success?type=subscription')} centerLabel="Nastav si svoju NeoMe" />
       <div style={{ marginTop: 8 }}>
         <HeroHead
           eyebrow="Programy NeoMe"

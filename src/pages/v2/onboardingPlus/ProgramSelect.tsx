@@ -101,9 +101,9 @@ export default function PlusProgramSelect() {
 
   return (
     <PlusPage>
-      <TopBar onBack={() => navigate('/onboarding-plus/program')} centerLabel="Tvoja cesta · Krok programu" />
+      <TopBar onBack={() => navigate('/onboarding-plus/program')} centerLabel="Nastav si svoju NeoMe" />
       <div style={{ padding: '0 22px 8px' }}>
-        <Eye color={NM.TERRA} size={10}>Tvoja cesta · Vyber program</Eye>
+        <Eye color={NM.TERRA} size={10}>Vyber program</Eye>
       </div>
       <div style={{ padding: '0 22px' }}>
         <div

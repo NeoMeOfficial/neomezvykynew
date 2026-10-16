@@ -19,24 +19,115 @@ function toLocalISODate(d: Date): string {
 
 const SK_MONTHS = ['januára', 'februára', 'marca', 'apríla', 'mája', 'júna', 'júla', 'augusta', 'septembra', 'októbra', 'novembra', 'decembra'];
 
+// A single date row: big serif "deň. mesiac" with a "Zmeniť" link that swaps
+// in a native date picker. Manages its own edit state.
+function DateField({
+  label,
+  value,
+  min,
+  max,
+  onChange,
+}: {
+  label: string;
+  value: Date;
+  min?: string;
+  max?: string;
+  onChange: (d: Date) => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  return (
+    <>
+      <Eye size={10} style={{ marginBottom: 14 }}>{label}</Eye>
+      {editing ? (
+        <input
+          type="date"
+          value={toLocalISODate(value)}
+          min={min}
+          max={max}
+          onChange={(e) => {
+            if (e.target.value) onChange(new Date(e.target.value));
+          }}
+          onBlur={() => setEditing(false)}
+          autoFocus
+          style={{
+            width: '100%',
+            padding: '10px 12px',
+            marginBottom: 18,
+            fontFamily: NM.SANS,
+            fontSize: 16,
+            border: `1px solid ${NM.HAIR_2}`,
+            borderRadius: 12,
+            color: NM.DEEP,
+            background: '#fff',
+          }}
+        />
+      ) : (
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 18 }}>
+          <span style={{ fontFamily: NM.SERIF, fontSize: 32, fontWeight: 500, color: NM.DEEP, letterSpacing: '-0.02em' }}>
+            {value.getDate()}.
+          </span>
+          <span style={{ fontFamily: NM.SERIF, fontSize: 18, fontWeight: 500, color: NM.MUTED, letterSpacing: '-0.01em' }}>
+            {SK_MONTHS[value.getMonth()]}
+          </span>
+          <button
+            onClick={() => setEditing(true)}
+            style={{
+              marginLeft: 'auto',
+              background: 'transparent',
+              border: 0,
+              cursor: 'pointer',
+              fontFamily: NM.SANS,
+              fontSize: 12,
+              color: NM.TERTIARY,
+              textDecoration: 'underline',
+              textUnderlineOffset: 3,
+              fontWeight: 400,
+            }}
+          >
+            Zmeniť
+          </button>
+        </div>
+      )}
+    </>
+  );
+}
+
 export default function PlusCycleInfo() {
   const navigate = useNavigate();
-  const { setLastPeriodStart, setCycleLength: persistCycleLength, cycleData } = useCycleData();
+  const { correctPeriod, setCycleLength: persistCycleLength, cycleData } = useCycleData();
   const today = useMemo(() => new Date(), []);
-  const [periodDate, setPeriodDate] = useState<Date>(() => {
+  const defaultStart = () => {
     if (cycleData?.lastPeriodStart) return new Date(cycleData.lastPeriodStart);
     const d = new Date();
     d.setDate(d.getDate() - 14);
     return d;
+  };
+  const [periodDate, setPeriodDate] = useState<Date>(defaultStart);
+  const [endDate, setEndDate] = useState<Date>(() => {
+    if (cycleData?.currentPeriodEnd) return new Date(cycleData.currentPeriodEnd);
+    const e = new Date(defaultStart());
+    e.setDate(e.getDate() + ((cycleData?.periodLength ?? 5) - 1));
+    return e;
   });
   const [cycleLength, setCycleLength] = useState<number>(cycleData?.cycleLength ?? 28);
-  const [editingDate, setEditingDate] = useState(false);
+
+  // Keep start ≤ end ≤ today whichever date the user edits.
+  const changeStart = (d: Date) => {
+    setPeriodDate(d);
+    if (endDate < d) setEndDate(d);
+  };
+  const changeEnd = (d: Date) => {
+    let e = d;
+    if (e < periodDate) e = periodDate;
+    if (e > today) e = today;
+    setEndDate(e);
+  };
+  const bleedDays = Math.max(1, Math.round((endDate.getTime() - periodDate.getTime()) / 86400000) + 1);
 
   const saveAndNext = () => {
-    // Use the hook's real API (saveCycleData is internal, not exported —
-    // calling it crashed 'p is not a function' on this step). Both
-    // setters persist via updateCycleData.
-    setLastPeriodStart(periodDate);
+    // correctPeriod saves start + end atomically and derives the bleed
+    // length (periodLength) from the two dates.
+    correctPeriod(periodDate, endDate);
     persistCycleLength(cycleLength);
     navigate('/onboarding-plus/hotovo');
   };
@@ -47,7 +138,7 @@ export default function PlusCycleInfo() {
     <PlusPage>
       <TopBar
         onBack={() => navigate('/onboarding-plus/program')}
-        centerLabel="Periodka"
+        centerLabel="Nastav si svoju NeoMe"
       />
       <HeroHead
         eyebrow="Periodka"
@@ -67,57 +158,37 @@ export default function PlusCycleInfo() {
             borderRadius: 18,
           }}
         >
-          {/* Last period start */}
-          <Eye size={10} style={{ marginBottom: 14 }}>Posledná menštruácia začala</Eye>
-          {editingDate ? (
-            <input
-              type="date"
-              value={toLocalISODate(periodDate)}
-              max={toLocalISODate(today)}
-              onChange={(e) => {
-                if (e.target.value) setPeriodDate(new Date(e.target.value));
-              }}
-              onBlur={() => setEditingDate(false)}
-              autoFocus
-              style={{
-                width: '100%',
-                padding: '10px 12px',
-                marginBottom: 18,
-                fontFamily: NM.SANS,
-                fontSize: 16,
-                border: `1px solid ${NM.HAIR_2}`,
-                borderRadius: 12,
-                color: NM.DEEP,
-                background: '#fff',
-              }}
-            />
-          ) : (
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 18 }}>
-              <span style={{ fontFamily: NM.SERIF, fontSize: 32, fontWeight: 500, color: NM.DEEP, letterSpacing: '-0.02em' }}>
-                {periodDate.getDate()}.
-              </span>
-              <span style={{ fontFamily: NM.SERIF, fontSize: 18, fontWeight: 500, color: NM.MUTED, letterSpacing: '-0.01em' }}>
-                {SK_MONTHS[periodDate.getMonth()]}
-              </span>
-              <button
-                onClick={() => setEditingDate(true)}
-                style={{
-                  marginLeft: 'auto',
-                  background: 'transparent',
-                  border: 0,
-                  cursor: 'pointer',
-                  fontFamily: NM.SANS,
-                  fontSize: 12,
-                  color: NM.TERTIARY,
-                  textDecoration: 'underline',
-                  textUnderlineOffset: 3,
-                  fontWeight: 400,
-                }}
-              >
-                Zmeniť
-              </button>
-            </div>
-          )}
+          {/* Last period — start date */}
+          <DateField
+            label="Posledná menštruácia začala"
+            value={periodDate}
+            max={toLocalISODate(today)}
+            onChange={changeStart}
+          />
+
+          <div style={{ height: 1, background: NM.HAIR, marginBottom: 18 }} />
+
+          {/* Last period — end date. Together with the start it gives us the
+              bleed length (how many days she actually bleeds). */}
+          <DateField
+            label="Posledná menštruácia skončila"
+            value={endDate}
+            min={toLocalISODate(periodDate)}
+            max={toLocalISODate(today)}
+            onChange={changeEnd}
+          />
+          <div
+            style={{
+              marginTop: -6,
+              marginBottom: 18,
+              fontFamily: NM.SANS,
+              fontSize: 12.5,
+              color: NM.MAUVE,
+              fontWeight: 500,
+            }}
+          >
+            Krvácanie {bleedDays} {bleedDays === 1 ? 'deň' : bleedDays <= 4 ? 'dni' : 'dní'}
+          </div>
 
           <div style={{ height: 1, background: NM.HAIR, marginBottom: 18 }} />
 
