@@ -55,20 +55,13 @@ const HERO_IMAGES: Record<ProgramSlug, string> = {
   'strong-sexy': '/images/r9/program-mindful.jpg',
 };
 
-// One-line tagline shown under the program title.
-const TAGLINES: Record<ProgramSlug, string> = {
-  postpartum: 'Bezpečný návrat k cvičeniu — panvové dno, diastáza, brušný korzet.',
-  bodyforming: 'Spevnenie celého tela s vlastnou váhou — bez gúm a činiek.',
-  'elastic-bands': 'Dynamický odpor — formovanie zadku, stehien a paží s gumami.',
-  'strong-sexy': 'Silový tréning s jednoručkami — definované krivky a sila.',
-};
-
-// Richer "Pre koho" line so it's obvious who each program suits.
-const WHO_ITS_FOR: Record<ProgramSlug, string> = {
-  postpartum: 'Pre ženy mesiace aj roky po pôrode. Bezpečné aj po sekcii (po 3 mesiacoch).',
-  bodyforming: 'Pre začiatočníčky alebo návrat po dlhšej prestávke. Bez diastázy.',
-  'elastic-bands': 'Pre tie, ktoré majú základy a chcú sa posunúť ďalej. Stredne pokročilá úroveň.',
-  'strong-sexy': 'Pre pokročilé. Predpokladá dobrú techniku a pravidelné cvičenie.',
+// Difficulty label per program — mirrors the eyebrow on the in-app
+// program cards (TeloPrograms / ProgramDetail).
+const DIFFICULTY: Record<ProgramSlug, string> = {
+  postpartum: 'Jemné',
+  bodyforming: 'Stredné',
+  'elastic-bands': 'Pokročilé',
+  'strong-sexy': 'Náročné',
 };
 
 const ACCENTS: Record<ProgramSlug, string> = {
@@ -196,7 +189,7 @@ export default function PlusProgramSelect() {
                     textTransform: 'uppercase' as const,
                   }}
                 >
-                  Level {p.level} · {p.weeks} týž.
+                  Level {p.level} · {p.weeks} týž. · {DIFFICULTY[slug]}
                 </div>
                 {/* Title bottom-left */}
                 <div
@@ -231,30 +224,20 @@ export default function PlusProgramSelect() {
                 />
               </div>
 
-              {/* Body text under the image */}
+              {/* Body text under the image — the canonical program
+                  description straight from programs.ts, so onboarding and
+                  the in-app program cards never drift apart. */}
               <div style={{ padding: '14px 16px 16px' }}>
                 <div
                   style={{
                     fontFamily: NM.SANS,
                     fontSize: 12.5,
-                    color: NM.DEEP,
-                    fontWeight: 500,
-                    lineHeight: 1.5,
-                  }}
-                >
-                  {TAGLINES[slug]}
-                </div>
-                <div
-                  style={{
-                    marginTop: 6,
-                    fontFamily: NM.SANS,
-                    fontSize: 11.5,
                     color: NM.MUTED,
-                    fontWeight: 300,
+                    fontWeight: 400,
                     lineHeight: 1.55,
                   }}
                 >
-                  {WHO_ITS_FOR[slug]}
+                  {p.description}
                 </div>
               </div>
             </button>
