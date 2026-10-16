@@ -348,7 +348,7 @@ function SubscriptionConfirmed({ onPrimary, loading }: { onPrimary: () => void; 
               screen (ProgramPrompt); asking here too was a duplicate
               (Sam 2026-10-06). */}
           <button onClick={onPrimary} disabled={loading} style={ctaPrimary({ background: '#fff', color: NM.DEEP })}>
-            Pokračovať
+            Nastav si svoju NeoMe
           </button>
         </div>
       </div>
