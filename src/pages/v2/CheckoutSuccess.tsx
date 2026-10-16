@@ -337,7 +337,7 @@ function SubscriptionConfirmed({ onPrimary, loading }: { onPrimary: () => void; 
       <div style={{ position: 'relative', zIndex: 1, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', width: '100%', maxWidth: 400, marginInline: 'auto' }}>
         <Eye color={NM.GOLD} size={10}>NeoMe Plus · aktivované</Eye>
         <div style={{ marginTop: 12, fontFamily: NM.SERIF, fontSize: 38, lineHeight: 1.05, letterSpacing: '-0.015em', color: '#fff' }}>
-          Vitaj v{' '}
+          Vitaj v tvojej{' '}
           <em style={{ color: NM.GOLD, fontWeight: 400 }}>NeoMe.</em>
         </div>
         <div style={{ marginTop: 14, fontFamily: NM.SANS, fontSize: 15, color: 'rgba(255,255,255,0.82)', fontWeight: 300, lineHeight: 1.55, maxWidth: 320 }}>
