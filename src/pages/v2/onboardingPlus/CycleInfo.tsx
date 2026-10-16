@@ -38,19 +38,19 @@ export default function PlusCycleInfo() {
     // setters persist via updateCycleData.
     setLastPeriodStart(periodDate);
     persistCycleLength(cycleLength);
-    navigate('/onboarding-plus/jedalnicek');
+    navigate('/onboarding-plus/hotovo');
   };
 
-  const skipNoCycle = () => navigate('/onboarding-plus/jedalnicek');
+  const skipNoCycle = () => navigate('/onboarding-plus/hotovo');
 
   return (
     <PlusPage>
       <TopBar
         onBack={() => navigate('/onboarding-plus/program')}
-        centerLabel="Cyklus"
+        centerLabel="Periodka"
       />
       <HeroHead
-        eyebrow="Cyklus"
+        eyebrow="Periodka"
         title="Tvoj cyklus,"
         accentTitle="tvoj rytmus."
         accentColor={NM.MAUVE}

@@ -116,7 +116,7 @@ const CORE_STEPS: Step[] = [
     eyebrow: 'Vitaj',
     accent: NM.GOLD,
     title: 'Vitaj v NeoMe.',
-    text: 'Všetko tu je nastavené tak, aby si mohla ísť vlastným tempom — nič nemusíš stihnúť naraz. Poď sa na chvíľu pozrieť, čo kde nájdeš.',
+    text: 'Všetko je tu nastavené tak, aby si mohla ísť vlastným tempom a budovať si svoju novú rutinu deň po dni. Poď sa pozrieť, čo kde nájdeš.',
   },
   {
     eyebrow: 'Telo',

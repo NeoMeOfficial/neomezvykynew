@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { NM, Eye } from '../../../components/v2/neome';
 import { PlusPage, TopBar, StickyCTA } from './shared';
@@ -40,6 +40,12 @@ function formatSkDate(iso: string): string {
   return `${SK_WEEKDAYS[date.getDay()]} ${d}. ${SK_MONTHS[m - 1]}`;
 }
 
+// Short label for the chips, e.g. "20. okt.".
+function shortSkDate(iso: string): string {
+  const [, m, d] = iso.split('-').map(Number);
+  return `${d}. ${SK_MONTHS[m - 1].slice(0, 3)}.`;
+}
+
 // Hero image per program — matched to what TeloPrograms / ProgramDetail
 // already use, so the visual identity is consistent across the app.
 const HERO_IMAGES: Record<ProgramSlug, string> = {
@@ -77,10 +83,19 @@ export default function PlusProgramSelect() {
   const [selected, setSelected] = useState<ProgramSlug | null>(null);
   // Default start date = today. User can pick today / tomorrow / next
   // Monday / a custom date. Stored as YYYY-MM-DD local-time.
-  const today = toLocalISODate(new Date());
-  const tomorrow = toLocalISODate(new Date(Date.now() + 86_400_000));
-  const monday = toLocalISODate(nextMonday(new Date()));
-  const [startDate, setStartDate] = useState<string>(today);
+  // Programs always start on a Monday — offer the three nearest Mondays
+  // (today included if today already is Monday). No free date picker.
+  const mondays = useMemo(() => {
+    const d = new Date();
+    const delta = (8 - d.getDay()) % 7; // 0 when today is Monday
+    d.setDate(d.getDate() + delta);
+    return [0, 1, 2].map((i) => {
+      const m = new Date(d);
+      m.setDate(d.getDate() + i * 7);
+      return toLocalISODate(m);
+    });
+  }, []);
+  const [startDate, setStartDate] = useState<string>(mondays[0]);
 
   const onContinue = () => {
     if (!selected) return;
@@ -89,11 +104,7 @@ export default function PlusProgramSelect() {
     navigate('/onboarding-plus/cyklus');
   };
 
-  const presets: { label: string; value: string }[] = [
-    { label: 'Dnes', value: today },
-    { label: 'Zajtra', value: tomorrow },
-    { label: 'Najbližší pondelok', value: monday },
-  ];
+  const presets: { label: string; value: string }[] = mondays.map((iso) => ({ label: shortSkDate(iso), value: iso }));
 
   return (
     <PlusPage>
@@ -255,7 +266,7 @@ export default function PlusProgramSelect() {
           quick presets + a native date input for anything custom. */}
       {selected && (
         <div style={{ padding: '4px 22px 16px' }}>
-          <Eye color={NM.TERRA} size={10}>Kedy chceš začať?</Eye>
+          <Eye color={NM.TERRA} size={10}>Kedy chceš začať? · programy začínajú v pondelok</Eye>
           <div
             style={{
               marginTop: 10,
@@ -287,22 +298,6 @@ export default function PlusProgramSelect() {
                 </button>
               );
             })}
-            <input
-              type="date"
-              value={startDate}
-              min={today}
-              onChange={(e) => setStartDate(e.target.value)}
-              style={{
-                padding: '8px 12px',
-                borderRadius: 999,
-                background: 'transparent',
-                color: NM.DEEP,
-                border: `1px solid ${NM.HAIR_2}`,
-                fontFamily: NM.SANS,
-                fontSize: 12.5,
-                fontWeight: 500,
-              }}
-            />
           </div>
           <div
             style={{

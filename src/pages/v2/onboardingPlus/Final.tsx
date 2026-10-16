@@ -107,7 +107,7 @@ export default function PlusFinal() {
         <div style={{ margin: '36px auto 0', display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 280 }}>
           {[
             picked ? `${picked.name} je pripravený` : 'Knižnica obsahu je otvorená',
-            'Cyklus a denník čakajú v Profile',
+            'Periodka a denník čakajú v Profile',
             'Príď, keď budeš mať čas',
           ].map((t) => (
             <div key={t} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -147,7 +147,7 @@ export default function PlusFinal() {
             cursor: 'pointer',
           }}
         >
-          {picked ? `Vstúpiť do ${picked.name}` : 'Vstúpiť'}
+          Vstúpiť do NeoMe
         </button>
       </div>
 
