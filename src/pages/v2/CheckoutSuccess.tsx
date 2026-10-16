@@ -323,7 +323,7 @@ function SubscriptionConfirmed({ onPrimary, loading }: { onPrimary: () => void; 
           <em style={{ color: NM.GOLD, fontWeight: 400 }}>doma.</em>
         </div>
         <div style={{ marginTop: 14, fontFamily: NM.SANS, fontSize: 15, color: 'rgba(255,255,255,0.82)', fontWeight: 300, lineHeight: 1.55, maxWidth: 320 }}>
-          Plný prístup k programom, cvičeniam, receptom, Periodke, denníku, meditáciám, návykom aj článkom.
+          Plný prístup k programom, cvičeniam, receptom, Periodke, denníku, meditáciám, návykom, komunite aj článkom.
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 24 }}>
           {/* Single CTA — the program now/later question lives on the next
