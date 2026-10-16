@@ -90,7 +90,16 @@ export async function handler(event: any) {
     const { error: updErr } = await supabase.auth.admin.updateUserById(userId, { password });
     if (updErr) {
       console.error('complete-guest-account password set failed:', updErr);
-      return json(500, { error: 'Heslo sa nepodarilo nastaviť.' });
+      // Surface the real reason so the user can fix it (Supabase replies in
+      // English — map the common password-policy failures to Slovak).
+      const raw = (updErr.message || '').toLowerCase();
+      const friendly = /weak|pwned|leaked|compromis|known to be/.test(raw)
+        ? 'Toto heslo je príliš slabé alebo uniknuté. Skús iné, bezpečnejšie heslo.'
+        : /at least|too short|length|minimum/.test(raw)
+          ? 'Heslo je príliš krátke — skús dlhšie (aspoň 8 znakov).'
+          : (updErr.message || 'Heslo sa nepodarilo nastaviť.');
+      // 400 = it's a password problem the user can correct, not a server fault.
+      return json(400, { error: friendly });
     }
 
     return json(200, { ok: true, email: userRow.user.email });
