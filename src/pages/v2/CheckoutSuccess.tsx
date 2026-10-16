@@ -148,7 +148,7 @@ export default function CheckoutSuccess() {
         ) : claimNeeded === null ? null : (
           <>
         {phase === 'pending' && <Pending />}
-        {phase === 'timeout' && <Timeout onRetry={onRetry} onSkip={() => navigate('/domov-new')} />}
+        {phase === 'timeout' && <Timeout onRetry={onRetry} onSkip={() => navigate('/onboarding-plus/program')} />}
         {phase === 'confirmed' && type === 'subscription' && (
           <SubscriptionConfirmed
             onPrimary={() => navigate('/onboarding-plus/program')}
@@ -300,13 +300,13 @@ function Timeout({ onRetry, onSkip }: { onRetry: () => void; onSkip: () => void 
         Trvá to dlhšie ako zvyčajne
       </div>
       <div style={{ marginTop: 12, fontFamily: NM.SANS, fontSize: 14, color: NM.MUTED, fontWeight: 300, lineHeight: 1.55 }}>
-        Tvoja platba je v poriadku. Potvrdenie sa môže oneskoriť o pár minút. Skús obnoviť za chvíľu — alebo pokračuj na hlavnú stránku, prístup sa odomkne automaticky.
+        Tvoja platba je v poriadku. Potvrdenie sa môže oneskoriť o pár minút. Skús obnoviť za chvíľu — alebo pokračuj v nastavení, prístup sa odomkne automaticky.
       </div>
       <button onClick={onRetry} style={ctaPrimary({ marginTop: 28 })}>
         Skontrolovať znovu
       </button>
       <button onClick={onSkip} style={ctaText({ marginTop: 12 })}>
-        Pokračovať na Domov
+        Pokračovať v nastavení
       </button>
     </div>
   );
