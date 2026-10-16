@@ -169,6 +169,7 @@ export default function CheckoutSuccess() {
 function ClaimAccount({ piSecret, onDone }: { piSecret: string; onDone: () => void }) {
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
+  const [showPw, setShowPw] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -228,19 +229,36 @@ function ClaimAccount({ piSecret, onDone }: { piSecret: string; onDone: () => vo
           fontFamily: NM.SANS, fontSize: 16, color: NM.DEEP, outline: 'none', background: '#fff',
         }}
       />
-      <input
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        onKeyDown={(e) => { if (e.key === 'Enter') submit(); }}
-        placeholder="Nové heslo (min. 8 znakov)"
-        autoComplete="new-password"
-        style={{
-          display: 'block', width: '100%', boxSizing: 'border-box', marginTop: 10,
-          padding: '14px 16px', borderRadius: 14, border: `1px solid ${NM.HAIR_2 ?? 'rgba(61,41,33,0.14)'}`,
-          fontFamily: NM.SANS, fontSize: 16, color: NM.DEEP, outline: 'none', background: '#fff',
-        }}
-      />
+      <div style={{ position: 'relative', marginTop: 10 }}>
+        <input
+          type={showPw ? 'text' : 'password'}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Enter') submit(); }}
+          placeholder="Nové heslo"
+          autoComplete="new-password"
+          style={{
+            display: 'block', width: '100%', boxSizing: 'border-box',
+            padding: '14px 46px 14px 16px', borderRadius: 14, border: `1px solid ${NM.HAIR_2 ?? 'rgba(61,41,33,0.14)'}`,
+            fontFamily: NM.SANS, fontSize: 16, color: NM.DEEP, outline: 'none', background: '#fff',
+          }}
+        />
+        <button
+          type="button"
+          onClick={() => setShowPw((v) => !v)}
+          aria-label={showPw ? 'Skryť heslo' : 'Zobraziť heslo'}
+          style={{ all: 'unset', cursor: 'pointer', position: 'absolute', right: 6, top: 0, bottom: 0, width: 40, display: 'grid', placeItems: 'center', color: NM.MUTED }}
+        >
+          {showPw ? (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><path d="M1 1l22 22"/></svg>
+          ) : (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          )}
+        </button>
+      </div>
+      <div style={{ marginTop: 7, fontFamily: NM.SANS, fontSize: 11.5, color: NM.TERTIARY, lineHeight: 1.45 }}>
+        Aspoň 8 znakov. Odporúčame kombináciu veľkých a malých písmen a aspoň jedno číslo — vyhni sa bežným heslám.
+      </div>
       {error && (
         <div style={{ marginTop: 10, fontFamily: NM.SANS, fontSize: 12.5, color: '#8E372F' }}>{error}</div>
       )}
