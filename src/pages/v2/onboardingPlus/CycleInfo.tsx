@@ -145,7 +145,7 @@ export default function PlusCycleInfo() {
         title="Tvoj cyklus,"
         accentTitle="tvoj rytmus."
         accentColor={NM.MAUVE}
-        helper="Spoznaj, čo sa s tebou deje v jednotlivých fázach — energia, nálada, chute, spánok. Nič ti neprispôsobujeme; iba ti dáme jazyk, ktorým si vieš lepšie porozumieť."
+        helper="Spoznaj, čo sa s tebou deje v jednotlivých fázach, a získaj tipy, ktoré ti pomôžu cítiť sa lepšie."
         size={30}
       />
 
